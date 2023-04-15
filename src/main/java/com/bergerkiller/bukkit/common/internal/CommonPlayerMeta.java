@@ -1,9 +1,8 @@
 package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.Task;
-import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.bukkit.common.entity.CommonEntity;
+import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook_1_8_to_1_13_2;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -27,7 +26,7 @@ public class CommonPlayerMeta {
     private final LongHashSet visibleChunks = new LongHashSet(441);
     private final WeakReference<Player> playerRef;
     private final Collection<Integer> removeQueue;
-    private List<EntityNetworkController<?>> pendingViewerUpdates = Collections.emptyList();
+    private List<EntityTrackerEntryHook_1_8_to_1_13_2.ViewableLogic> pendingViewerUpdates = Collections.emptyList();
     private int respawnBlindnessEndTick = 0;
 
     protected CommonPlayerMeta(Player player) {
@@ -81,19 +80,19 @@ public class CommonPlayerMeta {
      * If this is the case, the controller will be queued and updateViewer() will be
      * called once this blindness is over.
      * 
-     * @param controller to queue if blind
+     * @param viewable to queue if blind
      * @return True if not blind, False if blind
      */
-    public boolean respawnBlindnessCheck(EntityNetworkController<?> controller) {
+    public boolean respawnBlindnessCheck(EntityTrackerEntryHook_1_8_to_1_13_2.ViewableLogic viewable) {
         if (this.respawnBlindnessEndTick != 0) {
             int num = this.respawnBlindnessEndTick - CommonUtil.getServerTicks();
             if (num > 0 && CommonPlugin.hasInstance()) {
                 // Schedule updateViewer() at a later time
                 if (this.pendingViewerUpdates.isEmpty()) {
-                    this.pendingViewerUpdates = new ArrayList<EntityNetworkController<?>>();
+                    this.pendingViewerUpdates = new ArrayList<>();
                     new ProcessPendingViewerUpdatesTask().start(num);
                 }
-                this.pendingViewerUpdates.add(controller);
+                this.pendingViewerUpdates.add(viewable);
                 return false;
             } else {
                 this.respawnBlindnessEndTick = 0;
@@ -159,20 +158,10 @@ public class CommonPlayerMeta {
         @Override
         public void run() {
             Player viewer = CommonPlayerMeta.this.getPlayer();
-            List<EntityNetworkController<?>> pendingUpdates = CommonPlayerMeta.this.pendingViewerUpdates;
+            List<EntityTrackerEntryHook_1_8_to_1_13_2.ViewableLogic> pendingUpdates = CommonPlayerMeta.this.pendingViewerUpdates;
             CommonPlayerMeta.this.pendingViewerUpdates = Collections.emptyList();
-            if (viewer == null || !viewer.isOnline()) {
-                return;
-            }
-
-            for (EntityNetworkController<?> pending : pendingUpdates) {
-                CommonEntity<?> pendingEntity = pending.getEntity();
-                if (pendingEntity == null || pendingEntity.getWorld() != viewer.getWorld()) {
-                    continue; // not bound or wrong world
-                }
-                if (pending.isViewable(viewer)) {
-                    pending.addViewer(viewer);
-                }
+            if (viewer != null && viewer.isOnline()) {
+                pendingUpdates.forEach(viewable -> viewable.handleRespawnBlindness(viewer));
             }
         }
     }

@@ -8,8 +8,8 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
+import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook_1_8_to_1_13_2;
 import com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
@@ -19,7 +19,6 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
 
@@ -464,58 +463,12 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * 
      * @param viewer
      * @return True if visible
+     * @deprecated Not a reliable way to check whether this entity is viewable. This is subject
+     *             to changes done in servers or forks of them.
      */
+    @Deprecated
     public final boolean isViewable(Player viewer) {
-        // If viewer has blindness due to respawning, do not make it visible just yet
-        // When blindness runs out, perform an updateViewer again to make this entity visible quickly
-        if (!CommonPlugin.getInstance().getPlayerMeta(viewer).respawnBlindnessCheck(this)) {
-            return false;
-        }
-
-        return isViewable_self_or_passenger(viewer);
-    }
-
-    private boolean isViewable_self_or_passenger(Player viewer) {
-        if (!com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.isSeenBy.invoker.invoke(entity.getEntity(), viewer)) {
-            return false;
-        }
-        if (isViewable_self(viewer)) {
-            return true;
-        }
-        for (Entity passenger : entity.getPassengers()) {
-            EntityNetworkController<?> network = CommonEntity.get(passenger).getNetworkController();
-            if (network != null && network.isViewable_self_or_passenger(viewer)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isViewable_self(Player viewer) {
-        // Viewer is a passenger of this Entity
-        for (Entity passenger : entity.getPassengers()) {
-            if (viewer.equals(passenger)) {
-                return true;
-            }
-        }
-        // View range check
-        final int dx = MathUtil.floor(Math.abs(EntityUtil.getLocX(viewer) - this.locSynched.getX()));
-        final int dz = MathUtil.floor(Math.abs(EntityUtil.getLocZ(viewer) - this.locSynched.getZ()));
-        final int view = this.getViewDistance();
-        if (dx > view || dz > view) {
-            return false;
-        }
-        // The entity is in a chunk not seen by the viewer
-        if (!EntityHandle.T.isIgnoreChunkCheck.invoke(entity.getHandle())
-                && !PlayerUtil.isChunkVisible(viewer, entity.getChunkX(), entity.getChunkZ())) {
-            return false;
-        }
-        // Entity is a Player hidden from sight for the viewer?
-        if (entity.getEntity() instanceof Player && !viewer.canSee((Player) entity.getEntity())) {
-            return false;
-        }
-        // It can be seen
-        return true;
+        return (new EntityTrackerEntryHook_1_8_to_1_13_2.ViewableLogic(this)).isViewable(viewer);
     }
 
     /**

@@ -335,19 +335,6 @@ class EntityTrackerEntry {
     public void hideForAll:a();
 #endif
 
-    // Since Paper 1.14+ they filter the candidates for updatePlayer() to improve performance
-    // This has the effect that updatePlayer() might be called with the intent to remove the player as a viewer
-    // This method can be used to quickly check whether that is the case
-    public boolean isTrackingStoppedPaper(Object rawEntityPlayer) {
-#if exists net.minecraft.server.level.EntityTrackerEntry com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<net.minecraft.server.level.EntityPlayer> lastTrackerCandidates;
-        #require net.minecraft.server.level.EntityTrackerEntry com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<net.minecraft.server.level.EntityPlayer> lastTrackerCandidates;
-        com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet candidates = instance#lastTrackerCandidates;
-        return candidates == null || !candidates.contains(rawEntityPlayer);
-#else
-        return false; // Not used
-#endif
-    }
-
     // These got moved to the State class, but proxy them here to keep depending plugins compatible
     <code>
     @Deprecated
@@ -664,18 +651,16 @@ class EntityTrackerEntryState {
     }
     </code>
 
-    // Special handler for the hook to use on Tuinity server
-    // Detect this by checking for the tuinity-added onTrack method
-#if exists net.minecraft.server.level.EntityTrackerEntryState public final void onTrack(EntityPlayer player);
-    public optional void onViewerAdded_tuinity:b((org.bukkit.entity.Player) EntityPlayer entityplayer);
-    public optional void removeViewerFromMap_tuinity(Object entityplayer) {
-        #require net.minecraft.server.level.EntityTrackerEntryState final java.util.Set<EntityPlayer> tuinity_trackedPlayers:trackedPlayers;
-        java.util.Set set = instance#tuinity_trackedPlayers;
-        set.remove(entityplayer);
-    }
+    // These are needed for correct remapping of the state hook
+#if version >= 1.18
+    public optional void removePairing((Object) EntityPlayer viewer);
+    public optional void addPairing((Object) EntityPlayer viewer);
+#elseif version >= 1.14
+    public optional void removePairing:a((Object) EntityPlayer viewer);
+    public optional void addPairing:b((Object) EntityPlayer viewer);
 #else
-    public optional void onViewerAdded_tuinity:###((org.bukkit.entity.Player) EntityPlayer entityplayer);
-    public optional void removeViewerFromMap_tuinity:###(Object entityplayer);
+    public optional void removePairing:###((Object) EntityPlayer viewer);
+    public optional void addPairing:###((Object) EntityPlayer viewer);
 #endif
 
 #if version >= 1.14
