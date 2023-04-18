@@ -433,7 +433,7 @@ public final class CommonMapController implements PacketListener, Listener {
         // These tasks only run when map displays on item frames are enabled
         if (this.isFrameDisplaysEnabled) {
             startedTasks.add(new MapDisplayFramedMapUpdater(plugin, this).start(1, 1));
-            startedTasks.add(new ByWorldItemFrameSetRefresher(plugin).start(1200, 1200)); // every minute
+            startedTasks.add(new ByWorldItemFrameSetRefresher(plugin).start(2400, 2400)); // every 2 minutes
         }
 
         // Whether this sort of stuff is relevant at all, in case it's set from somewhere
@@ -1485,8 +1485,25 @@ public final class CommonMapController implements PacketListener, Listener {
             Collection<World> worlds = Bukkit.getWorlds();
             synchronized (CommonMapController.this) {
                 deinitItemFrameListForWorldsNotIn(worlds);
+
+                // Verify that all item frame entities currently loaded are validly mapped
+                // If some are not, we re-initialize the listing
+                List<EntityItemFrameHandle> itemFramesToAdd = new ArrayList<>();
                 for (World world : worlds) {
-                    initItemFrameSetOfWorld(world);
+                    for (Object entityHandle : (Iterable<?>) WorldServerHandle.T.getEntities.raw.invoke(HandleConversion.toWorldHandle(world))) {
+                        if (!EntityItemFrameHandle.T.isAssignableFrom(entityHandle)) {
+                            continue;
+                        }
+                        Integer id = EntityHandle.T.getId.invoker.invoke(entityHandle);
+                        if (itemFrames.containsKey(id)) {
+                            continue;
+                        }
+                        itemFramesToAdd.add(EntityItemFrameHandle.createHandle(entityHandle));
+                    }
+                }
+                for (EntityItemFrameHandle frameHandle : itemFramesToAdd) {
+                    getItemFrameEntities(new ItemFrameClusterKey(frameHandle)).add(frameHandle);
+                    onAddItemFrame(frameHandle);
                 }
             }
         }
