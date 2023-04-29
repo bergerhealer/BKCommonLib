@@ -22,7 +22,6 @@ dependencies:
   - name: InteractiveBoard
     required: false
 load-after:
-  - name: Vault
   - name: ProtocolLib
 dev-url: ${url}
 preloader:
