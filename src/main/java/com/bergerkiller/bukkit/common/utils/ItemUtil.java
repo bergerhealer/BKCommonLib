@@ -717,7 +717,7 @@ public class ItemUtil {
                 return;
             }
         }
-        throw new RuntimeException("This item is not a CraftItemStack! Please create one using createCraftItem()");
+        throw new RuntimeException("This item is not a CraftItemStack! Please create one using createItem(ItemStack)");
     }
 
     /**
@@ -755,7 +755,7 @@ public class ItemUtil {
             }
             return tag;
         } else if (create) {
-            throw new IllegalArgumentException("This item is not a CraftItemStack! Please create one using createCraftItem()");
+            throw new IllegalArgumentException("This item is not a CraftItemStack! Please create one using createItem(ItemStack)");
         } else {
             return null; // no tags are stored in Bukkit ItemStacks
         }
@@ -840,7 +840,7 @@ public class ItemUtil {
             if (CraftItemStackHandle.T.isAssignableFrom(stack)) {
                 CommonNMS.getHandle(stack).setName(displayName);
             } else {
-                throw new RuntimeException("This item is not a CraftItemStack! Please create one using createCraftItem()");
+                throw new RuntimeException("This item is not a CraftItemStack! Please create one using createItem(ItemStack)");
             }
         } else if (hasDisplayName(stack)) {
             CommonNMS.getHandle(stack).getTag().remove("display");
