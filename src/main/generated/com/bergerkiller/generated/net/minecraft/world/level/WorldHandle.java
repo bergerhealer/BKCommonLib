@@ -114,8 +114,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         public final Template.Method.Converted<List<?>> getRawEntitiesOfType = new Template.Method.Converted<List<?>>();
         public final Template.Method.Converted<List<EntityHandle>> getNearbyEntities = new Template.Method.Converted<List<EntityHandle>>();
         public final Template.Method.Converted<TileEntityHandle> getTileEntity = new Template.Method.Converted<TileEntityHandle>();
-        @Template.Optional
-        public final Template.Method<Void> makeSound = new Template.Method<Void>();
         public final Template.Method.Converted<Boolean> isBurnArea = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Entity> getEntityById = new Template.Method.Converted<Entity>();
         public final Template.Method.Converted<Boolean> areChunksLoaded = new Template.Method.Converted<Boolean>();

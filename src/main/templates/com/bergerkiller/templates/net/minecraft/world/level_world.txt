@@ -268,13 +268,6 @@ class World extends IBlockAccess {
     public (TileEntityHandle) TileEntity getTileEntity((IntVector3) BlockPosition blockposition);
 #endif
 
-    // Used on MC 1.8.8 only!
-#if version >= 1.9
-    public optional void makeSound:###(double x, double y, double z, String name, float volume, float pitch);
-#else
-    public optional void makeSound(double x, double y, double z, String name, float volume, float pitch);
-#endif
-
 #if version >= 1.18
     public boolean isBurnArea((AxisAlignedBBHandle) AxisAlignedBB bounds) {
         java.util.stream.Stream iblockdata_in_bounds_stream = instance.getBlockStatesIfLoaded(bounds);

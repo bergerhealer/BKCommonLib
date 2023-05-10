@@ -1136,17 +1136,8 @@ public class WorldUtil extends ChunkUtil {
      * @param pitch of the sound
      */
     public static void playSound(Location location, ResourceKey<SoundEffect> soundKey, float volume, float pitch) {
-        if (WorldHandle.T.makeSound.isAvailable()) {
-            // MC 1.8.8: use world makeSound function
-            WorldHandle.T.makeSound.invokeVA(HandleConversion.toWorldHandle(location.getWorld()),
-                    location.getX(), location.getY(), location.getZ(),
-                    soundKey.getName().getName(),
-                    volume, pitch);
-        } else {
-            // MC >= 1.9: we can use Bukkit's API for this!
-            com.bergerkiller.generated.org.bukkit.WorldHandle.T.playSound.invoke(location.getWorld(),
-                    location, soundKey.getName().getName(), volume, pitch);
-        }
+        com.bergerkiller.generated.org.bukkit.WorldHandle.T.playSound.invoke(location.getWorld(),
+                location, soundKey.getName(), volume, pitch);
     }
 
     /**

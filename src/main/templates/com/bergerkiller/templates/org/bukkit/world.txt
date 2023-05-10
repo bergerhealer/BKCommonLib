@@ -1,7 +1,20 @@
 package org.bukkit;
 
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+
 class World {
-    public optional void playSound(Location loc, String sound, float volume, float pitch);
+
+    public void playSound(Location loc, MinecraftKeyHandle sound, float volume, float pitch) {
+#if version >= 1.13
+        // Since 1.13 namespace can also be specified (MinecraftKey in packet)
+        instance.playSound(loc, sound.toString(), volume, pitch);
+#elseif version >= 1.9
+        instance.playSound(loc, sound.getName(), volume, pitch);
+#else
+        net.minecraft.world.level.World worldHandle = ((org.bukkit.craftbukkit.CraftWorld) instance).getHandle();
+        worldHandle.makeSound(loc.getX(), loc.getY(), loc.getZ(), sound.getName(), volume, pitch);
+#endif
+    }
 
 #if version >= 1.17
     public int getMinHeight();

@@ -345,7 +345,9 @@ public class PlayerUtil extends EntityUtil {
      */
     public static void playSound(Player player, ResourceKey<SoundEffect> soundKey, float volume, float pitch) {
         if (soundKey != null) {
-            player.playSound(player.getEyeLocation(), soundKey.getName().getName(), volume, pitch);
+            String name = CommonCapabilities.NAMESPACED_SOUNDS
+                    ? soundKey.getName().toString() : soundKey.getName().getName();
+            player.playSound(player.getEyeLocation(), name, volume, pitch);
         }
     }
 
