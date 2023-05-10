@@ -44,7 +44,7 @@ class Entity {
     protected (org.bukkit.entity.Entity) CraftEntity bukkitEntityField:bukkitEntity;
 #endif
 
-optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
+    optional (EntityTrackerEntryHandle) net.minecraft.server.level.EntityTrackerEntry tracker;
 
 #if version >= 1.17
     private static optional java.util.concurrent.atomic.AtomicInteger opt_atomic_entityCount:ENTITY_COUNTER;

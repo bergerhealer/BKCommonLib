@@ -293,11 +293,9 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *     EntityTypes entitytypes = entity.getEntityType();
          *     int i = entitytypes.getChunkRange() * 16;
          * #endif
-         * 
-         * #if spigot
+         *
          *     i = org.spigotmc.TrackingRange.getEntityTrackingRange(entity, i);
-         * #endif
-         * 
+         *
          * #if version >= 1.18
          *     int j = entitytypes.updateInterval();
          *     boolean trackDeltas = entitytypes.trackDeltas();

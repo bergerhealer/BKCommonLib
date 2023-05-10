@@ -105,14 +105,14 @@ public class EntityTracker extends BasicWrapper<EntityTrackerHandle> {
      * @return previously set entity tracker entry, null if there was none
      */
     public EntityTrackerEntryHandle setEntry(Entity entity, EntityTrackerEntryHandle entityTrackerEntry) {
-        // On PaperSpigot, the entry is also stored in the entity itself
+        // On Paper, the entry is also stored in the entity itself
         if (EntityHandle.T.tracker.isAvailable()) {
             EntityHandle.T.tracker.set(HandleConversion.toEntityHandle(entity), entityTrackerEntry);
         }
 
         return handle.putEntry(entity.getEntityId(), entityTrackerEntry);
     }
-    
+
     /**
      * Gets the entity tracker entry of an entity
      *
