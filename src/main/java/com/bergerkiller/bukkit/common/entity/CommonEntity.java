@@ -263,7 +263,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
                 newEntry.updatePlayer(previousViewer);
             }
         } else {
-            newEntry.scanPlayers(getWorld().getPlayers());
+            newEntry.updateViewers();
         }
     }
 

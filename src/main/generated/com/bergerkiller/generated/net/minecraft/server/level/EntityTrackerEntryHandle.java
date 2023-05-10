@@ -4,7 +4,6 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import org.bukkit.entity.Player;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.level.EntityTrackerEntry</b>.
@@ -36,7 +35,7 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
     public abstract EntityTrackerEntryStateHandle getState();
     public abstract EntityHandle getEntity();
     public abstract void setEntity(EntityHandle entity);
-    public abstract void scanPlayers(List<Player> playerList);
+    public abstract void updateViewers();
     public abstract void removeViewer(Player player);
     public abstract void updatePlayer(Player player);
     public abstract void hideForAll();
@@ -82,7 +81,7 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
         public final Template.Method.Converted<Void> setState = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<EntityHandle> getEntity = new Template.Method.Converted<EntityHandle>();
         public final Template.Method.Converted<Void> setEntity = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<Void> scanPlayers = new Template.Method.Converted<Void>();
+        public final Template.Method<Void> updateViewers = new Template.Method<Void>();
         public final Template.Method.Converted<Void> removeViewer = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> updatePlayer = new Template.Method.Converted<Void>();
         public final Template.Method<Void> hideForAll = new Template.Method<Void>();

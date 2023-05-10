@@ -299,11 +299,33 @@ class EntityTrackerEntry {
         entry#trackerEntryEntity = entity;
     }
 
+    public void updateViewers() {
+        Entity entity = instance#entity;
+  #if exists net.minecraft.server.level.PlayerChunkMap$EntityTracker final void updatePlayers(com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<net.minecraft.server.level.EntityPlayer> newTrackerCandidates);
+        // Paper after some optimizations were made to tracking
+        #require net.minecraft.server.level.PlayerChunkMap$EntityTracker final void paperUpdatePlayers:updatePlayers(com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<net.minecraft.server.level.EntityPlayer> newTrackerCandidates);
+        com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet players = entity.getPlayersInTrackRange();
+        instance#paperUpdatePlayers(players);
+  #else
+        // Spigot / old paper
+    #if version >= 1.17
+        WorldServer world = (WorldServer) entity.level;
+    #else
+        WorldServer world = (WorldServer) entity.world;
+    #endif
+    #if version >= 1.18
+        java.util.List playersOnWorld = world.players();
+        instance.updatePlayers(playersOnWorld);
+    #else
+        java.util.List playersOnWorld = world.getPlayers();
+        instance.track(playersOnWorld);
+    #endif
+  #endif
+    }
+
   #if version >= 1.18
-    public void scanPlayers:updatePlayers((List<org.bukkit.entity.Player>) List<EntityPlayer> playerList);
     public void removeViewer:removePlayer((org.bukkit.entity.Player) EntityPlayer player);
   #else
-    public void scanPlayers:track((List<org.bukkit.entity.Player>) List<EntityPlayer> playerList);
     public void removeViewer:clear((org.bukkit.entity.Player) EntityPlayer player);
   #endif
 #else
@@ -323,7 +345,15 @@ class EntityTrackerEntry {
         instance#entity = entity;
     }
 
-    public void scanPlayers((List<org.bukkit.entity.Player>) List<EntityHuman> playerList);
+    public void updateViewers() {
+        Entity entity = instance#entity;
+
+        // Spigot / old paper
+        WorldServer world = (WorldServer) entity.world;
+        java.util.List playersOnWorld = world.players;
+        instance.scanPlayers(playersOnWorld);
+    }
+
     public void removeViewer:a((org.bukkit.entity.Player) EntityPlayer player);
 #endif
 
