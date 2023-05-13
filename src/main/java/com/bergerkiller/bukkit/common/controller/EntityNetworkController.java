@@ -416,6 +416,15 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
     }
 
     /**
+     * Gets the internal Entity Tracker State data
+     *
+     * @return state handle
+     */
+    public EntityTrackerEntryStateHandle getStateHandle() {
+        return state;
+    }
+
+    /**
      * Gets a collection of all Players viewing this Entity
      *
      * @return viewing players

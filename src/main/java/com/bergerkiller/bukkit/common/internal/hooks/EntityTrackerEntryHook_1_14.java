@@ -77,17 +77,16 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
     @ClassHook.HookPackage("net.minecraft.server")
     @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
     public class StateHook extends ClassHook<StateHook> {
-
         @HookMethod("public void onTick:???()")
         public void onTick() {
-            EntityTrackerEntryStateHandle handle = EntityTrackerEntryStateHandle.createHandle(instance());
-            handle.setTimeSinceLocationSync(handle.getTimeSinceLocationSync() + 1);
             try {
+                EntityTrackerEntryStateHandle handle = controller.getStateHandle();
+                handle.setTimeSinceLocationSync(handle.getTimeSinceLocationSync() + 1);
                 controller.onTick();
+                handle.setTickCounter(handle.getTickCounter() + 1);
             } catch (Throwable t) {
                 Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to synchronize", t);
             }
-            handle.setTickCounter(handle.getTickCounter() + 1);
         }
 
         @HookMethod("public void removePairing:???(EntityPlayer entityPlayer)")
