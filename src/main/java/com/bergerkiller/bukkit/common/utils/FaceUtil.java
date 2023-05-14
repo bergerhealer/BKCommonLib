@@ -12,6 +12,7 @@ public class FaceUtil {
     public static final BlockFace[] BLOCK_SIDES = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
     public static final BlockFace[] ATTACHEDFACES = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP};
     public static final BlockFace[] ATTACHEDFACESDOWN = BLOCK_SIDES;
+    private static final double SUBCARDINAL_LIMIT = 2.4142135623730950488; // cos(22.5)/sin(22.5) OR 1+sqrt(2) - also called 'silver ratio'
     private static final int[] notches;
 
     static {
@@ -371,7 +372,48 @@ public class FaceUtil {
      * @return the Block Face of the direction
      */
     public static BlockFace getDirection(final double dx, final double dz, boolean useSubCardinalDirections) {
-        return yawToFace(MathUtil.getLookAtYaw(dx, dz), useSubCardinalDirections);
+        if (useSubCardinalDirections) {
+            double dz_lim = dz * SUBCARDINAL_LIMIT;
+            if (dz < 0.0) {
+                if (dx < dz_lim) {
+                    return BlockFace.WEST;
+                } else if (-dx < dz_lim) {
+                    return BlockFace.EAST;
+                } else if (dx < 0.0) {
+                    return (dz < (dx * SUBCARDINAL_LIMIT)) ? BlockFace.NORTH : BlockFace.NORTH_WEST;
+                } else {
+                    return (-dz >= (dx * SUBCARDINAL_LIMIT)) ? BlockFace.NORTH : BlockFace.NORTH_EAST;
+                }
+            } else {
+                if (dx > dz_lim) {
+                    return BlockFace.EAST;
+                } else if (-dx > dz_lim) {
+                    return BlockFace.WEST;
+                } else if (dx > 0.0) {
+                    return (dz > (dx * SUBCARDINAL_LIMIT)) ? BlockFace.SOUTH : BlockFace.SOUTH_EAST;
+                } else {
+                    return (dz >= -(dx * SUBCARDINAL_LIMIT)) ? BlockFace.SOUTH : BlockFace.SOUTH_WEST;
+                }
+            }
+        } else {
+            if (dz > 0.0) {
+                if (dx < dz) {
+                    return BlockFace.WEST;
+                } else if (-dx < dz) {
+                    return BlockFace.EAST;
+                } else {
+                    return BlockFace.NORTH;
+                }
+            } else {
+                if (dx > dz) {
+                    return BlockFace.EAST;
+                } else if (-dx > dz) {
+                    return BlockFace.WEST;
+                } else {
+                    return BlockFace.SOUTH;
+                }
+            }
+        }
     }
 
     /**
