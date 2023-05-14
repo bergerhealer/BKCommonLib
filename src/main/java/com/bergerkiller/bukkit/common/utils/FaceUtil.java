@@ -396,7 +396,7 @@ public class FaceUtil {
                 }
             }
         } else {
-            if (dz > 0.0) {
+            if (dz < 0.0) {
                 if (dx < dz) {
                     return BlockFace.WEST;
                 } else if (-dx < dz) {
