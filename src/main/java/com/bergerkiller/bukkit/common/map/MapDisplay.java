@@ -944,9 +944,25 @@ public class MapDisplay implements MapDisplayEvents {
     }
 
     /**
+     * Convenience function for playing sounds to the viewers of this map display
+     *
+     * @param soundKey of the sound to play
+     * @param category of the sound. Sets what sliders control playback volume
+     * @param volume of the sound
+     * @param pitch of the sound
+     */
+    public void playSound(ResourceKey<SoundEffect> soundKey, String category, float volume, float pitch) {
+        for (Player viewer : this.getViewers()) {
+            if (this._playSoundToAllViewers || this.isHolding(viewer)) {
+                PlayerUtil.playSound(viewer, soundKey, category, this._masterVolume * volume, pitch);
+            }
+        }
+    }
+
+    /**
      * Sends a status change event without argument to this map display and all widgets attached to it.
      * First {@link #onStatusChanged(MapStatusEvent)} is called for all widgets, then for this display.
-     * 
+     *
      * @param name of the status change
      */
     public final void sendStatusChange(String name) {

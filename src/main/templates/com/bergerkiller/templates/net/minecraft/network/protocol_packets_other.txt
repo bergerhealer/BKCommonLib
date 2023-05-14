@@ -77,6 +77,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomPayloadHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSetSlotHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundBundlePacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
@@ -1519,9 +1520,14 @@ class PacketPlayOutNamedSoundEffect extends Packet {
 
 }
 
-// Since MC 1.9
-optional class PacketPlayOutCustomSoundEffect extends Packet {
-#if version >= 1.17
+// This packet class is handled by PacketPlayOutNamedSoundEffect on MC 1.8 - 1.8.8, where it
+// can only really play Vanilla sound effects.
+// It is also handled by PacketPlayOutNamedSoundEffect on MC 1.19.3+ where the two packets
+// were merged into one.
+class PacketPlayOutCustomSoundEffect extends Packet {
+#if version >= 1.19.3
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.core.Holder<net.minecraft.sounds.SoundEffect> sound;
+#elseif version >= 1.17
     private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.resources.MinecraftKey sound:name;
 #elseif version >= 1.13
     private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.resources.MinecraftKey sound:a;
@@ -1530,47 +1536,106 @@ optional class PacketPlayOutCustomSoundEffect extends Packet {
 #endif
 
 #if version >= 1.17
-    private (String) SoundCategory category:source;
-    private int x;
-    private int y;
-    private int z;
     private float volume;
-#else
-    private (String) SoundCategory category:b;
-    private int x:c;
-    private int y:d;
-    private int z:e;
+#elseif version >= 1.9
     private float volume:f;
+#else
+    private float volume:e;
 #endif
 
-#if version >= 1.17
-    private optional float opt_pitch_float:pitch;
-    private optional int opt_pitch_integer:###;
-#elseif version >= 1.10.2
-    private optional float opt_pitch_float:g;
-    private optional int opt_pitch_integer:###;
+#if version >= 1.19.3
+    // Note: is PacketPlayOutNamedSoundEffect
+    public static (PacketPlayOutCustomSoundEffectHandle) PacketPlayOutCustomSoundEffect createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.core.Holder<net.minecraft.sounds.SoundEffect> soundEffect, (String) SoundCategory category, double x, double y, double z, float volume, float pitch, long randomSeed) {
+        return new PacketPlayOutCustomSoundEffect(soundEffect, category, x, y, z, volume, pitch, randomSeed);
+    }
+#elseif version >= 1.13
+    public static (PacketPlayOutCustomSoundEffectHandle) PacketPlayOutCustomSoundEffect createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.resources.MinecraftKey soundEffect, (String) SoundCategory category, double x, double y, double z, float volume, float pitch, long randomSeed) {
+  #if version >= 1.19
+        return new PacketPlayOutCustomSoundEffect(soundEffect, category, new Vec3D(x, y, z), volume, pitch, randomSeed);
+  #else
+        return new PacketPlayOutCustomSoundEffect(soundEffect, category, new Vec3D(x, y, z), volume, pitch);
+  #endif
+    }
+#elseif version >= 1.9
+    public static (PacketPlayOutCustomSoundEffectHandle) PacketPlayOutCustomSoundEffect createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String soundEffect, (String) SoundCategory category, double x, double y, double z, float volume, float pitch, long randomSeed) {
+        return new PacketPlayOutCustomSoundEffect(soundEffect, category, x, y, z, volume, pitch);
+    }
 #else
-    private optional float opt_pitch_float:###;
-    private optional int opt_pitch_integer:g;
+    // Note: no sound category supported. Is PacketPlayOutNamedSoundEffect
+    public static (PacketPlayOutCustomSoundEffectHandle) PacketPlayOutCustomSoundEffect createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String soundEffect, (String) String category, double x, double y, double z, float volume, float pitch, long randomSeed) {
+        return new PacketPlayOutCustomSoundEffect(soundEffect, x, y, z, volume, pitch);
+    }
 #endif
 
     <code>
-    public void setPitch(float pitch) {
-        if (T.opt_pitch_float.isAvailable()) {
-            T.opt_pitch_float.setFloat(getRaw(), pitch);
-        } else {
-            T.opt_pitch_integer.setInteger(getRaw(), (int) (pitch * 63.0f));
-        }
+    public static PacketPlayOutCustomSoundEffectHandle createNew(com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect> soundEffect, String category, org.bukkit.Location location, float volume, float pitch) {
+        return createNew(soundEffect, category, location.getWorld(), location.getX(), location.getY(), location.getZ(), volume, pitch);
     }
 
-    public float getPitch() {
-        if (T.opt_pitch_float.isAvailable()) {
-            return T.opt_pitch_float.getFloat(getRaw());
-        } else {
-            return (float) T.opt_pitch_integer.getInteger(getRaw()) / 63.0f;
-        }
+    public static PacketPlayOutCustomSoundEffectHandle createNew(com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect> soundEffect, String category, org.bukkit.World world, double x, double y, double z, float volume, float pitch) {
+        long randomSeed = com.bergerkiller.bukkit.common.utils.WorldUtil.getRandom(world).nextLong();
+        return createNew(soundEffect, category, x, y, z, volume, pitch, randomSeed);
     }
     </code>
+
+#if version >= 1.17
+    #require PacketPlayOutCustomSoundEffect private (String) SoundCategory customSoundCategory:source;
+    #require PacketPlayOutCustomSoundEffect private int customSoundX:x;
+    #require PacketPlayOutCustomSoundEffect private int customSoundY:y;
+    #require PacketPlayOutCustomSoundEffect private int customSoundZ:z;
+    #require PacketPlayOutCustomSoundEffect private float customSoundPitch:pitch;
+#elseif version >= 1.9
+    #require PacketPlayOutCustomSoundEffect private (String) SoundCategory customSoundCategory:b;
+    #require PacketPlayOutCustomSoundEffect private int customSoundX:c;
+    #require PacketPlayOutCustomSoundEffect private int customSoundY:d;
+    #require PacketPlayOutCustomSoundEffect private int customSoundZ:e;
+  #if version <= 1.10.2
+    #require PacketPlayOutCustomSoundEffect private float customSoundPitch:g;
+  #else
+    #require PacketPlayOutCustomSoundEffect private int customSoundPitchInt:g;
+  #endif
+#else
+    #require PacketPlayOutCustomSoundEffect private int customSoundX:b;
+    #require PacketPlayOutCustomSoundEffect private int customSoundY:c;
+    #require PacketPlayOutCustomSoundEffect private int customSoundZ:d;
+    #require PacketPlayOutCustomSoundEffect private int customSoundPitchInt:f;
+#endif
+
+    // Category supported since 1.9
+#if version >= 1.9
+    public String getCategory() { return instance#customSoundCategory; }
+    public void setCategory(String category) { instance#customSoundCategory = category; }
+#else
+    public String getCategory() { return "master"; }
+    public void setCategory(String category) { /* No-op */ }
+#endif
+
+    // x/y/z fields are encoded as int fields x8 scale
+    public double getX() { return (double) instance#customSoundX / 8.0; }
+    public double getY() { return (double) instance#customSoundY / 8.0; }
+    public double getZ() { return (double) instance#customSoundZ / 8.0; }
+    public void setX(double x) { instance#customSoundX = (int)(x*8.0); }
+    public void setY(double y) { instance#customSoundY = (int)(y*8.0); }
+    public void setZ(double z) { instance#customSoundZ = (int)(z*8.0); }
+
+    // For whatever ungodly reason Pitch was encoded as int at one point
+#if version >= 1.10.2
+    public void setPitch(float pitch) { instance#customSoundPitch = pitch; }
+    public float getPitch() { return instance#customSoundPitch; }
+#else
+    public void setPitch(float pitch) { instance#customSoundPitchInt = (int)(pitch*63.0f); }
+    public float getPitch() { return (float) instance#customSoundPitchInt / 63.0f; }
+#endif
+
+    // New 'seed' field since 1.19
+#if version >= 1.19
+    #require PacketPlayOutCustomSoundEffect private final long customSoundSeed:seed;
+    public long getRandomSeed() { return instance#customSoundSeed; }
+    public void setRandomSeed(long seed) { instance#customSoundSeed = seed; }
+#else
+    public long getRandomSeed() { return 0L; }
+    public void setRandomSeed(long seed) { /* No-op */ }
+#endif
 }
 
 class PacketPlayInSteerVehicle extends Packet {

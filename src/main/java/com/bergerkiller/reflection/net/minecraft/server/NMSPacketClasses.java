@@ -768,10 +768,54 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutCustomSoundEffect extends NMSPacket {
 
         public final FieldAccessor<ResourceKey<SoundEffect>> sound = PacketPlayOutCustomSoundEffectHandle.T.sound.toFieldAccessor();
-        public final FieldAccessor<String> category = PacketPlayOutCustomSoundEffectHandle.T.category.toFieldAccessor();
-        public final FieldAccessor<Integer> x = PacketPlayOutCustomSoundEffectHandle.T.x.toFieldAccessor();
-        public final FieldAccessor<Integer> y = PacketPlayOutCustomSoundEffectHandle.T.y.toFieldAccessor();
-        public final FieldAccessor<Integer> z = PacketPlayOutCustomSoundEffectHandle.T.z.toFieldAccessor();
+        public final FieldAccessor<String> category = new SafeDirectField<String>() {
+            @Override
+            public String get(Object instance) {
+                return PacketPlayOutCustomSoundEffectHandle.createHandle(instance).getCategory();
+            }
+
+            @Override
+            public boolean set(Object instance, String value) {
+                PacketPlayOutCustomSoundEffectHandle.createHandle(instance).setCategory(value);
+                return false;
+            }
+        };
+        public final FieldAccessor<Double> x = new SafeDirectField<Double>() {
+            @Override
+            public Double get(Object instance) {
+                return Double.valueOf(PacketPlayOutCustomSoundEffectHandle.createHandle(instance).getX());
+            }
+
+            @Override
+            public boolean set(Object instance, Double value) {
+                PacketPlayOutCustomSoundEffectHandle.createHandle(instance).setX(value.floatValue());
+                return true;
+            }
+        };
+        public final FieldAccessor<Double> y = new SafeDirectField<Double>() {
+            @Override
+            public Double get(Object instance) {
+                return Double.valueOf(PacketPlayOutCustomSoundEffectHandle.createHandle(instance).getY());
+            }
+
+            @Override
+            public boolean set(Object instance, Double value) {
+                PacketPlayOutCustomSoundEffectHandle.createHandle(instance).setY(value.floatValue());
+                return true;
+            }
+        };
+        public final FieldAccessor<Double> z = new SafeDirectField<Double>() {
+            @Override
+            public Double get(Object instance) {
+                return Double.valueOf(PacketPlayOutCustomSoundEffectHandle.createHandle(instance).getZ());
+            }
+
+            @Override
+            public boolean set(Object instance, Double value) {
+                PacketPlayOutCustomSoundEffectHandle.createHandle(instance).setZ(value.floatValue());
+                return true;
+            }
+        };
         public final FieldAccessor<Float> volume = PacketPlayOutCustomSoundEffectHandle.T.volume.toFieldAccessor();
         public final FieldAccessor<Float> pitch = new SafeDirectField<Float>() {
             @Override

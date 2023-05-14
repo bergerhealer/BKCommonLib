@@ -27,12 +27,22 @@ class RegistryMaterials {
     public (Object) K getKey:c(V value);
 #endif
 
-#if version >= 1.18.2
-    public optional Object rawResourceKeyToHolder(Object resourceKey) {
+#if version >= 1.19.3
+    public optional Object rawSoundEffectResourceKeyToHolder(Object resourceKey) {
+        net.minecraft.resources.ResourceKey resourceKeyCasted = (net.minecraft.resources.ResourceKey) resourceKey;
+        java.util.Optional holderOpt = instance.getHolder(resourceKeyCasted);
+        if (holderOpt.isPresent()) {
+            return holderOpt.get();
+        } else {
+            return net.minecraft.core.Holder.direct(net.minecraft.sounds.SoundEffect.createVariableRangeEvent(resourceKeyCasted.location()));
+        }
+    }
+#elseif version >= 1.18.2
+    public optional Object rawSoundEffectResourceKeyToHolder(Object resourceKey) {
         return instance.getHolderOrThrow((net.minecraft.resources.ResourceKey) resourceKey);
     }
 #else
-    public optional Object rawResourceKeyToHolder:###(Object resourceKey);
+    public optional Object rawSoundEffectResourceKeyToHolder:###(Object resourceKey);
 #endif
 }
 

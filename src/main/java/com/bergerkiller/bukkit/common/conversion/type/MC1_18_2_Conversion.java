@@ -87,7 +87,7 @@ public class MC1_18_2_Conversion {
     @ConverterMethod(output="net.minecraft.core.Holder<net.minecraft.sounds.SoundEffect>")
     public static Object soundEffectHolderFromResourceKey(ResourceKey<SoundEffect> soundKey) {
         Object raw_registry = SoundEffectHandle.T.opt_getRegistry.raw.invoke();
-        return RegistryMaterialsHandle.T.rawResourceKeyToHolder.invoke(raw_registry, soundKey.getRawHandle());
+        return RegistryMaterialsHandle.T.rawSoundEffectResourceKeyToHolder.invoke(raw_registry, soundKey.getRawHandle());
     }
 
     @Template.Optional

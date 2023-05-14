@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutWorldParticlesHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
@@ -344,11 +345,20 @@ public class PlayerUtil extends EntityUtil {
      * @param pitch of the sound
      */
     public static void playSound(Player player, ResourceKey<SoundEffect> soundKey, float volume, float pitch) {
-        if (soundKey != null) {
-            String name = CommonCapabilities.NAMESPACED_SOUNDS
-                    ? soundKey.getName().toString() : soundKey.getName().getName();
-            player.playSound(player.getEyeLocation(), name, volume, pitch);
-        }
+        playSound(player, player.getEyeLocation(), soundKey, "master", volume, pitch);
+    }
+
+    /**
+     * Plays a named sound effect at the player's location for a single player
+     *
+     * @param player to play for and play at
+     * @param soundKey of the sound to play
+     * @param category of the sound. Sets what sliders control playback volume
+     * @param volume of the sound
+     * @param pitch of the sound
+     */
+    public static void playSound(Player player, ResourceKey<SoundEffect> soundKey, String category, float volume, float pitch) {
+        playSound(player, player.getEyeLocation(), soundKey, category, volume, pitch);
     }
 
     /**
@@ -361,8 +371,23 @@ public class PlayerUtil extends EntityUtil {
      * @param pitch of the sound
      */
     public static void playSound(Player player, Location location, ResourceKey<SoundEffect> soundKey, float volume, float pitch) {
+        playSound(player, location, soundKey, "master", volume, pitch);
+    }
+
+    /**
+     * Plays a named sound effect at a location for a single player
+     *
+     * @param player to play for
+     * @param location to play at
+     * @param soundKey of the sound to play
+     * @param category of the sound. Sets what sliders control playback volume
+     * @param volume of the sound
+     * @param pitch of the sound
+     */
+    public static void playSound(Player player, Location location, ResourceKey<SoundEffect> soundKey, String category, float volume, float pitch) {
         if (soundKey != null) {
-            player.playSound(location, soundKey.getName().getName(), volume, pitch);
+            PacketUtil.sendPacket(player, PacketPlayOutCustomSoundEffectHandle.createNew(
+                    soundKey, category, location, volume, pitch));
         }
     }
 

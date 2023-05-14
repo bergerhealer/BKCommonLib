@@ -434,6 +434,10 @@ public class CommonBootstrap {
             // PacketPlayInUseItem and PacketPlayInBlockPlace were merged as one packet on these versions
             remappings.put("net.minecraft.network.protocol.game.PacketPlayInUseItem", "net.minecraft.network.protocol.game.PacketPlayInBlockPlace");
 
+            // PacketPlayOutCustomSoundEffect does not yet exist on 1.8 - 1.8.8, it is proxied by
+            // the PacketPlayOutNamedSoundEffect packet so it still (mostly) works
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffect", "net.minecraft.network.protocol.game.PacketPlayOutNamedSoundEffect");
+
             // We proxy a bunch of classes, because they don't exist in 1.8.8
             // Writing custom wrappers with switches would be too tiresome
             // This allows continued use of the same API without trouble
@@ -651,6 +655,8 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket");
             remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$a");
             remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$PlayerInfoData", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$b");
+            // CustomSoundEffect was removed as of 1.19.3, now fully handled by the unified NamedSoundEffect packet
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffect", "net.minecraft.network.protocol.game.PacketPlayOutNamedSoundEffect");
         } else {
             // BuiltInRegistries class does not exist, but all relevant fields are found in IRegistry instead
             remappings.put("net.minecraft.core.registries.BuiltInRegistries", "net.minecraft.core.IRegistry");

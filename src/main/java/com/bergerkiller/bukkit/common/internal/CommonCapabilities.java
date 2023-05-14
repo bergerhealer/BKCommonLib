@@ -145,11 +145,6 @@ public class CommonCapabilities {
     public static final boolean BLOCK_SLAB_HAS_OWN_BLOCK = CommonBootstrap.evaluateMCVersion(">=", "1.13");
 
     /**
-     * Since Minecraft 1.13 sound names can contain namespaces
-     */
-    public static final boolean NAMESPACED_SOUNDS = CommonBootstrap.evaluateMCVersion(">=", "1.13");
-
-    /**
      * Whether the ForcedChunk provider can make use of a chunk (plugin) ticket API to keep chunks loaded
      */
     public static final boolean HAS_CHUNK_TICKET_API = CommonBootstrap.evaluateMCVersion(">=", "1.13.1");
