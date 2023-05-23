@@ -7,6 +7,8 @@ import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
  */
 public final class Brightness {
     private final int block, sky, packed;
+    /** Special brightness value that indicates no brightness override is configured */
+    public static final Brightness UNSET = new Brightness(-1, -1, -1);
     /** No light is emitted at all */
     public static final Brightness NONE = new Brightness(0, 0);
     /** Full light levels, both block and sky light, are emitted */
@@ -17,9 +19,13 @@ public final class Brightness {
     public static final Brightness FULL_SKY = new Brightness(0, 15);
 
     private Brightness(int block, int sky) {
+        this(block, sky, (block << 4 | sky << 20));
+    }
+
+    private Brightness(int block, int sky, int packed) {
         this.block = block;
         this.sky = sky;
-        this.packed = (block << 4 | sky << 20);
+        this.packed = packed;
     }
 
     /**
@@ -79,6 +85,10 @@ public final class Brightness {
      */
     @ConverterMethod
     public static Brightness unpack(int packed) {
+        if (packed == -1) {
+            return UNSET;
+        }
+
         int j = packed >> 4 & '\uffff';
         int k = packed >> 20 & '\uffff';
 
@@ -114,5 +124,22 @@ public final class Brightness {
      */
     public static Brightness skyLight(int skyLightlevel) {
         return new Brightness(0, skyLightlevel);
+    }
+
+    @Override
+    public int hashCode() {
+        return packed;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        } else if (o instanceof Brightness) {
+            Brightness b = (Brightness) o;
+            return block == b.block && sky == b.sky;
+        } else {
+            return false;
+        }
     }
 }
