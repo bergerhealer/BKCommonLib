@@ -830,6 +830,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             public static final Type<BlockData> BLOCK_DATA = CommonCapabilities.HAS_BLOCKDATA_METADATA
                     ? getForType(BlockData.class) : missing();
             public static final Type<ItemDisplayMode> ITEM_DISPLAY_MODE = BYTE.translate(ItemDisplayMode.class);
+            public static final Type<Brightness> DISPLAY_BRIGHTNESS = INTEGER.translate(Brightness.class);
 
             // Used by missing() only
             private Type() {

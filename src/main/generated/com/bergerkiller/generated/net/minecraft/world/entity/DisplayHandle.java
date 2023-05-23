@@ -29,7 +29,7 @@ public abstract class DisplayHandle extends EntityHandle {
     public static final Key<com.bergerkiller.bukkit.common.math.Quaternion> DATA_LEFT_ROTATION = Key.Type.JOML_QUATERNIONF.createKey(T.DATA_LEFT_ROTATION_ID, -1);
     public static final Key<com.bergerkiller.bukkit.common.math.Quaternion> DATA_RIGHT_ROTATION = Key.Type.JOML_QUATERNIONF.createKey(T.DATA_RIGHT_ROTATION_ID, -1);
     public static final Key<Byte> DATA_BILLBOARD_RENDER_CONSTRAINTS = Key.Type.BYTE.createKey(T.DATA_BILLBOARD_RENDER_CONSTRAINTS_ID, -1);
-    public static final Key<Integer> DATA_BRIGHTNESS_OVERRIDE = Key.Type.INTEGER.createKey(T.DATA_BRIGHTNESS_OVERRIDE_ID, -1);
+    public static final Key<com.bergerkiller.bukkit.common.wrappers.Brightness> DATA_BRIGHTNESS_OVERRIDE = Key.Type.DISPLAY_BRIGHTNESS.createKey(T.DATA_BRIGHTNESS_OVERRIDE_ID, -1);
     public static final Key<Float> DATA_VIEW_RANGE = Key.Type.FLOAT.createKey(T.DATA_VIEW_RANGE_ID, -1);
     public static final Key<Float> DATA_SHADOW_RADIUS = Key.Type.FLOAT.createKey(T.DATA_SHADOW_RADIUS_ID, -1);
     public static final Key<Float> DATA_SHADOW_STRENGTH = Key.Type.FLOAT.createKey(T.DATA_SHADOW_STRENGTH_ID, -1);
