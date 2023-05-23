@@ -41,7 +41,8 @@ public class Common {
             "Common:MapDisplay:BoundsChangeViewFix",
             "Common:EntitySlimeHandle",
             "Common:PlayerGameInfo",
-            "Common:Yaml:BetterChangeListeners"
+            "Common:Yaml:BetterChangeListeners",
+            "Common:DisplayEntity:Brightness"
     ).collect(Collectors.toSet());
 
     /**
