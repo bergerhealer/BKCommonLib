@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common;
 
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import org.bukkit.Material;
 
 import java.util.*;
@@ -18,11 +20,17 @@ public abstract class MaterialBooleanProperty extends MaterialProperty<Boolean> 
      */
     public Collection<Material> getMaterials() {
         List<Material> mats = new ArrayList<Material>(20);
-        for (Material mat : mats) {
+        for (Material mat : MaterialUtil.getAllMaterials()) {
+            // Only include 1.13+ material names on 1.13+, exclude LEGACY_
+            if (CommonCapabilities.MATERIAL_ENUM_CHANGES && MaterialUtil.isLegacyType(mat)) {
+                continue;
+            }
+
             if (Boolean.TRUE.equals(get(mat))) {
                 mats.add(mat);
             }
         }
+
         return Collections.unmodifiableCollection(mats);
     }
 

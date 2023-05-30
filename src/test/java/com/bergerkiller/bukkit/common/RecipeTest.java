@@ -20,6 +20,12 @@ import com.bergerkiller.bukkit.common.utils.RecipeUtil;
 public class RecipeTest {
 
     @Test
+    public void testFurnaceHeatablesAndFuels() {
+        assertTrue(MaterialUtil.ISFUEL.toString().length() > 100);
+        assertTrue(MaterialUtil.ISHEATABLE.toString().length() > 100);
+    }
+
+    @Test
     public void testFireworkRecipe() {
         Material fireworkType = MaterialUtil.getFirst("FIREWORK_ROCKET", "LEGACY_FIREWORK");
         CraftRecipe[] recipes = RecipeUtil.getCraftingRequirements(fireworkType, -1);
