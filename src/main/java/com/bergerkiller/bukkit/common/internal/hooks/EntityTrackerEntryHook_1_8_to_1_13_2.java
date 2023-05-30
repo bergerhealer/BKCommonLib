@@ -36,16 +36,13 @@ public class EntityTrackerEntryHook_1_8_to_1_13_2 extends ClassHook<EntityTracke
         this.viewable = (controller == null) ? null : new ViewableLogic(controller);
     }
 
-    @HookMethod("public void scanPlayers(List<EntityHuman> list)")
-    public void scanPlayers(List<?> list) {
-        base.scanPlayers(list);
-    }
-
     @HookMethod("public void track(List<EntityHuman> list)")
     public void track(List<?> list) {
         EntityTrackerEntryStateHandle handle = EntityTrackerEntryStateHandle.createHandle(instance());
         if (handle.checkTrackNeeded()) {
-            scanPlayers(list);
+            for (Object player : list) {
+                updatePlayer(player);
+            }
         }
         handle.setTimeSinceLocationSync(handle.getTimeSinceLocationSync() + 1);
         try {

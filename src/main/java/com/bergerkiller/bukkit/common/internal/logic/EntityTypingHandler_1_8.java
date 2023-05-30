@@ -1,5 +1,8 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +34,7 @@ class EntityTypingHandler_1_8 extends EntityTypingHandler {
     private final WorldServerHandle dummyTrackerWorld;
     private final EntityTrackerHandle dummyTracker;
     private final IntHashMap<Object> entriesMap;
-    private final HashSet<Object> entriesSet;
+    private final Collection<Object> entries;
     private final FastMethod<Object> fallbackConstructor;
 
     public EntityTypingHandler_1_8() {
@@ -43,10 +46,9 @@ class EntityTypingHandler_1_8 extends EntityTypingHandler {
 
         // Initialize the dummy tracker without calling any methods/constructors
         this.entriesMap = new IntHashMap<Object>();
-        this.entriesSet = new HashSet<Object>();
         this.dummyTracker = EntityTrackerHandle.T.newHandleNull();
-        SafeField.create(EntityTrackerHandle.T.getType(), "c", Set.class).set(this.dummyTracker.getRaw(), this.entriesSet);
-        EntityTrackerHandle.T.world.raw.set(dummyTracker.getRaw(), dummyTrackerWorld.getRaw());
+        this.entries = tryInitEntries(this.dummyTracker.getRaw());
+        EntityTrackerHandle.T.setWorld.raw.invoke(dummyTracker.getRaw(), dummyTrackerWorld.getRaw());
         SafeField.set(this.dummyTracker.getRaw(), "trackedEntities", this.entriesMap.getRawHandle());
 
         // Find the fallback constructor for EntityTrackerEntry if track() fails to create one
@@ -68,6 +70,30 @@ class EntityTypingHandler_1_8 extends EntityTypingHandler {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private static Collection<Object> tryInitEntries(Object instance) {
+        try {
+            Field entriesField = EntityTrackerHandle.T.getType().getDeclaredField("c");
+            entriesField.setAccessible(true);
+            Collection<Object> result;
+            if (entriesField.getType().equals(Set.class) || entriesField.getType().equals(HashSet.class)) {
+                result = new HashSet<>();
+            } else if (entriesField.getType().equals(List.class)) {
+                result = new ArrayList<>();
+            } else if (entriesField.getType().getName().equals("me.rastrian.dev.utils.IndexedLinkedHashSet")) {
+                result = (Collection<Object>) entriesField.getType().getConstructor().newInstance();
+            } else {
+                throw new UnsupportedOperationException("Unsupported entries set type: " + entriesField.getType());
+            }
+
+            entriesField.set(instance, result);
+            return result;
+        } catch (Throwable t) {
+            Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to find EntityTracker flat entries 'c' set", t);
+            return new ArrayList<>();
+        }
+    }
+
     @Override
     public void enable() {
     }
@@ -86,7 +112,7 @@ class EntityTypingHandler_1_8 extends EntityTypingHandler {
         EntityTrackerEntryHandle createdEntry = null;
         try {
             // Reset
-            this.entriesSet.clear();
+            this.entries.clear();
             this.entriesMap.clear();
 
             // Track it!

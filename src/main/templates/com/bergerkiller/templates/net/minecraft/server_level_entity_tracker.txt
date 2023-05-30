@@ -15,10 +15,17 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 class EntityTracker {
 #if version >= 1.14
   #if version >= 1.17
-    public final (org.bukkit.World) WorldServer world:level;
+    #require net.minecraft.server.level.EntityTracker public final net.minecraft.server.level.WorldServer world:level;
   #else
-    public final (org.bukkit.World) WorldServer world;
+    #require net.minecraft.server.level.EntityTracker public final net.minecraft.server.level.WorldServer world;
   #endif
+
+    public (org.bukkit.World) WorldServer getWorld() {
+        return instance#world;
+    }
+    public void setWorld((org.bukkit.World) WorldServer world) {
+        instance#world = world;
+    }
 
   #if version >= 1.17
     #require net.minecraft.server.level.EntityTracker public final it.unimi.dsi.fastutil.ints.Int2ObjectMap<PlayerChunkMap.EntityTracker> trackedEntities:entityMap;
@@ -67,12 +74,42 @@ class EntityTracker {
   #endif
 
 #else
+  #if exists net.minecraft.server.level.EntityTracker private final List<EntityTrackerEntry> c;
+    // CopyOnWrite List on WindSpigot / others? on MC 1.8.8
+    #require net.minecraft.server.level.EntityTracker private final List<EntityTrackerEntry> trackedEntitiesSet:c;
+  #elseif exists net.minecraft.server.level.EntityTracker public me.rastrian.dev.utils.IndexedLinkedHashSet<net.minecraft.server.level.EntityTrackerEntry> c;
+    // Also seems to be used on (older?) WindSpigot/NachoSpigot 1.8.8 crap
+    #require net.minecraft.server.level.EntityTracker public me.rastrian.dev.utils.IndexedLinkedHashSet<net.minecraft.server.level.EntityTrackerEntry> trackedEntitiesSet:c;
+  #else
     #require net.minecraft.server.level.EntityTracker private final Set<EntityTrackerEntry> trackedEntitiesSet:c;
+  #endif
 
-    private final (org.bukkit.World) WorldServer world;
+    public (org.bukkit.World) WorldServer getWorld() {
+  #if exists net.minecraft.server.level.EntityTracker private final net.minecraft.server.level.WorldServer world;
+        #require net.minecraft.server.level.EntityTracker private final net.minecraft.server.level.WorldServer world;
+        return instance#world;
+  #else
+        // WindSpigot removed this field for whatever reason. Must iterate the server worlds to figure this one out.
+        java.util.Iterator worlds_iter = net.minecraft.server.MinecraftServer.getServer().worlds.iterator();
+        while (worlds_iter.hasNext()) {
+            net.minecraft.server.level.WorldServer world = (net.minecraft.server.level.WorldServer) worlds_iter.next();
+            if (world.tracker == instance) {
+                return world;
+            }
+        }
+        throw new UnsupportedOperationException("Entity tracker not used by any World for some reason");
+  #endif
+    }
+
+    public void setWorld((org.bukkit.World) WorldServer world) {
+  #if exists net.minecraft.server.level.EntityTracker private final net.minecraft.server.level.WorldServer world;
+        #require net.minecraft.server.level.EntityTracker private final net.minecraft.server.level.WorldServer world;
+        instance#world = world;
+  #endif
+    }
 
     public (Collection<EntityTrackerEntryHandle>) Collection<EntityTrackerEntry> getEntries() {
-        return instance#trackedEntitiesSet;
+        return (java.util.Collection) instance#trackedEntitiesSet;
     }
 
     public (EntityTrackerEntryHandle) EntityTrackerEntry getEntry(int entityId) {
@@ -80,18 +117,18 @@ class EntityTracker {
     }
 
     public (EntityTrackerEntryHandle) EntityTrackerEntry putEntry(int entityId, (EntityTrackerEntryHandle) EntityTrackerEntry entry) {
-        java.util.Set set = instance#trackedEntitiesSet;
+        java.util.Collection allEntries = (java.util.Collection) instance#trackedEntitiesSet;
 
         // Remove any previous entry
         EntityTrackerEntry previous = (EntityTrackerEntry) instance.trackedEntities.d(entityId);
         if (previous != null) {
-            set.remove(previous);
+            allEntries.remove(previous);
         }
 
         // Add the new entry
         if (entry != null) {
             instance.trackedEntities.a(entityId, (Object) entry);
-            set.add(entry);
+            allEntries.add(entry);
         }
 
         return previous;
@@ -351,7 +388,13 @@ class EntityTrackerEntry {
         // Spigot / old paper
         WorldServer world = (WorldServer) entity.world;
         java.util.List playersOnWorld = world.players;
+  #if exists net.minecraft.server.level.EntityTrackerEntry public void scanPlayers(java.util.List<net.minecraft.server.EntityPlayer> players);
         instance.scanPlayers(playersOnWorld);
+  #else
+        for (int i = 0; i < playersOnWorld.size(); i++) {
+            instance.updatePlayer((EntityPlayer) playersOnWorld.get(i));
+        }
+  #endif
     }
 
     public void removeViewer:a((org.bukkit.entity.Player) EntityPlayer player);

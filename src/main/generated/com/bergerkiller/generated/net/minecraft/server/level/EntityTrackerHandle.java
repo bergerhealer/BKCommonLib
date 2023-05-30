@@ -23,14 +23,14 @@ public abstract class EntityTrackerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract World getWorld();
+    public abstract void setWorld(World world);
     public abstract Collection<EntityTrackerEntryHandle> getEntries();
     public abstract EntityTrackerEntryHandle getEntry(int entityId);
     public abstract EntityTrackerEntryHandle putEntry(int entityId, EntityTrackerEntryHandle entry);
     public abstract void sendPacketToEntity(Entity entity, CommonPacket packet);
     public abstract void trackEntity(Entity entity);
     public abstract void untrackEntity(Entity entity);
-    public abstract World getWorld();
-    public abstract void setWorld(World value);
     public abstract int getTrackingDistance();
     public abstract void setTrackingDistance(int value);
     /**
@@ -38,9 +38,10 @@ public abstract class EntityTrackerHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityTrackerClass extends Template.Class<EntityTrackerHandle> {
-        public final Template.Field.Converted<World> world = new Template.Field.Converted<World>();
         public final Template.Field.Integer trackingDistance = new Template.Field.Integer();
 
+        public final Template.Method.Converted<World> getWorld = new Template.Method.Converted<World>();
+        public final Template.Method.Converted<Void> setWorld = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Collection<EntityTrackerEntryHandle>> getEntries = new Template.Method.Converted<Collection<EntityTrackerEntryHandle>>();
         public final Template.Method.Converted<EntityTrackerEntryHandle> getEntry = new Template.Method.Converted<EntityTrackerEntryHandle>();
         public final Template.Method.Converted<EntityTrackerEntryHandle> putEntry = new Template.Method.Converted<EntityTrackerEntryHandle>();

@@ -348,15 +348,26 @@ public class PacketType extends ClassTemplate<Object> {
             }
 
             // Gets the 'flows' field in EnumProtocol. This is a map by protocol direction.
-            Field flowsField;
+            Field flowsField = null;
             if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
                 flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "flows");
-            } else if (CommonBootstrap.evaluateMCVersion(">=", "1.10.2")) {
-                flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "h");
-            } else if (CommonBootstrap.evaluateMCVersion(">=", "1.8.3")) {
-                flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "j");
             } else {
-                flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "h");
+                // WindSpigot (and maybe others) renamed this field to "packetMap", look for that first
+                flowsField = LogicUtil.tryMake(() -> {
+                    Field f = enumProtocolType.getDeclaredField("packetMap");
+                    return Map.class.isAssignableFrom(f.getType()) ? f : null;
+                }, null);
+
+                if (flowsField == null) {
+                    // Past vanilla field names
+                    if (CommonBootstrap.evaluateMCVersion(">=", "1.10.2")) {
+                        flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "h");
+                    } else if (CommonBootstrap.evaluateMCVersion(">=", "1.8.3")) {
+                        flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "j");
+                    } else {
+                        flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "h");
+                    }
+                }
             }
             flowsField.setAccessible(true);
 
@@ -373,6 +384,11 @@ public class PacketType extends ClassTemplate<Object> {
                     Method containsValueMethod = bimapClass.getMethod("containsValue", Object.class);
                     Boolean containsValue = (Boolean) containsValueMethod.invoke(directionFlows, packetClass);
                     if (containsValue.booleanValue()) {
+                        return true;
+                    }
+                } else if (directionFlows instanceof Map) {
+                    // Used on WindSpigot and maybe other forks on MC 1.8.8 where it uses a netty IntObjectMap
+                    if (((Map<?, ?>) directionFlows).containsValue(packetClass)) {
                         return true;
                     }
                 } else {
