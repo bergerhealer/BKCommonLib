@@ -1589,7 +1589,7 @@ class PacketPlayOutCustomSoundEffect extends Packet {
     #require PacketPlayOutCustomSoundEffect private int customSoundX:c;
     #require PacketPlayOutCustomSoundEffect private int customSoundY:d;
     #require PacketPlayOutCustomSoundEffect private int customSoundZ:e;
-  #if version <= 1.10.2
+  #if version >= 1.10.2
     #require PacketPlayOutCustomSoundEffect private float customSoundPitch:g;
   #else
     #require PacketPlayOutCustomSoundEffect private int customSoundPitchInt:g;
