@@ -57,6 +57,15 @@ class CraftBlockState {
             entityState#tileEntityClass = tileEntity.getClass();
   #endif
 
+  #if exists org.bukkit.craftbukkit.block.CraftSign private final org.bukkit.craftbukkit.block.sign.CraftSignSide front;
+            if (entityState instanceof org.bukkit.craftbukkit.block.CraftSign) {
+                net.minecraft.world.level.block.entity.TileEntitySign tileEntitySign = (net.minecraft.world.level.block.entity.TileEntitySign) tileEntity;
+                org.bukkit.craftbukkit.block.sign.CraftSignSide front = new org.bukkit.craftbukkit.block.sign.CraftSignSide(tileEntitySign);
+                #require org.bukkit.craftbukkit.block.CraftSign private final org.bukkit.craftbukkit.block.sign.CraftSignSide front;
+                entityState#front = front;
+            }
+  #endif
+
             #require org.bukkit.craftbukkit.block.CraftBlockEntityState protected void load(T extends TileEntity tileEntity);
             entityState#load(tileEntity);
         }
