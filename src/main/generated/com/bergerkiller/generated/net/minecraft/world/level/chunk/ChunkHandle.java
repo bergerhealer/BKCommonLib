@@ -35,6 +35,7 @@ public abstract class ChunkHandle extends Template.Handle {
     public abstract int getLocZ();
     public abstract List<Integer> getLoadedSectionCoordinates();
     public abstract ChunkSection[] getSections();
+    public abstract Object getSectionRaw(int cy);
     public abstract ChunkSection getSection(int cy);
     public abstract Collection<?> getRawTileEntities();
     public abstract List<Entity> getEntities();
@@ -75,8 +76,9 @@ public abstract class ChunkHandle extends Template.Handle {
         public final Template.Method<Integer> getLocX = new Template.Method<Integer>();
         public final Template.Method<Integer> getLocZ = new Template.Method<Integer>();
         public final Template.Method<List<Integer>> getLoadedSectionCoordinates = new Template.Method<List<Integer>>();
-        public final Template.Method.Converted<ChunkSection[]> getSections = new Template.Method.Converted<ChunkSection[]>();
-        public final Template.Method.Converted<ChunkSection> getSection = new Template.Method.Converted<ChunkSection>();
+        public final Template.Method<ChunkSection[]> getSections = new Template.Method<ChunkSection[]>();
+        public final Template.Method<Object> getSectionRaw = new Template.Method<Object>();
+        public final Template.Method<ChunkSection> getSection = new Template.Method<ChunkSection>();
         public final Template.Method<Collection<?>> getRawTileEntities = new Template.Method<Collection<?>>();
         public final Template.Method.Converted<List<Entity>> getEntities = new Template.Method.Converted<List<Entity>>();
         public final Template.Method<Chunk> getBukkitChunk = new Template.Method<Chunk>();

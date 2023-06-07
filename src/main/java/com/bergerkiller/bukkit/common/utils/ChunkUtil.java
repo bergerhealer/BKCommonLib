@@ -165,7 +165,7 @@ public class ChunkUtil {
         if (y < 0) {
             return 0;
         } else if (y >= chunk.getWorld().getMaxHeight()) {
-            return EnumSkyBlockHandle.BLOCK.getBrightness();
+            return 0;
         } else {
             return ChunkHandle.fromBukkit(chunk).getBrightness(EnumSkyBlockHandle.BLOCK,
                     new IntVector3(x & 0xf, y, z & 0xf));
@@ -185,7 +185,7 @@ public class ChunkUtil {
         if (y < 0) {
             return 0;
         } else if (y >= chunk.getWorld().getMaxHeight()) {
-            return EnumSkyBlockHandle.SKY.getBrightness();
+            return 15;
         } else {
             return ChunkHandle.fromBukkit(chunk).getBrightness(EnumSkyBlockHandle.SKY,
                     new IntVector3(x & 0xf, y, z & 0xf));
@@ -234,7 +234,7 @@ public class ChunkUtil {
      */
     public static void setBlockFast(org.bukkit.Chunk chunk, Block block, BlockData data) {
         final int secIndex = block.getY() >> 4;
-        Object section = ChunkHandle.T.getSection.raw.invoke(HandleConversion.toChunkHandle(chunk), secIndex);
+        Object section = ChunkHandle.T.getSectionRaw.invoke(HandleConversion.toChunkHandle(chunk), secIndex);
         if (section != null) {
             ChunkSectionHandle.T.setBlockDataAtBlock.invoke(section, block, data);
         } else {
@@ -254,7 +254,7 @@ public class ChunkUtil {
      */
     public static void setBlockFast(org.bukkit.Chunk chunk, int x, int y, int z, BlockData data) {
         final int secIndex = y >> 4;
-        Object section = ChunkHandle.T.getSection.raw.invoke(HandleConversion.toChunkHandle(chunk), secIndex);
+        Object section = ChunkHandle.T.getSectionRaw.invoke(HandleConversion.toChunkHandle(chunk), secIndex);
         if (section != null) {
             ChunkSectionHandle.T.setBlockData.invoke(section, x & 0xf, y & 0xf, z & 0xf, data);
         } else {

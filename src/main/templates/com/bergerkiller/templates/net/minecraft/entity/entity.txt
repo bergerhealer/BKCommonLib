@@ -275,31 +275,6 @@ class Entity {
     }
     </code>
 
-    public void setWorld((WorldHandle) World world) {
-#if version >= 1.17
-        instance.level = world;
-#else
-        instance.world = world;
-#endif
-#if version < 1.16
-        if (world != null) {
-  #if version >= 1.13.1
-            instance.dimension = world.worldProvider.getDimensionManager();
-  #elseif version >= 1.9
-            instance.dimension = world.worldProvider.getDimensionManager().getDimensionID();
-  #else
-            instance.dimension = world.worldProvider.getDimension();
-  #endif
-        } else {
-  #if version >= 1.13.1
-            instance.dimension = null;
-  #else
-            instance.dimension = 0;
-  #endif
-        }
-#endif
-    }
-
     // Assigns this Entity instance to deep members of this Entity
     // Used during entity replacement logic to swap out two instances
     public void assignEntityReference() {
@@ -819,13 +794,19 @@ class Entity {
 
   #if exists net.minecraft.world.entity.Entity public net.minecraft.world.level.chunk.Chunk getCurrentChunk();
     public (org.bukkit.Chunk) Chunk getCurrentChunk();
-  #elseif exists io.papermc.paper.chunk.system.entity.EntityLookup.EntityCallback
-    // Paper new chunk system does not care about all this
-    public (org.bukkit.Chunk) Chunk getCurrentChunk() {
-        return ((WorldServer) instance.level).getChunkIfLoaded(instance.sectionX, instance.sectionZ);
-    }
   #else
     public (org.bukkit.Chunk) Chunk getCurrentChunk() {
+        WorldServer world;
+    #if version >= 1.20
+        world = (WorldServer) instance.level();
+    #else
+        world = (WorldServer) instance.level;
+    #endif
+
+    #if exists io.papermc.paper.chunk.system.entity.EntityLookup.EntityCallback
+        // Paper new chunk system does not care about all this
+        return world.getChunkIfLoaded(instance.sectionX, instance.sectionZ);
+    #else
         #require net.minecraft.world.entity.Entity private net.minecraft.world.level.entity.EntityInLevelCallback levelCallback;
         net.minecraft.world.level.entity.EntityInLevelCallback callback = instance#levelCallback;
         if (callback == net.minecraft.world.level.entity.EntityInLevelCallback.NULL) {
@@ -837,16 +818,17 @@ class Entity {
         long coordKey = callback#currentSectionKey;
 
         // Convert to chunk x/z coordinates
-    #if version >= 1.18
+      #if version >= 1.18
         int chunkX = SectionPosition.x(coordKey);
         //int chunkY = SectionPosition.y(coordKey);
         int chunkZ = SectionPosition.z(coordKey);
-    #else
+      #else
         int chunkX = SectionPosition.b(coordKey);
         //int chunkY = SectionPosition.c(coordKey);
         int chunkZ = SectionPosition.d(coordKey);
+      #endif
+        return world.getChunkIfLoaded(chunkX, chunkZ);
     #endif
-        return ((WorldServer) instance.level).getChunkIfLoaded(chunkX, chunkZ);
     }
   #endif
 #else
@@ -1979,24 +1961,60 @@ class Entity {
     public void collide((EntityHandle) Entity entity);
 #endif
 
+#if version >= 1.20
     public org.bukkit.World getBukkitWorld() {
-#if version >= 1.17
-        return instance.level.getWorld();
+        return instance.level().getWorld();
+    }
+
+    public (WorldHandle) World getWorld:level();
+    protected void setWorld:setLevel((WorldHandle) World world);
 #else
+    public org.bukkit.World getBukkitWorld() {
+  #if version >= 1.17
+        return instance.level.getWorld();
+  #else
         return instance.world.getWorld();
-#endif
+  #endif
     }
 
     public (WorldHandle) World getWorld() {
-#if version >= 1.17
+  #if version >= 1.17
         return instance.level;
-#else
+  #else
         return instance.world;
-#endif
+  #endif
     }
 
+    public void setWorld((WorldHandle) World world) {
+  #if version >= 1.17
+        instance.level = world;
+  #else
+        instance.world = world;
+  #endif
+  #if version < 1.16
+        if (world != null) {
+    #if version >= 1.13.1
+            instance.dimension = world.worldProvider.getDimensionManager();
+    #elseif version >= 1.9
+            instance.dimension = world.worldProvider.getDimensionManager().getDimensionID();
+    #else
+            instance.dimension = world.worldProvider.getDimension();
+    #endif
+        } else {
+    #if version >= 1.13.1
+            instance.dimension = null;
+    #else
+            instance.dimension = 0;
+    #endif
+        }
+  #endif
+    }
+#endif
+
     public org.bukkit.entity.Entity getBukkitEntity() {
-#if version >= 1.17
+#if version >= 1.20
+        if (instance.level() == null) {
+#elseif version >= 1.17
         if (instance.level == null) {
 #else
         if (instance.world == null) {

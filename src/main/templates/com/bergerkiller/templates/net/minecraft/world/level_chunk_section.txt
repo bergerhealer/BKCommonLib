@@ -16,12 +16,6 @@ class ChunkSection {
 #endif
 
 #if version >= 1.18
-    public int getYPosition:bottomBlockY();
-#else
-    public int getYPosition();
-#endif
-
-#if version >= 1.18
     public (DataPaletteBlockHandle) DataPaletteBlock<IBlockData> getBlockPalette:getStates();
 #elseif version >= 1.13
     public (DataPaletteBlockHandle) DataPaletteBlock<IBlockData> getBlockPalette:getBlocks();

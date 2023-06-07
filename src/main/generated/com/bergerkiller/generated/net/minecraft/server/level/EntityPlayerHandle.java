@@ -39,10 +39,14 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
     public abstract void sendMessage(ChatText ichatbasecomponent);
     public abstract int getCurrentWindowId();
     public abstract InventoryView openAnvilWindow(ChatText titleText);
-    public abstract void openSignEditWindow(IntVector3 signPosition);
+    public abstract void openSignEditWindow(IntVector3 signPosition, boolean isFrontText);
 
     public void closeSignEditWindow() {
         openSignEditWindow(IntVector3.of(Integer.MAX_VALUE, 0, Integer.MAX_VALUE));
+    }
+
+    public void openSignEditWindow(IntVector3 signPosition) {
+        openSignEditWindow(signPosition, true);
     }
 
 

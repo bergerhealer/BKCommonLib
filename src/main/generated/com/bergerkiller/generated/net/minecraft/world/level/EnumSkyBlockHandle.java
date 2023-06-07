@@ -25,8 +25,6 @@ public abstract class EnumSkyBlockHandle extends Template.Handle {
     public int ordinal() {
         return ((Enum<?>) getRaw()).ordinal();
     }
-    @Template.Readonly
-    public abstract int getBrightness();
     /**
      * Stores class members for <b>net.minecraft.world.level.EnumSkyBlock</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -34,9 +32,6 @@ public abstract class EnumSkyBlockHandle extends Template.Handle {
     public static final class EnumSkyBlockClass extends Template.Class<EnumSkyBlockHandle> {
         public final Template.EnumConstant.Converted<EnumSkyBlockHandle> SKY = new Template.EnumConstant.Converted<EnumSkyBlockHandle>();
         public final Template.EnumConstant.Converted<EnumSkyBlockHandle> BLOCK = new Template.EnumConstant.Converted<EnumSkyBlockHandle>();
-
-        @Template.Readonly
-        public final Template.Field.Integer brightness = new Template.Field.Integer();
 
     }
 

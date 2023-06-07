@@ -6,9 +6,12 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.IBlockAccess;
 import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.LootParams$Builder;
 import net.minecraft.world.level.storage.loot.LootTableInfo;
 import net.minecraft.world.level.storage.loot.LootTableInfo$Builder;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParameters;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParameterSet;
 import net.minecraft.world.level.World;
 import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.phys.shapes.OperatorBoolean;
@@ -423,7 +426,21 @@ class Block {
         isTileEntity = block.isTileEntity();
   #endif
 
-  #if version >= 1.18
+  #if version >= 1.20
+        net.minecraft.world.level.block.entity.TileEntity tileentity = isTileEntity ? world.getBlockEntity(blockposition) : null;
+        LootParams$Builder lootparams_builder = new LootParams$Builder(world);
+        lootparams_builder.withParameter(LootContextParameters.ORIGIN, (Object) Vec3D.atCenterOf(blockposition));
+        lootparams_builder.withParameter(LootContextParameters.TOOL, (Object) EMPTY_ITEM);
+        lootparams_builder.withOptionalParameter(LootContextParameters.BLOCK_ENTITY, (Object) tileentity);
+        lootparams_builder.withParameter(LootContextParameters.EXPLOSION_RADIUS, (Object) Float.valueOf(1.0F / yield));
+
+        java.util.Iterator items_iter = iblockdata.getDrops(lootparams_builder).iterator();
+        while (items_iter.hasNext()) {
+            ItemStack item = (ItemStack) items_iter.next();
+            Block.popResource((World) world, blockposition, item);
+        }
+        iblockdata.spawnAfterBreak(world, blockposition, EMPTY_ITEM, true);
+  #elseif version >= 1.18
         net.minecraft.world.level.block.entity.TileEntity tileentity = isTileEntity ? world.getBlockEntity(blockposition) : null;
         LootTableInfo$Builder loottableinfo_builder = new LootTableInfo$Builder(world);
         loottableinfo_builder = loottableinfo_builder.withRandom(((World) world).random);

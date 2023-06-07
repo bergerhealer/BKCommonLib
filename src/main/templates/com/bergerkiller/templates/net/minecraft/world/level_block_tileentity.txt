@@ -229,7 +229,9 @@ class TileEntityHopper extends TileEntity {
 
 class TileEntitySign extends TileEntity {
     public Object[] getRawLines() {
-#if version >= 1.17
+#if version >= 1.20
+        return instance.getFrontText().getMessages(false);
+#elseif version >= 1.17
         return (Object[]) instance.messages;
 #else
         return (Object[]) instance.lines;

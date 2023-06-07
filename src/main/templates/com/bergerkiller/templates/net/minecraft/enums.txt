@@ -81,12 +81,6 @@ class EnumSkyBlock {
     enum (EnumSkyBlockHandle) EnumSkyBlock SKY;
     enum (EnumSkyBlockHandle) EnumSkyBlock BLOCK;
 
-#if version >= 1.17
-    public final readonly int brightness:surrounding;
-#else
-    public final readonly int brightness:c;
-#endif
-
     <code>
     public int ordinal() {
         return ((Enum<?>) getRaw()).ordinal();

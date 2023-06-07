@@ -19,6 +19,7 @@ import com.bergerkiller.bukkit.common.collections.List2D;
 
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.EnumSkyBlockHandle;
 
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
@@ -72,7 +73,9 @@ class Chunk {
         for (int i = 0; i < sections.length; i++) {
             ChunkSection section = sections[i];
             if (section != null) {
-#if version >= 1.18
+#if version >= 1.20
+                result.add(Integer.valueOf(instance.getSectionYFromSectionIndex(i)));
+#elseif version >= 1.18
                 result.add(Integer.valueOf(section.bottomBlockY() >> 4));
 #else
                 result.add(Integer.valueOf(section.getYPosition() >> 4));
@@ -82,22 +85,59 @@ class Chunk {
         return result;
     }
 
-    public (com.bergerkiller.bukkit.common.wrappers.ChunkSection[]) ChunkSection[] getSections() {
+    // Converts ChunkSection into bkcl wrapper ChunkSection on <= 1.19.4 where ChunkSection had a field for reading y position
+#if version <= 1.19.4
+    #require net.minecraft.world.level.chunk.ChunkSection public static com.bergerkiller.bukkit.common.wrappers.ChunkSection wrapChunkSection(ChunkSection section) {
+        ChunkSectionHandle sectionHandle = ChunkSectionHandle.createHandle(section);
+  #if version >= 1.18
+        int yPos = section.bottomBlockY();
+  #else
+        int yPos = section.getYPosition();
+  #endif
+        return new com.bergerkiller.bukkit.common.wrappers.ChunkSection(sectionHandle, yPos);
+    }
+#endif
+
+    public com.bergerkiller.bukkit.common.wrappers.ChunkSection[] getSections() {
+        ChunkSection[] sections = null;
+
 #if exists io.github.opencubicchunks.cubicchunks.api.world.ICube
         World world = instance#getChunkWorld();
         if (world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld()) {
-            ChunkSection[] sections = new ChunkSection[16];
+            sections = new ChunkSection[16];
             for (int cy = 0; cy < 16; cy++) {
                 sections[cy] = instance.getCube(cy).getStorage();
             }
-            return sections;
         }
 #endif
 
-        return instance.getSections();
+        if (sections == null) {
+            sections = instance.getSections();
+        }
+
+        com.bergerkiller.bukkit.common.wrappers.ChunkSection[] wrapped;
+        wrapped = new com.bergerkiller.bukkit.common.wrappers.ChunkSection[sections.length];
+
+        for (int i = 0; i < sections.length; i++) {
+            ChunkSection section = sections[i];
+            if (section == null) {
+                continue;
+            }
+#if version >= 1.20
+            // Got to use the index of the array plus some other information to figure out the base y-position
+            // ChunkSection no longer contains a field to check this
+            int yPos = SectionPosition.sectionToBlockCoord(instance.getSectionYFromSectionIndex(i));
+            ChunkSectionHandle sectionHandle = ChunkSectionHandle.createHandle(section);
+            wrapped[i] = new com.bergerkiller.bukkit.common.wrappers.ChunkSection(sectionHandle, yPos);
+#else
+            wrapped[i] = #wrapChunkSection(section);
+#endif
+        }
+
+        return wrapped;
     }
 
-    public (com.bergerkiller.bukkit.common.wrappers.ChunkSection) ChunkSection getSection(int cy) {
+    #require net.minecraft.world.level.chunk.Chunk public ChunkSection getSectionRawImpl(int cy) {
 #if exists io.github.opencubicchunks.cubicchunks.api.world.ICube
         World world = instance#getChunkWorld();
         if (world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld()) {
@@ -113,13 +153,35 @@ class Chunk {
 
         ChunkSection[] sections = instance.getSections();
 #if version >= 1.17
-        cy = instance.getSectionIndexFromSectionY(cy);
+        int index = instance.getSectionIndexFromSectionY(cy);
+#else
+        int index = cy;
 #endif
-        if (cy >= 0 && cy < sections.length) {
-            return sections[cy];
+        if (index >= 0 && index < sections.length) {
+            return sections[index];
         } else {
             return null;
         }
+    }
+
+    public Object getSectionRaw(int cy) {
+        return instance#getSectionRawImpl(cy);
+    }
+
+    public com.bergerkiller.bukkit.common.wrappers.ChunkSection getSection(int cy) {
+        ChunkSection section = instance#getSectionRawImpl(cy);
+        if (section == null) {
+            return null;
+        }
+
+#if version >= 1.20
+        // Got to use cy to compute the base block position, as ChunkSection lacks this information
+        int yPos = SectionPosition.sectionToBlockCoord(cy);
+        ChunkSectionHandle sectionHandle = ChunkSectionHandle.createHandle(section);
+        return new com.bergerkiller.bukkit.common.wrappers.ChunkSection(sectionHandle, yPos);
+#else
+        return #wrapChunkSection(section);
+#endif
     }
 
     public java.util.Collection<?> getRawTileEntities() {

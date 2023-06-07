@@ -57,7 +57,17 @@ class CraftBlockState {
             entityState#tileEntityClass = tileEntity.getClass();
   #endif
 
-  #if exists org.bukkit.craftbukkit.block.CraftSign private final org.bukkit.craftbukkit.block.sign.CraftSignSide front;
+  #if version >= 1.20
+            if (entityState instanceof org.bukkit.craftbukkit.block.CraftSign) {
+                net.minecraft.world.level.block.entity.TileEntitySign tileEntitySign = (net.minecraft.world.level.block.entity.TileEntitySign) tileEntity;
+                org.bukkit.craftbukkit.block.sign.CraftSignSide front = new org.bukkit.craftbukkit.block.sign.CraftSignSide(tileEntitySign.getFrontText());
+                org.bukkit.craftbukkit.block.sign.CraftSignSide back = new org.bukkit.craftbukkit.block.sign.CraftSignSide(tileEntitySign.getBackText());
+                #require org.bukkit.craftbukkit.block.CraftSign private final org.bukkit.craftbukkit.block.sign.CraftSignSide front;
+                #require org.bukkit.craftbukkit.block.CraftSign private final org.bukkit.craftbukkit.block.sign.CraftSignSide back;
+                entityState#front = front;
+                entityState#back = back;
+            }
+  #elseif exists org.bukkit.craftbukkit.block.CraftSign private final org.bukkit.craftbukkit.block.sign.CraftSignSide front;
             if (entityState instanceof org.bukkit.craftbukkit.block.CraftSign) {
                 net.minecraft.world.level.block.entity.TileEntitySign tileEntitySign = (net.minecraft.world.level.block.entity.TileEntitySign) tileEntity;
                 org.bukkit.craftbukkit.block.sign.CraftSignSide front = new org.bukkit.craftbukkit.block.sign.CraftSignSide(tileEntitySign);

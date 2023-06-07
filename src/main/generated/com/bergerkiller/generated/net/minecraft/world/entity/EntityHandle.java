@@ -60,7 +60,6 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setLocY(double y);
     public abstract void setLocZ(double z);
     public abstract Vector getLoc();
-    public abstract void setWorld(WorldHandle world);
     public abstract void assignEntityReference();
     public abstract boolean isLastAndCurrentPositionDifferent();
     public abstract Vector getMot();
@@ -140,6 +139,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void collide(EntityHandle entity);
     public abstract World getBukkitWorld();
     public abstract WorldHandle getWorld();
+    public abstract void setWorld(WorldHandle world);
     public abstract Entity getBukkitEntity();
 
     public com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle getWorldServer() {
@@ -339,7 +339,6 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Void> setLocY = new Template.Method<Void>();
         public final Template.Method<Void> setLocZ = new Template.Method<Void>();
         public final Template.Method<Vector> getLoc = new Template.Method<Vector>();
-        public final Template.Method.Converted<Void> setWorld = new Template.Method.Converted<Void>();
         public final Template.Method<Void> assignEntityReference = new Template.Method<Void>();
         public final Template.Method<Boolean> isLastAndCurrentPositionDifferent = new Template.Method<Boolean>();
         public final Template.Method<Vector> getMot = new Template.Method<Vector>();
@@ -437,6 +436,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Void> collide = new Template.Method.Converted<Void>();
         public final Template.Method<World> getBukkitWorld = new Template.Method<World>();
         public final Template.Method.Converted<WorldHandle> getWorld = new Template.Method.Converted<WorldHandle>();
+        public final Template.Method.Converted<Void> setWorld = new Template.Method.Converted<Void>();
         public final Template.Method<Entity> getBukkitEntity = new Template.Method<Entity>();
 
     }

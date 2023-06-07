@@ -21,6 +21,16 @@ public abstract class PacketPlayOutOpenSignEditorHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public static PacketPlayOutOpenSignEditorHandle createNew(IntVector3 signPosition, boolean isFrontText) {
+        return T.createNew.invoke(signPosition, isFrontText);
+    }
+
+    public abstract boolean isFrontText();
+    public abstract void setFrontText(boolean front);
+
+    public static PacketPlayOutOpenSignEditorHandle createNew(IntVector3 signPosition) {
+        return createNew(signPosition, true);
+    }
     public abstract IntVector3 getSignPosition();
     public abstract void setSignPosition(IntVector3 value);
     /**
@@ -29,6 +39,11 @@ public abstract class PacketPlayOutOpenSignEditorHandle extends PacketHandle {
      */
     public static final class PacketPlayOutOpenSignEditorClass extends Template.Class<PacketPlayOutOpenSignEditorHandle> {
         public final Template.Field.Converted<IntVector3> signPosition = new Template.Field.Converted<IntVector3>();
+
+        public final Template.StaticMethod.Converted<PacketPlayOutOpenSignEditorHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutOpenSignEditorHandle>();
+
+        public final Template.Method<Boolean> isFrontText = new Template.Method<Boolean>();
+        public final Template.Method<Void> setFrontText = new Template.Method<Void>();
 
     }
 

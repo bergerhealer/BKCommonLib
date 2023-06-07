@@ -681,6 +681,12 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.entity.RelativeMovement", "net.minecraft.network.protocol.game.PacketPlayOutPosition$EnumPlayerTeleportFlags");
         }
 
+        // 1.20 mappings
+        if (evaluateMCVersion(">=", "1.20")) {
+            // Obfuscated class name
+            remappings.put("net.minecraft.world.level.storage.loot.LootParams$Builder", "net.minecraft.world.level.storage.loot.LootParams$a");
+        }
+
         // There have been various locations where starlight was installed
         // This was also part of tuinity at some point, but was then ported into paper
         {

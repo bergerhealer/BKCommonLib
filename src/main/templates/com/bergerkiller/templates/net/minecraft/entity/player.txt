@@ -274,7 +274,10 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 #else
         PlayerInventory playerInventory = instance.inventory;
 #endif
-#if version >= 1.18
+#if version >= 1.20
+        World world = instance.level();
+        BlockPosition position = instance.blockPosition();
+#elseif version >= 1.18
         World world = instance.getLevel();
         BlockPosition position = instance.blockPosition();
 #else
@@ -347,15 +350,27 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         // Tell client to close the dialog by editing a sign far away in a chunk that 100% guaranteed is not loaded
         openSignEditWindow(IntVector3.of(Integer.MAX_VALUE, 0, Integer.MAX_VALUE));
     }
+
+    public void openSignEditWindow(IntVector3 signPosition) {
+        openSignEditWindow(signPosition, true);
+    }
     </code>
 
-    public void openSignEditWindow((IntVector3) BlockPosition signPosition) {
-#if version >= 1.18
-        instance.connection.send((Packet) new PacketPlayOutOpenSignEditor(signPosition));
-#elseif version >= 1.17
-        instance.connection.sendPacket((Packet) new PacketPlayOutOpenSignEditor(signPosition));
+    public void openSignEditWindow((IntVector3) BlockPosition signPosition, boolean isFrontText) {
+#if version >= 1.20
+        instance.connection.send((Packet) new PacketPlayOutOpenSignEditor(signPosition, isFrontText));
 #else
+        if (!isFrontText) {
+            throw new UnsupportedOperationException("Back text not supported on this version of Minecraft");
+        }
+
+  #if version >= 1.18
+        instance.connection.send((Packet) new PacketPlayOutOpenSignEditor(signPosition));
+  #elseif version >= 1.17
+        instance.connection.sendPacket((Packet) new PacketPlayOutOpenSignEditor(signPosition));
+  #else
         instance.playerConnection.sendPacket((Packet) new PacketPlayOutOpenSignEditor(signPosition));
+  #endif
 #endif
     }
 

@@ -78,6 +78,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSetSlotHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundBundlePacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffectHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutOpenSignEditorHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
@@ -2706,6 +2707,39 @@ class PacketPlayOutOpenSignEditor extends Packet {
     private final (IntVector3) BlockPosition signPosition:pos;
 #else
     private (IntVector3) BlockPosition signPosition:a;
+#endif
+
+    <code>
+    public static PacketPlayOutOpenSignEditorHandle createNew(IntVector3 signPosition) {
+        return createNew(signPosition, true);
+    }
+    </code>
+
+    public static (PacketPlayOutOpenSignEditorHandle) PacketPlayOutOpenSignEditor createNew((IntVector3) BlockPosition signPosition, boolean isFrontText) {
+#if version >= 1.20
+        return new PacketPlayOutOpenSignEditor(signPosition, isFrontText);
+#else
+        if (!isFrontText) {
+            throw new UnsupportedOperationException("Back text not supported on this version of Minecraft");
+        }
+        return new PacketPlayOutOpenSignEditor(signPosition);
+#endif
+    }
+
+#if version >= 1.20
+    #require PacketPlayOutOpenSignEditor private final boolean isFrontText;
+    public boolean isFrontText() { return instance#isFrontText; }
+    public void setFrontText(boolean front) { instance#isFrontText = front; }
+#else
+    public boolean isFrontText() {
+        return true;
+    }
+
+    public void setFrontText(boolean front) {
+        if (!front) {
+            throw new UnsupportedOperationException("Back text not supported on this version of Minecraft");
+        }
+    }
 #endif
 }
 

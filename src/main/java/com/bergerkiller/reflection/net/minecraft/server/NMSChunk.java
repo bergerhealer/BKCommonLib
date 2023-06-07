@@ -57,7 +57,7 @@ public class NMSChunk {
         if (y < 0) {
             return 0;
         } else if (y >= ChunkHandle.T.getWorld.invoke(chunkHandle).getWorld().getMaxHeight()) {
-            return mode.getBrightness();
+            return (mode == EnumSkyBlockHandle.SKY) ? 15 : 0;
         }
         return ChunkHandle.T.getBrightness.invoke(chunkHandle, mode.getRaw(), new IntVector3(x & XZ_MASK, y, z & XZ_MASK));
     }

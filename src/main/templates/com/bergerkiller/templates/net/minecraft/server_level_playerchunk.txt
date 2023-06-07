@@ -7,6 +7,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.ChunkCoordIntPair;
 import net.minecraft.world.level.lighting.LightEngine;
+import net.minecraft.world.level.lighting.LevelLightEngine;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -45,7 +46,9 @@ class PlayerChunk {
 #endif
     }
 
-#if version >= 1.16
+#if version >= 1.20
+    #require net.minecraft.server.level.PlayerChunk private final net.minecraft.world.level.lighting.LevelLightEngine lightEngineField:lightEngine;
+#elseif version >= 1.16
     #require net.minecraft.server.level.PlayerChunk private final net.minecraft.world.level.lighting.LightEngine lightEngineField:lightEngine;
 #endif
 
@@ -103,7 +106,11 @@ class PlayerChunk {
         }
 
         // Create a map chunk packet
-#if version >= 1.18
+#if version >= 1.20
+        // Note: is now ClientboundLevelChunkWithLightPacket
+        LevelLightEngine lightengine = instance#lightEngineField;
+        PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(chunk, lightengine, null, null);
+#elseif version >= 1.18
         // Note: is now ClientboundLevelChunkWithLightPacket
         LightEngine lightengine = instance#lightEngineField;
         PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(chunk, lightengine, null, null, true);
@@ -181,10 +188,16 @@ class PlayerChunk {
   #endif
 
         // Retrieve LightEngine (used to make the update packet)
+  #if version >= 1.20
+        LevelLightEngine lightEngine = instance#lightEngineField;
+  #else
         LightEngine lightEngine = instance#lightEngineField;
+  #endif
 
         // Create a lighting update packet, similar to how it is done in PlayerChunk
-  #if version >= 1.17
+  #if version >= 1.20
+        PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunk.getPos(), lightEngine, null, null);
+  #elseif version >= 1.17
         PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunk.getPos(), lightEngine, null, null, false);
   #else
         PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunk.getPos(), lightEngine, 0x3FFFF, 0x3FFFF, false);

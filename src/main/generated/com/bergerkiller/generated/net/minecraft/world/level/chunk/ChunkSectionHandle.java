@@ -22,7 +22,6 @@ public abstract class ChunkSectionHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract boolean isEmpty();
-    public abstract int getYPosition();
     public abstract DataPaletteBlockHandle getBlockPalette();
     public abstract BlockData getBlockData(int x, int y, int z);
     public abstract void setBlockData(int x, int y, int z, BlockData data);
@@ -33,7 +32,6 @@ public abstract class ChunkSectionHandle extends Template.Handle {
      */
     public static final class ChunkSectionClass extends Template.Class<ChunkSectionHandle> {
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
-        public final Template.Method<Integer> getYPosition = new Template.Method<Integer>();
         public final Template.Method.Converted<DataPaletteBlockHandle> getBlockPalette = new Template.Method.Converted<DataPaletteBlockHandle>();
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
         public final Template.Method.Converted<Void> setBlockData = new Template.Method.Converted<Void>();

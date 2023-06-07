@@ -5,10 +5,12 @@ import com.bergerkiller.generated.net.minecraft.world.level.chunk.DataPaletteBlo
 
 public class ChunkSection extends BasicWrapper<ChunkSectionHandle> {
     private final DataPaletteBlockHandle blockIds;
+    private final int yPos;
 
-    public ChunkSection(ChunkSectionHandle nmsChunkSectionHandle) {
+    public ChunkSection(ChunkSectionHandle nmsChunkSectionHandle, int yPos) {
         setHandle(nmsChunkSectionHandle);
         this.blockIds = handle.getBlockPalette();
+        this.yPos = yPos;
     }
 
     /**
@@ -17,7 +19,7 @@ public class ChunkSection extends BasicWrapper<ChunkSectionHandle> {
      * @return section y coordinate
      */
     public int getY() {
-        return handle.getYPosition() >> 4;
+        return yPos >> 4;
     }
 
     /**
@@ -27,7 +29,7 @@ public class ChunkSection extends BasicWrapper<ChunkSectionHandle> {
      * @return bottom y position
      */
     public int getYPosition() {
-        return handle.getYPosition();
+        return yPos;
     }
 
     /**

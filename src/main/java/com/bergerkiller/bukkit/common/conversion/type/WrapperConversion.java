@@ -458,11 +458,6 @@ public class WrapperConversion {
         }
     }
 
-    @ConverterMethod(input="net.minecraft.world.level.chunk.ChunkSection")
-    public static ChunkSection toChunkSection(Object nmsChunkSectionHandle) {
-        return new ChunkSection(ChunkSectionHandle.createHandle(nmsChunkSectionHandle));
-    }
-
     @ConverterMethod
     @SuppressWarnings("deprecation")
     public static PotionEffectType toPotionEffectTypeFromId(int id) {
