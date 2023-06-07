@@ -12,11 +12,14 @@ import java.util.function.Function;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.mountiplex.MountiplexUtil;
+import com.bergerkiller.mountiplex.reflection.SafeField;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.BaseConstructor;
+import org.yaml.snakeyaml.constructor.Construct;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.nodes.Node;
@@ -49,19 +52,19 @@ public class YamlDeserializer {
      * Creates a new YamlDeserializer
      */
     public YamlDeserializer() {
-        // This custom constructor is used to properly de-serialize item stacks
-        YamlConstructor yamlConstructor = new YamlConstructor();
+        // This is used to de-serialize custom types
+        YamlConstructorFactory ctorFactory = new YamlConstructorFactory();
 
         // Check whether the SnakeYAML library currently in use imposes DOS protection
         // We want to turn this off so that de-serialization cannot break horrible with large files
         // DOS isn't our concern, so yeet it.
-        Yaml yaml;
+        Yaml yaml = null;
         Class<?> loaderOptionsType = CommonUtil.getClass("org.yaml.snakeyaml.LoaderOptions");
         if (loaderOptionsType != null && SafeMethod.contains(loaderOptionsType, "setNestingDepthLimit", int.class)) {
             try {
                 Constructor<Yaml> constr = Yaml.class.getConstructor(BaseConstructor.class, Representer.class, DumperOptions.class, LoaderOptions.class, Resolver.class);
 
-                Representer representer = new Representer();
+                Representer representer = new Representer(new DumperOptions());
                 DumperOptions dumperOptions = new DumperOptions();
                 dumperOptions.setDefaultFlowStyle(representer.getDefaultFlowStyle());
                 dumperOptions.setDefaultScalarStyle(representer.getDefaultScalarStyle());
@@ -72,15 +75,18 @@ public class YamlDeserializer {
                 LoaderOptions.class.getMethod("setCodePointLimit", int.class).invoke(loaderOptions, Integer.MAX_VALUE);
                 LoaderOptions.class.getMethod("setMaxAliasesForCollections", int.class).invoke(loaderOptions, Integer.MAX_VALUE);
                 Resolver resolver = new Resolver();
+                SafeConstructor yamlConstructor = ctorFactory.create(loaderOptions);
                 yaml = constr.newInstance(yamlConstructor, representer, dumperOptions, loaderOptions, resolver);
             } catch (Throwable t) {
                 Logging.LOGGER_CONFIG.log(Level.SEVERE, "Failed to disable SnakeYAML document size limits", t);
 
                 // Fallback
+                SafeConstructor yamlConstructor = ctorFactory.create();
                 yaml = new Yaml(yamlConstructor);
             }
         } else {
             // Default constructor
+            SafeConstructor yamlConstructor = ctorFactory.create();
             yaml = new Yaml(yamlConstructor);
         }
 
@@ -330,12 +336,12 @@ public class YamlDeserializer {
 
     // Custom version of org.bukkit.configuration.file.YamlConstructor
     // This allows us to add our own handlers for certain object types
-    private static class YamlConstructor extends SafeConstructor {
+    private static class YamlConstructorFactory {
         private final Map<String, Function<Map<String, Object>, ? extends Object>> custom_builders;
 
-        public YamlConstructor() {
-            this.yamlConstructors.put(Tag.MAP, new ConstructCustomObject());
+        public YamlConstructorFactory() {
             this.custom_builders = new HashMap<>();
+
             this.register("org.bukkit.inventory.ItemStack", ItemStackDeserializer.INSTANCE);
 
             // On versions 1.12.2 and before we must keep a backup of the original Map that created the
@@ -351,14 +357,55 @@ public class YamlDeserializer {
             custom_builders.put(typeName, builder);
         }
 
-        private class ConstructCustomObject extends ConstructYamlMap {
+        public SafeConstructor create(LoaderOptions loaderOptions) {
+            SafeConstructor ctor = new SafeConstructor(loaderOptions);
+            initConstructor(ctor);
+            return ctor;
+        }
+
+        public SafeConstructor create() {
+            // If empty constructor is available, use that. Otherwise, instantiate
+            // new LoaderOptions and use the other method.
+            try {
+                Constructor<SafeConstructor> ctor_ctor = SafeConstructor.class.getConstructor();
+                SafeConstructor ctor = ctor_ctor.newInstance();
+                initConstructor(ctor);
+                return ctor;
+            } catch (Throwable t) {
+                return createWithDefaultOptions();
+            }
+        }
+
+        private SafeConstructor createWithDefaultOptions() {
+            return create(new LoaderOptions());
+        }
+
+        private void initConstructor(SafeConstructor ctor) {
+            try {
+                Map<Tag, Construct> yamlConstructors = CommonUtil.unsafeCast(SafeField.get(ctor, "yamlConstructors", Map.class));
+
+                // Replace the 'Map' constructor with one that handles our custom type de-serialization logic
+                // The original 'Map' constructor is re-purposed to construct the map itself (super call)
+                yamlConstructors.computeIfPresent(Tag.MAP, (u, base) -> new ConstructCustomObject(base));
+            } catch (Throwable t) {
+                throw MountiplexUtil.uncheckedRethrow(t);
+            }
+        }
+
+        private class ConstructCustomObject implements org.yaml.snakeyaml.constructor.Construct {
+            private final org.yaml.snakeyaml.constructor.Construct mapConstructor;
+
+            public ConstructCustomObject(org.yaml.snakeyaml.constructor.Construct mapConstructor) {
+                this.mapConstructor = mapConstructor;
+            }
+
             @Override
             public Object construct(Node node) {
                 if (node.isTwoStepsConstruction()) {
                     throw new YAMLException("Unexpected referential mapping structure. Node: " + node);
                 }
 
-                Map<?, ?> raw = (Map<?, ?>) super.construct(node);
+                Map<?, ?> raw = (Map<?, ?>) this.mapConstructor.construct(node);
 
                 String serialized_type = LogicUtil.applyIfNotNull(raw.get(ConfigurationSerialization.SERIALIZED_TYPE_KEY), Object::toString, null);
                 if (serialized_type != null) {
@@ -390,6 +437,11 @@ public class YamlDeserializer {
                 }
 
                 return raw;
+            }
+
+            @Override
+            public void construct2ndStep(Node node, Object object) {
+                mapConstructor.construct2ndStep(node, object);
             }
         }
     }
