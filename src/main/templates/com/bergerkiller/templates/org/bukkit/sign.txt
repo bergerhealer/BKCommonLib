@@ -21,6 +21,10 @@ class Sign extends BlockState {
         SignSide back = instance.getSide(Side.BACK);
         return back.getLines();
     }
+
+    public static boolean isChangingFrontLines(org.bukkit.event.block.SignChangeEvent event) {
+        return event.getSide() == Side.FRONT;
+    }
 #else
     public String getBackLine(int index) {
         return "";
@@ -29,6 +33,10 @@ class Sign extends BlockState {
     }
     public String[] getBackLines() {
         return new String[] {"", "", "", ""};
+    }
+
+    public static boolean isChangingFrontLines(org.bukkit.event.block.SignChangeEvent event) {
+        return true;
     }
 #endif
 }

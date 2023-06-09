@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.utils;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import com.bergerkiller.generated.org.bukkit.block.SignHandle;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -11,6 +12,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.event.block.BlockRedstoneEvent;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.material.Directional;
 import org.bukkit.material.MaterialData;
 
@@ -586,5 +588,16 @@ public class BlockUtil extends MaterialUtil {
      */
     public static boolean canSupportTop(Block block) {
         return WorldUtil.getBlockData(block).canSupportTop(block);
+    }
+
+    /**
+     * Gets whether the lines that changed of a sign were the back lines, rather than the front lines.
+     * Always returns true on MC &lt; 1.20.
+     *
+     * @param event
+     * @return True if the front lines were changed, false if back lines (>= MC 1.20 only)
+     */
+    public static boolean isChangingFrontLines(SignChangeEvent event) {
+        return SignHandle.isChangingFrontLines(event);
     }
 }

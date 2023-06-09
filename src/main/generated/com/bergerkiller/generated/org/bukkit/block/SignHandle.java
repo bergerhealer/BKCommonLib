@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.org.bukkit.block;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.event.block.SignChangeEvent;
 
 /**
  * Instance wrapper handle for type <b>org.bukkit.block.Sign</b>.
@@ -19,6 +20,10 @@ public abstract class SignHandle extends BlockStateHandle {
 
     /* ============================================================================== */
 
+    public static boolean isChangingFrontLines(SignChangeEvent event) {
+        return T.isChangingFrontLines.invoker.invoke(null,event);
+    }
+
     public abstract String getFrontLine(int index);
     public abstract void setFrontLine(int index, String text);
     public abstract String[] getFrontLines();
@@ -30,6 +35,8 @@ public abstract class SignHandle extends BlockStateHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class SignClass extends Template.Class<SignHandle> {
+        public final Template.StaticMethod<Boolean> isChangingFrontLines = new Template.StaticMethod<Boolean>();
+
         public final Template.Method<String> getFrontLine = new Template.Method<String>();
         public final Template.Method<Void> setFrontLine = new Template.Method<Void>();
         public final Template.Method<String[]> getFrontLines = new Template.Method<String[]>();
