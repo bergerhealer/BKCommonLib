@@ -345,7 +345,9 @@ class EntityTrackerEntry {
         instance#paperUpdatePlayers(players);
   #else
         // Spigot / old paper
-    #if version >= 1.17
+    #if version >= 1.20
+        WorldServer world = (WorldServer) entity.level();
+    #elseif version >= 1.17
         WorldServer world = (WorldServer) entity.level;
     #else
         WorldServer world = (WorldServer) entity.world;
