@@ -185,24 +185,32 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *     #require EntityPlayer private boolean isChangingDimension:worldChangeInvuln;
          * #endif
          *     player#isChangingDimension = true;
-         * 
+         *
+         * #if version >= 1.20
+         *     WorldServer world = (WorldServer) player.level();
+         * #elseif version >= 1.17
+         *     WorldServer world = player.getLevel();
+         * #else
+         *     WorldServer world = player.getWorldServer();
+         * #endif
+         *
          * #if version >= 1.18
          *     player.unRide();
-         *     player.getLevel().removePlayerImmediately(player, Entity$RemovalReason.CHANGED_DIMENSION);
+         *     world.removePlayerImmediately(player, Entity$RemovalReason.CHANGED_DIMENSION);
          *     if (!player.wonGame) {
          *         player.wonGame = true;
          *         player.connection.send(new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.WIN_GAME, seenCredits ? 0.0F : 1.0F));
          *     }
          * #elseif version >= 1.17
          *     player.decouple();
-         *     player.getWorldServer().a(player, Entity$RemovalReason.CHANGED_DIMENSION);
+         *     world.a(player, Entity$RemovalReason.CHANGED_DIMENSION);
          *     if (!player.wonGame) {
          *         player.wonGame = true;
          *         player.connection.sendPacket((Packet) new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.WIN_GAME, seenCredits ? 0.0F : 1.0F));
          *     }
          * #else
          *     player.decouple();
-         *     player.getWorldServer().removePlayer(player);
+         *     world.removePlayer(player);
          *     if (!player.viewingCredits) {
          *         player.viewingCredits = true;
          *   #if version >= 1.16
