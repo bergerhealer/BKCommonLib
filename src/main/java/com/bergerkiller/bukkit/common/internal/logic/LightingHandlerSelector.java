@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.util.concurrent.CompletableFuture;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.component.LibraryComponentSelector;
@@ -13,6 +14,9 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
  * forwards calls to that handler.
  */
 public final class LightingHandlerSelector implements LightingHandler {
+    static {
+        CommonBootstrap.initServer();
+    }
     public static final LightingHandlerSelector INSTANCE = new LightingHandlerSelector();
 
     private final LightingHandler fallback;
@@ -24,7 +28,8 @@ public final class LightingHandlerSelector implements LightingHandler {
         this.fallback = LibraryComponentSelector.forModule(LightingHandler.class)
                 .setDefaultComponent(LightingHandlerDisabled::new)
                 .addVersionOption(null, "1.13.2", LightingHandler_1_8_to_1_13_2::new)
-                .addVersionOption("1.14", null, LightingHandler_1_14::new)
+                .addVersionOption("1.14", "1.19.4", LightingHandler_1_14::new)
+                .addVersionOption("1.20", null, LightingHandler_1_20::new)
                 .update();
 
         // Cubic chunks
