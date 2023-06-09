@@ -197,8 +197,30 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
             return !Helper.ADDED_MC_1_19_4.contains(type);
         });
 
+        // From MC 1.20 to 1.19.4
+        this.register(3337, map -> {
+            Object type = map.get("type");
+
+            // Remap 4 old archeology items
+            if ("ARCHER_POTTERY_SHERD".equals(type)) {
+                map.put("type", "POTTERY_SHARD_ARCHER");
+                return true;
+            } else if ("PRIZE_POTTERY_SHERD".equals(type)) {
+                map.put("type", "POTTERY_SHARD_PRIZE");
+                return true;
+            } else if ("ARMS_UP_POTTERY_SHERD".equals(type)) {
+                map.put("type", "POTTERY_SHARD_ARMS_UP");
+                return true;
+            } else if ("SKULL_POTTERY_SHERD".equals(type)) {
+                map.put("type", "POTTERY_SHARD_SKULL");
+                return true;
+            } else {
+                return !Helper.ADDED_MC_1_20.contains(type);
+            }
+        });
+
         // Maximum supported data version
-        this.max_version = 3337; // MC 1.19.4
+        this.max_version = 3463; // MC 1.20
     }
 
     // Registers a converter if it can convert from a future data version only
@@ -657,6 +679,22 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                 "POTTERY_SHARD_ARCHER", "POTTERY_SHARD_PRIZE", "POTTERY_SHARD_ARMS_UP",
                 "POTTERY_SHARD_SKULL", "CHERRY_WALL_SIGN", "CHERRY_WALL_HANGING_SIGN",
                 "POTTED_TORCHFLOWER", "POTTED_CHERRY_SAPLING", "TORCHFLOWER_CROP"
+        ));
+
+        // All material names (Material enum) added Minecraft 1.19.4 -> 1.20
+        public static final Set<String> ADDED_MC_1_20 = new HashSet<String>(Arrays.asList(
+                "SUSPICIOUS_GRAVEL", "PITCHER_PLANT", "SNIFFER_EGG", "PITCHER_CROP",
+                "CALIBRATED_SCULK_SENSOR", "PITCHER_POD", "MUSIC_DISC_RELIC",
+                "WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE", "SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE",
+                "SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE", "RAISER_ARMOR_TRIM_SMITHING_TEMPLATE",
+                "HOST_ARMOR_TRIM_SMITHING_TEMPLATE", "ANGLER_POTTERY_SHERD",
+                "ARCHER_POTTERY_SHERD", "ARMS_UP_POTTERY_SHERD", "BLADE_POTTERY_SHERD",
+                "BREWER_POTTERY_SHERD", "BURN_POTTERY_SHERD", "DANGER_POTTERY_SHERD",
+                "EXPLORER_POTTERY_SHERD", "FRIEND_POTTERY_SHERD", "HEART_POTTERY_SHERD",
+                "HEARTBREAK_POTTERY_SHERD", "HOWL_POTTERY_SHERD", "MINER_POTTERY_SHERD",
+                "MOURNER_POTTERY_SHERD", "PLENTY_POTTERY_SHERD", "PRIZE_POTTERY_SHERD",
+                "SHEAF_POTTERY_SHERD", "SHELTER_POTTERY_SHERD", "SKULL_POTTERY_SHERD",
+                "SNORT_POTTERY_SHERD"
         ));
     }
 }
