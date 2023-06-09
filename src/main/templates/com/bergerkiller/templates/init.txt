@@ -7,6 +7,7 @@
 #include /org/bukkit/entity.txt
 #include /org/bukkit/inventory.txt
 #include /org/bukkit/blockstate.txt
+#include /org/bukkit/sign.txt
 #include /org/bukkit/world.txt
 #include /org/bukkit/block_events.txt
 #include /org/bukkit/craftbukkit/entity.txt

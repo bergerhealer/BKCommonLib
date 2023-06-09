@@ -271,4 +271,10 @@ public class CommonCapabilities {
      * Since Minecraft 1.19.4 there is a bundle packet. Is also used by the server.
      */
     public static final boolean HAS_BUNDLE_PACKET = CommonBootstrap.evaluateMCVersion(">=", "1.19.4");
+
+    /**
+     * Since Minecraft 1.20 players can assign text to both the front and the back side of signs.
+     * As such a separate 'back' sign text property is available/tracked.
+     */
+    public static final boolean HAS_SIGN_BACK_TEXT = CommonBootstrap.evaluateMCVersion(">=", "1.20");
 }

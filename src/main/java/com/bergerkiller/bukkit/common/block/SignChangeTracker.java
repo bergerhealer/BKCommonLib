@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.generated.org.bukkit.block.SignHandle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -32,9 +34,11 @@ import com.bergerkiller.mountiplex.reflection.util.FastField;
 public class SignChangeTracker implements Cloneable {
     private final Block block;
     private Sign state;
+    private SignHandle stateHandle;
     private BlockData blockData;
     private TileEntitySignHandle tileEntity;
-    private Object[] lastRawLines;
+    private Object[] lastRawFrontLines;
+    private Object[] lastRawBackLines;
 
     // Need to swap what implementation we're using for certain server types
     private static final Function<Block, SignChangeTracker> constructor;
@@ -58,23 +62,29 @@ public class SignChangeTracker implements Cloneable {
     protected SignChangeTracker(Block block) {
         this.block = block;
         this.state = null;
+        this.stateHandle = null;
         this.tileEntity = null;
-        this.lastRawLines = null;
+        this.lastRawFrontLines = null;
+        this.lastRawBackLines = null;
     }
 
     private void initState(Sign state) {
         this.state = state;
+        this.stateHandle = SignHandle.createHandle(state);
         this.loadTileEntity(TileEntitySignHandle.fromBukkit(state));
     }
 
     private void loadTileEntity(TileEntitySignHandle tile) {
         if (tile == null) {
             this.tileEntity = null;
-            this.lastRawLines = null;
+            this.lastRawFrontLines = null;
+            this.lastRawBackLines = null;
             this.blockData = null;
         } else {
             this.tileEntity = tile;
-            this.lastRawLines = tile.getRawLines().clone();
+            this.lastRawFrontLines = tile.getRawFrontLines().clone();
+            this.lastRawBackLines = CommonCapabilities.HAS_SIGN_BACK_TEXT
+                    ? tile.getRawBackLines().clone() : null;
 
             // Note: it is possible for a TileEntity to be retrieved while it's added to a Chunk,
             // but not yet to a World. Especially on 1.12.2 and before. For that reason, we got to
@@ -118,6 +128,73 @@ public class SignChangeTracker implements Cloneable {
      */
     public int getZ() {
         return this.block.getZ();
+    }
+
+    /**
+     * Gets a line of the front of the sign
+     *
+     * @param index Line index
+     * @return Line at this index at the front of the sign
+     */
+    public String getFrontLine(int index) {
+        return stateHandle.getFrontLine(index);
+    }
+
+    /**
+     * Sets a line of the front of the sign, updating the sign in the world.
+     * After calling {@link #update()} this change will be detected.
+     *
+     * @param index Line index
+     * @param text New text to put at this index at the front of the sign
+     */
+    public void setFrontLine(int index, String text) {
+        stateHandle.setFrontLine(index, text);
+        state.update(true);
+    }
+
+    /**
+     * Gets all the lines put at the front of the sign. 4 lines.
+     *
+     * @return Sign front lines
+     */
+    public String[] getFrontLines() {
+        return stateHandle.getFrontLines();
+    }
+
+    /**
+     * Gets a line of the back of the sign.
+     * Always returns an empty String on Minecraft versions below 1.20.
+     *
+     * @param index Line index
+     * @return Line at this index at the back of the sign
+     */
+    public String getBackLine(int index) {
+        return stateHandle.getBackLine(index);
+    }
+
+    /**
+     * Sets a line of the back of the sign, updating the sign in the world.
+     * After calling {@link #update()} this change will be detected.
+     * Does nothing on Minecraft versions below 1.20.
+     *
+     * @param index Line index
+     * @param text New text to put at this index at the back of the sign
+     */
+    public void setBackLine(int index, String text) {
+        if (CommonCapabilities.HAS_SIGN_BACK_TEXT) {
+            stateHandle.setBackLine(index, text);
+            state.update(true);
+        }
+    }
+
+    /**
+     * Gets all the lines put at the front of the sign. 4 lines.
+     * Always returns an array of empty Strings on Minecraft versions below 1.20.
+     *
+     * @return Sign front lines
+     */
+    public String[] getBackLines() {
+        return stateHandle.getBackLines();
     }
 
     /**
@@ -236,9 +313,11 @@ public class SignChangeTracker implements Cloneable {
                 return true; // Backing TileEntity instance changed, so probably changed
             } else {
                 this.state = null;
+                this.stateHandle = null;
                 this.tileEntity = null;
                 this.blockData = null;
-                this.lastRawLines = null;
+                this.lastRawFrontLines = null;
+                this.lastRawBackLines = null;
                 return true; // Sign is gone
             }
         }
@@ -262,32 +341,58 @@ public class SignChangeTracker implements Cloneable {
     }
 
     private boolean detectChangedLines(TileEntitySignHandle tileEntity) {
-        Object[] oldRawLines = this.lastRawLines;
-        Object[] newRawLines = tileEntity.getRawLines();
-        int numLines = newRawLines.length;
-        if (oldRawLines.length != numLines) {
-            this.lastRawLines = newRawLines.clone();
-            return true; // Never happens, really
-        } else {
-            int line = 0;
-            while (line < numLines) {
-                Object newLine = newRawLines[line];
-                if (oldRawLines[line] != newLine) {
-                    oldRawLines[line] = newLine;
+        Object[] oldRawFrontLines = this.lastRawFrontLines;
+        Object[] newRawFrontLines = tileEntity.getRawFrontLines();
 
-                    // Detected a change. Re-create the Sign state with the updated lines,
-                    // and return true to indicate the change.
-                    while (++line < numLines) {
-                        oldRawLines[line] = newRawLines[line];
-                    }
-                    this.state = this.tileEntity.toBukkit();
-                    return true;
+        Object[] oldRawBackLines = this.lastRawBackLines;
+        Object[] newRawBackLines = tileEntity.getRawBackLines(); // Null on < 1.20
+
+        if (oldRawFrontLines.length != newRawFrontLines.length ||
+                (CommonCapabilities.HAS_SIGN_BACK_TEXT && oldRawBackLines.length != newRawBackLines.length)
+        ) {
+            this.lastRawFrontLines = newRawFrontLines.clone();
+            if (CommonCapabilities.HAS_SIGN_BACK_TEXT) {
+                this.lastRawBackLines = newRawBackLines.clone();
+            }
+            return true; // Never happens, really
+        }
+
+        if (!copyLinesCheckChanges(oldRawFrontLines, newRawFrontLines)) {
+            if (!CommonCapabilities.HAS_SIGN_BACK_TEXT || !copyLinesCheckChanges(oldRawBackLines, newRawBackLines)) {
+                // No changes.
+                return false;
+            }
+        } else if (CommonCapabilities.HAS_SIGN_BACK_TEXT) {
+            // Front changed, take over changes of back blindly as we haven't done the copy for thise
+            System.arraycopy(oldRawBackLines, 0, newRawBackLines, 0, newRawBackLines.length);
+        }
+
+        // Detected a change. Re-create the Sign state with the updated lines,
+        // and return true to indicate the change.
+        this.state = this.tileEntity.toBukkit();
+        this.stateHandle = SignHandle.createHandle(this.state);
+        return true;
+    }
+
+    private static boolean copyLinesCheckChanges(Object[] oldRawLines, Object[] newRawLines) {
+        int numLines = newRawLines.length;
+        int line = 0;
+        while (line < numLines) {
+            Object newLine = newRawLines[line];
+            if (oldRawLines[line] != newLine) {
+                oldRawLines[line] = newLine;
+
+                // Copy remaining lines over, too
+                while (++line < numLines) {
+                    oldRawLines[line] = newRawLines[line];
                 }
 
-                line++;
+                return true;
             }
-            return false;
+
+            line++;
         }
+        return false;
     }
 
     private boolean tryLoadFromWorld() {
@@ -299,6 +404,7 @@ public class SignChangeTracker implements Cloneable {
         ) {
             TileEntitySignHandle tileEntity = TileEntitySignHandle.createHandle(rawTileEntity);
             this.state = tileEntity.toBukkit();
+            this.stateHandle = SignHandle.createHandle(this.state);
             this.loadTileEntity(tileEntity);
             return true;
         }
@@ -343,9 +449,11 @@ public class SignChangeTracker implements Cloneable {
     public SignChangeTracker clone() {
         SignChangeTracker clone = new SignChangeTracker(this.block);
         clone.state = this.state;
+        clone.stateHandle = this.stateHandle;
         clone.blockData = this.blockData;
         clone.tileEntity = this.tileEntity;
-        clone.lastRawLines = this.lastRawLines;
+        clone.lastRawFrontLines = this.lastRawFrontLines;
+        clone.lastRawBackLines = this.lastRawBackLines;
         return clone;
     }
 

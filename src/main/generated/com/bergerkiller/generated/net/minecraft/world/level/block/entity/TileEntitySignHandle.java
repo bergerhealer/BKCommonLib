@@ -19,7 +19,8 @@ public abstract class TileEntitySignHandle extends TileEntityHandle {
 
     /* ============================================================================== */
 
-    public abstract Object[] getRawLines();
+    public abstract Object[] getRawFrontLines();
+    public abstract Object[] getRawBackLines();
 
     @Override
     public org.bukkit.block.Sign toBukkit() {
@@ -34,7 +35,8 @@ public abstract class TileEntitySignHandle extends TileEntityHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class TileEntitySignClass extends Template.Class<TileEntitySignHandle> {
-        public final Template.Method<Object[]> getRawLines = new Template.Method<Object[]>();
+        public final Template.Method<Object[]> getRawFrontLines = new Template.Method<Object[]>();
+        public final Template.Method<Object[]> getRawBackLines = new Template.Method<Object[]>();
 
     }
 

@@ -1,0 +1,34 @@
+package org.bukkit.block;
+
+import org.bukkit.block.sign.SignSide;
+import org.bukkit.block.sign.Side;
+
+class Sign extends BlockState {
+    public String getFrontLine:getLine(int index);
+    public void setFrontLine:setLine(int index, String text);
+    public String[] getFrontLines:getLines();
+
+#if version >= 1.20
+    public String getBackLine(int index) {
+        SignSide back = instance.getSide(Side.BACK);
+        return back.getLine(index);
+    }
+    public void setBackLine(int index, String text) {
+        SignSide back = instance.getSide(Side.BACK);
+        back.setLine(index, text);
+    }
+    public String[] getBackLines() {
+        SignSide back = instance.getSide(Side.BACK);
+        return back.getLines();
+    }
+#else
+    public String getBackLine(int index) {
+        return "";
+    }
+    public void setBackLine(int index, String text) {
+    }
+    public String[] getBackLines() {
+        return new String[] {"", "", "", ""};
+    }
+#endif
+}
