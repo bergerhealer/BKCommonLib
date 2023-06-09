@@ -220,7 +220,8 @@ public class ItemMaterialTest {
                 .checkNewAndLegacy("REDSTONE_BLOCK", true)
                 .check("LECTERN", true) // since mc 1.14
                 .check("LIGHTNING_ROD", true) // since mc 1.17
-                .check("SCULK_SENSOR", true); // since mc 1.17
+                .check("SCULK_SENSOR", true) // since mc 1.17
+                .check("CALIBRATED_SCULK_SENSOR", true); // since mc 1.20
 
             if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
                 // TODO!
