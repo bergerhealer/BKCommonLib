@@ -2,6 +2,7 @@ package net.minecraft.world.item.crafting;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.IRegistryCustom;
+import net.minecraft.core.IRegistryCustom$Dimension;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.Items;
@@ -33,8 +34,9 @@ class IRecipe {
             return itemstack;
         } else {
   #if version >= 1.19.4
-            //TODO: Technically could support World.registryAccess()!
-            return instance.getResultItem(IRegistryCustom.EMPTY);
+            //TODO: Technically could support world-specific recipes!
+            IRegistryCustom$Dimension registry = MinecraftServer.getServer().registryAccess();
+            return instance.getResultItem(registry);
   #elseif version >= 1.18
             return instance.getResultItem();
   #else
@@ -203,7 +205,8 @@ class CraftingManager {
             // One is shapeless, the other is complex
             // Correct for this and only keep the complex one!
   #if version >= 1.19.4
-            if (!(recipe instanceof RecipeFireworks) && ((IRecipe) recipe).getResultItem(IRegistryCustom.EMPTY).getItem() == Items.FIREWORK_ROCKET) {
+            IRegistryCustom$Dimension registry = MinecraftServer.getServer().registryAccess();
+            if (!(recipe instanceof RecipeFireworks) && ((IRecipe) recipe).getResultItem(registry).getItem() == Items.FIREWORK_ROCKET) {
                 continue;
             }
   #elseif version >= 1.18
