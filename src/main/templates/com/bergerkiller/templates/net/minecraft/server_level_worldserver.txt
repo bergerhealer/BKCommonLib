@@ -263,7 +263,9 @@ class WorldServer extends World {
   #endif
 
         if (chunk != null) {
-  #if exists net.minecraft.server.level.PlayerChunk public final net.minecraft.world.level.chunk.Chunk getFullChunk();
+  #if exists net.minecraft.server.level.PlayerChunk public net.minecraft.world.level.chunk.Chunk getFullChunkNow();
+            return chunk.getFullChunkNow();
+  #elseif exists net.minecraft.server.level.PlayerChunk public net.minecraft.world.level.chunk.Chunk getFullChunk();
             return chunk.getFullChunk();
   #else
             java.util.concurrent.CompletableFuture statusFuture;
