@@ -806,7 +806,15 @@ public final class CommonMapController implements PacketListener, Listener {
             if (items != null) {
                 ListIterator<DataWatcher.PackedItem<Object>> itemsIter = items.listIterator();
                 while (itemsIter.hasNext()) {
-                    DataWatcher.PackedItem<ItemStack> item = itemsIter.next().translate(EntityItemFrameHandle.DATA_ITEM);
+                    DataWatcher.PackedItem<Object> itemRaw = itemsIter.next();
+
+                    // Some plugins send garbage that isn't metadata and need to be updated
+                    // In that case, a null entry is put (as it cannot be converted)
+                    if (itemRaw == null) {
+                        continue;
+                    }
+
+                    DataWatcher.PackedItem<ItemStack> item = itemRaw.translate(EntityItemFrameHandle.DATA_ITEM);
                     if (item == null) {
                         continue;
                     }
@@ -847,9 +855,13 @@ public final class CommonMapController implements PacketListener, Listener {
         List<DataWatcher.PackedItem<Object>> items = entityMetadataPacket.read(PacketType.OUT_ENTITY_METADATA.watchedObjects);
         if (items != null) {
             for (DataWatcher.PackedItem<Object> dw_item : items) {
-                DataWatcher.PackedItem<ItemStack> item = dw_item.translate(EntityItemFrameHandle.DATA_ITEM);
-                if (item != null) {
-                    return CommonMapUUIDStore.isMap(item.value());
+                // Some plugins send garbage that isn't metadata and need to be updated
+                // In that case, a null entry is put (as it cannot be converted)
+                if (dw_item != null) {
+                    DataWatcher.PackedItem<ItemStack> item = dw_item.translate(EntityItemFrameHandle.DATA_ITEM);
+                    if (item != null) {
+                        return CommonMapUUIDStore.isMap(item.value());
+                    }
                 }
             }
         }
