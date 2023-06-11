@@ -12,7 +12,11 @@ optional class LightEngineThreaded {
         #require LightEngineThreaded private final net.minecraft.server.level.PlayerChunkMap chunkMap;
         net.minecraft.server.level.PlayerChunkMap pcm = instance#chunkMap;
         net.minecraft.server.level.WorldServer world = pcm.level;
+    #if version >= 1.20
+        world.chunkTaskScheduler.parallelGenExecutor.queueRunnable(runnable);
+    #else
         world.chunkTaskScheduler.lightExecutor.queueRunnable(runnable);
+    #endif
 
   #else
         // Spigot/Legacy Paper

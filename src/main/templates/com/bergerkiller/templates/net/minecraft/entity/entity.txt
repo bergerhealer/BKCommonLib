@@ -1967,7 +1967,13 @@ class Entity {
     }
 
     public (WorldHandle) World getWorld:level();
+
+    // Public on Paper
+  #if exists net.minecraft.world.entity.Entity public void setLevel(net.minecraft.world.level.World world);
+    public void setWorld:setLevel((WorldHandle) World world);
+  #else
     protected void setWorld:setLevel((WorldHandle) World world);
+  #endif
 #else
     public org.bukkit.World getBukkitWorld() {
   #if version >= 1.17
