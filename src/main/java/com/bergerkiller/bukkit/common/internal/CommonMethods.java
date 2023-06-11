@@ -15,6 +15,9 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHa
 public class CommonMethods {
 
     public static BlockState CraftBlockState_new(Block block) {
+        if (block == null) {
+            throw new IllegalArgumentException("Input block is null");
+        }
         return CraftBlockStateHandle.createNew(block);
     }
 
