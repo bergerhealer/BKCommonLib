@@ -4,7 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.material.Sign;
 
 /**
- * Sign class for non-standard Sign material types to fix the isWallSign() function
+ * Sign class for non-standard Sign material types to fix the isWallSign() function.
  */
 @Deprecated
 public class CommonSignDataFix extends Sign {

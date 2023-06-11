@@ -18,6 +18,7 @@ import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEnt
 public class BlockStateType extends BasicWrapper<TileEntityTypesHandle> {
     private static final Map<Object, BlockStateType> _cache = new IdentityHashMap<>();
     public static final BlockStateType SIGN = byName("sign");
+    public static final BlockStateType HANGING_SIGN = byName("hanging_sign");
 
     private BlockStateType(TileEntityTypesHandle handle) {
         setHandle(handle);

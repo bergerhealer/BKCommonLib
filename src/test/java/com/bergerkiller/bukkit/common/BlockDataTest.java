@@ -303,6 +303,34 @@ public class BlockDataTest {
     }
 
     @Test
+    public void testHangingSigns() {
+        if (!Common.evaluateMCVersion(">=", "1.19.3")) {
+            return;
+        }
+
+        for (String name : new String[] {
+                "OAK_HANGING_SIGN", "SPRUCE_HANGING_SIGN",
+                "BIRCH_HANGING_SIGN", "JUNGLE_HANGING_SIGN",
+                "ACACIA_HANGING_SIGN", "DARK_OAK_HANGING_SIGN",
+                "MANGROVE_HANGING_SIGN", "BAMBOO_HANGING_SIGN",
+                "CRIMSON_HANGING_SIGN", "WARPED_HANGING_SIGN",
+
+                "OAK_WALL_HANGING_SIGN", "SPRUCE_WALL_HANGING_SIGN",
+                "BIRCH_WALL_HANGING_SIGN", "JUNGLE_WALL_HANGING_SIGN",
+                "ACACIA_WALL_HANGING_SIGN", "DARK_OAK_WALL_HANGING_SIGN",
+                "MANGROVE_WALL_HANGING_SIGN", "BAMBOO_WALL_HANGING_SIGN",
+                "CRIMSON_WALL_HANGING_SIGN", "WARPED_WALL_HANGING_SIGN"
+        }) {
+            testSignMaterial(MaterialUtil.getMaterial(name), false);
+        }
+
+        if (!Common.evaluateMCVersion(">=", "1.19.4")) {
+            testSignMaterial(MaterialUtil.getMaterial("CHERRY_HANGING_SIGN"), false);
+            testSignMaterial(MaterialUtil.getMaterial("CHERRY_WALL_HANGING_SIGN"), false);
+        }
+    }
+
+    @Test
     public void testSerialize() {
         // Retrieve some complicated BlockData
         BlockData blockData = BlockData.fromMaterial(Material.FURNACE)

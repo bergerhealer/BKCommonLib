@@ -612,6 +612,69 @@ public class IBlockDataToMaterialData {
                 }
             }.build();
         }
+
+        // Minecraft 1.19.3 (1.20 enables it) adds HANGING signs
+        if (Common.evaluateMCVersion(">=", "1.19.3")) {
+            new CustomMaterialDataBuilder<CommonHangingSignDataFix>() {
+                @Override
+                public CommonHangingSignDataFix create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                    return new CommonHangingSignDataFix(material_type, legacy_data_value, false);
+                }
+
+                @Override
+                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, CommonHangingSignDataFix target) {
+                    List<IBlockDataHandle> states = new ArrayList<>(4);
+                    IBlockDataHandle base = iblockdata.set("rotation", Integer.valueOf(target.getData()));
+                    for (boolean waterlogged : new boolean[] {false, true}) {
+                        base = base.set("waterlogged", waterlogged);
+                        for (boolean attached : new boolean[] {false, true}) {
+                            states.add(base.set("attached", attached));
+                        }
+                    }
+                    return states;
+                }
+
+                @Override
+                public Material toLegacy(Material material) {
+                    return CommonLegacyMaterials.getLegacyMaterial("SIGN_POST");
+                }
+            }.setTypes("OAK_HANGING_SIGN", "SPRUCE_HANGING_SIGN",
+                       "BIRCH_HANGING_SIGN", "JUNGLE_HANGING_SIGN",
+                       "ACACIA_HANGING_SIGN", "DARK_OAK_HANGING_SIGN",
+                       "MANGROVE_HANGING_SIGN", "BAMBOO_HANGING_SIGN",
+                       "CRIMSON_HANGING_SIGN", "WARPED_HANGING_SIGN")
+                    .addTypesIf(Common.evaluateMCVersion(">=", "1.19.4"),
+                            "CHERRY_HANGING_SIGN")
+                    .setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+                    .build();
+
+            new CustomMaterialDataBuilder<CommonHangingSignDataFix>() {
+                @Override
+                public CommonHangingSignDataFix create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                    return new CommonHangingSignDataFix(material_type, legacy_data_value, true);
+                }
+
+                @Override
+                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, CommonHangingSignDataFix target) {
+                    IBlockDataHandle base = iblockdata.set("facing", target.getFacing());
+                    return Arrays.asList(base.set("waterlogged", false),
+                                         base.set("waterlogged", true));
+                }
+
+                @Override
+                public Material toLegacy(Material material) {
+                    return CommonLegacyMaterials.getLegacyMaterial("SIGN_POST");
+                }
+            }.setTypes("OAK_WALL_HANGING_SIGN", "SPRUCE_WALL_HANGING_SIGN",
+                       "BIRCH_WALL_HANGING_SIGN", "JUNGLE_WALL_HANGING_SIGN",
+                       "ACACIA_WALL_HANGING_SIGN", "DARK_OAK_WALL_HANGING_SIGN",
+                       "MANGROVE_WALL_HANGING_SIGN", "BAMBOO_WALL_HANGING_SIGN",
+                       "CRIMSON_WALL_HANGING_SIGN", "WARPED_WALL_HANGING_SIGN")
+                    .addTypesIf(Common.evaluateMCVersion(">=", "1.19.4"),
+                            "CHERRY_WALL_HANGING_SIGN")
+                    .setDataValues(0,1,6,7,8,9,10,11,12,13,14,15,2,3,4,5)
+                    .build();
+        }
     }
 
     private static void storeMaterialDataGen(String legacyTypeName, int data_start, int data_end) {
