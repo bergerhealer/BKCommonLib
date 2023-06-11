@@ -131,6 +131,37 @@ public class SignChangeTracker implements Cloneable {
     }
 
     /**
+     * Gets a line at one side of the sign
+     *
+     * @param index Line index
+     * @return Line at this index
+     */
+    public String getLine(SignSide side, int index) {
+        return side.getLine(stateHandle, index);
+    }
+
+    /**
+     * Sets a line of one side of the sign, updating the sign in the world.
+     * After calling {@link #update()} this change will be detected.
+     *
+     * @param index Line index
+     * @param text New text to put at this index
+     */
+    public void setLine(SignSide side, int index, String text) {
+        side.setLine(stateHandle, index, text);
+        state.update(true);
+    }
+
+    /**
+     * Gets all the lines put at a side of the sign. 4 lines.
+     *
+     * @return Sign lines
+     */
+    public String[] getLines(SignSide side) {
+        return side.getLines(stateHandle);
+    }
+
+    /**
      * Gets a line of the front of the sign
      *
      * @param index Line index

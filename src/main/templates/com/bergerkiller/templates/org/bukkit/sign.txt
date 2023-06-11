@@ -4,6 +4,7 @@ import org.bukkit.block.sign.SignSide;
 import org.bukkit.block.sign.Side;
 
 class Sign extends BlockState {
+    //TODO: This API is deprecated, might break/be removed in the future
     public String getFrontLine:getLine(int index);
     public void setFrontLine:setLine(int index, String text);
     public String[] getFrontLines:getLines();
