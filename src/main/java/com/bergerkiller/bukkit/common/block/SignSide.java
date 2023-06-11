@@ -1,8 +1,13 @@
 package com.bergerkiller.bukkit.common.block;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.utils.BlockUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.org.bukkit.block.SignHandle;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.event.block.SignChangeEvent;
 
 import java.util.function.Function;
 
@@ -43,6 +48,46 @@ public enum SignSide {
      */
     public boolean isSupported() {
         return supported;
+    }
+
+    /**
+     * Gets whether this is the front side. Can be used in places where the side
+     * of text is represented using a boolean.
+     *
+     * @return True if this side is the front side
+     */
+    public boolean isFront() {
+        return this == FRONT;
+    }
+
+    /**
+     * Gets the facing of text on a side. If this is the BACK side, returns the
+     * opposite face.
+     *
+     * @param signBlock Sign Block
+     * @return Facing
+     */
+    public BlockFace getFacing(Block signBlock) {
+        BlockFace facing = BlockUtil.getFacing(signBlock);
+        if (this == BACK) {
+            facing = facing.getOppositeFace();
+        }
+        return facing;
+    }
+
+    /**
+     * Gets the facing of text on a side. If this is the BACK side, returns the
+     * opposite face.
+     *
+     * @param signBlockData Sign BlockData
+     * @return Facing
+     */
+    public BlockFace getFacing(BlockData signBlockData) {
+        BlockFace facing = signBlockData.getFacingDirection();
+        if (this == BACK) {
+            facing = facing.getOppositeFace();
+        }
+        return facing;
     }
 
     /**
@@ -115,6 +160,27 @@ public enum SignSide {
      */
     public void setLine(SignHandle sign, int index, String text) {
         lineSetter.set(sign, index, text);
+    }
+
+    /**
+     * Gets the side that was changed by a Player that caused a sign change event.
+     * Always returns FRONT on Minecraft versions &lt; 1.20.
+     *
+     * @param event SignChangeEvent
+     * @return Side that was changed
+     */
+    public static SignSide sideChanged(SignChangeEvent event) {
+        return SignHandle.isChangingFrontLines(event) ? FRONT : BACK;
+    }
+
+    /**
+     * Gets either FRONT or BACK depending on the input boolean
+     *
+     * @param front True for FRONT, False for BACK
+     * @return SignSide
+     */
+    public static SignSide byFront(boolean front) {
+        return front ? FRONT : BACK;
     }
 
     @FunctionalInterface
