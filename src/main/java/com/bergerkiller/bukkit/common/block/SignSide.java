@@ -25,10 +25,16 @@ public enum SignSide {
      */
     BACK(SignHandle::getBackLines, SignHandle::getBackLine, SignHandle::setBackLine, CommonCapabilities.HAS_SIGN_BACK_TEXT);
 
+    static {
+        FRONT.opposite = BACK;
+        BACK.opposite = FRONT;
+    }
+
     private final Function<SignHandle, String[]> allLinesGetter;
     private final LineGetterFunc lineGetter;
     private final LineSetterFunc lineSetter;
     private final boolean supported;
+    private SignSide opposite;
 
     SignSide(Function<SignHandle, String[]> allLinesGetter,
              LineGetterFunc lineGetter,
@@ -39,6 +45,15 @@ public enum SignSide {
         this.lineGetter = lineGetter;
         this.lineSetter = lineSetter;
         this.supported = supported;
+    }
+
+    /**
+     * Gets the opposite side
+     *
+     * @return opposite side
+     */
+    public SignSide opposite() {
+        return opposite;
     }
 
     /**
@@ -88,6 +103,32 @@ public enum SignSide {
             facing = facing.getOppositeFace();
         }
         return facing;
+    }
+
+    /**
+     * Selects the FRONT-assigned value out of two values which are this side,
+     * or the opposite of this side.
+     *
+     * @param selfSideValue Value assigned to this side
+     * @param oppositeSideValue Value assigned to the {@link #opposite()} side
+     * @return Front value
+     * @param <T> Value Type
+     */
+    public <T> T selectFront(T selfSideValue, T oppositeSideValue) {
+        return (this == FRONT) ? selfSideValue : oppositeSideValue;
+    }
+
+    /**
+     * Selects the BACK-assigned value out of two values which are this side,
+     * or the opposite of this side.
+     *
+     * @param selfSideValue Value assigned to this side
+     * @param oppositeSideValue Value assigned to the {@link #opposite()} side
+     * @return Back value
+     * @param <T> Value Type
+     */
+    public <T> T selectBack(T selfSideValue, T oppositeSideValue) {
+        return (this == BACK) ? selfSideValue : oppositeSideValue;
     }
 
     /**
