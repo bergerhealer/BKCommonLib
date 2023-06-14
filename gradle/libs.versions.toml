@@ -16,6 +16,7 @@ adventure = "4.12.0"
 adventure-platform-bukkit = "4.2.0"
 mockito = "2.22.0"
 junit = "4.13"
+shadow = "8.1.1"
 
 [libraries]
 spigot = { module = "org.spigotmc:spigot", version.ref = "spigot" }
@@ -38,3 +39,7 @@ adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure" 
 adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform-bukkit" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 junit = { module = "junit:junit", version.ref = "junit" }
+
+[plugins]
+mountiplex = { id = "com.bergerkiller.mountiplex", version.ref = "mountiplex" }
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
