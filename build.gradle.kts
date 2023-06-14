@@ -1,8 +1,8 @@
 plugins {
     id("java-library")
-    id("com.bergerkiller.mountiplex") version "2.93"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
     id("maven-publish")
+    alias(libs.plugins.mountiplex)
+    alias(libs.plugins.shadow)
 }
 
 val buildNumber = System.getenv("BUILD_NUMBER") ?: "NO-CI"
