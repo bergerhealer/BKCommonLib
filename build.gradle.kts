@@ -150,6 +150,8 @@ tasks {
     }
 
     processResources {
+        inputs.property("version", version)
+        inputs.property("build", buildNumber)
         from("src/main/templates")
         filesMatching(listOf("plugin.yml", "paper-plugin.yml")) {
             expand(
