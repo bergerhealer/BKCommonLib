@@ -838,7 +838,14 @@ public abstract class PluginBase extends JavaPlugin {
                 // If set, show the build number. Exclude NO-CI as there is no way to know what that means.
                 final String pluginBuild = pluginConfig.getString("build", "NO-CI");
                 if (!pluginBuild.equals("") && !pluginBuild.equals("NO-CI")) {
+                    // Build metric
                     metrics.addCustomChart(new Metrics.SimplePie("build", () -> pluginBuild));
+
+                    // Plugin + Build combined metric
+                    final String version = this.getDescription().getVersion();
+                    metrics.addCustomChart(new Metrics.DrilldownPie("pluginBuildVersion", () ->
+                        Collections.singletonMap(version, Collections.singletonMap(pluginBuild, 1))
+                    ));
                 }
             }
         } catch (Throwable t) {
