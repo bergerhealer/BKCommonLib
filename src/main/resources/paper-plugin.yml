@@ -24,6 +24,9 @@ dependencies:
 load-after:
   - name: ProtocolLib
 dev-url: ${url}
+bstats:
+  enabled: true
+  plugin-id: 18760
 preloader:
   hastebinServer: https://paste.traincarts.net
 permissions:

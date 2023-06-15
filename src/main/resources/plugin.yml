@@ -9,6 +9,9 @@ description: Is used in all of my plugins to re-use common functions
 softdepend: [ProtocolLib]
 classdepend: [WorldEdit, Vault, FastAsyncWorldEdit, ViaVersion, LuckPerms, InteractiveBoard]
 dev-url: ${url}
+bstats:
+  enabled: true
+  plugin-id: 18760
 preloader:
   hastebinServer: https://paste.traincarts.net
 permissions:
