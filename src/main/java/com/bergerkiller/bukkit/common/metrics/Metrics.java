@@ -1,564 +1,881 @@
 /*
- * Copyright 2011 Tyler Blair. All rights reserved.
+ * This Metrics class was auto-generated and can be copied into your project if you are
+ * not using a build tool like Gradle or Maven for dependency management.
  *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
+ * IMPORTANT: You are not allowed to modify this class, except changing the package.
  *
- *	1. Redistributions of source code must retain the above copyright notice, this list of
- *	   conditions and the following disclaimer.
+ * Disallowed modifications include but are not limited to:
+ *  - Remove the option for users to opt-out
+ *  - Change the frequency for data submission
+ *  - Obfuscate the code (every obfuscator should allow you to make an exception for specific files)
+ *  - Reformat the code (if you use a linter, add an exception)
  *
- *	2. Redistributions in binary form must reproduce the above copyright notice, this list
- *	   of conditions and the following disclaimer in the documentation and/or other materials
- *	   provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and contributors and should not be interpreted as representing official policies,
- * either expressed or implied, of anybody else.
+ * Violations will result in a ban of your plugin and account from bStats.
  */
 package com.bergerkiller.bukkit.common.metrics;
 
-import com.bergerkiller.bukkit.common.ModuleLogger;
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginDescriptionFile;
-
-import java.io.*;
-import java.net.Proxy;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.util.*;
-import java.util.Map.Entry;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.zip.GZIPOutputStream;
+import javax.net.ssl.HttpsURLConnection;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
-/**
- * <p>
- * The metrics class obtains data about a plugin and submits statistics about it
- * to the metrics backend. </p>
- * <p>
- * Public methods provided by this class: </p>
- * <code>
- * Graph createGraph(String name); <br/>
- * void addCustomData(BukkitMetrics.Plotter plotter); <br/>
- * void start(); <br/>
- * </code>
- */
 public class Metrics {
 
-    /**
-     * The current revision number
-     */
-    private final static int REVISION = 6;
-    /**
-     * The base url of the metrics domain
-     */
-    private static final String BASE_URL = "http://mcstats.org";
-    /**
-     * The url used to report a server's status
-     */
-    private static final String REPORT_URL = "/report/%s";
-    /**
-     * The separator to use for custom data. This MUST NOT change unless you are
-     * hosting your own version of metrics and want to change it.
-     */
-    private static final String CUSTOM_DATA_SEPARATOR = "~~";
-    /**
-     * Interval of time to ping (in minutes)
-     */
-    private static final int PING_INTERVAL = 10;
-    /**
-     * Loggers used for logging errors when DEBUG is enabled
-     */
-    private static final Logger LOGGER = new ModuleLogger("Metrics");
-    /**
-     * The plugin this metrics submits for
-     */
     private final Plugin plugin;
-    /**
-     * All of the custom graphs to submit to metrics
-     */
-    private final Set<Graph> graphs = Collections.synchronizedSet(new HashSet<Graph>());
-    /**
-     * The plugin configuration file
-     */
-    private final YamlConfiguration configuration;
-    /**
-     * The plugin configuration file
-     */
-    private final File configurationFile;
-    /**
-     * Unique server id
-     */
-    private final String guid;
-    /**
-     * Debug mode
-     */
-    private final boolean debug;
-    /**
-     * Lock for synchronization
-     */
-    private final Object optOutLock = new Object();
-    /**
-     * The scheduled updating task
-     */
-    private Thread updateThread;
 
-    public Metrics(final Plugin plugin) throws IOException {
-        if (plugin == null) {
-            throw new IllegalArgumentException("Plugin cannot be null");
-        }
+    private final MetricsBase metricsBase;
 
+    /**
+     * Creates a new Metrics instance.
+     *
+     * @param plugin Your plugin instance.
+     * @param serviceId The id of the service. It can be found at <a
+     *     href="https://bstats.org/what-is-my-plugin-id">What is my plugin id?</a>
+     */
+    public Metrics(JavaPlugin plugin, int serviceId) {
         this.plugin = plugin;
-
-        // load the config
-        configurationFile = getConfigFile();
-        configuration = YamlConfiguration.loadConfiguration(configurationFile);
-
-        // add some defaults
-        configuration.addDefault("opt-out", false);
-        configuration.addDefault("guid", UUID.randomUUID().toString());
-        configuration.addDefault("debug", false);
-
-        // Do we need to create the file?
-        if (configuration.get("guid", null) == null) {
-            configuration.options().header("http://mcstats.org").copyDefaults(true);
-            configuration.save(configurationFile);
-        }
-
-        // Load the guid then
-        guid = configuration.getString("guid");
-        debug = configuration.getBoolean("debug", false);
-    }
-
-    /**
-     * Removes a previously added Graph
-     *
-     * @param name of the Graph to remove
-     */
-    public void removeGraph(final String name) {
-        if (name == null) {
-            throw new IllegalArgumentException("Graph name cannot be null");
-        }
-
-        synchronized (graphs) {
-            graphs.remove(name);
-        }
-    }
-
-    /**
-     * Construct and create a Graph that can be used to separate specific
-     * plotters to their own graphs on the metrics website. Plotters can be
-     * added to the graph object returned.
-     *
-     * @param name The name of the graph
-     * @return Graph object created. Will never return NULL under normal
-     * circumstances unless bad parameters are given
-     */
-    public Graph createGraph(final String name) {
-        if (name == null) {
-            throw new IllegalArgumentException("Graph name cannot be null");
-        }
-
-        // Construct the graph object
-        final Graph graph = new Graph(name);
-
-        // Now we can add our graph
-        synchronized (graphs) {
-            graphs.add(graph);
-        }
-
-        // and return back
-        return graph;
-    }
-
-    /**
-     * Add a Graph object to BukkitMetrics that represents data for the plugin
-     * that should be sent to the backend
-     *
-     * @param graph The name of the graph
-     */
-    public void addGraph(final Graph graph) {
-        if (graph == null) {
-            throw new IllegalArgumentException("Graph cannot be null");
-        }
-
-        synchronized (graphs) {
-            graphs.add(graph);
-        }
-    }
-
-    /**
-     * Start measuring statistics. This will immediately create an updating
-     * thread, immediately sending initial data to the metrics backend, and then
-     * after that it will post in increments of PING_INTERVAL * 60000
-     * milliseconds.
-     *
-     * @return True if statistics measuring is (now) running, otherwise false.
-     */
-    public boolean start() {
-        synchronized (optOutLock) {
-            // Did we opt out?
-            if (isOptOut()) {
-                return false;
-            }
-
-            // Is metrics already running?
-            if (updateThread != null) {
-                return true;
-            }
-
-            // Set up the updating task (we do not yet start it!)
-            updateThread = new Thread("Metrics updating thread of " + plugin.getName()) {
-                @Override
-                public void run() {
-                    try {
-                        boolean firstPost = true;
-                        final Object syncLock = new Object();
-                        final List<Graph> graphBuffer = new ArrayList<Graph>();
-                        while (true) {
-                            try {
-                                // Disable Task, if it is running and the server owner decided to opt-out
-                                if (isOptOut()) {
-                                    // End the updating thread
-                                    return;
-                                }
-
-                                // Update all graphs on the main thread
-                                graphBuffer.clear();
-                                synchronized (graphs) {
-                                    graphBuffer.addAll(graphs);
-                                }
-                                if (!graphBuffer.isEmpty()) {
-                                    Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                                        for (Graph graph : graphBuffer) {
-                                            graph.onUpdate(plugin);
-                                        }
-                                        synchronized (syncLock) {
-                                            syncLock.notify();
-                                        }
-                                    });
-                                    // Wait for the previous task to be completed
-                                    synchronized (syncLock) {
-                                        syncLock.wait();
-                                    }
-                                }
-
-                                // We use the inverse of firstPost because if it is the first time we are posting,
-                                // it is not a interval ping, so it evaluates to FALSE
-                                // Each time thereafter it will evaluate to TRUE, i.e PING!
-                                postPlugin(!firstPost);
-
-                                // After the first post we set firstPost to false
-                                // Each post thereafter will be a ping
-                                firstPost = false;
-                            } catch (Throwable t) {
-                                if (debug) {
-                                    LOGGER.log(Level.INFO, t.getMessage());
-                                }
-                            }
-
-                            // Wait out the pinging interval
-                            Thread.sleep(60000 * PING_INTERVAL);
-                        }
-                    } catch (InterruptedException ex) {
-                        // Thread is stopped - abort
-                    }
-                }
-            };
-            updateThread.start();
-            return true;
-        }
-    }
-
-    /**
-     * Stops measuring statistics. This will immediately interrupt the updating
-     * thread, this way disabling all updates to the metrics backend.
-     *
-     * @return True if the statistics measuring is (now) stopped, otherwise
-     * false.
-     */
-    public boolean stop() {
-        try {
-            if (updateThread != null) {
-                updateThread.interrupt();
-                updateThread = null;
-            }
-            return true;
-        } catch (SecurityException ex) {
-            ex.printStackTrace();
-            return false;
-        }
-    }
-
-    /**
-     * Has the server owner denied plugin metrics?
-     *
-     * @return true if metrics should be opted out of it
-     */
-    public boolean isOptOut() {
-        synchronized (optOutLock) {
+        // Get the config file
+        File bStatsFolder = new File(plugin.getDataFolder().getParentFile(), "bStats");
+        File configFile = new File(bStatsFolder, "config.yml");
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
+        if (!config.isSet("serverUuid")) {
+            config.addDefault("enabled", true);
+            config.addDefault("serverUuid", UUID.randomUUID().toString());
+            config.addDefault("logFailedRequests", false);
+            config.addDefault("logSentData", false);
+            config.addDefault("logResponseStatusText", false);
+            // Inform the server owners about bStats
+            config
+                    .options()
+                    .header(
+                            "bStats (https://bStats.org) collects some basic information for plugin authors, like how\n"
+                                    + "many people use their plugin and their total player count. It's recommended to keep bStats\n"
+                                    + "enabled, but if you're not comfortable with this, you can turn this setting off. There is no\n"
+                                    + "performance penalty associated with having metrics enabled, and data sent to bStats is fully\n"
+                                    + "anonymous.")
+                    .copyDefaults(true);
             try {
-                // Reload the metrics file
-                configuration.load(getConfigFile());
-            } catch (IOException ex) {
-                if (debug) {
-                    LOGGER.log(Level.INFO, ex.getMessage());
-                }
-                return true;
-            } catch (InvalidConfigurationException ex) {
-                if (debug) {
-                    LOGGER.log(Level.INFO, ex.getMessage());
-                }
-                return true;
+                config.save(configFile);
+            } catch (IOException ignored) {
             }
-            return configuration.getBoolean("opt-out", false);
         }
+        // Load the data
+        boolean enabled = config.getBoolean("enabled", true);
+        String serverUUID = config.getString("serverUuid");
+        boolean logErrors = config.getBoolean("logFailedRequests", false);
+        boolean logSentData = config.getBoolean("logSentData", false);
+        boolean logResponseStatusText = config.getBoolean("logResponseStatusText", false);
+        metricsBase =
+                new MetricsBase(
+                        "bukkit",
+                        serverUUID,
+                        serviceId,
+                        enabled,
+                        this::appendPlatformData,
+                        this::appendServiceData,
+                        submitDataTask -> Bukkit.getScheduler().runTask(plugin, submitDataTask),
+                        plugin::isEnabled,
+                        (message, error) -> this.plugin.getLogger().log(Level.WARNING, message, error),
+                        (message) -> this.plugin.getLogger().log(Level.INFO, message),
+                        logErrors,
+                        logSentData,
+                        logResponseStatusText);
+    }
+
+    /** Shuts down the underlying scheduler service. */
+    public void shutdown() {
+        metricsBase.shutdown();
     }
 
     /**
-     * Enables metrics for the server by setting "opt-out" to false in the
-     * config file and starting the metrics task.
+     * Adds a custom chart.
      *
-     * @throws java.io.IOException
+     * @param chart The chart to add.
      */
-    public void enable() throws IOException {
-        // This has to be synchronized or it can collide with the check in the task.
-        synchronized (optOutLock) {
-            // Check if the server owner has already set opt-out, if not, set it.
-            if (isOptOut()) {
-                configuration.set("opt-out", false);
-                configuration.save(configurationFile);
-            }
-            // Start updating thread
-            start();
-        }
+    public void addCustomChart(CustomChart chart) {
+        metricsBase.addCustomChart(chart);
     }
 
-    /**
-     * Disables metrics for the server by setting "opt-out" to true in the
-     * config file and canceling the metrics task.
-     *
-     * @throws java.io.IOException
-     */
-    public void disable() throws IOException {
-        // This has to be synchronized or it can collide with the check in the task.
-        synchronized (optOutLock) {
-            // Check if the server owner has already set opt-out, if not, set it.
-            if (!isOptOut()) {
-                configuration.set("opt-out", true);
-                configuration.save(configurationFile);
-            }
-            // Stop updating thread
-            stop();
-        }
+    private void appendPlatformData(JsonObjectBuilder builder) {
+        builder.appendField("playerAmount", getPlayerAmount());
+        builder.appendField("onlineMode", Bukkit.getOnlineMode() ? 1 : 0);
+        builder.appendField("bukkitVersion", Bukkit.getVersion());
+        builder.appendField("bukkitName", Bukkit.getName());
+        builder.appendField("javaVersion", System.getProperty("java.version"));
+        builder.appendField("osName", System.getProperty("os.name"));
+        builder.appendField("osArch", System.getProperty("os.arch"));
+        builder.appendField("osVersion", System.getProperty("os.version"));
+        builder.appendField("coreCount", Runtime.getRuntime().availableProcessors());
     }
 
-    /**
-     * Gets the File object of the config file that should be used to store data
-     * such as the GUID and opt-out status
-     *
-     * @return the File object for the config file
-     */
-    public File getConfigFile() {
-        // I believe the easiest way to get the base folder (e.g craftbukkit set via -P) for plugins to use
-        // is to abuse the plugin object we already have
-        // plugin.getDataFolder() => base/plugins/PluginA/
-        // pluginsFolder => base/plugins/
-        // The base is not necessarily relative to the startup directory.
-        File pluginsFolder = plugin.getDataFolder().getParentFile();
-
-        // return => base/plugins/PluginMetrics/config.yml
-        return new File(new File(pluginsFolder, "PluginMetrics"), "config.yml");
+    private void appendServiceData(JsonObjectBuilder builder) {
+        builder.appendField("pluginVersion", plugin.getDescription().getVersion());
     }
 
-    /**
-     * Generic method that posts a plugin to the metrics website
-     */
-    private void postPlugin(final boolean isPing) throws IOException {
-        // Server software specific section
-        PluginDescriptionFile description = plugin.getDescription();
-        String pluginName = description.getName();
-        boolean onlineMode = Bukkit.getServer().getOnlineMode(); // TRUE if online mode is enabled
-        String pluginVersion = description.getVersion();
-        String serverVersion = Bukkit.getVersion();
-        int playersOnline = Bukkit.getServer().getOnlinePlayers().size();
-
-        // END server software specific section -- all code below does not use any code outside of this class / Java
-        // Construct the post data
-        final StringBuilder data = new StringBuilder();
-
-        // The plugin's description file containg all of the plugin data such as name, version, author, etc
-        data.append(encode("guid")).append('=').append(encode(guid));
-        encodeDataPair(data, "version", pluginVersion);
-        encodeDataPair(data, "server", serverVersion);
-        encodeDataPair(data, "players", Integer.toString(playersOnline));
-        encodeDataPair(data, "revision", String.valueOf(REVISION));
-
-        // New data as of R6
-        String osname = System.getProperty("os.name");
-        String osarch = System.getProperty("os.arch");
-        String osversion = System.getProperty("os.version");
-        String java_version = System.getProperty("java.version");
-        int coreCount = Runtime.getRuntime().availableProcessors();
-
-        // normalize os arch .. amd64 -> x86_64
-        if (osarch.equals("amd64")) {
-            osarch = "x86_64";
-        }
-
-        encodeDataPair(data, "osname", osname);
-        encodeDataPair(data, "osarch", osarch);
-        encodeDataPair(data, "osversion", osversion);
-        encodeDataPair(data, "cores", Integer.toString(coreCount));
-        encodeDataPair(data, "online-mode", Boolean.toString(onlineMode));
-        encodeDataPair(data, "java_version", java_version);
-
-        // If we're pinging, append it
-        if (isPing) {
-            encodeDataPair(data, "ping", "true");
-        }
-
-        // Acquire a lock on the graphs, which lets us make the assumption we also lock everything
-        // inside of the graph (e.g plotters)
-        synchronized (graphs) {
-            final Iterator<Graph> iter = graphs.iterator();
-
-            while (iter.hasNext()) {
-                final Graph graph = iter.next();
-                for (Entry<String, Object> entry : graph.getPlotters().entrySet()) {
-                    // Ignore null values
-                    if (entry.getValue() == null) {
-                        continue;
-                    }
-                    // The key name to send to the metrics server
-                    // The format is C-GRAPHNAME-PLOTTERNAME where separator - is defined at the top
-                    // Legacy (R4) submitters use the format Custom%s, or CustomPLOTTERNAME
-                    final String key = String.format("C%s%s%s%s", CUSTOM_DATA_SEPARATOR, graph.getName(), CUSTOM_DATA_SEPARATOR, entry.getKey());
-
-                    // Add it to the http post data :)
-                    encodeDataPair(data, key, entry.getValue().toString());
-                }
-            }
-        }
-
-        // Create the url
-        URL url = new URL(BASE_URL + String.format(REPORT_URL, encode(pluginName)));
-
-        // Connect to the website
-        URLConnection connection;
-
-        // Mineshafter creates a socks proxy, so we can safely bypass it
-        // It does not reroute POST requests so we need to go around it
-        if (isMineshafterPresent()) {
-            connection = url.openConnection(Proxy.NO_PROXY);
-        } else {
-            connection = url.openConnection();
-        }
-
-        connection.setDoOutput(true);
-
-        // Write the data
-        final OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-        writer.write(data.toString());
-        writer.flush();
-
-        // Now read the response
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        final String response = reader.readLine();
-
-        // close resources
-        writer.close();
-        reader.close();
-
-        if (response == null || response.startsWith("ERR")) {
-            throw new IOException(response); //Throw the exception
-        } else {
-            // Is this the first update this hour?
-            if (response.contains("OK This is your first update this hour")) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                    synchronized (graphs) {
-                        for (Graph graph : graphs) {
-                            graph.onReset(plugin);
-                        }
-                    }
-                });
-            }
-        }
-    }
-
-    /**
-     * Check if mineshafter is present. If it is, we need to bypass it to send
-     * POST requests
-     *
-     * @return true if mineshafter is installed on the server
-     */
-    private boolean isMineshafterPresent() {
+    private int getPlayerAmount() {
         try {
-            Class.forName("mineshafter.MineServer");
-            return true;
+            // Around MC 1.8 the return type was changed from an array to a collection,
+            // This fixes java.lang.NoSuchMethodError:
+            // org.bukkit.Bukkit.getOnlinePlayers()Ljava/util/Collection;
+            Method onlinePlayersMethod = Class.forName("org.bukkit.Server").getMethod("getOnlinePlayers");
+            return onlinePlayersMethod.getReturnType().equals(Collection.class)
+                    ? ((Collection<?>) onlinePlayersMethod.invoke(Bukkit.getServer())).size()
+                    : ((Player[]) onlinePlayersMethod.invoke(Bukkit.getServer())).length;
         } catch (Exception e) {
-            return false;
+            // Just use the new method if the reflection failed
+            return Bukkit.getOnlinePlayers().size();
+        }
+    }
+
+    public static class MetricsBase {
+
+        /** The version of the Metrics class. */
+        public static final String METRICS_VERSION = "3.0.2";
+
+        private static final String REPORT_URL = "https://bStats.org/api/v2/data/%s";
+
+        private final ScheduledExecutorService scheduler;
+
+        private final String platform;
+
+        private final String serverUuid;
+
+        private final int serviceId;
+
+        private final Consumer<JsonObjectBuilder> appendPlatformDataConsumer;
+
+        private final Consumer<JsonObjectBuilder> appendServiceDataConsumer;
+
+        private final Consumer<Runnable> submitTaskConsumer;
+
+        private final Supplier<Boolean> checkServiceEnabledSupplier;
+
+        private final BiConsumer<String, Throwable> errorLogger;
+
+        private final Consumer<String> infoLogger;
+
+        private final boolean logErrors;
+
+        private final boolean logSentData;
+
+        private final boolean logResponseStatusText;
+
+        private final Set<CustomChart> customCharts = new HashSet<>();
+
+        private final boolean enabled;
+
+        /**
+         * Creates a new MetricsBase class instance.
+         *
+         * @param platform The platform of the service.
+         * @param serviceId The id of the service.
+         * @param serverUuid The server uuid.
+         * @param enabled Whether or not data sending is enabled.
+         * @param appendPlatformDataConsumer A consumer that receives a {@code JsonObjectBuilder} and
+         *     appends all platform-specific data.
+         * @param appendServiceDataConsumer A consumer that receives a {@code JsonObjectBuilder} and
+         *     appends all service-specific data.
+         * @param submitTaskConsumer A consumer that takes a runnable with the submit task. This can be
+         *     used to delegate the data collection to a another thread to prevent errors caused by
+         *     concurrency. Can be {@code null}.
+         * @param checkServiceEnabledSupplier A supplier to check if the service is still enabled.
+         * @param errorLogger A consumer that accepts log message and an error.
+         * @param infoLogger A consumer that accepts info log messages.
+         * @param logErrors Whether or not errors should be logged.
+         * @param logSentData Whether or not the sent data should be logged.
+         * @param logResponseStatusText Whether or not the response status text should be logged.
+         */
+        public MetricsBase(
+                String platform,
+                String serverUuid,
+                int serviceId,
+                boolean enabled,
+                Consumer<JsonObjectBuilder> appendPlatformDataConsumer,
+                Consumer<JsonObjectBuilder> appendServiceDataConsumer,
+                Consumer<Runnable> submitTaskConsumer,
+                Supplier<Boolean> checkServiceEnabledSupplier,
+                BiConsumer<String, Throwable> errorLogger,
+                Consumer<String> infoLogger,
+                boolean logErrors,
+                boolean logSentData,
+                boolean logResponseStatusText) {
+            ScheduledThreadPoolExecutor scheduler =
+                    new ScheduledThreadPoolExecutor(1, task -> new Thread(task, "bStats-Metrics"));
+            // We want delayed tasks (non-periodic) that will execute in the future to be
+            // cancelled when the scheduler is shutdown.
+            // Otherwise, we risk preventing the server from shutting down even when
+            // MetricsBase#shutdown() is called
+            scheduler.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+            this.scheduler = scheduler;
+            this.platform = platform;
+            this.serverUuid = serverUuid;
+            this.serviceId = serviceId;
+            this.enabled = enabled;
+            this.appendPlatformDataConsumer = appendPlatformDataConsumer;
+            this.appendServiceDataConsumer = appendServiceDataConsumer;
+            this.submitTaskConsumer = submitTaskConsumer;
+            this.checkServiceEnabledSupplier = checkServiceEnabledSupplier;
+            this.errorLogger = errorLogger;
+            this.infoLogger = infoLogger;
+            this.logErrors = logErrors;
+            this.logSentData = logSentData;
+            this.logResponseStatusText = logResponseStatusText;
+            checkRelocation();
+            if (enabled) {
+                // WARNING: Removing the option to opt-out will get your plugin banned from
+                // bStats
+                startSubmitting();
+            }
+        }
+
+        public void addCustomChart(CustomChart chart) {
+            this.customCharts.add(chart);
+        }
+
+        public void shutdown() {
+            scheduler.shutdown();
+        }
+
+        private void startSubmitting() {
+            final Runnable submitTask =
+                    () -> {
+                        if (!enabled || !checkServiceEnabledSupplier.get()) {
+                            // Submitting data or service is disabled
+                            scheduler.shutdown();
+                            return;
+                        }
+                        if (submitTaskConsumer != null) {
+                            submitTaskConsumer.accept(this::submitData);
+                        } else {
+                            this.submitData();
+                        }
+                    };
+            // Many servers tend to restart at a fixed time at xx:00 which causes an uneven
+            // distribution of requests on the
+            // bStats backend. To circumvent this problem, we introduce some randomness into
+            // the initial and second delay.
+            // WARNING: You must not modify and part of this Metrics class, including the
+            // submit delay or frequency!
+            // WARNING: Modifying this code will get your plugin banned on bStats. Just
+            // don't do it!
+            long initialDelay = (long) (1000 * 60 * (3 + Math.random() * 3));
+            long secondDelay = (long) (1000 * 60 * (Math.random() * 30));
+            scheduler.schedule(submitTask, initialDelay, TimeUnit.MILLISECONDS);
+            scheduler.scheduleAtFixedRate(
+                    submitTask, initialDelay + secondDelay, 1000 * 60 * 30, TimeUnit.MILLISECONDS);
+        }
+
+        private void submitData() {
+            final JsonObjectBuilder baseJsonBuilder = new JsonObjectBuilder();
+            appendPlatformDataConsumer.accept(baseJsonBuilder);
+            final JsonObjectBuilder serviceJsonBuilder = new JsonObjectBuilder();
+            appendServiceDataConsumer.accept(serviceJsonBuilder);
+            JsonObjectBuilder.JsonObject[] chartData =
+                    customCharts.stream()
+                            .map(customChart -> customChart.getRequestJsonObject(errorLogger, logErrors))
+                            .filter(Objects::nonNull)
+                            .toArray(JsonObjectBuilder.JsonObject[]::new);
+            serviceJsonBuilder.appendField("id", serviceId);
+            serviceJsonBuilder.appendField("customCharts", chartData);
+            baseJsonBuilder.appendField("service", serviceJsonBuilder.build());
+            baseJsonBuilder.appendField("serverUUID", serverUuid);
+            baseJsonBuilder.appendField("metricsVersion", METRICS_VERSION);
+            JsonObjectBuilder.JsonObject data = baseJsonBuilder.build();
+            scheduler.execute(
+                    () -> {
+                        try {
+                            // Send the data
+                            sendData(data);
+                        } catch (Exception e) {
+                            // Something went wrong! :(
+                            if (logErrors) {
+                                errorLogger.accept("Could not submit bStats metrics data", e);
+                            }
+                        }
+                    });
+        }
+
+        private void sendData(JsonObjectBuilder.JsonObject data) throws Exception {
+            if (logSentData) {
+                infoLogger.accept("Sent bStats metrics data: " + data.toString());
+            }
+            String url = String.format(REPORT_URL, platform);
+            HttpsURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
+            // Compress the data to save bandwidth
+            byte[] compressedData = compress(data.toString());
+            connection.setRequestMethod("POST");
+            connection.addRequestProperty("Accept", "application/json");
+            connection.addRequestProperty("Connection", "close");
+            connection.addRequestProperty("Content-Encoding", "gzip");
+            connection.addRequestProperty("Content-Length", String.valueOf(compressedData.length));
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("User-Agent", "Metrics-Service/1");
+            connection.setDoOutput(true);
+            try (DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream())) {
+                outputStream.write(compressedData);
+            }
+            StringBuilder builder = new StringBuilder();
+            try (BufferedReader bufferedReader =
+                         new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    builder.append(line);
+                }
+            }
+            if (logResponseStatusText) {
+                infoLogger.accept("Sent data to bStats and received response: " + builder);
+            }
+        }
+
+        /** Checks that the class was properly relocated. */
+        private void checkRelocation() {
+            // You can use the property to disable the check in your test environment
+            if (System.getProperty("bstats.relocatecheck") == null
+                    || !System.getProperty("bstats.relocatecheck").equals("false")) {
+                // Maven's Relocate is clever and changes strings, too. So we have to use this
+                // little "trick" ... :D
+                final String defaultPackage =
+                        new String(new byte[] {'o', 'r', 'g', '.', 'b', 's', 't', 'a', 't', 's'});
+                final String examplePackage =
+                        new String(new byte[] {'y', 'o', 'u', 'r', '.', 'p', 'a', 'c', 'k', 'a', 'g', 'e'});
+                // We want to make sure no one just copy & pastes the example and uses the wrong
+                // package names
+                if (MetricsBase.class.getPackage().getName().startsWith(defaultPackage)
+                        || MetricsBase.class.getPackage().getName().startsWith(examplePackage)) {
+                    throw new IllegalStateException("bStats Metrics class has not been relocated correctly!");
+                }
+            }
+        }
+
+        /**
+         * Gzips the given string.
+         *
+         * @param str The string to gzip.
+         * @return The gzipped string.
+         */
+        private static byte[] compress(final String str) throws IOException {
+            if (str == null) {
+                return null;
+            }
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            try (GZIPOutputStream gzip = new GZIPOutputStream(outputStream)) {
+                gzip.write(str.getBytes(StandardCharsets.UTF_8));
+            }
+            return outputStream.toByteArray();
+        }
+    }
+
+    public static class SimplePie extends CustomChart {
+
+        private final Callable<String> callable;
+
+        /**
+         * Class constructor.
+         *
+         * @param chartId The id of the chart.
+         * @param callable The callable which is used to request the chart data.
+         */
+        public SimplePie(String chartId, Callable<String> callable) {
+            super(chartId);
+            this.callable = callable;
+        }
+
+        @Override
+        protected JsonObjectBuilder.JsonObject getChartData() throws Exception {
+            String value = callable.call();
+            if (value == null || value.isEmpty()) {
+                // Null = skip the chart
+                return null;
+            }
+            return new JsonObjectBuilder().appendField("value", value).build();
+        }
+    }
+
+    public static class MultiLineChart extends CustomChart {
+
+        private final Callable<Map<String, Integer>> callable;
+
+        /**
+         * Class constructor.
+         *
+         * @param chartId The id of the chart.
+         * @param callable The callable which is used to request the chart data.
+         */
+        public MultiLineChart(String chartId, Callable<Map<String, Integer>> callable) {
+            super(chartId);
+            this.callable = callable;
+        }
+
+        @Override
+        protected JsonObjectBuilder.JsonObject getChartData() throws Exception {
+            JsonObjectBuilder valuesBuilder = new JsonObjectBuilder();
+            Map<String, Integer> map = callable.call();
+            if (map == null || map.isEmpty()) {
+                // Null = skip the chart
+                return null;
+            }
+            boolean allSkipped = true;
+            for (Map.Entry<String, Integer> entry : map.entrySet()) {
+                if (entry.getValue() == 0) {
+                    // Skip this invalid
+                    continue;
+                }
+                allSkipped = false;
+                valuesBuilder.appendField(entry.getKey(), entry.getValue());
+            }
+            if (allSkipped) {
+                // Null = skip the chart
+                return null;
+            }
+            return new JsonObjectBuilder().appendField("values", valuesBuilder.build()).build();
+        }
+    }
+
+    public static class AdvancedPie extends CustomChart {
+
+        private final Callable<Map<String, Integer>> callable;
+
+        /**
+         * Class constructor.
+         *
+         * @param chartId The id of the chart.
+         * @param callable The callable which is used to request the chart data.
+         */
+        public AdvancedPie(String chartId, Callable<Map<String, Integer>> callable) {
+            super(chartId);
+            this.callable = callable;
+        }
+
+        @Override
+        protected JsonObjectBuilder.JsonObject getChartData() throws Exception {
+            JsonObjectBuilder valuesBuilder = new JsonObjectBuilder();
+            Map<String, Integer> map = callable.call();
+            if (map == null || map.isEmpty()) {
+                // Null = skip the chart
+                return null;
+            }
+            boolean allSkipped = true;
+            for (Map.Entry<String, Integer> entry : map.entrySet()) {
+                if (entry.getValue() == 0) {
+                    // Skip this invalid
+                    continue;
+                }
+                allSkipped = false;
+                valuesBuilder.appendField(entry.getKey(), entry.getValue());
+            }
+            if (allSkipped) {
+                // Null = skip the chart
+                return null;
+            }
+            return new JsonObjectBuilder().appendField("values", valuesBuilder.build()).build();
+        }
+    }
+
+    public static class SimpleBarChart extends CustomChart {
+
+        private final Callable<Map<String, Integer>> callable;
+
+        /**
+         * Class constructor.
+         *
+         * @param chartId The id of the chart.
+         * @param callable The callable which is used to request the chart data.
+         */
+        public SimpleBarChart(String chartId, Callable<Map<String, Integer>> callable) {
+            super(chartId);
+            this.callable = callable;
+        }
+
+        @Override
+        protected JsonObjectBuilder.JsonObject getChartData() throws Exception {
+            JsonObjectBuilder valuesBuilder = new JsonObjectBuilder();
+            Map<String, Integer> map = callable.call();
+            if (map == null || map.isEmpty()) {
+                // Null = skip the chart
+                return null;
+            }
+            for (Map.Entry<String, Integer> entry : map.entrySet()) {
+                valuesBuilder.appendField(entry.getKey(), new int[] {entry.getValue()});
+            }
+            return new JsonObjectBuilder().appendField("values", valuesBuilder.build()).build();
+        }
+    }
+
+    public static class AdvancedBarChart extends CustomChart {
+
+        private final Callable<Map<String, int[]>> callable;
+
+        /**
+         * Class constructor.
+         *
+         * @param chartId The id of the chart.
+         * @param callable The callable which is used to request the chart data.
+         */
+        public AdvancedBarChart(String chartId, Callable<Map<String, int[]>> callable) {
+            super(chartId);
+            this.callable = callable;
+        }
+
+        @Override
+        protected JsonObjectBuilder.JsonObject getChartData() throws Exception {
+            JsonObjectBuilder valuesBuilder = new JsonObjectBuilder();
+            Map<String, int[]> map = callable.call();
+            if (map == null || map.isEmpty()) {
+                // Null = skip the chart
+                return null;
+            }
+            boolean allSkipped = true;
+            for (Map.Entry<String, int[]> entry : map.entrySet()) {
+                if (entry.getValue().length == 0) {
+                    // Skip this invalid
+                    continue;
+                }
+                allSkipped = false;
+                valuesBuilder.appendField(entry.getKey(), entry.getValue());
+            }
+            if (allSkipped) {
+                // Null = skip the chart
+                return null;
+            }
+            return new JsonObjectBuilder().appendField("values", valuesBuilder.build()).build();
+        }
+    }
+
+    public static class DrilldownPie extends CustomChart {
+
+        private final Callable<Map<String, Map<String, Integer>>> callable;
+
+        /**
+         * Class constructor.
+         *
+         * @param chartId The id of the chart.
+         * @param callable The callable which is used to request the chart data.
+         */
+        public DrilldownPie(String chartId, Callable<Map<String, Map<String, Integer>>> callable) {
+            super(chartId);
+            this.callable = callable;
+        }
+
+        @Override
+        public JsonObjectBuilder.JsonObject getChartData() throws Exception {
+            JsonObjectBuilder valuesBuilder = new JsonObjectBuilder();
+            Map<String, Map<String, Integer>> map = callable.call();
+            if (map == null || map.isEmpty()) {
+                // Null = skip the chart
+                return null;
+            }
+            boolean reallyAllSkipped = true;
+            for (Map.Entry<String, Map<String, Integer>> entryValues : map.entrySet()) {
+                JsonObjectBuilder valueBuilder = new JsonObjectBuilder();
+                boolean allSkipped = true;
+                for (Map.Entry<String, Integer> valueEntry : map.get(entryValues.getKey()).entrySet()) {
+                    valueBuilder.appendField(valueEntry.getKey(), valueEntry.getValue());
+                    allSkipped = false;
+                }
+                if (!allSkipped) {
+                    reallyAllSkipped = false;
+                    valuesBuilder.appendField(entryValues.getKey(), valueBuilder.build());
+                }
+            }
+            if (reallyAllSkipped) {
+                // Null = skip the chart
+                return null;
+            }
+            return new JsonObjectBuilder().appendField("values", valuesBuilder.build()).build();
+        }
+    }
+
+    public abstract static class CustomChart {
+
+        private final String chartId;
+
+        protected CustomChart(String chartId) {
+            if (chartId == null) {
+                throw new IllegalArgumentException("chartId must not be null");
+            }
+            this.chartId = chartId;
+        }
+
+        public JsonObjectBuilder.JsonObject getRequestJsonObject(
+                BiConsumer<String, Throwable> errorLogger, boolean logErrors) {
+            JsonObjectBuilder builder = new JsonObjectBuilder();
+            builder.appendField("chartId", chartId);
+            try {
+                JsonObjectBuilder.JsonObject data = getChartData();
+                if (data == null) {
+                    // If the data is null we don't send the chart.
+                    return null;
+                }
+                builder.appendField("data", data);
+            } catch (Throwable t) {
+                if (logErrors) {
+                    errorLogger.accept("Failed to get data for custom chart with id " + chartId, t);
+                }
+                return null;
+            }
+            return builder.build();
+        }
+
+        protected abstract JsonObjectBuilder.JsonObject getChartData() throws Exception;
+    }
+
+    public static class SingleLineChart extends CustomChart {
+
+        private final Callable<Integer> callable;
+
+        /**
+         * Class constructor.
+         *
+         * @param chartId The id of the chart.
+         * @param callable The callable which is used to request the chart data.
+         */
+        public SingleLineChart(String chartId, Callable<Integer> callable) {
+            super(chartId);
+            this.callable = callable;
+        }
+
+        @Override
+        protected JsonObjectBuilder.JsonObject getChartData() throws Exception {
+            int value = callable.call();
+            if (value == 0) {
+                // Null = skip the chart
+                return null;
+            }
+            return new JsonObjectBuilder().appendField("value", value).build();
         }
     }
 
     /**
-     * <p>
-     * Encode a key/value data pair to be used in a HTTP post request. This
-     * INCLUDES a & so the first key/value pair MUST be included manually,
-     * e.g:</p>
-     * <code>
-     * StringBuffer data = new StringBuffer();
-     * data.append(encode("guid")).append('=').append(encode(guid));
-     * encodeDataPair(data, "version", description.getVersion());
-     * </code>
+     * An extremely simple JSON builder.
      *
-     * @param buffer the stringbuilder to append the data pair onto
-     * @param key the key value
-     * @param value the value
+     * <p>While this class is neither feature-rich nor the most performant one, it's sufficient enough
+     * for its use-case.
      */
-    private static void encodeDataPair(final StringBuilder buffer, final String key, final String value) throws UnsupportedEncodingException {
-        buffer.append('&').append(encode(key)).append('=').append(encode(value));
-    }
+    public static class JsonObjectBuilder {
 
-    /**
-     * Encode text as UTF-8
-     *
-     * @param text the text to encode
-     * @return the encoded text, as UTF-8
-     */
-    private static String encode(final String text) throws UnsupportedEncodingException {
-        return URLEncoder.encode(text, "UTF-8");
-    }
+        private StringBuilder builder = new StringBuilder();
 
-    /**
-     * Attempts to create new Metrics for the plugin specified, and starts
-     * sending metrics information. If this operation fails, null is returned.
-     *
-     * @param plugin to initialize Metrics for
-     * @return the Metrics instance created, or null if this failed
-     */
-    public static Metrics initialize(Plugin plugin) {
-        try {
-            final Metrics m = new Metrics(plugin);
-            m.start();
-            return m;
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.SEVERE, "Failed to initialize Metrics");
-            e.printStackTrace();
-            return null;
+        private boolean hasAtLeastOneField = false;
+
+        public JsonObjectBuilder() {
+            builder.append("{");
+        }
+
+        /**
+         * Appends a null field to the JSON.
+         *
+         * @param key The key of the field.
+         * @return A reference to this object.
+         */
+        public JsonObjectBuilder appendNull(String key) {
+            appendFieldUnescaped(key, "null");
+            return this;
+        }
+
+        /**
+         * Appends a string field to the JSON.
+         *
+         * @param key The key of the field.
+         * @param value The value of the field.
+         * @return A reference to this object.
+         */
+        public JsonObjectBuilder appendField(String key, String value) {
+            if (value == null) {
+                throw new IllegalArgumentException("JSON value must not be null");
+            }
+            appendFieldUnescaped(key, "\"" + escape(value) + "\"");
+            return this;
+        }
+
+        /**
+         * Appends an integer field to the JSON.
+         *
+         * @param key The key of the field.
+         * @param value The value of the field.
+         * @return A reference to this object.
+         */
+        public JsonObjectBuilder appendField(String key, int value) {
+            appendFieldUnescaped(key, String.valueOf(value));
+            return this;
+        }
+
+        /**
+         * Appends an object to the JSON.
+         *
+         * @param key The key of the field.
+         * @param object The object.
+         * @return A reference to this object.
+         */
+        public JsonObjectBuilder appendField(String key, JsonObject object) {
+            if (object == null) {
+                throw new IllegalArgumentException("JSON object must not be null");
+            }
+            appendFieldUnescaped(key, object.toString());
+            return this;
+        }
+
+        /**
+         * Appends a string array to the JSON.
+         *
+         * @param key The key of the field.
+         * @param values The string array.
+         * @return A reference to this object.
+         */
+        public JsonObjectBuilder appendField(String key, String[] values) {
+            if (values == null) {
+                throw new IllegalArgumentException("JSON values must not be null");
+            }
+            String escapedValues =
+                    Arrays.stream(values)
+                            .map(value -> "\"" + escape(value) + "\"")
+                            .collect(Collectors.joining(","));
+            appendFieldUnescaped(key, "[" + escapedValues + "]");
+            return this;
+        }
+
+        /**
+         * Appends an integer array to the JSON.
+         *
+         * @param key The key of the field.
+         * @param values The integer array.
+         * @return A reference to this object.
+         */
+        public JsonObjectBuilder appendField(String key, int[] values) {
+            if (values == null) {
+                throw new IllegalArgumentException("JSON values must not be null");
+            }
+            String escapedValues =
+                    Arrays.stream(values).mapToObj(String::valueOf).collect(Collectors.joining(","));
+            appendFieldUnescaped(key, "[" + escapedValues + "]");
+            return this;
+        }
+
+        /**
+         * Appends an object array to the JSON.
+         *
+         * @param key The key of the field.
+         * @param values The integer array.
+         * @return A reference to this object.
+         */
+        public JsonObjectBuilder appendField(String key, JsonObject[] values) {
+            if (values == null) {
+                throw new IllegalArgumentException("JSON values must not be null");
+            }
+            String escapedValues =
+                    Arrays.stream(values).map(JsonObject::toString).collect(Collectors.joining(","));
+            appendFieldUnescaped(key, "[" + escapedValues + "]");
+            return this;
+        }
+
+        /**
+         * Appends a field to the object.
+         *
+         * @param key The key of the field.
+         * @param escapedValue The escaped value of the field.
+         */
+        private void appendFieldUnescaped(String key, String escapedValue) {
+            if (builder == null) {
+                throw new IllegalStateException("JSON has already been built");
+            }
+            if (key == null) {
+                throw new IllegalArgumentException("JSON key must not be null");
+            }
+            if (hasAtLeastOneField) {
+                builder.append(",");
+            }
+            builder.append("\"").append(escape(key)).append("\":").append(escapedValue);
+            hasAtLeastOneField = true;
+        }
+
+        /**
+         * Builds the JSON string and invalidates this builder.
+         *
+         * @return The built JSON string.
+         */
+        public JsonObject build() {
+            if (builder == null) {
+                throw new IllegalStateException("JSON has already been built");
+            }
+            JsonObject object = new JsonObject(builder.append("}").toString());
+            builder = null;
+            return object;
+        }
+
+        /**
+         * Escapes the given string like stated in https://www.ietf.org/rfc/rfc4627.txt.
+         *
+         * <p>This method escapes only the necessary characters '"', '\'. and '\u0000' - '\u001F'.
+         * Compact escapes are not used (e.g., '\n' is escaped as "\u000a" and not as "\n").
+         *
+         * @param value The value to escape.
+         * @return The escaped value.
+         */
+        private static String escape(String value) {
+            final StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < value.length(); i++) {
+                char c = value.charAt(i);
+                if (c == '"') {
+                    builder.append("\\\"");
+                } else if (c == '\\') {
+                    builder.append("\\\\");
+                } else if (c <= '\u000F') {
+                    builder.append("\\u000").append(Integer.toHexString(c));
+                } else if (c <= '\u001F') {
+                    builder.append("\\u00").append(Integer.toHexString(c));
+                } else {
+                    builder.append(c);
+                }
+            }
+            return builder.toString();
+        }
+
+        /**
+         * A super simple representation of a JSON object.
+         *
+         * <p>This class only exists to make methods of the {@link JsonObjectBuilder} type-safe and not
+         * allow a raw string inputs for methods like {@link JsonObjectBuilder#appendField(String,
+         * JsonObject)}.
+         */
+        public static class JsonObject {
+
+            private final String value;
+
+            private JsonObject(String value) {
+                this.value = value;
+            }
+
+            @Override
+            public String toString() {
+                return value;
+            }
         }
     }
 }

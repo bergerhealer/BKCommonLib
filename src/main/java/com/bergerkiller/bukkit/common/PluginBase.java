@@ -34,7 +34,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -828,19 +827,26 @@ public abstract class PluginBase extends JavaPlugin {
             this.saveLocalization();
         }
 
-        // ==== Enabling ====
+        // ==== BStats Metrics ====
         try {
-            // Metrics
-            if (this.pluginLoaderHandler.getPluginConfig().getBoolean("metrics", false)) {
-                // Send anonymous statistics to mcstats.org
-                try {
-                    this.metrics = new Metrics(this);
-                } catch (IOException ex) {
-                    log(Level.SEVERE, "Failed to initialize metrics for " + getName());
-                    CommonUtil.printFilteredStackTrace(ex);
+            org.bukkit.configuration.file.YamlConfiguration pluginConfig = this.pluginLoaderHandler.getPluginConfig();
+            org.bukkit.configuration.ConfigurationSection bstatsConfig = pluginConfig.getConfigurationSection("bstats");
+            if (bstatsConfig != null && bstatsConfig.getBoolean("enabled", false) && bstatsConfig.contains("plugin-id")) {
+                int id = bstatsConfig.getInt("plugin-id");
+                metrics = new Metrics(this, id);
+
+                // If set, show the build number. Exclude NO-CI as there is no way to know what that means.
+                final String pluginBuild = pluginConfig.getString("build", "NO-CI");
+                if (!pluginBuild.equals("") && !pluginBuild.equals("NO-CI")) {
+                    metrics.addCustomChart(new Metrics.SimplePie("build", () -> pluginBuild));
                 }
             }
+        } catch (Throwable t) {
+            getLogger().log(Level.SEVERE, "Failed to initialize metrics for " + getName(), t);
+        }
 
+        // ==== Enabling ====
+        try {
             this.wasDisableRequested = false;
             this.enable();
             if (this.hasCriticalStartupFailure() || this.wasDisableRequested) {
@@ -851,11 +857,6 @@ public abstract class PluginBase extends JavaPlugin {
             // Disable startup logging next tick. This makes sure that stuff logged by this plugin
             // while other plugins (depending on it) enable is still included in the history.
             startupLogHandler.setNotStartupNextTick();
-
-            // Start Metrics if enabled
-            if (metrics != null) {
-                metrics.start();
-            }
 
             // Done, this plugin is enabled
             this.enabled = true;
@@ -929,7 +930,7 @@ public abstract class PluginBase extends JavaPlugin {
 
         // Disable Metrics if enabled
         if (metrics != null) {
-            metrics.stop();
+            metrics.shutdown();
             metrics = null;
         }
 

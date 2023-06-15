@@ -34,8 +34,6 @@ import com.bergerkiller.bukkit.common.internal.map.CommonMapController;
 import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
 import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
-import com.bergerkiller.bukkit.common.metrics.MyDependingPluginsGraph;
-import com.bergerkiller.bukkit.common.metrics.SoftDependenciesGraph;
 import com.bergerkiller.bukkit.common.offline.OfflineWorld;
 import com.bergerkiller.bukkit.common.protocol.PlayerGameInfo;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -779,10 +777,10 @@ public class CommonPlugin extends PluginBase {
         // BKCommonLib Metrics
         if (hasMetrics()) {
             // Soft dependencies
-            getMetrics().addGraph(new SoftDependenciesGraph());
+            //getMetrics().addGraph(new SoftDependenciesGraph());
 
             // Depending
-            getMetrics().addGraph(new MyDependingPluginsGraph());
+            //getMetrics().addGraph(new MyDependingPluginsGraph());
         }
 
         // Server-specific enabling occurs
