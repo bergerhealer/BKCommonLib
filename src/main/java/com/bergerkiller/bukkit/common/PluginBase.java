@@ -836,17 +836,20 @@ public abstract class PluginBase extends JavaPlugin {
                 metrics = new Metrics(this, id);
 
                 // If set, show the build number. Exclude NO-CI as there is no way to know what that means.
-                final String pluginBuild = pluginConfig.getString("build", "NO-CI");
-                if (!pluginBuild.equals("") && !pluginBuild.equals("NO-CI")) {
-                    // Build metric
-                    metrics.addCustomChart(new Metrics.SimplePie("build", () -> pluginBuild));
-
-                    // Plugin + Build combined metric
-                    final String version = this.getDescription().getVersion();
-                    metrics.addCustomChart(new Metrics.DrilldownPie("pluginBuildVersion", () ->
-                        Collections.singletonMap(version, Collections.singletonMap(pluginBuild, 1))
-                    ));
+                String pluginBuildCfg = pluginConfig.getString("build", "NO-CI");
+                if (pluginBuildCfg.equals("") || pluginBuildCfg.equals("NO-CI")) {
+                    pluginBuildCfg = "other";
                 }
+                final String pluginBuild = pluginBuildCfg;
+
+                // Build metric
+                metrics.addCustomChart(new Metrics.SimplePie("build", () -> pluginBuild));
+
+                // Plugin + Build combined metric
+                final String version = this.getDescription().getVersion();
+                metrics.addCustomChart(new Metrics.DrilldownPie("pluginBuildVersion", () ->
+                        Collections.singletonMap(version, Collections.singletonMap(pluginBuild, 1))
+                ));
             }
         } catch (Throwable t) {
             getLogger().log(Level.SEVERE, "Failed to initialize metrics for " + getName(), t);
