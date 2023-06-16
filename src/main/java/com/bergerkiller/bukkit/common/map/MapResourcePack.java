@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -969,8 +970,10 @@ public class MapResourcePack {
             }
         } catch (JsonSyntaxException ex) {
             String s = (optPath == null) ? "" : (" at " + optPath);
+            String msg = ex.getMessage();
+            msg = StringUtil.trimStart(msg, "com.bergerkiller.bukkit.common.dep.gson.stream.MalformedJsonException: ");
             Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Failed to parse GSON for " + objectType.getSimpleName() +
-                    s + ": " + ex.getMessage());
+                    s + ": " + msg);
         } catch (IOException ex) {
             Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Unhandled IO Exception", ex);
         }
