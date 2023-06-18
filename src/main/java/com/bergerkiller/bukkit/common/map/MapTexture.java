@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 
@@ -76,6 +77,31 @@ public final class MapTexture extends MapCanvas {
         } else {
             return super.writePixels(x, y, w, h, colorData);
         }
+    }
+
+    @Override
+    public MapCanvas writePixelsFill(int x, int y, int w, int h, byte color) {
+        // Clamp to within range of this buffer
+        x = Math.max(x, 0);
+        y = Math.max(y, 0);
+        w = Math.min(w, this.width - x);
+        h = Math.min(h, this.height - y);
+
+        int index = y * this.width + x;
+        int res = this.width * this.height;
+        int max_index = Math.min(res, index + h * this.width + w);
+        if (index == 0 && max_index == res) {
+            // Fill entire canvas
+            Arrays.fill(this.buffer, 0, res, color);
+        } else {
+            // Fill the buffer within range in vertical slice steps
+            while (index < max_index) {
+                Arrays.fill(this.buffer, index, index + w, color);
+                index += width;
+            }
+        }
+
+        return this;
     }
 
     /**
