@@ -90,7 +90,7 @@ public class SignChangeTracker implements Cloneable {
             // but not yet to a World. Especially on 1.12.2 and before. For that reason, we got to
             // check whether the World was assigned to the tile entity. If not, we cannot use the tile
             // entity's property method, as it throws a NPE.
-            this.blockData = this.checkRemoved(tile) ? WorldUtil.getBlockData(this.block) : tile.getBlockData();
+            this.blockData = this.isTileRemoved(tile) ? WorldUtil.getBlockData(this.block) : tile.getBlockData();
         }
     }
 
@@ -137,6 +137,7 @@ public class SignChangeTracker implements Cloneable {
      * @return Line at this index
      */
     public String getLine(SignSide side, int index) {
+        checkRemoved();
         return side.getLine(stateHandle, index);
     }
 
@@ -148,6 +149,7 @@ public class SignChangeTracker implements Cloneable {
      * @param text New text to put at this index
      */
     public void setLine(SignSide side, int index, String text) {
+        checkRemoved();
         side.setLine(stateHandle, index, text);
         state.update(true);
     }
@@ -158,6 +160,7 @@ public class SignChangeTracker implements Cloneable {
      * @return Sign lines
      */
     public String[] getLines(SignSide side) {
+        checkRemoved();
         return side.getLines(stateHandle);
     }
 
@@ -168,6 +171,7 @@ public class SignChangeTracker implements Cloneable {
      * @return Line at this index at the front of the sign
      */
     public String getFrontLine(int index) {
+        checkRemoved();
         return stateHandle.getFrontLine(index);
     }
 
@@ -179,6 +183,7 @@ public class SignChangeTracker implements Cloneable {
      * @param text New text to put at this index at the front of the sign
      */
     public void setFrontLine(int index, String text) {
+        checkRemoved();
         stateHandle.setFrontLine(index, text);
         state.update(true);
     }
@@ -189,6 +194,7 @@ public class SignChangeTracker implements Cloneable {
      * @return Sign front lines
      */
     public String[] getFrontLines() {
+        checkRemoved();
         return stateHandle.getFrontLines();
     }
 
@@ -200,6 +206,7 @@ public class SignChangeTracker implements Cloneable {
      * @return Line at this index at the back of the sign
      */
     public String getBackLine(int index) {
+        checkRemoved();
         return stateHandle.getBackLine(index);
     }
 
@@ -212,6 +219,7 @@ public class SignChangeTracker implements Cloneable {
      * @param text New text to put at this index at the back of the sign
      */
     public void setBackLine(int index, String text) {
+        checkRemoved();
         if (CommonCapabilities.HAS_SIGN_BACK_TEXT) {
             stateHandle.setBackLine(index, text);
             state.update(true);
@@ -225,6 +233,7 @@ public class SignChangeTracker implements Cloneable {
      * @return Sign front lines
      */
     public String[] getBackLines() {
+        checkRemoved();
         return stateHandle.getBackLines();
     }
 
@@ -234,15 +243,8 @@ public class SignChangeTracker implements Cloneable {
      * @return Sign attached face
      */
     public BlockFace getAttachedFace() {
-        try {
-            return this.blockData.getAttachedFace();
-        } catch (NullPointerException ex) {
-            if (this.isRemoved()) {
-                throw new IllegalStateException("Sign is removed");
-            } else {
-                throw ex;
-            }
-        }
+        checkRemoved();
+        return this.blockData.getAttachedFace();
     }
 
     /**
@@ -252,15 +254,8 @@ public class SignChangeTracker implements Cloneable {
      * @return Sign facing
      */
     public BlockFace getFacing() {
-        try {
-            return this.blockData.getFacingDirection();
-        } catch (NullPointerException ex) {
-            if (this.isRemoved()) {
-                throw new IllegalStateException("Sign is removed");
-            } else {
-                throw ex;
-            }
-        }
+        checkRemoved();
+        return this.blockData.getFacingDirection();
     }
 
     /**
@@ -339,7 +334,7 @@ public class SignChangeTracker implements Cloneable {
 
         // Ask the TileEntity we already have whether it was removed from the World
         // If it was, we must re-set and re-check for the sign.
-        if (checkRemoved(tileEntity)) {
+        if (isTileRemoved(tileEntity)) {
             if (tryLoadFromWorld()) {
                 return true; // Backing TileEntity instance changed, so probably changed
             } else {
@@ -367,7 +362,19 @@ public class SignChangeTracker implements Cloneable {
         return detectChangedLines(tileEntity) || blockDataChanged;
     }
 
-    protected boolean checkRemoved(TileEntitySignHandle tileEntity) {
+    private void checkRemoved() {
+        if (isRemoved()) {
+            if (block == null) {
+                throw new IllegalStateException("Sign is removed");
+            } else {
+                throw new IllegalStateException("Sign at world=" + block.getWorld().getName() +
+                        " x=" + block.getX() + " y=" + block.getY() + " z=" + block.getZ() +
+                        " is removed");
+            }
+        }
+    }
+
+    protected boolean isTileRemoved(TileEntitySignHandle tileEntity) {
         return tileEntity.isRemoved();
     }
 
@@ -534,7 +541,7 @@ public class SignChangeTracker implements Cloneable {
         }
 
         @Override
-        protected boolean checkRemoved(TileEntitySignHandle tileEntity) {
+        protected boolean isTileRemoved(TileEntitySignHandle tileEntity) {
             List<Object> list = this.worldTileEntities;
             Object rawTileEntity = tileEntity.getRaw();
             if (lastIndex >= 0 && lastIndex < list.size() && list.get(lastIndex) == rawTileEntity) {
