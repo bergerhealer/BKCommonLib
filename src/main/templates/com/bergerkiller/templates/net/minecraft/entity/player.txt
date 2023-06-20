@@ -304,9 +304,11 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 #if version >= 1.18
         ContainerAccess access = ContainerAccess.create(world, position);
         ContainerAnvil container = new ContainerAnvil(windowId, playerInventory, access);
+        container.setTitle(title);
 #elseif version >= 1.14
         ContainerAccess access = ContainerAccess.at(world, position);
         ContainerAnvil container = new ContainerAnvil(windowId, playerInventory, access);
+        container.setTitle(title);
 #else
         ContainerAnvil container = new ContainerAnvil(playerInventory, world, position, (EntityHuman) instance);
         container.windowId = windowId;
