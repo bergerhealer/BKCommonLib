@@ -179,10 +179,6 @@ public abstract class SignEditDialog {
         // Open the dialog
         entityPlayer.openSignEditWindow(coordinates);
 
-        // Restore the original block. For some reason this doesn't close the GUI for the client.
-        // If this ever changes, migrate this to handleAbort / handleClosed instead.
-        metadata.sendOriginalBlock();
-
         this.onOpened(metadata.player, lines);
     }
 
@@ -193,6 +189,10 @@ public abstract class SignEditDialog {
      */
     private final void handleAbort(PlayerMetadata metadata) {
         EntityPlayerHandle.fromBukkit(metadata.player).closeSignEditWindow();
+
+        // Restore the original block
+        metadata.sendOriginalBlock();
+
         this.onAborted(metadata.player);
     }
 
@@ -210,6 +210,10 @@ public abstract class SignEditDialog {
                 break;
             }
         }
+
+        // Restore the original block
+        metadata.sendOriginalBlock();
+
         if (isAllEmpty) {
             this.onClosedWithoutLines(metadata.player);
         } else {
