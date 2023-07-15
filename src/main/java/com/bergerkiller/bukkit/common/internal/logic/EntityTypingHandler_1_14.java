@@ -1,9 +1,11 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.IdentityHashMap;
 import java.util.logging.Level;
 
+import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import org.bukkit.entity.Entity;
 
 import com.bergerkiller.bukkit.common.Common;
@@ -66,6 +68,36 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
         registerEntityTypes("LIGHTNING_BOLT", "net.minecraft.world.entity.EntityLightning");
         registerEntityTypes("PLAYER", "net.minecraft.server.level.EntityPlayer");
         registerEntityTypes("WITHER", "net.minecraft.world.entity.boss.wither.EntityWither"); // scoreboard things
+
+        // Go by all static fields in the EntityTypes class and decode the generic type information
+        // of the fields to figure out what type is represented. This might fail if generics are stripped
+        // during compiling, but most of the time this works fine.
+        for (Field f : EntityTypesHandle.T.getType().getDeclaredFields()) {
+            if (!Modifier.isStatic(f.getModifiers())) {
+                continue;
+            }
+            TypeDeclaration typeDec = TypeDeclaration.fromType(f.getGenericType());
+            if (!EntityTypesHandle.T.getType().isAssignableFrom(typeDec.type)) {
+                continue;
+            }
+            if (typeDec.genericTypes.length != 1) {
+                continue;
+            }
+            Object nmsEntityTypes;
+            try {
+                if (!Modifier.isPublic(f.getModifiers())) {
+                    f.setAccessible(true);
+                }
+                nmsEntityTypes = f.get(null);
+            } catch (Throwable t) {
+                continue;
+            }
+
+            // If not already registered, register it
+            if (!_cache.containsKey(nmsEntityTypes)) {
+                _cache.put(nmsEntityTypes, typeDec.genericTypes[0].type);
+            }
+        }
     }
 
     @Override
