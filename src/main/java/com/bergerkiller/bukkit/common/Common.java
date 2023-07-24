@@ -42,7 +42,8 @@ public class Common {
             "Common:EntitySlimeHandle",
             "Common:PlayerGameInfo",
             "Common:Yaml:BetterChangeListeners",
-            "Common:DisplayEntity:Brightness"
+            "Common:DisplayEntity:Brightness",
+            "Common:PacketPlayOutEntityEquipment:OwnerType"
     ).collect(Collectors.toSet());
 
     /**
