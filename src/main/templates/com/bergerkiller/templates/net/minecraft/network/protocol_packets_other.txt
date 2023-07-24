@@ -59,6 +59,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAttachEntityHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCameraHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityEquipmentHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityEquipmentHandle.OwnerType;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMountHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityMetadataHandle
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockDigHandle.EnumPlayerDigTypeHandle;
@@ -1876,19 +1877,19 @@ class PacketPlayOutEntityEquipment extends Packet {
         return slots.size();
     }
 
-    public static (PacketPlayOutEntityEquipmentHandle) PacketPlayOutEntityEquipment createNew(int entityId, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack) {
+    public static (PacketPlayOutEntityEquipmentHandle) PacketPlayOutEntityEquipment createNew(PacketPlayOutEntityEquipmentHandle.OwnerType ownerType, int entityId, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack) {
         java.util.List slots = com.google.common.collect.Lists.newArrayList();
         slots.add(com.mojang.datafixers.util.Pair.of(slot, itemStack));
         return new PacketPlayOutEntityEquipment(entityId, slots);
     }
 
-    public (org.bukkit.inventory.EquipmentSlot) EnumItemSlot getEquipmentSlot(int index) {
+    public (org.bukkit.inventory.EquipmentSlot) EnumItemSlot getEquipmentSlot(PacketPlayOutEntityEquipmentHandle.OwnerType ownerType, int index) {
         java.util.List slots = instance#slots;
         com.mojang.datafixers.util.Pair entry = (com.mojang.datafixers.util.Pair) slots.get(index);
         return (EnumItemSlot) entry.getFirst();
     }
 
-    public void setEquipmentSlot(int index, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot) {
+    public void setEquipmentSlot(PacketPlayOutEntityEquipmentHandle.OwnerType ownerType, int index, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot) {
         java.util.List slots = instance#slots;
         com.mojang.datafixers.util.Pair entry = (com.mojang.datafixers.util.Pair) slots.get(index);
         slots.set(index, com.mojang.datafixers.util.Pair.of(slot, entry.getSecond()));
@@ -1911,35 +1912,40 @@ class PacketPlayOutEntityEquipment extends Packet {
         return 1;
     }
 
+    public static (PacketPlayOutEntityEquipmentHandle) PacketPlayOutEntityEquipment createNew(PacketPlayOutEntityEquipmentHandle.OwnerType ownerType, int entityId, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack) {
   #if version >= 1.9
-    public static (PacketPlayOutEntityEquipmentHandle) PacketPlayOutEntityEquipment createNew(int entityId, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack) {
         return new PacketPlayOutEntityEquipment(entityId, slot, itemStack);
-    }
   #else
-    public static (PacketPlayOutEntityEquipmentHandle) PacketPlayOutEntityEquipment createNew(int entityId, (org.bukkit.inventory.EquipmentSlot) int slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack) {
-        return new PacketPlayOutEntityEquipment(entityId, slot, itemStack);
-    }
+        return new PacketPlayOutEntityEquipment(entityId, ownerType.isPlayer() ? slot.b() : slot.c(), itemStack);
   #endif
+    }
 
   #if version >= 1.9
     #require net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment private net.minecraft.world.entity.EnumItemSlot slot:b;
-    public (org.bukkit.inventory.EquipmentSlot) EnumItemSlot getEquipmentSlot(int index) {
+
+    public (org.bukkit.inventory.EquipmentSlot) EnumItemSlot getEquipmentSlot(PacketPlayOutEntityEquipmentHandle.OwnerType ownerType, int index) {
         if (index != 0) { throw new IndexOutOfBoundsException("Index out of range: " + index); }
         return instance#slot;
     }
-    public void setEquipmentSlot(int index, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot) {
+    public void setEquipmentSlot(PacketPlayOutEntityEquipmentHandle.OwnerType ownerType, int index, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot) {
         if (index != 0) { throw new IndexOutOfBoundsException("Index out of range: " + index); }
         instance#slot = slot;
     }
   #else
     #require net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment private int slot:b;
-    public (org.bukkit.inventory.EquipmentSlot) int getEquipmentSlot(int index) {
+    public (org.bukkit.inventory.EquipmentSlot) EnumItemSlot getEquipmentSlot(PacketPlayOutEntityEquipmentHandle.OwnerType ownerType, int index) {
         if (index != 0) { throw new IndexOutOfBoundsException("Index out of range: " + index); }
-        return instance#slot;
+        int slotIdx = instance#slot;
+        if (ownerType.isPlayer()) {
+            return EnumItemSlot.fromPlayerSlotIndex(slotIdx);
+        } else {
+            return EnumItemSlot.fromNonPlayerSlotIndex(slotIdx);
+        }
     }
-    public void setEquipmentSlot(int index, (org.bukkit.inventory.EquipmentSlot) int slot) {
+    public void setEquipmentSlot(PacketPlayOutEntityEquipmentHandle.OwnerType ownerType, int index, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot) {
         if (index != 0) { throw new IndexOutOfBoundsException("Index out of range: " + index); }
-        instance#slot = slot;
+        int slotIdx = ownerType.isPlayer() ? slot.b() : slot.c();
+        instance#slot = slotIdx;
     }
   #endif
 
@@ -1953,6 +1959,38 @@ class PacketPlayOutEntityEquipment extends Packet {
         instance#itemStack = itemStack;
     }
 #endif
+
+    <code>
+    public enum OwnerType {
+        NON_PLAYER(false), PLAYER(true);
+
+        private final boolean isPlayer;
+
+        OwnerType(boolean isPlayer) {
+            this.isPlayer = isPlayer;
+        }
+
+        public boolean isPlayer() {
+            return isPlayer;
+        }
+    }
+
+    // Should no longer be used because it could be invalid on Minecraft 1.8 (player vs non-player)
+    @Deprecated
+    public static PacketPlayOutEntityEquipmentHandle createNew(int entityId, org.bukkit.inventory.EquipmentSlot slot, org.bukkit.inventory.ItemStack itemStack) {
+        return createNew(OwnerType.NON_PLAYER, entityId, slot, itemStack);
+    }
+
+    @Deprecated
+    public org.bukkit.inventory.EquipmentSlot getEquipmentSlot(int index) {
+        return getEquipmentSlot(OwnerType.NON_PLAYER, index);
+    }
+
+    @Deprecated
+    public void setEquipmentSlot(int index, org.bukkit.inventory.EquipmentSlot slot) {
+        setEquipmentSlot(OwnerType.NON_PLAYER, index, slot);
+    }
+    </code>
 }
 
 // Only available >= MC 1.9

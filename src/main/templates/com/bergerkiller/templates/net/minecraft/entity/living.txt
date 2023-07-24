@@ -312,7 +312,18 @@ class EntityLiving extends Entity {
 #elseif version >= 1.9
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) EnumItemSlot paramEnumItemSlot);
 #else
-    public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) int paramEnumItemSlot);
+    public (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) EnumItemSlot paramEnumItemSlot) {
+        if (instance instanceof EntityHuman) {
+            if (paramEnumItemSlot == EnumItemSlot.HAND) {
+                // Technically not supported, we implement a workaround
+                return ((EntityHuman) instance).inventory.getItemInHand();
+            } else {
+                return instance.getEquipment(paramEnumItemSlot.b());
+            }
+        } else {
+            return instance.getEquipment(paramEnumItemSlot.c());
+        }
+    }
 #endif
 
     public final float getHealth();
