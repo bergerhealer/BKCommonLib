@@ -103,7 +103,12 @@ public class RecipeUtil {
             return null;
         } else {
             // <= 1.12.2
-            return Conversion.toItemStack.convert(RecipesFurnaceHandle.getInstance().getResult(CommonNMS.getHandle(cooked)));
+            ItemStackHandle input = CommonNMS.getHandle(cooked);
+            if (input == null) {
+                return null;
+            } else {
+                return Conversion.toItemStack.convert(RecipesFurnaceHandle.getInstance().getResult(input));
+            }
         }
     }
 
