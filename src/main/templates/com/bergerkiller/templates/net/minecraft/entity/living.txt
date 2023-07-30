@@ -314,7 +314,7 @@ class EntityLiving extends Entity {
 #else
     public (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) EnumItemSlot paramEnumItemSlot) {
         if (instance instanceof EntityHuman) {
-            if (paramEnumItemSlot == EnumItemSlot.HAND) {
+            if (paramEnumItemSlot == EnumItemSlot.MAINHAND) {
                 // Technically not supported, we implement a workaround
                 return ((EntityHuman) instance).inventory.getItemInHand();
             } else {
