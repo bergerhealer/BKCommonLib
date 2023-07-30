@@ -431,7 +431,7 @@ class WorldServer extends World {
     // isn't fired, for one.
 #if version >= 1.17
     public void removeEntityWithoutDeath((EntityHandle) Entity entity) {
-        entity.setRemoved(net.minecraft.world.entity.Entity$RemovalReason.DISCARDED);
+        entity.setRemoved(net.minecraft.world.entity.Entity$RemovalReason.CHANGED_DIMENSION);
     }
 #elseif version >= 1.14
     public void removeEntityWithoutDeath:removeEntity((EntityHandle) Entity entity);
