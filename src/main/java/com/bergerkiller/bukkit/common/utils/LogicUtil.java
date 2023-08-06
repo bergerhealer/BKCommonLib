@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -1144,10 +1145,28 @@ public class LogicUtil {
             return Collections.emptyMap();
         }
         Map<String, Object> values = serializable.serialize();
+        boolean cloned = false;
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             Object value = entry.getValue();
             if (value instanceof ConfigurationSerializable) {
-                entry.setValue(serializeDeep((ConfigurationSerializable) value));
+                Map<String, Object> serialized = serializeDeep((ConfigurationSerializable) value);
+                if (!cloned) {
+                    if (values instanceof com.google.common.collect.ImmutableMap) {
+                        // Optimization: avoid UnsupportedOps if we know this is the case
+                        values = new LinkedHashMap<>(values);
+                        cloned = true;
+                    } else {
+                        try {
+                            entry.setValue(serialized);
+                        } catch (UnsupportedOperationException ex) {
+                            values = new LinkedHashMap<>(values);
+                            cloned = true;
+                        }
+                    }
+                }
+                if (cloned) {
+                    values.put(entry.getKey(), serialized);
+                }
             }
         }
         return values;
