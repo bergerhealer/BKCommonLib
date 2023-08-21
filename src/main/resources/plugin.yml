@@ -7,7 +7,7 @@ authors: [${authors}]
 load: STARTUP
 description: Is used in all of my plugins to re-use common functions
 softdepend: [ProtocolLib]
-classdepend: [WorldEdit, Vault, FastAsyncWorldEdit, ViaVersion, LuckPerms, InteractiveBoard]
+classdepend: [WorldEdit, Vault, FastAsyncWorldEdit, ViaVersion, LuckPerms, InteractiveBoard, ImageFrame]
 dev-url: ${url}
 bstats:
   enabled: true

@@ -21,6 +21,8 @@ dependencies:
     required: false
   - name: InteractiveBoard
     required: false
+  - name: ImageFrame
+    required: false
 load-after:
   - name: ProtocolLib
 dev-url: ${url}

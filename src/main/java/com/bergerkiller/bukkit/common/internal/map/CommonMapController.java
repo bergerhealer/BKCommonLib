@@ -685,6 +685,9 @@ public final class CommonMapController implements PacketListener, Listener {
             return staticMapid;
         }
 
+        // Fixes an issue of maps going empty
+        ImageFrameIdZeroApplier.apply();
+
         // Increment this counter. The Map Id updater task will clean up unused maps every 1000 cycles.
         idGenerationCounter++;
 
