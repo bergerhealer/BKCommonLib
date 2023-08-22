@@ -1444,7 +1444,7 @@ public class WorldUtil extends ChunkUtil {
         private static IntCuboid toBorder(Location center, double size, int minY, int maxY) {
             double hsize = 0.5 * size;
             IntVector3 min = IntVector3.blockOf(center.getX() - hsize, minY, center.getZ() - hsize);
-            IntVector3 max = IntVector3.blockOf(center.getZ() + hsize + 1, maxY, center.getZ() + hsize + 1);
+            IntVector3 max = IntVector3.blockOf(center.getX() + hsize + 1, maxY, center.getZ() + hsize + 1);
             return IntCuboid.create(min, max);
         }
     }
