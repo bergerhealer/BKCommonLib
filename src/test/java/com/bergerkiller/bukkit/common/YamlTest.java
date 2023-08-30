@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.bergerkiller.bukkit.common.config.yaml.YamlListNode;
 import org.bukkit.GameMode;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.util.Vector;
@@ -27,6 +28,68 @@ import com.bergerkiller.bukkit.common.io.AsyncTextWriter;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 
 public class YamlTest {
+
+    @Test
+    public void testYamlCopyIntoArrayToNode() {
+        YamlNode rootOne = new YamlNode();
+        YamlNode childOne = rootOne.getNode("child");
+        childOne.set("array.1", "one");
+        childOne.set("array.2", "two");
+        childOne.set("array.3", "three");
+        childOne.set("array.4", "four");
+        childOne.set("array.5", "five");
+
+        YamlNode rootTwo = new YamlNode();
+        YamlNode childTwo = rootTwo.getNode("child");
+        childTwo.set("array", Arrays.asList(6, 7, 8));
+
+        // Copy rootTwo into rootOne. It should turn from a node into a list
+        rootOne.setTo(rootTwo);
+
+        // Verify
+        assertTrue(rootOne.get("child.array") instanceof YamlListNode);
+        assertEquals(Arrays.asList(6, 7, 8), rootOne.getList("child.array"));
+    }
+
+    @Test
+    public void testYamlCopyIntoNodeToArray() {
+        YamlNode rootOne = new YamlNode();
+        YamlNode childOne = rootOne.getNode("child");
+        childOne.set("array", Arrays.asList(1, 2, 3, 4, 5));
+
+        YamlNode rootTwo = new YamlNode();
+        YamlNode childTwo = rootTwo.getNode("child");
+        childTwo.set("array.6", "six");
+        childTwo.set("array.7", "seven");
+        childTwo.set("array.8", "eight");
+
+        // Copy rootTwo into rootOne. It should turn from a node into a list
+        rootOne.setTo(rootTwo);
+
+        // Verify
+        assertFalse(rootOne.get("child.array") instanceof YamlListNode);
+        assertEquals(3, rootOne.getNode("child.array").getKeys().size());
+        assertEquals("six", rootOne.get("child.array.6"));
+        assertEquals("seven", rootOne.get("child.array.7"));
+        assertEquals("eight", rootOne.get("child.array.8"));
+    }
+
+    @Test
+    public void testYamlCopyIntoArray() {
+        YamlNode rootOne = new YamlNode();
+        YamlNode childOne = rootOne.getNode("child");
+        childOne.set("array", Arrays.asList(1, 2, 3, 4, 5));
+
+        YamlNode rootTwo = new YamlNode();
+        YamlNode childTwo = rootTwo.getNode("child");
+        childTwo.set("array", Arrays.asList(6, 7, 8));
+
+        // Copy rootTwo into rootOne. It should remove 4/5 elements.
+        rootOne.setTo(rootTwo);
+
+        // Check
+        assertEquals(Arrays.asList(6, 7, 8), rootOne.getList("child.array"));
+    }
 
     @Test
     public void testSpecialStringValues() {

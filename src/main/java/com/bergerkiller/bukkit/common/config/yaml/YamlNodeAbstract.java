@@ -13,7 +13,6 @@ import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -1118,11 +1117,13 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
         }
 
         // When requested, track keys to remove from the clone
-        Set<String> keysToRemove = Collections.emptySet();
-        if (removeOthers) {
-            keysToRemove = clone._children.stream()
-                    .map(YamlEntry::getKey)
-                    .collect(Collectors.toCollection(HashSet::new));
+        DelayedRemovalOperation removalOp;
+        if (!removeOthers) {
+            removalOp = DelayedRemovalOperation.NONE;
+        } else if (clone instanceof YamlListNode) {
+            removalOp = new DelayedRemovalOperationList();
+        } else {
+            removalOp = new DelayedRemovalOperationNode(clone);
         }
 
         // Got to notify the parent changed when a new node is inserted / nodes are removed
@@ -1130,9 +1131,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
 
         // Perform copying of data
         for (YamlEntry child : this._children) {
-            if (removeOthers) {
-                keysToRemove.remove(child.getKey());
-            }
+            removalOp.childOverwritten(child);
 
             // Find the filter-relative path to use and pass it through the filter
             YamlPath filterPath;
@@ -1181,22 +1180,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
         }
 
         // Clean up keys that need to be removed from the clone target
-        if (!keysToRemove.isEmpty()) {
-            for (String key : keysToRemove) {
-                if (filterRoot != null && !filter.test(filterRoot.child(key))) {
-                    continue;
-                }
-  
-                YamlEntry childCloneToRemove = clone.getEntryIfExists(key);
-                if (childCloneToRemove != null) {
-                    int index = clone._children.indexOf(childCloneToRemove);
-                    if (index != -1) {
-                        clone.removeChildEntryAtWithoutEvent(index);
-                        parentChanged = true;
-                    }
-                }
-            }
-        }
+        parentChanged |= removalOp.remove(clone, filterRoot, filter);
 
         // If parent (this node) has any child nodes/keys added or removed, notify that too
         if (parentChanged) {
@@ -1471,5 +1455,90 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
 
         // May be useful?
         return entry;
+    }
+
+    private static abstract class DelayedRemovalOperation {
+        public static final DelayedRemovalOperation NONE = new DelayedRemovalOperation() {
+            @Override
+            public void childOverwritten(YamlEntry entry) {
+            }
+
+            @Override
+            public boolean remove(YamlNodeAbstract<?> node, YamlPath filterRoot, Predicate<YamlPath> filter) {
+                return false;
+            }
+        };
+
+        public abstract boolean remove(YamlNodeAbstract<?> node, YamlPath filterRoot, Predicate<YamlPath> filter);
+
+        public abstract void childOverwritten(YamlEntry entry);
+    }
+
+    private static class DelayedRemovalOperationNode extends DelayedRemovalOperation {
+        private final Set<String> nodeNamesToRemove;
+
+        public DelayedRemovalOperationNode(YamlNodeAbstract<?> node) {
+            nodeNamesToRemove = node._children.stream()
+                    .map(YamlEntry::getKey)
+                    .collect(Collectors.toCollection(HashSet::new));
+        }
+
+        @Override
+        public void childOverwritten(YamlEntry entry) {
+            nodeNamesToRemove.remove(entry.getKey());
+        }
+
+        @Override
+        public boolean remove(YamlNodeAbstract<?> node, YamlPath filterRoot, Predicate<YamlPath> filter) {
+            boolean changed = false;
+            for (String key : nodeNamesToRemove) {
+                if (filterRoot != null && !filter.test(filterRoot.child(key))) {
+                    continue;
+                }
+
+                YamlEntry childCloneToRemove = node.getEntryIfExists(key);
+                if (childCloneToRemove != null) {
+                    int index = node._children.indexOf(childCloneToRemove);
+                    if (index != -1) {
+                        node.removeChildEntryAtWithoutEvent(index);
+                        changed = true;
+                    }
+                }
+            }
+            return changed;
+        }
+    }
+
+    private static class DelayedRemovalOperationList extends DelayedRemovalOperation {
+        private int startIndexToRemove;
+
+        public DelayedRemovalOperationList() {
+            startIndexToRemove = 0;
+        }
+
+        @Override
+        public void childOverwritten(YamlEntry entry) {
+            int childIdx = entry.getYamlPath().listIndex();
+            if (childIdx >= startIndexToRemove) {
+                startIndexToRemove = childIdx + 1;
+            }
+        }
+
+        @Override
+        public boolean remove(YamlNodeAbstract<?> node, YamlPath filterRoot, Predicate<YamlPath> filter) {
+            int startIdx = this.startIndexToRemove;
+            boolean changed = false;
+            while (node._children.size() > startIdx) {
+                if (filterRoot != null && !filter.test(filterRoot.listChild(startIdx))) {
+                    startIdx++;
+                    continue;
+                }
+
+                node.removeChildEntryAtWithoutEvent(startIdx);
+                changed = true;
+            }
+
+            return changed;
+        }
     }
 }
