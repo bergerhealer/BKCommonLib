@@ -1131,8 +1131,6 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
 
         // Perform copying of data
         for (YamlEntry child : this._children) {
-            removalOp.childOverwritten(child);
-
             // Find the filter-relative path to use and pass it through the filter
             YamlPath filterPath;
             if (filterRoot == null) {
@@ -1143,6 +1141,9 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
                     continue;
                 }
             }
+
+            // Mark overwritten so this node isn't removed again later
+            removalOp.childOverwritten(child);
 
             // Find or create the entry at this path
             YamlPath childPath = clone.getYamlPath().childWithName(child.getYamlPath());
