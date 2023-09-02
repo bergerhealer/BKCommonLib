@@ -1518,10 +1518,9 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
 
         @Override
         public void childOverwritten(YamlEntry entry) {
-            int childIdx = entry.getYamlPath().listIndex();
-            if (childIdx >= startIndexToRemove) {
-                startIndexToRemove = childIdx + 1;
-            }
+            // Simply increment index. We cannot use the entry's list index because for some
+            // unknown reason there are List entries being created which use .index instead of [index]
+            startIndexToRemove++;
         }
 
         @Override
