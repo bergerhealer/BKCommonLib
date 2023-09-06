@@ -97,6 +97,39 @@ BKCommonLib adds a few default utilities to get set up for Paper/Spigot servers 
 ******
 </details>
 <details>
+<summary>SoftDependency Library</summary>
+
+#####
+[SoftDependency](https://github.com/bergerhealer/SoftDependency) is a simple library that makes it easier to lazily handle third-party soft dependencies enabling and disabling.
+See the Project GitHub page for more information. This library is included in BKCommonLib by default, no shading or relocating required. Dependency management is handled without having to call any methods from your _onEnable()_.
+
+##### Example
+```java
+public class MyPlugin extends JavaPlugin {
+
+    private final SoftDependency<MyDependencyPlugin> myDependency = new SoftDependency<MyDependencyPlugin>(this, "my_dependency") {
+        @Override
+        protected MyDependencyPlugin initialize(Plugin plugin) {
+            return MyDependencyPlugin.class.cast(plugin);
+        }
+
+        @Override
+        protected void onEnable() {
+            getLogger().info("Support for MyDependency enabled!");
+        }
+
+        @Override
+        protected void onDisable() {
+            getLogger().info("Support for MyDependency disabled!");
+        }
+   };
+
+   // Can use myDependency.get() anywhere, returns non-null if enabled.
+}
+```
+******
+</details>
+<details>
 <summary>Server Events</summary>
 
 #####
@@ -395,16 +428,11 @@ Want to use the included [Cloud Command Framework](https://github.com/bergerheal
 repositories {
     maven {
         url = 'https://ci.mg-dev.eu/plugin/repository/everything'
-        content {
-            includeGroup 'com.bergerkiller.bukkit'
-            includeGroup 'org.bergerhealer.cloud.commandframework'
-            includeGroup 'com.bergerkiller.mountiplex' 
-        }
     }
 }
 
 dependencies {
-    compileOnly 'com.bergerkiller.bukkit:BKCommonLib:1.19.2-v2'
+    compileOnly 'com.bergerkiller.bukkit:BKCommonLib:1.20.1-v1'
 }
 ```
 </details>

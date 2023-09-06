@@ -5,6 +5,7 @@ netty = "4.1.42.Final"
 log4j = "2.17.0"
 mountiplex = "2.95"
 regionchangetracker = "1.2"
+softdependencylib = "1.0"
 timings = "1.0.4"
 gson = "2.8.9"
 viaversion = "3.2.1"
@@ -26,6 +27,7 @@ log4j-api = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4
 log4j-core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
 mountiplex = { module = "com.bergerkiller.mountiplex:Mountiplex", version.ref = "mountiplex" }
 regionchangetracker = { module = "com.bergerkiller.bukkit.regionchangetracker:BKCommonLib-RegionChangeTracker-Core", version.ref = "regionchangetracker" }
+softdependency = { module = "com.bergerkiller.bukkit.softdependency:SoftDependency", version.ref = "softdependencylib" }
 timings = { module = "co.aikar:minecraft-timings", version.ref = "timings" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 viaversion = { module = "us.myles:viaversion", version.ref = "viaversion" }

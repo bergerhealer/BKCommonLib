@@ -59,6 +59,8 @@ dependencies {
     api(libs.mountiplex)
     // Region change tracker is included in BKCommonLib for the region block change event
     api(libs.regionchangetracker)
+    // SoftDependency lib is included in BKCommonLib for its handy API
+    api(libs.softdependency)
     // Aikar's minecraft timings library, https://github.com/aikar/minecraft-timings
     internal(libs.timings) {
         isTransitive = false
