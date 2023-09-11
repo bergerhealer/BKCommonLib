@@ -53,7 +53,7 @@ public class ItemUtil {
 
         // Fallback for mc 1.8 - 1.13.1/2
         return event -> {
-            if (event.getRawSlot() == event.getSlot()) {
+            if (event.getRawSlot() < event.getView().getTopInventory().getSize()) {
                 return event.getView().getTopInventory();
             } else {
                 return event.getView().getBottomInventory();
