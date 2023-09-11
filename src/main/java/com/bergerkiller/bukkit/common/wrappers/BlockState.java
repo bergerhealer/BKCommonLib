@@ -7,7 +7,7 @@ import java.util.Collection;
 
 /**
  * Deprecated class! This will be removed in the near future! Use
- * {@link BlockDataState} instead.
+ * {@link BlockDataStateKey} instead.
  *
  * @param <T> Value type
  */

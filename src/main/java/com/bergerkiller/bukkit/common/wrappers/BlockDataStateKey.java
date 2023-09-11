@@ -10,9 +10,9 @@ import com.bergerkiller.generated.net.minecraft.world.level.block.state.properti
  * which is more about block entity metadata. Acts as a key for changing block
  * data values like facing and redstone power state.
  */
-public class BlockDataState<T extends Comparable<?>> extends BlockState<T> {
+public class BlockDataStateKey<T extends Comparable<?>> extends BlockState<T> {
 
-    public BlockDataState(IBlockStateHandle handle) {
+    public BlockDataStateKey(IBlockStateHandle handle) {
         setHandle(handle);
     }
 

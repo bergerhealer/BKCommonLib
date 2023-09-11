@@ -227,7 +227,7 @@ public abstract class BlockData extends BlockDataRegistry {
     /**
      * Changes a state of this BlockData, returning the BlockData with the state updated.
      * 
-     * @param key Name of the state
+     * @param key Name of the state to change
      * @param value to set the state to
      * @return updated block data
      */
@@ -236,16 +236,16 @@ public abstract class BlockData extends BlockDataRegistry {
     /**
      * Changes a state of this BlockData, returning the BlockData with the state updated.
      * 
-     * @param state the state to change
+     * @param stateKey Key of the state to change
      * @param value to set the state to
      * @return updated block data
      */
-    public abstract BlockData setState(BlockDataState<?> state, Object value);
+    public abstract BlockData setState(BlockDataStateKey<?> stateKey, Object value);
 
     /**
      * Reads a state from this BlockData
      * 
-     * @param key Name of the state
+     * @param key Name of the state to get
      * @param type to turn the state value into (auto conversion)
      * @return state value
      */
@@ -254,28 +254,28 @@ public abstract class BlockData extends BlockDataRegistry {
     /**
      * Reads a state from this BlockData
      * 
-     * @param state the state to get
+     * @param stateKey Key of the state to get
      * @return state value
      */
-    public abstract <T extends Comparable<?>> T getState(BlockDataState<T> state);
+    public abstract <T extends Comparable<?>> T getState(BlockDataStateKey<T> stateKey);
 
     /**
      * Gets a mapping of all possible block states of this block, and their
      * current state value.
-     * 
+     *
      * @return block states map
      */
-    public abstract Map<BlockDataState<?>, Comparable<?>> getStates();
+    public abstract Map<BlockDataStateKey<?>, Comparable<?>> getStates();
 
     /**
      * Gets the state key that can be used to update a BlockState using
-     * {@link #setState(BlockDataState, Object)} or get it using
-     * {@link #getState(BlockDataState)}
+     * {@link #setState(BlockDataStateKey, Object)} or get it using
+     * {@link #getState(BlockDataStateKey)}
      *
      * @param key Name of the state
      * @return BlockState key, or <i>null</i> if not found
      */
-    public abstract BlockDataState<?> getStateKey(String key);
+    public abstract BlockDataStateKey<?> getStateKey(String key);
 
     /**
      * Gets whether this BlockData is of a certain Material type.
