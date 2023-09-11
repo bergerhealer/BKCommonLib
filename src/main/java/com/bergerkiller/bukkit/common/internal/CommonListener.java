@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import com.bergerkiller.mountiplex.reflection.util.FastField;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -44,6 +45,7 @@ import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 
 public class CommonListener implements Listener {
     /**
@@ -79,12 +81,15 @@ public class CommonListener implements Listener {
         }
 
         String name = LogicUtil.fixNull(event.getPlugin().getName(), "");
-        for (PluginBase pb : CommonPlugin.getInstance().plugins) {
-            try {
-                pluginLoaderHandlerField.get(pb).onPluginLoaded(event.getPlugin());
-                pb.updateDependency(event.getPlugin(), name, true);
-            } catch (Throwable t) {
-                pb.getLogger().log(Level.SEVERE, "Failed to handle updateDependency", t);
+        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+            if (plugin != event.getPlugin() && plugin.isEnabled() && plugin instanceof PluginBase) {
+                PluginBase pb = (PluginBase) plugin;
+                try {
+                    pluginLoaderHandlerField.get(pb).onPluginLoaded(event.getPlugin());
+                    pb.updateDependency(event.getPlugin(), name, true);
+                } catch (Throwable t) {
+                    pb.getLogger().log(Level.SEVERE, "Failed to handle updateDependency", t);
+                }
             }
         }
         CommonPlugin.flushSaveOperations(event.getPlugin());
@@ -93,11 +98,14 @@ public class CommonListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     protected void onPluginDisable(PluginDisableEvent event) {
         String name = LogicUtil.fixNull(event.getPlugin().getName(), "");
-        for (PluginBase pb : CommonPlugin.getInstance().plugins) {
-            try {
-                pb.updateDependency(event.getPlugin(), name, false);
-            } catch (Throwable t) {
-                pb.getLogger().log(Level.SEVERE, "Failed to handle updateDependency", t);
+        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+            if (plugin != event.getPlugin() && plugin.isEnabled() && plugin instanceof PluginBase) {
+                PluginBase pb = (PluginBase) plugin;
+                try {
+                    pb.updateDependency(event.getPlugin(), name, false);
+                } catch (Throwable t) {
+                    pb.getLogger().log(Level.SEVERE, "Failed to handle updateDependency", t);
+                }
             }
         }
         CommonPlugin.flushSaveOperations(event.getPlugin());

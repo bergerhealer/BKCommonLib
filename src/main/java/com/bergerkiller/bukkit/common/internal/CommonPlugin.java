@@ -90,7 +90,6 @@ public class CommonPlugin extends PluginBase {
      */
     private static CommonPlugin instance;
     private final LibraryComponentList<CommonPlugin> components = LibraryComponentList.forPlugin(this);
-    public final List<PluginBase> plugins = new ArrayList<>();
     private EntityMap<Player, CommonPlayerMeta> playerMetadata;
     private CommonListener listener;
     private final ArrayList<SoftReference<EntityMap>> maps = new ArrayList<>();

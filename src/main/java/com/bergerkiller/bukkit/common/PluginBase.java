@@ -877,7 +877,6 @@ public abstract class PluginBase extends JavaPlugin {
         }
 
         // update dependencies
-        CommonPlugin.getInstance().plugins.add(this);
         for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
             if (PluginLoaderHandler.isPluginFullyEnabled(plugin)) {
                 pluginLoaderHandler.onPluginLoaded(plugin);
@@ -933,9 +932,6 @@ public abstract class PluginBase extends JavaPlugin {
             }
             // Remove references to the plugin - it is disabled now
             this.enabled = false;
-            if (CommonPlugin.hasInstance()) {
-                CommonPlugin.getInstance().plugins.remove(this);
-            }
         }
 
         // Disable Metrics if enabled
