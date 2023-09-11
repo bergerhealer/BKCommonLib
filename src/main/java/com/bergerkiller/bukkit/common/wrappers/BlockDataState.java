@@ -6,13 +6,13 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.IBlockStateHandle;
 
 /**
- * A single state of a block
- *
- * TODO: Rename to BlockDataState to avoid confusion with Bukkit BlockState API
+ * A single state of a block's BlockData. Not to be confused with Bukkit's BlockState,
+ * which is more about block entity metadata. Acts as a key for changing block
+ * data values like facing and redstone power state.
  */
-public class BlockState<T extends Comparable<?>> extends BasicWrapper<IBlockStateHandle> {
+public class BlockDataState<T extends Comparable<?>> extends BasicWrapper<IBlockStateHandle> {
 
-    public BlockState(IBlockStateHandle handle) {
+    public BlockDataState(IBlockStateHandle handle) {
         setHandle(handle);
     }
 

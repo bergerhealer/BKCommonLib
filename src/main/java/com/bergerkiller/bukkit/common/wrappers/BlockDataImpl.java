@@ -639,7 +639,7 @@ class BlockDataImpl extends BlockData {
     }
 
     @Override
-    public BlockData setState(BlockState<?> state, Object value) {
+    public BlockData setState(BlockDataState<?> state, Object value) {
         IBlockDataHandle updated_data = this.data.set(state.getBackingHandle(), value);
         return BlockDataRegistry.fromBlockData(updated_data.getRaw());
     }
@@ -650,25 +650,31 @@ class BlockDataImpl extends BlockData {
     }
 
     @Override
-    public <T extends Comparable<?>> T getState(BlockState<T> state) {
+    public <T extends Comparable<?>> T getState(BlockDataState<T> state) {
         return CommonUtil.unsafeCast(this.data.get(state.getBackingHandle()));
     }
 
     @Override
-    public Map<BlockState<?>, Comparable<?>> getStates() {
-        DuplexConverter<IBlockStateHandle, BlockState<?>> keyConverter = new DuplexConverter<IBlockStateHandle, BlockState<?>>(IBlockStateHandle.class, BlockState.class) {
+    public Map<BlockDataState<?>, Comparable<?>> getStates() {
+        DuplexConverter<IBlockStateHandle, BlockDataState<?>> keyConverter = new DuplexConverter<IBlockStateHandle, BlockDataState<?>>(IBlockStateHandle.class, BlockDataState.class) {
             @Override
-            public BlockState<?> convertInput(IBlockStateHandle value) {
-                return new BlockState<Comparable<?>>(value);
+            public BlockDataState<?> convertInput(IBlockStateHandle value) {
+                return new BlockDataState<Comparable<?>>(value);
             }
 
             @Override
-            public IBlockStateHandle convertOutput(BlockState<?> value) {
+            public IBlockStateHandle convertOutput(BlockDataState<?> value) {
                 return value.getBackingHandle();
             }
         };
         DuplexConverter<Comparable<?>, Comparable<?>> valueConverter = DuplexConverter.createNull(TypeDeclaration.fromClass(Comparable.class));
-        return new ConvertingMap<BlockState<?>, Comparable<?>>(this.data.getStates(), keyConverter, valueConverter);
+        return new ConvertingMap<BlockDataState<?>, Comparable<?>>(this.data.getStates(), keyConverter, valueConverter);
+    }
+
+    @Override
+    public BlockDataState<?> getStateKey(String key) {
+        IBlockStateHandle handle = this.data.findState(key);
+        return (handle == null) ? null : new BlockDataState<>(handle);
     }
 
     @Override

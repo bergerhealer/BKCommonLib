@@ -227,7 +227,7 @@ public abstract class BlockData extends BlockDataRegistry {
     /**
      * Changes a state of this BlockData, returning the BlockData with the state updated.
      * 
-     * @param key of the state
+     * @param key Name of the state
      * @param value to set the state to
      * @return updated block data
      */
@@ -240,12 +240,12 @@ public abstract class BlockData extends BlockDataRegistry {
      * @param value to set the state to
      * @return updated block data
      */
-    public abstract BlockData setState(BlockState<?> state, Object value);
+    public abstract BlockData setState(BlockDataState<?> state, Object value);
 
     /**
      * Reads a state from this BlockData
      * 
-     * @param key of the state
+     * @param key Name of the state
      * @param type to turn the state value into (auto conversion)
      * @return state value
      */
@@ -257,7 +257,7 @@ public abstract class BlockData extends BlockDataRegistry {
      * @param state the state to get
      * @return state value
      */
-    public abstract <T extends Comparable<?>> T getState(BlockState<T> state);
+    public abstract <T extends Comparable<?>> T getState(BlockDataState<T> state);
 
     /**
      * Gets a mapping of all possible block states of this block, and their
@@ -265,7 +265,17 @@ public abstract class BlockData extends BlockDataRegistry {
      * 
      * @return block states map
      */
-    public abstract Map<BlockState<?>, Comparable<?>> getStates();
+    public abstract Map<BlockDataState<?>, Comparable<?>> getStates();
+
+    /**
+     * Gets the state key that can be used to update a BlockState using
+     * {@link #setState(BlockDataState, Object)} or get it using
+     * {@link #getState(BlockDataState)}
+     *
+     * @param key Name of the state
+     * @return BlockState key, or <i>null</i> if not found
+     */
+    public abstract BlockDataState<?> getStateKey(String key);
 
     /**
      * Gets whether this BlockData is of a certain Material type.
