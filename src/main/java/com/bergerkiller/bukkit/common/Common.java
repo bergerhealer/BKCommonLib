@@ -43,7 +43,8 @@ public class Common {
             "Common:PlayerGameInfo",
             "Common:Yaml:BetterChangeListeners",
             "Common:DisplayEntity:Brightness",
-            "Common:PacketPlayOutEntityEquipment:OwnerType"
+            "Common:PacketPlayOutEntityEquipment:OwnerType",
+            "Common:BlockDataStateRename"
     ).collect(Collectors.toSet());
 
     /**
