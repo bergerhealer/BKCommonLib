@@ -183,9 +183,8 @@ public abstract class MapDisplayProperties {
      * @param displayName Display name ChatText
      * @return these properties
      */
-    public MapDisplayProperties setDisplayName(ChatText displayName) {
+    public void setDisplayName(ChatText displayName) {
         ItemUtil.setDisplayChatText(this.getMapItem(), displayName);
-        return this;
     }
 
     /**
@@ -194,9 +193,8 @@ public abstract class MapDisplayProperties {
      * @param displayName Display name String
      * @return these properties
      */
-    public MapDisplayProperties setDisplayName(String displayName) {
+    public void setDisplayName(String displayName) {
         ItemUtil.setDisplayName(this.getMapItem(), displayName);
-        return this;
     }
 
     /**
@@ -207,8 +205,8 @@ public abstract class MapDisplayProperties {
      * @param blue Blue color value (0 - 255)
      * @return these properties
      */
-    public MapDisplayProperties setMapColor(int red, int green, int blue) {
-        return setMapColor(((red & 0xFF) << 16) | ((green & 0xFF) << 8) | (blue & 0xFF));
+    public void setMapColor(int red, int green, int blue) {
+        setMapColor(((red & 0xFF) << 16) | ((green & 0xFF) << 8) | (blue & 0xFF));
     }
 
     /**
@@ -217,10 +215,9 @@ public abstract class MapDisplayProperties {
      * @param rgbColor RGB color code (e.g. 0xFF0000)
      * @return these properties
      */
-    public MapDisplayProperties setMapColor(int rgbColor) {
+    public void setMapColor(int rgbColor) {
         CommonTagCompound display = getMetadata().createCompound("display");
         display.putValue("MapColor", rgbColor);
-        return this;
     }
 
     /**
