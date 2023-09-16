@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.map;
 
 import java.util.UUID;
 
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.inventory.ItemStack;
@@ -174,6 +175,52 @@ public abstract class MapDisplayProperties {
      */
     public <T> T get(String key, T defaultValue) {
         return getMetadata().getValue(key, defaultValue);
+    }
+
+    /**
+     * Sets the display name (title) of the item
+     *
+     * @param displayName Display name ChatText
+     * @return these properties
+     */
+    public MapDisplayProperties setDisplayName(ChatText displayName) {
+        ItemUtil.setDisplayChatText(this.getMapItem(), displayName);
+        return this;
+    }
+
+    /**
+     * Sets the display name (title) of the item
+     *
+     * @param displayName Display name String
+     * @return these properties
+     */
+    public MapDisplayProperties setDisplayName(String displayName) {
+        ItemUtil.setDisplayName(this.getMapItem(), displayName);
+        return this;
+    }
+
+    /**
+     * Sets the color of the map item icon in the inventory
+     *
+     * @param red Red color value (0 - 255)
+     * @param green Green color value (0 - 255)
+     * @param blue Blue color value (0 - 255)
+     * @return these properties
+     */
+    public MapDisplayProperties setMapColor(int red, int green, int blue) {
+        return setMapColor(((red & 0xFF) << 16) | ((green & 0xFF) << 8) | (blue & 0xFF));
+    }
+
+    /**
+     * Sets the color of the map item icon in the inventory
+     *
+     * @param rgbColor RGB color code (e.g. 0xFF0000)
+     * @return these properties
+     */
+    public MapDisplayProperties setMapColor(int rgbColor) {
+        CommonTagCompound display = getMetadata().createCompound("display");
+        display.putValue("MapColor", rgbColor);
+        return this;
     }
 
     /**
