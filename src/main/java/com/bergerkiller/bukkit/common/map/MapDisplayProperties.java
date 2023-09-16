@@ -181,7 +181,6 @@ public abstract class MapDisplayProperties {
      * Sets the display name (title) of the item
      *
      * @param displayName Display name ChatText
-     * @return these properties
      */
     public void setDisplayName(ChatText displayName) {
         ItemUtil.setDisplayChatText(this.getMapItem(), displayName);
@@ -191,7 +190,6 @@ public abstract class MapDisplayProperties {
      * Sets the display name (title) of the item
      *
      * @param displayName Display name String
-     * @return these properties
      */
     public void setDisplayName(String displayName) {
         ItemUtil.setDisplayName(this.getMapItem(), displayName);
@@ -203,7 +201,6 @@ public abstract class MapDisplayProperties {
      * @param red Red color value (0 - 255)
      * @param green Green color value (0 - 255)
      * @param blue Blue color value (0 - 255)
-     * @return these properties
      */
     public void setMapColor(int red, int green, int blue) {
         setMapColor(((red & 0xFF) << 16) | ((green & 0xFF) << 8) | (blue & 0xFF));
@@ -213,7 +210,6 @@ public abstract class MapDisplayProperties {
      * Sets the color of the map item icon in the inventory
      *
      * @param rgbColor RGB color code (e.g. 0xFF0000)
-     * @return these properties
      */
     public void setMapColor(int rgbColor) {
         CommonTagCompound display = getMetadata().createCompound("display");
