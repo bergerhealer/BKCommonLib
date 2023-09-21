@@ -1032,9 +1032,9 @@ class PacketPlayOutLogin extends Packet {
     private (org.bukkit.GameMode) EnumGamemode gameMode:c;
 #endif
 
+#if version >= 1.16
     // Since 1.16 the previous game mode of the player is also sent
     // This allows the player to toggle back and forth between modes
-#if version >= 1.16
   #if version >= 1.17
     #require net.minecraft.network.protocol.game.PacketPlayOutLogin private net.minecraft.world.level.EnumGamemode previousGameMode:previousGameType;
   #else

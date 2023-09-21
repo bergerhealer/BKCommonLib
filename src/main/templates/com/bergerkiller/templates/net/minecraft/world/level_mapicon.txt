@@ -33,7 +33,10 @@ class MapIcon {
     }
 
     public org.bukkit.map.MapCursor toCursor() {
-  #if version >= 1.14.4
+  #if version >= 1.20.2
+        IChatBaseComponent title = instance.name();
+        MapIcon$Type type = instance.type();
+  #elseif version >= 1.14.4
         IChatBaseComponent title = instance.getName();
         MapIcon$Type type = instance.getType();
   #else
@@ -41,7 +44,10 @@ class MapIcon {
         MapIcon$Type type = instance.b();
   #endif
 
-  #if version >= 1.18
+  #if version >= 1.20.2
+        byte iconId = instance.getImage();
+        byte rotation = instance.rot();
+  #elseif version >= 1.18
         byte iconId = type.getIcon();
         byte rotation = instance.getRot();
   #else
@@ -98,7 +104,11 @@ class MapIcon {
     }
 #endif
 
-#if version >= 1.18
+#if version >= 1.20.2
+    public byte getTypeId() {
+        return instance.getImage();
+    }
+#elseif version >= 1.18
     public byte getTypeId() {
         return instance.getType().getIcon();
     }
@@ -114,14 +124,18 @@ class MapIcon {
     public byte getTypeId:getType();
 #endif
 
-    public byte getX();
-
-    public byte getY();
-
-#if version >= 1.18
-    public byte getDirection:getRot();
+#if version >= 1.20.2
+    public byte getX:x();
+    public byte getY:y();
+    public byte getDirection:rot();
 #else
+    public byte getX();
+    public byte getY();
+  #if version >= 1.18
+    public byte getDirection:getRot();
+  #else
     public byte getDirection:getRotation();
+  #endif
 #endif
 
     optional class MapIcon.Type {

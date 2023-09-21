@@ -158,16 +158,6 @@ public class PlayerUtil extends EntityUtil {
     }
 
     /**
-     * Change the pinf form a player
-     *
-     * @param player to change ping for
-     * @param ping to replace with (in ms)
-     */
-    public static void setPing(Player player, int ping) {
-        CommonNMS.getHandle(player).setPing(ping);
-    }
-
-    /**
      * Gets the players game profile
      *
      * @param player to get game profile from

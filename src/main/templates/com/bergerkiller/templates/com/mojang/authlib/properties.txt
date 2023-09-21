@@ -6,7 +6,13 @@ class Property {
     public (PropertyHandle) Property(String name, String value);
     public (PropertyHandle) Property(String name, String value, String signature);
 
+#if version >= 1.20.2
+    public String getName:name();
+    public String getValue:value();
+    public String getSignature:signature();
+#else
     public String getName();
     public String getValue();
     public String getSignature();
+#endif
 }

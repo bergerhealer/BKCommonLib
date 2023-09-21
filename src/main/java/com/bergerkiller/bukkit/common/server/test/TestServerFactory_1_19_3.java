@@ -130,6 +130,18 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         return createFromCode(minecraftServerType, "return net.minecraft.core.IRegistryCustom.fromRegistryOfRegistries(net.minecraft.core.registries.BuiltInRegistries.REGISTRY);");
     }
 
+    protected Object createVanillaResourcePackRepository() throws Throwable {
+        final String repopath = "net.minecraft.server.packs.repository.";
+        final Class<?> resourcePackRepositoryType = Class.forName(repopath + "ResourcePackRepository");
+
+        // arg1: ResourcePackSource[]
+        final Object[] resourcePackSources = LogicUtil.createArray(Class.forName(repopath + "ResourcePackSource"), 1);
+        resourcePackSources[0] = construct(Class.forName(repopath + "ResourcePackSourceVanilla"));
+
+        // Construct new ResourcePackRepository
+        return construct(resourcePackRepositoryType, new Object[] {resourcePackSources});
+    }
+
     protected void initVanillaResourceManager(ServerEnvironment env, Class<?> minecraftServerType) throws Throwable {
         final String repopath = "net.minecraft.server.packs.repository.";
         final Class<?> resourcePackRepositoryType = Class.forName(repopath + "ResourcePackRepository");
@@ -147,12 +159,8 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
             Class<?> enumSourcePackTypeClass = Class.forName("net.minecraft.server.packs.EnumResourcePackType");
             resourcepacktype = getStaticField(enumSourcePackTypeClass, "SERVER_DATA");
 
-            // arg1: ResourcePackSource[]
-            final Object[] resourcePackSources = LogicUtil.createArray(Class.forName(repopath + "ResourcePackSource"), 1);
-            resourcePackSources[0] = construct(Class.forName(repopath + "ResourcePackSourceVanilla"));
-
             // Construct new ResourcePackRepository
-            resourcepackrepository = construct(resourcePackRepositoryType, new Object[] {resourcePackSources});
+            resourcepackrepository = createVanillaResourcePackRepository();
         }
 
         /*

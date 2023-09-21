@@ -7,8 +7,13 @@ import net.minecraft.world.entity.decoration.PaintingVariant;
 
 class CraftArt {
 #if version >= 1.19
+  #if version >= 1.20.2
+    public static org.bukkit.Art NotchToBukkit:minecraftHolderToBukkit((Object) Holder<PaintingVariant> art);
+    public static (Object) Holder<PaintingVariant> BukkitToNotch:bukkitToMinecraftHolder(org.bukkit.Art art);
+  #else
     public static org.bukkit.Art NotchToBukkit((Object) Holder<PaintingVariant> art);
     public static (Object) Holder<PaintingVariant> BukkitToNotch(org.bukkit.Art art);
+  #endif
 
     public static (Object) Holder<PaintingVariant> NotchFromInternalId(int internalId) {
         java.util.Optional opt = BuiltInRegistries.PAINTING_VARIANT.getHolder(internalId);

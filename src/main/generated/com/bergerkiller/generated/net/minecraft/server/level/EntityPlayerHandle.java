@@ -34,6 +34,7 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
     public abstract void setSpawnForced(boolean forced);
     public abstract float getSpawnAngle();
     public abstract void setSpawnAngle(float angle);
+    public abstract int getPing();
     public abstract boolean hasSeenCredits();
     public abstract void setHasSeenCredits(boolean hasSeen);
     public abstract void sendMessage(ChatText ichatbasecomponent);
@@ -55,8 +56,6 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
     }
     public abstract PlayerConnectionHandle getPlayerConnection();
     public abstract void setPlayerConnection(PlayerConnectionHandle value);
-    public abstract int getPing();
-    public abstract void setPing(int value);
     @Template.Readonly
     public abstract boolean isViewingCredits();
     /**
@@ -65,7 +64,6 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
      */
     public static final class EntityPlayerClass extends Template.Class<EntityPlayerHandle> {
         public final Template.Field.Converted<PlayerConnectionHandle> playerConnection = new Template.Field.Converted<PlayerConnectionHandle>();
-        public final Template.Field.Integer ping = new Template.Field.Integer();
         @Template.Readonly
         public final Template.Field.Boolean viewingCredits = new Template.Field.Boolean();
 
@@ -77,6 +75,7 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
         public final Template.Method<Void> setSpawnForced = new Template.Method<Void>();
         public final Template.Method<Float> getSpawnAngle = new Template.Method<Float>();
         public final Template.Method<Void> setSpawnAngle = new Template.Method<Void>();
+        public final Template.Method<Integer> getPing = new Template.Method<Integer>();
         public final Template.Method<Boolean> hasSeenCredits = new Template.Method<Boolean>();
         public final Template.Method<Void> setHasSeenCredits = new Template.Method<Void>();
         public final Template.Method.Converted<Void> sendMessage = new Template.Method.Converted<Void>();

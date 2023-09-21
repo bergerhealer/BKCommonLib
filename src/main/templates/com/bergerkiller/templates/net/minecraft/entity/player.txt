@@ -161,11 +161,19 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
     }
 #endif
 
+    public int getPing() {
+#if version >= 1.20.2
+        return instance.connection.latency();
+#elseif version >= 1.17
+        return instance.latency;
+#else
+        return instance.ping;
+#endif
+    }
+
 #if version >= 1.17
-    public int ping:latency;
     public readonly boolean viewingCredits:wonGame;
 #else
-    public int ping;
     public readonly boolean viewingCredits;
 #endif
 
