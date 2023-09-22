@@ -2061,8 +2061,30 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutUnloadChunk extends NMSPacket {
 
-        public final FieldAccessor<Integer> x = PacketPlayOutUnloadChunkHandle.T.cx.toFieldAccessor();
-        public final FieldAccessor<Integer> z = PacketPlayOutUnloadChunkHandle.T.cz.toFieldAccessor();
+        public final FieldAccessor<Integer> x = new SafeDirectField<Integer>() {
+            @Override
+            public Integer get(Object instance) {
+                return PacketPlayOutUnloadChunkHandle.T.getCx.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Integer value) {
+                PacketPlayOutUnloadChunkHandle.createHandle(instance).setCx(value);
+                return true;
+            }
+        };
+        public final FieldAccessor<Integer> z = new SafeDirectField<Integer>() {
+            @Override
+            public Integer get(Object instance) {
+                return PacketPlayOutUnloadChunkHandle.T.getCz.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Integer value) {
+                PacketPlayOutUnloadChunkHandle.createHandle(instance).setCz(value);
+                return true;
+            }
+        };
     }
 
     public static class NMSPacketPlayOutUpdateAttributes extends NMSPacket {

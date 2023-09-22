@@ -1381,13 +1381,40 @@ class PacketPlayOutMapChunk extends Packet {
 
 // Only >= MC 1.9 (MC 1.8.9 relies on clients themselves to unload as needed, for some reason)
 optional class PacketPlayOutUnloadChunk extends Packet {
-#if version >= 1.17
-    private int cx:x;
-    private int cz:z;
+#if version >= 1.20.2
+    public int getCx() { return instance.pos().x; }
+    public int getCz() { return instance.pos().z; }
+    public void setChunk(int cx, int cz) {
+        #require PacketPlayOutUnloadChunk private final net.minecraft.world.level.ChunkCoordIntPair pos;
+        net.minecraft.world.level.ChunkCoordIntPair pair = new net.minecraft.world.level.ChunkCoordIntPair(cx, cz);
+        instance#pos = pair;
+    }
 #else
-    private int cx:a;
-    private int cz:b;
+  #if version >= 1.17
+    #require PacketPlayOutUnloadChunk private int cx:x;
+    #require PacketPlayOutUnloadChunk private int cz:z;
+  #else
+    #require PacketPlayOutUnloadChunk private int cx:a;
+    #require PacketPlayOutUnloadChunk private int cz:b;
+  #endif
+
+    public int getCx() { return instance#cx; }
+    public int getCz() { return instance#cz; }
+    public void setChunk(int cx, int cz) {
+        instance#cx = cx;
+        instance#cz = cz;
+    }
 #endif
+
+    // Deprecated old stuff for bw compatibility
+    <code>
+    public void setCx(int cx) {
+        setChunk(cx, getCz());
+    }
+    public void setCz(int cz) {
+        setChunk(getCx(), cz);
+    }
+    </code>
 }
 
 class PacketPlayOutNamedSoundEffect extends Packet {

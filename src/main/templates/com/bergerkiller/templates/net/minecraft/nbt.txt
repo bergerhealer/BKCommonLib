@@ -816,8 +816,13 @@ class NBTCompressedStreamTools {
     // Uncompressed tag
     public static void uncompressed_writeTag:writeUnnamedTag((NBTBaseHandle) NBTBase nbtbase, java.io.DataOutput dataoutput);
     public static (NBTBaseHandle) NBTBase uncompressed_readTag(java.io.DataInput datainput) {
+  #if version >= 1.20.2
+        #require net.minecraft.nbt.NBTCompressedStreamTools private static NBTBase readUnnamedTag(java.io.DataInput datainput, NBTReadLimiter nbtreadlimiter);
+        return #readUnnamedTag(datainput, NBTReadLimiter.a);
+  #else
         #require net.minecraft.nbt.NBTCompressedStreamTools private static NBTBase readUnnamedTag(java.io.DataInput datainput, int i, NBTReadLimiter nbtreadlimiter);
         return #readUnnamedTag(datainput, 0, NBTReadLimiter.a);
+  #endif
     }
 
     // Uncompressed tag compound

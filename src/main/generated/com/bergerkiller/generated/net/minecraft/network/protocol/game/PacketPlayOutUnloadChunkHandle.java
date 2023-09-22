@@ -22,16 +22,23 @@ public abstract class PacketPlayOutUnloadChunkHandle extends PacketHandle {
     /* ============================================================================== */
 
     public abstract int getCx();
-    public abstract void setCx(int value);
     public abstract int getCz();
-    public abstract void setCz(int value);
+    public abstract void setChunk(int cx, int cz);
+
+    public void setCx(int cx) {
+        setChunk(cx, getCz());
+    }
+    public void setCz(int cz) {
+        setChunk(getCx(), cz);
+    }
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.PacketPlayOutUnloadChunk</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutUnloadChunkClass extends Template.Class<PacketPlayOutUnloadChunkHandle> {
-        public final Template.Field.Integer cx = new Template.Field.Integer();
-        public final Template.Field.Integer cz = new Template.Field.Integer();
+        public final Template.Method<Integer> getCx = new Template.Method<Integer>();
+        public final Template.Method<Integer> getCz = new Template.Method<Integer>();
+        public final Template.Method<Void> setChunk = new Template.Method<Void>();
 
     }
 
