@@ -47,26 +47,28 @@ class MapIcon {
   #if version >= 1.20.2
         byte iconId = instance.getImage();
         byte rotation = instance.rot();
+        byte x = instance.x();
+        byte y = instance.y();
   #elseif version >= 1.18
         byte iconId = type.getIcon();
         byte rotation = instance.getRot();
+        byte x = instance.getX();
+        byte y = instance.getY();
   #else
         byte iconId = type.a();
         byte rotation = instance.getRotation();
+        byte x = instance.getX();
+        byte y = instance.getY();
   #endif
 
         if (title != null) {
             return new org.bukkit.map.MapCursor(
-                instance.getX(), instance.getY(), rotation,
-                iconId,
-                true,
+                x, y, rotation, iconId, true,
                 com.bergerkiller.bukkit.common.wrappers.ChatText.fromComponent(title).getMessage()
             );
         } else {
             return new org.bukkit.map.MapCursor(
-                instance.getX(), instance.getY(), rotation,
-                iconId,
-                true
+                x, y, rotation, iconId, true
             );
         }
     }

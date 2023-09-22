@@ -4,7 +4,9 @@ import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
 
 class CraftSound {
-#if exists org.bukkit.craftbukkit.CraftSound public static net.minecraft.sounds.SoundEffect getSoundEffect(org.bukkit.Sound sound);
+#if version >= 1.20.2
+    public static (ResourceKey<SoundEffect>) net.minecraft.sounds.SoundEffect getSoundEffect:bukkitToMinecraft(org.bukkit.Sound sound);
+#elseif exists org.bukkit.craftbukkit.CraftSound public static net.minecraft.sounds.SoundEffect getSoundEffect(org.bukkit.Sound sound);
     // Since later build of 1.16.4: org.bukkit.Sound -> nms SoundEffect
     public static (ResourceKey<SoundEffect>) net.minecraft.sounds.SoundEffect getSoundEffect(org.bukkit.Sound sound);
 #else

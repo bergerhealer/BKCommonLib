@@ -11,6 +11,7 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
 
 /**
  * Creates new ForcedChunk instances. Required for glue code in NMS.
+ * Not used anymore after 1.20.2 when a factory() method was added that we can use.
  */
 public class ForcedChunkSupplier implements Supplier<Object>, Function<String, Object> {
     public static final ForcedChunkSupplier INSTANCE = new ForcedChunkSupplier();

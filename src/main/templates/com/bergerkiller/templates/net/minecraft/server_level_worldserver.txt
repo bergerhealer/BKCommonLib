@@ -360,7 +360,14 @@ class WorldServer extends World {
     }
 #endif
 
-#if version >= 1.18
+#if version >= 1.20.2
+    public optional (ForcedChunkHandle) ForcedChunk getForcedChunk() {
+        return (ForcedChunk) instance.getDataStorage().get(
+            ForcedChunk.factory(),
+            "chunks"
+        );
+    }
+#elseif version >= 1.18
     public optional (ForcedChunkHandle) ForcedChunk getForcedChunk() {
         return (ForcedChunk) instance.getDataStorage().get(
             (java.util.function.Function) com.bergerkiller.bukkit.common.internal.logic.ForcedChunkSupplier.INSTANCE,
