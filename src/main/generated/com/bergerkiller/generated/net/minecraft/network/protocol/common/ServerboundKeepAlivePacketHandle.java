@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.network.protocol.common;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.network.protocol.common.ServerboundKeepAlivePacket</b>.
@@ -8,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.InstanceType("net.minecraft.network.protocol.common.ServerboundKeepAlivePacket")
-public abstract class ServerboundKeepAlivePacketHandle extends Template.Handle {
+public abstract class ServerboundKeepAlivePacketHandle extends PacketHandle {
     /** @see ServerboundKeepAlivePacketClass */
     public static final ServerboundKeepAlivePacketClass T = Template.Class.create(ServerboundKeepAlivePacketClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */

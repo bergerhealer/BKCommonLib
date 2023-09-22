@@ -406,9 +406,9 @@ public class NMSPacketClasses {
         };
     }
 
-    public static class NMSPacketPlayInResourcePackStatus extends NMSPacket {
+    public static class NMSServerboundResourcePackPacket extends NMSPacket {
 
-        public final FieldAccessor<Object> enumStatus = PacketPlayInResourcePackStatusHandle.T.status.toFieldAccessor();
+        public final FieldAccessor<Object> enumStatus = ServerboundResourcePackPacketHandle.T.status.toFieldAccessor();
     }
 
     public static class NMSPacketPlayInSetCreativeSlot extends NMSPacket {
@@ -658,25 +658,24 @@ public class NMSPacketClasses {
     }
     */
 
-    public static class NMSPacketPlayOutCustomPayload extends NMSPacket {
+    public static class NMSClientboundCustomPayloadPacket extends NMSPacket {
 
         public static final FieldAccessor<String> channel = new SafeDirectField<String>() {
             @Override
             public String get(Object instance) {
-                return PacketPlayOutCustomPayloadHandle.createHandle(instance).getChannel();
+                return ClientboundCustomPayloadPacketHandle.createHandle(instance).getChannel();
             }
 
             @Override
             public boolean set(Object instance, String value) {
-                PacketPlayOutCustomPayloadHandle.createHandle(instance).setChannel(value);
-                return true;
+                return false;
             }
         };
 
         public static final FieldAccessor<byte[]> message = new SafeDirectField<byte[]>() {
             @Override
             public byte[] get(Object instance) {
-                return PacketPlayOutCustomPayloadHandle.createHandle(instance).getMessage();
+                return ClientboundCustomPayloadPacketHandle.createHandle(instance).getMessage();
             }
 
             @Override
@@ -686,7 +685,7 @@ public class NMSPacketClasses {
         };
 
         public static CommonPacket createNew(String channel, byte[] message) {
-            return PacketPlayOutCustomPayloadHandle.createNew(channel, message).toCommonPacket();
+            return ClientboundCustomPayloadPacketHandle.createNew(channel, message).toCommonPacket();
         }
     }
 
@@ -1525,13 +1524,13 @@ public class NMSPacketClasses {
     }
 
     /**
-     * @deprecated Use PacketPlayOutResourcePackSendHandle instead
+     * @deprecated Use ClientboundResourcePackPacketHandle instead
      */
     @Deprecated
-    public static class NMSPacketPlayOutResourcePackSend extends NMSPacket {
-        
-        public final FieldAccessor<String> name = PacketPlayOutResourcePackSendHandle.T.url.toFieldAccessor();
-        public final FieldAccessor<String> hash = PacketPlayOutResourcePackSendHandle.T.hash.toFieldAccessor();
+    public static class NMSClientboundResourcePackPacket extends NMSPacket {
+
+        public final FieldAccessor<String> name = ClientboundResourcePackPacketHandle.T.url.toFieldAccessor();
+        public final FieldAccessor<String> hash = ClientboundResourcePackPacketHandle.T.hash.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutRespawn extends NMSPacket {

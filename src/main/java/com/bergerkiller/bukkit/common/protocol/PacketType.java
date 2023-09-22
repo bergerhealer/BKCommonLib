@@ -55,7 +55,7 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayOutBlockAction OUT_BLOCK_ACTION = new NMSPacketPlayOutBlockAction();
     //public static final NMSPacketPlayOutChat OUT_CHAT = new NMSPacketPlayOutChat();
     public static final NMSPacketPlayOutCollect OUT_COLLECT = new NMSPacketPlayOutCollect();
-    public static final NMSPacketPlayOutCustomPayload OUT_CUSTOM_PAYLOAD = new NMSPacketPlayOutCustomPayload();
+    public static final NMSClientboundCustomPayloadPacket OUT_CUSTOM_PAYLOAD = new NMSClientboundCustomPayloadPacket();
     public static final NMSPacketPlayOutExperience OUT_EXPERIENCE = new NMSPacketPlayOutExperience();
     public static final NMSPacketPlayOutExplosion OUT_EXPLOSION = new NMSPacketPlayOutExplosion();
     public static final NMSPacketPlayOutGameStateChange OUT_GAME_STATE_CHANGE = new NMSPacketPlayOutGameStateChange();
@@ -87,7 +87,7 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayOutBoss OUT_BOSS = new NMSPacketPlayOutBoss();
     public static final NMSPacketPlayOutCamera OUT_CAMERA = new NMSPacketPlayOutCamera();
     public static final NMSPacketPlayOutCustomSoundEffect OUT_CUSTOM_SOUND_EFFECT = new NMSPacketPlayOutCustomSoundEffect();
-    public static final NMSPacketPlayOutResourcePackSend OUT_RESOURCE_PACK_SEND = new NMSPacketPlayOutResourcePackSend();
+    public static final NMSClientboundResourcePackPacket OUT_RESOURCE_PACK_SEND = new NMSClientboundResourcePackPacket();
     public static final NMSPacketPlayOutServerDifficulty OUT_SERVER_DIFFICULTY = new NMSPacketPlayOutServerDifficulty();
     public static final NMSPacketPlayOutSetCooldown OUT_SET_COOLDOWN = new NMSPacketPlayOutSetCooldown();
     public static final NMSPacketPlayOutUnloadChunk OUT_UNLOAD_CHUNK = new NMSPacketPlayOutUnloadChunk();
@@ -166,7 +166,7 @@ public class PacketType extends ClassTemplate<Object> {
     /* Window-related packets */
     public static final NMSPacketPlayInCloseWindow IN_WINDOW_CLOSE = new NMSPacketPlayInCloseWindow();
     public static final NMSPacketPlayInEnchantItem IN_WINDOW_ENCHANT_ITEM = new NMSPacketPlayInEnchantItem();
-    public static final NMSPacketPlayInResourcePackStatus IN_WINDOW_RESOURCEPACK_STATUS = new NMSPacketPlayInResourcePackStatus();
+    public static final NMSServerboundResourcePackPacket IN_WINDOW_RESOURCEPACK_STATUS = new NMSServerboundResourcePackPacket();
     public static final NMSPacketPlayInWindowClick IN_WINDOW_CLICK = new NMSPacketPlayInWindowClick();
 
     private final String name;

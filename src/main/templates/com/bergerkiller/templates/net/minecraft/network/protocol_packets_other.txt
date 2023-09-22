@@ -74,7 +74,6 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSpectateHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutWorldParticlesHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockChangeHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomPayloadHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSetSlotHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundBundlePacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffectHandle;
@@ -2091,18 +2090,6 @@ class PacketPlayInSettings extends Packet {
 // #endif
 // }
 
-class PacketPlayInResourcePackStatus extends Packet {
-    private optional String message:a;
-
-#if version >= 1.17
-    public (Object) PacketPlayInResourcePackStatus.EnumResourcePackStatus status:action;
-#elseif version >= 1.9
-    public (Object) PacketPlayInResourcePackStatus.EnumResourcePackStatus status;
-#else
-    public (Object) PacketPlayInResourcePackStatus.EnumResourcePackStatus status:b;
-#endif
-}
-
 class PacketPlayInSetCreativeSlot extends Packet {
 #if version >= 1.17
     private int slot:slotNum;
@@ -2870,51 +2857,6 @@ class PacketPlayOutWorldEvent extends Packet {
 #endif
 }
 
-class PacketPlayOutResourcePackSend extends Packet {
-#if version >= 1.17
-    private final String url;
-    private final String hash;
-#else
-    private String url:a;
-    private String hash:b;
-#endif
-
-#if version >= 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayOutResourcePackSend private final boolean required;
-    #require net.minecraft.network.protocol.game.PacketPlayOutResourcePackSend private final IChatBaseComponent prompt;
-
-    public void setRequired(boolean required) {
-        instance#required = required;
-    }
-
-    public boolean isRequired() {
-        return instance#required;
-    }
-
-    public void setPrompt((ChatText) IChatBaseComponent prompt) {
-        instance#prompt = prompt;
-    }
-
-    public (ChatText) IChatBaseComponent getPrompt() {
-        return instance#prompt;
-    }
-#else
-    public void setRequired(boolean required) {
-    }
-
-    public boolean isRequired() {
-        return false;
-    }
-
-    public void setPrompt((ChatText) IChatBaseComponent prompt) {
-    }
-
-    public (ChatText) IChatBaseComponent getPrompt() {
-        return null;
-    }
-#endif
-}
-
 class PacketPlayOutSpawnPosition extends Packet {
 #if version >= 1.17
     public final (IntVector3) BlockPosition position:pos;
@@ -2993,52 +2935,6 @@ optional class PacketPlayOutAdvancements extends Packet {
 #else
     private boolean initial:a;
 #endif
-}
-
-class PacketPlayOutCustomPayload extends Packet {
-    // Channel name
-#select version >=
-#case 1.17:    private final (String) net.minecraft.resources.MinecraftKey channel:identifier;
-#case 1.15:    private (String) net.minecraft.resources.MinecraftKey channel:r;
-#case 1.14.1:  private (String) net.minecraft.resources.MinecraftKey channel:n;
-#case 1.14:    private (String) net.minecraft.resources.MinecraftKey channel:m;
-#case 1.13:    private (String) net.minecraft.resources.MinecraftKey channel:i;
-#case else:    private (String) String channel:a;
-#endselect
-
-    // Read raw payload
-    public byte[] getMessage() {
-#select version >=
-#case 1.17:    #require PacketPlayOutCustomPayload private final PacketDataSerializer payload_data:data;
-#case 1.15:    #require PacketPlayOutCustomPayload private PacketDataSerializer payload_data:s;
-#case 1.14.1:  #require PacketPlayOutCustomPayload private PacketDataSerializer payload_data:o;
-#case 1.14:    #require PacketPlayOutCustomPayload private PacketDataSerializer payload_data:n;
-#case 1.13:    #require PacketPlayOutCustomPayload private PacketDataSerializer payload_data:j;
-#case else:    #require PacketPlayOutCustomPayload private PacketDataSerializer payload_data:b;
-#endselect
-        PacketDataSerializer payload = instance#payload_data;
-        return payload.array();
-    }
-
-    // Constructor
-    public static (PacketPlayOutCustomPayloadHandle) PacketPlayOutCustomPayload createNew(String channel, byte[] message) {
-        PacketDataSerializer serializer = new PacketDataSerializer(io.netty.buffer.Unpooled.wrappedBuffer(message));
-
-#if version >= 1.13
-        net.minecraft.resources.MinecraftKey key;
-        key = (net.minecraft.resources.MinecraftKey) MinecraftKeyHandle.createNew(channel).getRaw();
-        return new PacketPlayOutCustomPayload(key, serializer);
-#else
-        return new PacketPlayOutCustomPayload(channel, serializer);
-#endif
-    }
-
-    <code>
-    @Override
-    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
-        return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_CUSTOM_PAYLOAD;
-    }
-    </code>
 }
 
 // Since MC 1.19.4

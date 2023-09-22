@@ -1,6 +1,14 @@
 package net.minecraft.network.protocol.common;
 
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.network.PacketDataSerializer;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
+
 import com.bergerkiller.generated.net.minecraft.network.protocol.common.ClientboundKeepAlivePacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.common.ClientboundCustomPayloadPacketHandle;
 
 class ServerboundKeepAlivePacket extends Packet {
 #if version >= 1.12.2
@@ -56,4 +64,131 @@ class ClientboundKeepAlivePacket extends Packet {
         return new ClientboundKeepAlivePacket((int) key);
 #endif
     }
+}
+
+class ServerboundResourcePackPacket extends Packet {
+    private optional String message:a;
+
+#if version >= 1.17
+    public (Object) ServerboundResourcePackPacket.EnumResourcePackStatus status:action;
+#elseif version >= 1.9
+    public (Object) ServerboundResourcePackPacket.EnumResourcePackStatus status;
+#else
+    public (Object) ServerboundResourcePackPacket.EnumResourcePackStatus status:b;
+#endif
+}
+
+class ClientboundResourcePackPacket extends Packet {
+#if version >= 1.17
+    private final String url;
+    private final String hash;
+#else
+    private String url:a;
+    private String hash:b;
+#endif
+
+#if version >= 1.17
+    #require net.minecraft.network.protocol.common.ClientboundResourcePackPacket private final boolean required;
+    #require net.minecraft.network.protocol.common.ClientboundResourcePackPacket private final IChatBaseComponent prompt;
+
+    public void setRequired(boolean required) {
+        instance#required = required;
+    }
+
+    public boolean isRequired() {
+        return instance#required;
+    }
+
+    public void setPrompt((ChatText) IChatBaseComponent prompt) {
+        instance#prompt = prompt;
+    }
+
+    public (ChatText) IChatBaseComponent getPrompt() {
+        return instance#prompt;
+    }
+#else
+    public void setRequired(boolean required) {
+    }
+
+    public boolean isRequired() {
+        return false;
+    }
+
+    public void setPrompt((ChatText) IChatBaseComponent prompt) {
+    }
+
+    public (ChatText) IChatBaseComponent getPrompt() {
+        return null;
+    }
+#endif
+}
+
+class ClientboundCustomPayloadPacket extends Packet {
+    // Get channel name (Bukkit custom payload packet only)
+    public String getChannel() {
+#if version >= 1.20.2
+        //TODO: Implement this
+        #error NOT IMPLEMENTED
+#elseif version >= 1.13
+    #select version >=
+    #case 1.17:    #require ClientboundCustomPayloadPacket private final net.minecraft.resources.MinecraftKey channel:identifier;
+    #case 1.15:    #require ClientboundCustomPayloadPacket private net.minecraft.resources.MinecraftKey channel:r;
+    #case 1.14.1:  #require ClientboundCustomPayloadPacket private net.minecraft.resources.MinecraftKey channel:n;
+    #case 1.14:    #require ClientboundCustomPayloadPacket private net.minecraft.resources.MinecraftKey channel:m;
+    #case else:    #require ClientboundCustomPayloadPacket private net.minecraft.resources.MinecraftKey channel:i;
+    #endselect
+        net.minecraft.resources.MinecraftKey channel = instance#channel;
+        return (channel == null) ? null : channel.toString();
+#else
+        #require ClientboundCustomPayloadPacket private String channel:a;
+        return instance#channel;
+#endif
+    }
+
+
+    // Read raw payload
+    public byte[] getMessage() {
+#if version >= 1.20.2
+        //TODO: Implement this
+        #error NOT IMPLEMENTED
+#else
+    #select version >=
+    #case 1.17:    #require ClientboundCustomPayloadPacket private final PacketDataSerializer payload_data:data;
+    #case 1.15:    #require ClientboundCustomPayloadPacket private PacketDataSerializer payload_data:s;
+    #case 1.14.1:  #require ClientboundCustomPayloadPacket private PacketDataSerializer payload_data:o;
+    #case 1.14:    #require ClientboundCustomPayloadPacket private PacketDataSerializer payload_data:n;
+    #case 1.13:    #require ClientboundCustomPayloadPacket private PacketDataSerializer payload_data:j;
+    #case else:    #require ClientboundCustomPayloadPacket private PacketDataSerializer payload_data:b;
+    #endselect
+        PacketDataSerializer payload = instance#payload_data;
+        return payload.array();
+#endif
+    }
+
+    // Constructor
+    public static (ClientboundCustomPayloadPacketHandle) ClientboundCustomPayloadPacket createNew(String channel, byte[] message) {
+#if version >= 1.20.2
+        // Warning: this type is fake and is remapped in CommonBootstrap to an anonymous class in CraftPlayer!
+        // TODO: Implement this stuff!
+        #error NOT IMPLEMENTED
+        CustomPacketPayload payload = new net.minecraft.network.protocol.common.BukkitCustomPayload(???);
+#else
+        PacketDataSerializer serializer = new PacketDataSerializer(io.netty.buffer.Unpooled.wrappedBuffer(message));
+
+  #if version >= 1.13
+        net.minecraft.resources.MinecraftKey key;
+        key = (net.minecraft.resources.MinecraftKey) MinecraftKeyHandle.createNew(channel).getRaw();
+        return new ClientboundCustomPayloadPacket(key, serializer);
+  #else
+        return new ClientboundCustomPayloadPacket(channel, serializer);
+  #endif
+#endif
+    }
+
+    <code>
+    @Override
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_CUSTOM_PAYLOAD;
+    }
+    </code>
 }

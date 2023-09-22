@@ -1,21 +1,21 @@
-package com.bergerkiller.generated.net.minecraft.network.protocol.game;
+package com.bergerkiller.generated.net.minecraft.network.protocol.common;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.PacketPlayOutResourcePackSend</b>.
+ * Instance wrapper handle for type <b>net.minecraft.network.protocol.common.ClientboundResourcePackPacket</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutResourcePackSend")
-public abstract class PacketPlayOutResourcePackSendHandle extends PacketHandle {
-    /** @see PacketPlayOutResourcePackSendClass */
-    public static final PacketPlayOutResourcePackSendClass T = Template.Class.create(PacketPlayOutResourcePackSendClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
+@Template.InstanceType("net.minecraft.network.protocol.common.ClientboundResourcePackPacket")
+public abstract class ClientboundResourcePackPacketHandle extends PacketHandle {
+    /** @see ClientboundResourcePackPacketClass */
+    public static final ClientboundResourcePackPacketClass T = Template.Class.create(ClientboundResourcePackPacketClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
-    public static PacketPlayOutResourcePackSendHandle createHandle(Object handleInstance) {
+    public static ClientboundResourcePackPacketHandle createHandle(Object handleInstance) {
         return T.createHandle(handleInstance);
     }
 
@@ -30,10 +30,10 @@ public abstract class PacketPlayOutResourcePackSendHandle extends PacketHandle {
     public abstract String getHash();
     public abstract void setHash(String value);
     /**
-     * Stores class members for <b>net.minecraft.network.protocol.game.PacketPlayOutResourcePackSend</b>.
+     * Stores class members for <b>net.minecraft.network.protocol.common.ClientboundResourcePackPacket</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
-    public static final class PacketPlayOutResourcePackSendClass extends Template.Class<PacketPlayOutResourcePackSendHandle> {
+    public static final class ClientboundResourcePackPacketClass extends Template.Class<ClientboundResourcePackPacketHandle> {
         public final Template.Field<String> url = new Template.Field<String>();
         public final Template.Field<String> hash = new Template.Field<String>();
 

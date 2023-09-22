@@ -689,11 +689,45 @@ public class CommonBootstrap {
 
         // 1.20.2 mappings
         if (evaluateMCVersion(">=", "1.20.2")) {
+            // Not de-obfuscated
+            remappings.put("net.minecraft.network.protocol.common.ServerboundResourcePackPacket$EnumResourcePackStatus", "net.minecraft.network.protocol.common.ServerboundResourcePackPacket$a");
 
+            // De-obfuscate a ClientboundCustomPayloadPacket implementation used when sending messages using Bukkit API
+            // Spigot devs made this an anonymous Class which is highly annoying if you want to send it yourself
+            Class<?> customPayloadType = null;
+            try {
+                customPayloadType = MPLType.getClassByName("net.minecraft.network.protocol.common.custom.CustomPacketPayload");
+            } catch (Throwable t) {
+                Logging.LOGGER_REFLECTION.log(Level.WARNING, "Unable to identify the CustomPacketPayload type", t);
+            }
+            String anonTypeName = null;
+            if (customPayloadType != null) {
+                for (int n = 1; n < 1000; n++) {
+                    String name = server.getCBRoot() + ".entity.CraftPlayer$" + n;
+                    try {
+                        Class<?> type = MPLType.getClassByName(name);
+                        if (customPayloadType.isAssignableFrom(type)) {
+                            anonTypeName = name;
+                            break;
+                        }
+                    } catch (ClassNotFoundException e) {
+                        break;
+                    }
+                }
+            }
+            if (anonTypeName != null) {
+                remappings.put("net.minecraft.network.protocol.common.BukkitCustomPayload", anonTypeName);
+            } else {
+                Logging.LOGGER_REFLECTION.log(Level.WARNING, "Unable to identify the Bukkit custom payload type");
+            }
         } else {
             // For 1.20.1 and before, we got to move a few classes
             remappings.put("net.minecraft.network.protocol.common.ServerboundKeepAlivePacket", "net.minecraft.network.protocol.game.PacketPlayInKeepAlive");
             remappings.put("net.minecraft.network.protocol.common.ClientboundKeepAlivePacket", "net.minecraft.network.protocol.game.PacketPlayOutKeepAlive");
+            remappings.put("net.minecraft.network.protocol.common.ServerboundResourcePackPacket", "net.minecraft.network.protocol.game.PacketPlayInResourcePackStatus");
+            remappings.put("net.minecraft.network.protocol.common.ServerboundResourcePackPacket$EnumResourcePackStatus", "net.minecraft.network.protocol.game.PacketPlayInResourcePackStatus$EnumResourcePackStatus");
+            remappings.put("net.minecraft.network.protocol.common.ClientboundResourcePackPacket", "net.minecraft.network.protocol.game.PacketPlayOutResourcePackSend");
+            remappings.put("net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket", "net.minecraft.network.protocol.game.PacketPlayOutCustomPayload");
         }
 
         // There have been various locations where starlight was installed
