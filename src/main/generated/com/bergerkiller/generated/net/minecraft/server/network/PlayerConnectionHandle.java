@@ -19,6 +19,7 @@ public abstract class PlayerConnectionHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract Object getNetworkManager();
     public abstract void sendPacket(Object packet);
     public abstract void sendPos(double x, double y, double z);
 
@@ -97,15 +98,12 @@ public abstract class PlayerConnectionHandle extends Template.Handle {
         }
         return connection;
     }
-    public abstract Object getNetworkManager();
-    public abstract void setNetworkManager(Object value);
     /**
      * Stores class members for <b>net.minecraft.server.network.PlayerConnection</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PlayerConnectionClass extends Template.Class<PlayerConnectionHandle> {
-        public final Template.Field.Converted<Object> networkManager = new Template.Field.Converted<Object>();
-
+        public final Template.Method<Object> getNetworkManager = new Template.Method<Object>();
         public final Template.Method.Converted<Void> sendPacket = new Template.Method.Converted<Void>();
         public final Template.Method<Void> sendPos = new Template.Method<Void>();
 

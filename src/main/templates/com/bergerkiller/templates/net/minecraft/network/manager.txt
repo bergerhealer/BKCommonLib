@@ -19,6 +19,15 @@ class NetworkManager {
     public boolean isConnected:g();
 #endif
 
+    // Only used on 1.20.2+ in the callback for a QueuedPacket
+#if version >= 1.20.2
+    private void queue_sendPacketImpl:sendPacket((Object) Packet<?> packet, (Object) PacketSendListener packetsendlistener, boolean flush);
+#else
+    private void queue_sendPacketImpl((Object) Object packet, (Object) Object packetsendlistener, boolean flush) {
+        throw new UnsupportedOperationException("This method is only for 1.20.2+");
+    }
+#endif
+
     // Unsafe! May not function under some conditions!
     // Returns true if queuing was successful, false otherwise
     public static boolean queuePacketUnsafe((Object) NetworkManager networkManager, Object packet) {
@@ -27,7 +36,9 @@ class NetworkManager {
         return false;
 #else
         // Should work here
-  #if version >= 1.17
+  #if version >= 1.20.2
+        #require net.minecraft.network.NetworkManager private final readonly java.util.Queue packetQueue:pendingActions;
+  #elseif version >= 1.17
         #require net.minecraft.network.NetworkManager private final readonly java.util.Queue packetQueue:queue;
   #elseif version >= 1.13.2
         #require net.minecraft.network.NetworkManager private final readonly java.util.Queue packetQueue;
@@ -38,7 +49,9 @@ class NetworkManager {
   #endif
         java.util.Queue queue = networkManager#packetQueue;
 
-  #if exists net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket(net.minecraft.network.protocol.Packet<?> packet, io.netty.util.concurrent.GenericFutureListener listener)
+  #if version >= 1.20.2
+        Object queuedPacket = new com.bergerkiller.bukkit.common.internal.proxy.QueuedPacket_1_20_2(packet, null, false);
+  #elseif exists net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket(net.minecraft.network.protocol.Packet<?> packet, io.netty.util.concurrent.GenericFutureListener listener)
         #require net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket createQueuedPacket:<init>((Object) Packet<?> packet, GenericFutureListener listener);
         Object queuedPacket = #createQueuedPacket(packet, (GenericFutureListener) null);
   #elseif exists net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket(net.minecraft.network.protocol.Packet<?> packet, io.netty.util.concurrent.GenericFutureListener[] listener)
@@ -51,7 +64,10 @@ class NetworkManager {
         #error Cannot queue packets - queued packet constructor not found!
   #endif
 
-  #if version >= 1.14.4
+  #if version >= 1.20.2
+        // Can just add to it (is a Concurrent Linked Queue)
+        queue.add(queuedPacket);
+  #elseif version >= 1.14.4
         // Uses synchronized
         synchronized (queue) {
             queue.add(queuedPacket);

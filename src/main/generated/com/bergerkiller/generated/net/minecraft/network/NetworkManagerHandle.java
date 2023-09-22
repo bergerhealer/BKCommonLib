@@ -25,6 +25,7 @@ public abstract class NetworkManagerHandle extends Template.Handle {
     }
 
     public abstract boolean isConnected();
+    public abstract void queue_sendPacketImpl(Object packet, Object packetsendlistener, boolean flush);
     public abstract Channel getChannel();
     public abstract void setChannel(Channel value);
     /**
@@ -37,6 +38,7 @@ public abstract class NetworkManagerHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<Boolean> queuePacketUnsafe = new Template.StaticMethod.Converted<Boolean>();
 
         public final Template.Method<Boolean> isConnected = new Template.Method<Boolean>();
+        public final Template.Method.Converted<Void> queue_sendPacketImpl = new Template.Method.Converted<Void>();
 
     }
 

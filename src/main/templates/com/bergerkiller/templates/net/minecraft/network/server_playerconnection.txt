@@ -8,11 +8,17 @@ import net.minecraft.world.entity.RelativeMovement;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 
 class PlayerConnection {
-#if version >= 1.17
-    public final (Object) net.minecraft.network.NetworkManager networkManager:connection;
+    public Object getNetworkManager() {
+#if version >= 1.20.2
+        // Moved to ServerCommonPacketListenerImpl
+        #require net.minecraft.server.network.ServerCommonPacketListenerImpl protected final net.minecraft.network.NetworkManager networkManager:connection;
+#elseif version >= 1.17
+        #require PlayerConnection public final net.minecraft.network.NetworkManager networkManager:connection;
 #else
-    public final (Object) net.minecraft.network.NetworkManager networkManager;
+        #require PlayerConnection public final net.minecraft.network.NetworkManager networkManager;
 #endif
+        return instance#networkManager;
+    }
 
 #if version >= 1.18
     public void sendPacket:send((Object) Packet<?> packet);
