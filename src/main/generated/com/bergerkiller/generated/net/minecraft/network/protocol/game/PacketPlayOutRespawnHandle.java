@@ -25,25 +25,27 @@ public abstract class PacketPlayOutRespawnHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public abstract DimensionType getDimensionType();
+    public abstract void setDimensionType(DimensionType type);
+    public abstract GameMode getGamemode();
+    public abstract void setGamemode(GameMode gamemode);
     public abstract ResourceKey<World> getWorldName();
     public abstract void setWorldName(ResourceKey<World> worldType);
     public abstract GameMode getPreviousGameMode();
     public abstract void setPreviousGameMode(GameMode gameMode);
     public abstract void setEncryptedWorldSeed(World world);
-    public abstract DimensionType getDimensionType();
-    public abstract void setDimensionType(DimensionType value);
-    public abstract GameMode getGamemode();
-    public abstract void setGamemode(GameMode value);
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.PacketPlayOutRespawn</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutRespawnClass extends Template.Class<PacketPlayOutRespawnHandle> {
-        public final Template.Field.Converted<DimensionType> dimensionType = new Template.Field.Converted<DimensionType>();
         @Template.Optional
         public final Template.Field.Converted<Difficulty> difficulty = new Template.Field.Converted<Difficulty>();
-        public final Template.Field.Converted<GameMode> gamemode = new Template.Field.Converted<GameMode>();
 
+        public final Template.Method<DimensionType> getDimensionType = new Template.Method<DimensionType>();
+        public final Template.Method<Void> setDimensionType = new Template.Method<Void>();
+        public final Template.Method<GameMode> getGamemode = new Template.Method<GameMode>();
+        public final Template.Method<Void> setGamemode = new Template.Method<Void>();
         public final Template.Method.Converted<ResourceKey<World>> getWorldName = new Template.Method.Converted<ResourceKey<World>>();
         public final Template.Method.Converted<Void> setWorldName = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<GameMode> getPreviousGameMode = new Template.Method.Converted<GameMode>();

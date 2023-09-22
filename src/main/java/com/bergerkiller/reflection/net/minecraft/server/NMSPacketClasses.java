@@ -1224,8 +1224,30 @@ public class NMSPacketClasses {
 
         public final FieldAccessor<Integer> playerId = PacketPlayOutLoginHandle.T.playerId.toFieldAccessor();
         public final FieldAccessor<Boolean> hardcore = PacketPlayOutLoginHandle.T.hardcore.toFieldAccessor();
-        public final TranslatorFieldAccessor<GameMode> gameMode = PacketPlayOutLoginHandle.T.gameMode.toFieldAccessor();
-        public final FieldAccessor<DimensionType> dimensionType = PacketPlayOutLoginHandle.T.dimensionType.toFieldAccessor();
+        public final FieldAccessor<GameMode> gameMode = new SafeDirectField<GameMode>() {
+            @Override
+            public GameMode get(Object instance) {
+                return PacketPlayOutLoginHandle.T.getGameMode.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, GameMode value) {
+                PacketPlayOutLoginHandle.T.setGameMode.invoke(instance, value);
+                return true;
+            }
+        };
+        public final FieldAccessor<DimensionType> dimensionType = new SafeDirectField<DimensionType>() {
+            @Override
+            public DimensionType get(Object instance) {
+                return PacketPlayOutLoginHandle.T.getDimensionType.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, DimensionType value) {
+                PacketPlayOutLoginHandle.T.setDimensionType.invoke(instance, value);
+                return true;
+            }
+        };
         public final FieldAccessor<Integer> maxPlayers = PacketPlayOutLoginHandle.T.maxPlayers.toFieldAccessor();
         public final FieldAccessor<Boolean> reducedDebugInfo = PacketPlayOutLoginHandle.T.reducedDebugInfo.toFieldAccessor();
         public final FieldAccessor<Difficulty> difficulty = PacketPlayOutLoginHandle.T.difficulty.toFieldAccessor().ignoreInvalid(Difficulty.NORMAL);
@@ -1535,8 +1557,30 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutRespawn extends NMSPacket {
 
-        public final FieldAccessor<DimensionType> dimensionType = PacketPlayOutRespawnHandle.T.dimensionType.toFieldAccessor();
-        public final TranslatorFieldAccessor<GameMode> gamemode = PacketPlayOutRespawnHandle.T.gamemode.toFieldAccessor();
+        public final FieldAccessor<DimensionType> dimensionType = new SafeDirectField<DimensionType>() {
+            @Override
+            public DimensionType get(Object instance) {
+                return PacketPlayOutRespawnHandle.T.getDimensionType.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, DimensionType value) {
+                PacketPlayOutRespawnHandle.T.setDimensionType.invoke(instance, value);
+                return true;
+            }
+        };
+        public final FieldAccessor<GameMode> gamemode = new SafeDirectField<GameMode>() {
+            @Override
+            public GameMode get(Object instance) {
+                return PacketPlayOutRespawnHandle.T.getGamemode.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, GameMode value) {
+                PacketPlayOutRespawnHandle.T.setGamemode.invoke(instance, value);
+                return true;
+            }
+        };
 
         public final FieldAccessor<Difficulty> difficulty = new SafeDirectField<Difficulty>() {
             @Override

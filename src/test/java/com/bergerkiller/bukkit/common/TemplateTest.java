@@ -99,7 +99,7 @@ public class TemplateTest {
             }
         }
     }
-    
+
     @Test
     public void testTestServerInitialized() {
         CommonBootstrap.initServer();
