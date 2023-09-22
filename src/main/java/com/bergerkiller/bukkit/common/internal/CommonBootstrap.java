@@ -687,6 +687,15 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.level.storage.loot.LootParams$Builder", "net.minecraft.world.level.storage.loot.LootParams$a");
         }
 
+        // 1.20.2 mappings
+        if (evaluateMCVersion(">=", "1.20.2")) {
+
+        } else {
+            // For 1.20.1 and before, we got to move a few classes
+            remappings.put("net.minecraft.network.protocol.common.ServerboundKeepAlivePacket", "net.minecraft.network.protocol.game.PacketPlayInKeepAlive");
+            remappings.put("net.minecraft.network.protocol.common.ClientboundKeepAlivePacket", "net.minecraft.network.protocol.game.PacketPlayOutKeepAlive");
+        }
+
         // There have been various locations where starlight was installed
         // This was also part of tuinity at some point, but was then ported into paper
         {

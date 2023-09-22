@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.locks.LockSupport;
 
+import com.bergerkiller.generated.net.minecraft.network.protocol.common.ClientboundKeepAlivePacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.common.ServerboundKeepAlivePacketHandle;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.AsyncTask;
@@ -19,8 +21,6 @@ import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInKeepAliveHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutKeepAliveHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
 
@@ -82,7 +82,7 @@ public class CommonSyncPacketDispatcher extends AsyncTask implements PacketListe
             if (!s.syncTimeSentActive) {
                 return;
             }
-            if (s.syncTimeSent != PacketPlayInKeepAliveHandle.createHandle(event.getPacket().getHandle()).getKey()) {
+            if (s.syncTimeSent != ServerboundKeepAlivePacketHandle.createHandle(event.getPacket().getHandle()).getKey()) {
                 return;
             }
             s.syncTimeSentActive = false;
@@ -117,7 +117,7 @@ public class CommonSyncPacketDispatcher extends AsyncTask implements PacketListe
         _keepAliveTask = new Task(plugin) {
             @Override
             public void run() {
-                Invoker<?> createKeepAlive = ((Template.StaticMethod<?>) PacketPlayOutKeepAliveHandle.T.createNew.raw).invoker;
+                Invoker<?> createKeepAlive = ((Template.StaticMethod<?>) ClientboundKeepAlivePacketHandle.T.createNew.raw).invoker;
                 synchronized (CommonSyncPacketDispatcher.this) {
                     for (State s : _states.values()) {
                         s.syncTimeSent = getTime();

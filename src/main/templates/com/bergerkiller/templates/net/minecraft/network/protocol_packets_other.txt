@@ -65,7 +65,6 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockDigHandle.EnumPlayerDigTypeHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutOpenWindowHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPositionHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutKeepAliveHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutUpdateAttributesHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTitleHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTileEntityDataHandle;
@@ -236,62 +235,6 @@ class PacketPlayOutEntityDestroy extends Packet {
         }
 #else
         return new PacketPlayOutEntityDestroy(multipleEntityIds);
-#endif
-    }
-}
-
-class PacketPlayInKeepAlive extends Packet {
-#if version >= 1.12.2
-  #if version >= 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayInKeepAlive private final long key:id;
-  #else
-    #require net.minecraft.network.protocol.game.PacketPlayInKeepAlive private long key:a;
-  #endif
-    public long getKey() {
-        return instance#key;
-    }
-    public void setKey(long key) {
-        instance#key = key;
-    }
-#else
-    #require net.minecraft.network.protocol.game.PacketPlayInKeepAlive private int key:a;
-    public long getKey() {
-        return (long) instance#key;
-    }
-    public void setKey(long key) {
-        instance#key = (int)key;
-    }
-#endif
-}
-
-class PacketPlayOutKeepAlive extends Packet {
-#if version >= 1.12.2
-  #if version >= 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayOutKeepAlive private final long key:id;
-  #else
-    #require net.minecraft.network.protocol.game.PacketPlayOutKeepAlive private long key:a;
-  #endif
-    public long getKey() {
-        return instance#key;
-    }
-    public void setKey(long key) {
-        instance#key = key;
-    }
-#else
-    #require net.minecraft.network.protocol.game.PacketPlayOutKeepAlive private int key:a;
-    public long getKey() {
-        return (long) instance#key;
-    }
-    public void setKey(long key) {
-        instance#key = (int)key;
-    }
-#endif
-
-    public static (PacketPlayOutKeepAliveHandle) PacketPlayOutKeepAlive createNew(long key) {
-#if version >= 1.12.2
-        return new PacketPlayOutKeepAlive(key);
-#else
-        return new PacketPlayOutKeepAlive((int) key);
 #endif
     }
 }

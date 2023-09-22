@@ -60,7 +60,7 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayOutExplosion OUT_EXPLOSION = new NMSPacketPlayOutExplosion();
     public static final NMSPacketPlayOutGameStateChange OUT_GAME_STATE_CHANGE = new NMSPacketPlayOutGameStateChange();
     public static final NMSPacketPlayOutHeldItemSlot OUT_HELD_ITEM_SLOT = new NMSPacketPlayOutHeldItemSlot();
-    public static final NMSPacketPlayOutKeepAlive OUT_KEEP_ALIVE = new NMSPacketPlayOutKeepAlive();
+    public static final NMSClientboundKeepAlivePacket OUT_KEEP_ALIVE = new NMSClientboundKeepAlivePacket();
     public static final NMSPacketPlayOutKickDisconnect OUT_KICK_DISCONNECT = new NMSPacketPlayOutKickDisconnect();
     public static final NMSPacketPlayOutLogin OUT_LOGIN = new NMSPacketPlayOutLogin();
     public static final NMSPacketPlayOutMap OUT_MAP = new NMSPacketPlayOutMap();
@@ -151,7 +151,7 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayInPosition IN_POSITION = new NMSPacketPlayInPosition();
     public static final NMSPacketPlayInPositionLook IN_POSITION_LOOK = new NMSPacketPlayInPositionLook();
     public static final NMSPacketPlayInHeldItemSlot IN_HELD_ITEM_SLOT = new NMSPacketPlayInHeldItemSlot();
-    public static final NMSPacketPlayInKeepAlive IN_KEEP_ALIVE = new NMSPacketPlayInKeepAlive();
+    public static final NMSServerboundKeepAlivePacket IN_KEEP_ALIVE = new NMSServerboundKeepAlivePacket();
     public static final NMSPacketPlayInSpectate IN_SPECTATE = new NMSPacketPlayInSpectate();
     public static final NMSPacketPlayInSetCreativeSlot IN_SET_CREATIVE_SLOT = new NMSPacketPlayInSetCreativeSlot();
     public static final NMSPacketPlayInSettings IN_SETTINGS = new NMSPacketPlayInSettings();
@@ -207,6 +207,9 @@ public class PacketType extends ClassTemplate<Object> {
                 packetClass = CommonUtil.getClass("net.minecraft.network.protocol." + this.name);
             } else {
                 packetClass = CommonUtil.getClass("net.minecraft.network.protocol.game." + this.name);
+                if (packetClass == null) {
+                    packetClass = CommonUtil.getClass("net.minecraft.network.protocol.common." + this.name);
+                }
             }
         }
 

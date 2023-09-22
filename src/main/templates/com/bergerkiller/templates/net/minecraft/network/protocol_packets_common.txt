@@ -1,0 +1,59 @@
+package net.minecraft.network.protocol.common;
+
+import com.bergerkiller.generated.net.minecraft.network.protocol.common.ClientboundKeepAlivePacketHandle;
+
+class ServerboundKeepAlivePacket extends Packet {
+#if version >= 1.12.2
+  #if version >= 1.17
+    #require net.minecraft.network.protocol.common.ServerboundKeepAlivePacket private final long key:id;
+  #else
+    #require net.minecraft.network.protocol.common.ServerboundKeepAlivePacket private long key:a;
+  #endif
+    public long getKey() {
+        return instance#key;
+    }
+    public void setKey(long key) {
+        instance#key = key;
+    }
+#else
+    #require net.minecraft.network.protocol.common.ServerboundKeepAlivePacket private int key:a;
+    public long getKey() {
+        return (long) instance#key;
+    }
+    public void setKey(long key) {
+        instance#key = (int)key;
+    }
+#endif
+}
+
+class ClientboundKeepAlivePacket extends Packet {
+#if version >= 1.12.2
+  #if version >= 1.17
+    #require net.minecraft.network.protocol.common.ClientboundKeepAlivePacket private final long key:id;
+  #else
+    #require net.minecraft.network.protocol.common.ClientboundKeepAlivePacket private long key:a;
+  #endif
+    public long getKey() {
+        return instance#key;
+    }
+    public void setKey(long key) {
+        instance#key = key;
+    }
+#else
+    #require net.minecraft.network.protocol.common.ClientboundKeepAlivePacket private int key:a;
+    public long getKey() {
+        return (long) instance#key;
+    }
+    public void setKey(long key) {
+        instance#key = (int)key;
+    }
+#endif
+
+    public static (ClientboundKeepAlivePacketHandle) ClientboundKeepAlivePacket createNew(long key) {
+#if version >= 1.12.2
+        return new ClientboundKeepAlivePacket(key);
+#else
+        return new ClientboundKeepAlivePacket((int) key);
+#endif
+    }
+}

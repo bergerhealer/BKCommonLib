@@ -48,83 +48,8 @@ import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.WindowType;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacketHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInAbilitiesHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInArmAnimationHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockDigHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockPlaceHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBoatMoveHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInChatHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInCloseWindowHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInEnchantItemHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInEntityActionHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInFlyingHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInHeldItemSlotHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInKeepAliveHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInResourcePackStatusHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSetCreativeSlotHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSettingsHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSpectateHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSteerVehicleHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInTeleportAcceptHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInUpdateSignHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInUseEntityHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInUseItemHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInVehicleMoveHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInWindowClickHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAbilitiesHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAdvancementsHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAttachEntityHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockActionHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockBreakAnimationHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockChangeHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCameraHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCollectHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomPayloadHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffectHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityDestroyHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityEffectHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityEquipmentHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotationHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityMetadataHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityTeleportHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityVelocityHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutExplosionHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutKeepAliveHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutKickDisconnectHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutLoginHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapChunkHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMountHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawnHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutNamedSoundEffectHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutOpenSignEditorHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutOpenWindowHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPlayerListHeaderFooterHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPositionHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutRemoveEntityEffectHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutResourcePackSendHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutRespawnHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardObjectiveHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardScoreHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeamHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSetCooldownHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSetSlotHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityExperienceOrbHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLivingHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityPaintingHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityWeatherHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnPositionHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTileEntityDataHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutUnloadChunkHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutUpdateAttributesHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutUpdateSignHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutVehicleMoveHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutWindowItemsHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutWorldEventHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutWorldParticlesHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.*;
+import com.bergerkiller.generated.net.minecraft.network.protocol.common.*;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle;
@@ -465,17 +390,17 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> slot = PacketPlayInHeldItemSlotHandle.T.itemInHandIndex.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayInKeepAlive extends NMSPacket {
+    public static class NMSServerboundKeepAlivePacket extends NMSPacket {
 
         public final FieldAccessor<Long> key = new SafeDirectField<Long>() {
             @Override
             public Long get(Object instance) {
-                return Long.valueOf(PacketPlayInKeepAliveHandle.createHandle(instance).getKey());
+                return Long.valueOf(ServerboundKeepAlivePacketHandle.createHandle(instance).getKey());
             }
 
             @Override
             public boolean set(Object instance, Long value) {
-                PacketPlayInKeepAliveHandle.createHandle(instance).setKey(value.longValue());
+                ServerboundKeepAlivePacketHandle.createHandle(instance).setKey(value.longValue());
                 return true;
             }
         };
@@ -1286,9 +1211,9 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> slot = getField("a", int.class);
     }
 
-    public static class NMSPacketPlayOutKeepAlive extends NMSPacket {
+    public static class NMSClientboundKeepAlivePacket extends NMSPacket {
 
-        public final FieldAccessor<Long> key = FieldAccessor.wrapMethods(PacketPlayOutKeepAliveHandle.T.getKey, PacketPlayOutKeepAliveHandle.T.setKey);
+        public final FieldAccessor<Long> key = FieldAccessor.wrapMethods(ClientboundKeepAlivePacketHandle.T.getKey, ClientboundKeepAlivePacketHandle.T.setKey);
     }
 
     public static class NMSPacketPlayOutKickDisconnect extends NMSPacket {
