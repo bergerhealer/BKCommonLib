@@ -716,7 +716,7 @@ public class CommonBootstrap {
                 }
             }
             if (anonTypeName != null) {
-                remappings.put("net.minecraft.network.protocol.common.BukkitCustomPayload", anonTypeName);
+                remappings.put("net.minecraft.network.protocol.common.custom.BukkitCustomPayload", anonTypeName);
             } else {
                 Logging.LOGGER_REFLECTION.log(Level.WARNING, "Unable to identify the Bukkit custom payload type");
             }
