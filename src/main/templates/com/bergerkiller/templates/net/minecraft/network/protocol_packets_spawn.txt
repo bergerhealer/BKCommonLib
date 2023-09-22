@@ -284,8 +284,12 @@ class PacketPlayOutSpawnEntity extends Packet {
     </code>
 }
 
+// Note: since MC 1.20.2 this is identical to PacketPlayOutSpawnEntity
 class PacketPlayOutNamedEntitySpawn extends Packet {
-#if version >= 1.17
+#if version >= 1.20.2
+    private int entityId:id;
+    private UUID entityUUID:uuid;
+#elseif version >= 1.17
     private int entityId;
     private UUID entityUUID:playerId;
 #else

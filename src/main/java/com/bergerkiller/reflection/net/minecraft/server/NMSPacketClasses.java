@@ -417,14 +417,80 @@ public class NMSPacketClasses {
         public final FieldAccessor<ItemStack> item = PacketPlayInSetCreativeSlotHandle.T.item.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayInSettings extends NMSPacket {
+    public static class NMSServerboundClientInformationPacket extends NMSPacket {
 
-        public final FieldAccessor<String> locale = PacketPlayInSettingsHandle.T.locale.toFieldAccessor();
-        public final FieldAccessor<Integer> view = PacketPlayInSettingsHandle.T.view.toFieldAccessor();
-        public final FieldAccessor<Object> chatVisibility = PacketPlayInSettingsHandle.T.chatVisibility.toFieldAccessor();
-        public final FieldAccessor<Boolean> enableColors = PacketPlayInSettingsHandle.T.enableColors.toFieldAccessor();
-        public final FieldAccessor<Integer> modelPartFlags = PacketPlayInSettingsHandle.T.modelPartFlags.toFieldAccessor();
-        public final FieldAccessor<HumanHand> mainHand = PacketPlayInSettingsHandle.T.mainHand.toFieldAccessor().ignoreInvalid(HumanHand.RIGHT);
+        public final FieldAccessor<String> locale = new SafeDirectField<String>() {
+            @Override
+            public String get(Object instance) {
+                return ServerboundClientInformationPacketHandle.T.getLocale.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, String value) {
+                ServerboundClientInformationPacketHandle.T.setLocale.invoke(instance, value);
+                return true;
+            }
+        };
+        public final FieldAccessor<Integer> view = new SafeDirectField<Integer>() {
+            @Override
+            public Integer get(Object instance) {
+                return ServerboundClientInformationPacketHandle.T.getView.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Integer value) {
+                ServerboundClientInformationPacketHandle.T.setView.invoke(instance, value);
+                return true;
+            }
+        };
+        public final FieldAccessor<Object> chatVisibility = new SafeDirectField<Object>() {
+            @Override
+            public Object get(Object instance) {
+                return ServerboundClientInformationPacketHandle.T.getChatVisibility.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Object value) {
+                ServerboundClientInformationPacketHandle.T.setChatVisibility.invoke(instance, value);
+                return true;
+            }
+        };
+        public final FieldAccessor<Boolean> enableColors = new SafeDirectField<Boolean>() {
+            @Override
+            public Boolean get(Object instance) {
+                return ServerboundClientInformationPacketHandle.T.getEnableColors.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Boolean value) {
+                ServerboundClientInformationPacketHandle.T.setEnableColors.invoke(instance, value);
+                return true;
+            }
+        };
+        public final FieldAccessor<Integer> modelPartFlags = new SafeDirectField<Integer>() {
+            @Override
+            public Integer get(Object instance) {
+                return ServerboundClientInformationPacketHandle.T.getModelPartFlags.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Integer value) {
+                ServerboundClientInformationPacketHandle.T.setModelPartFlags.invoke(instance, value);
+                return true;
+            }
+        };
+        public final FieldAccessor<HumanHand> mainHand = new SafeDirectField<HumanHand>() {
+            @Override
+            public HumanHand get(Object instance) {
+                return ServerboundClientInformationPacketHandle.T.getMainHand.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, HumanHand value) {
+                ServerboundClientInformationPacketHandle.T.setMainHand.invoke(instance, value);
+                return true;
+            }
+        };
     }
 
     public static class NMSPacketPlayInSpectate extends NMSPacket {
@@ -1215,9 +1281,9 @@ public class NMSPacketClasses {
         public final FieldAccessor<Long> key = FieldAccessor.wrapMethods(ClientboundKeepAlivePacketHandle.T.getKey, ClientboundKeepAlivePacketHandle.T.setKey);
     }
 
-    public static class NMSPacketPlayOutKickDisconnect extends NMSPacket {
+    public static class NMSClientboundDisconnectPacket extends NMSPacket {
 
-        public final FieldAccessor<ChatText> reason = PacketPlayOutKickDisconnectHandle.T.reason.toFieldAccessor();
+        public final FieldAccessor<ChatText> reason = ClientboundDisconnectPacketHandle.T.reason.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutLogin extends NMSPacket {

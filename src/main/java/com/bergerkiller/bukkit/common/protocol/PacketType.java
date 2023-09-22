@@ -61,7 +61,7 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayOutGameStateChange OUT_GAME_STATE_CHANGE = new NMSPacketPlayOutGameStateChange();
     public static final NMSPacketPlayOutHeldItemSlot OUT_HELD_ITEM_SLOT = new NMSPacketPlayOutHeldItemSlot();
     public static final NMSClientboundKeepAlivePacket OUT_KEEP_ALIVE = new NMSClientboundKeepAlivePacket();
-    public static final NMSPacketPlayOutKickDisconnect OUT_KICK_DISCONNECT = new NMSPacketPlayOutKickDisconnect();
+    public static final NMSClientboundDisconnectPacket OUT_KICK_DISCONNECT = new NMSClientboundDisconnectPacket();
     public static final NMSPacketPlayOutLogin OUT_LOGIN = new NMSPacketPlayOutLogin();
     public static final NMSPacketPlayOutMap OUT_MAP = new NMSPacketPlayOutMap();
     public static final NMSPacketPlayOutMapChunk OUT_MAP_CHUNK = new NMSPacketPlayOutMapChunk();
@@ -154,7 +154,7 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSServerboundKeepAlivePacket IN_KEEP_ALIVE = new NMSServerboundKeepAlivePacket();
     public static final NMSPacketPlayInSpectate IN_SPECTATE = new NMSPacketPlayInSpectate();
     public static final NMSPacketPlayInSetCreativeSlot IN_SET_CREATIVE_SLOT = new NMSPacketPlayInSetCreativeSlot();
-    public static final NMSPacketPlayInSettings IN_SETTINGS = new NMSPacketPlayInSettings();
+    public static final NMSServerboundClientInformationPacket IN_SETTINGS = new NMSServerboundClientInformationPacket();
     public static final NMSPacketPlayInSteerVehicle IN_STEER_VEHICLE = new NMSPacketPlayInSteerVehicle();
     public static final NMSPacketPlayInTabComplete IN_TAB_COMPLETE = new NMSPacketPlayInTabComplete();
     public static final NMSPacketPlayInTeleportAccept IN_TELEPORT_ACCEPT = new NMSPacketPlayInTeleportAccept();

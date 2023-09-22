@@ -22,7 +22,6 @@ import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.EnumHand;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectList;
-import net.minecraft.world.entity.player.EnumChatVisibility;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.item.Item;
@@ -2054,54 +2053,6 @@ optional class PacketPlayOutSetCooldown extends Packet {
 #endif
 }
 
-class PacketPlayInSettings extends Packet {
-#if version >= 1.17
-    public String locale:language;
-#elseif version >= 1.16
-    public String locale;
-#else
-    private String locale:a;
-#endif
-
-#if version >= 1.17
-    public int view:viewDistance;
-#elseif fieldexists net.minecraft.network.protocol.game.PacketPlayInSettings public int viewDistance
-    public int view:viewDistance;
-#else
-    private int view:b;
-#endif
-
-#if version >= 1.17
-    private (Object) EnumChatVisibility chatVisibility;
-    private boolean enableColors:chatColors;
-    private int modelPartFlags:modelCustomisation;
-    private optional (HumanHand) net.minecraft.world.entity.EnumMainHand mainHand;
-#else
-    private (Object) EnumChatVisibility chatVisibility:c;
-    private boolean enableColors:d;
-    private int modelPartFlags:e;
-    private optional (HumanHand) net.minecraft.world.entity.EnumMainHand mainHand:f;
-#endif
-
-    //TODO: textFilteringEnabled
-
-    <code>
-    public HumanHand getMainHand() {
-        if (T.mainHand.isAvailable()) {
-            return T.mainHand.get(getRaw());
-        } else {
-            return HumanHand.RIGHT;
-        }
-    }
-
-    public void setMainHand(HumanHand mainHand) {
-        if (T.mainHand.isAvailable()) {
-            T.mainHand.set(getRaw(), mainHand);
-        }
-    }
-    </code>
-}
-
 // Changed completely on MC 1.13
 // class PacketPlayInTabComplete extends Packet {
 //     private String text:a;
@@ -2599,14 +2550,6 @@ class PacketPlayOutWorldParticles extends Packet {
     public void setPosZ(double z) {
         instance#pos_z = (float)z;
     }
-#endif
-}
-
-class PacketPlayOutKickDisconnect extends Packet {
-#if version >= 1.17
-  private (ChatText) IChatBaseComponent reason;
-#else
-  private (ChatText) IChatBaseComponent reason:a;
 #endif
 }
 

@@ -692,6 +692,9 @@ public class CommonBootstrap {
             // Not de-obfuscated
             remappings.put("net.minecraft.network.protocol.common.ServerboundResourcePackPacket$EnumResourcePackStatus", "net.minecraft.network.protocol.common.ServerboundResourcePackPacket$a");
 
+            // The Named spawn packet was removed and the normal spawn packet can now be used
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn", "net.minecraft.network.protocol.game.PacketPlayOutSpawnEntity");
+
             // De-obfuscate a ClientboundCustomPayloadPacket implementation used when sending messages using Bukkit API
             // Spigot devs made this an anonymous Class which is highly annoying if you want to send it yourself
             Class<?> customPayloadType = null;
@@ -728,6 +731,8 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.network.protocol.common.ServerboundResourcePackPacket$EnumResourcePackStatus", "net.minecraft.network.protocol.game.PacketPlayInResourcePackStatus$EnumResourcePackStatus");
             remappings.put("net.minecraft.network.protocol.common.ClientboundResourcePackPacket", "net.minecraft.network.protocol.game.PacketPlayOutResourcePackSend");
             remappings.put("net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket", "net.minecraft.network.protocol.game.PacketPlayOutCustomPayload");
+            remappings.put("net.minecraft.network.protocol.common.ClientboundDisconnectPacket", "net.minecraft.network.protocol.game.PacketPlayOutKickDisconnect");
+            remappings.put("net.minecraft.network.protocol.common.ServerboundClientInformationPacket", "net.minecraft.network.protocol.game.PacketPlayInSettings");
         }
 
         // There have been various locations where starlight was installed
