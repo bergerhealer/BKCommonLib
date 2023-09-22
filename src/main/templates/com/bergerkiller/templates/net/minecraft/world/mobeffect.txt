@@ -86,7 +86,9 @@ class MobEffect {
 }
 
 class MobEffectList {
-#if forge && version >= 1.18
+#if exists MobEffectList public static int getId(MobEffectList mobeffectlist);
+    public static int getId((MobEffectListHandle) MobEffectList mobeffectlist);
+#elseif version >= 1.18
     public static int getId((MobEffectListHandle) MobEffectList mobeffectlist) {
         return net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.getId((Object) mobeffectlist);
     }
@@ -98,14 +100,12 @@ class MobEffectList {
     public static int getId((MobEffectListHandle) MobEffectList mobeffectlist);
 #endif
 
-#if forge && version >= 1.18
-    // Forge fallback for 1.18+
+#if exists MobEffectList public static MobEffectList byId(int id);
+    public static (MobEffectListHandle) MobEffectList fromId:byId(int id);
+#elseif version >= 1.18
     public static (MobEffectListHandle) MobEffectList fromId(int id) {
         return (MobEffectList) net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.byId(id);
     }
-#elseif version >= 1.18 || exists net.minecraft.world.effect.MobEffectList public static MobEffectList byId(int id);
-    // Spigot/Paper 1.18+, Purpur 1.17.1+
-    public static (MobEffectListHandle) MobEffectList fromId:byId(int id);
 #elseif version < 1.9 && exists net.minecraft.world.effect.MobEffectList public static final MobEffectList[] byId;
     // NachoSpigot 1.8.8 has some weird hack thing
     public static (MobEffectListHandle) MobEffectList fromId(int id) {
