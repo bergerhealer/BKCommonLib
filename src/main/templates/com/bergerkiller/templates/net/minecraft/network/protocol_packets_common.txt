@@ -228,78 +228,59 @@ class ClientboundDisconnectPacket extends Packet {
 
 class ServerboundClientInformationPacket extends Packet {
 #if version >= 1.20.2
-    #require ServerboundClientInformationPacket public ClientInformation information();
+    public String getLocale() { return instance.information().language(); }
+    public int getView() { return instance.information().viewDistance(); }
+    public (Object) EnumChatVisibility getChatVisibility() { return instance.information().chatVisibility(); }
+    public boolean getEnableColors() { return instance.information().chatColors(); }
+    public int getModelPartFlags() { return instance.information().modelCustomisation(); }
 #else
-    #require ServerboundClientInformationPacket public ServerboundClientInformationPacket information() {
-        return instance;
-    }
-#endif
+  #if version >= 1.17
+    #require ServerboundClientInformationPacket public readonly String locale:language;
+  #elseif version >= 1.16
+    #require ServerboundClientInformationPacket public readonly String locale;
+  #else
+    #require ServerboundClientInformationPacket private readonly String locale:a;
+  #endif
+    public String getLocale() { return instance#locale; }
 
-#if version >= 1.20.2
-    #require ClientInformation private String locale:language;
-#elseif version >= 1.17
-    #require ServerboundClientInformationPacket public String locale:language;
-#elseif version >= 1.16
-    #require ServerboundClientInformationPacket public String locale;
-#else
-    #require ServerboundClientInformationPacket private String locale:a;
-#endif
-    public String getLocale() { return instance#information()#locale; }
-    public void setLocale(String locale) { return instance#information()#locale = locale; }
+  #if version >= 1.17
+    #require ServerboundClientInformationPacket public readonly int view:viewDistance;
+  #elseif fieldexists net.minecraft.network.protocol.game.PacketPlayInSettings public int viewDistance
+    #require ServerboundClientInformationPacket public readonly int view:viewDistance;
+  #else
+    #require ServerboundClientInformationPacket private readonly int view:b;
+  #endif
+    public int getView() { return instance#view; }
 
-#if version >= 1.20.2
-    #require ClientInformation private int view:viewDistance;
-#elseif version >= 1.17
-    #require ServerboundClientInformationPacket public int view:viewDistance;
-#elseif fieldexists net.minecraft.network.protocol.game.PacketPlayInSettings public int viewDistance
-    #require ServerboundClientInformationPacket public int view:viewDistance;
-#else
-    #require ServerboundClientInformationPacket private int view:b;
-#endif
-    public int getView() { return instance#information()#view; }
-    public void setView(int view) { instance#information()#view = view; }
-
-#if version >= 1.20.2
-    #require ClientInformation private EnumChatVisibility chatVisibility;
-    #require ClientInformation private boolean enableColors:chatColors;
-    #require ClientInformation private int modelPartFlags:modelCustomisation;
-#elseif version >= 1.17
-    #require ServerboundClientInformationPacket private EnumChatVisibility chatVisibility;
-    #require ServerboundClientInformationPacket private boolean enableColors:chatColors;
-    #require ServerboundClientInformationPacket private int modelPartFlags:modelCustomisation;
-#else
-    #require ServerboundClientInformationPacket private EnumChatVisibility chatVisibility:c;
-    #require ServerboundClientInformationPacket private boolean enableColors:d;
-    #require ServerboundClientInformationPacket private int modelPartFlags:e;
-#endif
-    public (Object) EnumChatVisibility getChatVisibility() { return instance#information()#chatVisibility; }
-    public void setChatVisibility((Object) EnumChatVisibility visibility) { instance#information()#chatVisibility = visibility; }
-    public boolean getEnableColors() { return instance#information()#enableColors; }
-    public void setEnableColors(boolean enable) { instance#information()#enableColors = enable; }
-    public int getModelPartFlags() { return instance#information()#modelPartFlags; }
-    public void setModelPartFlags(int flags) { instance#information()#modelPartFlags = flags; }
+  #if version >= 1.17
+    #require ServerboundClientInformationPacket private readonly EnumChatVisibility chatVisibility;
+    #require ServerboundClientInformationPacket private readonly boolean enableColors:chatColors;
+    #require ServerboundClientInformationPacket private readonly int modelPartFlags:modelCustomisation;
+  #else
+    #require ServerboundClientInformationPacket private readonly EnumChatVisibility chatVisibility:c;
+    #require ServerboundClientInformationPacket private readonly boolean enableColors:d;
+    #require ServerboundClientInformationPacket private readonly int modelPartFlags:e;
+  #endif
+    public (Object) EnumChatVisibility getChatVisibility() { return instance#chatVisibility; }
+    public boolean getEnableColors() { return instance#enableColors; }
+    public int getModelPartFlags() { return instance#modelPartFlags; }
 
     //TODO: textFilteringEnabled
+#endif
 
-#if version >= 1.20.2
-    #require ClientInformation private net.minecraft.world.entity.EnumMainHand mainHand;
-#elseif version >= 1.17
+#if version >= 1.17
     #require ServerboundClientInformationPacket private net.minecraft.world.entity.EnumMainHand mainHand;
 #elseif version >= 1.9
     #require ServerboundClientInformationPacket private net.minecraft.world.entity.EnumMainHand mainHand:f;
 #endif
 
     public (HumanHand) net.minecraft.world.entity.EnumMainHand getMainHand() {
-#if version >= 1.9
-        return instance#information()#mainHand;
+#if version >= 1.20.2
+        return instance.information().mainHand();
+#elseif version >= 1.9
+        return instance#mainHand;
 #else
         return HumanHand.RIGHT;
-#endif
-    }
-
-    public void setMainHand((HumanHand) net.minecraft.world.entity.EnumMainHand mainHand) {
-#if version >= 1.9
-        instance#information()#mainHand = mainHand;
 #endif
     }
 }

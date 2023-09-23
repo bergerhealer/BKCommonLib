@@ -955,14 +955,6 @@ class PacketPlayOutRemoveEntityEffect extends Packet {
 }
 
 class PacketPlayOutLogin extends Packet {
-#if version >= 1.20.2
-    #require PacketPlayOutLogin public CommonPlayerSpawnInfo common:commonPlayerSpawnInfo();
-#else
-    #require PacketPlayOutLogin public PacketPlayOutLogin common() {
-        return instance;
-    }
-#endif
-
 #if version >= 1.17
     private int playerId;
 #else
@@ -978,31 +970,51 @@ class PacketPlayOutLogin extends Packet {
 #endif
 
 #if version >= 1.20.2
-    #require CommonPlayerSpawnInfo private (org.bukkit.GameMode) EnumGamemode gameMode:gameType;
-#elseif version >= 1.17
-    #require PacketPlayOutLogin private (org.bukkit.GameMode) EnumGamemode gameMode:gameType;
-#elseif version >= 1.15
-    #require PacketPlayOutLogin private (org.bukkit.GameMode) EnumGamemode gameMode:d;
+    public (org.bukkit.GameMode) EnumGamemode getGameMode() {
+        return instance.commonPlayerSpawnInfo().gameType();
+    }
+    public (DimensionType) ResourceKey<DimensionManager> getDimensionType() {
+        return instance.commonPlayerSpawnInfo().dimensionType();
+    }
 #else
-    #require PacketPlayOutLogin private (org.bukkit.GameMode) EnumGamemode gameMode:c;
+  #if version >= 1.17
+    #require PacketPlayOutLogin private readonly EnumGamemode gameType;
+  #elseif version >= 1.15
+    #require PacketPlayOutLogin private readonly EnumGamemode gameType:d;
+  #else
+    #require PacketPlayOutLogin private readonly EnumGamemode gameType:c;
+  #endif
+
+    #select version >=
+    #case 1.19:     #require PacketPlayOutLogin private (DimensionType) ResourceKey<DimensionManager> dimensionType;
+    #case 1.18.2:   #require PacketPlayOutLogin private (DimensionType) net.minecraft.core.Holder<DimensionManager> dimensionType;
+    #case 1.17:     #require PacketPlayOutLogin private (DimensionType) DimensionManager dimensionType;
+    #case 1.16.2:   #require PacketPlayOutLogin private (DimensionType) DimensionManager dimensionType:h;
+    #case 1.16:     #require PacketPlayOutLogin private (DimensionType) ResourceKey<DimensionManager> dimensionType:h;
+    #case 1.15:     #require PacketPlayOutLogin private (DimensionType) DimensionManager dimensionType:e;
+    #case 1.13.1:   #require PacketPlayOutLogin private (DimensionType) DimensionManager dimensionType:d;
+    #case else:     #require PacketPlayOutLogin private (DimensionType) int dimensionType:d;
+    #endselect
+
+    public (org.bukkit.GameMode) EnumGamemode getGameMode() { return instance#gameType; }
+    public (DimensionType) DimensionType getDimensionType() { return instance#dimensionType; }
 #endif
 
-    public org.bukkit.GameMode getGameMode() { return instance#common()#gameMode; }
-    public void setGameMode(org.bukkit.GameMode gameMode) { instance#common()#gameMode = gameMode; }
-
-#if version >= 1.16
+#if version >= 1.20.2
+    public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
+        return instance.commonPlayerSpawnInfo().previousGameType();
+    }
+#elseif version >= 1.16
     // Since 1.16 the previous game mode of the player is also sent
     // This allows the player to toggle back and forth between modes
-  #if version >= 1.20.2
-    #require CommonPlayerSpawnInfo private net.minecraft.world.level.EnumGamemode previousGameMode:previousGameType;
-  #elseif version >= 1.17
+  #if version >= 1.17
     #require PacketPlayOutLogin private net.minecraft.world.level.EnumGamemode previousGameMode:previousGameType;
   #else
     #require PacketPlayOutLogin private net.minecraft.world.level.EnumGamemode previousGameMode:e;
   #endif
 
     public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
-        EnumGamemode mode = instance#common()#previousGameMode;
+        EnumGamemode mode = instance#previousGameMode;
   #if version <= 1.16.5
         if (mode == EnumGamemode.NOT_SET) {
             return null;
@@ -1010,38 +1022,11 @@ class PacketPlayOutLogin extends Packet {
   #endif
         return mode;
     }
-
-    public void setPreviousGameMode((org.bukkit.GameMode) EnumGamemode gameMode) {
-  #if version <= 1.16.5
-        if (gameMode == null) {
-            gameMode = EnumGamemode.NOT_SET;
-        }
-  #endif
-        instance#common()#previousGameMode = gameMode;
-    }
 #else
     public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
         return null;
     }
-
-    public void setPreviousGameMode((org.bukkit.GameMode) EnumGamemode gameMode) {
-    }
 #endif
-
-#select version >=
-#case 1.20.2:   #require CommonPlayerSpawnInfo private (DimensionType) ResourceKey<DimensionManager> dimensionType;
-#case 1.19:     #require PacketPlayOutLogin private (DimensionType) ResourceKey<DimensionManager> dimensionType;
-#case 1.18.2:   #require PacketPlayOutLogin private (DimensionType) net.minecraft.core.Holder<DimensionManager> dimensionType;
-#case 1.17:     #require PacketPlayOutLogin private (DimensionType) DimensionManager dimensionType;
-#case 1.16.2:   #require PacketPlayOutLogin private (DimensionType) DimensionManager dimensionType:h;
-#case 1.16:     #require PacketPlayOutLogin private (DimensionType) ResourceKey<DimensionManager> dimensionType:h;
-#case 1.15:     #require PacketPlayOutLogin private (DimensionType) DimensionManager dimensionType:e;
-#case 1.13.1:   #require PacketPlayOutLogin private (DimensionType) DimensionManager dimensionType:d;
-#case else:     #require PacketPlayOutLogin private (DimensionType) int dimensionType:d;
-#endselect
-
-    public DimensionType getDimensionType() { return instance#common()#dimensionType; }
-    public void setDimensionType(DimensionType dimensionType) { instance#common()#dimensionType = dimensionType; }
 
     // Difficulty field only exists <= 1.13.2
 #if version >= 1.14
@@ -1098,84 +1083,71 @@ class PacketPlayOutLogin extends Packet {
 
     // Encrypted world seed field was added on MC 1.15
     // It has little meaning, so we just add a method to initialize it
-    public void setEncryptedWorldSeed((org.bukkit.World) WorldServer world) {
+    //public void setEncryptedWorldSeed((org.bukkit.World) WorldServer world) {
 #if version >= 1.20.2
-        #require CommonPlayerSpawnInfo private long encryptedWorldSeed:seed;
-        instance#encryptedWorldSeed = BiomeManager.obfuscateSeed(world.getSeed());
+    //    #require CommonPlayerSpawnInfo private long encryptedWorldSeed:seed;
+    //    instance#encryptedWorldSeed = BiomeManager.obfuscateSeed(world.getSeed());
 #elseif version >= 1.18
-        #require net.minecraft.network.protocol.game.PacketPlayOutLogin private long encryptedWorldSeed:seed;
-        instance#encryptedWorldSeed = BiomeManager.obfuscateSeed(world.getSeed());
+    //    #require net.minecraft.network.protocol.game.PacketPlayOutLogin private long encryptedWorldSeed:seed;
+    //    instance#encryptedWorldSeed = BiomeManager.obfuscateSeed(world.getSeed());
 #elseif version >= 1.17
-        #require net.minecraft.network.protocol.game.PacketPlayOutLogin private long encryptedWorldSeed:seed;
-        instance#encryptedWorldSeed = BiomeManager.a(world.getSeed());
+    //    #require net.minecraft.network.protocol.game.PacketPlayOutLogin private long encryptedWorldSeed:seed;
+    //    instance#encryptedWorldSeed = BiomeManager.a(world.getSeed());
 #elseif version >= 1.16
-        #require net.minecraft.network.protocol.game.PacketPlayOutLogin private long encryptedWorldSeed:b;
-        instance#encryptedWorldSeed = BiomeManager.a(world.getSeed());
+    //    #require net.minecraft.network.protocol.game.PacketPlayOutLogin private long encryptedWorldSeed:b;
+    //    instance#encryptedWorldSeed = BiomeManager.a(world.getSeed());
 #elseif version >= 1.15
-        #require net.minecraft.network.protocol.game.PacketPlayOutLogin private long encryptedWorldSeed:b;
-        instance#encryptedWorldSeed = WorldData.c(world.getWorldData().getSeed());
+    //    #require net.minecraft.network.protocol.game.PacketPlayOutLogin private long encryptedWorldSeed:b;
+    //    instance#encryptedWorldSeed = WorldData.c(world.getWorldData().getSeed());
 #endif
-    }
+    //}
 }
 
 class PacketPlayOutRespawn extends Packet {
 #if version >= 1.20.2
-    #require PacketPlayOutRespawn public CommonPlayerSpawnInfo common:commonPlayerSpawnInfo();
-#else
-    #require PacketPlayOutRespawn public PacketPlayOutRespawn common() {
-        return instance;
+    public (DimensionType) ResourceKey<DimensionManager> getDimensionType() {
+        return instance.commonPlayerSpawnInfo().dimensionType();
     }
-#endif
+    public (org.bukkit.GameMode) EnumGamemode getGamemode() {
+        return instance.commonPlayerSpawnInfo().gameType();
+    }
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getWorldName() {
+        return instance.commonPlayerSpawnInfo().dimension();
+    }
+#else
+    #select version >=
+    #case 1.19:    #require PacketPlayOutRespawn private final (DimensionType) ResourceKey<DimensionManager> dimensionType;
+    #case 1.18.2:  #require PacketPlayOutRespawn private final (DimensionType) net.minecraft.core.Holder<DimensionManager> dimensionType;
+    #case 1.17:    #require PacketPlayOutRespawn private final (DimensionType) DimensionManager dimensionType;
+    #case 1.16.2:  #require PacketPlayOutRespawn private (DimensionType) DimensionManager dimensionType:a;
+    #case 1.16:    #require PacketPlayOutRespawn private (DimensionType) ResourceKey<DimensionManager> dimensionType:a;
+    #case 1.13.1:  #require PacketPlayOutRespawn private (DimensionType) DimensionManager dimensionType:a;
+    #case else:    #require PacketPlayOutRespawn private (DimensionType) int dimensionType:a;
+    #endselect
 
-#select version >=
-#case 1.20.2:  #require CommonPlayerSpawnInfo private final (DimensionType) ResourceKey<DimensionManager> dimensionType;
-#case 1.19:    #require PacketPlayOutRespawn private final (DimensionType) ResourceKey<DimensionManager> dimensionType;
-#case 1.18.2:  #require PacketPlayOutRespawn private final (DimensionType) net.minecraft.core.Holder<DimensionManager> dimensionType;
-#case 1.17:    #require PacketPlayOutRespawn private final (DimensionType) DimensionManager dimensionType;
-#case 1.16.2:  #require PacketPlayOutRespawn private (DimensionType) DimensionManager dimensionType:a;
-#case 1.16:    #require PacketPlayOutRespawn private (DimensionType) ResourceKey<DimensionManager> dimensionType:a;
-#case 1.13.1:  #require PacketPlayOutRespawn private (DimensionType) DimensionManager dimensionType:a;
-#case else:    #require PacketPlayOutRespawn private (DimensionType) int dimensionType:a;
-#endselect
+    #select version >=
+    #case 1.17:    #require PacketPlayOutRespawn private EnumGamemode gameType:playerGameType;
+    #case 1.16:    #require PacketPlayOutRespawn private EnumGamemode gameType:d;
+    #case 1.15:    #require PacketPlayOutRespawn private EnumGamemode gameType:c;
+    #case 1.14:    #require PacketPlayOutRespawn private EnumGamemode gameType:b;
+    #case else:    #require PacketPlayOutRespawn private EnumGamemode gameType:c;
+    #endselect
 
-    public DimensionType getDimensionType() { return instance#common()#dimensionType; }
-    public void setDimensionType(DimensionType type) { instance#common()#dimensionType = type; }
-
-#select version >=
-#case 1.20.2:  #require CommonPlayerSpawnInfo private (org.bukkit.GameMode) EnumGamemode gamemode:gameType;
-#case 1.17:    #require PacketPlayOutRespawn private (org.bukkit.GameMode) EnumGamemode gamemode:playerGameType;
-#case 1.16:    #require PacketPlayOutRespawn private (org.bukkit.GameMode) EnumGamemode gamemode:d;
-#case 1.15:    #require PacketPlayOutRespawn private (org.bukkit.GameMode) EnumGamemode gamemode:c;
-#case 1.14:    #require PacketPlayOutRespawn private (org.bukkit.GameMode) EnumGamemode gamemode:b;
-#case else:    #require PacketPlayOutRespawn private (org.bukkit.GameMode) EnumGamemode gamemode:c;
-#endselect
-
-    public org.bukkit.GameMode getGamemode() { return instance#common()#gamemode; }
-    public void setGamemode(org.bukkit.GameMode gamemode) { instance#common()#gamemode = gamemode; }
-
-    // Since Minecraft 1.16: World environment has a resource key, too!
-#if version >= 1.16
-  #if version >= 1.20.2
-    #require CommonPlayerSpawnInfo private net.minecraft.resources.ResourceKey<net.minecraft.world.level.World> worldName:dimension;
-  #elseif version >= 1.17
+  #if version >= 1.17
     #require PacketPlayOutRespawn private net.minecraft.resources.ResourceKey<net.minecraft.world.level.World> worldName:dimension;
-  #else
+  #elseif version >= 1.16
     #require PacketPlayOutRespawn private net.minecraft.resources.ResourceKey<net.minecraft.world.level.World> worldName:b;
   #endif
 
+    public (DimensionType) DimensionType getDimensionType() { return instance#dimensionType; }
+    public (org.bukkit.GameMode) EnumGamemode getGamemode() { return instance#gameType; }
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getWorldName() {
-        return instance#common()#worldName;
-    }
-
-    public void setWorldName((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> worldType) {
-        instance#common()#worldName = worldType;
-    }
-#else
-    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getWorldName() {
+        // Since Minecraft 1.16: World environment has a resource key, too!
+  #if version >= 1.16
+        return instance#worldName;
+  #else
         return null;
-    }
-
-    public void setWorldName((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> worldType) {
+  #endif
     }
 #endif
 
@@ -1191,17 +1163,19 @@ class PacketPlayOutRespawn extends Packet {
 
     // Since 1.16 the previous game mode of the player is also sent
     // This allows the player to toggle back and forth between modes
-#if version >= 1.16
-  #if version >= 1.20.2
-    #require CommonPlayerSpawnInfo private net.minecraft.world.level.EnumGamemode previousGameMode:previousGameType;
-  #elseif version >= 1.17
+#if version >= 1.20.2
+    public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
+        return instance.commonPlayerSpawnInfo().previousGameType();
+    }
+#elseif version >= 1.16
+  #if version >= 1.17
     #require PacketPlayOutRespawn private net.minecraft.world.level.EnumGamemode previousGameMode:previousPlayerGameType;
   #else
     #require PacketPlayOutRespawn private net.minecraft.world.level.EnumGamemode previousGameMode:e;
   #endif
 
     public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
-        EnumGamemode mode = instance#common()#previousGameMode;
+        EnumGamemode mode = instance#previousGameMode;
   #if version <= 1.16.5
         if (mode == EnumGamemode.NOT_SET) {
             return null;
@@ -1209,44 +1183,32 @@ class PacketPlayOutRespawn extends Packet {
   #endif
         return mode;
     }
-
-    public void setPreviousGameMode((org.bukkit.GameMode) EnumGamemode gameMode) {
-  #if version <= 1.16.5
-        if (gameMode == null) {
-            gameMode = EnumGamemode.NOT_SET;
-        }
-  #endif
-        instance#common()#previousGameMode = gameMode;
-    }
 #else
     public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
         return null;
-    }
-
-    public void setPreviousGameMode((org.bukkit.GameMode) EnumGamemode gameMode) {
     }
 #endif
 
     // Encrypted world seed field was added on MC 1.15
     // It has little meaning, so we just add a method to initialize it
-    public void setEncryptedWorldSeed((org.bukkit.World) WorldServer world) {
+    //public void setEncryptedWorldSeed((org.bukkit.World) WorldServer world) {
 #if version >= 1.20.2
-        #require CommonPlayerSpawnInfo private long encryptedWorldSeed:seed;
-        instance#common()#encryptedWorldSeed = BiomeManager.obfuscateSeed(world.getSeed());
+    //    #require CommonPlayerSpawnInfo private long encryptedWorldSeed:seed;
+    //    instance#common()#encryptedWorldSeed = BiomeManager.obfuscateSeed(world.getSeed());
 #elseif version >= 1.18
-        #require net.minecraft.network.protocol.game.PacketPlayOutRespawn private long encryptedWorldSeed:seed;
-        instance#encryptedWorldSeed = BiomeManager.obfuscateSeed(world.getSeed());
+    //    #require net.minecraft.network.protocol.game.PacketPlayOutRespawn private long encryptedWorldSeed:seed;
+    //    instance#encryptedWorldSeed = BiomeManager.obfuscateSeed(world.getSeed());
 #elseif version >= 1.17
-        #require net.minecraft.network.protocol.game.PacketPlayOutRespawn private long encryptedWorldSeed:seed;
-        instance#encryptedWorldSeed = BiomeManager.a(world.getSeed());
+    //    #require net.minecraft.network.protocol.game.PacketPlayOutRespawn private long encryptedWorldSeed:seed;
+    //    instance#encryptedWorldSeed = BiomeManager.a(world.getSeed());
 #elseif version >= 1.16
-        #require net.minecraft.network.protocol.game.PacketPlayOutRespawn private long encryptedWorldSeed:c;
-        instance#encryptedWorldSeed = BiomeManager.a(world.getSeed());
+    //    #require net.minecraft.network.protocol.game.PacketPlayOutRespawn private long encryptedWorldSeed:c;
+    //    instance#encryptedWorldSeed = BiomeManager.a(world.getSeed());
 #elseif version >= 1.15
-        #require net.minecraft.network.protocol.game.PacketPlayOutRespawn private long encryptedWorldSeed:b;
-        instance#encryptedWorldSeed = WorldData.c(world.getWorldData().getSeed());
+    //    #require net.minecraft.network.protocol.game.PacketPlayOutRespawn private long encryptedWorldSeed:b;
+    //    instance#encryptedWorldSeed = WorldData.c(world.getWorldData().getSeed());
 #endif
-    }
+    //}
 }
 
 class PacketPlayOutPlayerListHeaderFooter extends Packet {

@@ -22,34 +22,22 @@ public abstract class ServerboundClientInformationPacketHandle extends PacketHan
     /* ============================================================================== */
 
     public abstract String getLocale();
-    public abstract void setLocale(String locale);
     public abstract int getView();
-    public abstract void setView(int view);
     public abstract Object getChatVisibility();
-    public abstract void setChatVisibility(Object visibility);
     public abstract boolean getEnableColors();
-    public abstract void setEnableColors(boolean enable);
     public abstract int getModelPartFlags();
-    public abstract void setModelPartFlags(int flags);
     public abstract HumanHand getMainHand();
-    public abstract void setMainHand(HumanHand mainHand);
     /**
      * Stores class members for <b>net.minecraft.network.protocol.common.ServerboundClientInformationPacket</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ServerboundClientInformationPacketClass extends Template.Class<ServerboundClientInformationPacketHandle> {
         public final Template.Method<String> getLocale = new Template.Method<String>();
-        public final Template.Method<Void> setLocale = new Template.Method<Void>();
         public final Template.Method<Integer> getView = new Template.Method<Integer>();
-        public final Template.Method<Void> setView = new Template.Method<Void>();
         public final Template.Method<Object> getChatVisibility = new Template.Method<Object>();
-        public final Template.Method.Converted<Void> setChatVisibility = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> getEnableColors = new Template.Method<Boolean>();
-        public final Template.Method<Void> setEnableColors = new Template.Method<Void>();
         public final Template.Method<Integer> getModelPartFlags = new Template.Method<Integer>();
-        public final Template.Method<Void> setModelPartFlags = new Template.Method<Void>();
         public final Template.Method.Converted<HumanHand> getMainHand = new Template.Method.Converted<HumanHand>();
-        public final Template.Method.Converted<Void> setMainHand = new Template.Method.Converted<Void>();
 
     }
 

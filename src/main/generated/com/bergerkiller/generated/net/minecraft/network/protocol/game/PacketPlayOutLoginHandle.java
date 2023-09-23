@@ -5,7 +5,6 @@ import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
-import org.bukkit.World;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.PacketPlayOutLogin</b>.
@@ -25,12 +24,8 @@ public abstract class PacketPlayOutLoginHandle extends PacketHandle {
     /* ============================================================================== */
 
     public abstract GameMode getGameMode();
-    public abstract void setGameMode(GameMode gameMode);
-    public abstract GameMode getPreviousGameMode();
-    public abstract void setPreviousGameMode(GameMode gameMode);
     public abstract DimensionType getDimensionType();
-    public abstract void setDimensionType(DimensionType dimensionType);
-    public abstract void setEncryptedWorldSeed(World world);
+    public abstract GameMode getPreviousGameMode();
     public abstract int getPlayerId();
     public abstract void setPlayerId(int value);
     public abstract boolean isHardcore();
@@ -53,13 +48,9 @@ public abstract class PacketPlayOutLoginHandle extends PacketHandle {
         public final Template.Field.Integer viewDistance = new Template.Field.Integer();
         public final Template.Field.Boolean reducedDebugInfo = new Template.Field.Boolean();
 
-        public final Template.Method<GameMode> getGameMode = new Template.Method<GameMode>();
-        public final Template.Method<Void> setGameMode = new Template.Method<Void>();
+        public final Template.Method.Converted<GameMode> getGameMode = new Template.Method.Converted<GameMode>();
+        public final Template.Method.Converted<DimensionType> getDimensionType = new Template.Method.Converted<DimensionType>();
         public final Template.Method.Converted<GameMode> getPreviousGameMode = new Template.Method.Converted<GameMode>();
-        public final Template.Method.Converted<Void> setPreviousGameMode = new Template.Method.Converted<Void>();
-        public final Template.Method<DimensionType> getDimensionType = new Template.Method<DimensionType>();
-        public final Template.Method<Void> setDimensionType = new Template.Method<Void>();
-        public final Template.Method.Converted<Void> setEncryptedWorldSeed = new Template.Method.Converted<Void>();
 
     }
 

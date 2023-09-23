@@ -428,8 +428,7 @@ public class NMSPacketClasses {
 
             @Override
             public boolean set(Object instance, String value) {
-                ServerboundClientInformationPacketHandle.T.setLocale.invoke(instance, value);
-                return true;
+                return false;
             }
         };
         public final FieldAccessor<Integer> view = new SafeDirectField<Integer>() {
@@ -440,8 +439,7 @@ public class NMSPacketClasses {
 
             @Override
             public boolean set(Object instance, Integer value) {
-                ServerboundClientInformationPacketHandle.T.setView.invoke(instance, value);
-                return true;
+                return false;
             }
         };
         public final FieldAccessor<Object> chatVisibility = new SafeDirectField<Object>() {
@@ -452,8 +450,7 @@ public class NMSPacketClasses {
 
             @Override
             public boolean set(Object instance, Object value) {
-                ServerboundClientInformationPacketHandle.T.setChatVisibility.invoke(instance, value);
-                return true;
+                return false;
             }
         };
         public final FieldAccessor<Boolean> enableColors = new SafeDirectField<Boolean>() {
@@ -464,8 +461,7 @@ public class NMSPacketClasses {
 
             @Override
             public boolean set(Object instance, Boolean value) {
-                ServerboundClientInformationPacketHandle.T.setEnableColors.invoke(instance, value);
-                return true;
+                return false;
             }
         };
         public final FieldAccessor<Integer> modelPartFlags = new SafeDirectField<Integer>() {
@@ -476,8 +472,7 @@ public class NMSPacketClasses {
 
             @Override
             public boolean set(Object instance, Integer value) {
-                ServerboundClientInformationPacketHandle.T.setModelPartFlags.invoke(instance, value);
-                return true;
+                return false;
             }
         };
         public final FieldAccessor<HumanHand> mainHand = new SafeDirectField<HumanHand>() {
@@ -488,8 +483,7 @@ public class NMSPacketClasses {
 
             @Override
             public boolean set(Object instance, HumanHand value) {
-                ServerboundClientInformationPacketHandle.T.setMainHand.invoke(instance, value);
-                return true;
+                return false;
             }
         };
     }
@@ -1299,8 +1293,7 @@ public class NMSPacketClasses {
 
             @Override
             public boolean set(Object instance, GameMode value) {
-                PacketPlayOutLoginHandle.T.setGameMode.invoke(instance, value);
-                return true;
+                return false;
             }
         };
         public final FieldAccessor<DimensionType> dimensionType = new SafeDirectField<DimensionType>() {
@@ -1311,8 +1304,7 @@ public class NMSPacketClasses {
 
             @Override
             public boolean set(Object instance, DimensionType value) {
-                PacketPlayOutLoginHandle.T.setDimensionType.invoke(instance, value);
-                return true;
+                return false;
             }
         };
         public final FieldAccessor<Integer> maxPlayers = PacketPlayOutLoginHandle.T.maxPlayers.toFieldAccessor();
@@ -1632,8 +1624,7 @@ public class NMSPacketClasses {
 
             @Override
             public boolean set(Object instance, DimensionType value) {
-                PacketPlayOutRespawnHandle.T.setDimensionType.invoke(instance, value);
-                return true;
+                return false;
             }
         };
         public final FieldAccessor<GameMode> gamemode = new SafeDirectField<GameMode>() {
@@ -1644,8 +1635,7 @@ public class NMSPacketClasses {
 
             @Override
             public boolean set(Object instance, GameMode value) {
-                PacketPlayOutRespawnHandle.T.setGamemode.invoke(instance, value);
-                return true;
+                return false;
             }
         };
 
