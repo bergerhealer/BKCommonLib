@@ -178,6 +178,9 @@ optional class FurnaceRecipe extends IRecipe {
         java.util.List filteredResult = new java.util.ArrayList();
         while (allRecipes.hasNext()) {
             Object recipe = allRecipes.next();
+#if version >= 1.20.2
+            recipe = ((net.minecraft.world.item.crafting.RecipeHolder) recipe).value();
+#endif
             if (recipe instanceof FurnaceRecipe) {
                 filteredResult.add(recipe);
             }
@@ -197,6 +200,10 @@ class CraftingManager {
         java.util.List filteredResult = new java.util.ArrayList();
         while (allRecipes.hasNext()) {
             Object recipe = allRecipes.next();
+  #if version >= 1.20.2
+            recipe = ((net.minecraft.world.item.crafting.RecipeHolder) recipe).value();
+  #endif
+
             if (recipe instanceof FurnaceRecipe) {
                 continue;
             }
