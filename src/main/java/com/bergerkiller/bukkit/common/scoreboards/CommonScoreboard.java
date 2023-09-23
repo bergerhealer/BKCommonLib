@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.DisplaySlot;
 
 import java.io.*;
 import java.lang.ref.WeakReference;
@@ -54,14 +55,14 @@ public class CommonScoreboard {
         }
     };
     private CommonTeam team;
-    private CommonObjective[] objectives = new CommonObjective[3];
+    private CommonObjective[] objectives = new CommonObjective[DisplaySlot.values().length];
     private final WeakReference<Player> player;
 
     private CommonScoreboard(Player player) {
         this.team = dummyTeam;
         this.player = new WeakReference<Player>(player);
-        for (int i = 0; i < 3; i++) {
-            Display display = Display.fromInt(i);
+        for (int i = 0; i < objectives.length; i++) {
+            DisplaySlot display = DisplaySlot.values()[i];
             objectives[i] = new CommonObjective(this, display);
         }
     }
@@ -85,8 +86,8 @@ public class CommonScoreboard {
      * @param display Display
      * @return Objective
      */
-    public CommonObjective getObjective(Display display) {
-        return this.objectives[display.getId()];
+    public CommonObjective getObjective(DisplaySlot display) {
+        return this.objectives[display.ordinal()];
     }
 
     /**
@@ -207,8 +208,8 @@ public class CommonScoreboard {
         CommonScoreboard board = new CommonScoreboard(player);
 
         //Copy all objectives
-        for (int i = 0; i < 3; i++) {
-            Display display = Display.fromInt(i);
+        for (int i = 0; i < board.objectives.length; i++) {
+            DisplaySlot display = DisplaySlot.values()[i];
             board.objectives[i] = CommonObjective.copyFrom(board, from.getObjective(display));
         }
 
@@ -240,44 +241,5 @@ public class CommonScoreboard {
             boards.put(player, board);
         }
         return board;
-    }
-
-    public static enum Display {
-
-        LIST(0, "list", "List"),
-        SIDEBAR(1, "sidebar", "SideBar"),
-        BELOWNAME(2, "belowname", "BelowName");
-
-        private int id;
-        private String name;
-        private String displayName;
-
-        Display(int id, String name, String displayName) {
-            this.id = id;
-            this.name = name;
-            this.displayName = displayName;
-        }
-
-        public int getId() {
-            return this.id;
-        }
-
-        public String getName() {
-            return this.name;
-        }
-
-        public String getDisplayName() {
-            return this.displayName;
-        }
-
-        public static Display fromInt(int from) {
-            for (Display display : values()) {
-                if (display.id == from) {
-                    return display;
-                }
-            }
-
-            return null;
-        }
     }
 }

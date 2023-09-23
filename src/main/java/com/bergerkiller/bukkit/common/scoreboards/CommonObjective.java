@@ -2,9 +2,9 @@ package com.bergerkiller.bukkit.common.scoreboards;
 
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.scoreboards.CommonScoreboard.Display;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import org.bukkit.scoreboard.DisplaySlot;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,18 +13,18 @@ import java.util.Map;
 
 public class CommonObjective {
 
-    private Display display;
+    private DisplaySlot display;
     private CommonScoreboard scoreboard;
     private String name;
     private String displayName;
     private boolean displayed;
     private Map<String, CommonScore> scores = new HashMap<String, CommonScore>();
 
-    protected CommonObjective(CommonScoreboard scoreboard, Display display) {
+    protected CommonObjective(CommonScoreboard scoreboard, DisplaySlot display) {
         this.display = display;
         this.scoreboard = scoreboard;
-        this.name = display.getName();
-        this.displayName = display.getDisplayName();
+        this.name = display.name();
+        this.displayName = display.name();
     }
 
     /**
@@ -50,7 +50,7 @@ public class CommonObjective {
      *
      * @return Display
      */
-    public Display getDisplay() {
+    public DisplaySlot getDisplay() {
         return this.display;
     }
 
@@ -182,7 +182,7 @@ public class CommonObjective {
     private void display() {
         CommonPacket packet = new CommonPacket(PacketType.OUT_SCOREBOARD_DISPLAY_OBJECTIVE);
         packet.write(PacketType.OUT_SCOREBOARD_DISPLAY_OBJECTIVE.name, this.name);
-        packet.write(PacketType.OUT_SCOREBOARD_DISPLAY_OBJECTIVE.display, this.display.getId());
+        packet.write(PacketType.OUT_SCOREBOARD_DISPLAY_OBJECTIVE.display, this.display);
         PacketUtil.sendPacket(this.scoreboard.getPlayer(), packet);
     }
 

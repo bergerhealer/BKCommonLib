@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.bergerkiller.bukkit.common.conversion.type.JOMLConversion;
+import com.bergerkiller.bukkit.common.conversion.type.ScoreboardDisplaySlotConversion;
 import com.bergerkiller.bukkit.common.wrappers.Brightness;
 import com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode;
 import org.bukkit.Bukkit;
@@ -847,6 +848,15 @@ public class CommonBootstrap {
         if (evaluateMCVersion(">=", "1.18.2")) {
             MC1_18_2_Conversion.init();
             Conversion.registerConverters(MC1_18_2_Conversion.class);
+        }
+
+        // Scoreboard DisplaySlot conversions
+        try {
+            ScoreboardDisplaySlotConversion.init();
+            Conversion.registerConverters(ScoreboardDisplaySlotConversion.class);
+        } catch (Throwable t) {
+            Logging.LOGGER_REFLECTION.log(Level.SEVERE,
+                    "Failed to register Scoreboard DisplaySlot converters", t);
         }
 
         // JOML was introduced later

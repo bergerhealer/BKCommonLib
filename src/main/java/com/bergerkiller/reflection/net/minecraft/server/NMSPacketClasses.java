@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapCursor;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.Common;
@@ -1672,8 +1673,8 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutScoreboardDisplayObjective extends NMSPacket {
 
-        public final FieldAccessor<Integer> display = nextField("private int a");
-        public final FieldAccessor<String> name = nextFieldSignature("private String b");
+        public final FieldAccessor<DisplaySlot> display = PacketPlayOutScoreboardDisplayObjectiveHandle.T.display.toFieldAccessor();
+        public final FieldAccessor<String> name = PacketPlayOutScoreboardDisplayObjectiveHandle.T.name.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutScoreboardObjective extends NMSPacket {

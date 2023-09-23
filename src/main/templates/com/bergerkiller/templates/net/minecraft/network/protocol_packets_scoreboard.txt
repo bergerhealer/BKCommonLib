@@ -9,6 +9,8 @@ import net.minecraft.world.scores.criteria.IScoreboardCriteria.EnumScoreboardHea
 import net.minecraft.world.scores.ScoreboardTeamBase$EnumNameTagVisibility;
 import net.minecraft.world.scores.ScoreboardTeamBase$EnumTeamPush;
 
+import org.bukkit.scoreboard.DisplaySlot;
+
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle;
@@ -378,5 +380,18 @@ class PacketPlayOutScoreboardObjective extends Packet {
     private (ChatText) String displayName:b;
     private (Object) IScoreboardCriteria.EnumScoreboardHealthDisplay criteria:c;
     private int action:d;
+#endif
+}
+
+class PacketPlayOutScoreboardDisplayObjective extends Packet {
+#if version >= 1.20.2
+    private final (DisplaySlot) net.minecraft.world.scores.DisplaySlot display:slot;
+    private String name:objectiveName;
+#elseif version >= 1.17
+    private (DisplaySlot) int display:slot;
+    private String name:objectiveName;
+#else
+    private (DisplaySlot) int display:a;
+    private String name:b;
 #endif
 }
