@@ -118,6 +118,9 @@ class CommonClasses {
                     if (!name.startsWith("com/bergerkiller/generated") || !name.endsWith(".class")) {
                         continue;
                     }
+                    if (name.equals("com/bergerkiller/generated/net/minecraft/network/protocol/game/PacketPlayOutCustomPayloadHandle.class")) {
+                        continue; // Deprecated temporary fallback
+                    }
                     classNames.add(name.substring(0, name.length()-6).replace('/', '.'));
                 }
             }
