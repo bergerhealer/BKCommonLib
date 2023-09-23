@@ -145,6 +145,12 @@ tasks {
         targetCompatibility = "1.8"
     }
 
+    withType<Test> {
+        this.testLogging {
+            this.showStandardStreams = true
+        }
+    }
+
     javadoc {
         options.encoding = "UTF-8"
         isFailOnError = true
