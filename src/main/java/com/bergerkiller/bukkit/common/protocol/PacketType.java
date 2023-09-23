@@ -18,6 +18,7 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSPacketClasses.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -395,30 +396,31 @@ public class PacketType extends ClassTemplate<Object> {
                         return true;
                     }
                 } else {
-                    // Hidden class with a getPacketId() method. Used after MC 1.15.
-                    // Try superclasses until we find the method we want.
-                    Method getPacketIdMethod = null;
-                    Class<?> flowType = directionFlows.getClass();
-                    while (flowType != null && flowType != Object.class && getPacketIdMethod == null) {
-                        for (Method m : flowType.getDeclaredMethods()) {
-                            if (m.getParameterCount() == 1 &&
-                                m.getParameterTypes()[0].equals(Class.class) &&
-                                (m.getReturnType() == Integer.class || m.getReturnType() == int.class)
-                            ) {
-                                getPacketIdMethod = m;
+                    // After MC 1.20.2 the flows object stores an additional object which has the actual method
+                    // Go by all fields to find it
+                    PacketSearchResult packetContained = tryCheckPacketClassContained(directionFlows, packetClass);
+                    if (packetContained == PacketSearchResult.FAILED) {
+                        // Try fields contained in directionFlows
+                        for (Field f : directionFlows.getClass().getDeclaredFields()) {
+                            if (Modifier.isStatic(f.getModifiers())) {
+                                continue;
+                            }
+                            if (f.getType().getDeclaringClass() != enumProtocolType) {
+                                continue;
+                            }
+
+                            f.setAccessible(true);
+                            Object directionFlowsSub = f.get(directionFlows);
+                            packetContained = tryCheckPacketClassContained(directionFlowsSub, packetClass);
+                            if (packetContained != PacketSearchResult.FAILED) {
                                 break;
                             }
                         }
-                        flowType = flowType.getSuperclass();
-                    }
-                    if (getPacketIdMethod == null) {
-                        throw new IllegalStateException("EnumProtocol Flow getPacketId() method not found");
                     }
 
-                    // Invoke and check
-                    getPacketIdMethod.setAccessible(true);
-                    Integer packetId = (Integer) getPacketIdMethod.invoke(directionFlows, packetClass);
-                    if (packetId != null && packetId.intValue() != -1) {
+                    if (packetContained == PacketSearchResult.FAILED) {
+                        throw new IllegalStateException("Unable to identify packet flow direction");
+                    } else if (packetContained == PacketSearchResult.FOUND) {
                         return true;
                     }
                 }
@@ -428,6 +430,40 @@ public class PacketType extends ClassTemplate<Object> {
         }
 
         return false;
+    }
+
+    private static PacketSearchResult tryCheckPacketClassContained(Object flows, Class<?> packetClass) throws Throwable {
+        Method getPacketIdMethod = null;
+        if (flows != null) {
+            Class<?> flowType = flows.getClass();
+            while (flowType != null && flowType != Object.class) {
+                for (Method m : flowType.getDeclaredMethods()) {
+                    if (m.getParameterCount() == 1 &&
+                            m.getParameterTypes()[0].equals(Class.class) &&
+                            (m.getReturnType() == Integer.class || m.getReturnType() == int.class)
+                    ) {
+                        getPacketIdMethod = m;
+                        break;
+                    }
+                }
+                flowType = flowType.getSuperclass();
+            }
+        }
+        if (getPacketIdMethod == null) {
+            return PacketSearchResult.FAILED;
+        }
+
+        // Invoke and check
+        getPacketIdMethod.setAccessible(true);
+        Integer packetId = (Integer) getPacketIdMethod.invoke(flows, packetClass);
+        return (packetId != null && packetId.intValue() != -1)
+                ? PacketSearchResult.FOUND : PacketSearchResult.NOT_FOUND;
+    }
+
+    private enum PacketSearchResult {
+        FAILED,
+        NOT_FOUND,
+        FOUND
     }
 
     private static interface PacketTypeOptions {
