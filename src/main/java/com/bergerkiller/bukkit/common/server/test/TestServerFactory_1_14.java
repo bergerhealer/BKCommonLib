@@ -42,6 +42,7 @@ class TestServerFactory_1_14 extends TestServerFactory {
         Class<?> dedicatedType = Class.forName(env.NMS_ROOT + "DedicatedServer");
         ClassTemplate<?> mc_server_t = ClassTemplate.create(dedicatedType);
         Object mc_server = mc_server_t.newInstanceNull();
+        env.mc_server = mc_server;
 
         // Since we null-construct, some members of the parent class "IAsyncTaskHandler" are not initialized. Do that here.
         Class<?> iAsyncTaskHandlerClass = Class.forName(env.NMS_ROOT + "IAsyncTaskHandler");

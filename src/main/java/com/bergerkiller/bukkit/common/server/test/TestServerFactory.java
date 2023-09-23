@@ -243,6 +243,7 @@ public abstract class TestServerFactory {
     protected static final class ServerEnvironment {
         public String CB_ROOT = "FAIL";
         public String NMS_ROOT = "FAIL";
+        public Object mc_server = null;
         public Object resourcePackRepository = null;
         public Object resourceManager = null;
     }

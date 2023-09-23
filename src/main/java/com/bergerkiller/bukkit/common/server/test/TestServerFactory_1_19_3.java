@@ -47,6 +47,7 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         Class<?> dedicatedType = Class.forName("net.minecraft.server.dedicated.DedicatedServer");
         ClassTemplate<?> mc_server_t = ClassTemplate.create(dedicatedType);
         Object mc_server = mc_server_t.newInstanceNull();
+        env.mc_server = mc_server;
 
         // Since we null-construct, some members of the parent class "IAsyncTaskHandler" are not initialized. Do that here.
         Class<?> iAsyncTaskHandlerClass = Class.forName("net.minecraft.util.thread.IAsyncTaskHandler");

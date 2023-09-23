@@ -41,6 +41,7 @@ class TestServerFactory_1_8 extends TestServerFactory {
         Class<?> dedicatedType = Class.forName(env.NMS_ROOT + "DedicatedServer");
         ClassTemplate<?> mc_server_t = ClassTemplate.create(dedicatedType);
         Object mc_server = mc_server_t.newInstanceNull();
+        env.mc_server = mc_server;
 
         // Assign logger, nms Server instance and primary thread (current thread) to avoid NPE's during test
         setField(server, "logger",  MountiplexUtil.LOGGER);

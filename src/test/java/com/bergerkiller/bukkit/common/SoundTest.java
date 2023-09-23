@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import org.bukkit.Material;
 import org.junit.Test;
 
@@ -54,6 +55,7 @@ public class SoundTest {
 
     @Test
     public void testBukkitSoundConversion() {
+        CommonBootstrap.initServer();
         ResourceKey<SoundEffect> soundName = CraftSoundHandle.getSoundEffect(org.bukkit.Sound.BLOCK_ANVIL_STEP);
         assertEquals("minecraft:block.anvil.step", soundName.getPath());
     }
