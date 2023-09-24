@@ -44,7 +44,8 @@ public class Common {
             "Common:Yaml:BetterChangeListeners",
             "Common:DisplayEntity:Brightness",
             "Common:PacketPlayOutEntityEquipment:OwnerType",
-            "Common:BlockDataStateRename"
+            "Common:BlockDataStateRename",
+            "Common:Advancement:RewardDisabler"
     ).collect(Collectors.toSet());
 
     /**
