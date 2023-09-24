@@ -345,7 +345,8 @@ class EntityTrackerEntry {
   #if exists net.minecraft.server.level.PlayerChunkMap$EntityTracker final void updatePlayers(com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<net.minecraft.server.level.EntityPlayer> newTrackerCandidates);
         // Paper after some optimizations were made to tracking
         #require net.minecraft.server.level.PlayerChunkMap$EntityTracker final void paperUpdatePlayers:updatePlayers(com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<net.minecraft.server.level.EntityPlayer> newTrackerCandidates);
-        com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet players = entity.getPlayersInTrackRange();
+        #require Entity com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<net.minecraft.server.level.EntityPlayer> getPlayersInTrackRange();
+        com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet players = entity#getPlayersInTrackRange();
         instance#paperUpdatePlayers(players);
   #else
         // Spigot / old paper

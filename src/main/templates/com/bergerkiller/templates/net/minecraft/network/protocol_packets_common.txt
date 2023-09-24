@@ -1,5 +1,7 @@
 package net.minecraft.network.protocol.common;
 
+import io.netty.buffer.Unpooled;
+
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.PacketDataSerializer;
@@ -159,8 +161,8 @@ class ClientboundCustomPayloadPacket extends Packet {
             return payload#message;
         } else {
             // Use serializer with a byte buffer
-            io.netty.buffer.ByteBuf buf = io.netty.buffer.Unpooled.buffer();
-            PacketDataSerializer serializer = new PacketDataSerializer(io.netty.buffer.Unpooled.buffer());
+            io.netty.buffer.ByteBuf buf = Unpooled.buffer();
+            PacketDataSerializer serializer = new PacketDataSerializer(buf);
             payload.write(serializer);
             return java.util.Arrays.copyOf(buf.array(), buf.writerIndex());
         }
@@ -198,7 +200,7 @@ class ClientboundCustomPayloadPacket extends Packet {
 
         return new ClientboundCustomPayloadPacket(payload);
 #else
-        PacketDataSerializer serializer = new PacketDataSerializer(io.netty.buffer.Unpooled.wrappedBuffer(message));
+        PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.wrappedBuffer(message));
 
   #if version >= 1.13
         net.minecraft.resources.MinecraftKey key;
