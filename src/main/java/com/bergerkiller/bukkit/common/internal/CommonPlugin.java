@@ -678,7 +678,10 @@ public class CommonPlugin extends PluginBase {
                 "60% of the time, it works all the time.",
                 "I don't make mistakes. I just find ways not to code this plugin.",
                 "Less complicated than the American election.",
-                "Bless you SpottedLeaf <3");
+                "Bless you SpottedLeaf <3",
+                "Includes records and ways to change them!",
+                "Working hard to not do too much",
+                "Psst! I am backwards-compatible! Don't forget to update me regularly... :(");
 
         setEnableMessage(welcomeMessages.get(new Random().nextInt(welcomeMessages.size())));
         setDisableMessage(null);
