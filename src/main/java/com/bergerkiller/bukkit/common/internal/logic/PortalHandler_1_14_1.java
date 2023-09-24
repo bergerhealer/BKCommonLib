@@ -188,7 +188,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *
          * #if version >= 1.20
          *     WorldServer world = (WorldServer) player.level();
-         * #elseif version >= 1.17
+         * #elseif version >= 1.18
          *     WorldServer world = player.getLevel();
          * #else
          *     WorldServer world = player.getWorldServer();
