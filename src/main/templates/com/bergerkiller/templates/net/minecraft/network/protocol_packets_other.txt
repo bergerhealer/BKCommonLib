@@ -1377,7 +1377,7 @@ optional class PacketPlayOutUnloadChunk extends Packet {
   #if version >= 1.17
     #require PacketPlayOutUnloadChunk private int cx:x;
     #require PacketPlayOutUnloadChunk private int cz:z;
-  #else
+  #elseif version >= 1.9
     #require PacketPlayOutUnloadChunk private int cx:a;
     #require PacketPlayOutUnloadChunk private int cz:b;
   #endif
