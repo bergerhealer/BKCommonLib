@@ -79,7 +79,7 @@ class AdvancementRewardsDisablerImpl extends AdvancementRewardsDisabler {
         // We expect a grant() to occur soon after this method is called, but here, for some
         // reason it hasn't. Don't hook again as that could cause a permanent issue.
         if (ClassInterceptor.get(previous.function, AwardInterceptor.class) != null) {
-            Logging.LOGGER.log(Level.SEVERE, "disableNextGrant() was called twice in a row without any grant()!");
+            Logging.LOGGER.log(Level.WARNING, "Advancement disableNextGrant() was called twice in a row without any grant()!");
             return;
         }
 
