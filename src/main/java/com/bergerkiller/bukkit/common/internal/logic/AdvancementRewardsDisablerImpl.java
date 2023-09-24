@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.advancements.AdvancementRewardsHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
@@ -11,6 +12,7 @@ import org.bukkit.advancement.Advancement;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 /**
@@ -73,31 +75,19 @@ class AdvancementRewardsDisablerImpl extends AdvancementRewardsDisabler {
             return;
         }
 
+        // If the current rewards are already hooked, we entered a strange buggy situation
+        // We expect a grant() to occur soon after this method is called, but here, for some
+        // reason it hasn't. Don't hook again as that could cause a permanent issue.
+        if (ClassInterceptor.get(previous.function, AwardInterceptor.class) != null) {
+            Logging.LOGGER.log(Level.SEVERE, "disableNextGrant() was called twice in a row without any grant()!");
+            return;
+        }
+
         // Create a hook class of the 'none' reward function where we override
         // the get() method. When that is called, the rewards reached the end.
         // We roll back all experience/loot/recipes/function changes we've made.
-        ClassInterceptor interceptor = new ClassInterceptor() {
-            @Override
-            protected Invoker<?> getCallback(final Method method) {
-                if (overridedMethods.contains(method)) {
-                    return (instance, args) -> {
-                        // Restore all awards
-                        previous.reset();
-
-                        // Return no function here
-                        if (method.getReturnType() == java.util.Optional.class) {
-                            return java.util.Optional.empty();
-                        } else {
-                            return null; // @Nullable CustomFunction
-                        }
-                    };
-                }
-                return null;
-            }
-        };
-
         // Install the hooked function and reset all rewards
-        rewards.setFunction(interceptor.hook(AdvancementRewardsHandle.getNoneFunction()));
+        rewards.setFunction((new AwardInterceptor(previous)).hook(AdvancementRewardsHandle.getNoneFunction()));
         rewards.setExperience(0);
         rewards.setLoot(new MinecraftKeyHandle[0]);
         rewards.setRecipes(new MinecraftKeyHandle[0]);
@@ -133,6 +123,48 @@ class AdvancementRewardsDisablerImpl extends AdvancementRewardsDisabler {
             liveRewards.setLoot(loot);
             liveRewards.setRecipes(recipes);
             liveRewards.setFunction(function);
+        }
+    }
+
+    private class AwardInterceptor extends ClassInterceptor {
+        private final PreviousRewards previous;
+
+        public AwardInterceptor(PreviousRewards previous) {
+            this.previous = previous;
+            this.setUseGlobalCallbacks(true);
+        }
+
+        @Override
+        protected Invoker<?> getCallback(Method method) {
+            if (overridedMethods.contains(method)) {
+                return new AwardInterceptorCallback(method);
+            }
+            return null;
+        }
+    }
+
+    private static class AwardInterceptorCallback implements Invoker<Object> {
+        private final Method method;
+
+        public AwardInterceptorCallback(Method method) {
+            this.method = method;
+        }
+
+        @Override
+        public Object invokeVA(Object instance, Object... args) {
+            // Note: callbacks are global, must obtain the award interceptor instance
+            //       that is in use here.
+            AwardInterceptor interceptor = ClassInterceptor.get(instance, AwardInterceptor.class);
+
+            // Restore all awards
+            interceptor.previous.reset();
+
+            // Return no function here
+            if (method.getReturnType() == java.util.Optional.class) {
+                return java.util.Optional.empty();
+            } else {
+                return null; // @Nullable CustomFunction
+            }
         }
     }
 }
