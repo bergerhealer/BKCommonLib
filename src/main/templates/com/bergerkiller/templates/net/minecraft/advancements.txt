@@ -1,0 +1,52 @@
+package net.minecraft.advancements;
+
+import net.minecraft.commands.CustomFunction.a;
+import net.minecraft.resources.MinecraftKey;
+
+import com.bergerkiller.generated.net.minecraft.advancements.AdvancementRewardsHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+
+// Since Minecraft 1.12
+optional class AdvancementRewards {
+#if version >= 1.17
+    private final int experience;
+    private final (MinecraftKeyHandle[]) MinecraftKey[] loot;
+    private final (MinecraftKeyHandle[]) MinecraftKey[] recipes;
+    private final (Object) CustomFunction.a function;
+#else
+    private final int experience:b;
+    private final (MinecraftKeyHandle[]) MinecraftKey[] loot:c;
+    private final (MinecraftKeyHandle[]) MinecraftKey[] recipes:d;
+    private final (Object) CustomFunction.a function:e;
+#endif
+
+    public static (Object) CustomFunction.a getNoneFunction() {
+#if version >= 1.17
+        return net.minecraft.commands.CustomFunction$a.NONE;
+#else
+        return net.minecraft.commands.CustomFunction$a.a;
+#endif
+    }
+
+    public static (AdvancementRewardsHandle) AdvancementRewards getRewardsOf(org.bukkit.advancement.Advancement advancement) {
+        if (!(advancement instanceof org.bukkit.craftbukkit.advancement.CraftAdvancement)) {
+            return null;
+        }
+        org.bukkit.craftbukkit.advancement.CraftAdvancement craftAdv = (org.bukkit.craftbukkit.advancement.CraftAdvancement) advancement;
+
+        net.minecraft.advancements.Advancement advancement;
+#if version >= 1.20.2
+        advancement = craftAdv.getHandle().value();
+#else
+        advancement = craftAdv.getHandle();
+#endif
+
+#if version >= 1.20.2
+        return advancement.rewards();
+#elseif version >= 1.18
+        return advancement.getRewards();
+#else
+        return advancement.d();
+#endif
+    }
+}

@@ -8,6 +8,7 @@ import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonNextTickExecutor;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.internal.logic.AdvancementRewardsDisabler;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
@@ -1291,5 +1292,15 @@ public class CommonUtil {
                 server.getLogger().log(Level.SEVERE, "Error occurred (in the plugin loader) while removing chunk tickets for " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
             }
         }
+    }
+
+    /**
+     * Disables the very next grant() being performed of a certain advancement. Can be called while handling
+     * the AdvancementDone Bukkit event to disable the rewards.
+     *
+     * @param advancement Advancement
+     */
+    public static void disableNextGrant(org.bukkit.advancement.Advancement advancement) {
+        AdvancementRewardsDisabler.INSTANCE.disableNextGrant(advancement);
     }
 }
