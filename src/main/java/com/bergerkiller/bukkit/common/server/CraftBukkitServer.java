@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.server;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.cdn.MojangSpigotRemapper;
-import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldAliasResolver;
@@ -87,21 +86,17 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
         }
 
         // Find out what package version is used
-        String serverPath = SERVER_CLASS.getName();
-        if (!serverPath.startsWith(CB_ROOT)) {
-            return false;
-        }
-        PACKAGE_VERSION = StringUtil.getBefore(serverPath.substring(CB_ROOT.length()), ".");
+        CB_ROOT_VERSIONED = SERVER_CLASS.getPackage().getName();
+        CB_ROOT_LIBS = PACKAGE_CB_ROOT + ".libs";
 
         // Obtain the versioned roots
-        if (PACKAGE_VERSION.isEmpty()) {
-            NMS_ROOT_VERSIONED = PACKAGE_NMS_ROOT;
-            CB_ROOT_VERSIONED = PACKAGE_CB_ROOT;
-        } else {
+        if (CB_ROOT_VERSIONED.startsWith(CB_ROOT)) {
+            PACKAGE_VERSION = CB_ROOT_VERSIONED.substring(CB_ROOT.length());
             NMS_ROOT_VERSIONED = PACKAGE_NMS_ROOT + "." + PACKAGE_VERSION;
-            CB_ROOT_VERSIONED = PACKAGE_CB_ROOT + "." + PACKAGE_VERSION;
+        } else {
+            PACKAGE_VERSION = "";
+            NMS_ROOT_VERSIONED = PACKAGE_NMS_ROOT;
         }
-        CB_ROOT_LIBS = PACKAGE_CB_ROOT + ".libs";
 
         // Figure out the MC version from the server
         MC_VERSION = PACKAGE_VERSION;
