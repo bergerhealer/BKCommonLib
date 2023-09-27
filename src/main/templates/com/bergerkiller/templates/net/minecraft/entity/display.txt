@@ -10,8 +10,16 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
 // Since 1.19.4
 optional class Display extends Entity {
+#if version >= 1.20.2
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_INTERPOLATION_START_DELTA_TICKS_ID:DATA_TRANSFORMATION_INTERPOLATION_START_DELTA_TICKS_ID;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_INTERPOLATION_DURATION_ID:DATA_TRANSFORMATION_INTERPOLATION_DURATION_ID;
+    public static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_POS_ROT_INTERPOLATION_DURATION_ID;
+#else
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_INTERPOLATION_START_DELTA_TICKS_ID;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_INTERPOLATION_DURATION_ID;
+    public static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_POS_ROT_INTERPOLATION_DURATION_ID:###;
+#endif
+
     private static optional final (DataWatcher.Key<Object>) DataWatcherObject<Vector3f> DATA_TRANSLATION_ID;
     private static optional final (DataWatcher.Key<Object>) DataWatcherObject<Vector3f> DATA_SCALE_ID;
     private static optional final (DataWatcher.Key<Object>) DataWatcherObject<Quaternionf> DATA_LEFT_ROTATION_ID;
@@ -28,6 +36,7 @@ optional class Display extends Entity {
     <code>
     public static final Key<Integer> DATA_INTERPOLATION_START_DELTA_TICKS = Key.Type.INTEGER.createKey(T.DATA_INTERPOLATION_START_DELTA_TICKS_ID, -1);
     public static final Key<Integer> DATA_INTERPOLATION_DURATION = Key.Type.INTEGER.createKey(T.DATA_INTERPOLATION_DURATION_ID, -1);
+    public static final Key<Integer> DATA_POS_ROT_INTERPOLATION_DURATION = Key.Type.INTEGER.createKey(T.DATA_POS_ROT_INTERPOLATION_DURATION_ID, -1);
     public static final Key<org.bukkit.util.Vector> DATA_TRANSLATION = Key.Type.JOML_VECTOR3F.createKey(T.DATA_TRANSLATION_ID, -1);
     public static final Key<org.bukkit.util.Vector> DATA_SCALE = Key.Type.JOML_VECTOR3F.createKey(T.DATA_SCALE_ID, -1);
     public static final Key<com.bergerkiller.bukkit.common.math.Quaternion> DATA_LEFT_ROTATION = Key.Type.JOML_QUATERNIONF.createKey(T.DATA_LEFT_ROTATION_ID, -1);

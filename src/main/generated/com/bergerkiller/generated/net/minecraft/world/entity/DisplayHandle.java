@@ -24,6 +24,7 @@ public abstract class DisplayHandle extends EntityHandle {
 
     public static final Key<Integer> DATA_INTERPOLATION_START_DELTA_TICKS = Key.Type.INTEGER.createKey(T.DATA_INTERPOLATION_START_DELTA_TICKS_ID, -1);
     public static final Key<Integer> DATA_INTERPOLATION_DURATION = Key.Type.INTEGER.createKey(T.DATA_INTERPOLATION_DURATION_ID, -1);
+    public static final Key<Integer> DATA_POS_ROT_INTERPOLATION_DURATION = Key.Type.INTEGER.createKey(T.DATA_POS_ROT_INTERPOLATION_DURATION_ID, -1);
     public static final Key<org.bukkit.util.Vector> DATA_TRANSLATION = Key.Type.JOML_VECTOR3F.createKey(T.DATA_TRANSLATION_ID, -1);
     public static final Key<org.bukkit.util.Vector> DATA_SCALE = Key.Type.JOML_VECTOR3F.createKey(T.DATA_SCALE_ID, -1);
     public static final Key<com.bergerkiller.bukkit.common.math.Quaternion> DATA_LEFT_ROTATION = Key.Type.JOML_QUATERNIONF.createKey(T.DATA_LEFT_ROTATION_ID, -1);
@@ -45,6 +46,8 @@ public abstract class DisplayHandle extends EntityHandle {
         public final Template.StaticField.Converted<Key<Integer>> DATA_INTERPOLATION_START_DELTA_TICKS_ID = new Template.StaticField.Converted<Key<Integer>>();
         @Template.Optional
         public final Template.StaticField.Converted<Key<Integer>> DATA_INTERPOLATION_DURATION_ID = new Template.StaticField.Converted<Key<Integer>>();
+        @Template.Optional
+        public final Template.StaticField.Converted<Key<Integer>> DATA_POS_ROT_INTERPOLATION_DURATION_ID = new Template.StaticField.Converted<Key<Integer>>();
         @Template.Optional
         public final Template.StaticField.Converted<Key<Object>> DATA_TRANSLATION_ID = new Template.StaticField.Converted<Key<Object>>();
         @Template.Optional

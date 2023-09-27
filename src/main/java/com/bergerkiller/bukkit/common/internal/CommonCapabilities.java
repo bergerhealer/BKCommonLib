@@ -277,4 +277,9 @@ public class CommonCapabilities {
      * As such a separate 'back' sign text property is available/tracked.
      */
     public static final boolean HAS_SIGN_BACK_TEXT = CommonBootstrap.evaluateMCVersion(">=", "1.20");
+
+    /**
+     * Since Minecraft 1.20.2 the position/rotation interpolation tick duration can be set for display entities
+     */
+    public static final boolean HAS_DISPLAY_ENTITY_LOCATION_INTERPOLATION = CommonBootstrap.evaluateMCVersion(">=", "1.20.2");
 }
