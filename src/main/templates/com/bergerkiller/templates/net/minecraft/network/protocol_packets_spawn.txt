@@ -345,7 +345,12 @@ class PacketPlayOutNamedEntitySpawn extends Packet {
 #endif
 
     public static (PacketPlayOutNamedEntitySpawnHandle) PacketPlayOutNamedEntitySpawn createNew() {
-#if version >= 1.17
+#if version >= 1.20.2
+        PacketPlayOutNamedEntitySpawn packet = new PacketPlayOutNamedEntitySpawn(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+        #require PacketPlayOutNamedEntitySpawn private final EntityTypes<?> type;
+        packet#type = EntityTypes.PLAYER;
+        return packet;
+#elseif version >= 1.17
         return new PacketPlayOutNamedEntitySpawn(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
         return new PacketPlayOutNamedEntitySpawn();
