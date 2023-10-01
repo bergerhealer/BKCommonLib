@@ -45,7 +45,8 @@ public class Common {
             "Common:DisplayEntity:Brightness",
             "Common:PacketPlayOutEntityEquipment:OwnerType",
             "Common:BlockDataStateRename",
-            "Common:Advancement:RewardDisabler"
+            "Common:Advancement:RewardDisabler",
+            "Common:Sound:StopSoundPacket"
     ).collect(Collectors.toSet());
 
     /**
