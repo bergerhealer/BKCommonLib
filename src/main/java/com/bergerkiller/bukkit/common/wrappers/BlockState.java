@@ -12,7 +12,7 @@ import java.util.Collection;
  * @param <T> Value type
  */
 @Deprecated
-public abstract class BlockState<T> extends BasicWrapper<IBlockStateHandle> {
+public abstract class BlockState<T extends Comparable<?>> extends BasicWrapper<IBlockStateHandle> {
     /**
      * Name identifying this state
      *
