@@ -243,6 +243,12 @@ public abstract class BlockData extends BlockDataRegistry {
     public abstract BlockData setState(BlockDataStateKey<?> stateKey, Object value);
 
     /**
+     * @deprecated Use {@link #setState(BlockDataStateKey, Object)} instead
+     */
+    @Deprecated
+    public abstract BlockData setState(BlockState<?> stateKey, Object value);
+
+    /**
      * Reads a state from this BlockData
      * 
      * @param key Name of the state to get

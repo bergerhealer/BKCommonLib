@@ -645,6 +645,13 @@ class BlockDataImpl extends BlockData {
     }
 
     @Override
+    @Deprecated
+    public BlockData setState(BlockState<?> stateKey, Object value) {
+        IBlockDataHandle updated_data = this.data.set(stateKey.getBackingHandle(), value);
+        return BlockDataRegistry.fromBlockData(updated_data.getRaw());
+    }
+
+    @Override
     public <T> T getState(String key, Class<T> type) {
         return this.data.get(key, type);
     }
