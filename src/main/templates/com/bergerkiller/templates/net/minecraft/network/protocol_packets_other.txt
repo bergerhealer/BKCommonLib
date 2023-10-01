@@ -41,6 +41,8 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntLists;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 
+import io.netty.buffer.Unpooled;
+
 import com.bergerkiller.bukkit.common.wrappers.BlockStateChange;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
@@ -78,6 +80,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundBundlePacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutOpenSignEditorHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutStopSoundHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
@@ -1605,6 +1608,33 @@ class PacketPlayInSteerVehicle extends Packet {
     private float forwards:b;
     private boolean jump:c;
     private boolean unmount:d;
+#endif
+}
+
+// Note: this packet is PacketPlayOutCustomPayload on 1.8 - 1.12.2 where it sends an "MC|StopSound" message
+class PacketPlayOutStopSound extends Packet {
+#if version >= 1.9
+    public static (PacketPlayOutStopSoundHandle) PacketPlayOutStopSound createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.resources.MinecraftKey soundEffect, (String) SoundCategory category) {
+  #if version >= 1.13
+        return new PacketPlayOutStopSound(soundEffect, category);
+  #else
+        PacketDataSerializer packetdataserializer = new PacketDataSerializer(Unpooled.buffer());
+        packetdataserializer.a(category == null ? "" : category.a());
+    #if version >= 1.12
+        packetdataserializer.a(soundEffect.getKey());
+    #else
+        packetdataserializer.a(soundEffect.a());
+    #endif
+        return new PacketPlayOutStopSound("MC|StopSound", packetdataserializer);
+  #endif
+    }
+#else
+    public static (PacketPlayOutStopSoundHandle) PacketPlayOutStopSound createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.resources.MinecraftKey soundEffect, String category) {
+        PacketDataSerializer packetdataserializer = new PacketDataSerializer(Unpooled.buffer());
+        packetdataserializer.a(category == null ? "" : category);
+        packetdataserializer.a(soundEffect.a());
+        return new PacketPlayOutStopSound("MC|StopSound", packetdataserializer);
+    }
 #endif
 }
 

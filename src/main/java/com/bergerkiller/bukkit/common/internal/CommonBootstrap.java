@@ -510,6 +510,8 @@ public class CommonBootstrap {
             remappings.put("com.bergerkiller.bukkit.common.internal.proxy.HeightMap.Type", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2$Type");
             remappings.put("net.minecraft.world.phys.shapes.VoxelShape", "com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy");
             remappings.put("net.minecraft.world.level.block.entity.TileEntityTypes", "com.bergerkiller.bukkit.common.internal.proxy.TileEntityTypesProxy_1_8_to_1_12_2");
+            // Stop sound works using an MC|StopSound custom message
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutStopSound", "net.minecraft.network.protocol.game.PacketPlayOutCustomPayload");
         }
 
         // EnumArt has seen many places...
