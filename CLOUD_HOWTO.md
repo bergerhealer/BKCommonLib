@@ -2,7 +2,7 @@
 BKCommonLib shades in a custom fork of the [Cloud Command Framework](https://github.com/bergerhealer/cloud "Cloud Command Framework") library so that depending plugins can use it. If you are new to Cloud, look through their [documentation](https://incendo.github.io/cloud/ "documentation") first.
 
 ### Version
-Currently the 1.6.0 release of Cloud is included.
+Currently the 1.8.4 release of Cloud is included.
 
 ### Maven
 The bergerhealer cloud fork is hosted on the same repository as BKCommonLib:
@@ -15,8 +15,8 @@ The bergerhealer cloud fork is hosted on the same repository as BKCommonLib:
 Depend on BKCommonLib and the (fork) cloud command framework libraries:
 ```xml
     <properties>
-        <project.bkcommonlib.version>1.19.2-v2</project.bkcommonlib.version>
-        <project.cloud.version>1.8.0-SNAPSHOT</project.cloud.version>
+        <project.bkcommonlib.version>1.20.2-v1-SNAPSHOT</project.bkcommonlib.version>
+        <project.cloud.version>1.8.4</project.cloud.version>
     </properties>
 
     <dependencies>
