@@ -13,7 +13,7 @@ public class SoundEffect_1_8_8 {
         return this.name;
     }
 
-    public static SoundEffect_1_8_8 createVariableRangeEvent(MinecraftKeyHandle name) {
-        return new SoundEffect_1_8_8(name);
+    public static SoundEffect_1_8_8 createVariableRangeEvent(Object minecraftKey) {
+        return new SoundEffect_1_8_8(MinecraftKeyHandle.createHandle(minecraftKey));
     }
 }

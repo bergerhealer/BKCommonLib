@@ -46,7 +46,8 @@ public class Common {
             "Common:PacketPlayOutEntityEquipment:OwnerType",
             "Common:BlockDataStateRename",
             "Common:Advancement:RewardDisabler",
-            "Common:Sound:StopSoundPacket"
+            "Common:Sound:StopSoundPacket",
+            "Common:Sound:CloudParser"
     ).collect(Collectors.toSet());
 
     /**

@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.cloud;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiConsumer;
@@ -15,6 +14,7 @@ import java.util.stream.Stream;
 
 import cloud.commandframework.bukkit.BukkitCaptionRegistryFactory;
 import com.bergerkiller.bukkit.common.cloud.parsers.SoundEffectArgument;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import org.bukkit.Bukkit;
@@ -130,25 +130,19 @@ public class CloudSimpleHandler {
                     manager.registerBrigadier();
                     CloudBrigadierManager<?, ?> brig = manager.brigadierManager();
 
+                    brig.setNativeNumberSuggestions(false);
+
                     // Register a 'sound effect name' auto-completion provider for brigadier
                     // This is automatically used for ResourceKey<SoundEffect> types so clients see their client-side sound names.
                     // As this involves a bunch of at-runtime field and class types, do this stuff in a
-                    // function generated at runtime.
-                    {
-
+                    // function generated at runtime. Messy :(
+                    if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
+                        try {
+                            SoundEffectArgument.registerBrigadier(brig);
+                        } catch (Throwable t) {
+                            plugin.getLogger().log(Level.WARNING, "Failed to register sound effect auto-completion for brigadier", t);
+                        }
                     }
-
-                    /*
-                    brig.registerMapping(
-                            new TypeToken<ResourceKey<SoundEffect>>() {},
-                            builder -> {
-                                builder.to(parser -> new ResourceLocationArgument());
-                                builder.suggestedBy((argument, useCloud) -> (SuggestionProvider) SuggestionProviders.AVAILABLE_SOUNDS);
-                            }
-                    );
-                    */
-
-                    brig.setNativeNumberSuggestions(false);
                 } catch (BrigadierFailureException ex) {
                     plugin.getLogger().log(Level.WARNING, "Failed to register commands using brigadier, " +
                             "using fallback instead. Error:", ex);

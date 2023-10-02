@@ -4,18 +4,36 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.brigadier.BrigadierMappingBuilder;
+import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.cloud.captions.BKCommonLibCaptionKeys;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
+import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
+import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
+import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
+import com.bergerkiller.mountiplex.reflection.util.FastMethod;
+import com.bergerkiller.mountiplex.reflection.util.LambdaBuilder;
 import io.leangen.geantyref.TypeToken;
+import org.bukkit.command.CommandSender;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * cloud argument type that parses <i>ResourceKey&lt;SoundEffect&gt;</i>
@@ -129,6 +147,19 @@ public class SoundEffectArgument<C> extends CommandArgument<C, ResourceKey<Sound
             inputQueue.remove();
             return ArgumentParseResult.success(result);
         }
+
+        @Override
+        public List<String> suggestions(
+                final CommandContext<C> commandContext,
+                final String input
+        ) {
+            Collection<MinecraftKeyHandle> keys = SoundEffectHandle.getSoundNames();
+            List<String> suggestions = new ArrayList<>(keys.size());
+            for (MinecraftKeyHandle key : keys) {
+                suggestions.add(key.toString());
+            }
+            return suggestions;
+        }
     }
 
     public static final class SoundEffectParseException extends ParserException {
@@ -163,5 +194,70 @@ public class SoundEffectArgument<C> extends CommandArgument<C, ResourceKey<Sound
         public String getInput() {
             return this.input;
         }
+    }
+
+    /**
+     * Registers the vanilla sound effect suggestions in brigadier for the ResourceKey&lt;SoundEffect&gt; type.
+     * This is a mess because BKCommonLib does not 'see' internal types that it needs for this integration.
+     *
+     * @param brig CloudBrigadierManager
+     * @throws Exception
+     */
+    public static void registerBrigadier(CloudBrigadierManager<?, ?> brig) throws Exception {
+        ClassResolver resolver = new ClassResolver();
+        resolver.setDeclaredClassName("net.minecraft.commands.synchronization.CompletionProviders"); // SuggestionProviders
+        resolver.addImport("net.minecraft.commands.arguments.ArgumentMinecraftKeyRegistered"); // ResourceLocationArgument
+        resolver.addImport("com.mojang.brigadier.suggestion.SuggestionProvider");
+        resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
+
+        // Get a method that can produce a new ResourceLocationArgument instance
+        final FastMethod<Object> createResourceLocationArgument;
+        {
+            MethodDeclaration createResourceLocationArgumentMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess("" +
+                            "public static ArgumentMinecraftKeyRegistered createArgument() {\n" +
+                            "#if version >= 1.18\n" +
+                            "    return ArgumentMinecraftKeyRegistered.id();\n" +
+                            "#else\n" +
+                            "    return ArgumentMinecraftKeyRegistered.a();\n" +
+                            "#endif\n" +
+                            "}",
+                    resolver));
+            createResourceLocationArgument = new FastMethod<>(createResourceLocationArgumentMethod);
+            createResourceLocationArgument.forceInitialization();
+        }
+
+        // Get the AVAILABLE_SOUNDS SuggestionProvider instance
+        final Object soundSuggestionProvider;
+        {
+            MethodDeclaration createSuggestionProviderMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess("" +
+                            "public static SuggestionProvider getSoundSuggestions() {\n" +
+                            "#if version >= 1.17\n" +
+                            "    return CompletionProviders.AVAILABLE_SOUNDS;\n" +
+                            "#else\n" +
+                            "    return CompletionProviders.c;\n" +
+                            "#endif\n" +
+                            "}",
+                    resolver));
+            FastMethod<Object> createSuggestionProvider = new FastMethod<>(createSuggestionProviderMethod);
+            soundSuggestionProvider = createSuggestionProvider.invoke(null);
+        }
+
+        final BrigadierMappingBuilder.SuggestionProviderSupplier<?, ?> suggestionProvider =
+                LambdaBuilder.of(BrigadierMappingBuilder.SuggestionProviderSupplier.class)
+                             .createConstant(soundSuggestionProvider);
+
+        final FastMethod<Object> registerMapping = new FastMethod<>(CloudBrigadierManager.class.getMethod("registerMapping", TypeToken.class, Consumer.class));
+        final FastMethod<Object> builderTo = new FastMethod<>(BrigadierMappingBuilder.class.getMethod("to", Function.class));
+
+        registerMapping.forceInitialization();
+        builderTo.forceInitialization();
+
+        registerMapping.invoke(brig,
+                new TypeToken<SoundEffectArgument.SoundEffectParser<CommandSender>>() {},
+                (Consumer<BrigadierMappingBuilder<?, ?>>) builder -> {
+                    builderTo.invoke(builder, (Function<Object, Object>) o -> createResourceLocationArgument.invoke(null));
+                    builder.suggestedBy(CommonUtil.unsafeCast(suggestionProvider));
+                }
+        );
     }
 }

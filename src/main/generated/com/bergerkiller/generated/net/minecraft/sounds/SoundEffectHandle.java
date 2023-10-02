@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.sounds;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.generated.net.minecraft.core.RegistryMaterialsHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import java.util.Collection;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.sounds.SoundEffect</b>.
@@ -25,23 +25,22 @@ public abstract class SoundEffectHandle extends Template.Handle {
         return T.createVariableRangeEvent.invoke(minecraftkey);
     }
 
+    public static SoundEffectHandle byName(String name) {
+        return T.byName.invoke(name);
+    }
+
+    public static SoundEffectHandle byKey(MinecraftKeyHandle key) {
+        return T.byKey.invoke(key);
+    }
+
+    public static Collection<MinecraftKeyHandle> getSoundNames() {
+        return T.getSoundNames.invoke();
+    }
+
 
     @Deprecated
     public static SoundEffectHandle createNew(MinecraftKeyHandle name) {
         return createVariableRangeEvent(name);
-    }
-
-    public static SoundEffectHandle byName(String name) {
-        if (T.opt_getRegistry.isAvailable()) {
-            Object mc_key_raw = com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle.T.createNew.raw.invoke(name);
-            if (mc_key_raw != null) {
-                return createHandle(T.opt_getRegistry.invoke().get(mc_key_raw));
-            } else {
-                return null;
-            }
-        } else {
-            return createVariableRangeEvent(com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle.createNew(name));
-        }
     }
     public abstract MinecraftKeyHandle getName();
     public abstract void setName(MinecraftKeyHandle value);
@@ -52,9 +51,12 @@ public abstract class SoundEffectHandle extends Template.Handle {
     public static final class SoundEffectClass extends Template.Class<SoundEffectHandle> {
         public final Template.Field.Converted<MinecraftKeyHandle> name = new Template.Field.Converted<MinecraftKeyHandle>();
 
-        @Template.Optional
-        public final Template.StaticMethod.Converted<RegistryMaterialsHandle> opt_getRegistry = new Template.StaticMethod.Converted<RegistryMaterialsHandle>();
         public final Template.StaticMethod.Converted<SoundEffectHandle> createVariableRangeEvent = new Template.StaticMethod.Converted<SoundEffectHandle>();
+        public final Template.StaticMethod.Converted<SoundEffectHandle> byName = new Template.StaticMethod.Converted<SoundEffectHandle>();
+        public final Template.StaticMethod.Converted<SoundEffectHandle> byKey = new Template.StaticMethod.Converted<SoundEffectHandle>();
+        @Template.Optional
+        public final Template.StaticMethod<Object> rawSoundEffectResourceKeyToHolder = new Template.StaticMethod<Object>();
+        public final Template.StaticMethod.Converted<Collection<MinecraftKeyHandle>> getSoundNames = new Template.StaticMethod.Converted<Collection<MinecraftKeyHandle>>();
 
     }
 

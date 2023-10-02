@@ -13,7 +13,6 @@ import com.bergerkiller.bukkit.common.component.LibraryComponent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
-import com.bergerkiller.generated.net.minecraft.core.RegistryMaterialsHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
@@ -86,8 +85,7 @@ public class MC1_18_2_Conversion {
 
     @ConverterMethod(output="net.minecraft.core.Holder<net.minecraft.sounds.SoundEffect>")
     public static Object soundEffectHolderFromResourceKey(ResourceKey<SoundEffect> soundKey) {
-        Object raw_registry = SoundEffectHandle.T.opt_getRegistry.raw.invoke();
-        return RegistryMaterialsHandle.T.rawSoundEffectResourceKeyToHolder.invoke(raw_registry, soundKey.getRawHandle());
+        return SoundEffectHandle.T.rawSoundEffectResourceKeyToHolder.invoke(soundKey.getRawHandle());
     }
 
     @Template.Optional

@@ -45,45 +45,91 @@ class SoundEffect {
 #endselect
 
 #if version >= 1.9
-    public static final optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, SoundEffect> opt_getRegistry() {
+    #require SoundEffect public static  RegistryMaterials<MinecraftKey, SoundEffect> getSoundRegistry() {
   #if version >= 1.13.1
         return (RegistryMaterials) net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT;
   #else
         return SoundEffect.a;
   #endif
     }
-#else
-    public static final optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, SoundEffect> opt_getRegistry:###();
 #endif
 
 #if version >= 1.19.3
     public static (SoundEffectHandle) SoundEffect createVariableRangeEvent((MinecraftKeyHandle) MinecraftKey minecraftkey);
-#elseif version >= 1.9
+#else
     public static (SoundEffectHandle) SoundEffect createVariableRangeEvent((MinecraftKeyHandle) MinecraftKey minecraftkey) {
+  #if version >= 1.9
         return new SoundEffect(minecraftkey);
+  #else
+        return SoundEffect.createVariableRangeEvent((Object) minecraftkey);
+  #endif
+    }
+#endif
+
+    public static (SoundEffectHandle) SoundEffect byName(String name) {
+        com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod createKeyRaw;
+        createKeyRaw = (com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod) com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle.T.createNew.raw;
+        Object key = (MinecraftKey) createKeyRaw.invoke(name);
+        if (key == null) {
+            return null;
+        } else {
+            com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod byKeyRaw;
+            byKeyRaw = (com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod) SoundEffectHandle.T.byKey.raw;
+            return (SoundEffect) byKeyRaw.invoke(key);
+        }
+    }
+
+    public static (SoundEffectHandle) SoundEffect byKey((MinecraftKeyHandle) MinecraftKey key) {
+#if version >= 1.13.1
+        return (SoundEffect) ((RegistryMaterials) net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT).get((MinecraftKey) key);
+#elseif version >= 1.9
+        return (SoundEffect) SoundEffect.a.get((Object) key);
+#else
+        return SoundEffect.createVariableRangeEvent((Object) key);
+#endif
+    }
+
+#if version >= 1.18.2
+    public static optional Object rawSoundEffectResourceKeyToHolder(Object resourceKey) {
+        net.minecraft.resources.ResourceKey resourceKeyCasted = (net.minecraft.resources.ResourceKey) resourceKey;
+        RegistryMaterials registry = (RegistryMaterials) net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT;
+  #if version >= 1.19.3
+        java.util.Optional holderOpt = registry.getHolder(resourceKeyCasted);
+        if (holderOpt.isPresent()) {
+            return holderOpt.get();
+        } else {
+            return net.minecraft.core.Holder.direct(net.minecraft.sounds.SoundEffect.createVariableRangeEvent(resourceKeyCasted.location()));
+        }
+  #else
+        return registry.getHolderOrThrow(resourceKeyCasted);
+  #endif
     }
 #else
-    public static (SoundEffectHandle) SoundEffect createVariableRangeEvent(MinecraftKeyHandle minecraftkey);
+    public static optional Object rawSoundEffectResourceKeyToHolder:###(Object resourceKey);
 #endif
+
+    public static (java.util.Collection<MinecraftKeyHandle>) java.util.Collection<MinecraftKey> getSoundNames() {
+#if version >= 1.13.1
+        return ((RegistryMaterials) net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT).keySet();
+#elseif version >= 1.9
+        return SoundEffect.a.keySet();
+#else
+        // The only registry that exists is CraftSound. Sadge.
+        org.bukkit.Sound[] values = org.bukkit.Sound.values();
+        int len = values.length;
+        java.util.List names = new java.util.ArrayList(len);
+        for (int i = 0; i < len; i++) {
+            String nameStr = org.bukkit.craftbukkit.CraftSound.getSound(values[i]);
+            names.add(new MinecraftKey(nameStr));
+        }
+        return names;
+#endif
+    }
 
     <code>
     @Deprecated
     public static SoundEffectHandle createNew(MinecraftKeyHandle name) {
         return createVariableRangeEvent(name);
     }
-
-    public static SoundEffectHandle byName(String name) {
-        if (T.opt_getRegistry.isAvailable()) {
-            Object mc_key_raw = com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle.T.createNew.raw.invoke(name);
-            if (mc_key_raw != null) {
-                return createHandle(T.opt_getRegistry.invoke().get(mc_key_raw));
-            } else {
-                return null;
-            }
-        } else {
-            return createVariableRangeEvent(com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle.createNew(name));
-        }
-    }
     </code>
-
 }

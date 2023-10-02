@@ -32,7 +32,6 @@ import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockStateChange;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
-import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
@@ -66,7 +65,6 @@ import com.bergerkiller.generated.net.minecraft.world.level.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightMapHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
@@ -569,16 +567,12 @@ public class WrapperConversion {
 
     @ConverterMethod(output="net.minecraft.sounds.SoundEffect")
     public static Object soundEffectFromResourceKey(ResourceKey<SoundEffect> soundKey) {
-        if (SoundEffectHandle.T.opt_getRegistry.isAvailable()) {
-            Object mcKey = soundKey.getName().getRaw();
-            Object effect = SoundEffectHandle.T.opt_getRegistry.invoke().get(mcKey);
-            if (effect == null) {
-                effect = SoundEffectHandle.T.createVariableRangeEvent.raw.invoke(mcKey);
-            }
-            return effect;
-        } else {
-            return SoundEffectHandle.createVariableRangeEvent(MinecraftKeyHandle.createNew(soundKey.getPath()));
+        Object mcKey = soundKey.getName().getRaw();
+        Object effect = SoundEffectHandle.T.byKey.raw.invoke(mcKey);
+        if (effect == null) {
+            effect = SoundEffectHandle.T.createVariableRangeEvent.raw.invoke(mcKey);
         }
+        return effect;
     }
 
     @ConverterMethod
