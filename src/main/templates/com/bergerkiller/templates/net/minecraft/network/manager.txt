@@ -49,17 +49,23 @@ class NetworkManager {
   #endif
         java.util.Queue queue = networkManager#packetQueue;
 
+        Object queuedPacket;
   #if version >= 1.20.2
-        Object queuedPacket = new com.bergerkiller.bukkit.common.internal.proxy.QueuedPacket_1_20_2(packet, null, false);
+    #if exists net.minecraft.network.NetworkManager.PacketSendAction
+        #require net.minecraft.network.NetworkManager.PacketSendAction private net.minecraft.network.NetworkManager.PacketSendAction createQueuedPacket:<init>(net.minecraft.network.protocol.Packet<?> packet, net.minecraft.network.PacketSendListener listener, boolean flush);
+        queuedPacket = #createQueuedPacket((net.minecraft.network.protocol.Packet) packet, (net.minecraft.network.PacketSendListener) null, false);
+    #else
+        queuedPacket = new com.bergerkiller.bukkit.common.internal.proxy.QueuedPacket_1_20_2(packet, null, false);
+    #endif
   #elseif exists net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket(net.minecraft.network.protocol.Packet<?> packet, io.netty.util.concurrent.GenericFutureListener listener)
         #require net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket createQueuedPacket:<init>((Object) Packet<?> packet, GenericFutureListener listener);
-        Object queuedPacket = #createQueuedPacket(packet, (GenericFutureListener) null);
+        queuedPacket = #createQueuedPacket(packet, (GenericFutureListener) null);
   #elseif exists net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket(net.minecraft.network.protocol.Packet<?> packet, io.netty.util.concurrent.GenericFutureListener[] listener)
         #require net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket createQueuedPacket:<init>((Object) Packet<?> packet, GenericFutureListener[] listener);
-        Object queuedPacket = #createQueuedPacket(packet, (GenericFutureListener[]) null);
+        queuedPacket = #createQueuedPacket(packet, (GenericFutureListener[]) null);
   #elseif exists net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket(net.minecraft.network.protocol.Packet<?> packet, net.minecraft.network.PacketSendListener listener)
         #require net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket createQueuedPacket:<init>((Object) Packet<?> packet, net.minecraft.network.PacketSendListener listener);
-        Object queuedPacket = #createQueuedPacket(packet, (net.minecraft.network.PacketSendListener) null);
+        queuedPacket = #createQueuedPacket(packet, (net.minecraft.network.PacketSendListener) null);
   #else
         #error Cannot queue packets - queued packet constructor not found!
   #endif
