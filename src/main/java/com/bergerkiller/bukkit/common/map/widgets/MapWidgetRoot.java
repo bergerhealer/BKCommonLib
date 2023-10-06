@@ -29,13 +29,7 @@ public class MapWidgetRoot extends MapWidget {
     }
 
     private static boolean isWidgetVisibleRecurse(MapWidget widget) {
-        while (widget != null) {
-            if (!widget.isVisible()) {
-                return false;
-            }
-            widget = widget.parent;
-        }
-        return true;
+        return widget == null || widget.isVisibleAndDisplayed();
     }
 
     private static MapWidgetDepthPair findFocusableWidget(MapWidget widget, int depth) {
@@ -64,7 +58,7 @@ public class MapWidgetRoot extends MapWidget {
 
     public void setFocusedWidget(MapWidget widget) {
         // If widget is invisible, do nothing
-        if (widget != null && !isWidgetVisibleRecurse(widget)) {
+        if (widget != null && !widget.isVisibleAndDisplayed()) {
             return;
         }
 

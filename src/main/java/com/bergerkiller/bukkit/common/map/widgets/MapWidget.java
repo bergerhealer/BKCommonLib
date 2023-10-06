@@ -252,6 +252,22 @@ public class MapWidget implements MapDisplayEvents {
     }
 
     /**
+     * Checks {@link #isVisible()} for this widget and all parent widgets.
+     * If this widget or a recursive parent is not visible, returns false.
+     *
+     * @return True if this widget and all parent widgets are visible
+     * @see #isVisible()
+     */
+    public final boolean isVisibleAndDisplayed() {
+        for (MapWidget w = this; w != null; w = w.parent) {
+            if (!w.isVisible()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Sets whether this widget is visible
      * 
      * @param visible
@@ -261,6 +277,11 @@ public class MapWidget implements MapDisplayEvents {
         if (this._visible != visible) {
             this._visible = visible;
             this.invalidate();
+
+            // If parent is visible, then we need to invalidate all child widgets as well
+            if (parent == null || parent.isVisibleAndDisplayed()) {
+                invalidateRecurseChildrenIfVisible();
+            }
         }
         return this;
     }
@@ -641,6 +662,15 @@ public class MapWidget implements MapDisplayEvents {
      */
     public final void invalidate() {
         this._invalidated = true;
+    }
+
+    private void invalidateRecurseChildrenIfVisible() {
+        for (MapWidget child : _children) {
+            if (child.isVisible()) {
+                child.invalidate();
+                child.invalidateRecurseChildrenIfVisible();
+            }
+        }
     }
 
     /**
