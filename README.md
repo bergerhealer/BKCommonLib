@@ -415,7 +415,7 @@ Want to use the included [Cloud Command Framework](https://github.com/bergerheal
     <dependency>
         <groupId>com.bergerkiller.bukkit</groupId>
         <artifactId>BKCommonLib</artifactId>
-        <version>1.19.2-v2</version>
+        <version>1.20.2-v1</version>
         <scope>provided</scope>
     </dependency>
 </dependencies>
@@ -432,7 +432,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.bergerkiller.bukkit:BKCommonLib:1.20.1-v1'
+    compileOnly 'com.bergerkiller.bukkit:BKCommonLib:1.20.2-v1'
 }
 ```
 </details>
