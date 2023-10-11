@@ -13,7 +13,7 @@ class PlayerConnection {
         // Moved to ServerCommonPacketListenerImpl
         #require net.minecraft.server.network.ServerCommonPacketListenerImpl protected final net.minecraft.network.NetworkManager networkManager:connection;
 #elseif version >= 1.17
-        #require PlayerConnection public final net.minecraft.network.NetworkManager networkManager:connection;
+        #require PlayerConnection private final net.minecraft.network.NetworkManager networkManager:connection;
 #else
         #require PlayerConnection public final net.minecraft.network.NetworkManager networkManager;
 #endif
