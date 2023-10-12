@@ -43,12 +43,18 @@ public abstract class PacketPlayOutCustomSoundEffectHandle extends PacketHandle 
     public static final java.util.Random SOUND_RANDOM_SEED_SOURCE = new java.util.Random();
 
     public static PacketPlayOutCustomSoundEffectHandle createNew(com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect> soundEffect, String category, org.bukkit.Location location, float volume, float pitch) {
-        return createNew(soundEffect, category, location.getWorld(), location.getX(), location.getY(), location.getZ(), volume, pitch);
+        return createNew(soundEffect, category, location.getX(), location.getY(), location.getZ(), volume, pitch);
     }
 
-    public static PacketPlayOutCustomSoundEffectHandle createNew(com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect> soundEffect, String category, org.bukkit.World world, double x, double y, double z, float volume, float pitch) {
+    public static PacketPlayOutCustomSoundEffectHandle createNew(com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect> soundEffect, String category, double x, double y, double z, float volume, float pitch) {
         long randomSeed = SOUND_RANDOM_SEED_SOURCE.nextLong();
         return createNew(soundEffect, category, x, y, z, volume, pitch, randomSeed);
+    }
+
+
+    @Deprecated
+    public static PacketPlayOutCustomSoundEffectHandle createNew(com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect> soundEffect, String category, org.bukkit.World world, double x, double y, double z, float volume, float pitch) {
+        return createNew(soundEffect, category, x, y, z, volume, pitch);
     }
     public abstract ResourceKey<SoundEffect> getSound();
     public abstract void setSound(ResourceKey<SoundEffect> value);
