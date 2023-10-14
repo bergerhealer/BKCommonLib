@@ -75,7 +75,9 @@ dependencies {
     // ViaVersion API
     compileOnly(libs.viaversion)
     // Vault hook for special permissions handling
-    compileOnly(libs.vault)
+    compileOnly(libs.vault) {
+        exclude("org.bukkit", "bukkit")
+    }
     // ProtocolLib hook for protocol handling
     compileOnly(libs.protocollib)
 
