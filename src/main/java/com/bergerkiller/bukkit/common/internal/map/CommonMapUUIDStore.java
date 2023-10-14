@@ -86,6 +86,13 @@ public class CommonMapUUIDStore {
     public static UUID getMapUUID(ItemStack item) {
         if (item == null) {
             return null;
+        } else if (!CraftItemStackHandle.T.isAssignableFrom(item)) {
+            if (isMap(item)) {
+                // Turn it into a CraftItemStack so that we can read NBT properly
+                item = ItemUtil.createItem(item);
+            } else {
+                return null;
+            }
         }
         Object nmsItemStack = CraftItemStackHandle.T.handle.raw.get(item);
         if (nmsItemStack == null) {
