@@ -190,28 +190,29 @@ public class MapColorPaletteTest {
             String version = "1_17";
             flat.readFrom(new FileInputStream("misc/map_" + version + "_flat.dat"));
             BufferedImage img = new BufferedImage(4096, 4096, BufferedImage.TYPE_INT_RGB);
+
             {
                 for (int y = 0; y < 4096; y++) {
                     for (int x = 0; x < 4096; x++) {
-                        int r = (x & 0xFF);
+                        int b = (x & 0xFF);
                         int g = (y & 0xFF);
                         int b_1 = ((y >> 8) & 0xF);
                         int b_2 = ((x >> 8) & 0xF);
                         if ((b_2 & 0x1) != 0x0) {
-                            r = 255 - r;
+                            b = 255 - b;
                         }
                         if ((b_1 & 0x1) != 0x0) {
                             g = 255 - g;
                         }
-                        int b = b_2 | (b_1 << 4);
-                        
+                        int r = b_2 | (b_1 << 4);
+
                         byte c = flat.get(r, g, b);
                         Color cc = flat.getColor(c);
                         r = cc.getRed();
                         g = cc.getGreen();
                         b = cc.getBlue();
-                        
-                        int rgb = (r << 0) | (g << 8) | (b << 16);
+
+                        int rgb = (b << 0) | (g << 8) | (r << 16);
                         img.setRGB(x, y, rgb);
                     }
                 }
