@@ -10,6 +10,7 @@ timings = "1.0.4"
 gson = "2.8.9"
 viaversion = "3.2.1"
 vault = "1.7"
+luckperms = "5.4"
 protocollib = "4.4.0"
 cloud = "1.8.4"
 commodore = "1.13"
@@ -32,6 +33,7 @@ timings = { module = "co.aikar:minecraft-timings", version.ref = "timings" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 viaversion = { module = "us.myles:viaversion", version.ref = "viaversion" }
 vault = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
+luckperms = { module = "net.luckperms:api", version.ref = "luckperms" }
 protocollib = { module = "com.comphenix.protocol:ProtocolLib-API", version.ref = "protocollib" }
 cloud-paper = { module = "org.bergerhealer.cloud.commandframework:cloud-paper", version.ref = "cloud" }
 cloud-annotations = { module = "org.bergerhealer.cloud.commandframework:cloud-annotations", version.ref = "cloud" }

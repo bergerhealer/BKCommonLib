@@ -165,7 +165,7 @@ public abstract class PluginBase extends JavaPlugin {
      * @return Permission
      */
     public static Permission getPermission(String path) {
-        return CommonPlugin.getInstance().getPermissionHandler().getPermission(path);
+        return CommonPlugin.getInstance().getPermissionHandler().getOrCreatePermission(path);
     }
 
     /**

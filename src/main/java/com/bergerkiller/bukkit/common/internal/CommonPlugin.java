@@ -33,9 +33,12 @@ import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
 import com.bergerkiller.bukkit.common.internal.map.CommonMapController;
 import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
 import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
+import com.bergerkiller.bukkit.common.internal.permissions.PermissionHandler;
+import com.bergerkiller.bukkit.common.internal.permissions.PermissionHandlerSelector;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.offline.OfflineWorld;
 import com.bergerkiller.bukkit.common.protocol.PlayerGameInfo;
+import com.bergerkiller.bukkit.common.softdependency.SoftDependency;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
@@ -102,7 +105,7 @@ public class CommonPlugin extends PluginBase {
     private boolean isServerStarted = false;
     private PacketHandler packetHandler = null;
     private boolean warnedAboutBrokenBundlePacket = false;
-    private PermissionHandler permissionHandler = null;
+    private final PermissionHandlerSelector permissionHandlerSelector = new PermissionHandlerSelector(this);
     private CommonServerLogRecorder serverLogRecorder = new CommonServerLogRecorder(this);
     private CommonMapController mapController = null;
     private CommonForcedChunkManager forcedChunkManager = null;
@@ -317,7 +320,7 @@ public class CommonPlugin extends PluginBase {
      * @return permission handler
      */
     public PermissionHandler getPermissionHandler() {
-        return permissionHandler;
+        return permissionHandlerSelector.current();
     }
 
     /**
@@ -498,7 +501,6 @@ public class CommonPlugin extends PluginBase {
             packetHandler.removePacketListeners(plugin);
         }
         this.mapController.updateDependency(plugin, pluginName, enabled);
-        this.permissionHandler.updateDependency(plugin, pluginName, enabled);
         if (!this.updatePacketHandler()) {
             this.onCriticalStartupFailure("Critical failure updating the packet handler");
             return;
@@ -731,8 +733,8 @@ public class CommonPlugin extends PluginBase {
         forcedChunkManager = new CommonForcedChunkManager(this, trackForcedChunkCreationStack);
         forcedChunkManager.enable();
 
-        // Initialize permissions
-        permissionHandler = new PermissionHandler();
+        // Initialize permissions based on current state
+        SoftDependency.detectAll(permissionHandlerSelector);
 
         // Initialize event factory
         eventFactory = new CommonEventFactory();

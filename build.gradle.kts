@@ -78,6 +78,7 @@ dependencies {
     compileOnly(libs.vault) {
         exclude("org.bukkit", "bukkit")
     }
+    compileOnly(libs.luckperms)
     // ProtocolLib hook for protocol handling
     compileOnly(libs.protocollib)
 
