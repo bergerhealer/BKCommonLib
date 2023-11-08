@@ -12,6 +12,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
 import java.util.EnumMap;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -40,6 +41,9 @@ class PermissionHandlerLuckPerms5 implements PermissionHandler {
 
     @Override
     public boolean hasPermission(CommandSender sender, String permissionNode) {
+        // Make sure it is lowercased first, as is done in the wildcard fallback code
+        permissionNode = permissionNode.toLowerCase(Locale.ENGLISH);
+
         // If not a Player do the usual stuff.
         // When a permission is defined this can be optimized, as there is no special
         // wildcard handling for the * nodes in that case. It'll already be handled
