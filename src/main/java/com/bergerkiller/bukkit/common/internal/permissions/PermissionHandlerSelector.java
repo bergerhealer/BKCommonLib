@@ -32,8 +32,8 @@ public class PermissionHandlerSelector {
                         return null;
                     }
                 })
-                .whenEnable(this::detect)
-                .whenDisable(this::detect)
+                .whenEnable(this::detectPermOption)
+                .whenDisable(this::detectPermOption)
                 .create();
 
         vaultPermissions = new SoftServiceDependency<net.milkbowl.vault.permission.Permission>(plugin, "net.milkbowl.vault.permission.Permission") {
@@ -44,12 +44,12 @@ public class PermissionHandlerSelector {
 
             @Override
             protected void onEnable() {
-                detect();
+                detectPermOption();
             }
 
             @Override
             protected void onDisable() {
-                detect();
+                detectPermOption();
             }
         };
 
@@ -64,7 +64,7 @@ public class PermissionHandlerSelector {
         return handler;
     }
 
-    private void detect() {
+    private void detectPermOption() {
         for (Option opt : options) {
             if (!opt.active.getAsBoolean()) {
                 continue;
