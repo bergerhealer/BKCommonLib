@@ -254,9 +254,11 @@ public class ChunkUtil {
      */
     public static void setBlockFast(org.bukkit.Chunk chunk, int x, int y, int z, BlockData data) {
         final int secIndex = y >> 4;
-        Object section = ChunkHandle.T.getSectionRaw.invoke(HandleConversion.toChunkHandle(chunk), secIndex);
+        Object chunkHandle = HandleConversion.toChunkHandle(chunk);
+        Object section = ChunkHandle.T.getSectionRaw.invoke(chunkHandle, secIndex);
         if (section != null) {
             ChunkSectionHandle.T.setBlockData.invoke(section, x & 0xf, y & 0xf, z & 0xf, data);
+            ChunkHandle.T.markDirty.invoker.invoke(chunkHandle);
         } else {
             // Slow method, to initialize the empty chunk
             WorldUtil.setBlockData(chunk.getWorld(),
