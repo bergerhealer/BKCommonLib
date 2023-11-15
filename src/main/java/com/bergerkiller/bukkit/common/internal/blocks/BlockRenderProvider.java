@@ -69,6 +69,12 @@ public abstract class BlockRenderProvider {
      * @param resource path within BKCommonLib
      */
     protected void linkResource(ResourceType type, String path, String resource) {
+        if (type == null) {
+            throw new IllegalArgumentException("Input resource type is null");
+        }
+        if (path == null) {
+            throw new IllegalArgumentException("Input path is null");
+        }
         this.resources.put(type.makePath(path), resource);
     }
 
@@ -82,6 +88,12 @@ public abstract class BlockRenderProvider {
      * @return resource, null or exception if not found
      */
     public InputStream openResource(ResourceType type, String path) throws IOException {
+        if (type == null) {
+            throw new IllegalArgumentException("Input resource type is null");
+        }
+        if (path == null) {
+            throw new IllegalArgumentException("Input path is null");
+        }
         if (!this.resources.isEmpty()) {
             String resourcePath = this.resources.get(type.makePath(path));
             if (resourcePath != null) {

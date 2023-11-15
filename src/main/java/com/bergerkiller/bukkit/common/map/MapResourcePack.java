@@ -318,10 +318,14 @@ public class MapResourcePack {
      *  If the model could not be found or failed to be decoded, a placeholder
      *  is returned which can be checked with {@link ModelInfo#isPlaceholder()}
      *
-     * @param path Path to the model
+     * @param path Path to the model. Must not be null.
      * @return the model information
      */
     public ModelInfo getModelInfo(String path) {
+        if (path == null) {
+            throw new IllegalArgumentException("Input path is null");
+        }
+
         // Try cache first, just in case
         // Makes stuff easier
         {
@@ -875,6 +879,13 @@ public class MapResourcePack {
      * @return InputStream to read the file from, null if not found
      */
     protected InputStream openFileStream(ResourceType type, String path) {
+        if (type == null) {
+            throw new IllegalArgumentException("Input resource type is null");
+        }
+        if (path == null) {
+            throw new IllegalArgumentException("Input path is null");
+        }
+
         // Create full path
         String fullPath = type.makePath(path);
 
@@ -897,7 +908,7 @@ public class MapResourcePack {
 
             // Fallback: try the underlying resource pack (usually Vanilla)
             if (this.baseResourcePack != null) {
-                InputStream stream =  this.baseResourcePack.openFileStream(type, path);
+                InputStream stream = this.baseResourcePack.openFileStream(type, path);
                 if (stream != null) {
                     return stream;
                 }
@@ -933,6 +944,12 @@ public class MapResourcePack {
      * @return loaded Gson object, or <i>null</i> if not found or not loadable
      */
     protected final <T> T openGsonObject(Class<T> objectType, ResourceType type, String path) {
+        if (type == null) {
+            throw new IllegalArgumentException("Input resource type is null");
+        }
+        if (path == null) {
+            throw new IllegalArgumentException("Input path is null");
+        }
         return readGsonObject(objectType, this.openFileStream(type, path), path);
     }
 
