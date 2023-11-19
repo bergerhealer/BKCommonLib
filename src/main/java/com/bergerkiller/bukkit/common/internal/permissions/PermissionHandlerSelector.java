@@ -64,7 +64,7 @@ public class PermissionHandlerSelector {
         return handler;
     }
 
-    private void detectPermOption() {
+    public void detectPermOption() {
         for (Option opt : options) {
             if (!opt.active.getAsBoolean()) {
                 continue;

@@ -735,6 +735,7 @@ public class CommonPlugin extends PluginBase {
 
         // Initialize permissions based on current state
         SoftDependency.detectAll(permissionHandlerSelector);
+        permissionHandlerSelector.detectPermOption();
 
         // Initialize event factory
         eventFactory = new CommonEventFactory();
