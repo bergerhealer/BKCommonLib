@@ -1,10 +1,12 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.IdentityHashMap;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import org.bukkit.entity.Entity;
 
@@ -230,15 +232,8 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *     #require io.papermc.paper.configuration.WorldConfiguration WorldConfiguration create_paper_wc:<init>(org.spigotmc.SpigotWorldConfig spigotWC, net.minecraft.resources.MinecraftKey worldKey);
          *     net.minecraft.resources.MinecraftKey worldKey = new net.minecraft.resources.MinecraftKey(dummyWorldName);
          *     io.papermc.paper.configuration.WorldConfiguration paperWorldConfig = #create_paper_wc(spigotConfig, worldKey);
-         * 
-         *     // God this is awful. Is there no better way to initialize defaults?
-         *     paperWorldConfig.entities = new io.papermc.paper.configuration.WorldConfiguration.Entities(paperWorldConfig);
-         *     paperWorldConfig.entities.armorStands = new io.papermc.paper.configuration.WorldConfiguration.Entities.ArmorStands(paperWorldConfig.entities);
-         *     paperWorldConfig.entities.behavior = new io.papermc.paper.configuration.WorldConfiguration.Entities.Behavior(paperWorldConfig.entities);
-         *     paperWorldConfig.entities.behavior.doorBreakingDifficulty = new io.papermc.paper.configuration.WorldConfiguration.Entities.Behavior.DoorBreakingDifficulty(paperWorldConfig.entities.behavior);
-         *     paperWorldConfig.entities.behavior.mobsCanAlwaysPickUpLoot = new io.papermc.paper.configuration.WorldConfiguration.Entities.Behavior.MobsCanAlwaysPickUpLoot(paperWorldConfig.entities.behavior);
-         *     paperWorldConfig.misc = new io.papermc.paper.configuration.WorldConfiguration.Misc(paperWorldConfig);
-         * 
+         *     com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler.initConfigurationPartRecurse(paperWorldConfig);
+         *
          *     worldserver#paperConfig = paperWorldConfig;
          * #elseif fieldexists net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;
          *     #require net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;
