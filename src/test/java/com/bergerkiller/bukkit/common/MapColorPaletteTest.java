@@ -2,8 +2,7 @@ package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
 
-import java.awt.Color;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -14,6 +13,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import com.bergerkiller.bukkit.common.map.util.RGBColorToIntConversion;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -29,6 +29,36 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 
 public class MapColorPaletteTest {
+
+    @Ignore
+    @Test
+    public void benchmark() throws Throwable {
+        // Load image and initialize the palette by running it once
+        Image image = ImageIO.read(new File("misc/map_test_bg.jpg"));
+
+        {
+            BufferedImage temp = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
+            Graphics2D g = temp.createGraphics();
+            g.drawImage(image, 0, 0, null);
+            g.dispose();
+            image = temp;
+        }
+
+        System.out.println(RGBColorToIntConversion.SIMDLoader.getError());
+
+        MapColorPalette.convertImage(image);
+
+        MapDebugWindow.showMapForever(MapTexture.fromImage(image));
+
+        // Time further invocations
+        int count = 10000;
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < count; i++) {
+            MapColorPalette.convertImage(image);
+        }
+        long duration = System.currentTimeMillis() - start;
+        System.out.println("Took: " + (((double) duration) / count) + " ms/op");
+    }
 
     @Ignore
     @Test

@@ -36,6 +36,7 @@ import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
 import com.bergerkiller.bukkit.common.internal.permissions.PermissionHandler;
 import com.bergerkiller.bukkit.common.internal.permissions.PermissionHandlerSelector;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
+import com.bergerkiller.bukkit.common.map.util.RGBColorToIntConversion;
 import com.bergerkiller.bukkit.common.offline.OfflineWorld;
 import com.bergerkiller.bukkit.common.protocol.PlayerGameInfo;
 import com.bergerkiller.bukkit.common.softdependency.SoftDependency;
@@ -716,6 +717,11 @@ public class CommonPlugin extends PluginBase {
         // Do not do this if map displays are disabled.
         if (this.isMapDisplaysEnabled) {
             MapColorPalette.getColor(0, 0, 0);
+
+            // Log a message if java's experimental incubator vector api is used for loading images into map colors
+            if (RGBColorToIntConversion.ABGR.isUsingSIMD()) {
+                getLogger().log(Level.INFO, "JDK17+ incubator vector maths are enabled. Will use it for loading MapDisplay textures.");
+            }
         }
 
         // Initialize NBT early

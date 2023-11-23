@@ -8,7 +8,7 @@ plugins {
 val buildNumber = System.getenv("BUILD_NUMBER") ?: "NO-CI"
 
 group = "com.bergerkiller.bukkit"
-version = "1.20.2-v2"
+version = "1.20.2-v3-SNAPSHOT"
 
 repositories {
     mavenLocal {
@@ -67,6 +67,8 @@ dependencies {
     }
     // GSON isn't available in spigot versions prior to 1.8.1, shade it in order to keep 1.8 compatibility
     internal(libs.gson)
+    // Color conversion helper library, https://github.com/bergerhealer/BKCommonLib-ColorConversionHelper
+    api(libs.colorconversionhelper)
 
     //
     // Optional provided dependencies that BKCommonLib can talk with
@@ -152,6 +154,9 @@ tasks {
         this.testLogging {
             this.showStandardStreams = true
         }
+
+        // Uncomment to enable SIMD optimizations, to test performance of color conversion
+        //jvmArgs("--add-modules", "jdk.incubator.vector");
     }
 
     javadoc {

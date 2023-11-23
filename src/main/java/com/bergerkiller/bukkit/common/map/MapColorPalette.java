@@ -18,6 +18,7 @@ import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.map.color.MCSDBubbleFormat;
 import com.bergerkiller.bukkit.common.map.color.MCSDGenBukkit;
 import com.bergerkiller.bukkit.common.map.color.MapColorSpaceData;
+import com.bergerkiller.bukkit.common.map.util.RGBColorToIntConversion;
 
 /**
  * Additional functionality on top of Bukkit's MapPalette
@@ -284,19 +285,17 @@ public class MapColorPalette {
 
         // Obtain the color conversion type that has to be applied (RGB or BGR?)
         int type = imageBuf.getType();
-        int byteStep = 4;
-        ColorConverterType converterType = null;
+        RGBColorToIntConversion converterType = null;
         if (type == BufferedImage.TYPE_INT_RGB) {
-            converterType = ColorConverterType.RGB;
+            converterType = RGBColorToIntConversion.RGB;
         } else if (type == BufferedImage.TYPE_INT_ARGB) {
-            converterType = ColorConverterType.ARGB;
+            converterType = RGBColorToIntConversion.ARGB;
         } else if (type == BufferedImage.TYPE_INT_BGR) {
-            converterType = ColorConverterType.BGR;
+            converterType = RGBColorToIntConversion.BGR;
         } else if (type == BufferedImage.TYPE_3BYTE_BGR) {
-            converterType = ColorConverterType.BGR;
-            byteStep = 3;
+            converterType = RGBColorToIntConversion.BGR;
         } else if (type == BufferedImage.TYPE_4BYTE_ABGR) {
-            converterType = ColorConverterType.ABGR;
+            converterType = RGBColorToIntConversion.ABGR;
         }
 
         // Incompatible backing buffer or color format; simply use int[] ARGB
@@ -304,21 +303,24 @@ public class MapColorPalette {
             intPixels = new int[width * height];
             bytePixels = null;
             imageBuf.getRGB(0, 0, width, height, intPixels, 0, width);
-            converterType = ColorConverterType.ARGB;
+            converterType = RGBColorToIntConversion.ARGB;
+        }
+
+        // Conversion method
+        RGBColorToIntConversion.RGBToMapColorFunction converter;
+        if (converterType.hasTransparency()) {
+            converter = rgba -> (rgba & 0x80000000) != 0 ? COLOR_MAP_DATA.get(rgba & 0xFFFFFF)
+                                                         : COLOR_TRANSPARENT;
+        } else {
+            converter = COLOR_MAP_DATA::get;
         }
 
         // Perform efficient conversion from RGB int to byte color codes
         byte[] result = new byte[width * height];
         if (bytePixels != null) {
-            int index = 0;
-            for (int i = 0; i < result.length; i++) {
-                result[i] = converterType.convertBytes(bytePixels, index);
-                index += byteStep;
-            }
+            converterType.byteBufferToMapColors(bytePixels, width * height, converter, result);
         } else {
-            for (int i = 0; i < result.length; i++) {
-                result[i] = converterType.convert(intPixels[i]);
-            }
+            converterType.intBufferToMapColors(intPixels, width * height, converter, result);
         }
         return result;
     }
@@ -430,12 +432,13 @@ public class MapColorPalette {
             graphics2D.dispose();
         }
 
+        // Conversion method
+        RGBColorToIntConversion.RGBToMapColorFunction converter = rgba -> (rgba & 0x80000000) != 0
+                ? COLOR_MAP_DATA.get(rgba & 0xFFFFFF) : COLOR_TRANSPARENT;
+
         // Convert back to map colors
         int[] intPixels = ((java.awt.image.DataBufferInt) outputImage.getRaster().getDataBuffer()).getData();
-        ColorConverterType converterType = ColorConverterType.ARGB;
-        for (int i = 0; i < outputLength; i++) {
-            output[i] = converterType.convert(intPixels[i]);
-        }
+        RGBColorToIntConversion.ARGB.intBufferToMapColors(intPixels, outputLength, converter, output);
     }
 
     /**
@@ -495,79 +498,5 @@ public class MapColorPalette {
      */
     public static IndexColorModel getIndexColorModel() {
         return COLOR_INDEX_MODEL;
-    }
-
-    /**
-     * This class is used to convert raw color data into the
-     * map color format without using an int[] buffer in between.
-     * It is used when reading in images.
-     */
-    private static abstract class ColorConverterType {
-        public abstract byte convert(int color);
-        public abstract byte convertBytes(byte[] buffer, int index);
-
-        public static final ColorConverterType RGB = new ColorConverterType() {
-            @Override
-            public byte convert(int color) {
-                return COLOR_MAP_DATA.get(color >> 16, color >> 8, color);
-            }
-
-            @Override
-            public byte convertBytes(byte[] buffer, int index) {
-                return COLOR_MAP_DATA.get(buffer[index], buffer[index + 1], buffer[index + 2]);
-            }
-        };
-
-        public static final ColorConverterType ARGB = new ColorConverterType() {
-            @Override
-            public byte convert(int color) {
-                if ((color & 0x80000000) == 0) {
-                    return COLOR_TRANSPARENT;
-                } else {
-                    return COLOR_MAP_DATA.get(color >> 16, color >> 8, color);
-                }
-            }
-
-            @Override
-            public byte convertBytes(byte[] buffer, int index) {
-                if ((buffer[index] & 0x80) == 0) {
-                    return COLOR_TRANSPARENT;
-                } else {
-                    return COLOR_MAP_DATA.get(buffer[index + 1], buffer[index + 2], buffer[index + 3]);
-                }
-            }
-        };
-
-        public static final ColorConverterType BGR = new ColorConverterType() {
-            @Override
-            public byte convert(int color) {
-                return COLOR_MAP_DATA.get(color, color >> 8, color >> 16);
-            }
-
-            @Override
-            public byte convertBytes(byte[] buffer, int index) {
-                return COLOR_MAP_DATA.get(buffer[index + 2], buffer[index + 1], buffer[index]);
-            }
-        };
-
-        public static final ColorConverterType ABGR = new ColorConverterType() {
-            @Override
-            public byte convert(int color) {
-                if ((color & 0x80000000) == 0) {
-                    return COLOR_TRANSPARENT;
-                } else {
-                    return COLOR_MAP_DATA.get(color, color >> 8, color >> 16);
-                }
-            }
-
-            @Override
-            public byte convertBytes(byte[] buffer, int index) {
-                if ((buffer[index] & 0x80) == 0) {
-                    return COLOR_TRANSPARENT;
-                } else {
-                    return COLOR_MAP_DATA.get(buffer[index + 3], buffer[index + 2], buffer[index + 1]);
-                }
-            }
-        };
     }
 }
