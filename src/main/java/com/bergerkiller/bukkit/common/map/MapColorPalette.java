@@ -306,21 +306,31 @@ public class MapColorPalette {
             converterType = RGBColorToIntConversion.ARGB;
         }
 
-        // Conversion method
-        RGBColorToIntConversion.RGBToMapColorFunction converter;
+        // Decode RGB or RGBA into map colors
+        RGBColorToIntConversion.Decoder decoder;
+        byte[] result = new byte[width * height];
         if (converterType.hasTransparency()) {
-            converter = rgba -> (rgba & 0x80000000) != 0 ? COLOR_MAP_DATA.get(rgba & 0xFFFFFF)
-                                                         : COLOR_TRANSPARENT;
+            decoder = new RGBColorToIntConversion.Decoder(converterType) {
+                @Override
+                public void onPixel(int index, int rgba) {
+                    result[index] = (rgba & 0x80000000) != 0 ? COLOR_MAP_DATA.get(rgba & 0xFFFFFF)
+                                                             : COLOR_TRANSPARENT;
+                }
+            };
         } else {
-            converter = COLOR_MAP_DATA::get;
+            decoder = new RGBColorToIntConversion.Decoder(converterType) {
+                @Override
+                public void onPixel(int index, int rgba) {
+                    result[index] = COLOR_MAP_DATA.get(rgba);
+                }
+            };
         }
 
         // Perform efficient conversion from RGB int to byte color codes
-        byte[] result = new byte[width * height];
         if (bytePixels != null) {
-            converterType.byteBufferToMapColors(bytePixels, width * height, converter, result);
+            decoder.decode(bytePixels, width * height);
         } else {
-            converterType.intBufferToMapColors(intPixels, width * height, converter, result);
+            decoder.decode(intPixels, width * height);
         }
         return result;
     }
@@ -432,13 +442,14 @@ public class MapColorPalette {
             graphics2D.dispose();
         }
 
-        // Conversion method
-        RGBColorToIntConversion.RGBToMapColorFunction converter = rgba -> (rgba & 0x80000000) != 0
-                ? COLOR_MAP_DATA.get(rgba & 0xFFFFFF) : COLOR_TRANSPARENT;
-
         // Convert back to map colors
-        int[] intPixels = ((java.awt.image.DataBufferInt) outputImage.getRaster().getDataBuffer()).getData();
-        RGBColorToIntConversion.ARGB.intBufferToMapColors(intPixels, outputLength, converter, output);
+        new RGBColorToIntConversion.Decoder(RGBColorToIntConversion.ARGB) {
+            @Override
+            public void onPixel(int index, int rgba) {
+                output[index] = (rgba & 0x80000000) != 0 ? COLOR_MAP_DATA.get(rgba & 0xFFFFFF)
+                                                         : COLOR_TRANSPARENT;
+            }
+        }.decode(((java.awt.image.DataBufferInt) outputImage.getRaster().getDataBuffer()).getData(), outputLength);
     }
 
     /**
