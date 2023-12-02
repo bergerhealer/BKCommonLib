@@ -365,7 +365,7 @@ public class CloudSimpleHandler {
             final Class<T> clazz,
             final ParameterInjector<CommandSender, T> injector
     ) {
-        this.annotationParser.getParameterInjectorRegistry().registerInjector(clazz, injector);
+        this.manager.parameterInjectorRegistry().registerInjector(clazz, injector);
     }
 
     /**
