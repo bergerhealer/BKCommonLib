@@ -563,10 +563,36 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * @param path
      * @return list of configuration nodes
      */
-    @SuppressWarnings("unchecked")
     public List<N> getNodeList(String path) {
+        return getNodeList(path, true);
+    }
+
+    /**
+     * Gets a list of nodes at the path specified, creates one if not present.<br>
+     * <br>
+     * If at the path a node is stored rather than a list, then the children of
+     * that node are represented as a List instead, sorted by key names.
+     * No changes will occur to the node structure of the value at the path
+     * while reading these values. When a new value is added to this list,
+     * then the original key names will be replaced with an index incrementing
+     * starting at 1.<br>
+     * <br>
+     * If nothing is yet stored at this path, then a new list is created the first time
+     * a node is added to the list or when {@link #setNodeList(String, List)} is called.
+     * The returned list will be empty in that case.<br>
+     * <br>
+     * <b>Legacy: this will always produce a node with index children rather than a
+     * list of nodes. This will change in the near future.</b>
+     *
+     * @param path
+     * @param createIndexed If no list exists yet, whether to create an indexed (1:, 2:, etc.)
+     *                      List or not. If false, it creates an ordinary node list instead.
+     * @return list of configuration nodes
+     */
+    @SuppressWarnings("unchecked")
+    public List<N> getNodeList(String path, boolean createIndexed) {
         // Obtain the list, filter non-node values from it
-        List<?> list = this.getList(path, true);
+        List<?> list = this.getList(path, createIndexed);
         for (int i = 0; i < list.size(); i++) {
             Object value = list.get(i);
             if (!(value instanceof YamlNodeAbstract) || value instanceof YamlListNode) {
