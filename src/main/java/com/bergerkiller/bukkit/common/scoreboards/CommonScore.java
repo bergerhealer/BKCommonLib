@@ -1,9 +1,8 @@
 package com.bergerkiller.bukkit.common.scoreboards;
 
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
-import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundResetScorePacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardScoreHandle;
 
 public class CommonScore {
 
@@ -53,12 +52,7 @@ public class CommonScore {
         if (!this.created) {
             return;
         }
-        CommonPacket packet = new CommonPacket(PacketType.OUT_SCOREBOARD_SCORE);
-        packet.write(PacketType.OUT_SCOREBOARD_SCORE.name, this.name);
-        packet.write(PacketType.OUT_SCOREBOARD_SCORE.objName, this.objName);
-        packet.write(PacketType.OUT_SCOREBOARD_SCORE.value, this.value);
-        packet.write(PacketType.OUT_SCOREBOARD_SCORE.action, ScoreboardAction.CHANGE);
-        PacketUtil.sendPacket(scoreboard.getPlayer(), packet);
+        PacketUtil.sendPacket(scoreboard.getPlayer(), PacketPlayOutScoreboardScoreHandle.createNew(name, objName, value));
     }
 
     /**
@@ -79,10 +73,7 @@ public class CommonScore {
         if (!this.created) {
             return;
         }
-        CommonPacket packet = new CommonPacket(PacketType.OUT_SCOREBOARD_SCORE);
-        packet.write(PacketType.OUT_SCOREBOARD_SCORE.name, this.name);
-        packet.write(PacketType.OUT_SCOREBOARD_SCORE.action, ScoreboardAction.REMOVE);
-        PacketUtil.sendPacket(scoreboard.getPlayer(), packet);
+        PacketUtil.sendPacket(scoreboard.getPlayer(), ClientboundResetScorePacketHandle.createNew(name, objName));
         this.created = false;
     }
 

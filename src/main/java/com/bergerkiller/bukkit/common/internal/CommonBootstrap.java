@@ -747,6 +747,10 @@ public class CommonBootstrap {
 
         // 1.20.3 mappings
         if (evaluateMCVersion(">=", "1.20.3")) {
+
+        } else {
+            // Before 1.20.3 the score reset was handled by the PacketPlayOutScoreboardScore with an 'action' field
+            remappings.put("net.minecraft.network.protocol.game.ClientboundResetScorePacket", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore");
         }
 
         // There have been various locations where starlight was installed

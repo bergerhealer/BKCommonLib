@@ -41,7 +41,6 @@ import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
-import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.generated.net.minecraft.EnumChatFormatHandle;
 import com.bergerkiller.generated.net.minecraft.core.BaseBlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
@@ -405,11 +404,6 @@ public class WrapperConversion {
     @ConverterMethod(input="net.minecraft.util.IntHashMap<?>")
     public static IntHashMap<Object> toRawIntHashMap(Object nmsIntHashMapHandle) {
         return new IntHashMap<Object>(nmsIntHashMapHandle);
-    }
-
-    @ConverterMethod(input="net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore.EnumScoreboardAction")
-    public static ScoreboardAction toScoreboardAction(Object nmsEnumScoreboardActionHandle) {
-        return ScoreboardAction.fromHandle(nmsEnumScoreboardActionHandle);
     }
 
     @ConverterMethod(input="net.minecraft.world.level.block.state.IBlockData")

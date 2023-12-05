@@ -13,6 +13,8 @@ import org.bukkit.scoreboard.DisplaySlot;
 
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundResetScorePacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardScoreHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeamHandle;
 
@@ -345,22 +347,60 @@ class PacketPlayOutScoreboardTeam extends Packet {
 #endif
 }
 
+// Note: same as PacketPlayOutScoreboardScore on MC 1.20.2 and before
+// It uses an 'action' field to change which type of packet is represented
+class ClientboundResetScorePacket extends Packet {
+#if version >= 1.17
+    private String name:owner;
+    private String objName:objectiveName;
+#else
+    private String name:a;
+    private String objName:b;
+#endif
+
+    public static (ClientboundResetScorePacketHandle) ClientboundResetScorePacket createNew(String name, String objectiveName) {
+#if version >= 1.20.3
+        return new ClientboundResetScorePacket(name, objectiveName);
+#elseif version >= 1.13
+        return new ClientboundResetScorePacket(PacketPlayOutScoreboardScore$EnumScoreboardAction.REMOVE, objectiveName, name, 0);
+#else
+        ClientboundResetScorePacket packet = new ClientboundResetScorePacket(name);
+        #require ClientboundResetScorePacket private String objName:b;
+        packet#objName = objectiveName;
+        return packet;
+#endif
+    }
+}
+
 class PacketPlayOutScoreboardScore extends Packet {
 #if version >= 1.17
     private String name:owner;
     private String objName:objectiveName;
     private int value:score;
-    private (com.bergerkiller.bukkit.common.wrappers.ScoreboardAction) PacketPlayOutScoreboardScore.EnumScoreboardAction action:method;
 #else
     private String name:a;
     private String objName:b;
     private int value:c;
-    private (com.bergerkiller.bukkit.common.wrappers.ScoreboardAction) PacketPlayOutScoreboardScore.EnumScoreboardAction action:d;
 #endif
 
-    class PacketPlayOutScoreboardScore.EnumScoreboardAction {
-        enum (EnumScoreboardActionHandle) PacketPlayOutScoreboardScore.EnumScoreboardAction CHANGE;
-        enum (EnumScoreboardActionHandle) PacketPlayOutScoreboardScore.EnumScoreboardAction REMOVE;
+    public static (PacketPlayOutScoreboardScoreHandle) PacketPlayOutScoreboardScore createNew(String name, String objectiveName, int score) {
+#if version >= 1.20.3
+        //TODO: Display and number format
+        return new PacketPlayOutScoreboardScore(name, objectiveName, score, null, null);
+#elseif version >= 1.13
+        return new PacketPlayOutScoreboardScore(PacketPlayOutScoreboardScore$EnumScoreboardAction.CHANGE, objectiveName, name, score);
+#else
+        PacketPlayOutScoreboardScore packet = new PacketPlayOutScoreboardScore();
+        #require PacketPlayOutScoreboardScore private String scorePacketName:a;
+        #require PacketPlayOutScoreboardScore private String scorePacketObjName:b;
+        #require PacketPlayOutScoreboardScore private int scorePacketValue:c;
+        #require PacketPlayOutScoreboardScore private PacketPlayOutScoreboardScore.EnumScoreboardAction scorePacketAction:d;
+        packet#scorePacketName = name;
+        packet#scorePacketObjName = objectiveName;
+        packet#scorePacketValue = score;
+        packet#scorePacketAction = PacketPlayOutScoreboardScore$EnumScoreboardAction.CHANGE;
+        return packet;
+#endif
     }
 }
 

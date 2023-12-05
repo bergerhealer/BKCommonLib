@@ -1,7 +1,6 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -46,7 +45,6 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
-import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.WindowType;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.*;
@@ -1249,6 +1247,8 @@ public class NMSPacketClasses {
         public final FieldAccessor<Float> knockbackY = PacketPlayOutExplosionHandle.T.knockbackY.toFieldAccessor();
         public final FieldAccessor<Float> knockbackZ = PacketPlayOutExplosionHandle.T.knockbackZ.toFieldAccessor();
 
+        // Pain in the ass API with loads of parameters. Needs builder API honestly.
+        /*
         public CommonPacket newInstance(double x, double y, double z, float radius) {
             return newInstance(x, y, z, radius, Collections.emptyList());
         }
@@ -1260,6 +1260,7 @@ public class NMSPacketClasses {
         public CommonPacket newInstance(double x, double y, double z, float power, List<IntVector3> blocks, Vector knockback) {
             return PacketPlayOutExplosionHandle.createNew(x, y, z, power, blocks, knockback).toCommonPacket();
         }
+         */
     }
     
     public static class NMSPacketPlayOutGameStateChange extends NMSPacket {
@@ -1682,12 +1683,22 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> action = PacketPlayOutScoreboardObjectiveHandle.T.action.toFieldAccessor();
     }
 
+    public static class NMSClientboundResetScorePacket extends NMSPacket {
+
+        public static CommonPacket createNew(String name, String objectiveName) {
+            return ClientboundResetScorePacketHandle.createNew(name, objectiveName).toCommonPacket();
+        }
+    }
+
     public static class NMSPacketPlayOutScoreboardScore extends NMSPacket {
 
         public final FieldAccessor<String> name = PacketPlayOutScoreboardScoreHandle.T.name.toFieldAccessor();
         public final FieldAccessor<String> objName = PacketPlayOutScoreboardScoreHandle.T.objName.toFieldAccessor();
         public final FieldAccessor<Integer> value = PacketPlayOutScoreboardScoreHandle.T.value.toFieldAccessor();
-        public final FieldAccessor<ScoreboardAction> action = PacketPlayOutScoreboardScoreHandle.T.action.toFieldAccessor();
+
+        public static CommonPacket createNew(String name, String objectiveName, int value) {
+            return PacketPlayOutScoreboardScoreHandle.createNew(name, objectiveName, value).toCommonPacket();
+        }
     }
 
     /**

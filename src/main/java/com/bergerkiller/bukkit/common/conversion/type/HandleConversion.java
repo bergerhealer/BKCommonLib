@@ -41,7 +41,6 @@ import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
-import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.generated.net.minecraft.EnumChatFormatHandle;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.core.NonNullListHandle;
@@ -314,11 +313,6 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.world.EnumDifficulty")
     public static Object toEnumDifficultyHandle(Difficulty difficulty) {
         return EnumDifficultyHandle.T.getById.raw.invoke(difficulty.getValue());
-    }
-
-    @ConverterMethod(output="net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore.EnumScoreboardAction")
-    public static Object toEnumScoreboardActionHandle(ScoreboardAction action) {
-        return action.getHandle();
     }
 
     @ConverterMethod(output="net.minecraft.world.level.chunk.ChunkSection")
