@@ -2727,7 +2727,8 @@ class PacketPlayOutExplosion extends Packet {
     private float knockbackZ:h;
 #endif
 
-    public (PacketPlayOutExplosionHandle) PacketPlayOutExplosion(double x, double y, double z, float power, (List<IntVector3>) List<BlockPosition> blocks, (org.bukkit.util.Vector) Vec3D knockback);
+    // This API Is too annoying to maintain.
+    //public (PacketPlayOutExplosionHandle) PacketPlayOutExplosion(double x, double y, double z, float power, (List<IntVector3>) List<BlockPosition> blocks, (org.bukkit.util.Vector) Vec3D knockback);
 }
 
 class PacketPlayOutEntityEffect extends Packet {

@@ -3,7 +3,6 @@ package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
-import org.bukkit.util.Vector;
 import java.util.List;
 
 /**
@@ -19,10 +18,6 @@ public abstract class PacketPlayOutExplosionHandle extends PacketHandle {
 
     public static PacketPlayOutExplosionHandle createHandle(Object handleInstance) {
         return T.createHandle(handleInstance);
-    }
-
-    public static final PacketPlayOutExplosionHandle createNew(double x, double y, double z, float power, List<IntVector3> blocks, Vector knockback) {
-        return T.constr_x_y_z_power_blocks_knockback.newInstanceVA(x, y, z, power, blocks, knockback);
     }
 
     /* ============================================================================== */
@@ -48,8 +43,6 @@ public abstract class PacketPlayOutExplosionHandle extends PacketHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutExplosionClass extends Template.Class<PacketPlayOutExplosionHandle> {
-        public final Template.Constructor.Converted<PacketPlayOutExplosionHandle> constr_x_y_z_power_blocks_knockback = new Template.Constructor.Converted<PacketPlayOutExplosionHandle>();
-
         public final Template.Field.Double x = new Template.Field.Double();
         public final Template.Field.Double y = new Template.Field.Double();
         public final Template.Field.Double z = new Template.Field.Double();
