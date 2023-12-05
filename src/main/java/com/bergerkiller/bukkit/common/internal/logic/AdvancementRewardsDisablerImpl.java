@@ -11,6 +11,9 @@ import org.bukkit.advancement.Advancement;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -36,8 +39,19 @@ class AdvancementRewardsDisablerImpl extends AdvancementRewardsDisabler {
             throw new IllegalStateException("CustomFunction type not found");
         }
 
-        // Find the get() function of CustomFunction.a
-        overridedMethods = ReflectionUtil.getAllMethods(AdvancementRewardsHandle.getNoneFunction().getClass())
+        // Find class of function. Unwrap optional on 1.20.3+
+        Class<?> functionType;
+        {
+            Object noneFunction = AdvancementRewardsHandle.getNoneFunction();
+            if (noneFunction instanceof Optional) {
+                functionType = ((Optional<Object>) noneFunction).get().getClass();
+            } else {
+                functionType = noneFunction.getClass();
+            }
+        }
+
+        // Find the get() function of CustomFunction.a / CacheableFunction
+        overridedMethods = ReflectionUtil.getAllMethods(functionType)
                 .filter(m -> {
                     int mod = m.getModifiers();
                     return !Modifier.isPrivate(mod) && !Modifier.isStatic(mod) && !Modifier.isFinal(mod);
@@ -89,8 +103,8 @@ class AdvancementRewardsDisablerImpl extends AdvancementRewardsDisabler {
         // Install the hooked function and reset all rewards
         rewards.setFunction((new AwardInterceptor(previous)).hook(AdvancementRewardsHandle.getNoneFunction()));
         rewards.setExperience(0);
-        rewards.setLoot(new MinecraftKeyHandle[0]);
-        rewards.setRecipes(new MinecraftKeyHandle[0]);
+        rewards.setLoot(Collections.emptyList());
+        rewards.setRecipes(Collections.emptyList());
     }
 
     /**
@@ -99,8 +113,8 @@ class AdvancementRewardsDisablerImpl extends AdvancementRewardsDisabler {
     private static class PreviousRewards {
         public final AdvancementRewardsHandle liveRewards;
         public final int experience;
-        public final MinecraftKeyHandle[] loot;
-        public final MinecraftKeyHandle[] recipes;
+        public final List<MinecraftKeyHandle> loot;
+        public final List<MinecraftKeyHandle> recipes;
         public final Object function;
 
         public PreviousRewards(AdvancementRewardsHandle rewards) {
@@ -113,9 +127,9 @@ class AdvancementRewardsDisablerImpl extends AdvancementRewardsDisabler {
 
         public boolean isNone() {
             return experience == 0 &&
-                    loot.length == 0 &&
-                    recipes.length == 0 &&
-                    function == AdvancementRewardsHandle.getNoneFunction();
+                    loot.isEmpty() &&
+                    recipes.isEmpty() &&
+                    AdvancementRewardsHandle.isNoneFunction(function);
         }
 
         public void reset() {
@@ -140,6 +154,15 @@ class AdvancementRewardsDisablerImpl extends AdvancementRewardsDisabler {
                 return new AwardInterceptorCallback(method);
             }
             return null;
+        }
+
+        @Override
+        public Object hook(Object o) {
+            if (o instanceof Optional) {
+                return Optional.of(super.hook((Optional) o).get());
+            } else {
+                return super.hook(o);
+            }
         }
     }
 

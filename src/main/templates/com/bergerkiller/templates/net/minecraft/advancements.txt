@@ -8,20 +8,40 @@ import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 
 // Since Minecraft 1.12
 optional class AdvancementRewards {
-#if version >= 1.17
+
+#if version >= 1.20.3
     private final int experience;
-    private final (MinecraftKeyHandle[]) MinecraftKey[] loot;
-    private final (MinecraftKeyHandle[]) MinecraftKey[] recipes;
+    private final (List<MinecraftKeyHandle>) List<MinecraftKey> loot;
+    private final (List<MinecraftKeyHandle>) List<MinecraftKey> recipes;
+    private final (Object) java.util.Optional<net.minecraft.commands.CacheableFunction> function;
+#elseif version >= 1.17
+    private final int experience;
+    private final (List<MinecraftKeyHandle>) MinecraftKey[] loot;
+    private final (List<MinecraftKeyHandle>) MinecraftKey[] recipes;
     private final (Object) CustomFunction.a function;
 #else
     private final int experience:b;
-    private final (MinecraftKeyHandle[]) MinecraftKey[] loot:c;
-    private final (MinecraftKeyHandle[]) MinecraftKey[] recipes:d;
+    private final (List<MinecraftKeyHandle>) MinecraftKey[] loot:c;
+    private final (List<MinecraftKeyHandle>) MinecraftKey[] recipes:d;
     private final (Object) CustomFunction.a function:e;
 #endif
 
-    public static (Object) CustomFunction.a getNoneFunction() {
-#if version >= 1.17
+    public static boolean isNoneFunction(Object function) {
+#if version >= 1.20.3
+        return !((java.util.Optional) function).isPresent();
+#elseif version >= 1.17
+        return function == net.minecraft.commands.CustomFunction$a.NONE;
+#else
+        return function == net.minecraft.commands.CustomFunction$a.a;
+#endif
+    }
+
+    public static Object getNoneFunction() {
+#if version >= 1.20.3
+        // Note: Must return a valid CachableFunction instance, because we want to override a method in it
+        //       Normally it would just be an empty Optional...
+        return java.util.Optional.of(new net.minecraft.commands.CacheableFunction((MinecraftKey) null));
+#elseif version >= 1.17
         return net.minecraft.commands.CustomFunction$a.NONE;
 #else
         return net.minecraft.commands.CustomFunction$a.a;
