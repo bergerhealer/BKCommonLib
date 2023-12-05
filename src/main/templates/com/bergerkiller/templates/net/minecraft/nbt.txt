@@ -836,7 +836,13 @@ class NBTCompressedStreamTools {
     }
 
     // Compressed tag compound
+  #if version >= 1.20.3
+    public static (NBTTagCompoundHandle) NBTTagCompound compressed_readTagCompound(java.io.InputStream inputstream) {
+        return NBTCompressedStreamTools.readCompressed(inputstream, NBTReadLimiter.unlimitedHeap());
+    }
+  #else
     public static (NBTTagCompoundHandle) NBTTagCompound compressed_readTagCompound:readCompressed(java.io.InputStream inputstream);
+  #endif
     public static void compressed_writeTagCompound:writeCompressed((NBTTagCompoundHandle) NBTTagCompound nbttagcompound, java.io.OutputStream outputstream);
 #else
     // Uncompressed tag
