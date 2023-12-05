@@ -65,9 +65,17 @@ class IChatBaseComponent {
             }
             return key;
   #endif
+
+  #if version >= 1.20.3
+        } else if (contents != null && contents != net.minecraft.network.chat.CommonComponents.EMPTY) {
+            // Unsupported / dont care
+            return contents.toString();
+  #else
         } else if (contents != null && contents != net.minecraft.network.chat.ComponentContents.EMPTY) {
             // Unsupported / dont care
             return contents.toString();
+  #endif
+
         } else {
             return "";
         }

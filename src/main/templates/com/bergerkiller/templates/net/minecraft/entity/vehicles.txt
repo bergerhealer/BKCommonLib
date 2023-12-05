@@ -23,8 +23,26 @@ class EntityBoat extends Entity {
     </code>
 }
 
+// Since 1.20.3. Same data watcher fields as EntityMinecartAbstract.
+optional class VehicleEntity extends Entity {
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:DATA_ID_HURT;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:DATA_ID_HURTDIR;
+    private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:DATA_ID_DAMAGE;
+}
+
 class EntityMinecartAbstract extends Entity {
-#if version >= 1.17
+#if version >= 1.20.3
+    // Note: hurt/hurtdir/damage have been moved to parent class "VehicleEntity"
+    //       it's a bit of a mess with backwards compatibility unfortunately
+    //       we cope...
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:###;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:###;
+    private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:###;
+
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_TYPE:DATA_ID_DISPLAY_BLOCK;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_OFFSET:DATA_ID_DISPLAY_OFFSET;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_BLOCK_VISIBLE:DATA_ID_CUSTOM_DISPLAY;
+#elseif version >= 1.17
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:DATA_ID_HURT;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:DATA_ID_HURTDIR;
     private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:DATA_ID_DAMAGE;
@@ -55,9 +73,22 @@ class EntityMinecartAbstract extends Entity {
 #endif
 
     <code>
-    public static final Key<Integer> DATA_SHAKING_FACTOR = Key.Type.INTEGER.createKey(T.DATA_SHAKING_FACTOR, 17);
-    public static final Key<Integer> DATA_SHAKING_DIRECTION = Key.Type.INTEGER.createKey(T.DATA_SHAKING_DIRECTION, 18);
-    public static final Key<Float> DATA_SHAKING_DAMAGE = Key.Type.FLOAT.createKey(T.DATA_SHAKING_DAMAGE, 19);
+    public static final Key<Integer> DATA_SHAKING_FACTOR;
+    public static final Key<Integer> DATA_SHAKING_DIRECTION;
+    public static final Key<Float> DATA_SHAKING_DAMAGE;
+
+    static {
+        if (VehicleEntityHandle.T.isAvailable()) {
+            DATA_SHAKING_FACTOR = Key.Type.INTEGER.createKey(VehicleEntityHandle.T.DATA_SHAKING_FACTOR, -1);
+            DATA_SHAKING_DIRECTION = Key.Type.INTEGER.createKey(VehicleEntityHandle.T.DATA_SHAKING_DIRECTION, -1);
+            DATA_SHAKING_DAMAGE = Key.Type.FLOAT.createKey(VehicleEntityHandle.T.DATA_SHAKING_DAMAGE, -1);
+        } else {
+            DATA_SHAKING_FACTOR = Key.Type.INTEGER.createKey(T.DATA_SHAKING_FACTOR, 17);
+            DATA_SHAKING_DIRECTION = Key.Type.INTEGER.createKey(T.DATA_SHAKING_DIRECTION, 18);
+            DATA_SHAKING_DAMAGE = Key.Type.FLOAT.createKey(T.DATA_SHAKING_DAMAGE, 19);
+        }
+    }
+
     public static final Key<Integer> DATA_BLOCK_TYPE = Key.Type.INTEGER.createKey(T.DATA_BLOCK_TYPE, 20);
     public static final Key<Integer> DATA_BLOCK_OFFSET = Key.Type.INTEGER.createKey(T.DATA_BLOCK_OFFSET, 21);
     public static final Key<Boolean> DATA_BLOCK_VISIBLE = Key.Type.BOOLEAN.createKey(T.DATA_BLOCK_VISIBLE, 22);

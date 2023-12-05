@@ -26,9 +26,22 @@ public abstract class EntityMinecartAbstractHandle extends EntityHandle {
     public abstract int getHurtTime();
     public abstract void activate(int x, int y, int z, boolean active);
 
-    public static final Key<Integer> DATA_SHAKING_FACTOR = Key.Type.INTEGER.createKey(T.DATA_SHAKING_FACTOR, 17);
-    public static final Key<Integer> DATA_SHAKING_DIRECTION = Key.Type.INTEGER.createKey(T.DATA_SHAKING_DIRECTION, 18);
-    public static final Key<Float> DATA_SHAKING_DAMAGE = Key.Type.FLOAT.createKey(T.DATA_SHAKING_DAMAGE, 19);
+    public static final Key<Integer> DATA_SHAKING_FACTOR;
+    public static final Key<Integer> DATA_SHAKING_DIRECTION;
+    public static final Key<Float> DATA_SHAKING_DAMAGE;
+
+    static {
+        if (VehicleEntityHandle.T.isAvailable()) {
+            DATA_SHAKING_FACTOR = Key.Type.INTEGER.createKey(VehicleEntityHandle.T.DATA_SHAKING_FACTOR, -1);
+            DATA_SHAKING_DIRECTION = Key.Type.INTEGER.createKey(VehicleEntityHandle.T.DATA_SHAKING_DIRECTION, -1);
+            DATA_SHAKING_DAMAGE = Key.Type.FLOAT.createKey(VehicleEntityHandle.T.DATA_SHAKING_DAMAGE, -1);
+        } else {
+            DATA_SHAKING_FACTOR = Key.Type.INTEGER.createKey(T.DATA_SHAKING_FACTOR, 17);
+            DATA_SHAKING_DIRECTION = Key.Type.INTEGER.createKey(T.DATA_SHAKING_DIRECTION, 18);
+            DATA_SHAKING_DAMAGE = Key.Type.FLOAT.createKey(T.DATA_SHAKING_DAMAGE, 19);
+        }
+    }
+
     public static final Key<Integer> DATA_BLOCK_TYPE = Key.Type.INTEGER.createKey(T.DATA_BLOCK_TYPE, 20);
     public static final Key<Integer> DATA_BLOCK_OFFSET = Key.Type.INTEGER.createKey(T.DATA_BLOCK_OFFSET, 21);
     public static final Key<Boolean> DATA_BLOCK_VISIBLE = Key.Type.BOOLEAN.createKey(T.DATA_BLOCK_VISIBLE, 22);
