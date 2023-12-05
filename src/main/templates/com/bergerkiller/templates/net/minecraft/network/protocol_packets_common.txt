@@ -85,7 +85,9 @@ class ServerboundResourcePackPacket extends Packet {
 #endif
 }
 
-class ClientboundResourcePackPacket extends Packet {
+// Note: on 1.20.2 and before, this same packet SETS a resource pack, and doesn't support
+//       pushing multiple resource packs. Everything else is identical.
+class ClientboundResourcePackPushPacket extends Packet {
 #if version >= 1.17
     private final String url;
     private final String hash;
@@ -95,8 +97,8 @@ class ClientboundResourcePackPacket extends Packet {
 #endif
 
 #if version >= 1.17
-    #require net.minecraft.network.protocol.common.ClientboundResourcePackPacket private final boolean required;
-    #require net.minecraft.network.protocol.common.ClientboundResourcePackPacket private final IChatBaseComponent prompt;
+    #require net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket private final boolean required;
+    #require net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket private final IChatBaseComponent prompt;
 
     public void setRequired(boolean required) {
         instance#required = required;
@@ -128,6 +130,19 @@ class ClientboundResourcePackPacket extends Packet {
         return null;
     }
 #endif
+
+#if version >= 1.20.3
+    public java.util.UUID getId:id();
+#else
+    public java.util.UUID getId() {
+        return null; // Unsupported
+    }
+#endif
+}
+
+// Since Minecraft 1.20.3
+optional class ClientboundResourcePackPopPacket {
+    public java.util.Optional<java.util.UUID> getId:id();
 }
 
 class ClientboundCustomPayloadPacket extends Packet {

@@ -698,6 +698,13 @@ public class CommonBootstrap {
             // The Named spawn packet was removed and the normal spawn packet can now be used
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn", "net.minecraft.network.protocol.game.PacketPlayOutSpawnEntity");
 
+            // Since 1.20.3 resource packs can be loaded and unloaded ('pushed and popped')
+            // For easier compatibility, the 'push' packet handle handles the legacy "set resourcepack" packet, too
+            // It emulates a non-existent UUID
+            if (evaluateMCVersion("<", "1.20.3")) {
+                remappings.put("net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket", "net.minecraft.network.protocol.common.ClientboundResourcePackPacket");
+            }
+
             // De-obfuscate a ClientboundCustomPayloadPacket implementation used when sending messages using Bukkit API
             // Spigot devs made this an anonymous Class which is highly annoying if you want to send it yourself
             Class<?> customPayloadType = null;
@@ -732,10 +739,14 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.network.protocol.common.ClientboundKeepAlivePacket", "net.minecraft.network.protocol.game.PacketPlayOutKeepAlive");
             remappings.put("net.minecraft.network.protocol.common.ServerboundResourcePackPacket", "net.minecraft.network.protocol.game.PacketPlayInResourcePackStatus");
             remappings.put("net.minecraft.network.protocol.common.ServerboundResourcePackPacket$EnumResourcePackStatus", "net.minecraft.network.protocol.game.PacketPlayInResourcePackStatus$EnumResourcePackStatus");
-            remappings.put("net.minecraft.network.protocol.common.ClientboundResourcePackPacket", "net.minecraft.network.protocol.game.PacketPlayOutResourcePackSend");
+            remappings.put("net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket", "net.minecraft.network.protocol.game.PacketPlayOutResourcePackSend");
             remappings.put("net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket", "net.minecraft.network.protocol.game.PacketPlayOutCustomPayload");
             remappings.put("net.minecraft.network.protocol.common.ClientboundDisconnectPacket", "net.minecraft.network.protocol.game.PacketPlayOutKickDisconnect");
             remappings.put("net.minecraft.network.protocol.common.ServerboundClientInformationPacket", "net.minecraft.network.protocol.game.PacketPlayInSettings");
+        }
+
+        // 1.20.3 mappings
+        if (evaluateMCVersion(">=", "1.20.3")) {
         }
 
         // There have been various locations where starlight was installed

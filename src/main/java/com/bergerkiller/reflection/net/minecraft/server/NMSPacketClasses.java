@@ -1605,13 +1605,20 @@ public class NMSPacketClasses {
     }
 
     /**
-     * @deprecated Use ClientboundResourcePackPacketHandle instead
+     * @deprecated Use ClientboundResourcePackPushPacket instead
      */
     @Deprecated
-    public static class NMSClientboundResourcePackPacket extends NMSPacket {
+    public static class NMSClientboundResourcePackPushPacket extends NMSPacket {
 
-        public final FieldAccessor<String> name = ClientboundResourcePackPacketHandle.T.url.toFieldAccessor();
-        public final FieldAccessor<String> hash = ClientboundResourcePackPacketHandle.T.hash.toFieldAccessor();
+        public final FieldAccessor<String> name = ClientboundResourcePackPushPacketHandle.T.url.toFieldAccessor();
+        public final FieldAccessor<String> hash = ClientboundResourcePackPushPacketHandle.T.hash.toFieldAccessor();
+    }
+
+    /**
+     * @deprecated Use ClientboundResourcePackPopPacket instead
+     */
+    @Deprecated
+    public static class NMSClientboundResourcePackPopPacket extends NMSPacket {
     }
 
     public static class NMSPacketPlayOutRespawn extends NMSPacket {

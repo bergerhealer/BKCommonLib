@@ -88,7 +88,8 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayOutBoss OUT_BOSS = new NMSPacketPlayOutBoss();
     public static final NMSPacketPlayOutCamera OUT_CAMERA = new NMSPacketPlayOutCamera();
     public static final NMSPacketPlayOutCustomSoundEffect OUT_CUSTOM_SOUND_EFFECT = new NMSPacketPlayOutCustomSoundEffect();
-    public static final NMSClientboundResourcePackPacket OUT_RESOURCE_PACK_SEND = new NMSClientboundResourcePackPacket();
+    public static final NMSClientboundResourcePackPushPacket OUT_RESOURCE_PACK_PUSH = new NMSClientboundResourcePackPushPacket();
+    public static final NMSClientboundResourcePackPopPacket OUT_RESOURCE_PACK_POP = new NMSClientboundResourcePackPopPacket();
     public static final NMSPacketPlayOutServerDifficulty OUT_SERVER_DIFFICULTY = new NMSPacketPlayOutServerDifficulty();
     public static final NMSPacketPlayOutSetCooldown OUT_SET_COOLDOWN = new NMSPacketPlayOutSetCooldown();
     public static final NMSPacketPlayOutUnloadChunk OUT_UNLOAD_CHUNK = new NMSPacketPlayOutUnloadChunk();
