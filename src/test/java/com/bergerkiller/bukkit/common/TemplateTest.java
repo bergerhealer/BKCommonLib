@@ -458,6 +458,8 @@ public class TemplateTest {
 
     @Test
     public void testGenerateBukkitClassMapping() {
+        CommonBootstrap.initCommonServerAssertCompatibility();
+
         SpigotMappings mappings = new SpigotMappings();
         File mappingsFile = new File("src/main/resources/com/bergerkiller/bukkit/common/internal/resources/class_mappings.dat");
         if (mappingsFile.exists()) {

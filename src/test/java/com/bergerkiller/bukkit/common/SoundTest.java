@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import org.bukkit.Material;
 import org.junit.Test;
 
@@ -34,7 +35,7 @@ public class SoundTest {
     @Test
     public void testBlockStepSound() {
         assertTrue(SoundEffectTypeHandle.T.isAvailable());
-        ResourceKey<SoundEffect> stepName = BlockData.fromMaterial(Material.GRASS).getStepSound();
+        ResourceKey<SoundEffect> stepName = BlockData.fromMaterial(MaterialUtil.getFirst("GRASS_BLOCK", "GRASS", "LEGACY_GRASS")).getStepSound();
         if (CommonCapabilities.KEYED_EFFECTS) {
             assertEquals("minecraft:block.grass.step", stepName.getPath());
         } else {
@@ -45,7 +46,7 @@ public class SoundTest {
     @Test
     public void testBlockPlaceSound() {
         assertTrue(SoundEffectTypeHandle.T.isAvailable());
-        ResourceKey<SoundEffect> stepName = BlockData.fromMaterial(Material.GRASS).getPlaceSound();
+        ResourceKey<SoundEffect> stepName = BlockData.fromMaterial(MaterialUtil.getFirst("GRASS_BLOCK", "GRASS", "LEGACY_GRASS")).getPlaceSound();
         if (CommonCapabilities.KEYED_EFFECTS) {
             assertEquals("minecraft:block.grass.place", stepName.getPath());
         } else {

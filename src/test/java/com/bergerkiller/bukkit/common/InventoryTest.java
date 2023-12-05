@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.junit.Test;
@@ -29,7 +30,7 @@ public class InventoryTest {
 
     @Test
     public void testItemStackConversion() {
-        ItemStack item = new ItemStack(Material.GRASS, 1);
+        ItemStack item = new ItemStack(MaterialUtil.getFirst("GRASS_BLOCK", "GRASS", "LEGACY_GRASS"), 1);
         Object nmsHandle = HandleConversion.toItemStackHandle(item);
         assertNotNull(nmsHandle);
         ItemStack itemBackConv = WrapperConversion.toItemStack(nmsHandle);
@@ -56,7 +57,7 @@ public class InventoryTest {
             assertTrue(ItemStackHandle.EMPTY_ITEM.equals(handle.getItem(i)));
         }
 
-        ItemStack testItem1 = new ItemStack(Material.GRASS, 1);
+        ItemStack testItem1 = new ItemStack(MaterialUtil.getFirst("GRASS_BLOCK", "GRASS", "LEGACY_GRASS"), 1);
         inventory.setItem(2, testItem1);
         assertItemEquals(testItem1, inventory.getItem(2));
 

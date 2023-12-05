@@ -43,7 +43,7 @@ public class DebugUtil {
      * @param block to randomize
      */
     public static void randomizeBlock(Block block) {
-        randomizeBlock(block, Material.STONE, Material.DIRT, Material.GRASS,
+        randomizeBlock(block, Material.STONE, Material.DIRT, MaterialUtil.getFirst("GRASS_BLOCK", "GRASS", "LEGACY_GRASS"),
                 Material.IRON_ORE, Material.IRON_BLOCK, Material.GOLD_BLOCK, Material.DIAMOND_BLOCK);
     }
 
