@@ -183,6 +183,8 @@ class IChatBaseComponent {
     }
 
     class IChatBaseComponent.ChatSerializer {
+        #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
+
 #if version >= 1.18
         public static String chatComponentToJson:toJson((IChatBaseComponentHandle) IChatBaseComponent chatComponent);
 #else

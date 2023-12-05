@@ -23,6 +23,11 @@ public class ChatTextTest {
         assertEquals(msg, text.getMessage());
 
         Set<String> allowed = new HashSet<String>();
+        if (Common.evaluateMCVersion(">=", "1.20.3")) {
+            // I dont know what the fuck is going on here, but this is all spigots doing
+            // That text: "" really shouldn't be there. Also now literal "Hello, " is without {text:}
+            allowed.add("{\"text\":\"\",\"extra\":[\"Hello, \",{\"text\":\"World!\",\"obfuscated\":false,\"italic\":false,\"underlined\":false,\"strikethrough\":false,\"color\":\"red\",\"bold\":false}]}");
+        }
         if (Common.evaluateMCVersion(">=", "1.16")) {
             // Spigot 1.16 has a (temporary?) bug of including all style modes in the json
             // might get fixed in the future
@@ -63,6 +68,10 @@ public class ChatTextTest {
 
         Set<String> allowed = new HashSet<String>();
         allowed.add("{\"extra\":[{\"color\":\"red\",\"text\":\"\"}],\"text\":\"\"}");
+        if (Common.evaluateMCVersion(">=", " 1.20.3")) {
+            // IDK wtf
+            allowed.add("{\"text\":\"\",\"extra\":[{\"text\":\"\",\"obfuscated\":false,\"italic\":false,\"underlined\":false,\"strikethrough\":false,\"color\":\"red\",\"bold\":false},{\"text\":\"\",\"color\":\"red\"}]}");
+        }
         if (Common.evaluateMCVersion(">=", "1.16")) {
             // For some reason Minecraft repeats the color twice now in the json
             // It's still functionally identical, so we'll allow it I guess.
@@ -94,7 +103,12 @@ public class ChatTextTest {
         // Test empty chat text
         ChatText text = ChatText.empty();
         assertEquals("", text.getMessage());
-        assertEquals("{\"text\":\"\"}", text.getJson());
+        if (Common.evaluateMCVersion(">=", "1.20.3")) {
+            // Optimized so it just has a "" as output
+            assertEquals("\"\"", text.getJson());
+        } else {
+            assertEquals("{\"text\":\"\"}", text.getJson());
+        }
     }
 
     @Test
