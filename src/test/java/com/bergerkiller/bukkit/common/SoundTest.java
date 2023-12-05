@@ -35,7 +35,7 @@ public class SoundTest {
     @Test
     public void testBlockStepSound() {
         assertTrue(SoundEffectTypeHandle.T.isAvailable());
-        ResourceKey<SoundEffect> stepName = BlockData.fromMaterial(MaterialUtil.getFirst("GRASS_BLOCK", "GRASS", "LEGACY_GRASS")).getStepSound();
+        ResourceKey<SoundEffect> stepName = BlockData.fromMaterial(MaterialUtil.getFirst("GRASS_BLOCK", "LEGACY_GRASS")).getStepSound();
         if (CommonCapabilities.KEYED_EFFECTS) {
             assertEquals("minecraft:block.grass.step", stepName.getPath());
         } else {
@@ -46,7 +46,7 @@ public class SoundTest {
     @Test
     public void testBlockPlaceSound() {
         assertTrue(SoundEffectTypeHandle.T.isAvailable());
-        ResourceKey<SoundEffect> stepName = BlockData.fromMaterial(MaterialUtil.getFirst("GRASS_BLOCK", "GRASS", "LEGACY_GRASS")).getPlaceSound();
+        ResourceKey<SoundEffect> stepName = BlockData.fromMaterial(MaterialUtil.getFirst("GRASS_BLOCK", "LEGACY_GRASS")).getPlaceSound();
         if (CommonCapabilities.KEYED_EFFECTS) {
             assertEquals("minecraft:block.grass.place", stepName.getPath());
         } else {

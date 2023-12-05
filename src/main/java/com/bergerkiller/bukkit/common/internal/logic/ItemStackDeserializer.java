@@ -225,8 +225,20 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         // From MC 1.20.2 to 1.20.1
         this.register(3465, NO_CONVERSION);
 
+        // From MC 1.20.3 to 1.20.2
+        this.register(3578, map -> {
+            Object type = map.get("type");
+
+            if ("SHORT_GRASS".equals(type)) {
+                map.put("type", "GRASS");
+                return true;
+            } else {
+                return !Helper.ADDED_MC_1_20_3.contains(type);
+            }
+        });
+
         // Maximum supported data version
-        this.max_version = 3578; // MC 1.20.2
+        this.max_version = 3698; // MC 1.20.3
     }
 
     // Registers a converter if it can convert from a future data version only
@@ -701,6 +713,30 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                 "MOURNER_POTTERY_SHERD", "PLENTY_POTTERY_SHERD", "PRIZE_POTTERY_SHERD",
                 "SHEAF_POTTERY_SHERD", "SHELTER_POTTERY_SHERD", "SKULL_POTTERY_SHERD",
                 "SNORT_POTTERY_SHERD"
+        ));
+
+        // All material names (Material enum) added Minecraft 1.20.2 -> 1.20.3
+        public static final Set<String> ADDED_MC_1_20_3 = new HashSet<>(Arrays.asList(
+                "TUFF_SLAB", "TUFF_STAIRS", "TUFF_WALL", "CHISELED_TUFF", "POLISHED_TUFF",
+                "POLISHED_TUFF_SLAB", "POLISHED_TUFF_STAIRS", "POLISHED_TUFF_WALL",
+                "TUFF_BRICKS", "TUFF_BRICK_SLAB", "TUFF_BRICK_STAIRS", "TUFF_BRICK_WALL",
+                "CHISELED_TUFF_BRICKS", "CHISELED_COPPER", "EXPOSED_CHISELED_COPPER",
+                "WEATHERED_CHISELED_COPPER", "OXIDIZED_CHISELED_COPPER",
+                "WAXED_CHISELED_COPPER", "WAXED_EXPOSED_CHISELED_COPPER",
+                "WAXED_WEATHERED_CHISELED_COPPER", "WAXED_OXIDIZED_CHISELED_COPPER",
+                "COPPER_DOOR", "EXPOSED_COPPER_DOOR", "WEATHERED_COPPER_DOOR",
+                "OXIDIZED_COPPER_DOOR", "WAXED_COPPER_DOOR", "WAXED_EXPOSED_COPPER_DOOR",
+                "WAXED_WEATHERED_COPPER_DOOR", "WAXED_OXIDIZED_COPPER_DOOR",
+                "COPPER_TRAPDOOR", "EXPOSED_COPPER_TRAPDOOR", "WEATHERED_COPPER_TRAPDOOR",
+                "OXIDIZED_COPPER_TRAPDOOR", "WAXED_COPPER_TRAPDOOR", "WAXED_EXPOSED_COPPER_TRAPDOOR",
+                "WAXED_WEATHERED_COPPER_TRAPDOOR", "WAXED_OXIDIZED_COPPER_TRAPDOOR",
+                "CRAFTER", "BREEZE_SPAWN_EGG", "COPPER_GRATE", "EXPOSED_COPPER_GRATE",
+                "WEATHERED_COPPER_GRATE", "OXIDIZED_COPPER_GRATE", "WAXED_COPPER_GRATE",
+                "WAXED_EXPOSED_COPPER_GRATE", "WAXED_WEATHERED_COPPER_GRATE",
+                "WAXED_OXIDIZED_COPPER_GRATE", "COPPER_BULB", "EXPOSED_COPPER_BULB",
+                "WEATHERED_COPPER_BULB", "OXIDIZED_COPPER_BULB", "WAXED_COPPER_BULB",
+                "WAXED_EXPOSED_COPPER_BULB", "WAXED_WEATHERED_COPPER_BULB",
+                "WAXED_OXIDIZED_COPPER_BULB", "TRIAL_SPAWNER", "TRIAL_KEY"
         ));
     }
 }

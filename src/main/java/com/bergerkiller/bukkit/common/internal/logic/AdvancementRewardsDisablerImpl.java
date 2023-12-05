@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.advancements.AdvancementRewardsHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
@@ -34,7 +35,12 @@ class AdvancementRewardsDisablerImpl extends AdvancementRewardsDisabler {
         }
 
         // This is a possible return type of get()
-        final Class<?> customFunctionType = CommonUtil.getClass("net.minecraft.commands.CustomFunction");
+        final Class<?> customFunctionType;
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.20.3")) {
+            customFunctionType = CommonUtil.getClass("net.minecraft.commands.functions.CommandFunction");
+        } else {
+            customFunctionType = CommonUtil.getClass("net.minecraft.commands.CustomFunction");
+        }
         if (customFunctionType == null) {
             throw new IllegalStateException("CustomFunction type not found");
         }
