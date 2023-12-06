@@ -269,10 +269,12 @@ public class CommonBootstrap {
 
             // Make type and method information available for this server type
             // Templates should not be initialized during this time, bad things happen
-            boolean oldWarnTemplates = WARN_WHEN_INIT_TEMPLATES;
-            WARN_WHEN_INIT_TEMPLATES = true;
-            initResolvers(_commonServer);
-            WARN_WHEN_INIT_TEMPLATES = oldWarnTemplates;
+            if (_isCompatible) {
+                boolean oldWarnTemplates = WARN_WHEN_INIT_TEMPLATES;
+                WARN_WHEN_INIT_TEMPLATES = true;
+                initResolvers(_commonServer);
+                WARN_WHEN_INIT_TEMPLATES = oldWarnTemplates;
+            }
         }
         return _commonServer;
     }
