@@ -1160,7 +1160,7 @@ public class MapWidget implements MapDisplayEvents {
      * 
      * @param event
      */
-    protected void handleNavigation(MapKeyEvent event) {
+    public void handleNavigation(MapKeyEvent event) {
         MapWidget focused = this.root.getFocusedWidget();
         if (event.getKey() == Key.ENTER) {
             // Activate the currently focused widget when activated
