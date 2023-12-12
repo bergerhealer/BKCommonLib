@@ -19,6 +19,65 @@ public class YamlListenerTest {
     private final Listener listener = new Listener();
 
     @Test
+    public void testImplicitlyCreateAndRemoveListItems() {
+        YamlNode root = new YamlNode();
+        YamlNode child = root.getNode("node");
+
+        root.addChangeListener(listener);
+        listener.reset();
+
+        List<String> list = child.getList("list", String.class);
+
+        listener.testNone(); // Should not have fired anything yet
+
+        // These events fire for implicitly creating the list + adding each item
+        list.add("one");
+        list.add("two");
+        list.add("three");
+        listener.testMany(
+                /* These fire for creating the list itself */
+                "node", "node.list",
+                /* These fire for every item added (modify list, modify item of list itself) */
+                "node.list", "node.list[0]",
+                "node.list", "node.list[1]",
+                "node.list", "node.list[2]");
+
+        // Should fire a singular event for the list change
+        list.remove("two");
+        listener.testOne("node.list");
+        listener.testNone();
+
+        // Should fire just an event for the item change
+        list.set(0, "een");
+        listener.testOne("node.list[0]");
+        listener.testNone();
+    }
+
+    @Test
+    public void testCreateAndRemoveListItems() {
+        YamlNode root = new YamlNode();
+        YamlNode child = root.getNode("node");
+
+        root.addChangeListener(listener);
+        listener.reset();
+
+        // These events fire for setting a list
+        child.set("list", Arrays.asList("one", "two", "three"));
+        listener.testMany(
+                /* These fire for creating the list itself */
+                "node", "node.list",
+                /* These fire for every item added (modify list, modify item of list itself) */
+                "node.list", "node.list[0]",
+                "node.list", "node.list[1]",
+                "node.list", "node.list[2]");
+
+        // These events fire for removing an item from the list
+        child.getList("list").remove("two");
+        listener.testOne("node.list");
+        listener.testNone();
+    }
+
+    @Test
     public void testYamlListenerOnParentMigration() {
         YamlNode root = new YamlNode();
         YamlNode child = root.getNode("node");

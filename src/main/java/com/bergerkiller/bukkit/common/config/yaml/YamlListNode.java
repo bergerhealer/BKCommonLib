@@ -111,6 +111,7 @@ public class YamlListNode extends YamlNodeAbstract<YamlListNode> implements List
         int index = this.indexOfValue(o);
         if (index != -1) {
             this.removeChildEntryAtWithoutEvent(index);
+            this._entry.callChangeListeners();
             return true;
         }
         return false;
