@@ -165,7 +165,8 @@ class AdvancementRewardsDisablerImpl extends AdvancementRewardsDisabler {
         @Override
         public Object hook(Object o) {
             if (o instanceof Optional) {
-                return Optional.of(super.hook((Optional) o).get());
+                Object function = ((Optional<?>) o).get();
+                return Optional.of(super.hook(function));
             } else {
                 return super.hook(o);
             }
