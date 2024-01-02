@@ -56,6 +56,8 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
     }
     public abstract PlayerConnectionHandle getPlayerConnection();
     public abstract void setPlayerConnection(PlayerConnectionHandle value);
+    public abstract Object getAdvancements();
+    public abstract void setAdvancements(Object value);
     @Template.Readonly
     public abstract boolean isViewingCredits();
     /**
@@ -64,6 +66,7 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
      */
     public static final class EntityPlayerClass extends Template.Class<EntityPlayerHandle> {
         public final Template.Field.Converted<PlayerConnectionHandle> playerConnection = new Template.Field.Converted<PlayerConnectionHandle>();
+        public final Template.Field.Converted<Object> advancements = new Template.Field.Converted<Object>();
         @Template.Readonly
         public final Template.Field.Boolean viewingCredits = new Template.Field.Boolean();
 

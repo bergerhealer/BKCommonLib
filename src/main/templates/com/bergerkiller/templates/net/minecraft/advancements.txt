@@ -7,6 +7,18 @@ import com.bergerkiller.generated.net.minecraft.advancements.AdvancementRewardsH
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 
 // Since Minecraft 1.12
+optional class Advancement {
+
+    public static org.bukkit.advancement.Advancement toBukkit(Object advancement_or_holder) {
+#if version >= 1.20.2
+        return ((AdvancementHolder) advancement_or_holder).toBukkit();
+#else
+        return ((Advancement) advancement_or_holder).bukkit;
+#endif
+    }
+}
+
+// Since Minecraft 1.12
 optional class AdvancementRewards {
 
 #if version >= 1.20.3

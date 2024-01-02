@@ -1299,7 +1299,10 @@ public class CommonUtil {
      * the AdvancementDone Bukkit event to disable the rewards.
      *
      * @param advancement Advancement
+     * @deprecated Use {@link com.bergerkiller.bukkit.common.events.PlayerAdvancementProgressEvent} to disable
+     *             advancements instead
      */
+    @Deprecated
     public static void disableNextGrant(org.bukkit.advancement.Advancement advancement) {
         AdvancementRewardsDisabler.INSTANCE.disableNextGrant(advancement);
     }

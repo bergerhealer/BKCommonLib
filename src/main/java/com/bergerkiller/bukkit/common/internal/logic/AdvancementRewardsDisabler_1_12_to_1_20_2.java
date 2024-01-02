@@ -24,10 +24,11 @@ import java.util.stream.Collectors;
  * to none until the advancement is granted. This disables giving an advancement
  * to a Player when handling the AdvancementDone event.
  */
-class AdvancementRewardsDisablerImpl extends AdvancementRewardsDisabler {
+@Deprecated
+class AdvancementRewardsDisabler_1_12_to_1_20_2 extends AdvancementRewardsDisabler {
     private final Set<Method> overridedMethods;
 
-    AdvancementRewardsDisablerImpl() throws Throwable {
+    AdvancementRewardsDisabler_1_12_to_1_20_2() throws Throwable {
         // This is the input parameter to get()
         final Class<?> customFunctionDataType = CommonUtil.getClass("net.minecraft.server.CustomFunctionData");
         if (customFunctionDataType == null) {
@@ -45,16 +46,8 @@ class AdvancementRewardsDisablerImpl extends AdvancementRewardsDisabler {
             throw new IllegalStateException("CustomFunction type not found");
         }
 
-        // Find class of function. Unwrap optional on 1.20.3+
-        Class<?> functionType;
-        {
-            Object noneFunction = AdvancementRewardsHandle.getNoneFunction();
-            if (noneFunction instanceof Optional) {
-                functionType = ((Optional<Object>) noneFunction).get().getClass();
-            } else {
-                functionType = noneFunction.getClass();
-            }
-        }
+        // Find class of function.
+        Class<?> functionType = AdvancementRewardsHandle.getNoneFunction().getClass();
 
         // Find the get() function of CustomFunction.a / CacheableFunction
         overridedMethods = ReflectionUtil.getAllMethods(functionType)
@@ -63,7 +56,7 @@ class AdvancementRewardsDisablerImpl extends AdvancementRewardsDisabler {
                     return !Modifier.isPrivate(mod) && !Modifier.isStatic(mod) && !Modifier.isFinal(mod);
                 })
                 .filter(m -> m.getParameterCount() == 1 && m.getParameterTypes()[0] == customFunctionDataType)
-                .filter(m -> m.getReturnType() == java.util.Optional.class || m.getReturnType() == customFunctionType)
+                .filter(m -> m.getReturnType() == customFunctionType)
                 .collect(Collectors.toSet());
         if (overridedMethods.isEmpty()) {
             throw new IllegalStateException("Unable to find CustomFunction get(CustomFunctionData) method");
@@ -161,16 +154,6 @@ class AdvancementRewardsDisablerImpl extends AdvancementRewardsDisabler {
             }
             return null;
         }
-
-        @Override
-        public Object hook(Object o) {
-            if (o instanceof Optional) {
-                Object function = ((Optional<?>) o).get();
-                return Optional.of(super.hook(function));
-            } else {
-                return super.hook(o);
-            }
-        }
     }
 
     private static class AwardInterceptorCallback implements Invoker<Object> {
@@ -190,8 +173,8 @@ class AdvancementRewardsDisablerImpl extends AdvancementRewardsDisabler {
             interceptor.previous.reset();
 
             // Return no function here
-            if (method.getReturnType() == java.util.Optional.class) {
-                return java.util.Optional.empty();
+            if (method.getReturnType() == Optional.class) {
+                return Optional.empty();
             } else {
                 return null; // @Nullable CustomFunction
             }

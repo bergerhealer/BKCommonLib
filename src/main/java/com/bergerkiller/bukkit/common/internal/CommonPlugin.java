@@ -22,6 +22,8 @@ import com.bergerkiller.bukkit.common.events.CreaturePreSpawnEvent;
 import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
+import com.bergerkiller.bukkit.common.events.PlayerAdvancementProgressEvent;
+import com.bergerkiller.bukkit.common.internal.hooks.AdvancementDataPlayerHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.hooks.LookupEntityClassMap;
 import com.bergerkiller.bukkit.common.internal.logic.BlockDataWrapperHook;
@@ -768,6 +770,16 @@ public class CommonPlugin extends PluginBase {
         startedTasks.add(new CreaturePreSpawnEventHandlerDetectorTask(this).start(0, 20));
         startedTasks.add(new ObjectCacheCleanupTask(this).start(10, 20*60*30));
 
+        // Ensure advancements are hooked, if event is used
+        if (CommonCapabilities.HAS_ADVANCEMENTS) {
+            startedTasks.add(new AdvancementProgressEventHandlerDetectorTask(this).start(0, 1));
+            if (CommonUtil.hasHandlers(PlayerAdvancementProgressEvent.getHandlerList())) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    AdvancementDataPlayerHook.hook(player);
+                }
+            }
+        }
+
         // Some servers do not have an Entity Remove Queue.
         // For those servers, we handle them using our own system
         if (!EntityPlayerHandle.T.getRemoveQueue.isAvailable()) {
@@ -893,6 +905,11 @@ public class CommonPlugin extends PluginBase {
             BlockDataWrapperHook.disableHook(); // Prevents new ones being made
         } catch (Throwable t) {
             getLogger().log(Level.SEVERE, "Failed to disable the BlockData hook, some stuff might remain");
+        }
+
+        // Get rid of Player advancement handler hooks, if registered
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            AdvancementDataPlayerHook.unhook(player);
         }
 
         // Dereference
@@ -1073,6 +1090,28 @@ public class CommonPlugin extends PluginBase {
                 this._creaturePreSpawnEventHasHandlers = hasHandlers;
                 if (hasHandlers) {
                     CreaturePreSpawnHandler.INSTANCE.onEventHasHandlers();
+                }
+            }
+        }
+    }
+
+    private static class AdvancementProgressEventHandlerDetectorTask extends Task {
+        private boolean _advancementProgressEventHasHandlers;
+
+        public AdvancementProgressEventHandlerDetectorTask(JavaPlugin plugin) {
+            super(plugin);
+            this._advancementProgressEventHasHandlers = CommonUtil.hasHandlers(PlayerAdvancementProgressEvent.getHandlerList());
+        }
+
+        @Override
+        public void run() {
+            boolean hasHandlers = CommonUtil.hasHandlers(PlayerAdvancementProgressEvent.getHandlerList());
+            if (hasHandlers != this._advancementProgressEventHasHandlers) {
+                this._advancementProgressEventHasHandlers = hasHandlers;
+                if (hasHandlers) {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        AdvancementDataPlayerHook.hook(player);
+                    }
                 }
             }
         }

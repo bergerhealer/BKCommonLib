@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.WorldServer;
+import net.minecraft.server.AdvancementDataPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityLiving;
 import net.minecraft.world.entity.EntityInsentient;
@@ -45,6 +46,15 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 #else
     public (PlayerConnectionHandle) PlayerConnection playerConnection;
 #endif
+
+    // Used by AdvancementDataPlayerHook for disabling advancement progress
+#select version >=
+#case 1.17:    private final (Object) AdvancementDataPlayer advancements;
+#case 1.14:    private final (Object) AdvancementDataPlayer advancements:advancementDataPlayer;
+#case 1.13.1:  private final (Object) AdvancementDataPlayer advancements:cf;
+#case 1.13:    private final (Object) AdvancementDataPlayer advancements:cg;
+#case else:    private final (Object) AdvancementDataPlayer advancements:bY;
+#endselect
 
 #if version >= 1.16
     // World dimension on 1.16 and later

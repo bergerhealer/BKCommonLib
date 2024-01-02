@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.internal;
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.collections.ImmutableCachedSet;
+import com.bergerkiller.bukkit.common.internal.hooks.AdvancementDataPlayerHook;
 import com.bergerkiller.bukkit.common.internal.logic.CreaturePreSpawnHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.internal.logic.PluginLoaderHandler;
@@ -168,6 +169,9 @@ public class CommonListener implements Listener {
     protected void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         CommonPlugin.getInstance().getPacketHandler().onPlayerJoin(player);
+
+        // Hook advancement progress handler, if used
+        AdvancementDataPlayerHook.hook(player);
 
         // Scoreboard team init
         CommonTeam team = CommonScoreboard.get(player).getTeam();

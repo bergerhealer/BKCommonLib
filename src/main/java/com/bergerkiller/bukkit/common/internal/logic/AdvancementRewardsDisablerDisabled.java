@@ -5,6 +5,7 @@ import org.bukkit.advancement.Advancement;
 /**
  * Used when the disabler cannot be initialized (error)
  */
+@Deprecated
 class AdvancementRewardsDisablerDisabled extends AdvancementRewardsDisabler {
 
     @Override

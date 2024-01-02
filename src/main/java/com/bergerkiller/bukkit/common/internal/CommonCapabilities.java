@@ -119,6 +119,11 @@ public class CommonCapabilities {
     public static final boolean HAS_PREPARE_ANVIL_EVENT = CommonBootstrap.evaluateMCVersion(">=", "1.9");
 
     /**
+     * Since Minecraft 1.12 Minecraft has Advancements. Bukkit has an API for it.
+     */
+    public static final boolean HAS_ADVANCEMENTS = CommonBootstrap.evaluateMCVersion(">=", "1.12");
+
+    /**
      * Since Minecraft 1.13 items can have an empty String as a display name, and it will show
      * an empty spot instead of the item's default name. This can be used with the Anvil GUI
      * to set the text box to an empty default.

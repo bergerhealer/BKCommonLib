@@ -47,7 +47,8 @@ public class Common {
             "Common:BlockDataStateRename",
             "Common:Advancement:RewardDisabler",
             "Common:Sound:StopSoundPacket",
-            "Common:Sound:CloudParser"
+            "Common:Sound:CloudParser",
+            "Common:Event:PlayerAdvancementProgressEvent"
     ).collect(Collectors.toSet());
 
     /**

@@ -4,8 +4,6 @@ import static org.junit.Assert.*;
 
 import java.lang.reflect.Modifier;
 
-import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
-import com.bergerkiller.bukkit.common.internal.logic.AdvancementRewardsDisabler;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion;
@@ -121,13 +119,5 @@ public class InternalLogicInitializeTest {
     @Test
     public void testItemVariantsInit() {
         assertNotNull(ItemVariantListHandler.INSTANCE);
-    }
-
-    @Test
-    public void testAdvancementDisablerInit() {
-        if (CommonBootstrap.evaluateMCVersion(">=", "1.12")) {
-            assertNotNull(AdvancementRewardsDisabler.INSTANCE);
-            assertFalse(AdvancementRewardsDisabler.INSTANCE.getClass().getName().endsWith("Disabled"));
-        }
     }
 }
