@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.lang.reflect.Modifier;
 
+import com.bergerkiller.bukkit.common.internal.hooks.AdvancementDataPlayerHook;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion;
@@ -73,6 +75,11 @@ public class InternalLogicInitializeTest {
     public void testBlockDataSerializer() {
         assertNotNull(BlockDataSerializer.INSTANCE);
         BlockDataSerializer.INSTANCE.forceInitialization();
+    }
+
+    @Test
+    public void testAdvancementsPlayerHook() {
+        AdvancementDataPlayerHook.getAdvancementsInitFailure().ifPresent(Assert::fail);
     }
 
     @Test
