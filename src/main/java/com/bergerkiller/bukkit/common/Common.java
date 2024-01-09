@@ -48,7 +48,8 @@ public class Common {
             "Common:Advancement:RewardDisabler",
             "Common:Sound:StopSoundPacket",
             "Common:Sound:CloudParser",
-            "Common:Event:PlayerAdvancementProgressEvent"
+            "Common:Event:PlayerAdvancementProgressEvent",
+            "Common:Yaml:ChildWithLiteralName"
     ).collect(Collectors.toSet());
 
     /**

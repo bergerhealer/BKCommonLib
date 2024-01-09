@@ -192,6 +192,18 @@ public class YamlPath {
     }
 
     /**
+     * Gets a child path of this path. The name can be a string literal,
+     * and is allowed to contain special characters like '.' and '[]',
+     * and they will be escaped properly to be used as a single key part.
+     *
+     * @param name Child name
+     * @return child path
+     */
+    public YamlPath childWithName(String name) {
+        return new YamlPath(this, name);
+    }
+
+    /**
      * Creates a YamlPath which is this path, but relative to the absolute
      * path specified. If no such path is possible, returns null. This
      * method can also be used to check whether this path starts with
