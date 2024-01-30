@@ -49,7 +49,8 @@ public class Common {
             "Common:Sound:StopSoundPacket",
             "Common:Sound:CloudParser",
             "Common:Event:PlayerAdvancementProgressEvent",
-            "Common:Yaml:ChildWithLiteralName"
+            "Common:Yaml:ChildWithLiteralName",
+            "Common:ChunkUtil:getChunkViewers"
     ).collect(Collectors.toSet());
 
     /**

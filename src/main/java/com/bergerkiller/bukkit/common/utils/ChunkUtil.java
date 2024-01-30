@@ -10,8 +10,10 @@ import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
+import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.EnumSkyBlockHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkSectionHandle;
 
@@ -278,6 +280,30 @@ public class ChunkUtil {
      */
     public static List<org.bukkit.entity.Entity> getEntities(org.bukkit.Chunk chunk) {
         return ChunkHandle.fromBukkit(chunk).getEntities();
+    }
+
+    /**
+     * Gets a collection of players that are presently viewing / in range of a chunk.
+     * Block changes are notified to these players.
+     *
+     * @param chunk Chunk
+     * @return Unmodifiable collection of players that view this chunk
+     */
+    public static Collection<Player> getChunkViewers(org.bukkit.Chunk chunk) {
+        return getChunkViewers(chunk.getWorld(), chunk.getX(), chunk.getZ());
+    }
+
+    /**
+     * Gets a collection of players that are presently viewing / in range of a chunk.
+     * Block changes are notified to these players.
+     *
+     * @param world World the chunk is in
+     * @param chunkX The chunk X-coordinate
+     * @param chunkZ The chunk Z-coordinate
+     * @return Unmodifiable collection of players that view this chunk
+     */
+    public static Collection<Player> getChunkViewers(org.bukkit.World world, int chunkX, int chunkZ) {
+        return WorldServerHandle.fromBukkit(world).getPlayerChunkMap().getChunkEnteredPlayers(chunkX, chunkZ);
     }
 
     /**

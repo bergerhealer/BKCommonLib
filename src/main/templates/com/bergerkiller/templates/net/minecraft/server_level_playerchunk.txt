@@ -426,6 +426,17 @@ class PlayerChunkMap {
     }
 #endif
 
+<code>
+    public java.util.Collection<org.bukkit.entity.Player> getChunkEnteredPlayers(int chunkX, int chunkZ) {
+        PlayerChunkHandle playerChunk = getVisibleChunk(chunkX, chunkZ);
+        if (playerChunk == null || playerChunk.getChunkIfLoaded() == null) {
+            return java.util.Collections.emptyList();
+        } else {
+            return playerChunk.getPlayers();
+        }
+    }
+</code>
+
 #if version >= 1.14
     public boolean isChunkEntered((EntityPlayerHandle) EntityPlayer entityplayer, int chunkX, int chunkZ) {
   #if version >= 1.18

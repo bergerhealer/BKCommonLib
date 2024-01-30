@@ -22,6 +22,15 @@ public abstract class PlayerChunkMapHandle extends Template.Handle {
     public abstract PlayerChunkHandle getVisibleChunk(int x, int z);
     public abstract PlayerChunkHandle getUpdatingChunk(int x, int z);
     public abstract boolean isChunkEntered(EntityPlayerHandle entityplayer, int chunkX, int chunkZ);
+
+    public java.util.Collection<org.bukkit.entity.Player> getChunkEnteredPlayers(int chunkX, int chunkZ) {
+        PlayerChunkHandle playerChunk = getVisibleChunk(chunkX, chunkZ);
+        if (playerChunk == null || playerChunk.getChunkIfLoaded() == null) {
+            return java.util.Collections.emptyList();
+        } else {
+            return playerChunk.getPlayers();
+        }
+    }
     /**
      * Stores class members for <b>net.minecraft.server.level.PlayerChunkMap</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
