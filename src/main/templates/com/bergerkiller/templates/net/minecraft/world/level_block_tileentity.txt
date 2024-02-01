@@ -1,6 +1,7 @@
 package net.minecraft.world.level.block.entity;
 
 import net.minecraft.core.BlockPosition;
+import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.PacketPlayOutTileEntityData
 import net.minecraft.nbt.NBTTagCompound;
@@ -14,10 +15,12 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntitySignHandle;
 
 class TileEntity {
 #if version >= 1.17
@@ -238,11 +241,40 @@ class TileEntitySign extends TileEntity {
 #endif
     }
 
+<code>
+    public static final Object[] ALL_EMPTY_RAW_LINES;
+    static {
+        Object raw_empty = ChatText.empty().getRawHandle();
+        ALL_EMPTY_RAW_LINES = new Object[] {raw_empty, raw_empty, raw_empty, raw_empty};
+    }
+</code>
+
     public Object[] getRawBackLines() {
 #if version >= 1.20
         return instance.getBackText().getMessages(false);
 #else
-        return null;
+        return TileEntitySignHandle.ALL_EMPTY_RAW_LINES;
+#endif
+    }
+
+    public void setFormattedFrontLine(int index, (ChatText) IChatBaseComponent text) {
+#if version >= 1.20
+        instance.setText(instance.getFrontText().setMessage(index, text), true);
+#elseif version >= 1.18
+        instance.setMessage(index, text);
+        instance.setChanged();
+#elseif version >= 1.17
+        instance.a(index, text);
+        instance.update();
+#else
+        instance.lines[index] = text;
+        instance.update();
+#endif
+    }
+
+    public void setFormattedBackLine(int index, (ChatText) IChatBaseComponent text) {
+#if version >= 1.20
+        instance.setText(instance.getBackText().setMessage(index, text), false);
 #endif
     }
 

@@ -348,6 +348,25 @@ public class LogicUtil {
     }
 
     /**
+     * Maps all the elements of an input array and writes the result as a new array
+     *
+     * @param inputArray Input array to map
+     * @param outputType Output type of the array to map into
+     * @param mapper Mapper function. All values in the input array are mapped.
+     * @return Mapped array
+     * @param <I> Input array element type
+     * @param <O> Output array element type
+     */
+    public static <I, O> O[] mapArray(I[] inputArray, Class<O> outputType, Function<I, O> mapper) {
+        int len = inputArray.length;
+        O[] outputArray = createArray(outputType, len);
+        for (int i = 0; i < len; i++) {
+            outputArray[i] = mapper.apply(inputArray[i]);
+        }
+        return outputArray;
+    }
+
+    /**
      * Registers a custom value cloning function for the type specified, overriding any automatically
      * or previously decided cloning technique. This will be used by clone operations of this class.
      *

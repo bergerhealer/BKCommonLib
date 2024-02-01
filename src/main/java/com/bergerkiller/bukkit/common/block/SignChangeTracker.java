@@ -5,6 +5,8 @@ import java.util.function.Function;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.generated.org.bukkit.block.SignHandle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -199,6 +201,43 @@ public class SignChangeTracker implements Cloneable {
     }
 
     /**
+     * Gets a line as a formatted component of the front of the sign.
+     *
+     * @param index Line index
+     * @return Line at this index at the front of the sign
+     */
+    public ChatText getFormattedFrontLine(int index) {
+        checkRemoved();
+        return ChatText.fromComponent(tileEntity.getRawFrontLines()[index]);
+    }
+
+    /**
+     * Sets a line as a formatted component of the front of the sign, updating the sign in the world.
+     * After calling {@link #update()} this change will be detected.
+     *
+     * @param index Line index
+     * @param text New text to put at this index at the front of the sign
+     */
+    public void setFormattedFrontLine(int index, ChatText text) {
+        checkRemoved();
+        this.tileEntity.setFormattedFrontLine(index, text);
+
+        // Must recreate sign state, as that one caches the sign lines which are now outdated
+        this.state = this.tileEntity.toBukkit();
+        this.stateHandle = SignHandle.createHandle(this.state);
+    }
+
+    /**
+     * Gets all the lines put at the front of the sign as formatted components. 4 lines.
+     *
+     * @return Sign front lines
+     */
+    public ChatText[] getFormattedFrontLines() {
+        checkRemoved();
+        return LogicUtil.mapArray(tileEntity.getRawFrontLines(), ChatText.class, ChatText::fromComponent);
+    }
+
+    /**
      * Gets a line of the back of the sign.
      * Always returns an empty String on Minecraft versions below 1.20.
      *
@@ -227,7 +266,7 @@ public class SignChangeTracker implements Cloneable {
     }
 
     /**
-     * Gets all the lines put at the front of the sign. 4 lines.
+     * Gets all the lines put at the back of the sign. 4 lines.
      * Always returns an array of empty Strings on Minecraft versions below 1.20.
      *
      * @return Sign front lines
@@ -235,6 +274,48 @@ public class SignChangeTracker implements Cloneable {
     public String[] getBackLines() {
         checkRemoved();
         return stateHandle.getBackLines();
+    }
+
+    /**
+     * Gets a line as a formatted component of the back of the sign.
+     * Always returns an empty String on Minecraft versions below 1.20.
+     *
+     * @param index Line index
+     * @return Line at this index at the back of the sign
+     */
+    public ChatText getFormattedBackLine(int index) {
+        checkRemoved();
+        return ChatText.fromComponent(tileEntity.getRawBackLines()[index]);
+    }
+
+    /**
+     * Sets a line as a formatted component of the back of the sign, updating the sign in the world.
+     * After calling {@link #update()} this change will be detected.
+     * Does nothing on Minecraft versions below 1.20.
+     *
+     * @param index Line index
+     * @param text New text to put at this index at the back of the sign
+     */
+    public void setFormattedBackLine(int index, ChatText text) {
+        checkRemoved();
+        if (CommonCapabilities.HAS_SIGN_BACK_TEXT) {
+            this.tileEntity.setFormattedBackLine(index, text);
+
+            // Must recreate sign state, as that one caches the sign lines which are now outdated
+            this.state = this.tileEntity.toBukkit();
+            this.stateHandle = SignHandle.createHandle(this.state);
+        }
+    }
+
+    /**
+     * Gets all the lines put at the back of the sign as formatted components. 4 lines.
+     * Always returns an array of empty Strings on Minecraft versions below 1.20.
+     *
+     * @return Sign front lines
+     */
+    public ChatText[] getFormattedBackLines() {
+        checkRemoved();
+        return LogicUtil.mapArray(tileEntity.getRawBackLines(), ChatText.class, ChatText::fromComponent);
     }
 
     /**
@@ -383,7 +464,7 @@ public class SignChangeTracker implements Cloneable {
         Object[] newRawFrontLines = tileEntity.getRawFrontLines();
 
         Object[] oldRawBackLines = this.lastRawBackLines;
-        Object[] newRawBackLines = tileEntity.getRawBackLines(); // Null on < 1.20
+        Object[] newRawBackLines = tileEntity.getRawBackLines();
 
         if (oldRawFrontLines.length != newRawFrontLines.length ||
                 (CommonCapabilities.HAS_SIGN_BACK_TEXT && oldRawBackLines.length != newRawBackLines.length)

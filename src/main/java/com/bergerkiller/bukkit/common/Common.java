@@ -50,7 +50,8 @@ public class Common {
             "Common:Sound:CloudParser",
             "Common:Event:PlayerAdvancementProgressEvent",
             "Common:Yaml:ChildWithLiteralName",
-            "Common:ChunkUtil:getChunkViewers"
+            "Common:ChunkUtil:getChunkViewers",
+            "Common:SignChangeTracker:FormattedText"
     ).collect(Collectors.toSet());
 
     /**

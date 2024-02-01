@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.world.level.block.entity;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.world.level.block.entity.TileEntitySign</b>.
@@ -21,6 +22,15 @@ public abstract class TileEntitySignHandle extends TileEntityHandle {
 
     public abstract Object[] getRawFrontLines();
     public abstract Object[] getRawBackLines();
+    public abstract void setFormattedFrontLine(int index, ChatText text);
+    public abstract void setFormattedBackLine(int index, ChatText text);
+
+    public static final Object[] ALL_EMPTY_RAW_LINES;
+    static {
+        Object raw_empty = ChatText.empty().getRawHandle();
+        ALL_EMPTY_RAW_LINES = new Object[] {raw_empty, raw_empty, raw_empty, raw_empty};
+    }
+
 
     @Override
     public org.bukkit.block.Sign toBukkit() {
@@ -37,6 +47,8 @@ public abstract class TileEntitySignHandle extends TileEntityHandle {
     public static final class TileEntitySignClass extends Template.Class<TileEntitySignHandle> {
         public final Template.Method<Object[]> getRawFrontLines = new Template.Method<Object[]>();
         public final Template.Method<Object[]> getRawBackLines = new Template.Method<Object[]>();
+        public final Template.Method.Converted<Void> setFormattedFrontLine = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> setFormattedBackLine = new Template.Method.Converted<Void>();
 
     }
 
