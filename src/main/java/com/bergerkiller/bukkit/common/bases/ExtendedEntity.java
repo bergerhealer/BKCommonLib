@@ -1165,7 +1165,15 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public void setVelocity(Vector velocity) {
-        velocity.checkFinite();
+        // Note: not supported on old bukkit versions!
+        //velocity.checkFinite();
+        if (
+                !(Math.abs(velocity.getX()) <= Double.MAX_VALUE) ||
+                !(Math.abs(velocity.getY()) <= Double.MAX_VALUE) ||
+                !(Math.abs(velocity.getZ()) <= Double.MAX_VALUE)
+        ) {
+            throw new IllegalArgumentException("Velocity is not finite: " + velocity);
+        }
 
         // Note: can't use this because Paper does some annoying >4 checks on this
         //       from an API standpoint that spam is garbage.
