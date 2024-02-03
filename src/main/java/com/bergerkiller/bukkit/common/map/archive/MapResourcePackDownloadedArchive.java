@@ -19,9 +19,11 @@ import java.util.Collections;
 import java.util.Formatter;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
@@ -185,11 +187,13 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
             URLConnection con;
             try {
                 con = currURL.openConnection();
-                if (CommonPlugin.hasInstance()) {
-                    con.addRequestProperty("User-Agent", "BKCommonLib/Unknown");
-                } else {
-                    con.addRequestProperty("User-Agent", "BKCommonLib/" + CommonPlugin.getInstance().getVersion());
-                }
+                con.addRequestProperty("X-Minecraft-Version-ID", Common.MC_VERSION);
+                // X-Minecraft-Pack-Format: 22
+                con.addRequestProperty("X-Minecraft-Version", Common.MC_VERSION);
+                con.addRequestProperty("User-Agent", "Minecraft Java/" + Common.MC_VERSION);
+                con.addRequestProperty("X-Minecraft-Username", "plugin_bkcommonlib");
+                con.addRequestProperty("X-Minecraft-UUID", new UUID(0L, 0L).toString());
+
                 con.setReadTimeout(60000);
 
                 // Check for redirects
