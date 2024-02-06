@@ -774,9 +774,7 @@ public class CommonPlugin extends PluginBase {
         if (CommonCapabilities.HAS_ADVANCEMENTS) {
             startedTasks.add(new AdvancementProgressEventHandlerDetectorTask(this).start(0, 1));
             if (CommonUtil.hasHandlers(PlayerAdvancementProgressEvent.getHandlerList())) {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    AdvancementDataPlayerHook.hook(player);
-                }
+                initAdvancementProgressHandler();
             }
         }
 
@@ -1095,6 +1093,15 @@ public class CommonPlugin extends PluginBase {
         }
     }
 
+    private static void initAdvancementProgressHandler() {
+        AdvancementDataPlayerHook.getAdvancementsInitFailure().ifPresent(err -> {
+            getInstance().getLogger().log(Level.SEVERE, "Failed to hook advancement progress. Advancement disabling won't work! Error: " + err);
+        });
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            AdvancementDataPlayerHook.hook(player);
+        }
+    }
+
     private static class AdvancementProgressEventHandlerDetectorTask extends Task {
         private boolean _advancementProgressEventHasHandlers;
 
@@ -1109,9 +1116,7 @@ public class CommonPlugin extends PluginBase {
             if (hasHandlers != this._advancementProgressEventHasHandlers) {
                 this._advancementProgressEventHasHandlers = hasHandlers;
                 if (hasHandlers) {
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        AdvancementDataPlayerHook.hook(player);
-                    }
+                    initAdvancementProgressHandler();
                 }
             }
         }
