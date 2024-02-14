@@ -45,9 +45,19 @@ class Entity {
 
         net.minecraft.world.entity.Entity vehicleHandle = (net.minecraft.world.entity.Entity) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(instance);
         net.minecraft.world.entity.Entity passengerHandle = (net.minecraft.world.entity.Entity) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(passenger);
-        if (vehicleHandle == null || passengerHandle == null || !passengerHandle.a(vehicleHandle, true)) {
+        if (vehicleHandle == null || passengerHandle == null) {
             return false;
         }
+
+  #if version >= 1.18
+        if (!passengerHandle.startRiding(vehicleHandle, true)) {
+            return false;
+        }
+  #else
+        if (!passengerHandle.a(vehicleHandle, true)) {
+            return false;
+        }
+  #endif
 
         // Requires type conversion to use raw
         com.bergerkiller.mountiplex.reflection.declarations.Template$Field entityVehicleField;
