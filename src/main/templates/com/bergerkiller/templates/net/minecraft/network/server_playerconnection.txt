@@ -136,4 +136,28 @@ class PlayerConnection {
         instance.sendPacket((Packet) new PacketPlayOutPosition(x, y, z, 0.0f, 0.0f, flags));
   #endif
     }
+
+    public void resetAwaitTeleport() {
+#if version >= 1.9
+  #if version >= 1.17
+        #require PlayerConnection private net.minecraft.world.phys.Vec3D awaitingPositionFromClient;
+        #require PlayerConnection private int awaitingTeleport;
+  #else
+        #require PlayerConnection private net.minecraft.world.phys.Vec3D awaitingPositionFromClient:teleportPos;
+        #require PlayerConnection private int awaitingTeleport:teleportAwait;
+  #endif
+
+        net.minecraft.world.phys.Vec3D curr = instance#awaitingPositionFromClient;
+        if (curr == null) {
+            return;
+        }
+
+        int counter = instance#awaitingTeleport;
+        if (++counter == Integer.MAX_VALUE) {
+            counter = 0;
+        }
+        instance#awaitingTeleport = counter;
+        instance#awaitingPositionFromClient = null;
+#endif
+    }
 }

@@ -22,6 +22,7 @@ public abstract class PlayerConnectionHandle extends Template.Handle {
     public abstract Object getNetworkManager();
     public abstract void sendPacket(Object packet);
     public abstract void sendPos(double x, double y, double z);
+    public abstract void resetAwaitTeleport();
 
     private static final QueuePacketMethod defaultQueuePacketMethod = com.bergerkiller.generated.net.minecraft.network.NetworkManagerHandle::queuePacketUnsafe;
     private static final java.util.Map<Class<?>, QueuePacketMethod> queuePacketMethods = new java.util.concurrent.ConcurrentHashMap<Class<?>, QueuePacketMethod>(5, 0.75f, 2);
@@ -106,6 +107,7 @@ public abstract class PlayerConnectionHandle extends Template.Handle {
         public final Template.Method<Object> getNetworkManager = new Template.Method<Object>();
         public final Template.Method.Converted<Void> sendPacket = new Template.Method.Converted<Void>();
         public final Template.Method<Void> sendPos = new Template.Method<Void>();
+        public final Template.Method<Void> resetAwaitTeleport = new Template.Method<Void>();
 
     }
 

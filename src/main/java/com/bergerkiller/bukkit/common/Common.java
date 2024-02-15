@@ -51,7 +51,8 @@ public class Common {
             "Common:Event:PlayerAdvancementProgressEvent",
             "Common:Yaml:ChildWithLiteralName",
             "Common:ChunkUtil:getChunkViewers",
-            "Common:SignChangeTracker:FormattedText"
+            "Common:SignChangeTracker:FormattedText",
+            "Common:ConnectionResetAwaitTeleport"
     ).collect(Collectors.toSet());
 
     /**
