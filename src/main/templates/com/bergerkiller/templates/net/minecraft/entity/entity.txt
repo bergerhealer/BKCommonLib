@@ -1837,17 +1837,21 @@ class Entity {
     public void appendEntityCrashDetails((CrashReportSystemDetailsHandle) CrashReportSystemDetails crashreportsystemdetails);
 #endif
 
-#if version >= 1.18
-    public void onPush:push(double d0, double d1, double d2);
-#elseif version >= 1.16.2
-    public void onPush:i(double d0, double d1, double d2);
-#elseif version >= 1.15
-    public void onPush:h(double d0, double d1, double d2);
-#elseif version >= 1.11
-    public void onPush:f(double d0, double d1, double d2);
-#else
-    public void onPush:g(double d0, double d1, double d2);
-#endif
+#select version >=
+#case 1.18:     public void onPush:push(double d0, double d1, double d2);
+#case 1.16.2:   public void onPush:i(double d0, double d1, double d2);
+#case 1.15:     public void onPush:h(double d0, double d1, double d2);
+#case 1.11:     public void onPush:f(double d0, double d1, double d2);
+#case else:     public void onPush:g(double d0, double d1, double d2);
+#endselect
+
+#select version >=
+#case 1.20:   public final void positionRider((org.bukkit.entity.Entity) Entity passenger);
+#case 1.18:   public void positionRider((org.bukkit.entity.Entity) Entity passenger);
+#case 1.17:   public void positionRider:i((org.bukkit.entity.Entity) Entity passenger);
+#case 1.9:    public void positionRider:k((org.bukkit.entity.Entity) Entity passenger);
+#case else:   public void positionRider((org.bukkit.entity.Entity) Entity passenger) { instance.al(); }
+#endselect
 
     /*
      * Entity class:

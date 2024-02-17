@@ -4,6 +4,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
+import com.bergerkiller.bukkit.common.controller.EntityPositionApplier;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
+import com.bergerkiller.mountiplex.reflection.util.FastMethod;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 
 import com.bergerkiller.bukkit.common.Common;
@@ -25,9 +30,12 @@ import com.bergerkiller.generated.net.minecraft.world.entity.item.EntityItemHand
 import com.bergerkiller.generated.net.minecraft.world.entity.player.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
+import org.bukkit.util.Vector;
 
 @ClassHook.HookPackage("net.minecraft.server")
 @ClassHook.HookImport("net.minecraft.world.entity.player.EntityHuman")
+@ClassHook.HookImport("net.minecraft.world.entity.Entity")
+@ClassHook.HookImport("net.minecraft.world.entity.Entity.MoveFunction")
 @ClassHook.HookImport("net.minecraft.world.EnumHand")
 @ClassHook.HookImport("net.minecraft.world.EnumInteractionResult")
 @ClassHook.HookImport("net.minecraft.world.item.ItemStack")
@@ -35,6 +43,7 @@ import com.bergerkiller.mountiplex.reflection.ClassHook;
 @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
 public class EntityHook extends ClassHook<EntityHook> {
     private EntityController<?> controller = null;
+    private boolean controllerPositionsPassengers = false;
     private Throwable stack = null;
 
     public void setStack(Throwable t) {
@@ -61,6 +70,10 @@ public class EntityHook extends ClassHook<EntityHook> {
 
     public void setController(EntityController<?> controller) {
         this.controller = controller;
+
+        // Optimization: don't do complex hook stuff if not implemented in controller
+        this.controllerPositionsPassengers = (controller != null) && CommonUtil.isMethodOverrided(EntityController.class, controller,
+                "onPositionPassenger", Entity.class, EntityPositionApplier.class);
     }
 
     public InteractionResult base_onInteractBy(HumanEntity humanEntity, HumanHand humanHand) {
@@ -76,6 +89,23 @@ public class EntityHook extends ClassHook<EntityHook> {
             return InteractionResult.fromTruthy(base.onInteractBy_1_8_8(entityHumanHandle));
         } else {
             throw new UnsupportedOperationException("Don't know what interact method is used!");
+        }
+    }
+
+    // Used for handling passenger position updates on 1.20+
+    private static final FastMethod<Void> moveFunctionMethod = new FastMethod<>();
+    static {
+        Class<?> moveFunctionType = CommonUtil.getClass("net.minecraft.world.entity.Entity$MoveFunction");
+        if (moveFunctionType != null) {
+            try {
+                moveFunctionMethod.init(Resolver.resolveAndGetDeclaredMethod(moveFunctionType,
+                        "accept", EntityHandle.T.getType(), double.class, double.class, double.class));
+                moveFunctionMethod.forceInitialization();
+            } catch (Throwable t) {
+                Logging.LOGGER.log(Level.WARNING, "Failed to find the Entity MoveFunction accept method", t);
+            }
+        } else if (CommonBootstrap.evaluateMCVersion(">=", "1.20")) {
+            Logging.LOGGER.warning("Failed to find the Entity MoveFunction class");
         }
     }
 
@@ -174,8 +204,89 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
+    private static final boolean POSITIONRIDER_1_20 = CommonBootstrap.evaluateMCVersion(">=", "1.20");
+    private static final boolean POSITIONRIDER_1_9_TO_1_20 = CommonBootstrap.evaluateMCVersion(">=", "1.9") &&
+                                                             CommonBootstrap.evaluateMCVersion("<", "1.20");
+    private static final boolean POSITIONRIDER_1_8 = CommonBootstrap.evaluateMCVersion("<", "1.9");
+
+    public void basePositionRider(Entity passenger, EntityPositionApplier applier) {
+        if (POSITIONRIDER_1_20) {
+            if (!(applier instanceof EntityPositionApplierWithNMSMoveFunction)) {
+                throw new IllegalArgumentException("Position applier is of an invalid type");
+            }
+            Object nmsMoveFunction = ((EntityPositionApplierWithNMSMoveFunction) applier).nmsMoveFunction;
+            base.onPositionRider_1_20(HandleConversion.toEntityHandle(passenger), nmsMoveFunction);
+        } else if (POSITIONRIDER_1_9_TO_1_20) {
+            base.onPositionRider_1_9_to_1_20(HandleConversion.toEntityHandle(passenger));
+        } else if (POSITIONRIDER_1_8) {
+            base.onPositionRider_1_8();
+        }
+    }
+
+    @HookMethodCondition("version >= 1.20")
+    @HookMethod("protected void positionRider(Entity passenger, Entity.MoveFunction moveFunction)")
+    public void onPositionRider_1_20(Object nmsPassenger, Object nmsMoveFunction) {
+        if (!controllerPositionsPassengers) {
+            base.onPositionRider_1_20(nmsPassenger, nmsMoveFunction);
+            return;
+        }
+
+        Entity bPassenger = WrapperConversion.toEntity(nmsPassenger);
+        if (bPassenger == null || !controller.getEntity().isPassenger(bPassenger)) {
+            base.onPositionRider_1_20(nmsPassenger, nmsMoveFunction);
+            return;
+        }
+
+        try {
+            EntityPositionApplierWithNMSMoveFunction applier = new EntityPositionApplierWithNMSMoveFunction(nmsPassenger, nmsMoveFunction);
+            controller.onPositionPassenger(bPassenger, applier);
+        } catch (Throwable t) {
+            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity position rider callback", t);
+        }
+    }
+
+    @HookMethodCondition("version >= 1.9 && version < 1.20")
+    @HookMethod("public void positionRider:???(Entity passenger)")
+    public void onPositionRider_1_9_to_1_20(Object nmsPassenger) {
+        if (!controllerPositionsPassengers) {
+            base.onPositionRider_1_9_to_1_20(nmsPassenger);
+            return;
+        }
+
+        Entity bPassenger = WrapperConversion.toEntity(nmsPassenger);
+        if (bPassenger == null || !controller.getEntity().isPassenger(bPassenger)) {
+            base.onPositionRider_1_9_to_1_20(nmsPassenger);
+            return;
+        }
+
+        try {
+            controller.onPositionPassenger(bPassenger, new EntityPositionApplierBaseImpl(nmsPassenger));
+        } catch (Throwable t) {
+            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity position rider callback", t);
+        }
+    }
+
+    @HookMethodCondition("version < 1.9")
+    @HookMethod("public void positionRider:al()")
+    public void onPositionRider_1_8() {
+        if (!controllerPositionsPassengers) {
+            base.onPositionRider_1_8();
+            return;
+        }
+
+        try {
+            List<Entity> passengers = controller.getEntity().getPassengers();
+            for (Entity passenger : passengers) {
+                controller.onPositionPassenger(passenger, new EntityPositionApplierBaseImpl(
+                        HandleConversion.toEntityHandle(passenger)));
+            }
+        } catch (Throwable t) {
+            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity position rider callback", t);
+        }
+    }
+
     @HookMethodCondition("version >= 1.14")
-    @HookMethod(value="public void move(net.minecraft.world.entity.EnumMoveType enummovetype, net.minecraft.world.phys.Vec3D vec3d)")
+    @HookMethod("public void move(net.minecraft.world.entity.EnumMoveType enummovetype, net.minecraft.world.phys.Vec3D vec3d)")
     public void onMove_v3(Object enumMoveType, Object vec3d) {
         double dx = Vec3DHandle.T.x.getDouble(vec3d);
         double dy = Vec3DHandle.T.y.getDouble(vec3d);
@@ -461,6 +572,71 @@ public class EntityHook extends ClassHook<EntityHook> {
             return false;
         } else {
             return true;
+        }
+    }
+
+    private static class EntityPositionApplierWithNMSMoveFunction extends EntityPositionApplierBaseImpl {
+        protected final Object nmsMoveFunction;
+
+        public EntityPositionApplierWithNMSMoveFunction(Object nmsEntity, Object nmsMoveFunction) {
+            super(nmsEntity);
+            this.nmsMoveFunction = nmsMoveFunction;
+        }
+
+        @Override
+        public void setPosition(double x, double y, double z) {
+            moveFunctionMethod.invoke(nmsMoveFunction, entityHandle.getRaw(), x, y, z);
+        }
+    }
+
+    /**
+     * Used for passenger movement handling
+     */
+    private static class EntityPositionApplierBaseImpl implements EntityPositionApplier {
+        protected final EntityHandle entityHandle;
+
+        public EntityPositionApplierBaseImpl(Object nmsEntity) {
+            this.entityHandle = EntityHandle.createHandle(nmsEntity);
+        }
+
+        @Override
+        public void setPosition(double x, double y, double z) {
+            entityHandle.setPosition(x, y, z);
+        }
+
+        @Override
+        public Vector getPosition() {
+            return entityHandle.getLoc();
+        }
+
+        @Override
+        public void setBodyYaw(float yaw) {
+            entityHandle.setYaw(yaw);
+        }
+
+        @Override
+        public void setHeadYaw(float yaw) {
+            entityHandle.setHeadRotation(yaw);
+        }
+
+        @Override
+        public void setHeadPitch(float pitch) {
+            entityHandle.setPitch(pitch);
+        }
+
+        @Override
+        public float getBodyYaw() {
+            return entityHandle.getYaw();
+        }
+
+        @Override
+        public float getHeadYaw() {
+            return entityHandle.getHeadRotation();
+        }
+
+        @Override
+        public float getHeadPitch() {
+            return entityHandle.getPitch();
         }
     }
 }

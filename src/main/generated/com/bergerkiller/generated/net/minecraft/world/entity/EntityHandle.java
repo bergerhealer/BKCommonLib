@@ -131,6 +131,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract boolean isSneaking();
     public abstract void appendEntityCrashDetails(CrashReportSystemDetailsHandle crashreportsystemdetails);
     public abstract void onPush(double d0, double d1, double d2);
+    public abstract void positionRider(Entity passenger);
     public abstract int getPortalCooldownMaximum();
     public abstract int getPortalWaitTime();
     public abstract boolean isAlwaysTicked();
@@ -418,6 +419,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Boolean> isSneaking = new Template.Method<Boolean>();
         public final Template.Method.Converted<Void> appendEntityCrashDetails = new Template.Method.Converted<Void>();
         public final Template.Method<Void> onPush = new Template.Method<Void>();
+        public final Template.Method.Converted<Void> positionRider = new Template.Method.Converted<Void>();
         public final Template.Method<Integer> getPortalCooldownMaximum = new Template.Method<Integer>();
         public final Template.Method<Integer> getPortalWaitTime = new Template.Method<Integer>();
         @Template.Optional

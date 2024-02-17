@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.controller;
 
 import org.bukkit.Chunk;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -117,7 +118,7 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
 
     /**
      * Handles the collision of another Entity with this minecart.
-     * Prior to calling this callback the {@link #onEntityCollision(entity)} is called
+     * Prior to calling this callback the {@link #onEntityCollision(Entity)} is called
      * as well. The default implementation executes the 'bump' code of this entity,
      * which handles the velocity changes when other entities bump into this entity.
      * This can be overrided for custom velocity adjustments.<br>
@@ -177,6 +178,18 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
      */
     public void onItemSet(int index, ItemStack item) {
         hook.base.setInventoryItem(index, HandleConversion.toItemStackHandle(item));
+    }
+
+    /**
+     * Called when the position of a passenger of this Entity must be calculated. By default
+     * positions the entity in the vanilla way. The applier should be used to set the position
+     * of the entity. Do not use teleport!
+     *
+     * @param passenger Passenger entity
+     * @param applier Position applier
+     */
+    public void onPositionPassenger(Entity passenger, EntityPositionApplier applier) {
+        hook.basePositionRider(passenger, applier);
     }
 
     /**
