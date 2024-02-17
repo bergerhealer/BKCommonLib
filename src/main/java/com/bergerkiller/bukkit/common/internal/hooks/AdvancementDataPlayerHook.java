@@ -291,9 +291,9 @@ public class AdvancementDataPlayerHook extends ClassHook<AdvancementDataPlayerHo
          * #if version >= 1.20.3
          *     return net.minecraft.core.registries.BuiltInRegistries.TRIGGER_TYPES;
          * #elseif version >= 1.18
-         *     return net.minecraft.advancements.critereon.CriterionTriggers.all();
+         *     return net.minecraft.advancements.CriterionTriggers.all();
          * #else
-         *     return net.minecraft.advancements.critereon.CriterionTriggers.a();
+         *     return net.minecraft.advancements.CriterionTriggers.a();
          * #endif
          * }
          */
