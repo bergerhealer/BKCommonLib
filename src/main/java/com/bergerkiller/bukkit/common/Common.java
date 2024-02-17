@@ -52,7 +52,8 @@ public class Common {
             "Common:Yaml:ChildWithLiteralName",
             "Common:ChunkUtil:getChunkViewers",
             "Common:SignChangeTracker:FormattedText",
-            "Common:ConnectionResetAwaitTeleport"
+            "Common:ConnectionResetAwaitTeleport",
+            "Common:EntityController:PositionPassenger"
     ).collect(Collectors.toSet());
 
     /**
