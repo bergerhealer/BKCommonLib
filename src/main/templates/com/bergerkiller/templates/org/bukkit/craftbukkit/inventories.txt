@@ -5,6 +5,7 @@ import net.minecraft.world.inventory.InventoryMerchant;
 
 import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryMerchantHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 
 class CraftItemStack {
     (Object) net.minecraft.world.item.ItemStack handle;
@@ -17,6 +18,30 @@ class CraftItemStack {
 
     public static org.bukkit.inventory.meta.ItemMeta deserializeItemMeta(java.util.Map<String, Object> values) {
         return CraftMetaItem$SerializableMeta.deserialize(values);
+    }
+
+    <code>
+    public static final org.bukkit.Material FILLED_MAP_TYPE;
+    static {
+        if (com.bergerkiller.bukkit.common.internal.CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            FILLED_MAP_TYPE = com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials.getMaterial("FILLED_MAP");
+        } else {
+            FILLED_MAP_TYPE = com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials.getLegacyMaterial("MAP");
+        }
+    }
+    </code>
+
+    public static boolean isMapItem(org.bukkit.inventory.ItemStack itemStack) {
+        if (itemStack instanceof CraftItemStack) {
+            // Avoid a Material registry lookup by using NMS
+            #require org.bukkit.craftbukkit.inventory.CraftItemStack net.minecraft.world.item.ItemStack handle;
+            CraftItemStack craftItemStack = (CraftItemStack) itemStack;
+            net.minecraft.world.item.ItemStack handle = craftItemStack#handle;
+            return handle != null && handle.getItem() instanceof net.minecraft.world.item.ItemWorldMap;
+        } else {
+            // Fallback
+            return itemStack != null && itemStack.getType() == CraftItemStackHandle.FILLED_MAP_TYPE;
+        }
     }
 }
 

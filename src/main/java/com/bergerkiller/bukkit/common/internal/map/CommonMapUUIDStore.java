@@ -5,8 +5,6 @@ import java.util.UUID;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
-import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
@@ -19,15 +17,7 @@ public class CommonMapUUIDStore {
     /**
      * Material for a filled map, the type given out when creating map display items
      */
-    public static final Material FILLED_MAP_TYPE;
-
-    static {
-        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
-            FILLED_MAP_TYPE = CommonLegacyMaterials.getMaterial("FILLED_MAP");
-        } else {
-            FILLED_MAP_TYPE = CommonLegacyMaterials.getLegacyMaterial("MAP");
-        }
-    }
+    public static final Material FILLED_MAP_TYPE = CraftItemStackHandle.FILLED_MAP_TYPE;
 
     /**
      * Gets whether an ItemStack contains a Map item
@@ -36,7 +26,7 @@ public class CommonMapUUIDStore {
      * @return True if a map item
      */
     public static boolean isMap(ItemStack item) {
-        return item != null && item.getType() == FILLED_MAP_TYPE;
+        return CraftItemStackHandle.isMapItem(item);
     }
 
     /**

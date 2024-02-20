@@ -38,6 +38,19 @@ public abstract class CraftItemStackHandle extends Template.Handle {
         return T.deserializeItemMeta.invoker.invoke(null,values);
     }
 
+    public static boolean isMapItem(ItemStack itemStack) {
+        return T.isMapItem.invoker.invoke(null,itemStack);
+    }
+
+
+    public static final org.bukkit.Material FILLED_MAP_TYPE;
+    static {
+        if (com.bergerkiller.bukkit.common.internal.CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            FILLED_MAP_TYPE = com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials.getMaterial("FILLED_MAP");
+        } else {
+            FILLED_MAP_TYPE = com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials.getLegacyMaterial("MAP");
+        }
+    }
     public abstract Object getHandle();
     public abstract void setHandle(Object value);
     /**
@@ -51,6 +64,7 @@ public abstract class CraftItemStackHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<ItemStack> asCraftCopy = new Template.StaticMethod.Converted<ItemStack>();
         public final Template.StaticMethod.Converted<ItemStack> asCraftMirror = new Template.StaticMethod.Converted<ItemStack>();
         public final Template.StaticMethod<ItemMeta> deserializeItemMeta = new Template.StaticMethod<ItemMeta>();
+        public final Template.StaticMethod<Boolean> isMapItem = new Template.StaticMethod<Boolean>();
 
     }
 
