@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.collections;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -10,12 +11,16 @@ import java.util.Map.Entry;
 /**
  * A map that obtains the value bound to a given Class. Only if the key
  * specified is an instance of a mapped Class, is the value returned.
+ * This class is multithread-safe. Multiple threads can put new type
+ * mappings, or get them at the same time.
  *
  * @param <V> - Value type to map to Class keys
  */
 public class ClassMap<V> {
 
-    private final LinkedHashMap<Class<?>, V> classes = new LinkedHashMap<Class<?>, V>();
+    private final Object lock = new Object();
+    private LinkedHashMap<Class<?>, V> classes = new LinkedHashMap<Class<?>, V>();
+    private Map<Class<?>, V> classesGetCache = Collections.emptyMap();
 
     /**
      * Puts a Class : Value pair into this map. Null types are ignored.
@@ -40,7 +45,12 @@ public class ClassMap<V> {
         if (type == null) {
             return;
         }
-        classes.put(type, value);
+
+        synchronized (lock) {
+            LinkedHashMap<Class<?>, V> newClasses = new LinkedHashMap<>(classes);
+            newClasses.put(type, value);
+            classesGetCache = classes = newClasses;
+        }
     }
 
     /**
@@ -50,19 +60,7 @@ public class ClassMap<V> {
      * @return the value bound to the instance type
      */
     public V get(Class<?> type) {
-        if (type == null) {
-            return null;
-        }
-        final V value = classes.get(type);
-        if (value != null) {
-            return value;
-        }
-        for (Entry<Class<?>, V> entry : classes.entrySet()) {
-            if (entry.getKey().isAssignableFrom(type)) {
-                return entry.getValue();
-            }
-        }
-        return null;
+        return getOrDefault(type, null);
     }
 
     /**
@@ -74,18 +72,27 @@ public class ClassMap<V> {
      * @return the value bound to the instance type, or the default value
      */
     public V getOrDefault(Class<?> type, V defaultValue) {
-        if (type == null) {
-            return defaultValue;
-        }
-        final V value = classes.get(type);
+        V value = classesGetCache.get(type);
         if (value != null) {
             return value;
+        } else if (type == null) {
+            return defaultValue; // Weird? That's how it was...
         }
+
+        // Try to find another entry whose class is a superclass
+        // If found, return it as a result and cache it for next time
         for (Entry<Class<?>, V> entry : classes.entrySet()) {
             if (entry.getKey().isAssignableFrom(type)) {
-                return entry.getValue();
+                value = entry.getValue();
+                synchronized (lock) {
+                    Map<Class<?>, V> newCache = new HashMap<>(classesGetCache);
+                    newCache.putIfAbsent(type, value);
+                    classesGetCache = newCache;
+                }
+                return value;
             }
         }
+
         return defaultValue;
     }
 
@@ -98,21 +105,14 @@ public class ClassMap<V> {
     public V get(Object instance) {
         if (instance == null) {
             return null;
+        } else {
+            return get(instance.getClass());
         }
-        final V value = classes.get(instance.getClass());
-        if (value != null) {
-            return value;
-        }
-        for (Entry<Class<?>, V> entry : classes.entrySet()) {
-            if (entry.getKey().isInstance(instance)) {
-                return entry.getValue();
-            }
-        }
-        return null;
     }
 
     /**
-     * Obtains an unmodifiable map of the classes stored
+     * Obtains an unmodifiable map of the classes stored. The returned object
+     * is not modified when put is called and can be safely iterated.
      *
      * @return Class Instance Map data
      */
