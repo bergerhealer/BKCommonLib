@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import com.bergerkiller.mountiplex.reflection.ReflectionUtil;
+import com.bergerkiller.mountiplex.reflection.util.FastField;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -26,8 +28,6 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
-import com.bergerkiller.mountiplex.reflection.ClassTemplate;
-import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.util.NullInstantiator;
 import com.bergerkiller.mountiplex.reflection.util.fast.ConstantReturningInvoker;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
@@ -273,18 +273,15 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
     // caches the CraftWorld/CraftChunk fields stored inside the BlockState for later re-swapping
     private static final class BlockStateCache {
         private static final HashMap<Class<?>, BlockStateCache> cache = new HashMap<Class<?>, BlockStateCache>();
-        public final SafeField<Object> tileEntityField;
+        public final FastField<Object> tileEntityField;
 
         @SuppressWarnings("unchecked")
         private BlockStateCache(Class<?> type) {
-            ClassTemplate<?> template = ClassTemplate.create(type);
-            SafeField<?> tmpTileEntityField = null;
-            for (SafeField<?> f : template.getFields()) {
-                if (TileEntityHandle.T.isAssignableFrom(f.getType())) {
-                    tmpTileEntityField = f;
-                }
-            }
-            tileEntityField = (SafeField<Object>) tmpTileEntityField;
+            tileEntityField = ReflectionUtil.getAllNonStaticFields(type)
+                    .filter(f -> TileEntityHandle.T.isAssignableFrom(f.getType()))
+                    .reduce((first, second) -> second) // Select last
+                    .map(FastField::new)
+                    .orElse(null);
         }
 
         public static BlockStateCache get(Class<?> type) {

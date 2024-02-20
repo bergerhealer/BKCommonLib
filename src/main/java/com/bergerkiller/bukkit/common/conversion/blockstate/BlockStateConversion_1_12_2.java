@@ -1,10 +1,14 @@
 package com.bergerkiller.bukkit.common.conversion.blockstate;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
+import com.bergerkiller.mountiplex.reflection.ReflectionUtil;
+import com.bergerkiller.mountiplex.reflection.util.FastField;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -15,7 +19,6 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
@@ -27,8 +30,6 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
-import com.bergerkiller.mountiplex.reflection.ClassTemplate;
-import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.util.fast.ConstantReturningInvoker;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
 import com.bergerkiller.mountiplex.reflection.util.fast.NullInvoker;
@@ -198,10 +199,10 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
 
             // Internal BlockState needs to have all proxy field instances replaced with what it should be
             BlockStateCache cache = BlockStateCache.get(result.getClass());
-            for (SafeField<World> worldField : cache.worldFields) {
+            for (FastField<World> worldField : cache.worldFields) {
                 worldField.set(result, input_state.block.getWorld());
             }
-            for (SafeField<Chunk> chunkField : cache.chunkFields) {
+            for (FastField<Chunk> chunkField : cache.chunkFields) {
                 chunkField.set(result, input_state.block.getChunk());
             }
 
@@ -269,28 +270,30 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
     // caches the CraftWorld/CraftChunk fields stored inside the BlockState for later re-swapping
     private static final class BlockStateCache {
         private static final HashMap<Class<?>, BlockStateCache> cache = new HashMap<Class<?>, BlockStateCache>();
-        public final SafeField<Chunk> chunkFields[];
-        public final SafeField<World> worldFields[];
-        public final SafeField<Object> tileEntityField;
+        public final FastField<Chunk> chunkFields[];
+        public final FastField<World> worldFields[];
+        public final FastField<Object> tileEntityField;
 
         @SuppressWarnings("unchecked")
         private BlockStateCache(Class<?> type) {
-            ClassTemplate<?> template = ClassTemplate.create(type);
-            ArrayList<SafeField<?>> tmpChunkFields = new ArrayList<SafeField<?>>();
-            ArrayList<SafeField<?>> tmpWorldFields = new ArrayList<SafeField<?>>();
-            SafeField<?> tmpTileEntityField = null;
-            for (SafeField<?> f : template.getFields()) {
-                if (Chunk.class.isAssignableFrom(f.getType())) {
-                    tmpChunkFields.add(f);
-                } else if (World.class.isAssignableFrom(f.getType())) {
-                    tmpWorldFields.add(f);
-                } else if (TileEntityHandle.T.isAssignableFrom(f.getType())) {
-                    tmpTileEntityField = f;
-                }
-            }
-            chunkFields = LogicUtil.toArray(tmpChunkFields, SafeField.class);
-            worldFields = LogicUtil.toArray(tmpWorldFields, SafeField.class);
-            tileEntityField = (SafeField<Object>) tmpTileEntityField;
+            List<Field> allFields = ReflectionUtil.getAllNonStaticFields(type)
+                    .collect(Collectors.toList());
+
+            chunkFields = allFields.stream()
+                    .filter(f -> Chunk.class.isAssignableFrom(f.getType()))
+                    .map(FastField::new)
+                    .toArray(FastField[]::new);
+
+            worldFields = allFields.stream()
+                    .filter(f -> World.class.isAssignableFrom(f.getType()))
+                    .map(FastField::new)
+                    .toArray(FastField[]::new);
+
+            tileEntityField = allFields.stream()
+                    .filter(f -> TileEntityHandle.T.isAssignableFrom(f.getType()))
+                    .reduce((first, second) -> second) // Select last
+                    .map(FastField::new)
+                    .orElse(null);
         }
 
         public static BlockStateCache get(Class<?> type) {
