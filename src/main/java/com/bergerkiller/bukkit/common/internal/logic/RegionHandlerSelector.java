@@ -3,6 +3,8 @@ package com.bergerkiller.bukkit.common.internal.logic;
 import java.util.BitSet;
 import java.util.Set;
 
+import com.bergerkiller.bukkit.common.bases.IntCuboid;
+import org.bukkit.Location;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
@@ -63,6 +65,21 @@ final class RegionHandlerSelector extends RegionHandler {
         } else {
             return fallback;
         }
+    }
+
+    @Override
+    public int getMinHeight(World world) {
+        return getHandler(world).getMinHeight(world);
+    }
+
+    @Override
+    public int getMaxHeight(World world) {
+        return getHandler(world).getMaxHeight(world);
+    }
+
+    @Override
+    public IntCuboid createWorldBorder(Location center, double size) {
+        return getHandler(center.getWorld()).createWorldBorder(center, size);
     }
 
     @Override

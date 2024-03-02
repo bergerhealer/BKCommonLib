@@ -1429,23 +1429,14 @@ public class WorldUtil extends ChunkUtil {
 
         public CachedWorldBlockBorder withNewBorder(Location center, double size) {
             return new CachedWorldBlockBorder(center, size,
-                    toBorder(center, size, border.min.y, border.max.y));
+                    IntCuboid.createWorldBorder(center, size, border.min.y, border.max.y));
         }
 
         public static CachedWorldBlockBorder create(World world) {
             WorldBorder border = world.getWorldBorder();
             Location center = border.getCenter();
             double size = border.getSize();
-            int minY = RegionHandler.INSTANCE.getMinHeight(world);
-            int maxY = RegionHandler.INSTANCE.getMaxHeight(world);
-            return new CachedWorldBlockBorder(center, size, toBorder(center, size, minY, maxY));
-        }
-
-        private static IntCuboid toBorder(Location center, double size, int minY, int maxY) {
-            double hsize = 0.5 * size;
-            IntVector3 min = IntVector3.blockOf(center.getX() - hsize, minY, center.getZ() - hsize);
-            IntVector3 max = IntVector3.blockOf(center.getX() + hsize + 1, maxY, center.getZ() + hsize + 1);
-            return IntCuboid.create(min, max);
+            return new CachedWorldBlockBorder(center, size, RegionHandler.INSTANCE.createWorldBorder(center, size));
         }
     }
 }

@@ -47,6 +47,22 @@ public final class IntCuboid {
     }
 
     /**
+     * Creates the IntCuboid of a World Border
+     *
+     * @param center Center point of the World Border
+     * @param size Size of the world border
+     * @param minY Minimum build height
+     * @param maxY Maximum build height
+     * @return IntCuboid
+     */
+    public static IntCuboid createWorldBorder(Location center, double size, int minY, int maxY) {
+        double hsize = 0.5 * size;
+        IntVector3 min = IntVector3.blockOf(center.getX() - hsize, minY, center.getZ() - hsize);
+        IntVector3 max = IntVector3.blockOf(center.getX() + hsize + 1, maxY, center.getZ() + hsize + 1);
+        return IntCuboid.create(min, max);
+    }
+
+    /**
      * Gets whether the minimum X-coordinate is 'unlimited', meaning it is set
      * to Integer.MIN_VALUE to indicate there is no limit.
      *

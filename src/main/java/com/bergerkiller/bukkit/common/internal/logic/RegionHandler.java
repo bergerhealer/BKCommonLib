@@ -4,6 +4,8 @@ import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.bergerkiller.bukkit.common.bases.IntCuboid;
+import org.bukkit.Location;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
@@ -130,5 +132,18 @@ public abstract class RegionHandler implements LazyInitializedObject, LibraryCom
      */
     public int getMaxHeight(World world) {
         return world.getMaxHeight();
+    }
+
+    /**
+     * Creates a new world border cuboid, making use of the center coordinate and world border
+     * size specified.
+     *
+     * @param center World Border center point
+     * @param size Size of the world border
+     * @return IntCuboid
+     */
+    public IntCuboid createWorldBorder(Location center, double size) {
+        World world = center.getWorld();
+        return IntCuboid.createWorldBorder(center, size, getMinHeight(world), getMaxHeight(world));
     }
 }
