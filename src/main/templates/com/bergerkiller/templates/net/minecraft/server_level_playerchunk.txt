@@ -34,10 +34,10 @@ class PlayerChunk {
         return (PlayerChunkMap) instance.playerProvider;
 #elseif version >= 1.14
         return (PlayerChunkMap) instance.players;
-#elseif version >= 1.9
+#elseif exists net.minecraft.server.level.PlayerChunk private final PlayerChunkMap playerChunkMap;
         #require net.minecraft.server.level.PlayerChunk private final PlayerChunkMap playerChunkMap;
         return instance#playerChunkMap;
-#elseif version >= 1.8.3
+#elseif exists net.minecraft.server.level.PlayerChunk private final PlayerChunkMap this$0;
         #require net.minecraft.server.level.PlayerChunk private final PlayerChunkMap playerChunkMap:this$0;
         return instance#playerChunkMap;
 #else
@@ -335,7 +335,7 @@ class PlayerChunk {
 #elseif version >= 1.8
     #require net.minecraft.server.level.PlayerChunk private final net.minecraft.world.level.ChunkCoordIntPair location;
     #require net.minecraft.server.level.PlayerChunk private boolean loaded;
-    #if version >= 1.8.3
+    #if exists net.minecraft.server.level.PlayerChunk private final PlayerChunkMap this$0;
         #require net.minecraft.server.level.PlayerChunk private final PlayerChunkMap playerChunkMap:this$0;
     #else
         #require net.minecraft.server.level.PlayerChunk final PlayerChunkMap playerChunkMap;
