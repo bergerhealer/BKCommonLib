@@ -110,7 +110,11 @@ class PlayerConnection {
      */
     public static PlayerConnectionHandle forPlayer(org.bukkit.entity.Player player) {
         Object handle = com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player);
-        if (!com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle.T.isType(handle)) return null; // Check not NPC player
+
+        // Check not NPC player
+        // This check used to exist 7+ years ago or even older, and even back then it was unknown if this check was even needed.
+        // I've disabled it (9 apr 2024) because this breaks sending packets when mods/plugins alter the server player instance.
+        //if (!com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle.T.isType(handle)) return null;
 
         final PlayerConnectionHandle connection = com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle.T.playerConnection.get(handle);
         if (connection == null || !connection.isConnected()) {
