@@ -94,6 +94,12 @@ public abstract class DisplayHandle extends EntityHandle {
         /* ============================================================================== */
 
 
+        public static final byte STYLE_FLAG_SHADOW = 1;
+        public static final byte STYLE_FLAG_SEE_THROUGH = 2;
+        public static final byte STYLE_FLAG_USE_DEFAULT_BACKGROUND = 4;
+        public static final byte STYLE_FLAG_ALIGN_LEFT = 8;
+        public static final byte STYLE_FLAG_ALIGN_RIGHT = 16;
+
         public static final Key<com.bergerkiller.bukkit.common.wrappers.ChatText> DATA_TEXT = Key.Type.CHAT_TEXT.createKey(T.DATA_TEXT_ID, -1);
         public static final Key<Integer> DATA_LINE_WIDTH = Key.Type.INTEGER.createKey(T.DATA_LINE_WIDTH_ID, -1);
         public static final Key<Integer> DATA_BACKGROUND_COLOR = Key.Type.INTEGER.createKey(T.DATA_BACKGROUND_COLOR_ID, -1);
