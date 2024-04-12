@@ -105,7 +105,7 @@ class CraftBlock {
 #endif
 
     public static Object getBlockTileEntity(org.bukkit.block.Block block) {
-        net.minecraft.world.level.World nmsWorld = ((org.bukkit.craftbukkit.CraftWorld) block.getWorld()).getHandle();
+        net.minecraft.world.level.World nmsWorld = (net.minecraft.world.level.World) ((org.bukkit.craftbukkit.CraftWorld) block.getWorld()).getHandle();
         net.minecraft.core.BlockPosition nmsBlockPos;
 
 #if version >= 1.13.1
