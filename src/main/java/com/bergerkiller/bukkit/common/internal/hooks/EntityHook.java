@@ -420,6 +420,28 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
+    @HookMethodCondition("version >= 1.20 && exists net.minecraft.world.entity.Entity " +
+                         "public void remove(net.minecraft.world.entity.Entity.RemovalReason removalReason, " +
+                         "                   org.bukkit.event.entity.EntityRemoveEvent.Cause cause)")
+    @HookMethod("public void remove(net.minecraft.world.entity.Entity.RemovalReason removalReason, org.bukkit.event.entity.EntityRemoveEvent.Cause cause);")
+    public void onEntityRemovedWithCause(Object removalReason, Object removeEventCause) {
+        try {
+            if (checkController()) {
+                if (removalReason == ENTTIY_REMOVE_REASON_KILLED) {
+                    controller.onDie(true);
+                } else if (removalReason == ENTTIY_REMOVE_REASON_DISCARDED) {
+                    controller.onDie(false);
+                } else {
+                    base.onEntityRemovedWithCause(removalReason, removeEventCause);
+                }
+            } else {
+                base.onEntityRemovedWithCause(removalReason, removeEventCause);
+            }
+        } catch (Throwable t) {
+            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity remove callback", t);
+        }
+    }
+
     @HookMethod("public String getStringUUID:???()")
     public String getStringUUID() {
         try {
