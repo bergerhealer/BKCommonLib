@@ -324,10 +324,12 @@ public class EntityHook extends ClassHook<EntityHook> {
         this.onMove_v2(MoveType.SELF.getHandle(), dx, dy, dz);
     }
 
-    private static final Object ENTTIY_REMOVE_REASON_KILLED;
-    private static final Object ENTTIY_REMOVE_REASON_DISCARDED;
+    private static final Object ENTITY_REMOVE_REASON_KILLED;
+    private static final Object ENTITY_REMOVE_REASON_DISCARDED;
+    private static BaseEntityRemoveHandler BASE_ENTITY_REMOVED;
     static {
         Object killed = null, discarded = null;
+        BaseEntityRemoveHandler baseEntityRemoved = (hook, removalReason, cause) -> {};
         if (CommonCapabilities.ENTITY_REMOVE_WITH_REASON) {
             Class<?> reasonClass = CommonUtil.getClass("net.minecraft.world.entity.Entity.RemovalReason");
             if (reasonClass == null) {
@@ -341,26 +343,32 @@ public class EntityHook extends ClassHook<EntityHook> {
                         .filter(n -> n.name().equals("DISCARDED"))
                         .findFirst().orElse(null);
             }
+            baseEntityRemoved = (base, removalReason, cause) -> base.onEntityRemoved(removalReason);
+
+            // Is there an alternative method that accepts a Bukkit cause? If so, call that one instead
+            // This avoids a circular loop when the non-cause method calls into the one with cause
+            Class<?> bukkitCauseClass = CommonUtil.getClass("org.bukkit.event.entity.EntityRemoveEvent.Cause");
+            if (bukkitCauseClass != null) {
+                try {
+                    Resolver.resolveAndGetDeclaredMethod(EntityHandle.T.getType(), "remove", reasonClass, bukkitCauseClass);
+                    baseEntityRemoved = EntityHook::onEntityRemovedWithCause;
+                } catch (Throwable t) { /* ignore */ }
+            }
         }
-        ENTTIY_REMOVE_REASON_KILLED = killed;
-        ENTTIY_REMOVE_REASON_DISCARDED = discarded;
+        ENTITY_REMOVE_REASON_KILLED = killed;
+        ENTITY_REMOVE_REASON_DISCARDED = discarded;
+        BASE_ENTITY_REMOVED = baseEntityRemoved;
+    }
+
+    @FunctionalInterface
+    private interface BaseEntityRemoveHandler {
+        void remove(EntityHook hook, Object removalReason, Object cause);
     }
 
     public void onBaseDeath(boolean killed) {
         if (CommonCapabilities.ENTITY_REMOVE_WITH_REASON) {
-            if (CommonCapabilities.MOJANGMAP_METHODS) {
-                if (killed) {
-                    base.onEntityRemoved(ENTTIY_REMOVE_REASON_KILLED);
-                } else {
-                    base.onEntityRemoved(ENTTIY_REMOVE_REASON_DISCARDED);
-                }
-            } else {
-                if (killed) {
-                    base.onEntityRemoved_1_17(ENTTIY_REMOVE_REASON_KILLED);
-                } else {
-                    base.onEntityRemoved_1_17(ENTTIY_REMOVE_REASON_DISCARDED);
-                }
-            }
+            BASE_ENTITY_REMOVED.remove(base, killed ? ENTITY_REMOVE_REASON_KILLED
+                                                    : ENTITY_REMOVE_REASON_DISCARDED, null);
         } else {
             base.die();
         }
@@ -380,62 +388,42 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
-    @HookMethodCondition("version >= 1.17 && version <= 1.17.1")
-    @HookMethod("public void remove:a(net.minecraft.world.entity.Entity.RemovalReason removalReason)")
-    public void onEntityRemoved_1_17(Object removalReason) {
-        try {
-            if (checkController()) {
-                if (removalReason == ENTTIY_REMOVE_REASON_KILLED) {
-                    controller.onDie(true);
-                } else if (removalReason == ENTTIY_REMOVE_REASON_DISCARDED) {
-                    controller.onDie(false);
-                } else {
-                    base.onEntityRemoved_1_17(removalReason);
-                }
-            } else {
-                base.onEntityRemoved_1_17(removalReason);
-            }
-        } catch (Throwable t) {
-            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity remove callback", t);
-        }
-    }
-
-    @HookMethodCondition("version >= 1.18")
-    @HookMethod("public void remove(net.minecraft.world.entity.Entity.RemovalReason removalReason)")
+    @HookMethodCondition("version >= 1.17")
+    @HookMethod("public void remove:???(net.minecraft.world.entity.Entity.RemovalReason removalReason)")
     public void onEntityRemoved(Object removalReason) {
         try {
             if (checkController()) {
-                if (removalReason == ENTTIY_REMOVE_REASON_KILLED) {
+                if (removalReason == ENTITY_REMOVE_REASON_KILLED) {
                     controller.onDie(true);
-                } else if (removalReason == ENTTIY_REMOVE_REASON_DISCARDED) {
+                } else if (removalReason == ENTITY_REMOVE_REASON_DISCARDED) {
                     controller.onDie(false);
                 } else {
-                    base.onEntityRemoved(removalReason);
+                    BASE_ENTITY_REMOVED.remove(base, removalReason, null);
                 }
             } else {
-                base.onEntityRemoved(removalReason);
+                BASE_ENTITY_REMOVED.remove(base, removalReason, null);
             }
         } catch (Throwable t) {
             Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity remove callback", t);
         }
     }
 
-    @HookMethodCondition("version >= 1.20 && exists net.minecraft.world.entity.Entity " +
-                         "public void remove(net.minecraft.world.entity.Entity.RemovalReason removalReason, " +
-                         "                   org.bukkit.event.entity.EntityRemoveEvent.Cause cause)")
+    @HookMethodCondition("exists net.minecraft.world.entity.Entity public void remove(" +
+                         "    net.minecraft.world.entity.Entity.RemovalReason removalReason," +
+                         "    org.bukkit.event.entity.EntityRemoveEvent.Cause cause)")
     @HookMethod("public void remove(net.minecraft.world.entity.Entity.RemovalReason removalReason, org.bukkit.event.entity.EntityRemoveEvent.Cause cause);")
     public void onEntityRemovedWithCause(Object removalReason, Object removeEventCause) {
         try {
             if (checkController()) {
-                if (removalReason == ENTTIY_REMOVE_REASON_KILLED) {
+                if (removalReason == ENTITY_REMOVE_REASON_KILLED) {
                     controller.onDie(true);
-                } else if (removalReason == ENTTIY_REMOVE_REASON_DISCARDED) {
+                } else if (removalReason == ENTITY_REMOVE_REASON_DISCARDED) {
                     controller.onDie(false);
                 } else {
-                    base.onEntityRemovedWithCause(removalReason, removeEventCause);
+                    BASE_ENTITY_REMOVED.remove(base, removalReason, removeEventCause);
                 }
             } else {
-                base.onEntityRemovedWithCause(removalReason, removeEventCause);
+                BASE_ENTITY_REMOVED.remove(base, removalReason, removeEventCause);
             }
         } catch (Throwable t) {
             Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity remove callback", t);

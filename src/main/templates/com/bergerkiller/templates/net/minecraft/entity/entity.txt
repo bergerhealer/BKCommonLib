@@ -1909,6 +1909,15 @@ class Entity {
     public optional void opt_tick_pushToHopper:###();
 #endif
 
+    // Since MC 1.17. Has a special 'cause' Bukkit parameter on paper since 1.20.4-ish.
+#if version >= 1.18
+    public optional void remove(net.minecraft.world.entity.Entity.RemovalReason removalReason);
+#elseif version >= 1.17
+    public optional void remove:a(net.minecraft.world.entity.Entity.RemovalReason removalReason);
+#else
+    public optional void remove:###(net.minecraft.world.entity.Entity.RemovalReason removalReason);
+#endif
+
     // Since MC 1.16
 #if version >= 1.18
     public optional (InteractionResult) EnumInteractionResult onInteractBy_1_16:interact((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
