@@ -255,6 +255,18 @@ public class DebugUtil {
     }
 
     /**
+     * Goes down the entirety of the server to see where a particular instance of a variable is referenced.
+     * Note that this is very, very slow! It is here to verify correct replacement of hooks and the like.
+     * <br><br>
+     * All locations where the instance lives will be logged.
+     *
+     * @param matcher predicate to identify the variable to find
+     */
+    public static void logInstancesMatching(Predicate<Object> matcher) {
+        logInstancesMatching(Bukkit.class, matcher);
+    }
+
+    /**
      * Goes down the entirety of the class type specified to see where a particular instance of a variable is referenced.
      * Note that this is very, very slow! It is here to verify correct replacement of hooks and the like.
      * <br><br>
@@ -264,8 +276,25 @@ public class DebugUtil {
      * @param value to find
      */
     public static void logInstances(Object startObject, Object value) {
-        InstanceSearcher searcher = new InstanceSearcher(value);
+        InstanceSearcher searcher = new InstanceSearcher(o -> o == value);
         searcher.logger.info("Searching for [" + value.getClass().getName() + "] " + value.toString() + ":");
+        searcher.searchFrom(new StackElement(startObject));
+        searcher.run();
+        searcher.logger.info("Search completed.");
+    }
+
+    /**
+     * Goes down the entirety of the class type specified to see where a particular instance of a variable is referenced.
+     * Note that this is very, very slow! It is here to verify correct replacement of hooks and the like.
+     * <br><br>
+     * All locations where the instance lives will be logged.
+     *
+     * @param startObject to start looking for member values to begin
+     * @param matcher predicate to identify the variable to find
+     */
+    public static void logInstancesMatching(Object startObject, Predicate<Object> matcher) {
+        InstanceSearcher searcher = new InstanceSearcher(matcher);
+        searcher.logger.info("Searching for matching objects...");
         searcher.searchFrom(new StackElement(startObject));
         searcher.run();
         searcher.logger.info("Search completed.");
@@ -281,8 +310,25 @@ public class DebugUtil {
      * @param value to find
      */
     public static void logInstances(Class<?> startClass, Object value) {
-        InstanceSearcher searcher = new InstanceSearcher(value);
+        InstanceSearcher searcher = new InstanceSearcher(o -> o == value);
         searcher.logger.info("Searching for [" + value.getClass().getName() + "] " + value.toString() + ":");
+        searcher.searchFromClassFields(startClass);
+        searcher.run();
+        searcher.logger.info("Search completed.");
+    }
+
+    /**
+     * Goes down the entirety of the class type specified to see where a particular instance of a variable is referenced.
+     * Note that this is very, very slow! It is here to verify correct replacement of hooks and the like.
+     * <br><br>
+     * All locations where the instance lives will be logged.
+     *
+     * @param startClass to start looking for static values to begin
+     * @param matcher predicate to identify the variable to find
+     */
+    public static void logInstancesMatching(Class<?> startClass, Predicate<Object> matcher) {
+        InstanceSearcher searcher = new InstanceSearcher(matcher);
+        searcher.logger.info("Searching for matching objects...");
         searcher.searchFromClassFields(startClass);
         searcher.run();
         searcher.logger.info("Search completed.");
@@ -466,13 +512,13 @@ public class DebugUtil {
         private final ModuleLogger logger = Logging.LOGGER_DEBUG;
         private final IdentityHashMap<Object, Boolean> crossedValues = new IdentityHashMap<Object, Boolean>();
         private final HashMap<Class<?>, ArrayList<Field>> classFieldMapping = new HashMap<Class<?>, ArrayList<Field>>();
-        private final Object valueToFind;
+        private final Predicate<Object> matcher;
         private final StackTreeElement resultTree = new StackTreeElement(null);
         private List<StackElement> pending = new ArrayList<StackElement>();
         private List<StackElement> pending_tmp = new ArrayList<StackElement>(); // swapped for safe iteration
 
-        public InstanceSearcher(Object valueToFind) {
-            this.valueToFind = valueToFind;
+        public InstanceSearcher(Predicate<Object> matcher) {
+            this.matcher = matcher;
         }
 
         public void run() {
@@ -551,7 +597,7 @@ public class DebugUtil {
         }
 
         public void searchFrom(StackElement current) {
-            if (current.value == valueToFind) {
+            if (matcher.test(current.value)) {
                 // Compute the full stack that got us here
                 List<StackElement> stack = MountiplexUtil.iterateNullTerminated(current, s -> s.parent)
                         .collect(Collectors.toCollection(ArrayList::new));
