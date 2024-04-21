@@ -250,9 +250,18 @@ class PacketPlayInUseEntity extends Packet {
 
     // Since 1.17 there is an immutable UseType class storing all the details of the packet
     // It is incorrectly remapped to EnumEntityUseAction (!)
+#if version >= 1.18
+    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity.UseType public abstract (Enum) net.minecraft.network.protocol.game.PacketPlayInUseEntity.EnumEntityUseAction getType();
+#elseif version >= 1.17
+    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity.UseType public abstract (Enum) net.minecraft.network.protocol.game.PacketPlayInUseEntity.EnumEntityUseAction getType:a();
+#elseif version >= 1.13
+    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity public PacketPlayInUseEntity.EnumEntityUseAction getType:b();
+#else
+    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity public PacketPlayInUseEntity.EnumEntityUseAction getType:a();
+#endif
+
 #if version >= 1.17
     #require net.minecraft.network.protocol.game.PacketPlayInUseEntity private final PacketPlayInUseEntity.UseType action;
-    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity.UseType public abstract (Enum) net.minecraft.network.protocol.game.PacketPlayInUseEntity.EnumEntityUseAction getType:a();
     #require net.minecraft.network.protocol.game.PacketPlayInUseEntity.d private final readonly net.minecraft.world.EnumHand interactHand:hand;
     #require net.minecraft.network.protocol.game.PacketPlayInUseEntity.e private final readonly net.minecraft.world.EnumHand interactAtHand:hand;
     #require net.minecraft.network.protocol.game.PacketPlayInUseEntity.e private final readonly net.minecraft.world.phys.Vec3D interactAtLocation:location;
@@ -307,12 +316,6 @@ class PacketPlayInUseEntity extends Packet {
         instance#action = #createUseTypeInteract(hand);
     }
 #else
-  #if version >= 1.13
-    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity public PacketPlayInUseEntity.EnumEntityUseAction getType:b();
-  #else
-    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity public PacketPlayInUseEntity.EnumEntityUseAction getType:a();
-  #endif
-
     public boolean isInteract() {
         return instance#getType() == PacketPlayInUseEntity$EnumEntityUseAction.INTERACT;
     }
@@ -818,6 +821,18 @@ class PacketPlayOutSetSlot extends Packet {
     }
 }
 
+class PacketPlayOutWindowData extends Packet {
+#if version >= 1.17
+    private final int windowId:containerId;
+    private final int id;
+    private final int value;
+#else
+    private int windowId:a;
+    private int id:b;
+    private int value:c;
+#endif
+}
+
 class PacketPlayOutWindowItems extends Packet {
 #if version >= 1.17
     private int windowId:containerId;
@@ -831,6 +846,14 @@ class PacketPlayOutWindowItems extends Packet {
     private (List<org.bukkit.inventory.ItemStack>) List<ItemStack> items:b;
 #else
     private (List<org.bukkit.inventory.ItemStack>) ItemStack[] items:b;
+#endif
+}
+
+class PacketPlayOutCloseWindow extends Packet {
+#if version >= 1.17
+    private int windowId:containerId;
+#else
+    private int windowId:a;
 #endif
 }
 
@@ -1212,6 +1235,50 @@ class PacketPlayOutRespawn extends Packet {
     //    instance#encryptedWorldSeed = WorldData.c(world.getWorldData().getSeed());
 #endif
     //}
+}
+
+class PacketPlayOutUpdateHealth extends Packet {
+#if version >= 1.17
+    private float health;
+    private int food;
+    private float foodSaturation:saturation;
+#else
+    private float health:a;
+    private int food:b;
+    private float foodSaturation:c;
+#endif
+}
+
+class PacketPlayOutExperience extends Packet {
+#if version >= 1.17
+    private float experienceProgress;
+    private int totalExperience;
+    private int experienceLevel;
+#else
+    private float experienceProgress:a;
+    private int totalExperience:b;
+    private int experienceLevel:c;
+#endif
+}
+
+class PacketPlayOutUpdateTime extends Packet {
+#if version >= 1.17
+    private long gameTime;
+    private long dayTime;
+#else
+    private long gameTime:a;
+    private long dayTime:b;
+#endif
+}
+
+class PacketPlayOutServerDifficulty extends Packet {
+#if version >= 1.17
+    private final (org.bukkit.Difficulty) EnumDifficulty difficulty;
+    private final boolean hardcore:locked;
+#else
+    private final (org.bukkit.Difficulty) EnumDifficulty difficulty:a;
+    private final boolean hardcore:b;
+#endif
 }
 
 class PacketPlayOutPlayerListHeaderFooter extends Packet {
@@ -2157,8 +2224,38 @@ class PacketPlayOutEntityMetadata extends Packet {
     </code>
 }
 
-class PacketPlayOutUpdateAttributes extends Packet {
+// No longer exists since MC 1.14
+optional class PacketPlayOutBed extends Packet {
     private int entityId:a;
+    private (IntVector3) BlockPosition bedPosition:b;
+}
+
+class PacketPlayOutAnimation extends Packet {
+#if version >= 1.17
+    private int entityId:id;
+    private int action;
+#else
+    private int entityId:a;
+    private int action:b;
+#endif
+}
+
+class PacketPlayOutEntityStatus extends Packet {
+#if version >= 1.17
+    private int entityId;
+    private byte eventId;
+#else
+    private int entityId:a;
+    private byte eventId:b;
+#endif
+}
+
+class PacketPlayOutUpdateAttributes extends Packet {
+#if version >= 1.17
+    private int entityId;
+#else
+    private int entityId:a;
+#endif
 
     public static (PacketPlayOutUpdateAttributesHandle) PacketPlayOutUpdateAttributes createNew(int entityId, (java.util.Collection<AttributeModifiableHandle>) java.util.Collection<AttributeModifiable> attributes) {
         return new PacketPlayOutUpdateAttributes(entityId, attributes);
@@ -2191,6 +2288,14 @@ class PacketPlayOutUpdateAttributes extends Packet {
         java.util.Collection attributes = java.util.Collections.singleton(attribute);
         return new PacketPlayOutUpdateAttributes(entityId, attributes);
     }
+}
+
+class PacketPlayInClientCommand extends Packet {
+#if version >= 1.17
+    private (Object) PacketPlayInClientCommand.EnumClientCommand action;
+#else
+    private (Object) PacketPlayInClientCommand.EnumClientCommand action:a;
+#endif
 }
 
 class PacketPlayInUpdateSign extends Packet {
@@ -2628,6 +2733,14 @@ class PacketPlayOutCamera extends Packet {
 }
 
 class PacketPlayInHeldItemSlot extends Packet {
+#if version >= 1.17
+    private final int itemInHandIndex:slot;
+#else
+    private int itemInHandIndex;
+#endif
+}
+
+class PacketPlayOutHeldItemSlot extends Packet {
 #if version >= 1.17
     private final int itemInHandIndex:slot;
 #else

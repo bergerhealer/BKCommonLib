@@ -249,22 +249,37 @@ public class MojangSpigotRemapper {
      * @return Mojang-spigot remapper object
      */
     public static MojangSpigotRemapper load(String minecraftVersion, ClassPathResolver classPathResolver) {
-        // Generate mappings of all methods/fields/classes, using spigot's class naming structure
-        MojangMappings mappings;
-        {
-            // We require mojang's mappings
-            MojangMappings mojangMappings = MojangMappings.fromCacheOrDownload(minecraftVersion);
+        // We require mojang's mappings
+        MojangMappings mojangMappings = MojangMappings.fromCacheOrDownload(minecraftVersion);
 
-            // We require spigot<>mojang class translation
-            SpigotMappings.ClassMappings spigotMappings = SpigotMappings.fromCacheOrDownload(minecraftVersion);
+        // We require spigot<>mojang class translation
+        SpigotMappings.ClassMappings spigotMappings = SpigotMappings.fromCacheOrDownload(minecraftVersion);
 
-            // Final translation using the two, also translate using the class path resolver
-            mappings = mojangMappings.translateClassNames(name -> {
-                String spigotName = spigotMappings.toSpigot(name);
-                String remappedName = classPathResolver.resolveClassPath(spigotName);
-                return remappedName;
-            });
-        }
+        return create(mojangMappings, spigotMappings, classPathResolver);
+    }
+
+    /**
+     * Loads the mojang and spigot class name remapping details and creates a new MojangSpigotRemapper
+     * using them. If mojang's mappings are not yet available in cache they are downloaded. If the
+     * spigot mappings are not available in this library's jar an attempt to download them is made.
+     *
+     * @param mojangMappings Mojang method and field name mappings
+     * @param spigotMappings Spigot &lt;&gt; Mojang class name mappings
+     * @param classPathResolver If additional remapping is required after translating to the Spigot
+     *                          Class names, this classPathResolver should be used
+     * @return Mojang-spigot remapper object
+     */
+    public static MojangSpigotRemapper create(
+            final MojangMappings mojangMappings,
+            final SpigotMappings.ClassMappings spigotMappings,
+            final ClassPathResolver classPathResolver
+    ) {
+        // Final translation using the two, also translate using the class path resolver
+        MojangMappings mappings  = mojangMappings.translateClassNames(name -> {
+            String spigotName = spigotMappings.toSpigot(name);
+            String remappedName = classPathResolver.resolveClassPath(spigotName);
+            return remappedName;
+        });
 
         // Create remapper object
         MojangSpigotRemapper remapper = new MojangSpigotRemapper();

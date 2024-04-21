@@ -11,7 +11,11 @@ class ResourceKey {
 
 #if version >= 1.16
     public (MinecraftKeyHandle) MinecraftKey getCategory() {
+  #if version >= 1.17
+        #require net.minecraft.resources.ResourceKey private final MinecraftKey category:location;
+  #else
         #require net.minecraft.resources.ResourceKey private final MinecraftKey category:b;
+  #endif
         return instance#category;
     }
 

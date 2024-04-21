@@ -67,6 +67,13 @@ public interface CommonServer {
     public String getServerName();
 
     /**
+     * Gets whether the server uses Mojang's original class, field and method names
+     *
+     * @return True if the server uses mojang mappings
+     */
+    public boolean isMojangMappings();
+
+    /**
      * Gets whether this server is a type of Forge server implementation
      *
      * @return True if this is a forge-based server

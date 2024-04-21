@@ -41,7 +41,7 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
                         blockposition_b.set(k1, i2, l1);
                         VoxelShape voxelshape5;
 
-                        if (!worldborder.a((BlockPosition) blockposition_b)) {
+                        if (!worldborder.isWithinBounds((BlockPosition) blockposition_b)) {
                             voxelshape5 = VoxelShapes.block();
                         } else {
                             voxelshape5 = this.getBlockState((BlockPosition) blockposition_b).getCollisionShape((IBlockAccess) this, (BlockPosition) blockposition_b);

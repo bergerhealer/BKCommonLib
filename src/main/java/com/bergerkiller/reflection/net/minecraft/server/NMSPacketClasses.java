@@ -26,7 +26,6 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
@@ -323,7 +322,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInClientCommand extends NMSPacket {
 
-        public final FieldAccessor<Object> command = nextField("private PacketPlayInClientCommand.EnumClientCommand a");
+        public final FieldAccessor<Object> command = PacketPlayInClientCommandHandle.T.action.toFieldAccessor();
     }
 
     public static class NMSPacketPlayInCloseWindow extends NMSPacket {
@@ -621,8 +620,8 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutAnimation extends NMSPacket {
 
-        public final FieldAccessor<Integer> entityId = nextField("private int a");
-        public final FieldAccessor<Integer> animation = nextFieldSignature("private int b");
+        public final FieldAccessor<Integer> entityId = PacketPlayOutAnimationHandle.T.entityId.toFieldAccessor();
+        public final FieldAccessor<Integer> animation = PacketPlayOutAnimationHandle.T.action.toFieldAccessor();
     }
 
     /*
@@ -646,8 +645,8 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutBed extends NMSPacket {
 
-        public final FieldAccessor<Integer> entityId = nextField("private int a");
-        public final TranslatorFieldAccessor<IntVector3> bedPosition = nextFieldSignature("private BlockPosition b").translate(DuplexConversion.blockPosition);
+        public final FieldAccessor<Integer> entityId = PacketPlayOutBedHandle.T.entityId.toFieldAccessor();
+        public final TranslatorFieldAccessor<IntVector3> bedPosition = PacketPlayOutBedHandle.T.bedPosition.toFieldAccessor();
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityHumanHandle.T.getType(), BlockPositionHandle.T.getType());
 
         public CommonPacket newInstance(HumanEntity entity, IntVector3 bedPosition) {
@@ -687,8 +686,8 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutCloseWindow extends NMSPacket {
 
-        public final FieldAccessor<Integer> windowId = nextField("private int a");
-    }    
+        public final FieldAccessor<Integer> windowId = PacketPlayOutCloseWindowHandle.T.windowId.toFieldAccessor();
+    }
 
     public static class NMSPacketPlayOutCollect extends NMSPacket {
 
@@ -1124,8 +1123,8 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutEntityStatus extends NMSPacket {
 
-        public final FieldAccessor<Integer> entityId = nextField("private int a");
-        public final FieldAccessor<Byte> status = nextFieldSignature("private byte b");
+        public final FieldAccessor<Integer> entityId = PacketPlayOutEntityStatusHandle.T.entityId.toFieldAccessor();
+        public final FieldAccessor<Byte> status = PacketPlayOutEntityStatusHandle.T.eventId.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutEntityTeleport extends NMSPacket {
@@ -1226,9 +1225,9 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutExperience extends NMSPacket {
 
-        public final FieldAccessor<Float> bar = nextField("private float a");
-        public final FieldAccessor<Integer> level = nextFieldSignature("private int b");
-        public final FieldAccessor<Integer> totalXp = nextFieldSignature("private int c");
+        public final FieldAccessor<Float> bar = PacketPlayOutExperienceHandle.T.experienceProgress.toFieldAccessor();
+        public final FieldAccessor<Integer> level = PacketPlayOutExperienceHandle.T.experienceLevel.toFieldAccessor();
+        public final FieldAccessor<Integer> totalXp = PacketPlayOutExperienceHandle.T.totalExperience.toFieldAccessor();
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(float.class, int.class, int.class);
 
         public CommonPacket newInstance(float bar, int level, int totalXp) {
@@ -1269,7 +1268,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutHeldItemSlot extends NMSPacket {
 
-        public final FieldAccessor<Integer> slot = getField("a", int.class);
+        public final FieldAccessor<Integer> slot = PacketPlayOutHeldItemSlotHandle.T.itemInHandIndex.toFieldAccessor();
     }
 
     public static class NMSClientboundKeepAlivePacket extends NMSPacket {
@@ -1726,8 +1725,8 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutServerDifficulty extends NMSPacket {
         
-        public final FieldAccessor<Difficulty> difficulty = nextField("private net.minecraft.world.EnumDifficulty a").translate(DuplexConversion.difficulty);
-        public final FieldAccessor<Boolean> hardcore = nextFieldSignature("private boolean b");
+        public final FieldAccessor<Difficulty> difficulty = PacketPlayOutServerDifficultyHandle.T.difficulty.toFieldAccessor();
+        public final FieldAccessor<Boolean> hardcore = PacketPlayOutServerDifficultyHandle.T.hardcore.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutSetCooldown extends NMSPacket {
@@ -2220,15 +2219,15 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutUpdateHealth extends NMSPacket {
 
-        public final FieldAccessor<Float> health = nextField("private float a");
-        public final FieldAccessor<Short> food = nextFieldSignature("private int b");
-        public final FieldAccessor<Float> foodSaturation = nextFieldSignature("private float c");
+        public final FieldAccessor<Float> health = PacketPlayOutUpdateHealthHandle.T.health.toFieldAccessor();
+        public final FieldAccessor<Integer> food = PacketPlayOutUpdateHealthHandle.T.food.toFieldAccessor();
+        public final FieldAccessor<Float> foodSaturation = PacketPlayOutUpdateHealthHandle.T.foodSaturation.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutUpdateTime extends NMSPacket {
 
-        public final FieldAccessor<Long> age = nextField("private long a");
-        public final FieldAccessor<Long> timeOfDay = nextFieldSignature("private long b");
+        public final FieldAccessor<Long> age = PacketPlayOutUpdateTimeHandle.T.gameTime.toFieldAccessor();
+        public final FieldAccessor<Long> timeOfDay = PacketPlayOutUpdateTimeHandle.T.dayTime.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutVehicleMove extends NMSPacket {
@@ -2242,9 +2241,9 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutWindowData extends NMSPacket {
 
-        public final FieldAccessor<Integer> windowId = nextField("private int a");
-        public final FieldAccessor<Integer> count = nextFieldSignature("private int b");
-        public final FieldAccessor<Integer> data = nextFieldSignature("private int c");
+        public final FieldAccessor<Integer> windowId = PacketPlayOutWindowDataHandle.T.windowId.toFieldAccessor();
+        public final FieldAccessor<Integer> id = PacketPlayOutWindowDataHandle.T.id.toFieldAccessor();
+        public final FieldAccessor<Integer> value = PacketPlayOutWindowDataHandle.T.value.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutWindowItems extends NMSPacket {

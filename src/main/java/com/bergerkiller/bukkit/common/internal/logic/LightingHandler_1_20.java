@@ -2,11 +2,9 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.lighting.LightingHandler;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.level.LightEngineThreadedHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
@@ -124,8 +122,9 @@ class LightingHandler_1_20 implements LightingHandler {
         }
 
         // Get the private schedule method of the engine
-        this.light_engine_schedule = CommonUtil.getClass("net.minecraft.server.level.LightEngineThreaded").getDeclaredMethod("a",
-                int.class, int.class, IntSupplier.class, updateType, Runnable.class);
+        this.light_engine_schedule = Resolver.resolveAndGetDeclaredMethod(
+                CommonUtil.getClass("net.minecraft.server.level.LightEngineThreaded"),
+                "addTask", int.class, int.class, IntSupplier.class, updateType, Runnable.class);
 
         // Make all accessible
         this.light_layer_block.setAccessible(true);

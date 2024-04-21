@@ -138,6 +138,9 @@ public abstract class CommonServerBase implements CommonServer {
         final StringBuilder serverDesc = new StringBuilder(300);
         serverDesc.append(getServerName()).append(" (");
         serverDesc.append(getServerDescription());
+        if (isMojangMappings()) {
+            serverDesc.append(" | mojmap");
+        }
         serverDesc.append(") : ").append(getServerVersion());
         return serverDesc.toString();
     }

@@ -221,7 +221,9 @@ class TileEntityFurnace extends TileEntity {
 }
 
 class TileEntityHopper extends TileEntity {
-#if version >= 1.17
+#if version >= 1.18
+    public static boolean suckItems:suckInItems((org.bukkit.World) World world, (Object) IHopper ihopper);
+#elseif version >= 1.17
     public static boolean suckItems:a((org.bukkit.World) World world, (Object) IHopper ihopper);
 #else
     public static boolean suckItems((org.bukkit.World) World world, (Object) IHopper ihopper) {

@@ -36,6 +36,11 @@ public class UnknownServer extends CommonServerBase {
     }
 
     @Override
+    public boolean isMojangMappings() {
+        return false;
+    }
+
+    @Override
     public boolean isForgeServer() {
         return false;
     }

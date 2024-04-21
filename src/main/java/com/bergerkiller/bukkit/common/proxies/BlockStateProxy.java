@@ -161,6 +161,11 @@ public class BlockStateProxy extends ProxyBase<BlockState> implements BlockState
         return this;
     }
 
+    //@Override
+    public BlockState copy(Location location) {
+        return null;
+    }
+
     @Override
     public org.bukkit.block.data.BlockData getBlockData() {
         return base.getBlockData();
