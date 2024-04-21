@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 
 import com.bergerkiller.bukkit.common.controller.EntityPositionApplier;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import org.bukkit.entity.Entity;
@@ -191,6 +192,23 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
+    private static boolean HAS_ONPUSH_WITH_ENTITY = LogicUtil.tryCreate(() -> {
+        Resolver.resolveAndGetDeclaredMethod(EntityHandle.T.getType(),
+                "push", double.class, double.class, double.class, EntityHandle.T.getType());
+        return true;
+    }, err -> false);
+
+    private Object lastPushedEntity = null;
+
+    public void baseOnPush(double dx, double dy, double dz) {
+        if (HAS_ONPUSH_WITH_ENTITY) {
+            base.onPushWithEntity(dx, dy, dz, lastPushedEntity);
+        } else {
+            base.onPush(dx, dy, dz);
+        }
+    }
+
+    @HookMethodCondition("!exists net.minecraft.world.entity.Entity public void push(double x, double y, double z, net.minecraft.world.entity.Entity pushingEntity)")
     @HookMethod("public void onPush:???(double d0, double d1, double d2)")
     public void onPush(double dx, double dy, double dz) {
         try {
@@ -198,6 +216,26 @@ public class EntityHook extends ClassHook<EntityHook> {
                 controller.onPush(dx, dy, dz);
             } else {
                 base.onPush(dx, dy, dz);
+            }
+        } catch (Throwable t) {
+            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity push callback", t);
+        }
+    }
+
+    @HookMethodCondition("exists net.minecraft.world.entity.Entity public void push(double x, double y, double z, net.minecraft.world.entity.Entity pushingEntity)")
+    @HookMethod("public void push(double d0, double d1, double d2, net.minecraft.world.entity.Entity pushingEntity)")
+    public void onPushWithEntity(double dx, double dy, double dz, Object pushingEntity) {
+        try {
+            if (checkController()) {
+                Object before = lastPushedEntity;
+                try {
+                    lastPushedEntity = pushingEntity;
+                    controller.onPush(dx, dy, dz);
+                } finally {
+                    lastPushedEntity = before;
+                }
+            } else {
+                base.onPushWithEntity(dx, dy, dz, pushingEntity);
             }
         } catch (Throwable t) {
             Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity push callback", t);
