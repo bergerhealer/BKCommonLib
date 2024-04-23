@@ -565,6 +565,16 @@ public class ItemFrameInfo {
         }
     }
 
+    /**
+     * Informs that the Entity of this item frame has been removed (untracked) from the server.
+     * It's possible that it loads it again. Actual removal is handled a tick later.
+     */
+    public void signalEntityRemoved() {
+        removed = true;
+        needsItemRefresh.set(false);
+        entityTrackerEntryState = null; // This becomes invalid
+    }
+
     private void remove() {
         if (displayInfo != null) {
             displayInfo.itemFrames.remove(this);

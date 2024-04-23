@@ -1027,8 +1027,7 @@ public final class CommonMapController implements PacketListener, Listener {
             getItemFrameEntities(new ItemFrameClusterKey(frameHandle)).remove(frameHandle);
             ItemFrameInfo info = itemFrames.get(frame.getEntityId());
             if (info != null) {
-                info.removed = true;
-                info.needsItemRefresh.set(false);
+                info.signalEntityRemoved();
             }
         }
     }
