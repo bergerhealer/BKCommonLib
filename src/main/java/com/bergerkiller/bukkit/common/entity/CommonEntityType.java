@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartAbstractHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
+import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 
 import org.bukkit.Location;
@@ -26,8 +27,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.Function;
@@ -43,22 +47,53 @@ public class CommonEntityType {
     }
 
     private static final StampedLock lock = new StampedLock();
-    private static final Map<String, ObjectTypeInfo> objectTypes = new HashMap<String, ObjectTypeInfo>();
     private static final ClassMap<CommonEntityType> byNMS = new ClassMap<CommonEntityType>();
+    private static final EnumMap<EntityType, CommonEntityType> byEntityType = new EnumMap<EntityType, CommonEntityType>(EntityType.class);
+    private static final Map<String, CommonEntityType> byName = new HashMap<>();
     private static final Map<Integer, CommonEntityType> byObjectTypeId = new HashMap<>();
     private static final Map<Integer, CommonEntityType> byEntityTypeId = new HashMap<>();
     private static final Map<Object, CommonEntityType> byNMSEntityType = new HashMap<>();
     private static final Map<Class<?>, EntityTypesHandle> entityTypesByClass = new HashMap<>();
-    private static final CommonPair[] commonPairs;
-    private static final EnumMap<EntityType, CommonEntityType> byEntityType = new EnumMap<EntityType, CommonEntityType>(EntityType.class);
+
+    // Remappings between some Bukkit entity types and Common entity types
+    // Order is important, the first pair that can be used is selected
+    // Since humans are living entities, they must be put before living entities
+    private static final CommonPair[] commonPairs = new CommonPair[] {
+            CommonPair.create(CommonPlayer.class, CommonPlayer::new),
+            CommonPair.create(CommonMinecartChest.class, CommonMinecartChest::new),
+            CommonPair.create(CommonMinecartCommandBlock.class, CommonMinecartCommandBlock::new),
+            CommonPair.create(CommonMinecartFurnace.class, CommonMinecartFurnace::new),
+            CommonPair.create(CommonMinecartHopper.class, CommonMinecartHopper::new),
+            CommonPair.create(CommonMinecartMobSpawner.class, CommonMinecartMobSpawner::new),
+            CommonPair.create(CommonMinecartTNT.class, CommonMinecartTNT::new),
+            CommonPair.create(CommonMinecartRideable.class, CommonMinecartRideable::new),
+            CommonPair.create(CommonMinecartCommandBlock.class, CommonMinecartCommandBlock::new),
+            CommonPair.create(CommonItem.class, CommonItem::new),
+            CommonPair.<Minecart>create(CommonMinecart.class, CommonMinecart::new),
+            CommonPair.<LivingEntity>create(CommonLivingEntity.class, CommonLivingEntity::new)
+    };
+
     public static final CommonEntityType UNKNOWN = new CommonEntityType(EntityType.UNKNOWN, true);
-    public static final CommonEntityType PLAYER;
+
+    static {
+        initRegistry();
+    }
+
+    public static final CommonEntityType PLAYER = byName("PLAYER");
+    public static final CommonEntityType MINECART = byName("MINECART");
+    public static final CommonEntityType CHEST_MINECART = byName("CHEST_MINECART");
+    public static final CommonEntityType FURNACE_MINECART = byName("FURNACE_MINECART");
+    public static final CommonEntityType TNT_MINECART = byName("TNT_MINECART");
+    public static final CommonEntityType HOPPER_MINECART = byName("HOPPER_MINECART");
+    public static final CommonEntityType SPAWNER_MINECART = byName("SPAWNER_MINECART");
+    public static final CommonEntityType COMMAND_BLOCK_MINECART = byName("COMMAND_BLOCK_MINECART");
 
     public final ClassTemplate<?> nmsType;
     public final ClassTemplate<?> commonType;
     public final ClassTemplate<?> bukkitType;
     private final Function<Entity, CommonEntity<?>> commonConstructor;
     private final boolean hasWorldCoordConstructor;
+    public final List<String> entityTypeNames;
     public final EntityType entityType;
     public final int entityTypeId;
     public final int objectTypeId;
@@ -69,6 +104,7 @@ public class CommonEntityType {
     private CommonEntityType(EntityType entityType, boolean nullInitialize) {
         // Properties first
         this.entityType = entityType;
+        this.entityTypeNames = TypeNameAliases.getNames(entityType);
 
         // A type that is not supported for construction
         if (nullInitialize) {
@@ -92,12 +128,12 @@ public class CommonEntityType {
         // Create minecraft key from EntityType name
         String entityTypeName = entityType.getName();
         String entityTypeEnumName = entityType.name();
-        if (entityType == EntityType.MINECART_FURNACE) {
+        if (entityTypeNames.contains("FURNACE_MINECART")) {
             // New naming system had a bug, DAMMIT BUKKIT
             if (Common.evaluateMCVersion(">=", "1.11")) {
                 entityTypeName = "furnace_minecart";
             }
-        } else if (entityType == EntityType.MINECART_MOB_SPAWNER) {
+        } else if (entityTypeNames.contains("SPAWNER_MINECART")) {
             // Old naming system had a bug, DAMMIT BUKKIT
             if (Common.evaluateMCVersion("<", "1.11")) {
                 entityTypeName = "MinecartSpawner";
@@ -232,7 +268,7 @@ public class CommonEntityType {
             }
         } else {
             // Retrieve objectTypeId from internal mapping        
-            ObjectTypeInfo objectInfo = objectTypes.get((entityType == null) ? "" : entityType.name());
+            LegacyObjectTypes.ObjectTypeInfo objectInfo = LegacyObjectTypes.find(entityType);
             if (objectInfo != null) {
                 // Take from mapping we have registered ourselves
                 this.objectTypeId = objectInfo.typeId;
@@ -380,6 +416,43 @@ public class CommonEntityType {
         return UNKNOWN;
     }
 
+    /**
+     * Gets the Common Entity Type by a Bukkit Entity Type enum name. Also supports future or past
+     * enum names if such enum values were renamed.
+     *
+     * @param name Name of the Bukkit EntityType enum value
+     * @return CommonEntityType of this name, or {@link #UNKNOWN} if not found
+     */
+    public static CommonEntityType byName(String name) {
+        return byName.getOrDefault(name, UNKNOWN);
+    }
+
+    /**
+     * Parses a name to the best-matching CommonEntityType, based on the EntityType enum names.
+     * Also parses inexact names. For exact names, use {@link #byName(String)}.
+     *
+     * @param name Name
+     * @return Found CommonEntityType that matches this name, or null if none match
+     */
+    @ConverterMethod()
+    public static CommonEntityType parseNameToCommonEntityType(String name) {
+        TypeNameLookup.NamePair result = TypeNameLookup.lookupByName(name);
+        return result == null ? null : result.commonEntityType;
+    }
+
+    /**
+     * Parses a name to the best-matching Bukkit EntityType, based on the EntityType enum names.
+     * Also parses inexact names. For exact names, use {@link #byName(String)}.
+     *
+     * @param name Name
+     * @return Found EntityType that matches this name, or null if none match
+     */
+    @ConverterMethod()
+    public static EntityType parseNameToEntityType(String name) {
+        TypeNameLookup.NamePair result = TypeNameLookup.lookupByName(name);
+        return result == null ? null : result.entityType;
+    }
+
     public static CommonEntityType byNMSEntityType(EntityTypesHandle handle) {
         return (handle == null) ? UNKNOWN : byNMSEntityTypeRaw(handle.getRaw());
     }
@@ -405,18 +478,6 @@ public class CommonEntityType {
         } finally {
             lock.unlockWrite(stamp);
         }
-    }
-
-    private static void registerObjectType(String entityTypeName, int objectId, int extraData) {
-        ObjectTypeInfo info = new ObjectTypeInfo();
-        info.typeId = objectId;
-        info.extraData = extraData;
-        objectTypes.put(entityTypeName, info);
-    }
-
-    private static class ObjectTypeInfo {
-        public int typeId;
-        public int extraData;
     }
 
     @SuppressWarnings("rawtypes")
@@ -450,63 +511,7 @@ public class CommonEntityType {
         }
     }
 
-    static {
-        // There does not appear to be a registry for this yet. This is a workaround until one exists.
-        // This is only used on 1.13.2 and before, on 1.14 the Id can be obtained from the internal registry
-        registerObjectType("BOAT", 1, -1);
-        registerObjectType("DROPPED_ITEM", 2, 1);
-        registerObjectType("AREA_EFFECT_CLOUD", 3, -1);
-        registerObjectType("MINECART", 10, 0);
-        registerObjectType("MINECART_CHEST", 10, 1);
-        registerObjectType("MINECART_FURNACE", 10, 2);
-        registerObjectType("MINECART_TNT", 10, 3);
-        registerObjectType("MINECART_MOB_SPAWNER", 10, 4);
-        registerObjectType("MINECART_HOPPER", 10, 5);
-        registerObjectType("MINECART_COMMAND", 10, 6);
-        registerObjectType("PRIMED_TNT", 50, -1);
-        registerObjectType("ENDER_CRYSTAL", 51, -1);
-        registerObjectType("ARROW", 60, -1);
-        registerObjectType("TIPPED_ARROW", 60, -1);
-        registerObjectType("SNOWBALL", 61, -1);
-        registerObjectType("EGG", 62, -1);
-        registerObjectType("FIREBALL", 63, -1);
-        registerObjectType("SMALL_FIREBALL", 64, -1);
-        registerObjectType("ENDER_PEARL", 65, -1);
-        registerObjectType("WITHER_SKULL", 66, -1);
-        registerObjectType("SHULKER_BULLET", 67, 0);
-        registerObjectType("LLAMA_SPIT", 68, 0);
-        registerObjectType("FALLING_BLOCK", 70, -1);
-        registerObjectType("ITEM_FRAME", 71, -1);
-        registerObjectType("ENDER_SIGNAL", 72, -1);
-        registerObjectType("LINGERING_POTION", 73, 0);
-        registerObjectType("SPLASH_POTION", 73, 0);
-        registerObjectType("THROWN_EXP_BOTTLE", 75, 0);
-        registerObjectType("FIREWORK", 76, -1);
-        registerObjectType("LEASH_HITCH", 77, -1);
-        registerObjectType("ARMOR_STAND", 78, -1);
-        registerObjectType("EVOKER_FANGS", 79, -1);
-        registerObjectType("FISHING_HOOK", 90, -1);
-        registerObjectType("SPECTRAL_ARROW", 91, -1);
-        registerObjectType("DRAGON_FIREBALL", 92, -1);
-
-        // Remappings between some Bukkit entity types and Common entity types
-        // Order is important, the first pair that can be used is selected
-        // Since humans are living entities, they must be put before living entities
-        commonPairs = new CommonPair[] {
-                CommonPair.create(CommonPlayer.class, CommonPlayer::new),
-                CommonPair.create(CommonMinecartChest.class, CommonMinecartChest::new),
-                CommonPair.create(CommonMinecartCommandBlock.class, CommonMinecartCommandBlock::new),
-                CommonPair.create(CommonMinecartFurnace.class, CommonMinecartFurnace::new),
-                CommonPair.create(CommonMinecartHopper.class, CommonMinecartHopper::new),
-                CommonPair.create(CommonMinecartMobSpawner.class, CommonMinecartMobSpawner::new),
-                CommonPair.create(CommonMinecartTNT.class, CommonMinecartTNT::new),
-                CommonPair.create(CommonMinecartRideable.class, CommonMinecartRideable::new),
-                CommonPair.create(CommonMinecartCommandBlock.class, CommonMinecartCommandBlock::new),
-                CommonPair.create(CommonItem.class, CommonItem::new),
-                CommonPair.<Minecart>create(CommonMinecart.class, CommonMinecart::new),
-                CommonPair.<LivingEntity>create(CommonLivingEntity.class, CommonLivingEntity::new)
-        };
-
+    private static void initRegistry() {
         // Register all entity types and verify them
         int logLimitCtr = 0;
         for (EntityType entityType : EntityType.values()) {
@@ -528,9 +533,9 @@ public class CommonEntityType {
             }
             byNMS.put(commonEntityType.nmsType, commonEntityType);
             byEntityType.put(entityType, commonEntityType);
+            for (String name : commonEntityType.entityTypeNames) {
+                byName.put(name, commonEntityType);
+            }
         }
-
-        // Some constant types that are always available
-        PLAYER = byEntityType.get(EntityType.PLAYER);
     }
 }

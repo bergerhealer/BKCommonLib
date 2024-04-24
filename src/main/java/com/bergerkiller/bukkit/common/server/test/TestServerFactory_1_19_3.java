@@ -249,6 +249,7 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
          *         newThreadExecutor());
          */
         CompletableFuture<Object> futureDPLoaded;
+        Object datapackresources;
         {
             Class<?> serverTypeType = Class.forName("net.minecraft.commands.CommandDispatcher$ServerType");
             Object serverType = getStaticField(serverTypeType, "DEDICATED");
@@ -265,28 +266,55 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
             }
             Executor executor2 = newThreadExecutor();
             Class<?> dataPackResourcesType = Class.forName("net.minecraft.server.DataPackResources");
-            Method startLoadingMethod = Resolver.resolveAndGetDeclaredMethod(dataPackResourcesType, "loadResources",
-                    Class.forName("net.minecraft.server.packs.resources.IResourceManager"),
-                    Class.forName("net.minecraft.core.IRegistryCustom$Dimension"),
-                    Class.forName("net.minecraft.world.flag.FeatureFlagSet"),
-                    serverTypeType,
-                    int.class,
-                    Executor.class,
-                    Executor.class);
-            futureDPLoaded = (CompletableFuture<Object>) startLoadingMethod.invoke(null,
-                    env.resourceManager, customRegistryDimension, featureFlagSet, serverType, functionPermissionLevel, executor1, executor2);
-        }
 
-        // Retrieve it, using get(). May throw if problems occur.
-        Object datapackresources = futureDPLoaded.get();
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.20.5")) {
+                // Pass the registries object instead of the customdimension object
+                // It calls the same getAccessForLoading internally
+                Method startLoadingMethod = Resolver.resolveAndGetDeclaredMethod(dataPackResourcesType, "loadResources",
+                        Class.forName("net.minecraft.server.packs.resources.IResourceManager"),
+                        Class.forName("net.minecraft.core.LayeredRegistryAccess"),
+                        Class.forName("net.minecraft.world.flag.FeatureFlagSet"),
+                        serverTypeType,
+                        int.class,
+                        Executor.class,
+                        Executor.class);
+                futureDPLoaded = (CompletableFuture<Object>) startLoadingMethod.invoke(null,
+                        env.resourceManager, registries, featureFlagSet, serverType, functionPermissionLevel, executor1, executor2);
 
-        // Call j() on the result - which calls bind() on the tags
-        // datapackresources.i();
-        {
-            Class<?> datapackresourceType = Class.forName("net.minecraft.server.DataPackResources");
-            Resolver.resolveAndGetDeclaredMethod(datapackresourceType, "updateRegistryTags",
-                    Class.forName("net.minecraft.core.IRegistryCustom"))
-                        .invoke(datapackresources, customRegistryDimension);
+                // Retrieve it, using get(). May throw if problems occur.
+                datapackresources = futureDPLoaded.get();
+
+                // Call updateRegistryTags() on the result - which calls bind() on the tags
+                {
+                    Class<?> datapackresourceType = Class.forName("net.minecraft.server.DataPackResources");
+                    Resolver.resolveAndGetDeclaredMethod(datapackresourceType, "updateRegistryTags")
+                            .invoke(datapackresources);
+                }
+            } else {
+                // 1.19.3 - 1.20.4
+                Method startLoadingMethod = Resolver.resolveAndGetDeclaredMethod(dataPackResourcesType, "loadResources",
+                        Class.forName("net.minecraft.server.packs.resources.IResourceManager"),
+                        Class.forName("net.minecraft.core.IRegistryCustom$Dimension"),
+                        Class.forName("net.minecraft.world.flag.FeatureFlagSet"),
+                        serverTypeType,
+                        int.class,
+                        Executor.class,
+                        Executor.class);
+                futureDPLoaded = (CompletableFuture<Object>) startLoadingMethod.invoke(null,
+                        env.resourceManager, customRegistryDimension, featureFlagSet, serverType, functionPermissionLevel, executor1, executor2);
+
+                // Retrieve it, using get(). May throw if problems occur.
+                datapackresources = futureDPLoaded.get();
+
+                // Call j() on the result - which calls bind() on the tags
+                // datapackresources.i();
+                {
+                    Class<?> datapackresourceType = Class.forName("net.minecraft.server.DataPackResources");
+                    Resolver.resolveAndGetDeclaredMethod(datapackresourceType, "updateRegistryTags",
+                                    Class.forName("net.minecraft.core.IRegistryCustom"))
+                            .invoke(datapackresources, customRegistryDimension);
+                }
+            }
         }
 
         // Now set all these fields in the MinecraftServer instance

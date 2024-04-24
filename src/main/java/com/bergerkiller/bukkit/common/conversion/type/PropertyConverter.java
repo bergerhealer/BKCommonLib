@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
@@ -174,23 +175,26 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
     private static class MinecartMaterialHelper {
         private static final EnumMap<Material, EntityType> matToMinecartType = new EnumMap<Material, EntityType>(Material.class);
         private static final HashMap<String, EntityType> matNameToMinecartType = new HashMap<>();
-        private static void storeMinecartTypes(EntityType type, String... materialNames) {
+        private static void storeMinecartTypes(CommonEntityType type, String... materialNames) {
+            if (type == CommonEntityType.UNKNOWN) {
+                throw new IllegalArgumentException("Unknown entity type registered!");
+            }
             for (String materialName : materialNames) {
-                matNameToMinecartType.put(materialName, type);
-                matNameToMinecartType.put(materialName.replace("_", ""), type);
+                matNameToMinecartType.put(materialName, type.entityType);
+                matNameToMinecartType.put(materialName.replace("_", ""), type.entityType);
                 Material mat = MaterialsByName.getMaterial(materialName);
                 if (mat != null) {
-                    matToMinecartType.put(mat, type);
+                    matToMinecartType.put(mat, type.entityType);
                 }
             }
         }
         static {
-            storeMinecartTypes(EntityType.MINECART, "MINECART", "LEGACY_MINECART");
-            storeMinecartTypes(EntityType.MINECART_HOPPER, "HOPPER", "HOPPER_MINECART", "LEGACY_HOPPER_MINECART");
-            storeMinecartTypes(EntityType.MINECART_CHEST, "CHEST", "STORAGE", "STORAGE_MINECART", "CHEST_MINECART", "LEGACY_CHEST", "LEGACY_STORAGE_MINECART");
-            storeMinecartTypes(EntityType.MINECART_COMMAND, "COMMAND_BLOCK", "COMMAND_BLOCK_MINECART", "LEGACY_COMMAND", "LEGACY_COMMAND_MINECART");
-            storeMinecartTypes(EntityType.MINECART_FURNACE, "FURNACE", "FURNACE_MINECART", "LEGACY_FURNACE", "LEGACY_POWERED_MINECART");
-            storeMinecartTypes(EntityType.MINECART_TNT, "TNT", "TNT_MINECART", "LEGACY_TNT", "LEGACY_EXPLOSIVE_MINECART");
+            storeMinecartTypes(CommonEntityType.MINECART, "MINECART", "LEGACY_MINECART");
+            storeMinecartTypes(CommonEntityType.HOPPER_MINECART, "HOPPER", "HOPPER_MINECART", "LEGACY_HOPPER_MINECART");
+            storeMinecartTypes(CommonEntityType.CHEST_MINECART, "CHEST", "STORAGE", "STORAGE_MINECART", "CHEST_MINECART", "LEGACY_CHEST", "LEGACY_STORAGE_MINECART");
+            storeMinecartTypes(CommonEntityType.COMMAND_BLOCK_MINECART, "COMMAND_BLOCK", "COMMAND_BLOCK_MINECART", "LEGACY_COMMAND", "LEGACY_COMMAND_MINECART");
+            storeMinecartTypes(CommonEntityType.FURNACE_MINECART, "FURNACE", "FURNACE_MINECART", "LEGACY_FURNACE", "LEGACY_POWERED_MINECART");
+            storeMinecartTypes(CommonEntityType.TNT_MINECART, "TNT", "TNT_MINECART", "LEGACY_TNT", "LEGACY_EXPLOSIVE_MINECART");
         }
     }
 }

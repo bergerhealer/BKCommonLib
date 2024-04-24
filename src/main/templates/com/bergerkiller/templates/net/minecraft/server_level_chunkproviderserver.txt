@@ -2,7 +2,7 @@ package net.minecraft.server.level;
 
 import net.minecraft.core.BlockPosition;
 import net.minecraft.world.level.chunk.Chunk;
-import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.chunk.storage.IChunkLoader;
 import net.minecraft.world.level.ChunkCoordIntPair;
 
@@ -58,7 +58,7 @@ class ChunkProviderServer {
 
 #if version >= 1.14
     public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {
-        #require net.minecraft.server.level.ChunkProviderServer private java.util.concurrent.CompletableFuture<com.mojang.datafixers.util.Either<net.minecraft.world.level.chunk.IChunkAccess, net.minecraft.server.level.PlayerChunk.Failure>> getChunkFutureMainThread(int cx, int cz, net.minecraft.world.level.chunk.ChunkStatus chunkstatus, boolean flag);
+        #require net.minecraft.server.level.ChunkProviderServer private java.util.concurrent.CompletableFuture<com.mojang.datafixers.util.Either<net.minecraft.world.level.chunk.IChunkAccess, net.minecraft.server.level.PlayerChunk.Failure>> getChunkFutureMainThread(int cx, int cz, net.minecraft.world.level.chunk.status.ChunkStatus chunkstatus, boolean flag);
 
         java.util.concurrent.CompletableFuture future;
         future = instance#getChunkFutureMainThread(cx, cz, ChunkStatus.FULL, true);

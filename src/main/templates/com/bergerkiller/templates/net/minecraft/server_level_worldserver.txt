@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.level.chunk.Chunk;
-import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.ChunkCoordIntPair;
 import net.minecraft.world.level.dimension.DimensionManager;
 import net.minecraft.world.level.ForcedChunk;
@@ -271,7 +271,7 @@ class WorldServer extends World {
             java.util.concurrent.CompletableFuture statusFuture;
     #if version >= 1.18
             statusFuture = chunk.getFutureIfPresentUnchecked(ChunkStatus.FULL);
-    #elseif exists net.minecraft.server.level.PlayerChunk public java.util.concurrent.CompletableFuture getStatusFutureUnchecked(net.minecraft.world.level.chunk.ChunkStatus chunkstatus)
+    #elseif exists net.minecraft.server.level.PlayerChunk public java.util.concurrent.CompletableFuture getStatusFutureUnchecked(net.minecraft.world.level.chunk.status.ChunkStatus chunkstatus)
             statusFuture = chunk.getStatusFutureUnchecked(ChunkStatus.FULL);
     #else
             statusFuture = chunk.a(ChunkStatus.FULL);

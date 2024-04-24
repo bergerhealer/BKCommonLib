@@ -12,6 +12,7 @@ import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.StringTreeNode;
+import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
@@ -670,6 +671,9 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
                     } else {
                         value = text;
                     }
+                } else if (value instanceof CommonEntityType) {
+                    // Hacked this in...
+                    value = ((CommonEntityType) value).entityType.name();
                 }
 
                 // When value is a key: value pair, use a singleton map to emulate that

@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import com.bergerkiller.bukkit.common.conversion.type.JOMLConversion;
 import com.bergerkiller.bukkit.common.conversion.type.ScoreboardDisplaySlotConversion;
+import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.wrappers.Brightness;
 import com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode;
 import org.bukkit.Bukkit;
@@ -755,6 +756,16 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.network.protocol.game.ClientboundResetScorePacket", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore");
         }
 
+        // 1.20.5 mappings
+        if (evaluateMCVersion(">=", "1.20.5")) {
+            // Obfuscated class name was moved
+            remappings.put("net.minecraft.network.syncher.DataWatcher$PackedItem", "net.minecraft.network.syncher.DataWatcher$c");
+
+        } else {
+            // Before 1.20.5, ChunkStatus was elsewhere
+            remappings.put("net.minecraft.world.level.chunk.status.ChunkStatus", "net.minecraft.world.level.chunk.ChunkStatus");
+        }
+
         // There have been various locations where starlight was installed
         // This was also part of tuinity at some point, but was then ported into paper
         {
@@ -835,6 +846,7 @@ public class CommonBootstrap {
         Conversion.registerConverters(NBTConversion.class);
         Conversion.registerConverters(ItemDisplayMode.class);
         Conversion.registerConverters(Brightness.class);
+        Conversion.registerConverters(CommonEntityType.class);
 
         // EquipmentSlot <> EnumItemSlot, only for later version of 1.8 builds
         {

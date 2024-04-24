@@ -1,8 +1,6 @@
 package com.bergerkiller.bukkit.common.bases;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -977,10 +975,6 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 
     public void setFireTicks(int arg0) {
         entity.setFireTicks(arg0);
-    }
-
-    public void setLastDamageCause(EntityDamageEvent arg0) {
-        entity.setLastDamageCause(arg0);
     }
 
     /**

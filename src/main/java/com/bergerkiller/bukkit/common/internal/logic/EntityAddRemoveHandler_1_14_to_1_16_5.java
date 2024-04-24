@@ -482,14 +482,14 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
         /*
          * <GET_CHUNK_TRY_HARD>
          * public static org.bukkit.Chunk getChunkTryHard(net.minecraft.server.level.PlayerChunk playerChunk) {
-         *     #require net.minecraft.server.level.PlayerChunk private static final java.util.List<net.minecraft.world.level.chunk.ChunkStatus> CHUNK_STATUSES;
+         *     #require net.minecraft.server.level.PlayerChunk private static final java.util.List<net.minecraft.world.level.chunk.status.ChunkStatus> CHUNK_STATUSES;
          *     java.util.List chunk_statuses = PlayerChunk#CHUNK_STATUSES;
          *     for (int i = chunk_statuses.size() - 1; i >= 0; --i) {
          *         java.util.concurrent.CompletableFuture future;
          * #if version >= 1.14.1
-         *         future = playerChunk.getStatusFutureUnchecked((net.minecraft.world.level.chunk.ChunkStatus) chunk_statuses.get(i));
+         *         future = playerChunk.getStatusFutureUnchecked((net.minecraft.world.level.chunk.status.ChunkStatus) chunk_statuses.get(i));
          * #else
-         *         future = playerChunk.a((net.minecraft.world.level.chunk.ChunkStatus) chunk_statuses.get(i));
+         *         future = playerChunk.a((net.minecraft.world.level.chunk.status.ChunkStatus) chunk_statuses.get(i));
          * #endif
          *         if (!future.isCompletedExceptionally()) {
          *             com.mojang.datafixers.util.Either either = (com.mojang.datafixers.util.Either) future.getNow(null);
