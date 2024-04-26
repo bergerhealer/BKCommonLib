@@ -1,6 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.world.effect;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.Holder;
+import org.bukkit.potion.PotionEffectType;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.world.effect.MobEffectList</b>.
@@ -19,6 +21,18 @@ public abstract class MobEffectListHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static MobEffectListHandle fromBukkit(PotionEffectType effectType) {
+        return T.fromBukkit.invoke(effectType);
+    }
+
+    public static Holder<MobEffectListHandle> holderFromBukkit(PotionEffectType effectType) {
+        return T.holderFromBukkit.invoke(effectType);
+    }
+
+    public static PotionEffectType holderToBukkit(Holder<MobEffectListHandle> mobEffectList) {
+        return T.holderToBukkit.invoke(mobEffectList);
+    }
+
     public static int getId(MobEffectListHandle mobeffectlist) {
         return T.getId.invoke(mobeffectlist);
     }
@@ -27,13 +41,19 @@ public abstract class MobEffectListHandle extends Template.Handle {
         return T.fromId.invoke(id);
     }
 
+    public abstract PotionEffectType toBukkit();
     /**
      * Stores class members for <b>net.minecraft.world.effect.MobEffectList</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class MobEffectListClass extends Template.Class<MobEffectListHandle> {
+        public final Template.StaticMethod.Converted<MobEffectListHandle> fromBukkit = new Template.StaticMethod.Converted<MobEffectListHandle>();
+        public final Template.StaticMethod.Converted<Holder<MobEffectListHandle>> holderFromBukkit = new Template.StaticMethod.Converted<Holder<MobEffectListHandle>>();
+        public final Template.StaticMethod.Converted<PotionEffectType> holderToBukkit = new Template.StaticMethod.Converted<PotionEffectType>();
         public final Template.StaticMethod.Converted<Integer> getId = new Template.StaticMethod.Converted<Integer>();
         public final Template.StaticMethod.Converted<MobEffectListHandle> fromId = new Template.StaticMethod.Converted<MobEffectListHandle>();
+
+        public final Template.Method<PotionEffectType> toBukkit = new Template.Method<PotionEffectType>();
 
     }
 

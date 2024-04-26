@@ -2,6 +2,8 @@ package com.bergerkiller.bukkit.common.conversion.type;
 
 import java.util.WeakHashMap;
 
+import com.bergerkiller.bukkit.common.wrappers.Holder;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -18,7 +20,8 @@ import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
- * Converts between Holder&lt;DimensionManager&gt; and DimensionManager
+ * Converts between Holder&lt;DimensionManager&gt; and DimensionManager, and does
+ * similar logic for MobEffectList (potion effects)
  */
 public class MC1_18_2_Conversion {
     private static WeakHashMap<Object, Object> holdersByDimensionManager = new WeakHashMap<>();
@@ -86,6 +89,16 @@ public class MC1_18_2_Conversion {
     @ConverterMethod(output="net.minecraft.core.Holder<net.minecraft.sounds.SoundEffect>")
     public static Object soundEffectHolderFromResourceKey(ResourceKey<SoundEffect> soundKey) {
         return SoundEffectHandle.T.rawSoundEffectResourceKeyToHolder.invoke(soundKey.getRawHandle());
+    }
+
+    @ConverterMethod(input="net.minecraft.core.Holder<net.minecraft.world.effect.MobEffectList>")
+    public static Holder<MobEffectListHandle> wrapMobEffectHolder(Object nmsHolder) {
+        return Holder.fromHandle(nmsHolder, MobEffectListHandle::createHandle);
+    }
+
+    @ConverterMethod(output="net.minecraft.core.Holder<net.minecraft.world.effect.MobEffectList>")
+    public static Object unwrapMobEffectHolder(Holder<MobEffectListHandle> holder) {
+        return holder.toRawHolder();
     }
 
     @Template.Optional

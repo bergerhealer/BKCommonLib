@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.bergerkiller.bukkit.common.wrappers.Holder;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
@@ -1028,12 +1029,12 @@ public class NMSPacketClasses {
         public final FieldAccessor<PotionEffectType> effect = new SafeDirectField<PotionEffectType>() {
             @Override
             public PotionEffectType get(Object instance) {
-                return PacketPlayOutEntityEffectHandle.T.getEffect.invoke(instance);
+                return PacketPlayOutEntityEffectHandle.createHandle(instance).getPotionEffectType();
             }
 
             @Override
             public boolean set(Object instance, PotionEffectType value) {
-                PacketPlayOutEntityEffectHandle.T.setEffect.invoke(instance, value);
+                PacketPlayOutEntityEffectHandle.createHandle(instance).setPotionEffectType(value);
                 return true;
             }
         };
@@ -1041,27 +1042,8 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> effectDuration = PacketPlayOutEntityEffectHandle.T.effectDurationTicks.toFieldAccessor();
         public final FieldAccessor<Byte> effectFlags = PacketPlayOutEntityEffectHandle.T.flags.toFieldAccessor();
 
-        /**
-         * @deprecated Use {@link #effect} instead
-         */
-        @Deprecated
-        public final FieldAccessor<Integer> effectId = new SafeDirectField<Integer>() {
-            @Override
-            public Integer get(Object instance) {
-                PotionEffectType type = PacketPlayOutEntityEffectHandle.T.getEffect.invoke(instance);
-                return (type == null) ? -1 : type.getId();
-            }
-
-            @Override
-            public boolean set(Object instance, Integer value) {
-                PotionEffectType type = PotionEffectType.getById(value);
-                PacketPlayOutEntityEffectHandle.T.setEffect.invoke(instance, type);
-                return true;
-            }
-        };
-
         public CommonPacket newInstance(int entityId, MobEffectHandle mobEffect) {
-            return new CommonPacket(PacketPlayOutEntityEffectHandle.T.constr_entityId_mobeffect.raw.newInstance(entityId, mobEffect.getRaw()));
+            return new CommonPacket(PacketPlayOutEntityEffectHandle.T.createNew.raw.invoke(entityId, mobEffect.getRaw(), false));
         }
 
         public CommonPacket newInstance(int entityId, PotionEffect effect) {
@@ -1597,9 +1579,13 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutRemoveEntityEffect extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = PacketPlayOutRemoveEntityEffectHandle.T.entityId.toFieldAccessor();
-        public final FieldAccessor<MobEffectListHandle> effectList = PacketPlayOutRemoveEntityEffectHandle.T.effectList.toFieldAccessor();
+        public final FieldAccessor<Holder<MobEffectListHandle>> effect = PacketPlayOutRemoveEntityEffectHandle.T.effect.toFieldAccessor();
 
-        public CommonPacket newInstance(int entityId, MobEffectListHandle mobEffectList) {
+        public CommonPacket newInstance(int entityId, PotionEffectType effectType) {
+            return PacketPlayOutRemoveEntityEffectHandle.createNew(entityId, effectType).toCommonPacket();
+        }
+
+        public CommonPacket newInstance(int entityId, Holder<MobEffectListHandle> mobEffectList) {
             return PacketPlayOutRemoveEntityEffectHandle.createNew(entityId, mobEffectList).toCommonPacket();
         }
     }

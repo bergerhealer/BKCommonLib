@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.conversion.type;
 
 import java.util.List;
 
+import com.bergerkiller.bukkit.common.wrappers.Holder;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
@@ -81,6 +82,26 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersH
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
 public class WrapperConversion {
+
+    @ConverterMethod
+    public static Holder<MobEffectListHandle> holderFromBukkit(org.bukkit.potion.PotionEffectType effectType) {
+        return null;
+    }
+
+    @ConverterMethod
+    public static org.bukkit.potion.PotionEffectType holderToBukkit(Holder<MobEffectListHandle> MobEffectList) {
+        return null;
+    }
+
+    @ConverterMethod(input="net.minecraft.world.effect.MobEffectList")
+    public static Holder<MobEffectListHandle> mobEffectListToHolder(Object nmsMobEffectList) {
+        return Holder.directWrap(nmsMobEffectList, MobEffectListHandle::createHandle);
+    }
+
+    @ConverterMethod(output="net.minecraft.world.effect.MobEffectList")
+    public static Object holderToMobEffectList(Holder<MobEffectListHandle> holder) {
+        return holder.rawValue();
+    }
 
     @ConverterMethod(input="net.minecraft.nbt.NBTTagCompound")
     public static BlockStateChange deserializeBlockStateChange(Object nmsNBTTagCompoundMetadataHandle) {

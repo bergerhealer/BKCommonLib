@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
+import com.bergerkiller.bukkit.common.wrappers.Holder;
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
@@ -18,6 +19,17 @@ public class MC1_8_8_Conversion {
     @ConverterMethod()
     public static com.bergerkiller.bukkit.common.internal.proxy.DataPaletteBlock createProxyDataPaletteBlock(char[] data) {
         return new com.bergerkiller.bukkit.common.internal.proxy.DataPaletteBlock(data);
+    }
+
+    @ConverterMethod
+    public static Holder<MobEffectListHandle> createMobEffectListHolderFromId(Integer id) {
+        return Holder.directWrap(MobEffectListHandle.T.fromId.raw.invoker.invoke(null, id),
+                MobEffectListHandle::createHandle);
+    }
+
+    @ConverterMethod
+    public static Integer getMobEffectListIdFromHolder(Holder<MobEffectListHandle> holder) {
+        return getMobEffectListId(holder.rawValue());
     }
 
     @ConverterMethod(output="net.minecraft.world.effect.MobEffectList")

@@ -46,6 +46,7 @@ import io.netty.buffer.Unpooled;
 import com.bergerkiller.bukkit.common.wrappers.BlockStateChange;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import com.bergerkiller.bukkit.common.wrappers.Holder;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.resources.BlockStateType;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
@@ -947,6 +948,83 @@ class PacketPlayInArmAnimation extends Packet {
     </code>
 }
 
+class PacketPlayOutEntityEffect extends Packet {
+    <code>
+    public static final int FLAG_AMBIENT = 1;
+    public static final int FLAG_VISIBLE = 2;
+    public static final int FLAG_SHOW_ICON = 4;
+    </code>
+
+#if version >= 1.17
+    private final int entityId;
+    private final byte effectAmplifier;
+    private final int effectDurationTicks;
+    private final byte flags;
+#else
+    private int entityId:a;
+    private byte effectAmplifier:c;
+    private int effectDurationTicks:d;
+    private byte flags:e;
+#endif
+
+#if version >= 1.20.5
+    public (Holder<MobEffectListHandle>) net.minecraft.core.Holder<MobEffectList> getEffect();
+    public void setEffect((Holder<MobEffectListHandle>) net.minecraft.core.Holder<MobEffectList> effect) {
+        #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final net.minecraft.core.Holder<MobEffectList> effect;
+        instance#effect = effect;
+    }
+#elseif version >= 1.19
+    public (Holder<MobEffectListHandle>) MobEffectList getEffect();
+    public void setEffect((Holder<MobEffectListHandle>) MobEffectList effect) {
+        #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final MobEffectList effect;
+        instance#effect = effect;
+    }
+#elseif version >= 1.18.2
+    public (Holder<MobEffectListHandle>) int getEffect:getEffectId();
+    public void setEffect((Holder<MobEffectListHandle>) int effect) {
+        #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final int effectId;
+        instance#effectId = effect;
+    }
+#else
+  #if version >= 1.17
+    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final byte effectId;
+  #else
+    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private byte effectId:b;
+  #endif
+
+    public (Holder<MobEffectListHandle>) int getEffect() {
+        return (int) instance#effectId;
+    }
+
+    public void setEffect((Holder<MobEffectListHandle>) int effect) {
+        byte b = (byte) effect;
+        instance#effectId = b;
+    }
+#endif
+
+    <code>
+    public org.bukkit.potion.PotionEffectType getPotionEffectType() {
+        return MobEffectListHandle.holderToBukkit(getEffect());
+    }
+
+    public void setPotionEffectType(org.bukkit.potion.PotionEffectType effectType) {
+        setEffect(MobEffectListHandle.holderFromBukkit(effectType));
+    }
+
+    public static PacketPlayOutEntityEffectHandle createNew(int entityId, org.bukkit.potion.PotionEffect effect) {
+        return createNew(entityId, effect, false);
+    }
+    </code>
+
+    public static (PacketPlayOutEntityEffectHandle) PacketPlayOutEntityEffect createNew(int entityId, (org.bukkit.potion.PotionEffect) MobEffect effect, boolean blend) {
+#if version >= 1.20.5
+        return new PacketPlayOutEntityEffect(entityId, effect, blend);
+#else
+        return new PacketPlayOutEntityEffect(entityId, effect);
+#endif
+    }
+}
+
 class PacketPlayOutRemoveEntityEffect extends Packet {
 #if version >= 1.17
     private int entityId;
@@ -954,12 +1032,14 @@ class PacketPlayOutRemoveEntityEffect extends Packet {
     private int entityId:a;
 #endif
 
-#if version >= 1.17
-    private (MobEffectListHandle) MobEffectList effectList:effect;
+#if version >= 1.20.5
+    private (Holder<MobEffectListHandle>) net.minecraft.core.Holder<MobEffectList> effect;
+#elseif version >= 1.17
+    private (Holder<MobEffectListHandle>) MobEffectList effect;
 #elseif version >= 1.9
-    private (MobEffectListHandle) MobEffectList effectList:b;
+    private (Holder<MobEffectListHandle>) MobEffectList effect:b;
 #else
-    private (MobEffectListHandle) int effectList:b;
+    private (Holder<MobEffectListHandle>) int effect:b;
 #endif
 
     public static (PacketPlayOutRemoveEntityEffectHandle) PacketPlayOutRemoveEntityEffect createNew() {
@@ -971,10 +1051,25 @@ class PacketPlayOutRemoveEntityEffect extends Packet {
     }
 
     <code>
-    public static PacketPlayOutRemoveEntityEffectHandle createNew(int entityId, MobEffectListHandle mobEffectList) {
+    public org.bukkit.potion.PotionEffectType getPotionEffectType() {
+        return MobEffectListHandle.holderToBukkit(getEffect());
+    }
+
+    public void setPotionEffectType(org.bukkit.potion.PotionEffectType effectType) {
+        setEffect(MobEffectListHandle.holderFromBukkit(effectType));
+    }
+
+    public static PacketPlayOutRemoveEntityEffectHandle createNew(int entityId, org.bukkit.potion.PotionEffectType effectType) {
         PacketPlayOutRemoveEntityEffectHandle handle = createNew();
         handle.setEntityId(entityId);
-        handle.setEffectList(mobEffectList);
+        handle.setPotionEffectType(effectType);
+        return handle;
+    }
+
+    public static PacketPlayOutRemoveEntityEffectHandle createNew(int entityId, Holder<MobEffectListHandle> effect) {
+        PacketPlayOutRemoveEntityEffectHandle handle = createNew();
+        handle.setEntityId(entityId);
+        handle.setEffect(effect);
         return handle;
     }
     </code>
@@ -2844,57 +2939,6 @@ class PacketPlayOutExplosion extends Packet {
     //public (PacketPlayOutExplosionHandle) PacketPlayOutExplosion(double x, double y, double z, float power, (List<IntVector3>) List<BlockPosition> blocks, (org.bukkit.util.Vector) Vec3D knockback);
 }
 
-class PacketPlayOutEntityEffect extends Packet {
-    <code>
-    public static final int FLAG_AMBIENT = 1;
-    public static final int FLAG_VISIBLE = 2;
-    public static final int FLAG_SHOW_ICON = 4;
-    </code>
-
-#if version >= 1.17
-    private final int entityId;
-    private final byte effectAmplifier;
-    private final int effectDurationTicks;
-    private final byte flags;
-#else
-    private int entityId:a;
-    private byte effectAmplifier:c;
-    private int effectDurationTicks:d;
-    private byte flags:e;
-#endif
-
-#if version >= 1.19
-    public (PotionEffectType) MobEffectList getEffect();
-    public void setEffect((PotionEffectType) MobEffectList type) {
-        #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final MobEffectList effect;
-        instance#effect = type;
-    }
-#elseif version >= 1.18.2
-    public (PotionEffectType) int getEffect:getEffectId();
-    public void setEffect((PotionEffectType) int type) {
-        #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final int effectId;
-        instance#effectId = type;
-    }
-#else
-  #if version >= 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final byte effectId;
-  #else
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private byte effectId:b;
-  #endif
-
-    public (PotionEffectType) int getEffect() {
-        return (int) instance#effectId;
-    }
-
-    public void setEffect((PotionEffectType) int type) {
-        byte b = (byte) type;
-        instance#effectId = b;
-    }
-#endif
-
-    public (PacketPlayOutEntityEffectHandle) PacketPlayOutEntityEffect(int entityId, (org.bukkit.potion.PotionEffect) MobEffect mobeffect);
-}
-
 class PacketPlayInAbilities extends Packet {
 #if version >= 1.17
     private final boolean isFlying;
@@ -3022,7 +3066,9 @@ optional class PacketPlayOutAdvancements extends Packet {
 // Since MC 1.19.4
 optional class ClientboundBundlePacket extends Packet {
 
-#if version >= 1.19.4
+#if version >= 1.20.5
+    #require net.minecraft.network.protocol.BundlePacket private final Iterable<Packet<?>> bundlePackets:packets;
+#elseif version >= 1.19.4
     #require net.minecraft.network.protocol.BundlePacket private final Iterable<Packet<T extends net.minecraft.network.PacketListener>> bundlePackets:packets;
 #endif
 
@@ -3030,7 +3076,11 @@ optional class ClientboundBundlePacket extends Packet {
         return new ClientboundBundlePacket(rawPackets);
     }
 
+#if version >= 1.20.5
+    public final (Iterable<Object>) Iterable<Packet<?>> subPackets();
+#else
     public final (Iterable<Object>) Iterable<Packet<T extends net.minecraft.network.PacketListener>> subPackets();
+#endif
 
     public void setSubPackets(Iterable<Object> packets) {
         instance#bundlePackets = packets;

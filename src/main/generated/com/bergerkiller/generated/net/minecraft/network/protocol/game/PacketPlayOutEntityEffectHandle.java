@@ -1,9 +1,10 @@
 package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.Holder;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.PacketPlayOutEntityEffect</b>.
@@ -20,18 +21,31 @@ public abstract class PacketPlayOutEntityEffectHandle extends PacketHandle {
         return T.createHandle(handleInstance);
     }
 
-    public static final PacketPlayOutEntityEffectHandle createNew(int entityId, PotionEffect mobeffect) {
-        return T.constr_entityId_mobeffect.newInstance(entityId, mobeffect);
-    }
-
     /* ============================================================================== */
 
-    public abstract PotionEffectType getEffect();
-    public abstract void setEffect(PotionEffectType type);
+    public static PacketPlayOutEntityEffectHandle createNew(int entityId, PotionEffect effect, boolean blend) {
+        return T.createNew.invoke(entityId, effect, blend);
+    }
+
+    public abstract Holder<MobEffectListHandle> getEffect();
+    public abstract void setEffect(Holder<MobEffectListHandle> effect);
 
     public static final int FLAG_AMBIENT = 1;
     public static final int FLAG_VISIBLE = 2;
     public static final int FLAG_SHOW_ICON = 4;
+
+
+    public org.bukkit.potion.PotionEffectType getPotionEffectType() {
+        return MobEffectListHandle.holderToBukkit(getEffect());
+    }
+
+    public void setPotionEffectType(org.bukkit.potion.PotionEffectType effectType) {
+        setEffect(MobEffectListHandle.holderFromBukkit(effectType));
+    }
+
+    public static PacketPlayOutEntityEffectHandle createNew(int entityId, org.bukkit.potion.PotionEffect effect) {
+        return createNew(entityId, effect, false);
+    }
     public abstract int getEntityId();
     public abstract void setEntityId(int value);
     public abstract byte getEffectAmplifier();
@@ -45,14 +59,14 @@ public abstract class PacketPlayOutEntityEffectHandle extends PacketHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutEntityEffectClass extends Template.Class<PacketPlayOutEntityEffectHandle> {
-        public final Template.Constructor.Converted<PacketPlayOutEntityEffectHandle> constr_entityId_mobeffect = new Template.Constructor.Converted<PacketPlayOutEntityEffectHandle>();
-
         public final Template.Field.Integer entityId = new Template.Field.Integer();
         public final Template.Field.Byte effectAmplifier = new Template.Field.Byte();
         public final Template.Field.Integer effectDurationTicks = new Template.Field.Integer();
         public final Template.Field.Byte flags = new Template.Field.Byte();
 
-        public final Template.Method.Converted<PotionEffectType> getEffect = new Template.Method.Converted<PotionEffectType>();
+        public final Template.StaticMethod.Converted<PacketPlayOutEntityEffectHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutEntityEffectHandle>();
+
+        public final Template.Method.Converted<Holder<MobEffectListHandle>> getEffect = new Template.Method.Converted<Holder<MobEffectListHandle>>();
         public final Template.Method.Converted<Void> setEffect = new Template.Method.Converted<Void>();
 
     }

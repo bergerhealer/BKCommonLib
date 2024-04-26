@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.world.effect;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.wrappers.Holder;
 import org.bukkit.potion.PotionEffect;
 
 /**
@@ -30,8 +31,8 @@ public abstract class MobEffectHandle extends Template.Handle {
     }
 
     public abstract PotionEffect toBukkit();
-    public abstract MobEffectListHandle getEffectList();
-    public abstract void setEffectList(MobEffectListHandle value);
+    public abstract Holder<MobEffectListHandle> getEffectList();
+    public abstract void setEffectList(Holder<MobEffectListHandle> value);
     public abstract int getDuration();
     public abstract void setDuration(int value);
     public abstract int getAmplifier();
@@ -45,7 +46,7 @@ public abstract class MobEffectHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class MobEffectClass extends Template.Class<MobEffectHandle> {
-        public final Template.Field.Converted<MobEffectListHandle> effectList = new Template.Field.Converted<MobEffectListHandle>();
+        public final Template.Field.Converted<Holder<MobEffectListHandle>> effectList = new Template.Field.Converted<Holder<MobEffectListHandle>>();
         public final Template.Field.Integer duration = new Template.Field.Integer();
         public final Template.Field.Integer amplifier = new Template.Field.Integer();
         public final Template.Field.Boolean ambient = new Template.Field.Boolean();

@@ -10,14 +10,17 @@ import org.bukkit.craftbukkit.potion.CraftPotionUtil;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.wrappers.Holder;
 
 class MobEffect {
-#if version >= 1.17
-    private final (MobEffectListHandle) MobEffectList effectList:effect;
+#if version >= 1.20.5
+    private final (Holder<MobEffectListHandle>) net.minecraft.core.Holder<MobEffectList> effectList:effect;
+#elseif version >= 1.17
+    private final (Holder<MobEffectListHandle>) MobEffectList effectList:effect;
 #elseif version >= 1.9
-    private final (MobEffectListHandle) MobEffectList effectList:b;
+    private final (Holder<MobEffectListHandle>) MobEffectList effectList:b;
 #else
-    private (MobEffectListHandle) int effectList:effectId;
+    private (Holder<MobEffectListHandle>) int effectList:effectId;
 #endif
 
 #if version >= 1.17
@@ -86,6 +89,40 @@ class MobEffect {
 }
 
 class MobEffectList {
+#if version >= 1.20.5
+    public org.bukkit.potion.PotionEffectType toBukkit() {
+        return org.bukkit.craftbukkit.potion.CraftPotionEffectType.minecraftToBukkit(instance);
+    }
+
+    public static (MobEffectListHandle) MobEffectList fromBukkit(org.bukkit.potion.PotionEffectType effectType) {
+        return (MobEffectList) org.bukkit.craftbukkit.potion.CraftPotionEffectType.bukkitToMinecraft(effectType);
+    }
+
+    public static (Holder<MobEffectListHandle>) net.minecraft.core.Holder<MobEffectList> holderFromBukkit(org.bukkit.potion.PotionEffectType effectType) {
+        return org.bukkit.craftbukkit.potion.CraftPotionEffectType.bukkitToMinecraftHolder(effectType);
+    }
+
+    public static org.bukkit.potion.PotionEffectType holderToBukkit((Holder<MobEffectListHandle>) net.minecraft.core.Holder<MobEffectList> mobEffectList) {
+        return org.bukkit.craftbukkit.potion.CraftPotionEffectType.minecraftHolderToBukkit(mobEffectList);
+    }
+#else
+    public org.bukkit.potion.PotionEffectType toBukkit() {
+        return org.bukkit.potion.PotionEffectType.getById(((Integer) MobEffectListHandle.T.getId.invoke(instance)).intValue());
+    }
+
+    public static (MobEffectListHandle) MobEffectList fromBukkit(org.bukkit.potion.PotionEffectType effectType) {
+        return (MobEffectList) MobEffectListHandle.T.fromId.raw.invoke(effectType.getId());
+    }
+
+    public static (Holder<MobEffectListHandle>) MobEffectList holderFromBukkit(org.bukkit.potion.PotionEffectType effectType) {
+        return MobEffectListHandle.byId(effectType.getId());
+    }
+
+    public static org.bukkit.potion.PotionEffectType holderToBukkit((Holder<MobEffectListHandle>) MobEffectList mobEffectList) {
+        return org.bukkit.potion.PotionEffectType.getById(((Integer) MobEffectListHandle.T.getId.raw.invoke(mobEffectList)).intValue());
+    }
+#endif
+
 #if exists MobEffectList public static int getId(MobEffectList mobeffectlist);
     public static int getId((MobEffectListHandle) MobEffectList mobeffectlist);
 #elseif version >= 1.18

@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.world.entity;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+import com.bergerkiller.bukkit.common.wrappers.Holder;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeMapBaseHandle;
@@ -50,8 +51,8 @@ public abstract class EntityLivingHandle extends EntityHandle {
     public static EntityLivingHandle fromBukkit(org.bukkit.entity.LivingEntity livingEntity) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(livingEntity));
     }
-    public abstract Map<MobEffectListHandle, MobEffectHandle> getMobEffects();
-    public abstract void setMobEffects(Map<MobEffectListHandle, MobEffectHandle> value);
+    public abstract Map<Holder<MobEffectListHandle>, MobEffectHandle> getMobEffects();
+    public abstract void setMobEffects(Map<Holder<MobEffectListHandle>, MobEffectHandle> value);
     public abstract float getLastDamage();
     public abstract void setLastDamage(float value);
     public abstract float getSideMovement();
@@ -78,7 +79,7 @@ public abstract class EntityLivingHandle extends EntityHandle {
         @Template.Optional
         public final Template.StaticField.Converted<Key<IntVector3>> DATA_BEDPOSITION = new Template.StaticField.Converted<Key<IntVector3>>();
 
-        public final Template.Field.Converted<Map<MobEffectListHandle, MobEffectHandle>> mobEffects = new Template.Field.Converted<Map<MobEffectListHandle, MobEffectHandle>>();
+        public final Template.Field.Converted<Map<Holder<MobEffectListHandle>, MobEffectHandle>> mobEffects = new Template.Field.Converted<Map<Holder<MobEffectListHandle>, MobEffectHandle>>();
         public final Template.Field.Float lastDamage = new Template.Field.Float();
         public final Template.Field.Float sideMovement = new Template.Field.Float();
         public final Template.Field.Float forwardMovement = new Template.Field.Float();
