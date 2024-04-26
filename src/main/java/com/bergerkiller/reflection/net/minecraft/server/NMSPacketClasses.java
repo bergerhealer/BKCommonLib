@@ -1038,7 +1038,18 @@ public class NMSPacketClasses {
                 return true;
             }
         };
-        public final FieldAccessor<Byte> effectAmplifier = PacketPlayOutEntityEffectHandle.T.effectAmplifier.toFieldAccessor();
+        public final FieldAccessor<Integer> effectAmplifier = new SafeDirectField<Integer>() {
+            @Override
+            public Integer get(Object instance) {
+                return PacketPlayOutEntityEffectHandle.createHandle(instance).getEffectAmplifier();
+            }
+
+            @Override
+            public boolean set(Object instance, Integer value) {
+                PacketPlayOutEntityEffectHandle.createHandle(instance).setEffectAmplifier(value);
+                return true;
+            }
+        };
         public final FieldAccessor<Integer> effectDuration = PacketPlayOutEntityEffectHandle.T.effectDurationTicks.toFieldAccessor();
         public final FieldAccessor<Byte> effectFlags = PacketPlayOutEntityEffectHandle.T.flags.toFieldAccessor();
 

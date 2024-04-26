@@ -957,14 +957,40 @@ class PacketPlayOutEntityEffect extends Packet {
 
 #if version >= 1.17
     private final int entityId;
-    private final byte effectAmplifier;
     private final int effectDurationTicks;
     private final byte flags;
 #else
     private int entityId:a;
-    private byte effectAmplifier:c;
     private int effectDurationTicks:d;
     private byte flags:e;
+#endif
+
+#if version >= 1.20.5
+    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final int effectAmplifier;
+
+    public int getEffectAmplifier() {
+        return instance#effectAmplifier;
+    }
+
+    public void setEffectAmplifier(int amplifier) {
+        instance#effectAmplifier = amplifier;
+    }
+#else
+  #if version >= 1.17
+    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final byte effectAmplifier;
+  #else
+    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private byte effectAmplifier:c;
+  #endif
+
+    public int getEffectAmplifier() {
+        byte b = instance#effectAmplifier;
+        return (int) (b & 0xFF);
+    }
+
+    public void setEffectAmplifier(int amplifier) {
+        byte b = (byte) amplifier;
+        instance#effectAmplifier = b;
+    }
 #endif
 
 #if version >= 1.20.5

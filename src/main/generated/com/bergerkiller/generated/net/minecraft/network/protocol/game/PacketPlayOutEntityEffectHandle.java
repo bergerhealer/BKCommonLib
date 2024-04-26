@@ -27,6 +27,8 @@ public abstract class PacketPlayOutEntityEffectHandle extends PacketHandle {
         return T.createNew.invoke(entityId, effect, blend);
     }
 
+    public abstract int getEffectAmplifier();
+    public abstract void setEffectAmplifier(int amplifier);
     public abstract Holder<MobEffectListHandle> getEffect();
     public abstract void setEffect(Holder<MobEffectListHandle> effect);
 
@@ -48,8 +50,6 @@ public abstract class PacketPlayOutEntityEffectHandle extends PacketHandle {
     }
     public abstract int getEntityId();
     public abstract void setEntityId(int value);
-    public abstract byte getEffectAmplifier();
-    public abstract void setEffectAmplifier(byte value);
     public abstract int getEffectDurationTicks();
     public abstract void setEffectDurationTicks(int value);
     public abstract byte getFlags();
@@ -60,12 +60,13 @@ public abstract class PacketPlayOutEntityEffectHandle extends PacketHandle {
      */
     public static final class PacketPlayOutEntityEffectClass extends Template.Class<PacketPlayOutEntityEffectHandle> {
         public final Template.Field.Integer entityId = new Template.Field.Integer();
-        public final Template.Field.Byte effectAmplifier = new Template.Field.Byte();
         public final Template.Field.Integer effectDurationTicks = new Template.Field.Integer();
         public final Template.Field.Byte flags = new Template.Field.Byte();
 
         public final Template.StaticMethod.Converted<PacketPlayOutEntityEffectHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutEntityEffectHandle>();
 
+        public final Template.Method<Integer> getEffectAmplifier = new Template.Method<Integer>();
+        public final Template.Method<Void> setEffectAmplifier = new Template.Method<Void>();
         public final Template.Method.Converted<Holder<MobEffectListHandle>> getEffect = new Template.Method.Converted<Holder<MobEffectListHandle>>();
         public final Template.Method.Converted<Void> setEffect = new Template.Method.Converted<Void>();
 
