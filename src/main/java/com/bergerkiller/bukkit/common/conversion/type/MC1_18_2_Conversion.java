@@ -4,6 +4,7 @@ import java.util.WeakHashMap;
 
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeBaseHandle;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -21,7 +22,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
  * Converts between Holder&lt;DimensionManager&gt; and DimensionManager, and does
- * similar logic for MobEffectList (potion effects)
+ * similar logic for MobEffectList (potion effects) and AttributeBase (attributes)
  */
 public class MC1_18_2_Conversion {
     private static WeakHashMap<Object, Object> holdersByDimensionManager = new WeakHashMap<>();
@@ -98,6 +99,16 @@ public class MC1_18_2_Conversion {
 
     @ConverterMethod(output="net.minecraft.core.Holder<net.minecraft.world.effect.MobEffectList>")
     public static Object unwrapMobEffectHolder(Holder<MobEffectListHandle> holder) {
+        return holder.toRawHolder();
+    }
+
+    @ConverterMethod(input="net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.AttributeBase>")
+    public static Holder<AttributeBaseHandle> wrapAttributeHolder(Object nmsHolder) {
+        return Holder.fromHandle(nmsHolder, AttributeBaseHandle::createHandle);
+    }
+
+    @ConverterMethod(output="net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.AttributeBase>")
+    public static Object unwrapAttributeHolder(Holder<AttributeBaseHandle> holder) {
         return holder.toRawHolder();
     }
 

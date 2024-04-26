@@ -6,6 +6,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeBaseHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeMapBaseHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
 import org.bukkit.inventory.EquipmentSlot;
@@ -32,7 +33,7 @@ public abstract class EntityLivingHandle extends EntityHandle {
 
     public abstract void resetAttributes();
     public abstract AttributeMapBaseHandle getAttributeMap();
-    public abstract AttributeModifiableHandle getAttribute(Object iattribute);
+    public abstract AttributeModifiableHandle getAttribute(Holder<AttributeBaseHandle> attribute);
     public abstract Collection<MobEffectHandle> getEffects();
     public abstract ItemStack getEquipment(EquipmentSlot paramEnumItemSlot);
     public abstract float getHealth();

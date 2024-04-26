@@ -3,7 +3,9 @@ package net.minecraft.world.entity.ai.attributes;
 import net.minecraft.nbt.NBTTagList;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
+import com.bergerkiller.bukkit.common.wrappers.Holder;
 
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeBaseHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeMapBaseHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
 
@@ -53,17 +55,29 @@ class AttributeMapBase {
 #endif
 }
 
+// Note: on very old versions it also uses IAttribute, but thats always AttributeBase anyway
+class AttributeBase {
+#if version >= 1.18
+    public String getDescriptionId();
+#else
+    public String getDescriptionId:getName();
+#endif
+}
+
 class GenericAttributes {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
-#if version >= 1.16
-    public static final (Object) AttributeBase FOLLOW_RANGE;
-    public static final (Object) AttributeBase MOVEMENT_SPEED;
+#if version >= 1.20.5
+    public static final (Holder<AttributeBaseHandle>) net.minecraft.core.Holder<AttributeBase> FOLLOW_RANGE;
+    public static final (Holder<AttributeBaseHandle>) net.minecraft.core.Holder<AttributeBase> MOVEMENT_SPEED;
+#elseif version >= 1.16
+    public static final (Holder<AttributeBaseHandle>) AttributeBase FOLLOW_RANGE;
+    public static final (Holder<AttributeBaseHandle>) AttributeBase MOVEMENT_SPEED;
 #elseif version >= 1.8.4
-    public static final (Object) IAttribute FOLLOW_RANGE;
-    public static final (Object) IAttribute MOVEMENT_SPEED;
+    public static final (Holder<AttributeBaseHandle>) IAttribute FOLLOW_RANGE;
+    public static final (Holder<AttributeBaseHandle>) IAttribute MOVEMENT_SPEED;
 #else
-    public static final (Object) IAttribute FOLLOW_RANGE:b;
-    public static final (Object) IAttribute MOVEMENT_SPEED:d;
+    public static final (Holder<AttributeBaseHandle>) IAttribute FOLLOW_RANGE:b;
+    public static final (Holder<AttributeBaseHandle>) IAttribute MOVEMENT_SPEED:d;
 #endif
 }

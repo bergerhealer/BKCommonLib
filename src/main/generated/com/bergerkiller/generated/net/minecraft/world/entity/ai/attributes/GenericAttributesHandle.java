@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.Holder;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.world.entity.ai.attributes.GenericAttributes</b>.
@@ -11,8 +12,8 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class GenericAttributesHandle extends Template.Handle {
     /** @see GenericAttributesClass */
     public static final GenericAttributesClass T = Template.Class.create(GenericAttributesClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-    public static final Object FOLLOW_RANGE = T.FOLLOW_RANGE.getSafe();
-    public static final Object MOVEMENT_SPEED = T.MOVEMENT_SPEED.getSafe();
+    public static final Holder<AttributeBaseHandle> FOLLOW_RANGE = T.FOLLOW_RANGE.getSafe();
+    public static final Holder<AttributeBaseHandle> MOVEMENT_SPEED = T.MOVEMENT_SPEED.getSafe();
     /* ============================================================================== */
 
     public static GenericAttributesHandle createHandle(Object handleInstance) {
@@ -26,8 +27,8 @@ public abstract class GenericAttributesHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class GenericAttributesClass extends Template.Class<GenericAttributesHandle> {
-        public final Template.StaticField.Converted<Object> FOLLOW_RANGE = new Template.StaticField.Converted<Object>();
-        public final Template.StaticField.Converted<Object> MOVEMENT_SPEED = new Template.StaticField.Converted<Object>();
+        public final Template.StaticField.Converted<Holder<AttributeBaseHandle>> FOLLOW_RANGE = new Template.StaticField.Converted<Holder<AttributeBaseHandle>>();
+        public final Template.StaticField.Converted<Holder<AttributeBaseHandle>> MOVEMENT_SPEED = new Template.StaticField.Converted<Holder<AttributeBaseHandle>>();
 
     }
 

@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.conversion.type;
 import java.util.List;
 
 import com.bergerkiller.bukkit.common.wrappers.Holder;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeMapBaseHandle;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
@@ -82,6 +83,22 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersH
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
 public class WrapperConversion {
+
+    // Plugs a gap 1.8 - 1.16 where some fields used IAttribute (but were really AttributeBase)
+    @ConverterMethod(input="net.minecraft.world.entity.ai.attributes.IAttribute", optional=true)
+    public static Holder<AttributeMapBaseHandle> iAttributeToHolder(Object nmsIAttribute) {
+        return attributeBaseToHolder(nmsIAttribute);
+    }
+
+    @ConverterMethod(input="net.minecraft.world.entity.ai.attributes.AttributeBase")
+    public static Holder<AttributeMapBaseHandle> attributeBaseToHolder(Object nmsAttributeBase) {
+        return Holder.directWrap(nmsAttributeBase, AttributeMapBaseHandle::createHandle);
+    }
+
+    @ConverterMethod(output="net.minecraft.world.entity.ai.attributes.AttributeBase")
+    public static Object holderToAttributeBase(Holder<AttributeMapBaseHandle> attributeHolder) {
+        return attributeHolder.rawValue();
+    }
 
     @ConverterMethod
     public static Holder<MobEffectListHandle> holderFromBukkit(org.bukkit.potion.PotionEffectType effectType) {

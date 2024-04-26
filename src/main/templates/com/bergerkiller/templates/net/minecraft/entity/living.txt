@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeBaseHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeMapBaseHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
@@ -203,12 +204,12 @@ class EntityLiving extends Entity {
 #endif
 
 #if version >= 1.18
-    public (AttributeModifiableHandle) AttributeModifiable getAttribute((Object) AttributeBase iattribute);
+    public (AttributeModifiableHandle) AttributeModifiable getAttribute((Holder<AttributeBaseHandle>) net.minecraft.core.Holder<AttributeBase> attribute);
 #elseif version >= 1.16
-    public (AttributeModifiableHandle) AttributeModifiable getAttribute:getAttributeInstance((Object) AttributeBase iattribute);
+    public (AttributeModifiableHandle) AttributeModifiable getAttribute:getAttributeInstance((Holder<AttributeBaseHandle>) AttributeBase attribute);
 #else
-    public (AttributeModifiableHandle) AttributeModifiable getAttribute((Object) IAttribute iattribute) {
-        return (AttributeModifiable) instance.getAttributeInstance(iattribute);
+    public (AttributeModifiableHandle) AttributeModifiable getAttribute((Holder<AttributeBaseHandle>) IAttribute attribute) {
+        return (AttributeModifiable) instance.getAttributeInstance(attribute);
     }
 #endif
 
