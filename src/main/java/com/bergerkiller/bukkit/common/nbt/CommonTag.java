@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.wrappers.BasicWrapper;
 import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
 import com.bergerkiller.generated.net.minecraft.nbt.NBTCompressedStreamToolsHandle;
+import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingMap;
 
@@ -20,6 +21,8 @@ import java.util.Map;
  * double, byte[], int[], String</u>
  */
 public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable {
+    // Guards against modifications when a read-only NBT object is requested
+    boolean readOnly = false;
 
     public CommonTag(NBTBaseHandle handle) {
         setHandle(handle);
@@ -30,6 +33,12 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable 
             setHandle((NBTBaseHandle) data);
         } else {
             setHandle(NBTBaseHandle.createHandleForData(data));
+        }
+    }
+
+    void assertWritable() {
+        if (readOnly) {
+            throw new UnsupportedOperationException("This NBT Tag is read-only");
         }
     }
 
@@ -48,7 +57,7 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable 
      * @return Tag data
      */
     public Object getData() {
-        return wrapRawData(getRawData());
+        return wrapRawData(getRawData(), readOnly);
     }
 
     /**
@@ -146,27 +155,45 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable 
         }
     }
 
-    protected static Object wrapGetDataForHandle(Object nmsNBTHandle) {
-        return wrapRawData(NBTBaseHandle.getDataForHandle(nmsNBTHandle));
+    protected static Object wrapGetDataForHandle(Object nmsNBTHandle, boolean readOnly) {
+        return wrapRawData(NBTBaseHandle.getDataForHandle(nmsNBTHandle), readOnly);
     }
 
     /**
      * Wraps Map and List data to expose CommonTag objects rather than NBTBase.
      * Other types are returned as-is.
      * 
-     * @param value
+     * @param value Value to wrap
+     * @param readOnly Whether any CommonTags should be wrapped as read-only
      * @return wrapped value
      */
-    protected static Object wrapRawData(Object value) {
+    protected static Object wrapRawData(Object value, boolean readOnly) {
         if (value instanceof Map) {
             // Convert Map<String, NBTBase> to Map<String, CommonTag>
-            return new ConvertingMap<String, CommonTag>((Map<?, ?>) value, DuplexConversion.string_string, DuplexConversion.nbtBase_commonTag);
+            return new ConvertingMap<String, CommonTag>((Map<?, ?>) value, DuplexConversion.string_string, nbtBaseToCommonTag(readOnly));
         } else if (value instanceof List) {
             // Convert List<NBTBase> to List<CommonTag>
-            return new ConvertingList<CommonTag>((List<?>) value, DuplexConversion.nbtBase_commonTag);
+            return new ConvertingList<CommonTag>((List<?>) value, nbtBaseToCommonTag(readOnly));
         } else {
             // Tag data value type does not require further conversion
             return value;
         }
+    }
+
+    static DuplexConverter<Object, CommonTag> nbtBaseToCommonTag(boolean readOnly) {
+        return readOnly ? DuplexConversion.nbtBase_commonTag_readOnly : DuplexConversion.nbtBase_commonTag;
+    }
+
+    /**
+     * Makes a tag read-only. Remove and put operations will no longer work.
+     *
+     * @param tag NBT Tag
+     * @return Same input tag, but with read-only mode enabled
+     */
+    public static <T extends CommonTag> T makeReadOnly(T tag) {
+        if (tag != null) {
+            tag.readOnly = true;
+        }
+        return tag;
     }
 }

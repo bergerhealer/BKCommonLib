@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.nbt;
 
 import com.bergerkiller.bukkit.common.collections.CollectionBasics;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
@@ -30,6 +29,11 @@ import java.util.Map.Entry;
  */
 @SuppressWarnings("unchecked")
 public class CommonTagList extends CommonTag implements List<CommonTag> {
+
+    /**
+     * A read-only EMPTY tag list. This tag cannot be modified!
+     */
+    public static final CommonTagList EMPTY = makeReadOnly(new CommonTagList());
 
     public CommonTagList() {
         this(new ArrayList<CommonTag>());
@@ -83,6 +87,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
     @Override
     public void clear() {
+        assertWritable();
         getBackingHandle().clear();
     }
 
@@ -95,7 +100,8 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      * @return element value
      */
     public Object getValue(int index) {
-        return wrapRawData(NBTBaseHandle.getDataForHandle(NBTTagListHandle.T.get_at.raw.invoke(getRawHandle(), index)));
+        return wrapRawData(NBTBaseHandle.getDataForHandle(NBTTagListHandle.T.get_at.raw.invoke(getRawHandle(), index)),
+                readOnly);
     }
 
     /**
@@ -147,6 +153,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      * @param element to set to
      */
     public void setValue(int index, Object element) {
+        assertWritable();
         NBTTagListHandle.T.set_at.raw.invoke(getRawHandle(), index, NBTBaseHandle.createRawHandleForData(element));
     }
 
@@ -159,6 +166,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      * @param element to add
      */
     public void addValue(int index, Object element) {
+        assertWritable();
         NBTTagListHandle.T.add_at.raw.invoke(getRawHandle(), index, NBTBaseHandle.createRawHandleForData(element));
     }
 
@@ -170,6 +178,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      * @param element to add
      */
     public void addValue(Object element) {
+        assertWritable();
         NBTTagListHandle.T.add.raw.invoke(getRawHandle(), NBTBaseHandle.createRawHandleForData(element));
     }
 
@@ -202,6 +211,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
     @Override
     public boolean remove(Object o) {
+        assertWritable();
         int index = indexOf(o);
         if (index == -1) {
             return false;
@@ -213,26 +223,32 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
     @Override
     public CommonTag get(int index) {
-        return getBackingHandle().get_at(index).toCommonTag();
+        CommonTag tag = getBackingHandle().get_at(index).toCommonTag();
+        tag.readOnly = this.readOnly;
+        return tag;
     }
 
     @Override
     public CommonTag set(int index, CommonTag element) {
+        assertWritable();
         return getBackingHandle().set_at(index, element.getBackingHandle()).toCommonTag();
     }
 
     @Override
     public CommonTag remove(int index) {
+        assertWritable();
         return getBackingHandle().remove_at(index).toCommonTag();
     }
 
     @Override
     public void add(int index, CommonTag element) {
+        assertWritable();
         getBackingHandle().add_at(index, element.getBackingHandle());
     }
 
     @Override
     public boolean add(CommonTag element) {
+        assertWritable();
         return getBackingHandle().add(element.getBackingHandle());
     }
 
@@ -359,17 +375,20 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
     @Override
     public Iterator<CommonTag> iterator() {
-        return new ConvertingIterator<CommonTag>(getRawData().iterator(), Conversion.toCommonTag);
+        return new ConvertingIterator<>(getRawData().iterator(),
+                nbtBaseToCommonTag(readOnly));
     }
 
     @Override
     public ListIterator<CommonTag> listIterator() {
-        return new ConvertingListIterator<CommonTag>(getRawData().listIterator(), DuplexConversion.commonTag);
+        return new ConvertingListIterator<>(getRawData().listIterator(),
+                nbtBaseToCommonTag(readOnly));
     }
 
     @Override
     public ListIterator<CommonTag> listIterator(int index) {
-        return new ConvertingListIterator<CommonTag>(getRawData().listIterator(index), DuplexConversion.commonTag);
+        return new ConvertingListIterator<>(getRawData().listIterator(index),
+                nbtBaseToCommonTag(readOnly));
     }
 
     @Override
@@ -401,5 +420,16 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      */
     public static CommonTagList create(Object handle) {
         return CommonUtil.tryCast(CommonTag.create(handle), CommonTagList.class);
+    }
+
+    /**
+     * Creates an unmodifiable CommonTagList from the handle specified<br>
+     * If the handle is null or not a list, null is returned
+     *
+     * @param handle to create a list wrapper class for
+     * @return Wrapper class suitable for the given handle
+     */
+    public static CommonTagList createReadOnly(Object handle) {
+        return makeReadOnly(create(handle));
     }
 }

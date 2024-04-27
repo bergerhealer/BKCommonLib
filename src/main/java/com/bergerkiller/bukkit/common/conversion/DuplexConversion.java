@@ -114,6 +114,17 @@ public class DuplexConversion {
             return value.getRawHandle();
         }
     };
+    public static final DuplexConverter<Object, CommonTag> nbtBase_commonTag_readOnly = new DuplexConverter<Object, CommonTag>(CommonUtil.getClass("net.minecraft.nbt.NBTBase", false), CommonTag.class) {
+        @Override
+        public CommonTag convertInput(Object value) {
+            return CommonTag.makeReadOnly(NBTBaseHandle.createHandleForData(value).toCommonTag());
+        }
+
+        @Override
+        public Object convertOutput(CommonTag value) {
+            return value.getRawHandle();
+        }
+    };
     public static final DuplexConverter<Object, NBTBaseHandle> nbtBase_nbtBaseHandle = new DuplexConverter<Object, NBTBaseHandle>(CommonUtil.getClass("net.minecraft.nbt.NBTBase", false), NBTBaseHandle.class) {
         @Override
         public NBTBaseHandle convertInput(Object value) {

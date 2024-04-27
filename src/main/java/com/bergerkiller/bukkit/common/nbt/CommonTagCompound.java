@@ -21,6 +21,12 @@ import java.util.*;
 @SuppressWarnings("unchecked")
 public class CommonTagCompound extends CommonTag implements Map<String, CommonTag> {
 
+    /**
+     * A read-only EMPTY tag compound. This tag cannot be modified! Is returned
+     * as a constant when reading the custom data of items that don't have any.
+     */
+    public static final CommonTagCompound EMPTY = makeReadOnly(new CommonTagCompound());
+
     public CommonTagCompound() {
         this(new HashMap<String, CommonTag>());
     }
@@ -76,8 +82,9 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
         if (key == null) {
             return null;
         }
+        assertWritable();
         Object removedHandle = getRawData().remove(key);
-        return removedHandle == null ? null : wrapGetDataForHandle(removedHandle);
+        return removedHandle == null ? null : wrapGetDataForHandle(removedHandle, readOnly);
     }
 
     /**
@@ -91,6 +98,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
         if (key == null) {
             return null;
         }
+        assertWritable();
         return CommonTag.create(getRawData().remove(key.toString()));
     }
 
@@ -141,9 +149,11 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
             rawNBTResult = NBTTagCompoundHandle.T.get.raw.invoke(getRawHandle(), key);
         } else if (op == PutGetRemoveOp.REMOVE || (op == PutGetRemoveOp.PUT && value == null)) {
             // Remove other types of values
+            assertWritable();
             rawNBTResult = getRawData().remove(key);
         } else if (op == PutGetRemoveOp.PUT) {
             // Put other types of values
+            assertWritable();
             Object putValueNBT = NBTBaseHandle.createRawHandleForData(value);
             rawNBTResult = NBTTagCompoundHandle.T.put.raw.invoke(getRawHandle(), key, putValueNBT);
         }
@@ -152,17 +162,23 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
         if (rawNBTResult == null) {
             return null; // failure or no previous value
         } else if (type == null) {
-            return (T) wrapGetDataForHandle(rawNBTResult);
+            return (T) wrapGetDataForHandle(rawNBTResult, readOnly);
         } else if (NBTBaseHandle.class.isAssignableFrom(type)) {
             return Conversion.convert(NBTBaseHandle.createHandleForData(rawNBTResult), type, null);
         } else if (CommonTag.class.isAssignableFrom(type)) {
-            return Conversion.convert(NBTBaseHandle.createHandleForData(rawNBTResult).toCommonTag(), type, null);
+            CommonTag commonTag = NBTBaseHandle.createHandleForData(rawNBTResult).toCommonTag();
+            commonTag.readOnly = this.readOnly;
+            return Conversion.convert(commonTag, type, null);
         } else if (NBTBaseHandle.T.isAssignableFrom(type)) {
             return Conversion.convert(rawNBTResult, type, null);
         } else if (NBTTagCompoundHandle.T.isAssignableFrom(rawNBTResult)) {
-            return Conversion.convert(wrapRawData(NBTTagCompoundHandle.T.data.get(rawNBTResult)), type, null);
+            return Conversion.convert(
+                    wrapRawData(NBTTagCompoundHandle.T.data.get(rawNBTResult), readOnly),
+                    type, null);
         } else if (NBTTagListHandle.T.isAssignableFrom(rawNBTResult)) {
-            return Conversion.convert(wrapRawData(NBTTagListHandle.T.data.get(rawNBTResult)), type, null);
+            return Conversion.convert(
+                    wrapRawData(NBTTagListHandle.T.data.get(rawNBTResult), readOnly),
+                    type, null);
         } else {
             return Conversion.convert(NBTBaseHandle.getDataForHandle(rawNBTResult), type, null);
         }
@@ -220,7 +236,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * boolean, short, int, long, float, double, byte[], int[],
      * String, UUID*, BlockLocation*, IntVector3*, other**</u><br>
      * <br>
-     * <i>* these types do not support removing, use {@link #removeValue(key, type)}
+     * <i>* these types do not support removing, use {@link #removeValue(String, Class)}
      * or {@link #putValue(String, Class, Object)} instead</i><br>
      * <i>** these types are serialized from/to a stored String type.</i>
      *
@@ -415,8 +431,11 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
         }
         Object handle = getRawData().get(key);
         if (NBTTagCompoundHandle.T.isAssignableFrom(handle)) {
-            return CommonTagCompound.create(NBTTagCompoundHandle.createHandle(handle));
+            CommonTagCompound tag = CommonTagCompound.create(NBTTagCompoundHandle.createHandle(handle));
+            tag.readOnly = this.readOnly;
+            return tag;
         } else {
+            assertWritable();
             CommonTagCompound new_compound = new CommonTagCompound();
             getRawData().put(key.toString(), new_compound.getRawHandle());
             return new_compound;
@@ -436,8 +455,11 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
         }
         Object handle = getRawData().get(key);
         if (NBTTagListHandle.T.isAssignableFrom(handle)) {
-            return CommonTagList.create(NBTTagListHandle.createHandle(handle));
+            CommonTagList list = CommonTagList.create(NBTTagListHandle.createHandle(handle));
+            list.readOnly = this.readOnly;
+            return list;
         } else {
+            assertWritable();
             CommonTagList new_list = new CommonTagList();
             getRawData().put(key.toString(), new_list.getRawHandle());
             return new_list;
@@ -471,6 +493,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
 
     @Override
     public void clear() {
+        assertWritable();
         getRawData().clear();
     }
 
@@ -636,6 +659,17 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      */
     public static CommonTagCompound create(Object handle) {
         return CommonUtil.tryCast(CommonTag.create(handle), CommonTagCompound.class);
+    }
+
+    /**
+     * Creates an unmodifiable CommonTagCompound from the handle specified<br>
+     * If the handle is null or not a compound, null is returned
+     *
+     * @param handle to create a compound wrapper class for
+     * @return Wrapper class suitable for the given handle
+     */
+    public static CommonTagCompound createReadOnly(Object handle) {
+        return makeReadOnly(create(handle));
     }
 
     /**
