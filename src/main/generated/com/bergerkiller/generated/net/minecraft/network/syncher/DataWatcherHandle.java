@@ -22,12 +22,14 @@ public abstract class DataWatcherHandle extends Template.Handle {
         return T.createHandle(handleInstance);
     }
 
-    public static final DataWatcherHandle createNew(EntityHandle owner) {
-        return T.constr_owner.newInstance(owner);
-    }
-
     /* ============================================================================== */
 
+    public static DataWatcherHandle createNew(EntityHandle owner) {
+        return T.createNew.invoke(owner);
+    }
+
+    public abstract EntityHandle getOwner();
+    public abstract void setOwner(EntityHandle owner);
     public abstract List<PackedItem<?>> packChanges();
     public abstract List<PackedItem<?>> packNonDefaults();
     public abstract List<PackedItem<?>> packAll();
@@ -40,20 +42,21 @@ public abstract class DataWatcherHandle extends Template.Handle {
     public abstract boolean isChanged();
     public abstract boolean isEmpty();
 
+    public static final Object UNSET_MARKER_VALUE = new Object();
+
+
     public static DataWatcherHandle createNew(org.bukkit.entity.Entity owner) {
-        return createHandle(T.constr_owner.raw.newInstance(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(owner)));
+        return createHandle(T.createNew.raw.invoke(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(owner)));
     }
-    public abstract EntityHandle getOwner();
-    public abstract void setOwner(EntityHandle value);
     /**
      * Stores class members for <b>net.minecraft.network.syncher.DataWatcher</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class DataWatcherClass extends Template.Class<DataWatcherHandle> {
-        public final Template.Constructor.Converted<DataWatcherHandle> constr_owner = new Template.Constructor.Converted<DataWatcherHandle>();
+        public final Template.StaticMethod.Converted<DataWatcherHandle> createNew = new Template.StaticMethod.Converted<DataWatcherHandle>();
 
-        public final Template.Field.Converted<EntityHandle> owner = new Template.Field.Converted<EntityHandle>();
-
+        public final Template.Method.Converted<EntityHandle> getOwner = new Template.Method.Converted<EntityHandle>();
+        public final Template.Method.Converted<Void> setOwner = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<List<PackedItem<?>>> packChanges = new Template.Method.Converted<List<PackedItem<?>>>();
         public final Template.Method.Converted<List<PackedItem<?>>> packNonDefaults = new Template.Method.Converted<List<PackedItem<?>>>();
         public final Template.Method.Converted<List<PackedItem<?>>> packAll = new Template.Method.Converted<List<PackedItem<?>>>();

@@ -9,21 +9,74 @@ import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandl
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherObjectHandle;
 
 class DataWatcher {
-#if version >= 1.14.4
-    private final (EntityHandle) Entity owner:entity;
-#elseif version >= 1.10.2
-    private final (EntityHandle) Entity owner:c;
-#elseif version >= 1.9
-    private final (EntityHandle) Entity owner:b;
-#else
-    private final (EntityHandle) Entity owner:a;
+
+    // This marker value is set as the 'default' when for a particular key/id, no value is known yet
+    // When packing items to send in metadata packets, it treats items with this value as
+    // set to the default value, as a result not sending it. When the user later sets a new, proper value,
+    // then the entry is seen as always changed (from the default) always sending it.
+    //
+    // This, as opposed to using register, which uses that value's default value. This could be
+    // more efficient as then no metadata packets are sent when they're the default.
+    <code>
+    public static final Object UNSET_MARKER_VALUE = new Object();
+    </code>
+
+#if version >= 1.20.5
+    #require net.minecraft.network.syncher.DataWatcher public static DataWatcher.Item createDataWatcherDummyItem() {
+        return new DataWatcher$Item( (net.minecraft.network.syncher.DataWatcherObject) null,
+                                     DataWatcherHandle.UNSET_MARKER_VALUE );
+
+    }
 #endif
 
-    public (DataWatcherHandle) DataWatcher((EntityHandle) Entity owner);
+#if version >= 1.20.5
+    #require net.minecraft.network.syncher.DataWatcher private final net.minecraft.network.syncher.SyncedDataHolder owner:entity;
+
+    public (EntityHandle) Entity getOwner() {
+        net.minecraft.network.syncher.SyncedDataHolder owner = instance#owner;
+        if (owner instanceof Entity) {
+            return (Entity) owner;
+        } else {
+            return null;
+        }
+    }
+
+    public void setOwner((EntityHandle) Entity owner) {
+        instance#owner = owner;
+    }
+#else
+  #if version >= 1.14.4
+    #require net.minecraft.network.syncher.DataWatcher private final Entity owner:entity;
+  #elseif version >= 1.10.2
+    #require net.minecraft.network.syncher.DataWatcher private final Entity owner:c;
+  #elseif version >= 1.9
+    #require net.minecraft.network.syncher.DataWatcher private final Entity owner:b;
+  #else
+    #require net.minecraft.network.syncher.DataWatcher private final Entity owner:a;
+  #endif
+
+    public (EntityHandle) Entity getOwner() {
+        return instance#owner;
+    }
+
+    public void setOwner((EntityHandle) Entity owner) {
+        instance#owner = owner;
+    }
+#endif
+
+    public static (DataWatcherHandle) DataWatcher createNew((EntityHandle) Entity owner) {
+#if version >= 1.20.5
+        #require net.minecraft.network.syncher.DataWatcher DataWatcher createDataWatcher:<init>(SyncedDataHolder owner, DataWatcher.Item<?>[] items);
+
+        return #createDataWatcher((SyncedDataHolder) owner, new DataWatcher$Item[0]);
+#else
+        return new DataWatcher(owner);
+#endif
+    }
 
     <code>
     public static DataWatcherHandle createNew(org.bukkit.entity.Entity owner) {
-        return createHandle(T.constr_owner.raw.newInstance(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(owner)));
+        return createHandle(T.createNew.raw.invoke(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(owner)));
     }
     </code>
 
@@ -46,11 +99,49 @@ class DataWatcher {
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.WatchableObject> packNonDefaults:c();
 #endif
 
-#if version >= 1.19.3
+#if version >= 1.20.5
+    #require DataWatcher private final DataWatcher.Item<?>[] itemsById;
+
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.PackedItem<?>> packAll() {
         // No method is available on this version, so use reflection to hack something together
         // Note: vanilla does some locking, doesn't appear to be used on spigot/paper
-        #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<DataWatcher.Item<?>> itemsById;
+        DataWatcher$Item[] itemsById = instance#itemsById;
+        java.util.ArrayList resultItems = new java.util.ArrayList(itemsById.length);
+        for (int i = 0; i < itemsById.length; i++) {
+            DataWatcher$Item item = itemsById[i];
+            if (item.getValue() != DataWatcherHandle.UNSET_MARKER_VALUE) {
+                resultItems.add(item.value());
+            }
+        }
+        return resultItems;
+    }
+
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> getCopyOfAllItems() {
+        // No method is available on this version, so use reflection to hack something together
+        // Note: vanilla does some locking, doesn't appear to be used on spigot/paper
+        DataWatcher$Item[] itemsById = instance#itemsById;
+        java.util.ArrayList resultItems = new java.util.ArrayList(itemsById.length);
+        for (int i = 0; i < itemsById.length; i++) {
+            DataWatcher$Item item = itemsById[i];
+            Object value = item.getValue();
+            if (value != DataWatcherHandle.UNSET_MARKER_VALUE) {
+                #require DataWatcher$Item private final T itemInitialValue:initialValue;
+                Object initialValue = item#itemInitialValue;
+
+                DataWatcher$Item copy = new DataWatcher$Item(item.getAccessor(), initialValue);
+                copy.setValue(item.getValue());
+                copy.setDirty(item.isDirty());
+                resultItems.add(copy);
+            }
+        }
+        return resultItems;
+    }
+#elseif version >= 1.19.3
+    #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<DataWatcher.Item<?>> itemsById;
+
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.PackedItem<?>> packAll() {
+        // No method is available on this version, so use reflection to hack something together
+        // Note: vanilla does some locking, doesn't appear to be used on spigot/paper
         it.unimi.dsi.fastutil.ints.Int2ObjectMap itemsById = instance#itemsById;
         java.util.ArrayList resultItems = new java.util.ArrayList(itemsById.size());
         it.unimi.dsi.fastutil.objects.ObjectIterator objectiterator = itemsById.values().iterator();
@@ -64,13 +155,12 @@ class DataWatcher {
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> getCopyOfAllItems() {
         // No method is available on this version, so use reflection to hack something together
         // Note: vanilla does some locking, doesn't appear to be used on spigot/paper
-        #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<DataWatcher.Item<?>> itemsById;
         it.unimi.dsi.fastutil.ints.Int2ObjectMap itemsById = instance#itemsById;
         java.util.ArrayList resultItems = new java.util.ArrayList(itemsById.size());
         it.unimi.dsi.fastutil.objects.ObjectIterator objectiterator = itemsById.values().iterator();
         while (objectiterator.hasNext()) {
             DataWatcher$Item item = (DataWatcher$Item) objectiterator.next();
-            #require DataWatcher.Item private final T itemInitialValue:initialValue;
+            #require DataWatcher$Item private final T itemInitialValue:initialValue;
             Object initialValue = item#itemInitialValue;
 
             DataWatcher$Item copy = new DataWatcher$Item(item.getAccessor(), initialValue);
@@ -91,7 +181,20 @@ class DataWatcher {
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.WatchableObject> getCopyOfAllItems:c();
 #endif
 
-#if version >= 1.18
+#if version >= 1.20.5
+    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>) DataWatcher.Item<T> read((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key) {
+        DataWatcher$Item[] itemsById = instance#itemsById;
+        int index = key.id();
+        if (index < 0 || index >= itemsById.length) {
+            return null;
+        }
+        DataWatcher$Item item = itemsById[index];
+        if (item.getValue() == DataWatcherHandle.UNSET_MARKER_VALUE) {
+            return null; // Gap between valid keys where no actual item is stored
+        }
+        return item;
+    }
+#elseif version >= 1.18
     private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>) DataWatcher.Item<T> read:getItem((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
 #elseif version >= 1.13
     private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>) DataWatcher.Item<T> read:b((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
@@ -105,14 +208,35 @@ class DataWatcher {
         if (key == null) {
             throw new IllegalArgumentException("key is null");
         }
-#if version >= 1.18
-        #require net.minecraft.network.syncher.DataWatcher private void register:define(DataWatcherObject<T> key, Object defaultValue);
-#elseif version >= 1.9
-        #require net.minecraft.network.syncher.DataWatcher private void register:registerObject(DataWatcherObject<T> key, Object defaultValue);
+
+        Object defaultValueConv = key.getType().getConverter().convertReverse(defaultValue);
+
+#if version >= 1.20.5
+        // Grow the internal array of items as required
+        // Insert dummy items in gaps that form so no NPEs can occur
+        DataWatcherObject keyObj = (DataWatcherObject) key.getRawHandle();
+        int index = keyObj.id();
+        DataWatcher$Item[] itemsById = instance#itemsById;
+        if (index >= itemsById.length) {
+            // Grow array. Fill intermediate items with dummy items
+            int startIndex = itemsById.length;
+            itemsById = (DataWatcher$Item[]) java.util.Arrays.copyOf(itemsById, index + 1);
+            for (int i = startIndex; i < index; i++) {
+                itemsById[i] = #createDataWatcherDummyItem();
+            }
+        }
+        itemsById[index] = new DataWatcher$Item(keyObj, defaultValueConv);
+        instance#itemsById = itemsById;
 #else
+  #if version >= 1.18
+        #require net.minecraft.network.syncher.DataWatcher private void register:define(DataWatcherObject<T> key, Object defaultValue);
+  #elseif version >= 1.9
+        #require net.minecraft.network.syncher.DataWatcher private void register:registerObject(DataWatcherObject<T> key, Object defaultValue);
+  #else
         #require net.minecraft.network.syncher.DataWatcher private void register:a((DataWatcherObject<T>) int key, Object defaultValue);
+  #endif
+        instance#register((DataWatcherObject) key.getRawHandle(), defaultValueConv);
 #endif
-        instance#register((DataWatcherObject) key.getRawHandle(), key.getType().getConverter().convertReverse(defaultValue));
     }
 
     public void set(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> key, Object value) {
@@ -120,7 +244,33 @@ class DataWatcher {
             throw new IllegalArgumentException("key is null");
         }
         Object convertedValue = key.getType().getConverter().convertReverse(value);
-#if version >= 1.9
+#if version >= 1.20.5
+        // Make sure altering dummy items is forbidden, requiring a register first
+        DataWatcher$Item[] itemsById = instance#itemsById;
+        DataWatcherObject keyObj = (DataWatcherObject) key.getRawHandle();
+        int keyIndex = keyObj.id();
+        if (keyIndex < 0 || keyIndex >= itemsById.length) {
+            throw new NullPointerException(); // Signals that it doesn't exist...
+        }
+
+        DataWatcher$Item item = itemsById[keyIndex];
+        Object currValue = item.getValue();
+        if (currValue == DataWatcherHandle.UNSET_MARKER_VALUE) {
+            throw new NullPointerException(); // Signals that it doesn't exist...
+        }
+
+        // Vanilla logic
+        if (org.apache.commons.lang3.ObjectUtils.notEqual(convertedValue, currValue)) {
+            item.setValue(convertedValue);
+
+            net.minecraft.network.syncher.SyncedDataHolder owner = instance#owner;
+            owner.onSyncedDataUpdated(keyObj);
+            item.setDirty(true);
+
+            #require net.minecraft.network.syncher.DataWatcher private boolean dwIsDirty:isDirty;
+            instance#dwIsDirty = true;
+        }
+#elseif version >= 1.9
         instance.set((DataWatcherObject) key.getRawHandle(), convertedValue);
 #else
         int id = ((com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject) key.getRawHandle()).getId();
@@ -135,7 +285,30 @@ class DataWatcher {
         Object convertedValue = key.getType().getConverter().convertReverse(value);
         DataWatcherObject dwo = (DataWatcherObject) key.getRawHandle();
 
-#if version >= 1.19.4
+#if version >= 1.20.5
+        // Make sure altering dummy items is forbidden, requiring a register first
+        DataWatcher$Item[] itemsById = instance#itemsById;
+        int keyIndex = dwo.id();
+        if (keyIndex < 0 || keyIndex >= itemsById.length) {
+            throw new NullPointerException(); // Signals that it doesn't exist...
+        }
+
+        DataWatcher$Item item = itemsById[keyIndex];
+        Object currValue = item.getValue();
+        if (currValue == DataWatcherHandle.UNSET_MARKER_VALUE) {
+            throw new NullPointerException(); // Signals that it doesn't exist...
+        }
+
+        // Vanilla logic
+        item.setValue(convertedValue);
+
+        net.minecraft.network.syncher.SyncedDataHolder owner = instance#owner;
+        owner.onSyncedDataUpdated(dwo);
+        item.setDirty(true);
+
+        #require net.minecraft.network.syncher.DataWatcher private boolean dwIsDirty:isDirty;
+        instance#dwIsDirty = true;
+#elseif version >= 1.19.4
         instance.set(dwo, convertedValue, true);
 #else
         // API doesn't exist yet, but it's also not too important as it isn't used at all.
@@ -200,7 +373,13 @@ class DataWatcher {
         return key.getType().getConverter().convert(rawValue);
     }
 
-#if version >= 1.18
+#if version >= 1.20.5
+    public boolean isChanged:isDirty();
+    public boolean isEmpty() {
+        DataWatcher$Item[] itemsById = instance#itemsById;
+        return itemsById.length == 0;
+    }
+#elseif version >= 1.18
     public boolean isChanged:isDirty();
     public boolean isEmpty();
 #else
@@ -290,7 +469,10 @@ class DataWatcher {
 }
 
 class DataWatcherObject {
-#if version >= 1.18
+#if version >= 1.20.5
+    public int getId:id();
+    public (Object) DataWatcherSerializer<T> getSerializer:serializer()
+#elseif version >= 1.18
     public int getId();
     public (Object) DataWatcherSerializer<T> getSerializer()
 #elseif version >= 1.9
