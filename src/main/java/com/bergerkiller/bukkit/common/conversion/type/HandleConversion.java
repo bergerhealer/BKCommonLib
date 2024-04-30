@@ -146,7 +146,7 @@ public class HandleConversion {
                     // Fallback under test - does not go into production!
                     ItemStackHandle handle = ItemStackHandle.newInstance(itemStack.getType());
                     handle.setAmountField(itemStack.getAmount());
-                    handle.setDurability(itemStack.getDurability());
+                    handle.setDamageValue(itemStack.getDurability());
                     return handle.getRaw();
                 }
 

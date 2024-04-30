@@ -53,7 +53,8 @@ public class Common {
             "Common:ChunkUtil:getChunkViewers",
             "Common:SignChangeTracker:FormattedText",
             "Common:ConnectionResetAwaitTeleport",
-            "Common:EntityController:PositionPassenger"
+            "Common:EntityController:PositionPassenger",
+            "Common:CommonItemStack"
     ).collect(Collectors.toSet());
 
     /**

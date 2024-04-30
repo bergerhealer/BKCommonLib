@@ -1,7 +1,10 @@
 package com.bergerkiller.bukkit.common.map;
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
+import com.bergerkiller.bukkit.common.inventory.CommonItemMaterials;
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.ItemFrame;
@@ -26,14 +29,26 @@ import com.bergerkiller.bukkit.common.utils.ItemUtil;
 public abstract class MapDisplayProperties {
 
     /**
-     * Gets the ItemStack information of the map item.
+     * Gets the CommonItemStack information of the map item.
      * Note that changes to this item will alter these properties.
      * This item can be given to players, or put in item frames,
      * and will then begin displaying contents.
-     * 
+     *
      * @return map item
      */
-    public abstract ItemStack getMapItem();
+    public abstract CommonItemStack getCommonMapItem();
+
+    /**
+     * Gets the Bukkit ItemStack information of the map item.
+     * Note that changes to this item will alter these properties.
+     * This item can be given to players, or put in item frames,
+     * and will then begin displaying contents.
+     *
+     * @return map item
+     */
+    public final ItemStack getMapItem() {
+        return getCommonMapItem().toBukkit();
+    }
 
     /**
      * Gets the name of the plugin owner of the display.
@@ -96,30 +111,44 @@ public abstract class MapDisplayProperties {
     }
 
     /**
-     * Gets the NBT Tag Compound that stores all the map display properties.
-     * This tag can be modified to update properties stored in the underlying map
-     * item.
+     * Gets the read-only NBT Tag Compound that stores all the map display properties.
+     * This tag is read-only and cannot be modified!
      * 
-     * @return map item properties NBT Tag Compound
+     * @return Read-only map item properties NBT Tag Compound
      */
     public CommonTagCompound getMetadata() {
-        CommonTagCompound tag = ItemUtil.getMetaTag(getMapItem(), false);
-        if (tag == null) {
-            throw new IllegalStateException("Map display item does not have metadata");
-        }
-        return tag;
+        return getCommonMapItem().getCustomData();
     }
 
     /**
-     * Gets or creates an NBT Tag Compound at the key specified.
-     * This represents a group of properties all stored in a single block
-     * at this key.
-     * 
-     * @param key Key at which to get or create the compound
-     * @return NBT Tag Compound with the group of properties at the key
+     * Gets a writable copy of the NBT Tag Compound that stores all the map display properties.
+     * This tag is writable, but changes will not occur until {@link #setMetadata(CommonTagCompound)}
+     * is called.
+     *
+     * @return Copy of the map item properties NBT Tag Compound
      */
-    public CommonTagCompound compound(String key) {
-        return getMetadata().createCompound(key);
+    public CommonTagCompound getMetadataCopy() {
+        return getCommonMapItem().getCustomDataCopy();
+    }
+
+    /**
+     * Updates the metadata of these map display properties. Further changes to the input
+     * metadata are not reflected by these properties. (a copy is made)
+     *
+     * @param metadata Metadata NBT Tag Compound to set
+     */
+    public void setMetadata(CommonTagCompound metadata) {
+        getCommonMapItem().setCustomData(metadata);
+    }
+
+    /**
+     * Updates the metadata of these map display properties. The consumer callback is called
+     * with the writable metadata, where the callback can update it.
+     *
+     * @param consumer Consumer to mutate the NBT metadata tag
+     */
+    public void updateMetadata(Consumer<CommonTagCompound> consumer) {
+        getCommonMapItem().updateCustomData(consumer);
     }
 
     /**
@@ -140,7 +169,9 @@ public abstract class MapDisplayProperties {
      * @param value to set to
      */
     public void set(String key, Object value) {
-        getMetadata().putValue(key, value);
+        updateMetadata(metadata -> {
+            metadata.putValue(key, value);
+        });
     }
 
     /**
@@ -183,7 +214,7 @@ public abstract class MapDisplayProperties {
      * @param displayName Display name ChatText
      */
     public void setDisplayName(ChatText displayName) {
-        ItemUtil.setDisplayChatText(this.getMapItem(), displayName);
+        getCommonMapItem().setCustomName(displayName);
     }
 
     /**
@@ -192,7 +223,8 @@ public abstract class MapDisplayProperties {
      * @param displayName Display name String
      */
     public void setDisplayName(String displayName) {
-        ItemUtil.setDisplayName(this.getMapItem(), displayName);
+        getCommonMapItem().setCustomName((displayName == null) ? null
+                : ChatText.fromMessage(displayName));
     }
 
     /**
@@ -212,8 +244,7 @@ public abstract class MapDisplayProperties {
      * @param rgbColor RGB color code (e.g. 0xFF0000)
      */
     public void setMapColor(int rgbColor) {
-        CommonTagCompound display = getMetadata().createCompound("display");
-        display.putValue("MapColor", rgbColor);
+        getCommonMapItem().setFilledMapColor(rgbColor);
     }
 
     /**
@@ -231,15 +262,22 @@ public abstract class MapDisplayProperties {
 
     /**
      * Creates a map display properties view of a map item.
-     * If the input item is invalid, and can't store map display data,
-     * then null is returned instead.
      * 
      * @param mapItem The item to create a properties view of
-     * @return map display properties, or null if the input item is null or has no metadata
+     * @return map display properties
      */
     public static MapDisplayProperties of(ItemStack mapItem) {
-        CommonTagCompound metadata = ItemUtil.getMetaTag(mapItem, false);
-        return (metadata == null) ? null : new ItemStackMapDisplayProperties(mapItem, metadata);
+        return of(CommonItemStack.of(mapItem));
+    }
+
+    /**
+     * Creates a map display properties view of a map item.
+     *
+     * @param mapItem The item to create a properties view of
+     * @return map display properties
+     */
+    public static MapDisplayProperties of(CommonItemStack mapItem) {
+        return new ItemStackMapDisplayProperties(mapItem);
     }
 
     /**
@@ -293,12 +331,13 @@ public abstract class MapDisplayProperties {
             throw new IllegalArgumentException("The class " + mapDisplayClass.getName() + " does not have an empty constructor. Override onAttached() and use properties instead!");
         }
 
-        ItemStack mapItem = ItemUtil.createItem(CommonMapUUIDStore.FILLED_MAP_TYPE, 1);
-        CommonMapUUIDStore.setItemMapId(mapItem, 0);
-        CommonTagCompound tag = ItemUtil.getMetaTag(mapItem, true);
-        tag.putValue("mapDisplayPlugin", plugin.getName());
-        tag.putValue("mapDisplayClass", mapDisplayClass.getName());
-        tag.putUUID("mapDisplay", CommonMapUUIDStore.generateDynamicMapUUID());
+        CommonItemStack mapItem = CommonItemStack.create(CommonItemMaterials.FILLED_MAP, 1);
+        mapItem.setFilledMapId(0);
+        mapItem.updateCustomData(tag -> {
+            tag.putValue("mapDisplayPlugin", plugin.getName());
+            tag.putValue("mapDisplayClass", mapDisplayClass.getName());
+            tag.putUUID("mapDisplay", CommonMapUUIDStore.generateDynamicMapUUID());
+        });
         return of(mapItem);
     }
 }

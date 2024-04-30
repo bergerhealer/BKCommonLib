@@ -9,6 +9,7 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -17,7 +18,7 @@ import org.bukkit.inventory.ItemStack;
  * Can be used to match items against, and to provide amounts. Material AIR is
  * designated for invalid (or failed-to-parse) Item Parsers.
  */
-public class ItemParser {
+public class ItemParser implements Predicate<CommonItemStack> {
     public static final char METADATA_CHAR = '$';
     public static final char STACK_MULTIPLIER = '^';
     public static final char[] MULTIPLIER_SIGNS = {'x', 'X', '*', ' ', '@', STACK_MULTIPLIER};
@@ -198,6 +199,17 @@ public class ItemParser {
     }
 
     /**
+     * Calls {@link #match(ItemStack)} with the CommonItemStack.
+     *
+     * @param commonItemStack ItemStack to test
+     * @return True if it matches
+     */
+    @Override
+    public boolean test(CommonItemStack commonItemStack) {
+        return match(commonItemStack.toBukkit());
+    }
+
+    /**
      * Checks whether an ItemStack matches this Item Parser
      * 
      * @param stack
@@ -219,6 +231,8 @@ public class ItemParser {
         }
 
         // Metadata rules
+        // TODO: Broken as of 1.20.5!
+        /*
         if (!this.rules.isEmpty()) {
             CommonTagCompound meta = ItemUtil.getMetaTag(stack, false);
             if (meta == null) {
@@ -231,6 +245,7 @@ public class ItemParser {
                 }
             }
         }
+         */
 
         return true;
     }

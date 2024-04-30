@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.junit.Ignore;
@@ -104,6 +105,11 @@ public class TemplateTest {
     public void testTestServerInitialized() {
         CommonBootstrap.initServer();
         assertNotNull(Bukkit.getServer());
+    }
+
+    @Test
+    public void testTestServerInitialized2() {
+        ItemStackHandle.T.forceInitialization();
     }
 
     @Test

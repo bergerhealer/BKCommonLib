@@ -3,8 +3,8 @@ package com.bergerkiller.bukkit.common;
 import static org.junit.Assert.*;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.math.Quaternion;
-import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode;
 import com.bergerkiller.generated.net.minecraft.world.entity.DisplayHandle;
@@ -177,14 +177,18 @@ public class DataWatcherTest {
 
     @Test
     public void testItemFrameMeta() {
-        ItemStack item = ItemUtil.createItem(MaterialUtil.getFirst("OAK_LOG", "LEGACY_LOG"), 2);
-        ItemUtil.getMetaTag(item, true).putValue("UniqueKey", "UniqueValue123");
+        CommonItemStack item = CommonItemStack.create(MaterialUtil.getFirst("OAK_LOG", "LEGACY_LOG"), 2)
+                        .updateCustomData(metadata -> {
+                            metadata.putValue("UniqueKey", "UniqueValue123");
+                        });
 
         DataWatcher metadata = new DataWatcher();
-        metadata.set(EntityItemFrameHandle.DATA_ITEM, item);
-        ItemStack read = metadata.get(EntityItemFrameHandle.DATA_ITEM);
+        metadata.set(EntityItemFrameHandle.DATA_ITEM, item.toBukkit());
+
+        CommonItemStack read = CommonItemStack.of(metadata.get(EntityItemFrameHandle.DATA_ITEM));
         assertEquals(item, read);
-        assertEquals("UniqueValue123", ItemUtil.getMetaTag(read).getValue("UniqueKey"));
+        assertEquals(item.toBukkit(), read.toBukkit());
+        assertEquals("UniqueValue123", read.getCustomData().getValue("UniqueKey"));
     }
 
     @Test
@@ -243,15 +247,18 @@ public class DataWatcherTest {
 
         CommonBootstrap.initServer();
 
-        ItemStack item = ItemUtil.createItem(MaterialUtil.getMaterial("ACACIA_LOG"), 1);
-        ItemUtil.getMetaTag(item, true).putValue("UniqueKey", "UniqueValue123");
+        CommonItemStack item = CommonItemStack.create(MaterialUtil.getMaterial("ACACIA_LOG"), 1)
+                        .updateCustomData(metadata -> {
+                            metadata.putValue("UniqueKey", "UniqueValue123");
+                        });
 
         DataWatcher metadata = new DataWatcher();
         {
-            metadata.set(DisplayHandle.ItemDisplayHandle.DATA_ITEM_STACK, item);
-            ItemStack read = metadata.get(DisplayHandle.ItemDisplayHandle.DATA_ITEM_STACK);
+            metadata.set(DisplayHandle.ItemDisplayHandle.DATA_ITEM_STACK, item.toBukkit());
+            CommonItemStack read = CommonItemStack.of(metadata.get(DisplayHandle.ItemDisplayHandle.DATA_ITEM_STACK));
             assertEquals(item, read);
-            assertEquals("UniqueValue123", ItemUtil.getMetaTag(read).getValue("UniqueKey"));
+            assertEquals(item.toBukkit(), read.toBukkit());
+            assertEquals("UniqueValue123", read.getCustomData().getValue("UniqueKey"));
         }
 
         for (ItemDisplayMode mode : ItemDisplayMode.values()) {

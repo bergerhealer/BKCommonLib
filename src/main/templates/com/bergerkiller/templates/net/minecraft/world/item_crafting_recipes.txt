@@ -24,13 +24,7 @@ class IRecipe {
         if (instance instanceof RecipeFireworks) {
             // Special case (see getIngredients code)
             net.minecraft.world.item.ItemStack itemstack = new ItemStack(net.minecraft.world.item.Items.FIREWORK_ROCKET, 3);
-  #if version >= 1.18
-            net.minecraft.nbt.NBTTagCompound nbttagcompound = itemstack.getOrCreateTagElement("Fireworks");
-            nbttagcompound.putByte("Flight", (byte) 3);
-  #else
-            net.minecraft.nbt.NBTTagCompound nbttagcompound = itemstack.a("Fireworks");
-            nbttagcompound.setByte("Flight", (byte) 3);
-  #endif
+            ItemStackHandle.T.setFireworksFlightDuration.invoke(itemstack, Integer.valueOf(3));
             return itemstack;
         } else {
   #if version >= 1.19.4

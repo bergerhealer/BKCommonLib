@@ -10,7 +10,6 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.player.PlayerInventoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.food.FoodMetaDataHandle;
 import com.bergerkiller.generated.net.minecraft.world.inventory.InventoryEnderChestHandle;
-import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
 import com.bergerkiller.generated.org.bukkit.block.BlockStateHandle;
 
@@ -57,18 +56,20 @@ public class NBTUtil {
         EntityHandle.fromBukkit(entity).loadFromNBT(compound);
     }
 
-    /**
-     * Saves an itemstack to a Tag Compound
-     *
-     * @param item ItemStack
-     * @param compound TagCompound
-     */
-    public static void saveItemStack(org.bukkit.inventory.ItemStack item, CommonTagCompound compound) {
-        ItemStackHandle stack = ItemStackHandle.fromBukkit(item);
-        if (stack != null) {
-            stack.saveToNBT(compound);
-        }
-    }
+    // Method is gone as of 1.20.5 because of data components
+    //
+    // /**
+    //  * Saves an itemstack to a Tag Compound
+    //  *
+    //  * @param item ItemStack
+    //  * @param compound TagCompound
+    //  */
+    // public static void saveItemStack(org.bukkit.inventory.ItemStack item, CommonTagCompound compound) {
+    //     ItemStackHandle stack = ItemStackHandle.fromBukkit(item);
+    //     if (stack != null) {
+    //        stack.saveToNBT(compound);
+    //     }
+    // }
 
     /**
      * Saves food meta data to the NBT Tag Compound specified

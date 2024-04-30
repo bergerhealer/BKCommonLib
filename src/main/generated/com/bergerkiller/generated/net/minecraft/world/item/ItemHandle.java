@@ -24,8 +24,8 @@ public abstract class ItemHandle extends Template.Handle {
         return T.getRegistry.invoker.invoke(null);
     }
 
-    public abstract void setMaxStackSize(int maxStackSize);
     public abstract int getMaxStackSize();
+    public abstract void setMaxStackSize(int maxStackSize);
     public abstract int getMaxDurability();
     public abstract boolean usesDurability();
     public abstract String getInternalName(ItemStack itemstack);
@@ -36,8 +36,8 @@ public abstract class ItemHandle extends Template.Handle {
     public static final class ItemClass extends Template.Class<ItemHandle> {
         public final Template.StaticMethod<Iterable<?>> getRegistry = new Template.StaticMethod<Iterable<?>>();
 
-        public final Template.Method<Void> setMaxStackSize = new Template.Method<Void>();
         public final Template.Method<Integer> getMaxStackSize = new Template.Method<Integer>();
+        public final Template.Method<Void> setMaxStackSize = new Template.Method<Void>();
         public final Template.Method<Integer> getMaxDurability = new Template.Method<Integer>();
         public final Template.Method<Boolean> usesDurability = new Template.Method<Boolean>();
         public final Template.Method.Converted<String> getInternalName = new Template.Method.Converted<String>();

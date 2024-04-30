@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -370,11 +371,22 @@ public class MapResourcePack {
     /**
      * Loads the model to be displayed for items displayed in the world, held in a player's hand
      * or shown in a GUI item slot.
-     * 
-     * @param item to get the model for
+     *
+     * @param item Bukkit ItemStack to get the model for, can be null
      * @return item model for the item
      */
     public Model getItemModel(ItemStack item) {
+        return getItemModel(CommonItemStack.of(item));
+    }
+
+    /**
+     * Loads the model to be displayed for items displayed in the world, held in a player's hand
+     * or shown in a GUI item slot.
+     * 
+     * @param item CommonItemStack to get the model for, may not be null
+     * @return item model for the item
+     */
+    public Model getItemModel(CommonItemStack item) {
         ItemRenderOptions options = ModelInfoLookup.lookupItemRenderOptions(item);
         String itemModelName = options.lookupModelName();
         Model m = this.loadModel("item/" + itemModelName, options);
@@ -390,13 +402,25 @@ public class MapResourcePack {
 
     /**
      * Renders the item gui slot texture of an item
-     * 
+     *
      * @param item to render
      * @param width of the produced icon image
      * @param height of the produced icon image
      * @return rendered item slot image
      */
     public MapTexture getItemTexture(ItemStack item, int width, int height) {
+        return getItemTexture(CommonItemStack.of(item), width, height);
+    }
+
+    /**
+     * Renders the item gui slot texture of an item
+     * 
+     * @param item to render
+     * @param width of the produced icon image
+     * @param height of the produced icon image
+     * @return rendered item slot image
+     */
+    public MapTexture getItemTexture(CommonItemStack item, int width, int height) {
         Model model = this.getItemModel(item);
         if (model == null || model.isPlaceholder()) {
             return Model.createPlaceholderTexture(width, height);

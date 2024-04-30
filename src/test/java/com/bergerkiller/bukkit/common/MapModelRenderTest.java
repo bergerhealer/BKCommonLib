@@ -14,6 +14,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.junit.Ignore;
@@ -118,8 +119,9 @@ class Pseudo3DImagePanel extends JPanel
 
         System.out.println(opt);
 
-        ItemStack item = ItemUtil.createItem(Material.GOLDEN_PICKAXE, 15, 1);
-        ItemUtil.getMetaTag(item, true).putValue("Unbreakable", true);
+        CommonItemStack item = CommonItemStack.create(Material.GOLDEN_PICKAXE, 15);
+        item.setDamage(1);
+        item.setUnbreakable(true);
         Model model = textures.getBlockModel(opt);
         Matrix4x4 transform = new Matrix4x4();
 

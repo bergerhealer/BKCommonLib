@@ -1,16 +1,26 @@
 package net.minecraft.world.item;
 
+import com.mojang.authlib.GameProfile;
+
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.IMaterial;
+import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.item.ItemWorldMap;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTNumber;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagLong;
+import net.minecraft.nbt.NBTTagInt;
+import net.minecraft.nbt.NBTTagByte;
+import net.minecraft.nbt.NBTTagString;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipesFurnaceHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
@@ -18,6 +28,51 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 class ItemStack {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
+
+    // Required macros to deal with all the NBT tag nonsense pre-1.20.5
+#if version >= 1.20.5
+    // None yet?
+#else
+  #if version >= 1.18
+    #require net.minecraft.nbt.NBTTagCompound public boolean isTagEmpty:isEmpty();
+  #elseif forge_nms_obfuscated
+    #require net.minecraft.nbt.NBTTagCompound public boolean isTagEmpty:b_();
+  #else
+    #require net.minecraft.nbt.NBTTagCompound public boolean isTagEmpty:isEmpty();
+  #endif
+
+  #if version >= 1.13
+    #require net.minecraft.world.item.ItemStack public net.minecraft.nbt.NBTTagCompound getOrCreateTag();
+  #else
+    #require net.minecraft.world.item.ItemStack public net.minecraft.nbt.NBTTagCompound getOrCreateTag() {
+        net.minecraft.nbt.NBTTagCompound tag = instance.getTag();
+        if (tag == null) {
+            tag = new net.minecraft.nbt.NBTTagCompound();
+            instance.setTag(tag);
+        }
+        return tag;
+    }
+  #endif
+
+    #require net.minecraft.world.item.ItemStack public void removeTagIfEmpty() {
+        net.minecraft.nbt.NBTTagCompound tag = instance.getTag();
+        if (tag != null) {
+            boolean tagIsEmpty = tag#isTagEmpty();
+            if (tagIsEmpty) {
+                instance.setTag(null);
+            }
+        }
+    }
+
+    #require net.minecraft.world.item.ItemStack public void updateTag(net.minecraft.nbt.NBTTagCompound tag) {
+        boolean tagIsNullOrEmpty = tag == null || tag#isTagEmpty();
+        if (tagIsNullOrEmpty) {
+            instance.setTag(null);
+        } else {
+
+        }
+    }
+#endif
 
 #if version >= 1.17
     public optional static final (ItemStackHandle) ItemStack OPT_EMPTY_ITEM:EMPTY;
@@ -30,7 +85,6 @@ class ItemStack {
 #endif
 
     private int amountField:count;
-    private (com.bergerkiller.bukkit.common.nbt.CommonTagCompound) NBTTagCompound tagField:tag;
 
     <code>
     public static final ItemStackHandle EMPTY_ITEM;
@@ -87,64 +141,573 @@ class ItemStack {
     }
 
 
-#if version >= 1.18
-    public (ChatText) IChatBaseComponent getName:getHoverName();
-    public (void) ItemStack setName:setHoverName((ChatText) IChatBaseComponent name);
+#if version >= 1.20.5
+    public boolean hasCustomName() {
+        return instance.has(DataComponents.CUSTOM_NAME);
+    }
+    public (ChatText) IChatBaseComponent getCustomName() {
+        return instance.get(DataComponents.CUSTOM_NAME);
+    }
+    public void setCustomName:setHoverName((ChatText) IChatBaseComponent name) {
+        if (name != null) {
+            instance.set(DataComponents.CUSTOM_NAME, name);
+        } else {
+            instance.remove(DataComponents.CUSTOM_NAME);
+        }
+    }
+#elseif version >= 1.18
+    public boolean hasCustomName:hasCustomHoverName();
+    public (ChatText) IChatBaseComponent getCustomName:getHoverName();
+    public (void) ItemStack setCustomName:setHoverName((ChatText) IChatBaseComponent name);
 #elseif version >= 1.13
-    public (ChatText) IChatBaseComponent getName();
-    public (void) ItemStack setName:a((ChatText) IChatBaseComponent name);
+    public boolean hasCustomName:hasName();
+    public (ChatText) IChatBaseComponent getCustomName:getName();
+    public (void) ItemStack setCustomName:a((ChatText) IChatBaseComponent name);
 #else
-    public (ChatText) String getName();
-
-    #if version >= 1.11
-        public (void) ItemStack setName:g((ChatText) String name);
-    #else
-        public (void) ItemStack setName:c((ChatText) String name);
-    #endif
-#endif
-
-#if version >= 1.18
-    public int getDurability:getDamageValue();
-#elseif version >= 1.13
-    public int getDurability:getDamage();
-#else
-    public int getDurability:getData();
-#endif
-
-    public void setDurability(int durability) {
-#if version >= 1.13
-        // Only set when durability > 0 or a tag exists
-        // This prevents creating a NBT tag for storing durability 0
-        if (durability > 0 || instance.getTag() != null) {
-  #if version >= 1.18
-            instance.setDamageValue(durability);
+    public boolean hasCustomName:hasName();
+    public (ChatText) String getCustomName:getName();
+    public void setCustomName((ChatText) String name) {
+  #if version >= 1.11
+        if (name != null) {
+            instance.g(name);
+        } else {
+            instance.s();
+        }
   #else
-            instance.setDamage(durability);
+        if (name != null) {
+            instance.c(name);
+        } else {
+            instance.r();
+        }
+  #endif
+    }
+#endif
+
+
+#if version >= 1.20.5
+    public (List<ChatText>) List<IChatBaseComponent> getLores() {
+        net.minecraft.world.item.component.ItemLore lore;
+        lore = (net.minecraft.world.item.component.ItemLore) instance.get(DataComponents.LORE);
+        if (lore != null) {
+            return lore.lines();
+        } else {
+            return java.util.Collections.emptyList();
+        }
+    }
+    public void addLore((ChatText) IChatBaseComponent line) {
+        net.minecraft.world.item.component.ItemLore lore;
+        lore = (net.minecraft.world.item.component.ItemLore) instance.get(DataComponents.LORE);
+        if (lore == null) {
+            lore = net.minecraft.world.item.component.ItemLore.EMPTY;
+        }
+        lore = lore.withLineAdded(line);
+        instance.set(DataComponents.LORE, lore);
+    }
+    public void clearLores() {
+        instance.remove(DataComponents.LORE);
+    }
+#else
+    public (List<ChatText>) List<IChatBaseComponent> getLores() {
+        NBTTagCompound tag = instance.getTag();
+        if (tag != null) {
+            NBTBase displayBase = tag.get("display");
+            if (displayBase instanceof NBTTagCompound) {
+                NBTBase loreListBase = ((NBTTagCompound) displayBase).get("Lore");
+                if (loreListBase instanceof NBTTagList) {
+                    NBTTagList loreList = (NBTTagList) loreListBase;
+                    int loreCount = loreList.size();
+                    java.util.List result = new java.util.ArrayList(loreCount);
+                    for (int i = 0; i < loreCount; i++) {
+                        NBTBase loreLine = loreList.get(i);
+                        if (loreLine instanceof NBTTagString) {
+                            String line = ((NBTTagString) loreLine).getAsString();
+                            IChatBaseComponent lineComponent;
+  #if version >= 1.14
+                            // Decode JSON into chat component
+                            lineComponent = net.minecraft.network.chat.IChatBaseComponent$ChatSerializer.fromJson(line);
+  #else
+                            // Wrap String message into chat component
+                            // Has a lot of bukkit-esque crap in it, so we use our own ChatText for parsing it
+                            ChatText text = ChatText.fromMessage(line);
+                            lineComponent = (text == null) ? null : (IChatBaseComponent) text.getRawHandle();
+  #endif
+                            if (lineComponent != null) {
+                                result.add(lineComponent);
+                            }
+                        }
+                    }
+                    return java.util.Collections.unmodifiableList(result);
+                }
+            }
+        }
+
+        return java.util.Collections.emptyList();
+    }
+
+    public void addLore((ChatText) IChatBaseComponent line) {
+        // All this to retrieve the list of lore line tags
+        NBTTagCompound tag = instance#getOrCreateTag();
+        NBTBase displayBase = tag.get("display");
+        if (!(displayBase instanceof NBTTagCompound)) {
+            displayBase = new NBTTagCompound();
+            tag.put("display", displayBase);
+        }
+        NBTTagCompound display = (NBTTagCompound) displayBase;
+        NBTBase loreListBase = display.get("Lore");
+        if (!(loreListBase instanceof NBTTagList)) {
+            loreListBase = new NBTTagList();
+            display.put("Lore", loreListBase);
+        }
+        NBTTagList loreList = (NBTTagList) loreListBase;
+
+  #if version >= 1.14
+        // Add a String entry to the list - Encode as JSON
+        if (line != null) {
+            String json = net.minecraft.network.chat.IChatBaseComponent$ChatSerializer.toJson(line);
+            if (json != null) {
+    #if version >= 1.15
+                loreList.add((NBTBase) NBTTagString.valueOf(json));
+    #else
+                loreList.add((NBTBase) new NBTTagString(json));
+    #endif
+            }
+        }
+  #else
+        // Add a String entry to the list - Encode as Bukkit legacy Message
+        // Use ChatText for this as it contains a lot of hacky crap
+        ChatText text = ChatText.fromComponent(line);
+        if (text != null) {
+            loreList.add(new NBTTagString(text.getMessage()));
+        }
+  #endif
+    }
+
+    public void clearLores() {
+        NBTTagCompound tag = instance.getTag();
+        if (tag != null) {
+            NBTBase displayBase = tag.get("display");
+            if (displayBase instanceof NBTTagCompound) {
+                NBTTagCompound display = (NBTTagCompound) displayBase;
+                display.remove("Lore");
+                if (display.isEmpty()) {
+                    tag.remove("display");
+                    instance#removeTagIfEmpty();
+                }
+            }
+        }
+    }
+#endif
+
+
+#if version >= 1.18
+    public int getDamageValue();
+#elseif version >= 1.13
+    public int getDamageValue:getDamage();
+#else
+    public int getDamageValue:getData();
+#endif
+    public void setDamageValue(int damage) {
+#if version >= 1.20.5
+        instance.setDamageValue(damage);
+#elseif version >= 1.13
+        // Only set when damage > 0 or a tag exists
+        // This prevents creating a NBT tag for storing damage 0
+        if (damage > 0 || instance.getTag() != null) {
+  #if version >= 1.18
+            instance.setDamageValue(damage);
+  #else
+            instance.setDamage(damage);
   #endif
         }
 #else
         #require net.minecraft.world.item.ItemStack private int durabilityField:damage;
-        instance#durabilityField = durability;
+        instance#durabilityField = damage;
 #endif
     }
 
-#if version >= 1.18
-    public int getRepairCost:getBaseRepairCost();
-    public boolean hasName:hasCustomHoverName();
-    public (ItemStackHandle) ItemStack cloneItemStack:copy();
+
+    public boolean isUnbreakable() {
+#if version >= 1.20.5
+        return instance.has(DataComponents.UNBREAKABLE);
 #else
+        NBTTagCompound tag = instance.getTag();
+        if (tag != null) {
+            NBTBase unbreakable = instance.get("Unbreakable");
+            if (unbreakable instanceof NBTTagByte) {
+                return ((NBTTagByte) unbreakable).getAsByte() != 0;
+            }
+        }
+        return false;
+#endif
+    }
+    public void setUnbreakable(boolean unbreakable) {
+#if version >= 1.20.5
+        // Preserve tooltip yes/no by only checking it changed
+        if (unbreakable != instance.has(DataComponents.UNBREAKABLE)) {
+            if (unbreakable) {
+                instance.set(DataComponents.UNBREAKABLE, new net.minecraft.world.item.component.Unbreakable(false));
+            } else {
+                instance.remove(DataComponents.UNBREAKABLE);
+            }
+        }
+#else
+        NBTTagCompound tag = instance#getOrCreateTag();
+        if (unbreakable) {
+            tag.putBoolean("Unbreakable", true);
+        } else {
+            tag.remove("Unbreakable");
+            instance#removeTagIfEmpty();
+        }
+#endif
+    }
+
+
+#if version >= 1.20.5
+    public int getRepairCost() {
+        Integer cost = (Integer) instance.get(DataComponents.REPAIR_COST);
+        return (cost != null) ? cost.intValue() : 0;
+    }
+    public void setRepairCost(int cost) {
+        if (cost > 0) {
+            instance.set(DataComponents.REPAIR_COST, Integer.valueOf(cost));
+        } else {
+            instance.remove(DataComponents.REPAIR_COST);
+        }
+    }
+#else
+  #if version >= 1.18
+    public int getRepairCost:getBaseRepairCost();
+  #else
     public int getRepairCost();
-    public boolean hasName();
-    public (ItemStackHandle) ItemStack cloneItemStack();
+  #endif
+    public void setRepairCost(int cost);
 #endif
 
-    public void setRepairCost(int cost);
 
-    public boolean hasTag();
+    public int getMapColor() {
+#if version >= 1.20.5
+        net.minecraft.world.item.component.MapItemColor color;
+        color = (net.minecraft.world.item.component.MapItemColor) instance.get(DataComponents.MAP_COLOR);
+        return (color == null) ? -1 : color.rgb();
+#else
+        NBTTagCompound tag = instance.getTag();
+        if (tag != null) {
+            NBTBase baseDisplayTag = tag.get("display");
+            if (baseDisplayTag instanceof NBTTagCompound) {
+                NBTBase color = ((NBTTagCompound) baseDisplayTag).get("MapColor");
+                if (color instanceof NBTTagInt) {
+                    return ((NBTTagInt) color).getAsInt();
+                }
+            }
+        }
+        return -1;
+#endif
+    }
+    public void setMapColor(int rgb) {
+#if version >= 1.20.5
+        if (rgb != -1) {
+            instance.set(DataComponents.MAP_COLOR, new net.minecraft.world.item.component.MapItemColor(rgb));
+        } else {
+            instance.remove(DataComponents.MAP_COLOR);
+        }
+#else
+        if (rgb != -1) {
+            NBTTagCompound tag = instance#getOrCreateTag();
+            NBTBase displayTag = tag.get("display");
+            if (!(displayTag instanceof NBTTagCompound)) {
+                displayTag = new NBTTagCompound();
+                tag.put("display", displayTag);
+            }
+            ((NBTTagCompound) displayTag).putInt("MapColor", rgb);
+        } else {
+            NBTTagCompound tag = instance.getTag();
+            if (tag != null) {
+                NBTBase baseDisplayTag = tag.get("display");
+                if (baseDisplayTag instanceof NBTTagCompound) {
+                    NBTTagCompound displayTag = (NBTTagCompound) baseDisplayTag;
+                    displayTag.remove("MapColor");
+                    if (displayTag.isEmpty()) {
+                        tag.remove("display");
+                        instance#removeTagIfEmpty();
+                    }
+                }
+            }
+        }
+#endif
+    }
 
-    public (CommonTagCompound) NBTTagCompound getTag();
 
-    public (CommonTagCompound) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
+    public int getLeatherArmorColor() {
+        int rgb = 5190175; // default brown
+#if version >= 1.20.5
+        net.minecraft.world.item.component.DyedItemColor color = (net.minecraft.world.item.component.DyedItemColor) instance.get(DataComponents.DYED_COLOR);
+        if (color != null) {
+            rgb = color.rgb();
+        }
+#else
+        NBTTagCompound tag = instance.getTag();
+        if (tag != null) {
+            NBTBase display = tag.get("display");
+            if (display instanceof NBTTagCompound) {
+                NBTBase color = ((NBTTagCompound) display).get("color");
+                if (color instanceof NBTTagInt) {
+                    rgb = ((NBTTagInt) color).getAsInt();
+                }
+            }
+        }
+#endif
+        return rgb;
+    }
+
+
+    public int getPotionColor() {
+#if version >= 1.20.5
+        net.minecraft.world.item.alchemy.PotionContents potioncontents = (net.minecraft.world.item.alchemy.PotionContents) instance.get(DataComponents.POTION_CONTENTS);
+        if (potioncontents != null) {
+            return potioncontents.getColor() & 0x00FFFFFF; // Only keep RGB, omit alpha
+        } else {
+            return 0x385DC6;
+        }
+#else
+        NBTTagCompound tag = instance.getTag();
+        if (tag != null) {
+            NBTBase potionColor = tag.get("CustomPotionColor");
+            if (potionColor instanceof NBTTagInt) {
+                return ((NBTTagInt) potionColor).getAsInt();
+            }
+        }
+
+        //TODO: Base color based on potion type?
+        org.bukkit.craftbukkit.inventory.CraftItemStack item = org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(instance);
+        int durability = (int) item.getDurability();
+        return com.bergerkiller.bukkit.common.map.util.ModelInfoLookup.getPotionColor(durability);
+#endif
+    }
+
+
+    public int getFireworksFlightDuration() {
+#if version >= 1.20.5
+        net.minecraft.world.item.component.Fireworks fireworks;
+        fireworks = (net.minecraft.world.item.component.Fireworks) instance.get(DataComponents.FIREWORKS);
+        return (fireworks != null) ? fireworks.flightDuration() : 0;
+#else
+        NBTTagCompound tag = instance.getTag();
+        if (tag != null) {
+            NBTBase fireworksTagBase = tag.get("Fireworks");
+            if (fireworksTagBase instanceof NBTTagCompound) {
+                NBTBase flightDurBase = ((NBTTagCompound) fireworksTagBase).get("Flight");
+                if (flightDurBase instanceof NBTTagByte) {
+                    return (int) ((NBTTagByte) flightDurBase).getAsByte() & 0XFF;
+                }
+            }
+        }
+        return 0;
+#endif
+    }
+    public void setFireworksFlightDuration(int duration) {
+#if version >= 1.20.5
+        if (duration > 0) {
+            net.minecraft.world.item.component.Fireworks fireworks;
+            fireworks = (net.minecraft.world.item.component.Fireworks) instance.get(DataComponents.FIREWORKS);
+            if (fireworks != null) {
+                fireworks = new net.minecraft.world.item.component.Fireworks(duration, fireworks.explosions());
+            } else {
+                fireworks = new net.minecraft.world.item.component.Fireworks(duration, java.util.Collections.emptyList());
+            }
+            instance.set(DataComponents.FIREWORKS, fireworks);
+        } else {
+            instance.remove(DataComponents.FIREWORKS);
+        }
+#else
+        if (duration > 0) {
+            NBTTagCompound tag = instance#getOrCreateTag();
+            NBTBase fireworksTagBase = tag.get("Fireworks");
+            if (!(fireworksTagBase instanceof NBTTagCompound)) {
+                fireworksTagBase = new NBTTagCompound();
+                tag.put("Fireworks", fireworksTagBase);
+            }
+            ((NBTTagCompound) fireworksTagBase).putByte("Flight", (byte) duration);
+        } else {
+            NBTTagCompound tag = instance.getTag();
+            if (tag != null) {
+                NBTBase fireworksTagBase = tag.get("Fireworks");
+                if (fireworksTagBase instanceof NBTTagCompound) {
+                    tag.remove("Fireworks");
+                    instance#removeTagIfEmpty();
+                }
+            }
+        }
+#endif
+    }
+
+
+    public void setSkullProfile((GameProfileHandle) GameProfile profile) {
+#if version >= 1.20.5
+        if (profile != null) {
+            instance.set(DataComponents.PROFILE, new net.minecraft.world.item.component.ResolvableProfile(profile));
+        } else {
+            instance.remove(DataComponents.PROFILE);
+        }
+#else
+        if (profile != null) {
+            NBTTagCompound tag = instance#getOrCreateTag();
+            NBTTagCompound serializedProfile = (NBTTagCompound) GameProfileHandle.T.serialize.raw.invoke(profile);
+            NBTTagCompoundHandle.T.put.raw.invoke(tag, serializedProfile);
+    #if version < 1.13
+            instance#durabilityField = 3;
+    #endif
+        } else {
+            NBTTagCompound tag = instance.getTag();
+            if (tag != null) {
+                tag.remove("SkullOwner");
+                instance#removeTagIfEmpty();
+    #if version < 1.13
+                instance#durabilityField = 0;
+    #endif
+            }
+        }
+#endif
+    }
+
+
+#if version >= 1.20.5
+    public boolean hasCustomModelData() {
+        return instance.has(DataComponents.CUSTOM_MODEL_DATA);
+    }
+
+    public int getCustomModelData() {
+        net.minecraft.world.item.component.CustomModelData cmd;
+        cmd = (net.minecraft.world.item.component.CustomModelData) instance.get(DataComponents.CUSTOM_MODEL_DATA);
+        return (cmd == null) ? -1 : cmd.value();
+    }
+
+    public void setCustomModelData(int value) {
+        instance.set(DataComponents.CUSTOM_MODEL_DATA, new net.minecraft.world.item.component.CustomModelData(value));
+    }
+
+    public void clearCustomModelData() {
+        instance.remove(DataComponents.CUSTOM_MODEL_DATA);
+    }
+#else
+    public boolean hasCustomModelData() {
+        NBTTagCompound tag = instance.getTag();
+        return tag != null && tag.get("CustomModelData") instanceof NBTTagInt;
+    }
+
+    public int getCustomModelData() {
+        NBTTagCompound tag = instance.getTag();
+        if (tag != null) {
+            NBTBase cmd = tag.get("CustomModelData");
+            if (cmd instanceof NBTTagInt) {
+                return cmd.getAsInt();
+            }
+        }
+        return -1;
+    }
+
+    public void setCustomModelData(int value) {
+        NBTTagCompound tag = instance#getOrCreateTag();
+        tag.putInt("CustomModelData", value);
+    }
+
+    public void clearCustomModelData() {
+        NBTTagCompound tag = instance.getTag();
+        if (tag != null) {
+            tag.remove("CustomModelData");
+            instance#removeTagIfEmpty();
+        }
+    }
+#endif
+
+
+#if version >= 1.20.5
+    public boolean hasCustomData() {
+        return instance.has(DataComponents.CUSTOM_DATA);
+    }
+
+    public (CommonTagCompound) NBTTagCompound getCustomDataCopy() {
+        CustomData customData = (CustomData) instance.get(DataComponents.CUSTOM_DATA);
+        return (customData != null) ? customData.copyTag() : new NBTTagCompound();
+    }
+
+    public CommonTagCompound getCustomData() {
+        CustomData customData = (CustomData) instance.get(DataComponents.CUSTOM_DATA);
+        return (customData != null) ? CommonTagCompound.createReadOnly(customData.getUnsafe())
+                                    : CommonTagCompound.EMPTY;
+    }
+
+    public void setCustomData((CommonTagCompound) NBTTagCompound tag) {
+        if (tag == null || tag.isEmpty()) {
+            instance.remove(DataComponents.CUSTOM_DATA);
+        } else {
+            instance.set(DataComponents.CUSTOM_DATA, (Object) CustomData.of(tag));
+        }
+    }
+
+    public void updateCustomData((java.util.function.Consumer<CommonTagCompound>) java.util.function.Consumer<NBTTagCompound> consumer) {
+        CustomData.update(DataComponents.CUSTOM_DATA, instance, consumer);
+    }
+#else
+    public boolean hasCustomData:hasTag();
+
+    public (CommonTagCompound) NBTTagCompound getCustomDataCopy() {
+        NBTTagCompound tag = instance.getTag();
+        if (tag == null) {
+            return new NBTTagCompound();
+        } else {
+  #if version >= 1.18
+            return (NBTTagCompound) tag.copy();
+  #else
+            return (NBTTagCompound) tag.clone();
+  #endif
+        }
+    }
+
+    public CommonTagCompound getCustomData() {
+        NBTTagCompound tag = instance.getTag();
+        return (tag != null) ? CommonTagCompound.createReadOnly(tag) : CommonTagCompound.EMPTY;
+    }
+
+    public void setCustomData((CommonTagCompound) NBTTagCompound tag) {
+        boolean tagIsNullOrEmpty = tag == null || tag#isTagEmpty();
+        if (tagIsNullOrEmpty) {
+            instance.setTag(null);
+        } else {
+  #if version >= 1.18
+            instance.setTag((NBTTagCompound) tag.copy());
+  #else
+            instance.setTag((NBTTagCompound) tag.clone());
+  #endif
+        }
+    }
+
+    public void updateCustomData((java.util.function.Consumer<CommonTagCompound>) java.util.function.Consumer<NBTTagCompound> consumer) {
+        NBTTagCompound tag = instance.getTag();
+        if (tag == null) {
+            tag = new NBTTagCompound();
+        } else {
+  #if version >= 1.18
+            tag = (NBTTagCompound) tag.copy();
+  #else
+            tag = (NBTTagCompound) tag.clone();
+  #endif
+        }
+
+        consumer.accept(tag);
+
+        boolean tagIsEmpty = tag#isTagEmpty();
+        instance.setTag(tagIsEmpty ? null : tag);
+    }
+#endif
+
+    // No longer supported as of 1.20.5
+    //public (CommonTagCompound) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
+
+#if version >= 1.18
+    public (ItemStackHandle) ItemStack cloneItemStack:copy();
+#else
+    public (ItemStackHandle) ItemStack cloneItemStack();
+#endif
 
 #if version >= 1.18
     public (ItemStackHandle) ItemStack cloneAndSubtract:split(int n);
@@ -167,10 +730,10 @@ class ItemStack {
     }
 
     public void setMapId(int mapId) {
-#if version >= 1.18
-        instance.getOrCreateTag().putInt("map", mapId);
+#if version >= 1.20.5
+        instance.set(DataComponents.MAP_ID, (Object) new MapId(mapId));
 #elseif version >= 1.13
-        instance.getOrCreateTag().setInt("map", mapId);
+        instance.getOrCreateTag().putInt("map", mapId);
 #else
         instance.setData(mapId);
 #endif

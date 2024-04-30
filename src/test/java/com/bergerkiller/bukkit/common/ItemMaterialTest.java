@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.DetectorRail;
@@ -289,16 +290,30 @@ public class ItemMaterialTest {
     }
 
     @Test
-    public void testItemTag() {
-        ItemStack item = ItemUtil.createItem(getFirst("OAK_PLANKS", "LEGACY_WOOD"), 1);
-        assertNull(ItemUtil.getMetaTag(item));
-        CommonTagCompound tag = ItemUtil.getMetaTag(item, true);
-        assertNotNull(tag);
-        tag.putValue("test", "awesome!");
-        tag = ItemUtil.getMetaTag(item);
-        assertNotNull(tag);
-        assertTrue(tag.containsKey("test"));
-        assertEquals("awesome!", tag.getValue("test"));
+    public void testItemCustomData() {
+        CommonItemStack item = CommonItemStack.create(getFirst("OAK_PLANKS", "LEGACY_WOOD"), 1);
+        assertFalse(item.hasCustomData());
+        assertTrue(item.getCustomData().isEmpty());
+        assertTrue(item.getCustomDataCopy().isEmpty());
+
+        item.updateCustomData(metadata -> {
+            metadata.putValue("test", "awesome!");
+        });
+
+        assertTrue(item.hasCustomData());
+        assertFalse(item.getCustomData().isEmpty());
+        assertEquals("awesome!", item.getCustomData().getValue("test"));
+        assertEquals("awesome!", item.getCustomDataCopy().getValue("test"));
+
+        CommonTagCompound meta = item.getCustomDataCopy();
+        meta.putValue("otherTest", "cool!");
+        item.setCustomData(meta);
+
+        // Verify this is updated too
+        assertEquals("cool!", item.getCustomData().getValue("otherTest"));
+        assertEquals("cool!", item.getCustomDataCopy().getValue("otherTest"));
+        assertEquals("awesome!", item.getCustomData().getValue("test"));
+        assertEquals("awesome!", item.getCustomDataCopy().getValue("test"));
     }
 
     @Test
@@ -444,19 +459,19 @@ public class ItemMaterialTest {
             // Can also test 1.13 and later material names
             // Data value specified, should match red wool, both legacy and new
             testItemParser("WOOL:RED", new ItemStack[] {
-                    ItemUtil.createItem(getMaterial("LEGACY_WOOL"), 14, 1),
+                    BlockData.fromMaterialData(getMaterial("LEGACY_WOOL"), 14).createItem(1),
                     ItemUtil.createItem(getMaterial("RED_WOOL"), 1),
             }, new ItemStack[] {
-                    ItemUtil.createItem(getMaterial("LEGACY_WOOL"), 10, 1),
-                    ItemUtil.createItem(getMaterial("LEGACY_STONE"), 0, 1)
+                    BlockData.fromMaterialData(getMaterial("LEGACY_WOOL"), 10).createItem(1),
+                    BlockData.fromMaterialData(getMaterial("LEGACY_STONE"), 0).createItem(1),
             });
             // Data value set to 'any', which should guarantee parsing to any type of wool
             testItemParser("WOOL:", new ItemStack[] {
-                    ItemUtil.createItem(getMaterial("LEGACY_WOOL"), 14, 1),
-                    ItemUtil.createItem(getMaterial("LEGACY_WOOL"), 10, 1),
+                    BlockData.fromMaterialData(getMaterial("LEGACY_WOOL"), 14).createItem(1),
+                    BlockData.fromMaterialData(getMaterial("LEGACY_WOOL"), 10).createItem(1),
                     ItemUtil.createItem(getMaterial("RED_WOOL"), 1)
             }, new ItemStack[] {
-                    ItemUtil.createItem(getMaterial("LEGACY_STONE"), 0, 1)
+                    BlockData.fromMaterialData(getMaterial("LEGACY_STONE"), 0).createItem(1),
             });
             // OAK_SLAB since 1.13
             testItemParser("OAK_SLAB", new ItemStack[] {
@@ -468,17 +483,17 @@ public class ItemMaterialTest {
             // Only legacy material names work
             // Data value specified, should match red wool only
             testItemParser("WOOL:RED", new ItemStack[] {
-                    ItemUtil.createItem(getMaterial("LEGACY_WOOL"), 14, 1),
+                    BlockData.fromMaterialData(getMaterial("LEGACY_WOOL"), 14).createItem(1),
             }, new ItemStack[] {
-                    ItemUtil.createItem(getMaterial("LEGACY_WOOL"), 10, 1),
-                    ItemUtil.createItem(getMaterial("LEGACY_STONE"), 0, 1)
+                    BlockData.fromMaterialData(getMaterial("LEGACY_WOOL"), 10).createItem(1),
+                    BlockData.fromMaterialData(getMaterial("LEGACY_STONE"), 0).createItem(1),
             });
             // Data value set to 'any', which should guarantee parsing to any type of wool
             testItemParser("WOOL:", new ItemStack[] {
-                    ItemUtil.createItem(getMaterial("LEGACY_WOOL"), 14, 1),
-                    ItemUtil.createItem(getMaterial("LEGACY_WOOL"), 10, 1)
+                    BlockData.fromMaterialData(getMaterial("LEGACY_WOOL"), 14).createItem(1),
+                    BlockData.fromMaterialData(getMaterial("LEGACY_WOOL"), 10).createItem(1),
             }, new ItemStack[] {
-                    ItemUtil.createItem(getMaterial("LEGACY_STONE"), 0, 1)
+                    BlockData.fromMaterialData(getMaterial("LEGACY_STONE"), 0).createItem(1),
             });
         }
     }

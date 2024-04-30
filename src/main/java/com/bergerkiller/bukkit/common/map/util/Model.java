@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 
@@ -18,9 +19,7 @@ import com.bergerkiller.bukkit.common.map.MapTexture;
 import com.bergerkiller.bukkit.common.map.util.Model.Element.Face;
 import com.bergerkiller.bukkit.common.math.Matrix4x4;
 import com.bergerkiller.bukkit.common.math.Vector3;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
-import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.wrappers.RenderOptions;
 import com.google.gson.annotations.SerializedName;
@@ -573,13 +572,13 @@ public class Model extends ModelInfo {
          * @return Updated item (clone)
          */
         public ItemStack applyToItem(ItemStack item) {
-            ItemStack copy = ItemUtil.createItem(item);
+            CommonItemStack copy = CommonItemStack.copyOf(item);
             if (this.predicate != null) {
                 for (Map.Entry<String, String> predicate : this.predicate.entrySet()) {
                     PredicateType.get(predicate.getKey()).applyToItem(copy, predicate.getValue());
                 }
             }
-            return copy;
+            return copy.toBukkit();
         }
 
         /**
@@ -588,18 +587,14 @@ public class Model extends ModelInfo {
         private static enum PredicateType {
             CUSTOM_MODEL_DATA("custom_model_data") {
                 @Override
-                public void applyToItem(ItemStack item, String value) {
+                public void applyToItem(CommonItemStack item, String value) {
                     int cmd;
                     try {
                         cmd = Integer.parseInt(value);
                     } catch (NumberFormatException ex) {
                         return;
                     }
-
-                    CommonTagCompound tag = ItemUtil.getMetaTag(item, true);
-                    if (tag != null) {
-                        tag.putValue("CustomModelData", cmd);
-                    }
+                    item.setCustomModelData(cmd);
                 }
 
                 @Override
@@ -609,11 +604,8 @@ public class Model extends ModelInfo {
             },
             UNBREAKABLE("damaged") {
                 @Override
-                public void applyToItem(ItemStack item, String value) {
-                    CommonTagCompound tag = ItemUtil.getMetaTag(item, true);
-                    if (tag != null) {
-                        tag.putValue("Unbreakable", value.equals("0"));
-                    }
+                public void applyToItem(CommonItemStack item, String value) {
+                    item.setUnbreakable(value.equals("0"));
                 }
 
                 @Override
@@ -623,10 +615,9 @@ public class Model extends ModelInfo {
             },
             DAMAGE("damage") {
                 @Override
-                @SuppressWarnings("deprecation")
-                public void applyToItem(ItemStack item, String value) {
-                    int maxDurability = ItemUtil.getMaxDurability(item);
-                    if (maxDurability <= 0) {
+                public void applyToItem(CommonItemStack item, String value) {
+                    int maxDamage = item.getMaxDamage();
+                    if (maxDamage <= 0) {
                         return;
                     }
 
@@ -638,7 +629,7 @@ public class Model extends ModelInfo {
                         return;
                     }
 
-                    item.setDurability((short) ((int) (damageDbl * maxDurability) + 1));
+                    item.setDamage((int) (damageDbl * maxDamage) + 1);
                 }
 
                 @Override
@@ -649,7 +640,7 @@ public class Model extends ModelInfo {
             },
             DEFAULT(null) {
                 @Override
-                public void applyToItem(ItemStack item, String value) {
+                public void applyToItem(CommonItemStack item, String value) {
                     // No-Op
                 }
 
@@ -677,7 +668,7 @@ public class Model extends ModelInfo {
                 return key;
             }
 
-            public abstract void applyToItem(ItemStack item, String value);
+            public abstract void applyToItem(CommonItemStack item, String value);
             public abstract boolean matches(String a, String b);
 
             public static PredicateType get(String key) {

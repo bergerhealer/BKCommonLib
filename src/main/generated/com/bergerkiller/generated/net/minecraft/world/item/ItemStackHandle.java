@@ -3,10 +3,13 @@ package com.bergerkiller.generated.net.minecraft.world.item;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.world.item.ItemStack</b>.
@@ -35,17 +38,35 @@ public abstract class ItemStackHandle extends Template.Handle {
 
     public abstract Object getItem();
     public abstract Material getTypeField();
-    public abstract ChatText getName();
-    public abstract void setName(ChatText name);
-    public abstract int getDurability();
-    public abstract void setDurability(int durability);
+    public abstract boolean hasCustomName();
+    public abstract ChatText getCustomName();
+    public abstract void setCustomName(ChatText name);
+    public abstract List<ChatText> getLores();
+    public abstract void addLore(ChatText line);
+    public abstract void clearLores();
+    public abstract int getDamageValue();
+    public abstract void setDamageValue(int damage);
+    public abstract boolean isUnbreakable();
+    public abstract void setUnbreakable(boolean unbreakable);
     public abstract int getRepairCost();
-    public abstract boolean hasName();
-    public abstract ItemStackHandle cloneItemStack();
     public abstract void setRepairCost(int cost);
-    public abstract boolean hasTag();
-    public abstract CommonTagCompound getTag();
-    public abstract CommonTagCompound saveToNBT(CommonTagCompound compound);
+    public abstract int getMapColor();
+    public abstract void setMapColor(int rgb);
+    public abstract int getLeatherArmorColor();
+    public abstract int getPotionColor();
+    public abstract int getFireworksFlightDuration();
+    public abstract void setFireworksFlightDuration(int duration);
+    public abstract void setSkullProfile(GameProfileHandle profile);
+    public abstract boolean hasCustomModelData();
+    public abstract int getCustomModelData();
+    public abstract void setCustomModelData(int value);
+    public abstract void clearCustomModelData();
+    public abstract boolean hasCustomData();
+    public abstract CommonTagCompound getCustomDataCopy();
+    public abstract CommonTagCompound getCustomData();
+    public abstract void setCustomData(CommonTagCompound tag);
+    public abstract void updateCustomData(Consumer<CommonTagCompound> consumer);
+    public abstract ItemStackHandle cloneItemStack();
     public abstract ItemStackHandle cloneAndSubtract(int n);
     public abstract ItemStack toBukkit();
     public abstract boolean isMapItem();
@@ -73,8 +94,6 @@ public abstract class ItemStackHandle extends Template.Handle {
     }
     public abstract int getAmountField();
     public abstract void setAmountField(int value);
-    public abstract CommonTagCompound getTagField();
-    public abstract void setTagField(CommonTagCompound value);
     /**
      * Stores class members for <b>net.minecraft.world.item.ItemStack</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -84,7 +103,6 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.StaticField.Converted<ItemStackHandle> OPT_EMPTY_ITEM = new Template.StaticField.Converted<ItemStackHandle>();
 
         public final Template.Field.Integer amountField = new Template.Field.Integer();
-        public final Template.Field.Converted<CommonTagCompound> tagField = new Template.Field.Converted<CommonTagCompound>();
 
         public final Template.StaticMethod.Converted<ItemStackHandle> newInstance = new Template.StaticMethod.Converted<ItemStackHandle>();
         public final Template.StaticMethod.Converted<ItemStackHandle> fromBlockData = new Template.StaticMethod.Converted<ItemStackHandle>();
@@ -93,17 +111,35 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
         public final Template.Method<Object> getItem = new Template.Method<Object>();
         public final Template.Method.Converted<Material> getTypeField = new Template.Method.Converted<Material>();
-        public final Template.Method.Converted<ChatText> getName = new Template.Method.Converted<ChatText>();
-        public final Template.Method.Converted<Void> setName = new Template.Method.Converted<Void>();
-        public final Template.Method<Integer> getDurability = new Template.Method<Integer>();
-        public final Template.Method<Void> setDurability = new Template.Method<Void>();
+        public final Template.Method<Boolean> hasCustomName = new Template.Method<Boolean>();
+        public final Template.Method.Converted<ChatText> getCustomName = new Template.Method.Converted<ChatText>();
+        public final Template.Method.Converted<Void> setCustomName = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<List<ChatText>> getLores = new Template.Method.Converted<List<ChatText>>();
+        public final Template.Method.Converted<Void> addLore = new Template.Method.Converted<Void>();
+        public final Template.Method<Void> clearLores = new Template.Method<Void>();
+        public final Template.Method<Integer> getDamageValue = new Template.Method<Integer>();
+        public final Template.Method<Void> setDamageValue = new Template.Method<Void>();
+        public final Template.Method<Boolean> isUnbreakable = new Template.Method<Boolean>();
+        public final Template.Method<Void> setUnbreakable = new Template.Method<Void>();
         public final Template.Method<Integer> getRepairCost = new Template.Method<Integer>();
-        public final Template.Method<Boolean> hasName = new Template.Method<Boolean>();
-        public final Template.Method.Converted<ItemStackHandle> cloneItemStack = new Template.Method.Converted<ItemStackHandle>();
         public final Template.Method<Void> setRepairCost = new Template.Method<Void>();
-        public final Template.Method<Boolean> hasTag = new Template.Method<Boolean>();
-        public final Template.Method.Converted<CommonTagCompound> getTag = new Template.Method.Converted<CommonTagCompound>();
-        public final Template.Method.Converted<CommonTagCompound> saveToNBT = new Template.Method.Converted<CommonTagCompound>();
+        public final Template.Method<Integer> getMapColor = new Template.Method<Integer>();
+        public final Template.Method<Void> setMapColor = new Template.Method<Void>();
+        public final Template.Method<Integer> getLeatherArmorColor = new Template.Method<Integer>();
+        public final Template.Method<Integer> getPotionColor = new Template.Method<Integer>();
+        public final Template.Method<Integer> getFireworksFlightDuration = new Template.Method<Integer>();
+        public final Template.Method<Void> setFireworksFlightDuration = new Template.Method<Void>();
+        public final Template.Method.Converted<Void> setSkullProfile = new Template.Method.Converted<Void>();
+        public final Template.Method<Boolean> hasCustomModelData = new Template.Method<Boolean>();
+        public final Template.Method<Integer> getCustomModelData = new Template.Method<Integer>();
+        public final Template.Method<Void> setCustomModelData = new Template.Method<Void>();
+        public final Template.Method<Void> clearCustomModelData = new Template.Method<Void>();
+        public final Template.Method<Boolean> hasCustomData = new Template.Method<Boolean>();
+        public final Template.Method.Converted<CommonTagCompound> getCustomDataCopy = new Template.Method.Converted<CommonTagCompound>();
+        public final Template.Method<CommonTagCompound> getCustomData = new Template.Method<CommonTagCompound>();
+        public final Template.Method.Converted<Void> setCustomData = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> updateCustomData = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<ItemStackHandle> cloneItemStack = new Template.Method.Converted<ItemStackHandle>();
         public final Template.Method.Converted<ItemStackHandle> cloneAndSubtract = new Template.Method.Converted<ItemStackHandle>();
         public final Template.Method<ItemStack> toBukkit = new Template.Method<ItemStack>();
         public final Template.Method<Boolean> isMapItem = new Template.Method<Boolean>();

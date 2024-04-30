@@ -3,14 +3,11 @@ package com.bergerkiller.bukkit.common.utils;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
-import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.logic.ItemVariantListHandler;
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
-import com.bergerkiller.bukkit.common.nbt.CommonTagList;
-import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.item.EntityItemHandle;
@@ -21,6 +18,8 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStac
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -67,19 +66,16 @@ public class ItemUtil {
      *
      * @param gameProfile
      * @return Skull item
+     * @deprecated Use {@link CommonItemStack#createPlayerSkull(GameProfileHandle)} instead
      */
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public static ItemStack createPlayerHeadItem(GameProfileHandle gameProfile) {
-        ItemStack item = createItem(MaterialUtil.getFirst("PLAYER_HEAD", "LEGACY_SKULL_ITEM"), 1);
-        CommonTagCompound nbt = getMetaTag(item, true);
-        nbt.put("SkullOwner", gameProfile.serialize());
-        item.setDurability((short) 3); // For supporting MC 1.12.2 and before
-        return item;
+        return CommonItemStack.createPlayerSkull(gameProfile).toBukkit();
     }
 
     /**
      * Tests if the given ItemStacks can be fully transferred to another array
-     * of ItemStacks
+     * of ItemStacks. <b>Note: slow</b>
      *
      * @param from ItemStack source array
      * @param to destination Inventory
@@ -91,7 +87,7 @@ public class ItemUtil {
 
     /**
      * Tests if the given ItemStacks can be fully transferred to another array
-     * of ItemStacks
+     * of ItemStacks. <b>Note: slow</b>
      *
      * @param from ItemStack source array
      * @param to ItemStack destination array
@@ -99,9 +95,10 @@ public class ItemUtil {
      */
     public static boolean canTransferAll(org.bukkit.inventory.ItemStack[] from, org.bukkit.inventory.ItemStack[] to) {
         Inventory invto = new InventoryBaseImpl(to, true);
-        for (org.bukkit.inventory.ItemStack item : cloneItems(from)) {
-            transfer(item, invto, Integer.MAX_VALUE);
-            if (!LogicUtil.nullOrEmpty(item)) {
+        for (org.bukkit.inventory.ItemStack item : from) {
+            CommonItemStack fromItem = CommonItemStack.copyOf(item);
+            fromItem.transferTo(invto, -1);
+            if (!fromItem.isEmpty()) {
                 return false;
             }
         }
@@ -112,45 +109,22 @@ public class ItemUtil {
      * Tests if the given ItemStack can be transferred to the Inventory
      *
      * @return The amount that could be transferred
+     * @deprecated Use {@link CommonItemStack#testTransferTo(Inventory)} instead
      */
+    @Deprecated
     public static int testTransfer(org.bukkit.inventory.ItemStack from, Inventory to) {
-        if (LogicUtil.nullOrEmpty(from)) {
-            return 0;
-        }
-        int startAmount = from.getAmount();
-        int fromAmount = startAmount;
-        for (org.bukkit.inventory.ItemStack item : to.getContents()) {
-            if (LogicUtil.nullOrEmpty(item)) {
-                // Full transfer is possible (empty slot)
-                fromAmount -= getMaxSize(from);
-            } else if (equalsIgnoreAmount(from, item)) {
-                // Stack transfer is possible (same item slot)
-                fromAmount -= getMaxSize(item) - item.getAmount();
-            }
-            if (fromAmount <= 0) {
-                // All items could be transferred!
-                return startAmount;
-            }
-        }
-        return startAmount - fromAmount;
+        return CommonItemStack.of(from).testTransferTo(to);
     }
 
     /**
      * Tests if the two items can be merged
      *
      * @return The amount that could be transferred
+     * @deprecated Moved to {@link CommonItemStack#testTransferTo(CommonItemStack)}
      */
+    @Deprecated
     public static int testTransfer(org.bukkit.inventory.ItemStack from, org.bukkit.inventory.ItemStack to) {
-        if (LogicUtil.nullOrEmpty(from)) {
-            return 0;
-        }
-        if (LogicUtil.nullOrEmpty(to)) {
-            return Math.min(from.getAmount(), getMaxSize(from));
-        }
-        if (equalsIgnoreAmount(from, to)) {
-            return Math.min(from.getAmount(), getMaxSize(to) - to.getAmount());
-        }
-        return 0;
+        return CommonItemStack.of(from).testTransferTo(CommonItemStack.of(to));
     }
 
     /**
@@ -162,170 +136,11 @@ public class ItemUtil {
      * @param parser The item parser used to set what items to transfer. Can be
      * null.
      * @return The amount of items that got transferred
+     * @deprecated Use {@link CommonItemStack#transfer(Inventory, Inventory, Predicate, int)} instead
      */
+    @Deprecated
     public static int transfer(Inventory from, Inventory to, ItemParser parser, int maxAmount) {
-        int startAmount = maxAmount < 0 ? Integer.MAX_VALUE : maxAmount;
-        int amountToTransfer = startAmount;
-        int tmptrans;
-        for (int i = 0; i < from.getSize() && amountToTransfer > 0; i++) {
-            org.bukkit.inventory.ItemStack item = from.getItem(i);
-            if (LogicUtil.nullOrEmpty(item) || (parser != null && !parser.match(item))) {
-                continue;
-            }
-            tmptrans = transfer(item, to, amountToTransfer);
-            if (tmptrans > 0) {
-                amountToTransfer -= tmptrans;
-                from.setItem(i, LogicUtil.nullOrEmpty(item) ? null : item);
-            }
-        }
-        return startAmount - amountToTransfer;
-    }
-
-    /**
-     * Transfers the given ItemStack to multiple slots in the Inventory
-     *
-     * @param from The ItemStack to transfer
-     * @param to The Inventory to transfer to
-     * @param maxAmount The maximum amount of the item to transfer, -1 for
-     * infinite
-     * @return The amount of the item that got transferred
-     */
-    public static int transfer(org.bukkit.inventory.ItemStack from, Inventory to, int maxAmount) {
-        int startAmount = maxAmount < 0 ? Integer.MAX_VALUE : maxAmount;
-        if (startAmount == 0 || LogicUtil.nullOrEmpty(from)) {
-            return 0;
-        }
-        int tmptrans;
-        int amountToTransfer = startAmount;
-
-        // try to stack to already existing items
-        org.bukkit.inventory.ItemStack toitem;
-        for (int i = 0; i < to.getSize(); i++) {
-            toitem = to.getItem(i);
-            if (!LogicUtil.nullOrEmpty(toitem)) {
-                tmptrans = transfer(from, toitem, amountToTransfer);
-                if (tmptrans > 0) {
-                    amountToTransfer -= tmptrans;
-                    to.setItem(i, toitem);
-                    // everything done?
-                    if (amountToTransfer <= 0 || LogicUtil.nullOrEmpty(from)) {
-                        break;
-                    }
-                }
-            }
-        }
-
-        // try to add it to empty slots
-        if (amountToTransfer > 0 && from.getAmount() > 0) {
-            for (int i = 0; i < to.getSize(); i++) {
-                toitem = to.getItem(i);
-                if (LogicUtil.nullOrEmpty(toitem)) {
-                    toitem = emptyItem();
-                    // Transfer
-                    tmptrans = transfer(from, toitem, amountToTransfer);
-                    if (tmptrans > 0) {
-                        amountToTransfer -= tmptrans;
-                        to.setItem(i, toitem);
-                        // everything done?
-                        if (amountToTransfer <= 0 || LogicUtil.nullOrEmpty(from)) {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        return startAmount - amountToTransfer;
-    }
-
-    /**
-     * Tries to transfer items from the Inventory to the ItemStack
-     *
-     * @param from The Inventory to take an ItemStack from
-     * @param to The ItemStack to merge the item taken
-     * @param parser The item parser used to set what item to transfer if the
-     * receiving item is empty. Can be null.
-     * @param maxAmount The maximum amount of the item to transfer, -1 for
-     * infinite
-     * @return The amount of the item that got transferred
-     */
-    public static int transfer(Inventory from, org.bukkit.inventory.ItemStack to, ItemParser parser, int maxAmount) {
-        int startAmount = maxAmount < 0 ? Integer.MAX_VALUE : maxAmount;
-        int amountToTransfer = startAmount;
-        for (int i = 0; i < from.getSize() && amountToTransfer > 0; i++) {
-            org.bukkit.inventory.ItemStack item = from.getItem(i);
-            if (LogicUtil.nullOrEmpty(item)) {
-                continue;
-            }
-
-            // If the target is null or empty, use parser to verify the item
-            if (LogicUtil.nullOrEmpty(to) && parser != null && !parser.match(item)) {
-                continue;
-            }
-
-            // Perform the transfer. If to is empty (but not null) it will be copied in full.
-            amountToTransfer -= transfer(item, to, amountToTransfer);
-            from.setItem(i, item);
-        }
-        return startAmount - amountToTransfer;
-    }
-
-    /**
-     * Merges two ItemStacks together<br>
-     * - If from is empty or null, no transfer happens<br>
-     * - If to is null, no transfer happens<br>
-     * - If to is empty, full transfer occurs
-     *
-     * @param from The ItemStack to merge
-     * @param to The receiving ItemStack
-     * @param maxAmount The maximum amount of the item to transfer, -1 for
-     * infinite
-     * @return The amount of the item that got transferred
-     */
-    public static int transfer(org.bukkit.inventory.ItemStack from, org.bukkit.inventory.ItemStack to, int maxAmount) {
-        if (LogicUtil.nullOrEmpty(from) || to == null) {
-            return 0;
-        }
-        int amountToTransfer = Math.min(maxAmount < 0 ? Integer.MAX_VALUE : maxAmount, from.getAmount());
-
-        // Transfering to an empty item, don't bother doing any stacking logic
-        if (LogicUtil.nullOrEmpty(to)) {
-            // Limit amount by maximum of the from item
-            amountToTransfer = Math.min(amountToTransfer, getMaxSize(from));
-            if (amountToTransfer <= 0) {
-                return 0;
-            }
-            // Transfer item information
-            transferInfo(from, to);
-            // Transfer the amount
-            to.setAmount(amountToTransfer);
-            subtractAmount(from, amountToTransfer);
-            return amountToTransfer;
-        }
-
-        // Can we stack?
-        amountToTransfer = Math.min(amountToTransfer, getMaxSize(to) - to.getAmount());
-        if (amountToTransfer <= 0 || !equalsIgnoreAmount(from, to)) {
-            return 0;
-        }
-
-        // From and to are equal, we can now go ahead and stack them
-        addAmount(to, amountToTransfer);
-        subtractAmount(from, amountToTransfer);
-        return amountToTransfer;
-    }
-
-    /**
-     * Transfers the item type, data and enchantments from one item stack to the
-     * other
-     *
-     * @param from which Item Stack to read the info
-     * @param to which Item Stack to transfer the info to
-     */
-    public static void transferInfo(org.bukkit.inventory.ItemStack from, org.bukkit.inventory.ItemStack to) {
-        // Transfer type, durability and any other remaining metadata information
-        to.setType(from.getType());
-        to.setDurability(from.getDurability());
-        setMetaTag(to, LogicUtil.clone(getMetaTag(from)));
+        return CommonItemStack.transfer(from, to, parser, maxAmount);
     }
 
     /**
@@ -346,28 +161,10 @@ public class ItemUtil {
      * @param item1 to check
      * @param item2 to check
      * @return True if the items have the same type, data and enchantments,
-     * False if not
+     *         False if not
      */
     public static boolean equalsIgnoreAmount(org.bukkit.inventory.ItemStack item1, org.bukkit.inventory.ItemStack item2) {
-        //TODO: This can be done trivially with ItemStack.isSimilar by itself. But some code is included here that
-        //      Bukkit doesn't seem to do (AttributeModifiers). Is this important? We probably wanna get rid of this,
-        //      because isSimilar exists on MC 1.8 and appears to work fine.
-        //      This original patch dates back to 2013...
-
-        if (item1 == null || item2 == null || !item1.isSimilar(item2)) {
-            return false;
-        }
-
-        // Not included in metadata checks: Item attributes (Bukkit needs to update)
-        CommonTagCompound item1NBT = getMetaTag(item1);
-        CommonTagCompound item2NBT = getMetaTag(item2);
-        if (item1NBT != null && item2NBT != null) {
-            CommonTagList item1Attr = item1NBT.get("AttributeModifiers", CommonTagList.class);
-            CommonTagList item2Attr = item2NBT.get("AttributeModifiers", CommonTagList.class);
-            return LogicUtil.bothNullOrEqual(item1Attr, item2Attr);
-        } else {
-            return true; // Assume good.
-        }
+        return (item1 == null) ? (item2 == null) : item1.isSimilar(item2);
     }
 
     /**
@@ -414,7 +211,7 @@ public class ItemUtil {
      * @return Empty item stack
      */
     public static org.bukkit.inventory.ItemStack emptyItem() {
-        return createItem(Material.AIR, 0, 0);
+        return createItem(Material.AIR, 0);
     }
 
     /**
@@ -437,27 +234,6 @@ public class ItemUtil {
     public static org.bukkit.inventory.ItemStack createItem(Material type, int amount) {
         ItemStackHandle stack = ItemStackHandle.newInstance(type);
         stack.setAmountField(amount);
-        return stack.toBukkit();
-    }
-
-    /**
-     * Creates a new ItemStack that is guaranteed to be a CraftItemStack with a valid NMS ItemStack handle.<br>
-     * <b>Deprecated: Uses outdated MaterialData</b>
-     * 
-     * @param type of item
-     * @param data of the item
-     * @param amount of the item
-     * @return ItemStack
-     */
-    @Deprecated
-    public static org.bukkit.inventory.ItemStack createItem(Material type, int data, int amount) {
-        if (CommonCapabilities.MATERIAL_ENUM_CHANGES && type.isBlock()) {
-            return BlockData.fromMaterialData(type, data).createItem(amount);
-        }
-
-        ItemStackHandle stack = ItemStackHandle.newInstance(type);
-        stack.setAmountField(amount);
-        stack.setDurability(data);
         return stack.toBukkit();
     }
 
@@ -559,7 +335,11 @@ public class ItemUtil {
      * @param type of the items to look for, null for any item type
      * @param data of the items to look for, -1 for any data
      * @return Amount of items in the inventory
+     * @deprecated This method is bad, because it doesn't adhere to the stack limit. Use
+     *             {@link CommonItemStack#streamOfContents(Inventory)} instead to find all items
+     *             that match in the inventory, and operate on that instead.
      */
+    @Deprecated
     public static org.bukkit.inventory.ItemStack findItem(Inventory inventory, Material type, int data) {
         org.bukkit.inventory.ItemStack rval = null;
         int itemData = data;
@@ -599,18 +379,14 @@ public class ItemUtil {
      * @return Amount of items in the inventory
      */
     public static int getItemCount(Inventory inventory, Material type, int data) {
-        if (type == null) {
-            int count = 0;
-            for (org.bukkit.inventory.ItemStack item : inventory.getContents()) {
-                if (!LogicUtil.nullOrEmpty(item)) {
-                    count += item.getAmount();
-                }
+        Stream<CommonItemStack> stream = CommonItemStack.streamOfContents(inventory);
+        if (type != null) {
+            stream = stream.filter(item -> item.isType(type));
+            if (data != -1) {
+                stream = stream.filter(item -> MaterialUtil.getRawData(item.toBukkit()) == data);
             }
-            return count;
-        } else {
-            org.bukkit.inventory.ItemStack rval = findItem(inventory, type, data);
-            return rval == null ? 0 : rval.getAmount();
         }
+        return stream.mapToInt(CommonItemStack::getAmount).sum();
     }
 
     /**
@@ -693,75 +469,6 @@ public class ItemUtil {
     }
 
     /**
-     * Checks whether an Item stores a metadata tag
-     *
-     * @param stack to check
-     * @return True if a metadata tag is stored, False if not
-     */
-    public static boolean hasMetaTag(org.bukkit.inventory.ItemStack stack) {
-        return CommonNMS.getHandle(stack).hasTag();
-    }
-
-    /**
-     * Sets the Metadata tag stored in an item. If tag is null, all metadata is
-     * cleared.
-     *
-     * @param stack to set the metadata tag of
-     * @param tag to set to
-     */
-    public static void setMetaTag(org.bukkit.inventory.ItemStack stack, CommonTagCompound tag) {
-        if (CraftItemStackHandle.T.isAssignableFrom(stack)) {
-            Object handle = HandleConversion.toItemStackHandle(stack);
-            if (handle != null) {
-                ItemStackHandle.T.tagField.set(handle, tag);
-                return;
-            }
-        }
-        throw new RuntimeException("This item is not a CraftItemStack! Please create one using createItem(ItemStack)");
-    }
-
-    /**
-     * Obtains the CommonTagCompound storing metadata for an item. If the item has
-     * no metadata tag yet, null is returned instead.
-     * 
-     * @param stack to get the tag compound for
-     * @return Tag Compound, or null if none exist.
-     */
-    public static CommonTagCompound getMetaTag(org.bukkit.inventory.ItemStack stack) {
-        return getMetaTag(stack, false);
-    }
-
-    /**
-     * Obtains the CommonTagCompound storing metadata for an item
-     * 
-     * @param stack to get the tag compound for
-     * @param create whether to create a new tag if one does not exist
-     * @return Tag Compound, or null if none exist and create is false
-     */
-    public static CommonTagCompound getMetaTag(org.bukkit.inventory.ItemStack stack, boolean create) {
-        if (CraftItemStackHandle.T.isAssignableFrom(stack)) {
-            Object handle = CraftItemStackHandle.T.handle.get(stack);
-            if (handle == null) {
-                if (create) {
-                    throw new IllegalArgumentException("Input item is empty and can not have a metadata tag");
-                } else {
-                    return null;
-                }
-            }
-            CommonTagCompound tag = ItemStackHandle.T.tagField.get(handle);
-            if (tag == null && create) {
-                tag = new CommonTagCompound();
-                ItemStackHandle.T.tagField.set(handle, tag);
-            }
-            return tag;
-        } else if (create) {
-            throw new IllegalArgumentException("This item is not a CraftItemStack! Please create one using createItem(ItemStack)");
-        } else {
-            return null; // no tags are stored in Bukkit ItemStacks
-        }
-    }
-
-    /**
      * Sets the cost of repairing this item
      *
      * @param stack to set the repair cost of
@@ -786,10 +493,11 @@ public class ItemUtil {
      *
      * @param stack to check
      * @return True if a custom name is set, False if not
+     * @deprecated Use {@link CommonItemStack#hasCustomName()} instead
      */
+    @Deprecated
     public static boolean hasDisplayName(org.bukkit.inventory.ItemStack stack) {
-        ItemStackHandle handle = CommonNMS.getHandle(stack);
-        return (handle == null) ? false : handle.hasName();
+        return CommonItemStack.of(stack).hasCustomName();
     }
 
     /**
@@ -799,9 +507,12 @@ public class ItemUtil {
      *
      * @param stack to get the display name of
      * @return display name
+     * @deprecated Use {@link CommonItemStack#getCustomName()} instead
      */
+    @Deprecated
     public static String getDisplayName(org.bukkit.inventory.ItemStack stack) {
-        return getDisplayChatText(stack).getMessage();
+        ChatText text = getDisplayChatText(stack);
+        return (text == null) ? null : text.getMessage();
     }
 
     /**
@@ -811,12 +522,11 @@ public class ItemUtil {
      *
      * @param stack to get the display name of
      * @return display name ChatText
+     * @deprecated Use {@link CommonItemStack#getCustomName()} instead
      */
+    @Deprecated
     public static ChatText getDisplayChatText(org.bukkit.inventory.ItemStack stack) {
-        if (ItemUtil.isEmpty(stack)) {
-            throw new IllegalArgumentException("Input item is null, empty or air");
-        }
-        return CommonNMS.getHandle(stack).getName();
+        return CommonItemStack.of(stack).getCustomName();
     }
 
     /**
@@ -824,7 +534,9 @@ public class ItemUtil {
      *
      * @param stack to set the display name of
      * @param displayName to set to, null to reset to the default
+     * @deprecated Use {@link CommonItemStack#setCustomName(ChatText)} instead
      */
+    @Deprecated
     public static void setDisplayName(org.bukkit.inventory.ItemStack stack, String displayName) {
         setDisplayChatText(stack, ChatText.fromMessage(displayName));
     }
@@ -834,16 +546,22 @@ public class ItemUtil {
      *
      * @param stack to set the display name of
      * @param displayName to set to, null to reset to the default
+     * @deprecated Use {@link CommonItemStack#setCustomName(ChatText)} instead
      */
+    @Deprecated
     public static void setDisplayChatText(org.bukkit.inventory.ItemStack stack, ChatText displayName) {
         if (displayName != null) {
             if (CraftItemStackHandle.T.isAssignableFrom(stack)) {
-                CommonNMS.getHandle(stack).setName(displayName);
+                CommonNMS.getHandle(stack).setCustomName(displayName);
             } else {
                 throw new RuntimeException("This item is not a CraftItemStack! Please create one using createItem(ItemStack)");
             }
         } else if (hasDisplayName(stack)) {
-            CommonNMS.getHandle(stack).getTag().remove("display");
+            if (CraftItemStackHandle.T.isAssignableFrom(stack)) {
+                CommonNMS.getHandle(stack).setCustomName(null);
+            } else {
+                throw new RuntimeException("This item is not a CraftItemStack! Please create one using createItem(ItemStack)");
+            }
         }
     }
 
@@ -851,13 +569,11 @@ public class ItemUtil {
      * Removes all lores from an item that are set, if they are set
      * 
      * @param itemStack
+     * @deprecated Use {@link CommonItemStack#clearLores()} instead
      */
+    @Deprecated
     public static void clearLoreNames(org.bukkit.inventory.ItemStack itemStack) {
-        CommonTagCompound meta = ItemUtil.getMetaTag(itemStack, false);
-        if (meta == null) return;
-        CommonTagCompound display = meta.get("display", CommonTagCompound.class);
-        if (display == null) return;
-        display.remove("Lore");
+        CommonItemStack.of(itemStack).clearLores();
     }
 
     /**
@@ -865,9 +581,11 @@ public class ItemUtil {
      * 
      * @param itemStack
      * @param name
+     * @deprecated Use {@link CommonItemStack#addLoreMessage(String)} instead
      */
+    @Deprecated
     public static void addLoreName(org.bukkit.inventory.ItemStack itemStack, String name) {
-        addLoreChatText(itemStack, ChatText.fromMessage(name));
+        CommonItemStack.of(itemStack).addLoreMessage(name);
     }
 
     /**
@@ -875,14 +593,11 @@ public class ItemUtil {
      * 
      * @param itemStack
      * @param lore
+     * @deprecated Use {@link CommonItemStack#addLore(ChatText)} instead
      */
+    @Deprecated
     public static void addLoreChatText(org.bukkit.inventory.ItemStack itemStack, ChatText lore) {
-        CommonTagList lores = ItemUtil.getMetaTag(itemStack, true).createCompound("display").createList("Lore");
-        if (CommonCapabilities.LORE_IS_CHAT_COMPONENT) {
-            lores.addValue(lore.getJson());
-        } else {
-            lores.addValue(lore.getMessage());
-        }
+        CommonItemStack.of(itemStack).addLore(lore);
     }
 
     /**

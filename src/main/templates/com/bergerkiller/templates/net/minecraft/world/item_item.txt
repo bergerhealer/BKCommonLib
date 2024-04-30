@@ -18,14 +18,31 @@ class Item {
         return #REGISTRY;
     }
 
+#if version >= 1.20.5
+    public int getMaxStackSize:getDefaultMaxStackSize();
+
+    public void setMaxStackSize(int maxStackSize) {
+        //TODO: Gotta build a new components mapping with an updated DataComponents.MAX_STACK_SIZE
+    }
+#else
+    public int getMaxStackSize();
+
     public void setMaxStackSize(int maxStackSize) {
         #require net.minecraft.world.item.Item private final int maxStackSize;
         instance#maxStackSize = maxStackSize;
     }
+#endif
 
-    public int getMaxStackSize();
-
-#if version >= 1.18
+#if version >= 1.20.5
+    public int getMaxDurability() {
+        Integer maxDamage = (Integer) instance.components().get(DataComponents.MAX_DAMAGE);
+        return (maxDamage != null) ? maxDamage.intValue() : 0;
+    }
+    public boolean usesDurability() {
+        Integer maxDamage = (Integer) instance.components().get(DataComponents.MAX_DAMAGE);
+        return maxDamage != null && maxDamage.intValue() != 0;
+    }
+#elseif version >= 1.18
     public int getMaxDurability:getMaxDamage();
     public boolean usesDurability:canBeDepleted();
 #else

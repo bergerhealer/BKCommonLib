@@ -18,6 +18,8 @@ import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -349,18 +351,17 @@ public final class CommonMapController implements PacketListener, Listener {
      * @param oldItem that was changed
      * @param newItem the old item was changed into
      */
-    public synchronized void updateMapItem(ItemStack oldItem, ItemStack newItem) {
-        if (oldItem == null) {
-            throw new IllegalArgumentException("oldItem is null");
-        } else if (!CraftItemStackHandle.T.isAssignableFrom(oldItem)) {
-            oldItem = ItemUtil.createItem(oldItem); // Ensure CraftItemStack
-        }
-        if (newItem != null && !CraftItemStackHandle.T.isAssignableFrom(newItem)) {
-            newItem = ItemUtil.createItem(newItem); // Ensure CraftItemStack
+    public synchronized void updateMapItem(CommonItemStack oldItem, CommonItemStack newItem) {
+        if (oldItem.isEmpty()) {
+            throw new IllegalArgumentException("oldItem is empty");
         }
 
+        // Ensure both are CraftItemStacks
+        oldItem.getHandle();
+        newItem.getHandle();
+
         boolean unchanged = isItemUnchanged(oldItem, newItem);
-        UUID oldMapUUID = CommonMapUUIDStore.getMapUUID(oldItem);
+        UUID oldMapUUID = oldItem.getHandle().map(ItemStackHandle::getMapDisplayUUID).orElse(null);
         if (oldMapUUID != null) {
             // Change in the inventories of all player owners
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -369,9 +370,9 @@ public final class CommonMapController implements PacketListener, Listener {
                     UUID mapUUID = CommonMapUUIDStore.getMapUUID(inv.getItem(i));
                     if (oldMapUUID.equals(mapUUID)) {
                         if (unchanged) {
-                            PlayerUtil.setItemSilently(player, i, newItem);
+                            PlayerUtil.setItemSilently(player, i, newItem.toBukkit());
                         } else {
-                            inv.setItem(i, newItem);
+                            inv.setItem(i, newItem.toBukkit());
                         }
                     }
                 }
@@ -384,10 +385,10 @@ public final class CommonMapController implements PacketListener, Listener {
                         // When unchanged set the item in the metadata without causing a refresh
                         DataWatcher data = EntityHandle.fromBukkit(itemFrameInfo.itemFrame).getDataWatcher();
                         DataWatcher.Item<ItemStack> dataItem = data.getItem(EntityItemFrameHandle.DATA_ITEM);
-                        dataItem.setValue(newItem, dataItem.isChanged());
+                        dataItem.setValue(newItem.toBukkit(), dataItem.isChanged());
                     } else {
                         // When changed, set it normally so the item is refreshed
-                        itemFrameInfo.itemFrameHandle.setItem(newItem);
+                        itemFrameInfo.itemFrameHandle.setItem(newItem.toBukkit());
                         this.itemFrameUpdateList.prioritize(itemFrameInfo.updateEntry);
                     }
                 }
@@ -397,17 +398,15 @@ public final class CommonMapController implements PacketListener, Listener {
             MapDisplayInfo info = maps.get(oldMapUUID);
             if (info != null) {
                 for (MapSession session : info.getSessions()) {
-                    session.display.setMapItemSilently(newItem);
+                    session.display.setMapItemSilently(newItem.toBukkit());
                 }
             }
         }
 
     }
 
-    private boolean isItemUnchanged(ItemStack item1, ItemStack item2) {
-        ItemStack trimmed_old_item = CommonMapController.trimExtraData(item1);
-        ItemStack trimmed_new_item = CommonMapController.trimExtraData(item2);
-        return LogicUtil.bothNullOrEqual(trimmed_old_item, trimmed_new_item);
+    private boolean isItemUnchanged(CommonItemStack item1, CommonItemStack item2) {
+        return trimExtraData(item1).equals(trimExtraData(item2));
     }
 
     /**
@@ -600,27 +599,25 @@ public final class CommonMapController implements PacketListener, Listener {
      * @param item
      * @param tileX the X-coordinate of the tile in which the item is displayed
      * @param tileY the Y-coordinate of the tile in which the item is displayed
-     * @return True if the item was changed and needs to be updated in the packet
+     * @return The new item stack to put in the slot, or <i>null</i> if the item did not
+     *         need to change
      */
-    public ItemStack handleItemSync(ItemStack item, int tileX, int tileY) {
-        if (!CommonMapUUIDStore.isMap(item)) {
+    public CommonItemStack handleItemSync(CommonItemStack item, int tileX, int tileY) {
+        if (!item.isFilledMap()) {
             return null;
         }
 
         // When a map UUID is specified, use that to dynamically allocate a map Id to use
-        CommonTagCompound tag = ItemUtil.getMetaTag(item, false);
-        if (tag != null) {
-            UUID mapUUID = tag.getUUID("mapDisplay");
-            if (mapUUID != null) {
-                item = trimExtraData(item);
-                int id = getMapId(new MapUUID(mapUUID, tileX, tileY));
-                CommonMapUUIDStore.setItemMapId(item, id);
-                return item;
-            }
+        UUID mapUUID = item.getCustomData().getUUID("mapDisplay");
+        if (mapUUID != null) {
+            item = trimExtraData(item);
+            int id = getMapId(new MapUUID(mapUUID, tileX, tileY));
+            item.setFilledMapId(id);
+            return item;
         }
 
         // Static map Id MUST be enforced
-        int mapId = CommonMapUUIDStore.getItemMapId(item);
+        int mapId = item.getFilledMapId();
         if (mapId != -1) {
             storeStaticMapId(mapId);
         }
@@ -751,17 +748,17 @@ public final class CommonMapController implements PacketListener, Listener {
             List<ItemStack> items = event.getPacket().read(PacketType.OUT_WINDOW_ITEMS.items);
             ListIterator<ItemStack> iter = items.listIterator();
             while (iter.hasNext()) {
-                ItemStack newItem = this.handleItemSync(iter.next(), 0, 0);
+                CommonItemStack newItem = this.handleItemSync(CommonItemStack.of(iter.next()), 0, 0);
                 if (newItem != null) {
-                    iter.set(newItem);
+                    iter.set(newItem.toBukkit());
                 }
             }
         }
         if (event.getType() == PacketType.OUT_WINDOW_SET_SLOT) {
             ItemStack oldItem = event.getPacket().read(PacketType.OUT_WINDOW_SET_SLOT.item);
-            ItemStack newItem = this.handleItemSync(oldItem, 0, 0);
+            CommonItemStack newItem = this.handleItemSync(CommonItemStack.of(oldItem), 0, 0);
             if (newItem != null) {
-                event.getPacket().write(PacketType.OUT_WINDOW_SET_SLOT.item, newItem);
+                event.getPacket().write(PacketType.OUT_WINDOW_SET_SLOT.item, newItem.toBukkit());
             }
         }
 
@@ -897,20 +894,21 @@ public final class CommonMapController implements PacketListener, Listener {
         // When in creative mode, players may accidentally set the 'virtual' map Id as the actual Id in their inventory
         // We have to prevent that in here
         if (event.getType() == PacketType.IN_SET_CREATIVE_SLOT) {
-            ItemStack item = event.getPacket().read(PacketType.IN_SET_CREATIVE_SLOT.item);
+            CommonItemStack item = CommonItemStack.of(event.getPacket().read(PacketType.IN_SET_CREATIVE_SLOT.item));
             UUID mapUUID = CommonMapUUIDStore.getMapUUID(item);
             if (mapUUID != null && CommonMapUUIDStore.getStaticMapId(mapUUID) == -1) {
                 // Dynamic Id map. Since we do not refresh NBT data over the network, this packet contains incorrect data
                 // Find the original item the player took (by UUID). If it exists, merge its NBT data with this item.
                 // For this we also have the map item cache, which is filled with data the moment a player picks up an item
                 // This data is kept around for 10 minutes (unlikely a player will hold onto it for that long...)
-                ItemStack originalMapItem = null;
+                CommonItemStack originalMapItem = null;
                 CreativeDraggedMapItem cachedItem = this.creativeDraggedMapItems.get(mapUUID);
                 if (cachedItem != null) {
                     cachedItem.life = CreativeDraggedMapItem.CACHED_ITEM_MAX_LIFE;
                     originalMapItem = cachedItem.item;
                 } else {
-                    for (ItemStack oldItem : event.getPlayer().getInventory()) {
+                    for (ItemStack oldBukkitItem : event.getPlayer().getInventory()) {
+                        CommonItemStack oldItem = CommonItemStack.of(oldBukkitItem);
                         if (mapUUID.equals(CommonMapUUIDStore.getMapUUID(oldItem))) {
                             originalMapItem = oldItem.clone();
                             break;
@@ -920,13 +918,13 @@ public final class CommonMapController implements PacketListener, Listener {
                 if (originalMapItem != null) {
                     // Original item was found. Restore all properties of that item.
                     // Keep metadata the player can control, replace everything else
-                    ItemUtil.setMetaTag(item, ItemUtil.getMetaTag(originalMapItem));
-                    event.getPacket().write(PacketType.IN_SET_CREATIVE_SLOT.item, item);
+                    item.setCustomData(originalMapItem.getCustomData());
+                    event.getPacket().write(PacketType.IN_SET_CREATIVE_SLOT.item, item.toBukkit());
                 } else {
                     // Dynamic Id. Force a map id value of 0 to prevent creation of new World Map instances
-                    item = ItemUtil.cloneItem(item);
-                    CommonMapUUIDStore.setItemMapId(item, 0);
-                    event.getPacket().write(PacketType.IN_SET_CREATIVE_SLOT.item, item);
+                    item = item.clone();
+                    item.setFilledMapId(0);
+                    event.getPacket().write(PacketType.IN_SET_CREATIVE_SLOT.item, item.toBukkit());
                 }
             }
         }
@@ -956,7 +954,7 @@ public final class CommonMapController implements PacketListener, Listener {
         if (is_place &&
             event.getSlotType() == SlotType.QUICKBAR &&
             event.getWhoClicked() instanceof Player &&
-            CommonMapUUIDStore.isMapDisplay(event.getCursor())
+            CommonItemStack.of(event.getCursor()).isMapDisplay()
         ) {
             final Player player = (Player) event.getWhoClicked();
             final int slot = event.getSlot();
@@ -967,7 +965,7 @@ public final class CommonMapController implements PacketListener, Listener {
                 }
 
                 ItemStack item = player.getInventory().getItem(slot);
-                if (CommonMapUUIDStore.isMapDisplay(item)) {
+                if (CommonItemStack.of(item).isMapDisplay()) {
                     // Resend the item!
                     PacketUtil.sendPacket(player, PacketPlayOutSetSlotHandle.createNew(EntityPlayerHandle.fromBukkit(player).getCurrentWindowId(), rawSlot, item));
                 }
@@ -979,7 +977,7 @@ public final class CommonMapController implements PacketListener, Listener {
         if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY &&
             event.getSlotType() != SlotType.QUICKBAR &&
             event.getWhoClicked() instanceof Player &&
-            CommonMapUUIDStore.isMapDisplay(event.getCurrentItem())
+            CommonItemStack.of(event.getCurrentItem()).isMapDisplay()
         ) {
             final Player player = (Player) event.getWhoClicked();
             CommonUtil.nextTick(() -> {
@@ -1056,9 +1054,10 @@ public final class CommonMapController implements PacketListener, Listener {
         // When taking items from the inventory in creative mode, store metadata of what is taken
         // We apply this metadata again when receiving the item
         if (event.getResult() != Result.DENY) {
-            UUID mapUUID = CommonMapUUIDStore.getMapUUID(event.getCurrentItem());
+            CommonItemStack item = CommonItemStack.of(event.getCurrentItem());
+            UUID mapUUID = CommonMapUUIDStore.getMapUUID(item);
             if (mapUUID != null) {
-                this.creativeDraggedMapItems.put(mapUUID, new CreativeDraggedMapItem(event.getCurrentItem().clone()));
+                this.creativeDraggedMapItems.put(mapUUID, new CreativeDraggedMapItem(item.clone()));
             }
         }
     }
@@ -1798,18 +1797,18 @@ public final class CommonMapController implements PacketListener, Listener {
      * @param item
      * @return new item copy with metadata trimmed
      */
-    public static ItemStack trimExtraData(ItemStack item) {
-        // If null, return null. Simples.
-        if (item == null) {
-            return null;
+    public static CommonItemStack trimExtraData(CommonItemStack item) {
+        // If empty, return empty. Simples.
+        if (item.isEmpty()) {
+            return CommonItemStack.empty();
         }
 
         // If item has no metadata tag, there is no need to clone it
-        CommonTagCompound oldTag = ItemUtil.getMetaTag(item, false);
-        if (oldTag == null) {
+        final CommonTagCompound oldTag = item.getCustomData();
+        if (oldTag.isEmpty()) {
             // Make sure item is a CraftItemStack so we can access NBT properly
             // If metadata tag is null, that's okay.
-            if (!CraftItemStackHandle.T.isAssignableFrom(item)) {
+            if (!item.isCraftItemStack()) {
                 throw new IllegalArgumentException("Input item is no CraftItemStack");
             }
 
@@ -1818,25 +1817,25 @@ public final class CommonMapController implements PacketListener, Listener {
 
         // Get rid of all custom metadata from the item
         // Only Minecraft items are interesting (because its the Minecraft client)
-        CommonTagCompound newTag = new CommonTagCompound();
-        final String[] nbt_filter = {
-                "ench", "display", "RepairCost",
-                "AttributeModifiers", "CanDestroy",
-                "CanPlaceOn", "Unbreakable",
+        item = item.clone();
+        item.setCustomData(null); // Avoids unneeded clone overhead
+        item.updateCustomData(newTag -> {
+            final String[] nbt_filter = {
+                    "ench", "display", "RepairCost",
+                    "AttributeModifiers", "CanDestroy",
+                    "CanPlaceOn", "Unbreakable",
 
-                // Also keep Map Display specific tags alive
-                // This is important to prevent potential corruption
-                "mapDisplayUUIDMost", "mapDisplayUUIDLeast",
-                "mapDisplayPlugin", "mapDisplayClass"
-        };
-        for (String filter : nbt_filter) {
-            if (oldTag.containsKey(filter)) {
-                newTag.put(filter, oldTag.get(filter));
+                    // Also keep Map Display specific tags alive
+                    // This is important to prevent potential corruption
+                    "mapDisplayUUIDMost", "mapDisplayUUIDLeast",
+                    "mapDisplayPlugin", "mapDisplayClass"
+            };
+            for (String filter : nbt_filter) {
+                if (oldTag.containsKey(filter)) {
+                    newTag.put(filter, oldTag.get(filter));
+                }
             }
-        }
-
-        item = ItemUtil.cloneItem(item);
-        ItemUtil.setMetaTag(item, newTag);
+        });
         return item;
     }
 

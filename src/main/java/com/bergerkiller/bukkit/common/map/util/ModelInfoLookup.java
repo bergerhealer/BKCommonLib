@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.map.util;
 
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -7,8 +9,6 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
-import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -23,71 +23,47 @@ import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
  */
 public class ModelInfoLookup {
 
-    public static ItemRenderOptions lookupItemRenderOptions(ItemStack item) {
+    public static ItemRenderOptions lookupItemRenderOptions(CommonItemStack item) {
         // Blocks
-        Material type = (item == null) ? Material.AIR : item.getType();
-        if (item == null || type.isBlock()) {
+        Material type = item.getType();
+        if (type.isBlock()) {
             BlockRenderOptions blockOpt = BlockData.fromItemStack(item).getDefaultRenderOptions();
-            return new ItemRenderOptions(item, blockOpt);
+            return new ItemRenderOptions(item.toBukkit(), blockOpt);
         }
 
-        // Some items, like leather boots, require additional render options passed
-        ItemRenderOptions options = new ItemRenderOptions(item, "");
-        if (MaterialUtil.ISLEATHERARMOR.get(type)) {
-            // Check 'display.color' metadata tag for custom colors
-            int color = 5190175; // default brown
-            CommonTagCompound nbt = ItemUtil.getMetaTag(item, false);
-            if (nbt != null) {
-                CommonTagCompound display = nbt.getValue("display", CommonTagCompound.class);
-                if (display != null) {
-                    color = display.getValue("color", color);
-                }
-            }
+        ItemStack bukkitItem = item.toBukkit();
+        ItemStackHandle handle = item.getHandle().orElseThrow(() -> new IllegalStateException("Item should not be empty"));
 
-            // Convert color to hexadecimal and store it as an option
-            options.put("layer0tint", String.format("#%06x", color));
+        // Some items, like leather boots, require additional render options passed
+        ItemRenderOptions options = new ItemRenderOptions(bukkitItem, "");
+        if (MaterialUtil.ISLEATHERARMOR.get(type)) {
+            options.put("layer0tint", String.format("#%06x", handle.getLeatherArmorColor()));
         }
 
         // Similarly, the liquid inside potion bottles have a color set
         if (MaterialUtil.ISPOTION.get(type)) {
-            int color = getPotionColor(item.getDurability());
-
-            // Check 'CustomPotionColor' metadata tag for custom colors
-            CommonTagCompound nbt = ItemUtil.getMetaTag(item, false);
-            if (nbt != null) {
-                color = nbt.getValue("CustomPotionColor", color);
-            }
-
             // Convert color to hexadecimal and store it as an option
-            options.put("layer0tint", String.format("#%06x", color));
+            options.put("layer0tint", String.format("#%06x", handle.getPotionColor()));
         }
 
         // damage and damaged properties of weapons, armor and tools
-        if (ItemUtil.hasDurability(item)) {
-            boolean unbreakable = false;
-            CommonTagCompound nbt = ItemUtil.getMetaTag(item, false);
-            if (nbt != null) {
-                unbreakable = nbt.getValue("Unbreakable", unbreakable);
-            }
-            options.put("damaged", unbreakable ? "0" : "1");
-            options.put("damage", Double.toString((double) item.getDurability() / (double) (ItemUtil.getMaxDurability(item) + 1)));
+        if (item.isDamageSupported()) {
+            options.put("damaged", item.isUnbreakable() ? "0" : "1");
+            options.put("damage", Double.toString((double) item.getDamage() / (double) (item.getMaxDamage() + 1)));
         }
 
         // custom model data
         if (CommonCapabilities.HAS_CUSTOM_MODEL_DATA) {
-            CommonTagCompound nbt = ItemUtil.getMetaTag(item, false);
-            if (nbt != null) {
-                Integer value = nbt.getValue("CustomModelData", Integer.class);
-                if (value != null) {
-                    options.put("custom_model_data", Integer.toString(value));
-                }
+            if (item.hasCustomModelData()) {
+                options.put("custom_model_data", Integer.toString(item.getCustomModelData()));
             }
         }
 
         return options;
     }
 
-    private static int getPotionColor(int durability) {
+    // Used in generated code!
+    public static int getPotionColor(int durability) {
         // Colors obtained by reverse-engineering the sprites
         // Top-left color of the grayscale template is value 251
         // To get the real input colors, level them input=251 output=255
@@ -106,7 +82,7 @@ public class ModelInfoLookup {
         case 0xd: return 0x2D5299; // Water Breathing/Blue2
         case 0xe: return 0x7E8392; // Invisibility/Light-Gray
         default:
-            return 0x375DC6; // Water/Blue default color
+            return 0x385DC6; // Water/Blue default color
         }
     }
 

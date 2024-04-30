@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 import java.util.Collection;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.data.CraftBlockDataHandle;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -96,6 +97,21 @@ public class BlockDataRegistry {
     public static BlockData fromBukkit(Object bukkitBlockData) {
         //TODO: Is non-craftbukkit BlockData even a thing in the wild?
         return CraftBlockDataHandle.T.getState.invoke(bukkitBlockData);
+    }
+
+    /**
+     * Obtains immutable BlockData information for the Material and Data of an ItemStack
+     *
+     * @param itemStack input
+     * @return Immutable BlockData
+     */
+    public static BlockData fromItemStack(CommonItemStack itemStack) {
+        Material type = itemStack.getType();
+        if (CommonLegacyMaterials.isLegacy(type)) {
+            return fromMaterialData(type, itemStack.getDamage());
+        } else {
+            return fromMaterial(itemStack.getType());
+        }
     }
 
     /**

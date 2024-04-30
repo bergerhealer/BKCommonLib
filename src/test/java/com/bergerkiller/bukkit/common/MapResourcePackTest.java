@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.util.HashSet;
 import java.util.Random;
 
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.junit.Ignore;
@@ -35,8 +36,9 @@ public class MapResourcePackTest {
         MapResourcePack pack = MapResourcePack.SERVER; //new MapResourcePack("https://www.dropbox.com/s/s77nz3zaclrdqog/TestPack.zip?dl=1");
         pack.load();
 
-        ItemStack item = ItemUtil.createItem(Material.DIAMOND_SWORD, 2, 1);
-        ItemUtil.getMetaTag(item, true).putValue("Unbreakable", true);
+        CommonItemStack item = CommonItemStack.create(Material.DIAMOND_SWORD, 2)
+                .setDamage(1)
+                .setUnbreakable(true);
 
         //map.draw(pack.getItemTexture(item, 128, 128), 0, 0);
 
@@ -62,9 +64,15 @@ public class MapResourcePackTest {
     }
 
     protected void testDrawModel(MapTexture canvas, MapResourcePack pack, int x, int y, int damage) {
-        ItemStack item = ItemUtil.createItem(Material.DIAMOND_SWORD, damage, 1);
-        ItemUtil.getMetaTag(item, true).putValue("Unbreakable", true);
+        CommonItemStack item = CommonItemStack.create(Material.DIAMOND_SWORD, 1)
+                .setDamage(damage)
+                .setUnbreakable(true);
         testDraw(canvas, pack, x, y, item);
+    }
+
+    protected void testDraw(MapTexture canvas, MapResourcePack pack, int x, int y, CommonItemStack item) {
+        canvas.drawRectangle(x, y, 16, 16, MapColorPalette.COLOR_RED);
+        canvas.draw(pack.getItemTexture(item, 16, 16), x, y);
     }
 
     protected void testDraw(MapTexture canvas, MapResourcePack pack, int x, int y, ItemStack item) {

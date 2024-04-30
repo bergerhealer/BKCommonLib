@@ -215,12 +215,8 @@ public class CraftRecipe {
                 ItemStack newItem = inventoryClone.getItem(i);
                 if (LogicUtil.nullOrEmpty(newItem)) {
                     items[i] = null;
-                } else if (items[i] == null) {
-                    items[i] = newItem.clone();
                 } else {
-                    // Transfer info and amount
-                    ItemUtil.transferInfo(newItem, items[i]);
-                    items[i].setAmount(newItem.getAmount());
+                    items[i] = newItem.clone();
                 }
             }
         }
@@ -252,9 +248,9 @@ public class CraftRecipe {
 
             // add resulting items to inventory
             for (ItemStack item : this.output) {
-                ItemStack cloned = ItemUtil.cloneItem(item);
-                ItemUtil.transfer(cloned, inventory, Integer.MAX_VALUE);
-                if (!LogicUtil.nullOrEmpty(cloned)) {
+                CommonItemStack cloned = CommonItemStack.copyOf(item);
+                cloned.transferTo(inventory, -1);
+                if (!cloned.isEmpty()) {
                     // Could not add result (inventory is full), unsuccessful
                     return false;
                 }

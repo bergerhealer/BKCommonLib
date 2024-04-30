@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -46,8 +47,8 @@ import com.bergerkiller.bukkit.common.wrappers.HumanHand;
  * The display is purely <u>virtual</u>, meaning that the map contents are never saved on the server.<br>
  * <br>
  * Owner input can be <u>intercepted</u>, allowing the owner of the map to control it directly using steering controls.
- * The easiest way to enable this, is to set {@link #setReceiveInputWhenHolding(opt)} to true. Alternatively it can be
- * set for individual owners using {@link #setReceiveInput(owner, opt)}. Please note that the player can not move
+ * The easiest way to enable this, is to set {@link #setReceiveInputWhenHolding(boolean)} to true. Alternatively it can be
+ * set for individual owners using {@link #setReceiveInput(Player, boolean)}. Please note that the player can not move
  * around while input is intercepted.<br>
  * <br>
  * To use this class, it should be further implemented to add custom functionality:
@@ -76,8 +77,8 @@ public class MapDisplay implements MapDisplayEvents {
     private boolean _playSoundToAllViewers = false;
     private float _masterVolume = 1.0f;
     private int updateTaskId = -1;
-    private ItemStack _oldItem = null;
-    private ItemStack _item = null;
+    private final CommonItemStack _oldItem = CommonItemStack.empty();
+    private final CommonItemStack _item = CommonItemStack.empty();
     protected MapDisplayInfo info = null;
     protected JavaPlugin plugin = null;
     private final MapWidgetRoot widgets = new MapWidgetRoot(this);
@@ -95,8 +96,8 @@ public class MapDisplay implements MapDisplayEvents {
      */
     public final MapDisplayProperties properties = new MapDisplayProperties() {
         @Override
-        public ItemStack getMapItem() {
-            return MapDisplay.this.getMapItem();
+        public CommonItemStack getCommonMapItem() {
+            return MapDisplay.this.getCommonMapItem();
         }
 
         @Override
@@ -154,8 +155,8 @@ public class MapDisplay implements MapDisplayEvents {
         } else {
             this.plugin = plugin;
             this.info = mapInfo;
-            this._item = mapItem.clone();
-            this._oldItem = ItemUtil.cloneItem(this._item);
+            this._item.setToCopyOf(mapItem);
+            this._oldItem.setToCopyOf(this._item);
         }
         this.setRunning(true);
     }
@@ -254,7 +255,7 @@ public class MapDisplay implements MapDisplayEvents {
 
     /**
      * Adds an owner to this Map Display that will receive map updates and can perform key input.
-     * If this is the first owner being added, and {@link #initialize(plugin, mapItem)} has been called,
+     * If this is the first owner being added, and {@link #initialize(JavaPlugin, ItemStack)} has been called,
      * the display will start updating automatically. If there is an existing Map Display for this map,
      * that also is owned by this player, this player is removed as owner and re-added once this Map Display
      * stops.
@@ -461,7 +462,7 @@ public class MapDisplay implements MapDisplayEvents {
     }
 
     private final void refreshMapItem() {
-        if (!LogicUtil.bothNullOrEqual(this._oldItem, this._item)) {
+        if (!this._item.equals(this._oldItem)) {
             CommonPlugin.getInstance().getMapController().updateMapItem(this._oldItem, this._item);
         }
     }
@@ -487,11 +488,20 @@ public class MapDisplay implements MapDisplayEvents {
     }
 
     /**
-     * Gets the item associated with the map
+     * Gets the Bukkit ItemStack item associated with the map
      * 
      * @return map item
      */
     public ItemStack getMapItem() {
+        return this._item.toBukkit();
+    }
+
+    /**
+     * Gets the CommonItemStack item associated with the map.
+     *
+     * @return map item
+     */
+    public CommonItemStack getCommonMapItem() {
         return this._item;
     }
 
@@ -501,8 +511,8 @@ public class MapDisplay implements MapDisplayEvents {
      * @param item to set to
      */
     public void setMapItemSilently(ItemStack item) {
-        this._item = item;
-        this._oldItem = ItemUtil.cloneItem(item);
+        this._item.setTo(item);
+        this._oldItem.setToCopyOf(this._item);
         this.onMapItemChanged();
         onMapChangedWidgets(this.widgets);
     }
@@ -522,7 +532,7 @@ public class MapDisplay implements MapDisplayEvents {
      * @param item to set to
      */
     public void setMapItem(ItemStack item) {
-        this._item = item;
+        this._item.setTo(item);
     }
 
     /**
@@ -847,7 +857,7 @@ public class MapDisplay implements MapDisplayEvents {
      * Creates a new marker and adds it to the display.
      * The id specified will be assigned to the marker,
      * allowing it to be later retrieved again by the same id
-     * using {@link #getMarker(id)}.<br>
+     * using {@link #getMarker(String)}.<br>
      * <br>
      * If a marker with this id already exists, then that marker
      * is replaced with a new one that has the initial settings
@@ -1601,6 +1611,16 @@ public class MapDisplay implements MapDisplayEvents {
      * @param newItem to set to, null to remove. Can be same as oldItem.
      */
     public static void updateMapItem(ItemStack oldItem, ItemStack newItem) {
+        updateMapItem(CommonItemStack.of(oldItem), CommonItemStack.of(newItem));
+    }
+
+    /**
+     * Globally refreshes the contents of a particular map item
+     *
+     * @param oldItem to be refreshed, can not be null or empty
+     * @param newItem to set to, empty to remove. Can be same as oldItem. Cannot be null.
+     */
+    public static void updateMapItem(CommonItemStack oldItem, CommonItemStack newItem) {
         CommonPlugin.getInstance().getMapController().updateMapItem(oldItem, newItem);
     }
 

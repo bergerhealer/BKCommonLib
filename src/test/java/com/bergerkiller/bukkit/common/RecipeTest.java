@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import static com.bergerkiller.bukkit.common.utils.MaterialUtil.getFirst;
 
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -12,8 +13,6 @@ import org.junit.Test;
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
-import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.RecipeUtil;
 
@@ -48,9 +47,10 @@ public class RecipeTest {
         assertEquals(1, outputs.length);
         assertEquals(fireworkType, outputs[0].getType());
         if (Common.evaluateMCVersion(">=", "1.15")) {
-            assertEquals(Byte.valueOf((byte) 3), ItemUtil.getMetaTag(outputs[0], false)
-                    .get("Fireworks", CommonTagCompound.class)
-                    .getValue("Flight", Byte.class));
+            assertEquals(3, CommonItemStack.of(outputs[0])
+                    .getHandle()
+                    .orElseThrow(() -> new IllegalStateException("No Handle"))
+                    .getFireworksFlightDuration());
         }
     }
 

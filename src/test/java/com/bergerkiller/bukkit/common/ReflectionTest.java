@@ -55,7 +55,6 @@ public class ReflectionTest {
             loadClass(NMSChunk.class);
             loadClass(NMSChunkSection.class);
             loadClass(NMSEntity.class);
-            loadClass(NMSItemStack.class);
             loadClass(NMSWorld.class);
             loadClass(NMSEntityHuman.class);
             loadClass(NMSEntityLiving.class);

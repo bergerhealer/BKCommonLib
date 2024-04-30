@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.map;
 
-import org.bukkit.inventory.ItemStack;
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 
 /**
  * An item that a player picked up and is dragging through the inventory
@@ -12,9 +12,9 @@ class CreativeDraggedMapItem {
     public static final int CACHED_ITEM_CLEAN_INTERVAL = 60; //60 ticks
 
     public int life;
-    public final ItemStack item;
+    public final CommonItemStack item;
 
-    public CreativeDraggedMapItem(ItemStack item) {
+    public CreativeDraggedMapItem(CommonItemStack item) {
         this.item = item;
         this.life = CACHED_ITEM_MAX_LIFE;
     }

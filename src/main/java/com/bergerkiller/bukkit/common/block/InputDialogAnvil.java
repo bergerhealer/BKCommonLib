@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -334,21 +335,21 @@ public class InputDialogAnvil {
             if (getMaterial() == null || BlockData.AIR.isType(getMaterial())) {
                 return null;
             } else {
-                ItemStack item = ItemUtil.createItem(getMaterial(), 1);
+                CommonItemStack item = CommonItemStack.create(getMaterial(), 1);
                 if (this.getTitle() != null && !this.getTitle().isEmpty()) {
-                    ItemUtil.setDisplayName(item, this.getTitle());
+                    item.setCustomNameMessage(this.getTitle());
                 } else if (CommonCapabilities.EMPTY_ITEM_NAME) {
-                    ItemUtil.setDisplayName(item, "");
+                    item.setCustomNameMessage("");
                 } else {
-                    ItemUtil.setDisplayName(item, "\0");
+                    item.setCustomNameMessage("\0");
                 }
-                ItemUtil.getMetaTag(item).putValue("RepairCost", 0);
+                item.setRepairCost(0); // Ensure no cost shown in menu
                 if (this.getDescription() != null && !this.getDescription().isEmpty()) {
                     for (String line : this.getDescription().split("\n")) {
-                        ItemUtil.addLoreName(item, ChatColor.RESET.toString() + line);
+                        item.addLoreMessage(ChatColor.RESET.toString() + line);
                     }
                 }
-                return item;
+                return item.toBukkit();
             }
         }
 

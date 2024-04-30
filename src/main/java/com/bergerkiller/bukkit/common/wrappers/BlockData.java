@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 
 import java.util.Map;
 
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -220,9 +221,19 @@ public abstract class BlockData extends BlockDataRegistry {
      * Creates an ItemStack holding a stack of blocks of this type of BlockData.
      * 
      * @param amount of blocks
-     * @return Item
+     * @return Bukkit ItemStack
      */
     public abstract org.bukkit.inventory.ItemStack createItem(int amount);
+
+    /**
+     * Creates a CommonItemStack holding a stack of blocks of this type of BlockData.
+     *
+     * @param amount of blocks
+     * @return CommonItemStack
+     */
+    public final CommonItemStack createCommonItem(int amount) {
+        return CommonItemStack.of(createItem(amount));
+    }
 
     /**
      * Changes a state of this BlockData, returning the BlockData with the state updated.

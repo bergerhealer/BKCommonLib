@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeMapBaseHandle;
@@ -20,6 +21,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
+import com.bergerkiller.bukkit.common.internal.proxy.NBTTagCompoundConsumer;
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
@@ -83,6 +85,11 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersH
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
 public class WrapperConversion {
+
+    @ConverterMethod(output="java.util.function.Consumer<net.minecraft.nbt.NBTTagCompound>")
+    public static Consumer<Object> createNBTTagCompoundConsumer(Consumer<CommonTagCompound> consumer) {
+        return new NBTTagCompoundConsumer(consumer);
+    }
 
     // Plugs a gap 1.8 - 1.16 where some fields used IAttribute (but were really AttributeBase)
     @ConverterMethod(input="net.minecraft.world.entity.ai.attributes.IAttribute", optional=true)
