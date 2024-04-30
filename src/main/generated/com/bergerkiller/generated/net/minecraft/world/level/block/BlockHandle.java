@@ -51,7 +51,6 @@ public abstract class BlockHandle extends Template.Handle {
     public abstract int getEmission(IBlockDataHandle iblockdata, World world, int x, int y, int z);
     public abstract boolean isOccluding_at(IBlockDataHandle iblockdata, World world, int x, int y, int z);
     public abstract boolean isOccluding(IBlockDataHandle iblockdata, Block block);
-    public abstract boolean isPowerSource(IBlockDataHandle iblockdata);
     public abstract boolean canSupportOnFace(IBlockDataHandle iblockdata, Block block, BlockFace direction);
     public abstract float getDamageResillience();
     public abstract void dropNaturally(IBlockDataHandle iblockdata, World world, IntVector3 blockposition, float yield, int chance);
@@ -79,7 +78,6 @@ public abstract class BlockHandle extends Template.Handle {
         public final Template.Method.Converted<Integer> getEmission = new Template.Method.Converted<Integer>();
         public final Template.Method.Converted<Boolean> isOccluding_at = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Boolean> isOccluding = new Template.Method.Converted<Boolean>();
-        public final Template.Method.Converted<Boolean> isPowerSource = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Boolean> canSupportOnFace = new Template.Method.Converted<Boolean>();
         public final Template.Method<Float> getDamageResillience = new Template.Method<Float>();
         public final Template.Method.Converted<Void> dropNaturally = new Template.Method.Converted<Void>();

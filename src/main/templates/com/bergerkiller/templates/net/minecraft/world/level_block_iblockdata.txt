@@ -209,6 +209,22 @@ interface IBlockData {
     }
 #endif
 
+#if version >= 1.18
+    public boolean isPowerSource:isSignalSource();
+#elseif version >= 1.13
+    public boolean isPowerSource();
+#elseif version >= 1.12
+    public boolean isPowerSource:m();
+#elseif version >= 1.11
+    public boolean isPowerSource:n();
+#elseif version >= 1.9
+    public boolean isPowerSource:m();
+#else
+    public boolean isPowerSource() {
+        return instance.getBlock().isPowerSource();
+    }
+#endif
+
     public boolean isSolid() {
 #if version >= 1.20
         // Note: deprecated!
@@ -256,6 +272,7 @@ interface IBlockData {
     }
 
 #select version >=
+#case 1.20.5: public (Map<IBlockStateHandle, Comparable<?>>) java.util.Map<IBlockState<?>, Comparable<?>> getStates:getValues();
 #case 1.18: public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:getValues();
 #case 1.17: public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:getStateMap();
 #case 1.13.2

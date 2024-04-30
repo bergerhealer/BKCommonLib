@@ -138,7 +138,6 @@ class Block {
         return iblockdata.isRedstoneConductor(iblockaccess, blockposition);
     }
 
-    public boolean isPowerSource:isSignalSource((IBlockDataHandle) IBlockData iblockdata);
 #elseif version >= 1.14
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
   #if version >= 1.17
@@ -185,7 +184,6 @@ class Block {
     #endif
     }
 
-    public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
 #elseif version >= 1.13
     // Since 1.13 getOpacity has a BlockPosition argument
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
@@ -215,7 +213,6 @@ class Block {
         return instance.isOccluding(iblockdata);
     }
 
-    public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
 #elseif version >= 1.9
     // On later versions, it has an IBlockData argument
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
@@ -245,7 +242,6 @@ class Block {
         return instance.isOccluding(iblockdata);
     }
 
-    public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
 #else
     // By IBlockData does not exist; proxy to the empty args version
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
@@ -280,10 +276,6 @@ class Block {
 
     public boolean isOccluding((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block) {
         return instance.isOccluding();
-    }
-
-    public boolean isPowerSource((IBlockDataHandle) IBlockData iblockdata) {
-        return instance.isPowerSource();
     }
 #endif
 

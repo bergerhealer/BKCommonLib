@@ -582,7 +582,7 @@ class BlockDataImpl extends BlockData {
 
     @Override
     public final boolean isPowerSource() {
-        return this.block.isPowerSource(this.data);
+        return this.data.isPowerSource();
     }
 
     @Override
