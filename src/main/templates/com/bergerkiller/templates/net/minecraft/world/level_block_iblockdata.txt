@@ -233,15 +233,17 @@ interface IBlockData {
     public (SoundEffectTypeHandle) SoundEffectType getSoundType:getStepSound()
 #elseif version >= 1.14
     public (SoundEffectTypeHandle) SoundEffectType getSoundType:r()
-#else
+#elseif version >= 1.9
     public (SoundEffectTypeHandle) SoundEffectType getSoundType() {
   #if version >= 1.11
         return instance.getBlock().getStepSound();
-  #elseif version >= 1.9
-        return instance.getBlock().w();
   #else
-        return instance.getBlock().stepSound;
+        return instance.getBlock().w();
   #endif
+    }
+#else
+    public (SoundEffectTypeHandle) net.minecraft.world.level.block.Block.StepSound getSoundType() {
+        return instance.getBlock().stepSound;
     }
 #endif
 
