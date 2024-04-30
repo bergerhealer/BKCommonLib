@@ -32,6 +32,7 @@ public abstract class WorldHandle extends IBlockAccessHandle {
 
     /* ============================================================================== */
 
+    public abstract void setKeepSpawnInMemoryDuringInit(boolean loaded);
     public abstract void method_profiler_begin(String label);
     public abstract void method_profiler_end();
     public abstract World getWorld();
@@ -81,8 +82,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract void setRandom(RandomSourceHandle value);
     public abstract World getBukkitWorld();
     public abstract void setBukkitWorld(World value);
-    public abstract boolean isKeepSpawnInMemory();
-    public abstract void setKeepSpawnInMemory(boolean value);
     /**
      * Stores class members for <b>net.minecraft.world.level.World</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -92,8 +91,8 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         @Template.Optional
         public final Template.Field.Converted<Object> field_chunkProvider = new Template.Field.Converted<Object>();
         public final Template.Field.Converted<World> bukkitWorld = new Template.Field.Converted<World>();
-        public final Template.Field.Boolean keepSpawnInMemory = new Template.Field.Boolean();
 
+        public final Template.Method<Void> setKeepSpawnInMemoryDuringInit = new Template.Method<Void>();
         public final Template.Method<Void> method_profiler_begin = new Template.Method<Void>();
         public final Template.Method<Void> method_profiler_end = new Template.Method<Void>();
         public final Template.Method.Converted<World> getWorld = new Template.Method.Converted<World>();

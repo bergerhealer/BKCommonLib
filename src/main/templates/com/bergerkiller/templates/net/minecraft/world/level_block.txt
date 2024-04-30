@@ -24,7 +24,6 @@ import com.bergerkiller.bukkit.common.bases.IntVector3
 
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.IBlockAccessHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.SoundEffectTypeHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
@@ -47,24 +46,6 @@ class Block {
     public static final rawtype (Iterable) net.minecraft.core.RegistryBlockID<IBlockData> REGISTRY_ID;
 #else
     public static final rawtype (Iterable) net.minecraft.util.RegistryID<IBlockData> REGISTRY_ID:d;
-#endif
-
-#if version >= 1.18
-    public (SoundEffectTypeHandle) SoundEffectType getSoundType((IBlockDataHandle) IBlockData iblockdata);
-#elseif version >= 1.14
-    public (SoundEffectTypeHandle) SoundEffectType getSoundType:getStepSound((IBlockDataHandle) IBlockData iblockdata);
-#elseif version >= 1.11
-    public (SoundEffectTypeHandle) SoundEffectType getSoundType((IBlockDataHandle) IBlockData iblockdata) {
-        return instance.getStepSound();
-    }
-#elseif version >= 1.9
-    public (SoundEffectTypeHandle) SoundEffectType getSoundType((IBlockDataHandle) IBlockData iblockdata) {
-        return instance.w();
-    }
-#else
-    public (SoundEffectTypeHandle) Block.StepSound getSoundType((IBlockDataHandle) IBlockData iblockdata) {
-        return instance.stepSound;
-    }
 #endif
 
 #if version >= 1.18

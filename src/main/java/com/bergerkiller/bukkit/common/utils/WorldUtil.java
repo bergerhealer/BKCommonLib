@@ -294,13 +294,17 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
-     * Sets if the spawn chunk area should be kept in memory
+     * Sets if the spawn chunk area should be kept in memory, for use during
+     * the WorldInitEvent
      *
      * @param world World to apply value on
      * @param value Keep in memory or not?
+     * @deprecated Bad API is bad. Don't use this. Only use is to disable spawn in the
+     *             WorldInitEvent, but even that works poorly.
      */
+    @Deprecated
     public static void setKeepSpawnInMemory(org.bukkit.World world, boolean value) {
-        CommonNMS.getHandle(world).setKeepSpawnInMemory(value);
+        CommonNMS.getHandle(world).setKeepSpawnInMemoryDuringInit(value);
     }
 
     /**

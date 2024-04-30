@@ -96,7 +96,28 @@ class ClientboundResourcePackPushPacket extends Packet {
     private String hash:b;
 #endif
 
-#if version >= 1.17
+#if version >= 1.20.5
+    #require net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket private final boolean required;
+    #require net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket private final java.util.Optional<IChatBaseComponent> prompt;
+
+    public void setRequired(boolean required) {
+        instance#required = required;
+    }
+
+    public boolean isRequired() {
+        return instance#required;
+    }
+
+    public void setPrompt((ChatText) IChatBaseComponent prompt) {
+        java.util.Optional opt = java.util.Optional.ofNullable(prompt);
+        instance#prompt = opt;
+    }
+
+    public (ChatText) IChatBaseComponent getPrompt() {
+        java.util.Optional opt = instance#prompt;
+        return (IChatBaseComponent) opt.orElse(null);
+    }
+#elseif version >= 1.17
     #require net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket private final boolean required;
     #require net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket private final IChatBaseComponent prompt;
 

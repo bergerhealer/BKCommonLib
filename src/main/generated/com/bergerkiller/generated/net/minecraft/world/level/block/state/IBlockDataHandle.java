@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.world.level.block.state;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.collections.BlockFaceSet;
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.SoundEffectTypeHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.IBlockStateHandle;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ public abstract class IBlockDataHandle extends Template.Handle {
     public abstract BlockFaceSet getCachedOpaqueFaces();
     public abstract int getCachedOpacity();
     public abstract boolean isPowerSource();
+    public abstract SoundEffectTypeHandle getSoundType();
     public abstract boolean isSolid();
     public abstract Object get(IBlockStateHandle state);
     public abstract IBlockDataHandle set(IBlockStateHandle state, Object value);
@@ -67,6 +69,7 @@ public abstract class IBlockDataHandle extends Template.Handle {
         public final Template.Method<BlockFaceSet> getCachedOpaqueFaces = new Template.Method<BlockFaceSet>();
         public final Template.Method<Integer> getCachedOpacity = new Template.Method<Integer>();
         public final Template.Method<Boolean> isPowerSource = new Template.Method<Boolean>();
+        public final Template.Method.Converted<SoundEffectTypeHandle> getSoundType = new Template.Method.Converted<SoundEffectTypeHandle>();
         public final Template.Method<Boolean> isSolid = new Template.Method<Boolean>();
         public final Template.Method.Converted<Object> get = new Template.Method.Converted<Object>();
         public final Template.Method.Converted<IBlockDataHandle> set = new Template.Method.Converted<IBlockDataHandle>();

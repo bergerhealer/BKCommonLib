@@ -461,17 +461,17 @@ class BlockDataImpl extends BlockData {
 
     @Override
     public final ResourceKey<SoundEffect> getStepSound() {
-        return ResourceCategory.sound_effect.createKey(block.getSoundType(data).getStepSound().getName());
+        return ResourceCategory.sound_effect.createKey(data.getSoundType().getStepSound().getName());
     }
 
     @Override
     public final ResourceKey<SoundEffect> getPlaceSound() {
-        return ResourceCategory.sound_effect.createKey(block.getSoundType(data).getPlaceSound().getName());
+        return ResourceCategory.sound_effect.createKey(data.getSoundType().getPlaceSound().getName());
     }
 
     @Override
     public final ResourceKey<SoundEffect> getBreakSound() {
-        return ResourceCategory.sound_effect.createKey(block.getSoundType(data).getBreakSound().getName());
+        return ResourceCategory.sound_effect.createKey(data.getSoundType().getBreakSound().getName());
     }
 
     @Override

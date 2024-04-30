@@ -26,8 +26,6 @@ import com.bergerkiller.bukkit.common.RunOnceTask;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.chunk.ForcedChunkLoadTimeoutException;
 import com.bergerkiller.bukkit.common.chunk.ForcedChunkManager;
-import com.bergerkiller.bukkit.common.collections.RunnableConsumer;
-import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
@@ -356,12 +354,12 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
 
         @Override
         public void accept(Object result) {
-            // Either -> Left
-            result = RunnableConsumer.unpack(result);
+            // 1.14 - 1.20.4: Either -> Left -> orElse(null)
+            // 1.20.5+: ChunkResult -> orElse(null)
+            final org.bukkit.Chunk chunk = ChunkProviderServerHandle.unpackGetChunkAsyncResult(result);
 
             // If successful, complete the async chunk loading future
-            if (result != null) {
-                final org.bukkit.Chunk chunk = WrapperConversion.toChunk(result);
+            if (chunk != null) {
                 asyncLoadCallbackHandler.execute(() -> this.chunkFuture.complete(chunk));
                 return;
             }

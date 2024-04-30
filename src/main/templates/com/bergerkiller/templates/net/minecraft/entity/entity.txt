@@ -1037,15 +1037,21 @@ class Entity {
         return (float) instance#stepCounter;
     }
 
-#select version >=
-#case 1.17:  public float heightOffset:maxUpStep;
-#case 1.16:  public float heightOffset:G;
-#case 1.15:  public float heightOffset:H;
-#case 1.14:  public float heightOffset:K;
-#case 1.13:  public float heightOffset:Q;
-#case 1.9:   public float heightOffset:P;
-#case else:  public float heightOffset:S;
-#endselect
+#if version >= 1.19.4
+    public float getHeightOffset:maxUpStep();
+#else
+    public float getHeightOffset() {
+  #select version >=
+  #case 1.17:  return instance.maxUpStep;
+  #case 1.16:  return instance.G;
+  #case 1.15:  return instance.H;
+  #case 1.14:  return instance.K;
+  #case 1.13:  return instance.Q;
+  #case 1.9:   return instance.P;
+  #case else:  return instance.S;
+  #endselect
+    }
+#endif
 
 #if version >= 1.17
     public boolean noclip:noPhysics;
@@ -1581,13 +1587,19 @@ class Entity {
     public void setSize(float width, float height) {
         #require net.minecraft.world.entity.Entity private EntitySize dimensions;
         #require net.minecraft.world.entity.Entity private float eyeHeight;
-        #require net.minecraft.world.entity.Entity protected float getEyeHeight(EntityPose entitypose, EntitySize entitysize);
 
         EntityPose entitypose = instance.getPose();
         EntitySize newSize = EntitySize.scalable(width, height);
 
         instance#dimensions = newSize;
+
+  #if version >= 1.20.5
+        #require net.minecraft.world.entity.Entity protected float getEyeHeight(EntityPose entitypose);
+        instance#eyeHeight = instance#getEyeHeight(entitypose);
+  #else
+        #require net.minecraft.world.entity.Entity protected float getEyeHeight(EntityPose entitypose, EntitySize entitysize);
         instance#eyeHeight = instance#getEyeHeight(entitypose, newSize);
+  #endif
 
         double half_width = (double) width / 2.0;
         AxisAlignedBB new_BoundingBox = new AxisAlignedBB(
@@ -1729,7 +1741,11 @@ class Entity {
     private void setPositionFromBoundingBox:recalcPosition();
 #endif
 
-#if version >= 1.18
+#if version >= 1.20.5
+    public boolean isBurning:isOnFire();
+    public void setOnFire:igniteForSeconds(int numSeconds);
+    public optional int prop_getMaxFireTicks:getFireImmuneTicks();
+#elseif version >= 1.18
     public boolean isBurning:isOnFire();
     public void setOnFire:setSecondsOnFire(int numSeconds);
     public optional int prop_getMaxFireTicks:getFireImmuneTicks();

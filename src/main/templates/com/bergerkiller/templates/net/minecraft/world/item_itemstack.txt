@@ -33,14 +33,6 @@ class ItemStack {
 #if version >= 1.20.5
     // None yet?
 #else
-  #if version >= 1.18
-    #require net.minecraft.nbt.NBTTagCompound public boolean isTagEmpty:isEmpty();
-  #elseif forge_nms_obfuscated
-    #require net.minecraft.nbt.NBTTagCompound public boolean isTagEmpty:b_();
-  #else
-    #require net.minecraft.nbt.NBTTagCompound public boolean isTagEmpty:isEmpty();
-  #endif
-
   #if version >= 1.13
     #require net.minecraft.world.item.ItemStack public net.minecraft.nbt.NBTTagCompound getOrCreateTag();
   #else
@@ -56,16 +48,13 @@ class ItemStack {
 
     #require net.minecraft.world.item.ItemStack public void removeTagIfEmpty() {
         net.minecraft.nbt.NBTTagCompound tag = instance.getTag();
-        if (tag != null) {
-            boolean tagIsEmpty = tag#isTagEmpty();
-            if (tagIsEmpty) {
-                instance.setTag(null);
-            }
+        if (tag != null && tag.isEmpty()) {
+            instance.setTag(null);
         }
     }
 
     #require net.minecraft.world.item.ItemStack public void updateTag(net.minecraft.nbt.NBTTagCompound tag) {
-        boolean tagIsNullOrEmpty = tag == null || tag#isTagEmpty();
+        boolean tagIsNullOrEmpty = tag == null || tag.isEmpty();
         if (tagIsNullOrEmpty) {
             instance.setTag(null);
         } else {
@@ -669,7 +658,7 @@ class ItemStack {
     }
 
     public void setCustomData((CommonTagCompound) NBTTagCompound tag) {
-        boolean tagIsNullOrEmpty = tag == null || tag#isTagEmpty();
+        boolean tagIsNullOrEmpty = tag == null || tag.isEmpty();
         if (tagIsNullOrEmpty) {
             instance.setTag(null);
         } else {
@@ -695,7 +684,7 @@ class ItemStack {
 
         consumer.accept(tag);
 
-        boolean tagIsEmpty = tag#isTagEmpty();
+        boolean tagIsEmpty = tag.isEmpty();
         instance.setTag(tagIsEmpty ? null : tag);
     }
 #endif

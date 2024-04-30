@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.server.level;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
+import org.bukkit.Chunk;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
@@ -23,6 +24,10 @@ public abstract class ChunkProviderServerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static Chunk unpackGetChunkAsyncResult(Object result) {
+        return T.unpackGetChunkAsyncResult.invoke(result);
+    }
+
     public abstract ChunkHandle getChunkAt(int cx, int cz);
     public abstract Executor getAsyncExecutor();
     public abstract void getChunkAtAsync(int cx, int cz, Consumer<?> consumer);
@@ -36,6 +41,8 @@ public abstract class ChunkProviderServerHandle extends Template.Handle {
      */
     public static final class ChunkProviderServerClass extends Template.Class<ChunkProviderServerHandle> {
         public final Template.Field.Converted<WorldServerHandle> world = new Template.Field.Converted<WorldServerHandle>();
+
+        public final Template.StaticMethod.Converted<Chunk> unpackGetChunkAsyncResult = new Template.StaticMethod.Converted<Chunk>();
 
         public final Template.Method.Converted<ChunkHandle> getChunkAt = new Template.Method.Converted<ChunkHandle>();
         public final Template.Method<Executor> getAsyncExecutor = new Template.Method<Executor>();

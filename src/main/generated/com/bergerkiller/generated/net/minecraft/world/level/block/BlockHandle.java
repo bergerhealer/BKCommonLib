@@ -43,7 +43,6 @@ public abstract class BlockHandle extends Template.Handle {
         return T.getCombinedId.invoke(iblockdata);
     }
 
-    public abstract SoundEffectTypeHandle getSoundType(IBlockDataHandle iblockdata);
     public abstract void entityHitVertical(WorldHandle world, EntityHandle entity);
     public abstract String getTitle();
     public abstract boolean isFaceOpaque(IBlockDataHandle iblockdata, World world, int x, int y, int z, BlockFace direction);
@@ -70,7 +69,6 @@ public abstract class BlockHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<IBlockDataHandle> getByCombinedId = new Template.StaticMethod.Converted<IBlockDataHandle>();
         public final Template.StaticMethod.Converted<Integer> getCombinedId = new Template.StaticMethod.Converted<Integer>();
 
-        public final Template.Method.Converted<SoundEffectTypeHandle> getSoundType = new Template.Method.Converted<SoundEffectTypeHandle>();
         public final Template.Method.Converted<Void> entityHitVertical = new Template.Method.Converted<Void>();
         public final Template.Method<String> getTitle = new Template.Method<String>();
         public final Template.Method.Converted<Boolean> isFaceOpaque = new Template.Method.Converted<Boolean>();

@@ -56,13 +56,30 @@ class ChunkProviderServer {
     }
 #endif
 
-#if version >= 1.14
+#if version >= 1.20.5
+    public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {
+        #require net.minecraft.server.level.ChunkProviderServer private java.util.concurrent.CompletableFuture<net.minecraft.server.level.ChunkResult<net.minecraft.world.level.chunk.IChunkAccess>> getChunkFutureMainThread(int cx, int cz, net.minecraft.world.level.chunk.status.ChunkStatus chunkstatus, boolean flag);
+
+        java.util.concurrent.CompletableFuture future;
+        future = instance#getChunkFutureMainThread(cx, cz, ChunkStatus.FULL, true);
+        future.thenAccept(consumer);
+    }
+
+    public static (org.bukkit.Chunk) net.minecraft.world.level.chunk.IChunkAccess unpackGetChunkAsyncResult((Object) net.minecraft.server.level.ChunkResult result) {
+        return (net.minecraft.world.level.chunk.IChunkAccess) result.orElse(null);
+    }
+#elseif version >= 1.14
     public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {
         #require net.minecraft.server.level.ChunkProviderServer private java.util.concurrent.CompletableFuture<com.mojang.datafixers.util.Either<net.minecraft.world.level.chunk.IChunkAccess, net.minecraft.server.level.PlayerChunk.Failure>> getChunkFutureMainThread(int cx, int cz, net.minecraft.world.level.chunk.status.ChunkStatus chunkstatus, boolean flag);
 
         java.util.concurrent.CompletableFuture future;
         future = instance#getChunkFutureMainThread(cx, cz, ChunkStatus.FULL, true);
         future.thenAccept(consumer);
+    }
+
+    public static (org.bukkit.Chunk) net.minecraft.world.level.chunk.IChunkAccess unpackGetChunkAsyncResult((Object) com.mojang.datafixers.util.Either result) {
+        java.util.Optional opt = (java.util.Optional) result.left();
+        return (net.minecraft.world.level.chunk.IChunkAccess) opt.orElse(null);
     }
 #elseif version >= 1.13
     public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {
@@ -73,6 +90,10 @@ class ChunkProviderServer {
         instance.a(iterable, consumer);
   #endif
     }
+
+    public static (org.bukkit.Chunk) net.minecraft.world.level.chunk.Chunk unpackGetChunkAsyncResult((Object) net.minecraft.world.level.chunk.Chunk result) {
+        return result;
+    }
 #else
     public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {
         com.bergerkiller.bukkit.common.internal.proxy.ChunkConsumerProxy proxy;
@@ -82,6 +103,10 @@ class ChunkProviderServer {
   #else
         instance.getChunkAt(cx, cz, proxy);
   #endif
+    }
+
+    public static (org.bukkit.Chunk) net.minecraft.world.level.chunk.Chunk unpackGetChunkAsyncResult((Object) net.minecraft.world.level.chunk.Chunk result) {
+        return result;
     }
 #endif
 

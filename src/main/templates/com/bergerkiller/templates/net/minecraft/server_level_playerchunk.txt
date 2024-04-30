@@ -324,7 +324,11 @@ class PlayerChunk {
     //     public void sendChunk:b((org.bukkit.entity.Player) EntityPlayer player);
     // #endif
 
-#if version >= 1.18
+#if version >= 1.20.5
+    //TODO: Is this safe? It's not the exact same code. The old one is just gone, and only
+    //      checked the full chunk future. The new one does a lot more.
+    public (org.bukkit.Chunk) Chunk getChunkIfLoaded:getFullChunkNow();
+#elseif version >= 1.18
     public (org.bukkit.Chunk) Chunk getChunkIfLoaded:getFullChunk();
 #elseif version >= 1.14
     public (org.bukkit.Chunk) Chunk getChunkIfLoaded:getChunk();

@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPosition;
 import net.minecraft.core.EnumDirection;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BlockCarpet;
+import net.minecraft.world.level.block.SoundEffectType;
 import net.minecraft.world.level.block.state.properties.IBlockState;
 import net.minecraft.world.level.IBlockAccess;
 
@@ -12,6 +13,7 @@ import com.google.common.collect.ImmutableMap;
 import com.bergerkiller.bukkit.common.collections.BlockFaceSet;
 
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.SoundEffectTypeHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.IBlockStateHandle;
 
@@ -222,6 +224,24 @@ interface IBlockData {
 #else
     public boolean isPowerSource() {
         return instance.getBlock().isPowerSource();
+    }
+#endif
+
+#if version >= 1.18
+    public (SoundEffectTypeHandle) SoundEffectType getSoundType()
+#elseif version >= 1.16
+    public (SoundEffectTypeHandle) SoundEffectType getSoundType:getStepSound()
+#elseif version >= 1.14
+    public (SoundEffectTypeHandle) SoundEffectType getSoundType:r()
+#else
+    public (SoundEffectTypeHandle) SoundEffectType getSoundType() {
+  #if version >= 1.11
+        return instance.getBlock().getStepSound();
+  #elseif version >= 1.9
+        return instance.getBlock().w();
+  #else
+        return instance.getBlock().stepSound;
+  #endif
     }
 #endif
 
