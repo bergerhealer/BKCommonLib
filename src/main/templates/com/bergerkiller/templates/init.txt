@@ -1,5 +1,9 @@
 #resolver com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER
 
+// These remappings will be available everywhere, including method bodies and such
+#include /net/minecraft/remapping/nbt_remappings.txt
+#include /net/minecraft/remapping/chat_remappings.txt
+
 #include /com/mojang/authlib/gameprofile.txt
 #include /com/mojang/authlib/properties.txt
 

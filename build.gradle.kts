@@ -138,7 +138,7 @@ tasks {
     generateTemplateHandles {
         source.set("com/bergerkiller/templates/init.txt")
         target.set("com/bergerkiller/generated")
-        variables.put("version", libs.versions.minecraft)
+        variables.put("version", libs.versions.template.minecraft.version);
     }
 
     assemble {

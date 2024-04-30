@@ -170,26 +170,14 @@ class NBTBase {
     </code>
 
     class NBTTagString extends NBTBase {
-#if version >= 1.18
+#if version >= 1.15
         public static (NBTBaseHandle.NBTTagStringHandle) NBTTagString create:valueOf(String data);
-#elseif version >= 1.15
-        public static (NBTBaseHandle.NBTTagStringHandle) NBTTagString create:a(String data);
 #else
         public static (NBTBaseHandle.NBTTagStringHandle) NBTTagString create(String data) { return new NBTTagString(data); }
 #endif
 
         // Overrides getData() in NBTBase
-#if version >= 1.18
         public String getData:getAsString();
-#elseif version >= 1.13.2
-        public String getData:asString();
-#elseif version >= 1.13
-        public String getData:b_();
-#elseif version >= 1.10.2
-        public String getData:c_();
-#else
-        public String getData:a_();
-#endif
 
         <code>
         static {
@@ -203,22 +191,13 @@ class NBTBase {
     }
 
     class NBTTagByte extends NBTBase {
-#if version >= 1.18
+#if version >= 1.15
         public static (NBTBaseHandle.NBTTagByteHandle) NBTTagByte create:valueOf(byte data);
-#elseif version >= 1.15
-        public static (NBTBaseHandle.NBTTagByteHandle) NBTTagByte create:a(byte data);
 #else
         public static (NBTBaseHandle.NBTTagByteHandle) NBTTagByte create(byte data) { return new NBTTagByte(data); }
 #endif
-#if version >= 1.18
+
         public byte getByteData:getAsByte();
-#elseif version >= 1.13.2
-        public byte getByteData:asByte();
-#elseif version >= 1.10.2
-        public byte getByteData:g();
-#else
-        public byte getByteData:f();
-#endif
 
         <code>
         static {
@@ -233,10 +212,8 @@ class NBTBase {
     }
 
     class NBTTagShort extends NBTBase {
-#if version >= 1.18
+#if version >= 1.15
         public static (NBTBaseHandle.NBTTagShortHandle) NBTTagShort create:valueOf(short data);
-#elseif version >= 1.15
-        public static (NBTBaseHandle.NBTTagShortHandle) NBTTagShort create:a(short data);
 #else
         public static (NBTBaseHandle.NBTTagShortHandle) NBTTagShort create(short data) { return new NBTTagShort(data); }
 #endif
@@ -264,22 +241,12 @@ class NBTBase {
     }
 
     class NBTTagInt extends NBTBase {
-#if version >= 1.18
+#if version >= 1.15
         public static (NBTBaseHandle.NBTTagIntHandle) NBTTagInt create:valueOf(int data);
-#elseif version >= 1.15
-        public static (NBTBaseHandle.NBTTagIntHandle) NBTTagInt create:a(int data);
 #else
         public static (NBTBaseHandle.NBTTagIntHandle) NBTTagInt create(int data) { return new NBTTagInt(data); }
 #endif
-#if version >= 1.18
         public int getIntegerData:getAsInt();
-#elseif version >= 1.13.2
-        public int getIntegerData:asInt();
-#elseif version >= 1.10.2
-        public int getIntegerData:e();
-#else
-        public int getIntegerData:d();
-#endif
 
         <code>
         static {
@@ -294,10 +261,8 @@ class NBTBase {
     }
 
     class NBTTagLong extends NBTBase {
-#if version >= 1.18
+#if version >= 1.15
         public static (NBTBaseHandle.NBTTagLongHandle) NBTTagLong create:valueOf(long data);
-#elseif version >= 1.15
-        public static (NBTBaseHandle.NBTTagLongHandle) NBTTagLong create:a(long data);
 #else
         public static (NBTBaseHandle.NBTTagLongHandle) NBTTagLong create(long data) { return new NBTTagLong(data); }
 #endif
@@ -324,10 +289,8 @@ class NBTBase {
     }
 
     class NBTTagFloat extends NBTBase {
-#if version >= 1.18
+#if version >= 1.15
         public static (NBTBaseHandle.NBTTagFloatHandle) NBTTagFloat create:valueOf(float data);
-#elseif version >= 1.15
-        public static (NBTBaseHandle.NBTTagFloatHandle) NBTTagFloat create:a(float data);
 #else
         public static (NBTBaseHandle.NBTTagFloatHandle) NBTTagFloat create(float data) { return new NBTTagFloat(data); }
 #endif
@@ -354,10 +317,8 @@ class NBTBase {
     }
 
     class NBTTagDouble extends NBTBase {
-#if version >= 1.18
+#if version >= 1.15
         public static (NBTBaseHandle.NBTTagDoubleHandle) NBTTagDouble create:valueOf(double data);
-#elseif version >= 1.15
-        public static (NBTBaseHandle.NBTTagDoubleHandle) NBTTagDouble create:a(double data);
 #else
         public static (NBTBaseHandle.NBTTagDoubleHandle) NBTTagDouble create(double data) { return new NBTTagDouble(data); }
 #endif
@@ -490,14 +451,7 @@ class NBTTagList extends NBTBase {
     </code>
 
     public int size();
-
-#if version >= 1.18
     public boolean isEmpty();
-#elseif forge_nms_obfuscated
-    public boolean isEmpty:b_();
-#else
-    public boolean isEmpty();
-#endif
 
 #if version >= 1.18
     public (byte) byte getElementTypeId:getElementType();
@@ -517,21 +471,7 @@ class NBTTagList extends NBTBase {
     public (byte) int getElementTypeId:f();
 #endif
 
-#if version >= 1.16.5 && forge == mohist
-    // Mohist 1.16.5+ remapping bug
-    public (NBTBaseHandle) NBTBase get_at:k(int index);
-#elseif version >= 1.16.5 && forge == magma
-    // Magma 1.16.5+ remapping bug
-    public (NBTBaseHandle) NBTBase get_at:k(int index);
-#elseif version >= 1.13
     public (NBTBaseHandle) NBTBase get_at:get(int index);
-#elseif version >= 1.12
-    public (NBTBaseHandle) NBTBase get_at:i(int index);
-#elseif version >= 1.9
-    public (NBTBaseHandle) NBTBase get_at:h(int index);
-#else
-    public (NBTBaseHandle) NBTBase get_at:g(int index);
-#endif
 
 #if version >= 1.14
     public void clear();
@@ -572,15 +512,7 @@ class NBTTagList extends NBTBase {
             throw new UnsupportedOperationException("Trying to set tag of type " +
                 nbt_value#getTagTypeId() + " in list of " + list_type);
         }
-  #if version >= 1.13
         NBTBase old_value = instance.get(index);
-  #elseif version >= 1.12
-        NBTBase old_value = instance.i(index);
-  #elseif version >= 1.9
-        NBTBase old_value = instance.h(index);
-  #else
-        NBTBase old_value = instance.g(index);
-  #endif
   #if version >= 1.18
         instance.setTag(index, nbt_value);
   #else
@@ -608,13 +540,7 @@ class NBTTagList extends NBTBase {
   #else
         NBTBase removed = instance.a(index);
   #endif
-  #if version >= 1.18
         if (instance.isEmpty()) {
-  #elseif forge_nms_obfuscated
-        if (instance.b_()) {
-  #else
-        if (instance.isEmpty()) {
-  #endif
             instance#type = (byte) 0;
         }
         return removed;
@@ -712,13 +638,7 @@ class NBTTagCompound extends NBTBase {
     }
     </code>
 
-#if version >= 1.18
     public boolean isEmpty();
-#elseif forge_nms_obfuscated
-    public boolean isEmpty:b_();
-#else
-    public boolean isEmpty();
-#endif
 
 #if version >= 1.18
     public int size();

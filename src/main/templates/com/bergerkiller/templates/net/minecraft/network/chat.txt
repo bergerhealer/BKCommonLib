@@ -185,18 +185,11 @@ class IChatBaseComponent {
     class IChatBaseComponent.ChatSerializer {
         #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
-#if version >= 1.18
         public static String chatComponentToJson:toJson((IChatBaseComponentHandle) IChatBaseComponent chatComponent);
-#else
-        public static String chatComponentToJson:a((IChatBaseComponentHandle) IChatBaseComponent chatComponent);
-#endif
-
-#if version >= 1.18
+#if version >= 1.16
         public static (IChatBaseComponentHandle) IChatMutableComponent jsonToChatComponent:fromJson(String jsonString);
-#elseif version >= 1.16
-        public static (IChatBaseComponentHandle) IChatMutableComponent jsonToChatComponent:a(String jsonString);
 #else
-        public static (IChatBaseComponentHandle) IChatBaseComponent jsonToChatComponent:a(String jsonString);
+        public static (IChatBaseComponentHandle) IChatBaseComponent jsonToChatComponent:fromJson(String jsonString);
 #endif
 
         public static (IChatBaseComponentHandle) IChatBaseComponent empty() {

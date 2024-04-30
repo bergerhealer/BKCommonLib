@@ -1,12 +1,20 @@
 package net.minecraft.world.item;
 
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomData;
+
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTNumber;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagLong;
 
+import net.minecraft.world.level.saveddata.maps.MapId;
+
 #require net.minecraft.world.item.ItemStack public int getItemStackMapId() {
-#if version >= 1.13
+#if version >= 1.20.5
+    MapId mapId = (MapId) instance.get(DataComponents.MAP_ID);
+    return (mapId == null) ? -1 : mapId.id();
+#elseif version >= 1.13
     NBTTagCompound metadata = instance.getTag();
     if (metadata == null) {
         return -1;
@@ -30,7 +38,16 @@ import net.minecraft.nbt.NBTTagLong;
 }
 
 #require net.minecraft.world.item.ItemStack public java.util.UUID getItemStackMapDisplayUUID() {
+#if version >= 1.20.5
+    CustomData customData = (CustomData) instance.get(DataComponents.CUSTOM_DATA);
+    if (customData == null) {
+        return null;
+    }
+
+    NBTTagCompound metadata = customData.getUnsafe(); // Note: unmodifiable!
+#else
     NBTTagCompound metadata = instance.getTag();
+#endif
     if (metadata != null) {
         NBTBase mapDisplayUUIDMost = metadata.get("mapDisplayUUIDMost");
         if (mapDisplayUUIDMost instanceof NBTTagLong) {
