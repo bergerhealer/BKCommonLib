@@ -21,7 +21,7 @@ import com.bergerkiller.mountiplex.reflection.util.UniqueHash;
 
 public class MapDisplayMarkers {
     public static final UniqueHash RANDOM_NAME_SOURCE = new UniqueHash();
-    public static final MapDisplayMarkerApplier APPLIER = Template.Class.create(MapDisplayMarkerApplier.class, Common.TEMPLATE_RESOLVER);
+    public static final MapDisplayMarkerConverter APPLIER = Template.Class.create(MapDisplayMarkerConverter.class, Common.TEMPLATE_RESOLVER);
     private final Map<String, Entry> markersById = new HashMap<>();
     private final Map<IntVector2, MapDisplayMarkerTile> markersByTile = new HashMap<>();
 
@@ -140,13 +140,11 @@ public class MapDisplayMarkers {
                 // Requires update, ask the tile to do this
                 if (mapUpdate == null) {
                     mapUpdate = new MapDisplayTile.Update(displayedTile.tile, displayedTile.getMapId());
-                    APPLIER.apply(mapUpdate.packet.getRaw(), tile);
-                } else {
-                    mapUpdate = mapUpdate.clone();
+                    mapUpdate.packet.cursors_raw(APPLIER.getMapIcons(tile));
                 }
 
-                // Send to this player
-                PacketUtil.sendPacket(owner.player, mapUpdate.packet, false);
+                // Send to this player. Makes a new packet each time, as the pixels byte[] array is mutable.
+                PacketUtil.sendPacket(owner.player, mapUpdate.packet.create(), false);
             }
         }
 
@@ -176,10 +174,10 @@ public class MapDisplayMarkers {
     public boolean addMarkersToUpdate(Player viewer, MapDisplayTile.Update mapUpdate) {
         MapDisplayMarkerTile tile = markersByTile.get(mapUpdate.tile);
         if (tile == null) {
-            mapUpdate.packet.setCursors(Collections.emptyList());
+            mapUpdate.packet.no_cursors();
             return false;
         } else {
-            APPLIER.apply(mapUpdate.packet.getRaw(), tile);
+            mapUpdate.packet.cursors_raw(APPLIER.getMapIcons(tile));
             return tile.isChangedFor(viewer);
         }
     }

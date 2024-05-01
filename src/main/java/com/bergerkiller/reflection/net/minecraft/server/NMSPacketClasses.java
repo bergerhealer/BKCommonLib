@@ -1307,17 +1307,6 @@ public class NMSPacketClasses {
     }
 
     public static class NMSPacketPlayOutMap extends NMSPacket {
-
-        public final FieldAccessor<Integer> mapId = PacketPlayOutMapHandle.T.mapId.toFieldAccessor();
-        public final FieldAccessor<Byte> scale = PacketPlayOutMapHandle.T.scale.toFieldAccessor();
-        public final FieldAccessor<List<MapCursor>> cursors = PacketPlayOutMapHandle.T.cursors.toFieldAccessor();
-        public final FieldAccessor<Integer> startX = FieldAccessor.wrapMethods(PacketPlayOutMapHandle.T.getStartX, PacketPlayOutMapHandle.T.setStartX);
-        public final FieldAccessor<Integer> startY = FieldAccessor.wrapMethods(PacketPlayOutMapHandle.T.getStartY, PacketPlayOutMapHandle.T.setStartY);
-        public final FieldAccessor<Integer> width = FieldAccessor.wrapMethods(PacketPlayOutMapHandle.T.getWidth, PacketPlayOutMapHandle.T.setWidth);
-        public final FieldAccessor<Integer> height = FieldAccessor.wrapMethods(PacketPlayOutMapHandle.T.getHeight, PacketPlayOutMapHandle.T.setHeight);
-        public final FieldAccessor<byte[]> pixels = FieldAccessor.wrapMethods(PacketPlayOutMapHandle.T.getPixels, PacketPlayOutMapHandle.T.setPixels);
-        public final FieldAccessor<Boolean> locked = FieldAccessor.wrapMethods(PacketPlayOutMapHandle.T.isLocked, PacketPlayOutMapHandle.T.setLocked);
-        public final FieldAccessor<Boolean> track = FieldAccessor.wrapMethods(PacketPlayOutMapHandle.T.isTrack, PacketPlayOutMapHandle.T.setTrack);
     }
 
     public static class NMSPacketPlayOutMapChunk extends NMSPacket {

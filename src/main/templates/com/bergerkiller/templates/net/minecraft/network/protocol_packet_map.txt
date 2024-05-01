@@ -6,243 +6,386 @@ import net.minecraft.world.level.saveddata.maps.WorldMap;
 import net.minecraft.world.level.saveddata.maps.WorldMap$PatchData;
 
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapHandle.Builder;
 
 class PacketPlayOutMap extends Packet {
-#if version >= 1.17
-    private int mapId;
-    private byte scale;
+
+    <code>
+    public static class Builder implements Cloneable {
+        private int mapId = 0;
+        private byte scale = (byte) 1;
+        private boolean locked = false;
+        private java.util.Optional<java.util.List<Object>> nmsMapIcons = java.util.Optional.empty();
+        private boolean hasData = false;
+        private int startX, startY;
+        private int width, height;
+        private byte[] colors = null;
+
+        private Builder() {
+        }
+
+        public int get_mapId() {
+            return this.mapId;
+        }
+
+        public byte get_scale() {
+            return scale;
+        }
+
+        public boolean get_locked() {
+            return locked;
+        }
+
+        public java.util.Optional<java.util.List<org.bukkit.map.MapCursor>> get_cursors() {
+            return nmsMapIcons.map(list -> new com.bergerkiller.mountiplex.conversion.util.ConvertingList<>(list,
+                com.bergerkiller.bukkit.common.conversion.DuplexConversion.mapCursor));
+        }
+
+        public java.util.Optional<java.util.List<Object>> get_cursors_raw() {
+            return nmsMapIcons;
+        }
+
+        public boolean has_data() {
+            return hasData;
+        }
+
+        public int get_data_startX() {
+            return startX;
+        }
+
+        public int get_data_startY() {
+            return startY;
+        }
+
+        public int get_data_width() {
+            return width;
+        }
+
+        public int get_data_height() {
+            return height;
+        }
+
+        public byte[] get_data_colors() {
+            return colors;
+        }
+
+        public Builder mapId(int mapId) {
+            this.mapId = mapId;
+            return this;
+        }
+
+        public Builder scale(byte scale) {
+            this.scale = scale;
+            return this;
+        }
+
+        public Builder locked(boolean locked) {
+            this.locked = locked;
+            return this;
+        }
+
+        private List<Object> convertCursors(java.util.List<org.bukkit.map.MapCursor> cursors) {
+            return new com.bergerkiller.mountiplex.conversion.util.ConvertingList<>(cursors,
+                    com.bergerkiller.bukkit.common.conversion.DuplexConversion.mapCursor.reverse());
+        }
+
+        public Builder no_cursors() {
+            return this.cursors_raw(java.util.Collections.emptyList());
+        }
+
+        public Builder cursors(java.util.List<org.bukkit.map.MapCursor> cursors) {
+            return this.cursors_raw(convertCursors(cursors));
+        }
+
+        public Builder cursors_raw(java.util.List<Object> rawCursors) {
+            this.nmsMapIcons = java.util.Optional.of(rawCursors);
+            return this;
+        }
+
+        public Builder add_cursors(java.util.List<org.bukkit.map.MapCursor> cursors) {
+            return add_cursors_raw(convertCursors(cursors));
+        }
+
+        public Builder add_cursors_raw(java.util.List<Object> rawCursors) {
+            if (!this.nmsMapIcons.isPresent()) {
+                this.cursors_raw(rawCursors);
+            } else if (!rawCursors.isEmpty()) {
+                java.util.List<Object> existing = this.nmsMapIcons.get();
+                java.util.List<Object> newList = new java.util.ArrayList<>(existing.size() + rawCursors.size());
+                newList.addAll(existing);
+                newList.addAll(rawCursors);
+                this.nmsMapIcons = java.util.Optional.of(newList);
+            }
+            return this;
+        }
+
+        public Builder data(int startX, int startY, int width, int height, byte[] colors) {
+            this.startX = startX;
+            this.startY = startY;
+            this.width = width;
+            this.height = height;
+            this.colors = colors;
+            this.hasData = true;
+            return this;
+        }
+
+        @Override
+        public Builder clone() {
+            Builder copy = new Builder();
+            copy.mapId = this.mapId;
+            copy.scale = this.scale;
+            copy.locked = this.locked;
+            copy.nmsMapIcons = this.nmsMapIcons;
+            copy.startX = this.startX;
+            copy.startY = this.startY;
+            copy.width = this.width;
+            copy.height = this.height;
+            copy.colors = this.colors;
+            copy.hasData = this.hasData;
+            return copy;
+        }
+
+        public PacketPlayOutMapHandle create() {
+            return createNew(this);
+        }
+    }
+
+    public static Builder build() {
+        return new Builder();
+    }
+
+    public Builder mutable() {
+        Builder b = build()
+            .mapId(getMapId())
+            .scale(getScale())
+            .locked(isLocked());
+        if (hasCursors()) {
+            b.cursors(getCursors());
+        }
+        if (hasPixels()) {
+            b.data(getStartX(), getStartY(), getWidth(), getHeight(), getPixels());
+        }
+        return b;
+    }
+    </code>
+
+#if version >= 1.20.5
+    public int getMapId() {
+        return instance.mapId().id();
+    }
+    public byte getScale:scale();
+    public boolean isLocked:locked();
+#elseif version >= 1.18
+    public int getMapId();
+    public byte getScale();
+    public boolean isLocked();
+#elseif version >= 1.17
+    public int getMapId:b();
+    public byte getScale:c();
+    public boolean isLocked:d();
 #else
-    private int mapId:a;
-    private byte scale:b;
-#endif
-
-#if version >= 1.17
-    private final (List<org.bukkit.map.MapCursor>) List<MapIcon> cursors:decorations;
-#elseif version >= 1.14
-    private (List<org.bukkit.map.MapCursor>) MapIcon[] cursors:e;
-#elseif version >= 1.9
-    private (List<org.bukkit.map.MapCursor>) MapIcon[] cursors:d;
-#else
-    private (List<org.bukkit.map.MapCursor>) MapIcon[] cursors:c;
-#endif
-
-#if version >= 1.17
-    // Since 1.17 the region coordinates and pixel data are in a separate 'Patch' class
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private final net.minecraft.world.level.saveddata.maps.WorldMap$PatchData colorPatch;
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap public net.minecraft.world.level.saveddata.maps.WorldMap$PatchData createPatchData() {
-        WorldMap$PatchData colorPatch;
-        colorPatch = instance#colorPatch;
-        if (colorPatch == null) {
-            colorPatch = new WorldMap$PatchData(0, 0, 0, 0, new byte[0]);
-            instance#colorPatch = colorPatch;
-        }
-        return colorPatch;
+    public int getMapId() {
+        #require net.minecraft.network.protocol.game.PacketPlayOutMap private int mapId:a;
+        return instance#mapId;
     }
-
-    // All fields inside the PatchData class
-    #require net.minecraft.world.level.saveddata.maps.WorldMap$PatchData public final int startX;
-    #require net.minecraft.world.level.saveddata.maps.WorldMap$PatchData public final int startY;
-    #require net.minecraft.world.level.saveddata.maps.WorldMap$PatchData public final int width;
-    #require net.minecraft.world.level.saveddata.maps.WorldMap$PatchData public final int height;
-    #require net.minecraft.world.level.saveddata.maps.WorldMap$PatchData public final byte[] mapColors;
-
-    public int getStartX() {
-        WorldMap$PatchData colorPatch = instance#colorPatch;
-        if (colorPatch == null) {
-            return 0;
-        } else {
-            return colorPatch#startX;
-        }
+    public byte getScale() {
+        #require net.minecraft.network.protocol.game.PacketPlayOutMap private byte scale:b;
+        return instance#scale;
     }
-
-    public void setStartX(int startx) {
-        WorldMap$PatchData colorPatch = instance#createPatchData();
-        colorPatch#startX = startx;
-    }
-
-    public int getStartY() {
-        WorldMap$PatchData colorPatch = instance#colorPatch;
-        if (colorPatch == null) {
-            return 0;
-        } else {
-            return colorPatch#startY;
-        }
-    }
-
-    public void setStartY(int starty) {
-        WorldMap$PatchData colorPatch = instance#createPatchData();
-        colorPatch#startY = starty;
-    }
-
-    public int getWidth() {
-        WorldMap$PatchData colorPatch = instance#colorPatch;
-        if (colorPatch == null) {
-            return 0;
-        } else {
-            return colorPatch#width;
-        }
-    }
-
-    public void setWidth(int width) {
-        WorldMap$PatchData colorPatch = instance#createPatchData();
-        colorPatch#width = width;
-    }
-
-    public int getHeight() {
-        WorldMap$PatchData colorPatch = instance#colorPatch;
-        if (colorPatch == null) {
-            return 0;
-        } else {
-            return colorPatch#height;
-        }
-    }
-
-    public void setHeight(int height) {
-        WorldMap$PatchData colorPatch = instance#createPatchData();
-        colorPatch#height = height;
-    }
-
-    public byte[] getPixels() {
-        WorldMap$PatchData colorPatch = instance#colorPatch;
-        if (colorPatch == null) {
-            return null;
-        } else {
-            return colorPatch#mapColors;
-        }
-    }
-
-    public void setPixels(byte[] pixels) {
-        WorldMap$PatchData colorPatch = instance#createPatchData();
-        colorPatch#mapColors = pixels;
-    }
-
-    public void setPixelData(int startX, int startY, int width, int height, byte[] pixels) {
-        WorldMap$PatchData colorPatch = new WorldMap$PatchData(startX, startY, width, height, pixels);
-        instance#colorPatch = colorPatch;
-    }
-
-#else
-    // On Minecraft 1.16.5 and earlier all fields were in the packet itself
+    public boolean isLocked() {
   #if version >= 1.14
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int startx:f;
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int starty:g;
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int width:h;
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int height:i;
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private byte[] pixels:j;
-  #elseif version >= 1.9
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int startx:e;
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int starty:f;
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int width:g;
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int height:h;
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private byte[] pixels:i;
+        #require net.minecraft.network.protocol.game.PacketPlayOutMap private boolean locked:d;
+        return instance#locked;
   #else
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int startx:d;
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int starty:e;
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int width:f;
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int height:g;
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private byte[] pixels:h;
+        return false;
+  #endif
+    }
+#endif
+
+#if version >= 1.20.5
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap public WorldMap$PatchData getColorPatch() {
+        return (WorldMap$PatchData) instance.colorPatch().orElse(null);
+    }
+
+    public boolean hasCursors() {
+        return instance.decorations().isPresent();
+    }
+    public (java.util.List<org.bukkit.map.MapCursor>) java.util.List<MapIcon> getCursors() {
+        return (java.util.List) instance.decorations().orElse(null);
+    }
+    public int getStartX() {
+        WorldMap$PatchData data = instance#getColorPatch();
+        return (data == null) ? 0 : data.startX();
+    }
+    public int getStartY() {
+        WorldMap$PatchData data = instance#getColorPatch();
+        return (data == null) ? 0 : data.startY();
+    }
+    public int getWidth() {
+        WorldMap$PatchData data = instance#getColorPatch();
+        return (data == null) ? 0 : data.width();
+    }
+    public int getHeight() {
+        WorldMap$PatchData data = instance#getColorPatch();
+        return (data == null) ? 0 : data.height();
+    }
+    public boolean hasPixels() {
+        return instance.colorPatch().isPresent();
+    }
+    public byte[] getPixels() {
+        WorldMap$PatchData data = instance#getColorPatch();
+        return (data == null) ? null : data.mapColors();
+    }
+#elseif version >= 1.17
+    // Since 1.17 the region coordinates and pixel data are in a separate 'Patch' class
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly final List<MapIcon> cursors:decorations;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private final net.minecraft.world.level.saveddata.maps.WorldMap$PatchData colorPatch;
+
+    public boolean hasCursors() {
+        java.util.List cursors = instance#cursors;
+        return cursors != null;
+    }
+    public (java.util.List<org.bukkit.map.MapCursor>) java.util.List<MapIcon> getCursors() {
+        return instance#cursors;
+    }
+    public int getStartX() {
+        #require net.minecraft.world.level.saveddata.maps.WorldMap$PatchData public final readonly int startX;
+        WorldMap$PatchData colorPatch = instance#colorPatch;
+        return (colorPatch == null) ? 0 : colorPatch#startX;
+    }
+    public int getStartY() {
+        #require net.minecraft.world.level.saveddata.maps.WorldMap$PatchData public final readonly int startY;
+        WorldMap$PatchData colorPatch = instance#colorPatch;
+        return (colorPatch == null) ? 0 : colorPatch#startY;
+    }
+    public int getWidth() {
+        #require net.minecraft.world.level.saveddata.maps.WorldMap$PatchData public final readonly int width;
+        WorldMap$PatchData colorPatch = instance#colorPatch;
+        return (colorPatch == null) ? 0 : colorPatch#width;
+    }
+    public int getHeight() {
+        #require net.minecraft.world.level.saveddata.maps.WorldMap$PatchData public final readonly int height;
+        WorldMap$PatchData colorPatch = instance#colorPatch;
+        return (colorPatch == null) ? 0 : colorPatch#height;
+    }
+    public boolean hasPixels() {
+        WorldMap$PatchData colorPatch = instance#colorPatch;
+        return colorPatch != null;
+    }
+    public byte[] getPixels() {
+        #require net.minecraft.world.level.saveddata.maps.WorldMap$PatchData public final readonly byte[] mapColors;
+        WorldMap$PatchData colorPatch = instance#colorPatch;
+        return (colorPatch == null) ? null : colorPatch#mapColors;
+    }
+#else
+  #if version >= 1.14
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly MapIcon[] cursors:e;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly int startx:f;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly int starty:g;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly int width:h;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly int height:i;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly byte[] pixels:j;
+  #elseif version >= 1.9
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly MapIcon[] cursors:d;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly int startx:e;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly int starty:f;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly int width:g;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly int height:h;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly byte[] pixels:i;
+  #else
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly MapIcon[] cursors:c;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly int startx:d;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly int starty:e;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly int width:f;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly int height:g;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private readonly byte[] pixels:h;
   #endif
 
+    public boolean hasCursors() {
+        MapIcon[] cursors = instance#cursors;
+        return cursors != null;
+    }
+    public (java.util.List<org.bukkit.map.MapCursor>) java.util.List<MapIcon> getCursors() {
+        MapIcon[] cursors = instance#cursors;
+        return (cursors == null) ? java.util.Collections.emptyList() : java.util.Arrays.asList(cursors);
+    }
     public int getStartX() {
         return instance#startx;
     }
-
-    public void setStartX(int startx) {
-        instance#startx = startx;
-    }
-
     public int getStartY() {
         return instance#starty;
     }
-
-    public void setStartY(int starty) {
-        instance#starty = starty;
-    }
-
     public int getWidth() {
         return instance#width;
     }
-
-    public void setWidth(int width) {
-        instance#width = width;
-    }
-
     public int getHeight() {
         return instance#height;
     }
-
-    public void setHeight(int height) {
-        instance#height = height;
+    public boolean hasPixels() {
+        byte[] pixels = instance#pixels;
+        return pixels != null;
     }
-
     public byte[] getPixels() {
         return instance#pixels;
     }
-
-    public void setPixels(byte[] pixels) {
-        instance#pixels = pixels;
-    }
-
-    public void setPixelData(int startX, int startY, int width, int height, byte[] pixels) {
-        instance#startx = startX;
-        instance#starty = startY;
-        instance#width = width;
-        instance#height = height;
-        instance#pixels = pixels;
-    }
 #endif
 
-#if version >= 1.14
-  #if version >= 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private final boolean locked;
-  #else
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private boolean locked:d;
-  #endif
-
-    public boolean isLocked() {
-        return instance#locked;
-    }
-
-    public void setLocked(boolean locked) {
-        instance#locked = locked;
-    }
-#else
-    public boolean isLocked() {
-        return false;
-    }
-
-    public void setLocked(boolean locked) {
-    }
-#endif
-
-#if version >= 1.9 && version < 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private boolean track:c;
-
-    public boolean isTrack() {
-        return instance#track;
-    }
-
-    public void setTrack(boolean track) {
-        instance#track = track;
-    }
-#else
-    public boolean isTrack() {
-        return false;
-    }
-
-    public void setTrack(boolean track) {
-    }
-#endif
-
-    public static (PacketPlayOutMapHandle) PacketPlayOutMap createNew() {
+    public static (PacketPlayOutMapHandle) PacketPlayOutMap createNew(PacketPlayOutMapHandle.Builder builder) {
+        // Convert Bukkit MapCursor -> MapIcon
+        java.util.List mapIconsList;
+        if (builder.get_cursors().isPresent()) {
+            java.util.List mapCursors = (java.util.List) builder.get_cursors().get();
+            mapIconsList = new java.util.ArrayList(mapCursors.size());
+            for (int i = 0; i < mapCursors.size(); i++) {
+                org.bukkit.map.MapCursor cursor = (org.bukkit.map.MapCursor) mapCursors.get(i);
+                MapIcon icon = (MapIcon) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toMapIconHandle(cursor);
+                if (icon != null) {
+                    mapIconsList.add(icon);
+                }
+            }
+        } else {
 #if version >= 1.17
-        return new PacketPlayOutMap(0, (byte) 1, false, null, null);
-#elseif version >= 1.14
-        return new PacketPlayOutMap(0, (byte) 1, false, false, java.util.Collections.emptyList(), null, 0, 0, 0, 0);
-#elseif version >= 1.9
-        return new PacketPlayOutMap(0, (byte) 1, false, java.util.Collections.emptyList(), null, 0, 0, 0, 0);
+            mapIconsList = null;
 #else
-        return new PacketPlayOutMap(0, (byte) 1, java.util.Collections.emptyList(), null, 0, 0, 0, 0);
+            mapIconsList = java.util.Collections.emptyList();
+#endif
+        }
+
+        // Pack the pixel data into the PatchData class after MC 1.17
+#if version >= 1.17
+        WorldMap$PatchData patchData;
+        if (builder.has_data()) {
+            patchData = new WorldMap$PatchData(builder.get_data_startX(), builder.get_data_startY(),
+                                               builder.get_data_width(), builder.get_data_height(),
+                                               builder.get_data_pixels());
+        } else {
+            patchData = null;
+        }
+#endif
+
+#if version >= 1.20.5
+        java.util.Optional mapIconsOpt = builder.get_cursors().isPresent() ?
+                java.util.Optional.of(mapIconsList) : java.util.Optional.empty();
+        return new PacketPlayOutMap(new net.minecraft.world.level.saveddata.maps.MapId(builder.get_mapId()),
+                builder.get_scale(), builder.get_locked(), mapIconsOpt, patchData);
+#elseif version >= 1.17
+        return new PacketPlayOutMap(builder.get_mapId(), builder.get_scale(), builder.get_locked(), mapIconsList, patchData);
+#elseif version >= 1.14
+        boolean track = false;
+        return new PacketPlayOutMap(builder.get_mapId(), builder.get_scale(), track, builder.get_locked(), mapIconsList,
+                builder.get_data_startX(), builder.get_data_startY(),
+                builder.get_data_width(), builder.get_data_height(),
+                builder.get_data_pixels());
+#elseif version >= 1.9
+        return new PacketPlayOutMap(builder.get_mapId(), builder.get_scale(), builder.get_locked(), mapIconsList,
+                builder.get_data_startX(), builder.get_data_startY(),
+                builder.get_data_width(), builder.get_data_height(),
+                builder.get_data_pixels());
+#else
+        return new PacketPlayOutMap(builder.get_mapId(), builder.get_scale(), mapIconsList,
+                builder.get_data_startX(), builder.get_data_startY(),
+                builder.get_data_width(), builder.get_data_height(),
+                builder.get_data_pixels());
 #endif
     }
 }

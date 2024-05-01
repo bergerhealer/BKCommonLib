@@ -8,8 +8,6 @@ import org.bukkit.entity.Player;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.map.util.MapUUID;
-import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.utils.DebugUtil;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapHandle;
 
 /**
@@ -80,7 +78,7 @@ public class MapDisplayTile {
                 srcPos += stride;
                 dstPos += RESOLUTION;
             }
-            mapUpdate.packet.setPixelData(0, 0, RESOLUTION, RESOLUTION, pixels);
+            mapUpdate.packet.data(0, 0, RESOLUTION, RESOLUTION, pixels);
             return mapUpdate;
         } else if (tileClip.isDirty()) {
             int w = tileClip.getWidth();
@@ -95,7 +93,7 @@ public class MapDisplayTile {
                 dstPos += w;
             }
 
-            mapUpdate.packet.setPixelData(tileClip.getX(), tileClip.getY(), w, h, pixels);
+            mapUpdate.packet.data(tileClip.getX(), tileClip.getY(), w, h, pixels);
             return mapUpdate;
         } else {
             // No updates for this tile, only send if markers changed
@@ -108,23 +106,22 @@ public class MapDisplayTile {
      */
     public static final class Update implements Cloneable {
         public final IntVector2 tile;
-        public final PacketPlayOutMapHandle packet;
+        public final PacketPlayOutMapHandle.Builder packet;
 
         public Update(IntVector2 tile, int mapId) {
             this.tile = tile;
-            this.packet = PacketPlayOutMapHandle.createNew(); // Note: fully initializes a valid packet!
-            this.packet.setMapId(mapId);
+            this.packet = PacketPlayOutMapHandle.build();
+            this.packet.mapId(mapId);
         }
 
-        private Update(IntVector2 tile, PacketPlayOutMapHandle packet) {
+        private Update(IntVector2 tile, PacketPlayOutMapHandle.Builder packet) {
             this.tile = tile;
             this.packet = packet;
         }
 
         @Override
         public Update clone() {
-            return new Update(tile, PacketPlayOutMapHandle.createHandle(
-                            PacketType.OUT_MAP.cloneInstance(packet.getRaw())));
+            return new Update(tile, packet.clone());
         }
     }
 }

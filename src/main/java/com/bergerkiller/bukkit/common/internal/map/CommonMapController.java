@@ -19,6 +19,7 @@ import java.util.function.Predicate;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -723,7 +724,7 @@ public final class CommonMapController implements PacketListener, Listener {
     public synchronized void onPacketSend(PacketSendEvent event) {
         // Check if any virtual single maps are attached to this map
         if (event.getType() == PacketType.OUT_MAP) {
-            int itemid = event.getPacket().read(PacketType.OUT_MAP.mapId);
+            int itemid = PacketPlayOutMapHandle.createHandle(event.getPacket().getHandle()).getMapId();
             this.storeStaticMapId(itemid);
 
             // This used to be used to just cancel interfering plugins
