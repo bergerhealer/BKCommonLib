@@ -2255,11 +2255,14 @@ optional class PacketPlayOutSetCooldown extends Packet {
 // }
 
 class PacketPlayInSetCreativeSlot extends Packet {
-#if version >= 1.17
-    private int slot:slotNum;
+#if version >= 1.20.5
+    private (int) short slot:slotNum;
+    private (org.bukkit.inventory.ItemStack) ItemStack item:itemStack;
+#elseif version >= 1.17
+    private (int) int slot:slotNum;
     private (org.bukkit.inventory.ItemStack) ItemStack item:itemStack;
 #else
-    private int slot;
+    private (int) int slot;
     private (org.bukkit.inventory.ItemStack) ItemStack item:b;
 #endif
 }

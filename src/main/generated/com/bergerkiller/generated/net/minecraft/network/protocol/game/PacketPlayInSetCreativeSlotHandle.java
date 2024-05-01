@@ -30,7 +30,7 @@ public abstract class PacketPlayInSetCreativeSlotHandle extends PacketHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayInSetCreativeSlotClass extends Template.Class<PacketPlayInSetCreativeSlotHandle> {
-        public final Template.Field.Integer slot = new Template.Field.Integer();
+        public final Template.Field.Converted<Integer> slot = new Template.Field.Converted<Integer>();
         public final Template.Field.Converted<ItemStack> item = new Template.Field.Converted<ItemStack>();
 
     }

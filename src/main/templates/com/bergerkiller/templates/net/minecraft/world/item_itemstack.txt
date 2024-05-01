@@ -211,7 +211,11 @@ class ItemStack {
                         if (loreLine instanceof NBTTagString) {
                             String line = ((NBTTagString) loreLine).getAsString();
                             IChatBaseComponent lineComponent;
-  #if version >= 1.14
+  #if version >= 1.20.5
+                            // Decode JSON into chat component (uses Minecraft's main server registry)
+                            lineComponent = net.minecraft.network.chat.IChatBaseComponent$ChatSerializer.fromJson(line,
+                                    net.minecraft.server.MinecraftServer.getDefaultRegistryAccess());
+  #elseif version >= 1.14
                             // Decode JSON into chat component
                             lineComponent = net.minecraft.network.chat.IChatBaseComponent$ChatSerializer.fromJson(line);
   #else

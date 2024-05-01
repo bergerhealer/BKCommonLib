@@ -185,8 +185,21 @@ class IChatBaseComponent {
     class IChatBaseComponent.ChatSerializer {
         #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
+#if version >= 1.20.5
+        public static String chatComponentToJson((IChatBaseComponentHandle) IChatBaseComponent chatComponent) {
+            return IChatBaseComponent$ChatSerializer.toJson(chatComponent,
+                    net.minecraft.server.MinecraftServer.getDefaultRegistryAccess());
+        }
+#else
         public static String chatComponentToJson:toJson((IChatBaseComponentHandle) IChatBaseComponent chatComponent);
-#if version >= 1.16
+#endif
+
+#if version >= 1.20.5
+        public static (IChatBaseComponentHandle) IChatMutableComponent jsonToChatComponent(String jsonString) {
+            return IChatBaseComponent$ChatSerializer.fromJson(jsonString,
+                    net.minecraft.server.MinecraftServer.getDefaultRegistryAccess());
+        }
+#elseif version >= 1.16
         public static (IChatBaseComponentHandle) IChatMutableComponent jsonToChatComponent:fromJson(String jsonString);
 #else
         public static (IChatBaseComponentHandle) IChatBaseComponent jsonToChatComponent:fromJson(String jsonString);

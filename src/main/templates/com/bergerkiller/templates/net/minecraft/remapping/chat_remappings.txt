@@ -1,12 +1,9 @@
 
-#select version >= 1.18
-#case 1.18:  #remap net.minecraft.network.chat.IChatBaseComponent.ChatSerializer public static net.minecraft.network.chat.IChatMutableComponent fromJson(String jsonString);
-#case 1.16:  #remap net.minecraft.network.chat.IChatBaseComponent.ChatSerializer public static net.minecraft.network.chat.IChatMutableComponent fromJson:a(String jsonString);
-#case else:  #remap net.minecraft.network.chat.IChatBaseComponent.ChatSerializer public static net.minecraft.network.chat.IChatBaseComponent fromJson:a(String jsonString);
-#endselect
-
-#if version >= 1.18
-  #remap net.minecraft.network.chat.IChatBaseComponent.ChatSerializer public static String toJson(net.minecraft.network.chat.IChatBaseComponent chatComponent);
-#else
+#if version < 1.18
+  #if version >= 1.16
+    #remap net.minecraft.network.chat.IChatBaseComponent.ChatSerializer public static net.minecraft.network.chat.IChatMutableComponent fromJson:a(String jsonString);
+  #else
+    #remap net.minecraft.network.chat.IChatBaseComponent.ChatSerializer public static net.minecraft.network.chat.IChatBaseComponent fromJson:a(String jsonString);
+  #endif
   #remap net.minecraft.network.chat.IChatBaseComponent.ChatSerializer public static String toJson:a(net.minecraft.network.chat.IChatBaseComponent chatComponent);
 #endif
