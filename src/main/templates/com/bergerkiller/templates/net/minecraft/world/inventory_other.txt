@@ -4,6 +4,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.IInventory;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.player.EntityHuman;
 
 import com.bergerkiller.generated.net.minecraft.world.inventory.SlotHandle;
 import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle;
@@ -12,13 +13,25 @@ import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerAnvilHa
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 
 class InventoryEnderChest extends IInventory {
-#if version >= 1.18
+#if version >= 1.20.5
+    public void loadFromNBT((CommonTagList) NBTTagList nbttaglist) {
+        #require InventoryEnderChest private final EntityHuman owner;
+        EntityHuman owner = instance#owner;
+        instance.fromTag(nbttaglist, owner.registryAccess());
+    }
+#elseif version >= 1.18
     public void loadFromNBT:fromTag((CommonTagList) NBTTagList nbttaglist)
 #else
     public void loadFromNBT:a((CommonTagList) NBTTagList nbttaglist)
 #endif
 
-#if version >= 1.18
+#if version >= 1.20.5
+    public (CommonTagList) NBTTagList saveToNBT() {
+        #require InventoryEnderChest private final EntityHuman owner;
+        EntityHuman owner = instance#owner;
+        return instance.createTag(owner.registryAccess());
+    }
+#elseif version >= 1.18
     public (CommonTagList) NBTTagList saveToNBT:createTag()
 #elseif version >= 1.16
     public (CommonTagList) NBTTagList saveToNBT:g()

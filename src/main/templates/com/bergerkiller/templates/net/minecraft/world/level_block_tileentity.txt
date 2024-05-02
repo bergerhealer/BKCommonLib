@@ -74,7 +74,11 @@ class TileEntity {
 #endif
     }
 
-#if version >= 1.17
+#if version >= 1.20.5
+    public void load((BlockData) IBlockData blockData, (CommonTagCompound) NBTTagCompound nbttagcompound) {
+        instance.loadWithComponents(nbttagcompound, instance.getLevel().registryAccess());
+    }
+#elseif version >= 1.17
     public void load((BlockData) IBlockData blockData, (CommonTagCompound) NBTTagCompound nbttagcompound) {
         instance.load(nbttagcompound);
     }
@@ -90,7 +94,11 @@ class TileEntity {
     }
 #endif
 
-#if version >= 1.18
+#if version >= 1.20.5
+    public final (CommonTagCompound) NBTTagCompound save() {
+        return instance.saveWithFullMetadata(instance.getLevel().registryAccess());
+    }
+#elseif version >= 1.18
     public final (CommonTagCompound) NBTTagCompound save:saveWithFullMetadata();
 #else
     public (CommonTagCompound) NBTTagCompound save() {
