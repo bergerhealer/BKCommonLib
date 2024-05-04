@@ -6,7 +6,6 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.block.Block;
-import org.bukkit.map.MapCursor;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -362,11 +361,6 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.resources.ResourceKey<V>")
     public static Object toResourceKeyHandle(ResourceKey<?> resourceKeyWrapper) {
         return resourceKeyWrapper.getRawHandle();
-    }
-
-    @ConverterMethod(output="net.minecraft.world.level.saveddata.maps.MapIcon")
-    public static Object toMapIconHandle(MapCursor cursor) {
-        return MapIconHandle.fromCursor(cursor).getRaw();
     }
 
     @ConverterMethod

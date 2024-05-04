@@ -1411,4 +1411,35 @@ public class LogicUtil {
             return defaultValue;
         }
     }
+
+    /**
+     * Gets a value from a Map. If the value does not exist, calls the function to compute a value.
+     * <b>The value is not stored in the map.</b>
+     *
+     * @param map Map
+     * @param key Key
+     * @param computer Function to compute a value if absent from the Map
+     * @return Value from Map, or computed value
+     * @param <K> Map Key Type
+     * @param <V> Map Value Type
+     */
+    public static <K, V> V getOrComputeDefault(Map<K, V> map, K key, Function<? super K, ? extends V> computer) {
+        V value = map.get(key);
+        return (value != null) ? value : computer.apply(key);
+    }
+
+    /**
+     * Gets a value from a Map. If the value does not exist, calls the supplier to compute a value.
+     * <b>The value is not stored in the map.</b>
+     *
+     * @param map Map
+     * @param key Key
+     * @param supplier Supplier to compute a value if absent from the Map
+     * @return Value from Map, or computed value
+     * @param <V> Map Value Type
+     */
+    public static <V> V getOrSupplyDefault(Map<?, V> map, Object key, Supplier<? extends V> supplier) {
+        V value = map.get(key);
+        return (value != null) ? value : supplier.get();
+    }
 }

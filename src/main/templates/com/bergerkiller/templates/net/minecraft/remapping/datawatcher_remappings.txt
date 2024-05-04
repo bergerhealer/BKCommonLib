@@ -1,0 +1,8 @@
+
+#select version >=
+#case 1.20.5:  #remap net.minecraft.network.syncher.DataWatcher private final net.minecraft.network.syncher.SyncedDataHolder owner:entity;
+#case 1.14.4:  #remap net.minecraft.network.syncher.DataWatcher private final net.minecraft.world.entity.Entity owner:entity;
+#case 1.10.2:  #remap net.minecraft.network.syncher.DataWatcher private final net.minecraft.world.entity.Entity owner:c;
+#case 1.9:     #remap net.minecraft.network.syncher.DataWatcher private final net.minecraft.world.entity.Entity owner:b;
+#case else:    #remap net.minecraft.network.syncher.DataWatcher private final net.minecraft.world.entity.Entity owner:a;
+#endselect

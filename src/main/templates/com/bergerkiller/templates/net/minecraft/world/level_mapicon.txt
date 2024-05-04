@@ -1,22 +1,66 @@
 package net.minecraft.world.level.saveddata.maps;
 
 import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.resources.MinecraftKey;
 
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.bukkit.common.wrappers.Holder;
+
+import com.bergerkiller.bukkit.common.map.MapMarker.Type;
 
 import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapIconHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapIconHandle.TypeHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapDecorationTypeHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 
 class MapIcon {
+    #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
     <code>
-    public static MapIconHandle createNew(byte type, byte x, byte y, byte direction) {
+    public static MapIconHandle createNew(Type type, byte x, byte y, byte direction) {
         return createNew(type, x, y, direction, null);
     }
     </code>
 
-#if version >= 1.13
-    public static (MapIconHandle) MapIcon createNew((byte) MapIcon.Type type, byte x, byte y, byte direction, (ChatText) IChatBaseComponent title) {
+#if version >= 1.20.5
+    public static (MapIconHandle) MapIcon createNew((MapMarker.Type) net.minecraft.core.Holder<MapDecorationType> type, byte x, byte y, byte direction, (ChatText) IChatBaseComponent title) {
+        java.util.Optional titleOpt = java.util.Optional.ofNullable(title);
+        return new MapIcon(type, x, y, direction, titleOpt);
+    }
+
+    public static (MapIconHandle) MapIcon fromCursor(org.bukkit.map.MapCursor cursor) {
+        java.util.Optional titleOpt;
+        if (cursor.getCaption() != null) {
+            titleOpt = java.util.Optional.of(com.bergerkiller.bukkit.common.wrappers.ChatText.fromMessage(cursor.getCaption()).getRawHandle());
+        } else {
+            titleOpt = java.util.Optional.empty();
+        }
+        net.minecraft.core.Holder type = org.bukkit.craftbukkit.map.CraftMapCursor$CraftType.bukkitToMinecraftHolder(cursor.getType());
+
+        return new MapIcon(type, cursor.getX(), cursor.getY(), cursor.getDirection(), titleOpt);
+    }
+
+    public org.bukkit.map.MapCursor toCursor() {
+        java.util.Optional titleOpt = instance.name();
+        org.bukkit.map.MapCursor$Type type = org.bukkit.craftbukkit.map.CraftMapCursor$CraftType.minecraftHolderToBukkit(instance.type());
+
+        byte rotation = instance.rot();
+        byte x = instance.x();
+        byte y = instance.y();
+
+        if (titleOpt.isPresent()) {
+            return new org.bukkit.map.MapCursor(
+                x, y, rotation, type, true,
+                com.bergerkiller.bukkit.common.wrappers.ChatText.fromComponent(titleOpt.get()).getMessage()
+            );
+        } else {
+            return new org.bukkit.map.MapCursor(
+                x, y, rotation, type, true
+            );
+        }
+    }
+
+#elseif version >= 1.13
+    public static (MapIconHandle) MapIcon createNew((MapMarker.Type) MapDecorationType type, byte x, byte y, byte direction, (ChatText) IChatBaseComponent title) {
         return new MapIcon(type, x, y, direction, title);
     }
 
@@ -26,22 +70,22 @@ class MapIcon {
             title = (IChatBaseComponent) com.bergerkiller.bukkit.common.wrappers.ChatText.fromMessage(cursor.getCaption()).getRawHandle();
         }
   #if version >= 1.18
-        return new MapIcon(MapIcon$Type.byIcon(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), title);
+        return new MapIcon(MapDecorationType.byIcon(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), title);
   #else
-        return new MapIcon(MapIcon$Type.a(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), title);
+        return new MapIcon(MapDecorationType.a(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), title);
   #endif
     }
 
     public org.bukkit.map.MapCursor toCursor() {
   #if version >= 1.20.2
         IChatBaseComponent title = instance.name();
-        MapIcon$Type type = instance.type();
+        MapDecorationType type = instance.type();
   #elseif version >= 1.14.4
         IChatBaseComponent title = instance.getName();
-        MapIcon$Type type = instance.getType();
+        MapDecorationType type = instance.getType();
   #else
         IChatBaseComponent title = instance.g();
-        MapIcon$Type type = instance.b();
+        MapDecorationType type = instance.b();
   #endif
 
   #if version >= 1.20.2
@@ -72,13 +116,14 @@ class MapIcon {
             );
         }
     }
+
 #elseif version >= 1.11
-    public static (MapIconHandle) MapIcon createNew((byte) MapIcon.Type type, byte x, byte y, byte direction, (ChatText) IChatBaseComponent title) {
+    public static (MapIconHandle) MapIcon createNew((MapMarker.Type) MapDecorationType type, byte x, byte y, byte direction, (ChatText) IChatBaseComponent title) {
         return new MapIcon(type, x, y, direction);
     }
 
     public static (MapIconHandle) MapIcon fromCursor(org.bukkit.map.MapCursor cursor) {
-        return new MapIcon(MapIcon$Type.a(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection());
+        return new MapIcon(MapDecorationType.a(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection());
     }
 
     public org.bukkit.map.MapCursor toCursor() {
@@ -89,8 +134,8 @@ class MapIcon {
         );
     }
 #else
-    public static (MapIconHandle) MapIcon createNew(byte type, byte x, byte y, byte direction, (ChatText) IChatBaseComponent title) {
-         return new MapIcon(type, x, y, direction);
+    public static (MapIconHandle) MapIcon createNew((MapMarker.Type) byte typeId, byte x, byte y, byte direction, (ChatText) IChatBaseComponent title) {
+         return new MapIcon(typeId, x, y, direction);
     }
 
     public static (MapIconHandle) MapIcon fromCursor(org.bukkit.map.MapCursor cursor) {
@@ -106,24 +151,12 @@ class MapIcon {
     }
 #endif
 
-#if version >= 1.20.2
-    public byte getTypeId() {
-        return instance.getImage();
-    }
-#elseif version >= 1.18
-    public byte getTypeId() {
-        return instance.getType().getIcon();
-    }
-#elseif version >= 1.14.4
-    public byte getTypeId() {
-        return instance.getType().a();
-    }
-#elseif version >= 1.13
-    public byte getTypeId() {
-        return instance.b().a();
-    }
-#else
-    public byte getTypeId:getType();
+#select version >=
+#case 1.20.5:   public (MapMarker.Type) net.minecraft.core.Holder<MapDecorationType> getType:type();
+#case 1.20.2:   public (MapMarker.Type) MapDecorationType getType:type();
+#case 1.14.4:   public (MapMarker.Type) MapDecorationType getType();
+#case 1.13:     public (MapMarker.Type) MapDecorationType getType:b();
+#case else:     public (MapMarker.Type) byte getType();
 #endif
 
 #if version >= 1.20.2
@@ -139,12 +172,76 @@ class MapIcon {
     public byte getDirection:getRotation();
   #endif
 #endif
+}
 
-    optional class MapIcon.Type {
-#if version >= 1.18
-        public static (MapIconHandle.TypeHandle) MapIcon.Type fromId:byIcon(byte id);
+// Is our proxy MapDecorationType_1_8_to_1_10_2 class on 1.8 - 1.10.2
+// Is MapIcon.Type on 1.11 - 1.20.4
+class MapDecorationType {
+    #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
+
+#if version >= 1.20.5
+    public (MinecraftKeyHandle) MinecraftKey getName:assetId();
+#elseif version >= 1.20.2
+    public (MinecraftKeyHandle) MinecraftKey getName() {
+        return new MinecraftKey(instance.getSerializedName());
+    }
 #else
-        public static (MapIconHandle.TypeHandle) MapIcon.Type fromId:a(byte id);
+    public (MinecraftKeyHandle) MinecraftKey getName() {
+        // Enum with constant values. The names were based on these enum names, but lower-cased
+        return new MinecraftKey(instance.name().toLowerCase(java.util.Locale.ENGLISH));
+    }
+#endif
+
+#if version >= 1.20.5
+    public boolean isShownOnItemFrame:showOnItemFrame();
+#elseif version >= 1.18
+    public boolean isShownOnItemFrame:isRenderedOnFrame();
+#elseif version >= 1.17
+    public boolean isShownOnItemFrame:b();
+#else
+    public boolean isShownOnItemFrame() {
+  #if version >= 1.13
+        #require net.minecraft.world.level.saveddata.maps.MapDecorationType private final readonly boolean shownOnItemFrames:C;
+  #else
+        #require net.minecraft.world.level.saveddata.maps.MapDecorationType private final readonly boolean shownOnItemFrames:l;
+  #endif
+        return instance#shownOnItemFrames;
+    }
+#endif
+
+    public org.bukkit.map.MapCursor.Type toBukkit() {
+#if version >= 1.20.5
+        return org.bukkit.craftbukkit.map.CraftMapCursor$CraftType.minecraftToBukkit(instance);
+#elseif version >= 1.18
+        return org.bukkit.map.MapCursor$Type.byValue(instance.getIcon());
+#else
+        return org.bukkit.map.MapCursor$Type.byValue(instance.a());
 #endif
     }
+
+#if version >= 1.20.5
+    // On this version no internal id exists anymore, and it's all done by cursor name
+    // However, there's still a deprecated Bukkit API with an id, so we can use that instead.
+    // This is very unlikely to actually be called by anyone.
+    public byte getId() {
+        org.bukkit.map.MapCursor$Type bukkitType = org.bukkit.craftbukkit.map.CraftMapCursor$CraftType.minecraftToBukkit(instance);
+        return bukkitType.getValue();
+    }
+#elseif version >= 1.18
+    public byte getId:getIcon();
+#else
+    public byte getId:a();
+#endif
+
+#if version >= 1.20.5
+    public static (List<Holder<MapDecorationTypeHandle>>) List<net.minecraft.core.Holder<MapDecorationType>> getValues() {
+        return net.minecraft.core.registries.BuiltInRegistries.MAP_DECORATION_TYPE
+                .holders()
+                .collect(java.util.stream.Collectors.toList());
+    }
+#else
+    public static (List<Holder<MapDecorationTypeHandle>>) List<MapDecorationType> getValues() {
+        return java.util.Arrays.asList(MapDecorationType.values());
+    }
+#endif
 }

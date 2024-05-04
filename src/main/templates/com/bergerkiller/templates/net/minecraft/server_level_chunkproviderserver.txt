@@ -66,7 +66,7 @@ class ChunkProviderServer {
     }
 
     public static (org.bukkit.Chunk) net.minecraft.world.level.chunk.IChunkAccess unpackGetChunkAsyncResult((Object) net.minecraft.server.level.ChunkResult result) {
-        return (net.minecraft.world.level.chunk.IChunkAccess) result.orElse(null);
+        return (net.minecraft.world.level.chunk.IChunkAccess) result.orElse((Object) null);
     }
 #elseif version >= 1.14
     public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {

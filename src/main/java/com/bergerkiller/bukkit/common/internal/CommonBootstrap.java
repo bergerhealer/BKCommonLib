@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.bergerkiller.bukkit.common.conversion.type.JOMLConversion;
+import com.bergerkiller.bukkit.common.conversion.type.MapConversion;
 import com.bergerkiller.bukkit.common.conversion.type.ScoreboardDisplaySlotConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.wrappers.Brightness;
@@ -506,6 +507,11 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.scores.criteria.IScoreboardCriteria$EnumScoreboardHealthDisplay", "net.minecraft.world.scores.criteria.EnumScoreboardHealthDisplay");
         }
 
+        // MapIcon$Type (MapDecorationType) did not exist before 1.11, we use a proxy class for 1.8 - 1.10.2
+        if (evaluateMCVersion("<", "1.11")) {
+            remappings.put("net.minecraft.world.level.saveddata.maps.MapDecorationType", "com.bergerkiller.bukkit.common.internal.proxy.MapDecorationType_1_8_to_1_10_2");
+        }
+
         // Proxy classes that were added in 1.13 so that 1.12.2 and before works with the same API
         if (evaluateMCVersion("<", "1.13")) {
             remappings.put("net.minecraft.world.level.levelgen.HeightMap", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2");
@@ -764,6 +770,8 @@ public class CommonBootstrap {
         } else {
             // Before 1.20.5, ChunkStatus was elsewhere
             remappings.put("net.minecraft.world.level.chunk.status.ChunkStatus", "net.minecraft.world.level.chunk.ChunkStatus");
+            // Before 1.20.5, MapDecorationType was an enum and not in a registry
+            remappings.put("net.minecraft.world.level.saveddata.maps.MapDecorationType", "net.minecraft.world.level.saveddata.maps.MapIcon$Type");
         }
 
         // There have been various locations where starlight was installed
@@ -847,6 +855,7 @@ public class CommonBootstrap {
         Conversion.registerConverters(ItemDisplayMode.class);
         Conversion.registerConverters(Brightness.class);
         Conversion.registerConverters(CommonEntityType.class);
+        Conversion.registerConverters(MapConversion.class);
 
         // EquipmentSlot <> EnumItemSlot, only for later version of 1.8 builds
         {

@@ -152,7 +152,9 @@ class PlayerChunk {
     // Since Minecraft 1.16 the sending of lighting is broken and nothing gets updated
     // We must send the light update packet ourselves
     public boolean resendAllLighting() {
-  #if version >= 1.18
+  #if version >= 1.20.5
+        Chunk chunk = instance.getFullChunkNow();
+  #elseif version >= 1.18
         Chunk chunk = instance.getFullChunk();
   #else
         Chunk chunk = instance.getChunk();

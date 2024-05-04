@@ -30,7 +30,7 @@ class DataWatcher {
 #endif
 
 #if version >= 1.20.5
-    #require net.minecraft.network.syncher.DataWatcher private final net.minecraft.network.syncher.SyncedDataHolder owner:entity;
+    #require net.minecraft.network.syncher.DataWatcher private final net.minecraft.network.syncher.SyncedDataHolder owner;
 
     public (EntityHandle) Entity getOwner() {
         net.minecraft.network.syncher.SyncedDataHolder owner = instance#owner;
@@ -45,15 +45,7 @@ class DataWatcher {
         instance#owner = owner;
     }
 #else
-  #if version >= 1.14.4
-    #require net.minecraft.network.syncher.DataWatcher private final Entity owner:entity;
-  #elseif version >= 1.10.2
-    #require net.minecraft.network.syncher.DataWatcher private final Entity owner:c;
-  #elseif version >= 1.9
-    #require net.minecraft.network.syncher.DataWatcher private final Entity owner:b;
-  #else
-    #require net.minecraft.network.syncher.DataWatcher private final Entity owner:a;
-  #endif
+    #require net.minecraft.network.syncher.DataWatcher private final Entity owner;
 
     public (EntityHandle) Entity getOwner() {
         return instance#owner;
@@ -326,9 +318,13 @@ class DataWatcher {
         }
 
         // Get Entity owner that should be notified of the datawatcher change
-        com.bergerkiller.mountiplex.reflection.declarations.Template.Field ownerRaw;
-        ownerRaw = (com.bergerkiller.mountiplex.reflection.declarations.Template.Field) DataWatcherHandle.T.owner.raw;
-        Entity owner = (Entity) ownerRaw.get(instance);
+  #if version >= 1.20.5
+        #require net.minecraft.network.syncher.DataWatcher private final net.minecraft.network.syncher.SyncedDataHolder owner;
+        net.minecraft.network.syncher.SyncedDataHolder owner = instance#owner;
+  #else
+        #require net.minecraft.network.syncher.DataWatcher private final Entity owner;
+        Entity owner = instance#owner;
+  #endif
 
   #if version >= 1.18
         item.setValue(convertedValue);
@@ -459,6 +455,7 @@ class DataWatcher {
 
         public boolean isForKey((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key) {
 #select version >=
+#case 1.20.5:  return key != null && instance.id() == key.id() && instance.serializer() == key.serializer();
 #case 1.19.3:  return key != null && instance.id() == key.getId() && instance.serializer() == key.getSerializer();
 #case 1.18:    return instance.getAccessor() == key;
 #case 1.9:     return instance.a() == key;

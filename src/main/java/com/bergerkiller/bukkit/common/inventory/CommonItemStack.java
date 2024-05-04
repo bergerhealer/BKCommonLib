@@ -797,9 +797,9 @@ public final class CommonItemStack implements Cloneable {
 
     /**
      * Updates the custom data set for this ItemStack. If the input tag is null or empty, removes the
-     * custom data. The underlying item must not be empty.
-     *
-     * <h2>Note</h2>
+     * custom data. The underlying item must not be empty.<br>
+     * <br>
+     * <strong>Note:</strong>
      * If the underlying item is not a {@link #isCraftItemStack() CraftItemStack},
      * then the item is cloned and converted into one. As such, this method can change the returned
      * instance of {@link #toBukkit()}.
@@ -818,9 +818,9 @@ public final class CommonItemStack implements Cloneable {
     /**
      * Updates the custom data set for this ItemStack with a callback modifying the original custom data, if any.
      * If there was no previous custom data stored, the consumer receives a fresh new empty tag.
-     * The underlying item must not be empty.
-     *
-     * <h2>Note</h2>
+     * The underlying item must not be empty.<br>
+     * <br>
+     * <strong>Note:</strong>
      * If the underlying item is not a {@link #isCraftItemStack() CraftItemStack},
      * then the item is cloned and converted into one. As such, this method can change the returned
      * instance of {@link #toBukkit()}.
@@ -984,9 +984,9 @@ public final class CommonItemStack implements Cloneable {
      * Attempts to transfer this item into another one. I If the destination item stack
      * reached the maximum stack size, or is incompatible with this item, then
      * no more items are transferred. Equivalent to {@link #transferTo(CommonItemStack, int)}
-     * with a max amount of -1.
+     * with a max amount of -1.<br>
      * <br>
-     * <h2>Note:</h2>
+     * <strong>Note:</strong>
      * Note that if the target item is an empty item with a defined type, then it will
      * not transfer items of a different type. It only does this if this item
      * was initialized without type (AIR).
@@ -1002,9 +1002,9 @@ public final class CommonItemStack implements Cloneable {
     /**
      * Attempts to transfer this item into another one. If the destination item stack
      * reached the maximum stack size, or is incompatible with this item, then
-     * no more items are transferred.
+     * no more items are transferred.<br>
      * <br>
-     * <h2>Note:</h2>
+     * <strong>Note:</strong>
      * Note that if the target item is an empty item with a defined type, then it will
      * not transfer items of a different type. It only does this if this item
      * was initialized without type (AIR).

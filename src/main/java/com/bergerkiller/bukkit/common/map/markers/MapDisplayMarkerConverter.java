@@ -27,7 +27,7 @@ public abstract class MapDisplayMarkerConverter extends Template.Class<Template.
      *         com.bergerkiller.bukkit.common.map.MapMarker marker = tile.getMarker(i);
      * 
      * #if version >= 1.11
-     *         MapIcon$Type type = MapIcon$Type.a(marker.getType().id());
+     *         MapDecorationType type = MapDecorationType.a(marker.getType().id());
      * #endif
      * 
      *         byte x = tile.encodeX(marker.getPositionX());

@@ -234,7 +234,7 @@ class PacketPlayOutMap extends Packet {
     }
     public byte[] getPixels() {
         WorldMap$PatchData data = instance#getColorPatch();
-        return (data == null) ? null : data.mapColors();
+        return (data == null) ? (byte[]) null : data.mapColors();
     }
 #elseif version >= 1.17
     // Since 1.17 the region coordinates and pixel data are in a separate 'Patch' class
@@ -338,7 +338,7 @@ class PacketPlayOutMap extends Packet {
             mapIconsList = new java.util.ArrayList(mapCursors.size());
             for (int i = 0; i < mapCursors.size(); i++) {
                 org.bukkit.map.MapCursor cursor = (org.bukkit.map.MapCursor) mapCursors.get(i);
-                MapIcon icon = (MapIcon) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toMapIconHandle(cursor);
+                MapIcon icon = (MapIcon) com.bergerkiller.bukkit.common.conversion.type.MapConversion.toMapIconHandle(cursor);
                 if (icon != null) {
                     mapIconsList.add(icon);
                 }
@@ -357,7 +357,7 @@ class PacketPlayOutMap extends Packet {
         if (builder.has_data()) {
             patchData = new WorldMap$PatchData(builder.get_data_startX(), builder.get_data_startY(),
                                                builder.get_data_width(), builder.get_data_height(),
-                                               builder.get_data_pixels());
+                                               builder.get_data_colors());
         } else {
             patchData = null;
         }
@@ -366,8 +366,9 @@ class PacketPlayOutMap extends Packet {
 #if version >= 1.20.5
         java.util.Optional mapIconsOpt = builder.get_cursors().isPresent() ?
                 java.util.Optional.of(mapIconsList) : java.util.Optional.empty();
+        java.util.Optional patchDataOpt = java.util.Optional.ofNullable(patchData);
         return new PacketPlayOutMap(new net.minecraft.world.level.saveddata.maps.MapId(builder.get_mapId()),
-                builder.get_scale(), builder.get_locked(), mapIconsOpt, patchData);
+                builder.get_scale(), builder.get_locked(), mapIconsOpt, patchDataOpt);
 #elseif version >= 1.17
         return new PacketPlayOutMap(builder.get_mapId(), builder.get_scale(), builder.get_locked(), mapIconsList, patchData);
 #elseif version >= 1.14
@@ -375,17 +376,17 @@ class PacketPlayOutMap extends Packet {
         return new PacketPlayOutMap(builder.get_mapId(), builder.get_scale(), track, builder.get_locked(), mapIconsList,
                 builder.get_data_startX(), builder.get_data_startY(),
                 builder.get_data_width(), builder.get_data_height(),
-                builder.get_data_pixels());
+                builder.get_data_colors());
 #elseif version >= 1.9
         return new PacketPlayOutMap(builder.get_mapId(), builder.get_scale(), builder.get_locked(), mapIconsList,
                 builder.get_data_startX(), builder.get_data_startY(),
                 builder.get_data_width(), builder.get_data_height(),
-                builder.get_data_pixels());
+                builder.get_data_colors());
 #else
         return new PacketPlayOutMap(builder.get_mapId(), builder.get_scale(), mapIconsList,
                 builder.get_data_startX(), builder.get_data_startY(),
                 builder.get_data_width(), builder.get_data_height(),
-                builder.get_data_pixels());
+                builder.get_data_colors());
 #endif
     }
 }

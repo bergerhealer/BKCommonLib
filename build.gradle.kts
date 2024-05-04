@@ -17,6 +17,7 @@ repositories {
         content {
             includeGroup("org.spigotmc")
             includeGroup("com.mojang")
+            includeGroup("com.bergerkiller.mountiplex")
         }
     }
     mavenCentral()

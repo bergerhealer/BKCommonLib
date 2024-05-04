@@ -1,18 +1,23 @@
 package com.bergerkiller.bukkit.common.map;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkers;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.bukkit.common.wrappers.Holder;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapDecorationTypeHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
+import org.jetbrains.annotations.Debug;
 
 /**
  * A marker icon displayed on the {@link MapDisplay}
@@ -41,7 +46,7 @@ public final class MapMarker {
      * Gets the unique String identifier of this Map Marker.
      * This identifier can be used to retrieve this Map Marker instance
      * from the map display it was added to.
-     * 
+     *
      * @return id
      */
     public String getId() {
@@ -50,9 +55,9 @@ public final class MapMarker {
 
     /**
      * Removes this marker from the display
-     * 
+     *
      * @return True if this marker was found and removed, False
-     *         if the marker was already removed
+     * if the marker was already removed
      */
     public boolean remove() {
         return this.owner.remove(this);
@@ -60,7 +65,7 @@ public final class MapMarker {
 
     /**
      * Gets the type of marker displayed on the map display
-     * 
+     *
      * @return marker type
      */
     public Type getType() {
@@ -69,7 +74,7 @@ public final class MapMarker {
 
     /**
      * Sets the type of marker displayed on the map display
-     * 
+     *
      * @param type The type of marker to set to
      * @return this
      */
@@ -86,7 +91,7 @@ public final class MapMarker {
     /**
      * Gets the horizontal X-coordinate of the position of this
      * map marker.
-     * 
+     *
      * @return Position X-coordinate
      */
     public double getPositionX() {
@@ -96,7 +101,7 @@ public final class MapMarker {
     /**
      * Gets the vertical Y-coordinate of the position of this
      * map marker.
-     * 
+     *
      * @return Position Y-coordinate
      */
     public double getPositionY() {
@@ -106,7 +111,7 @@ public final class MapMarker {
     /**
      * Sets the horizontal X-coordinate of the position of this
      * map marker.
-     * 
+     *
      * @param x X-Coordinate to set to
      * @return this
      */
@@ -117,7 +122,7 @@ public final class MapMarker {
     /**
      * Sets the vertical Y-coordinate of the position of this
      * map marker.
-     * 
+     *
      * @param y Y-Coordinate to set to
      * @return this
      */
@@ -128,7 +133,7 @@ public final class MapMarker {
     /**
      * Sets the position of this marker on the display at the x and y
      * pixel coordinates specified.
-     * 
+     *
      * @param x X-Coordinate
      * @param y Y-Coordinate
      * @return this
@@ -144,7 +149,7 @@ public final class MapMarker {
 
     /**
      * Gets the rotation angle of the icon in degrees
-     * 
+     *
      * @return rotation angle
      */
     public double getRotation() {
@@ -153,7 +158,7 @@ public final class MapMarker {
 
     /**
      * Sets the rotation angle of the icon in degrees
-     * 
+     *
      * @param rotation angle
      * @return this
      */
@@ -168,7 +173,7 @@ public final class MapMarker {
 
     /**
      * Gets whether this map marker is currently visible
-     * 
+     *
      * @return True if visible, False if not
      */
     public boolean isVisible() {
@@ -179,7 +184,7 @@ public final class MapMarker {
      * Sets whether this marker is visible. When false, the marker
      * is removed from the map, but can be re-added cleanly from here,
      * with all the original properties left intact.
-     * 
+     *
      * @param visible True to make visible, False to keep hidden
      * @return this
      */
@@ -192,7 +197,7 @@ public final class MapMarker {
     /**
      * Gets the message caption displayed on the map where this marker is located.
      * Returns null when the caption is hidden.
-     * 
+     *
      * @return caption text message, null when hidden
      */
     public String getCaption() {
@@ -203,7 +208,7 @@ public final class MapMarker {
      * Sets the message caption displayed on the map where this marker is located.
      * Supports standard Bukkit chat formatting characters.
      * For more advanced formats, use {@link #setFormattedCaption(ChatText)}.
-     * 
+     *
      * @param caption Text message caption, use null to hide the caption
      * @return this
      */
@@ -229,7 +234,7 @@ public final class MapMarker {
      * <br>
      * <b>Note: </b>the returned ChatText may later change when setCaption() or
      * setFormattedCaption() are called! If you plan to store it, make a clone.
-     * 
+     *
      * @return caption formatted text, null when hidden
      */
     public ChatText getFormattedCaption() {
@@ -241,7 +246,7 @@ public final class MapMarker {
      * <br>
      * <b>Note: </b>later changes to the input caption will not change the caption of this
      * map marker. The input ChatText is copied.
-     * 
+     *
      * @param caption Formatted ChatText caption, use null to hide the caption
      * @return this
      */
@@ -277,7 +282,7 @@ public final class MapMarker {
         WHITE, ORANGE, MAGENTA, LIGHT_BLUE,
         YELLOW, LIME, PINK, GRAY,
         LIGHT_GRAY, CYAN, PURPLE, BLUE,
-        BROWN, GREEN,  RED, BLACK;
+        BROWN, GREEN, RED, BLACK;
 
         private final org.bukkit.DyeColor _dyeColor;
         private static final Color[] _cached_values = values();
@@ -288,7 +293,7 @@ public final class MapMarker {
 
         /**
          * Gets the Bukkit Color RGB this Color constant represents
-         * 
+         *
          * @return color
          */
         public org.bukkit.Color toColor() {
@@ -297,7 +302,7 @@ public final class MapMarker {
 
         /**
          * Gets the Bukkit DyeColor matching this Color constant
-         * 
+         *
          * @return dye color
          */
         public org.bukkit.DyeColor toDyeColor() {
@@ -307,7 +312,7 @@ public final class MapMarker {
         /**
          * Gets the Color enum constant by Bukkit Dye Color.
          * If input is null, null is returned.
-         * 
+         *
          * @param dyeColor
          * @return Color
          */
@@ -319,12 +324,84 @@ public final class MapMarker {
          * Gets the Color enum constant by the ordinal value.
          * The ordinal value wraps around when exceeding the maximum number
          * of elements, allowing for counter color wheel functionality.
-         * 
+         *
          * @param ordinal
          * @return values[ordinal % count]
          */
         public static Color byOrdinal(int ordinal) {
             return _cached_values[ordinal & 0xf];
+        }
+    }
+
+    // We give a fancy display name and color to marker types. This performs the mapping of the registry name to this one.
+    private static class TypeInfo {
+        private static final Map<MinecraftKeyHandle, TypeInfo> byKey = new HashMap<>();
+        public final MinecraftKeyHandle key;
+        public final String name;
+        public final String displayName;
+        public final Color color;
+
+        static {
+            register("player", "WHITE_POINTER", "pointer (white)", Color.WHITE);
+            register("frame", "GREEN_POINTER", "pointer (green)", Color.GREEN);
+            register("red_marker", "RED_POINTER", "pointer (red)", Color.RED);
+            register("blue_marker", "BLUE_POINTER", "pointer (blue)", Color.BLUE);
+            register("target_x", "WHITE_CROSS", "cross (white)", Color.WHITE);
+            register("target_point", "RED_MARKER", "marker (red)", Color.RED);
+            register("player_off_map", "WHITE_CIRCLE", "ball (white)", Color.WHITE);
+
+            // Since Minecraft 1.11
+            register("player_off_limits", "SMALL_WHITE_CIRCLE", "dot (white)", Color.WHITE);
+            register("mansion", "MANSION", "mansion", Color.CYAN);
+            register("monument", "TEMPLE", "temple", Color.BROWN);
+
+            // Since Minecraft 1.13
+            register("banner_white",  "BANNER_WHITE", "banner (white)", Color.WHITE);
+            register("banner_orange", "BANNER_ORANGE", "banner (orange)", Color.ORANGE);
+            register("banner_magenta", "BANNER_MAGENTA", "banner (magenta)", Color.MAGENTA);
+            register("banner_light_blue", "BANNER_LIGHT_BLUE", "banner (light blue)", Color.LIGHT_BLUE);
+            register("banner_yellow", "BANNER_YELLOW", "banner (yellow)", Color.YELLOW);
+            register("banner_lime", "BANNER_LIME", "banner (lime)", Color.LIME);
+            register("banner_pink", "BANNER_PINK", "banner (pink)", Color.PINK);
+            register("banner_gray", "BANNER_GRAY", "banner (gray)", Color.GRAY);
+            register("banner_light_gray", "BANNER_LIGHT_GRAY", "banner (light gray)", Color.LIGHT_GRAY);
+            register("banner_cyan", "BANNER_CYAN", "banner (cyan)", Color.CYAN);
+            register("banner_purple", "BANNER_PURPLE", "banner (purple)", Color.PURPLE);
+            register("banner_blue", "BANNER_BLUE", "banner (blue)", Color.BLUE);
+            register("banner_brown", "BANNER_BROWN", "banner (brown)", Color.BROWN);
+            register("banner_green", "BANNER_GREEN", "banner (green)", Color.GREEN);
+            register("banner_red", "BANNER_RED", "banner (red)", Color.RED);
+            register("banner_black", "BANNER_BLACK", "banner (black)", Color.BLACK);
+            register("red_x", "RED_X", "cross (red)", Color.RED);
+        }
+
+        private static void register(String registryName, String name, String displayName, Color color) {
+            MinecraftKeyHandle key = MinecraftKeyHandle.createNew("minecraft", registryName);
+            byKey.put(key, new TypeInfo(key, name, displayName, color));
+        }
+
+        public static TypeInfo get(MinecraftKeyHandle key) {
+            return LogicUtil.getOrComputeDefault(byKey, key, TypeInfo::new);
+        }
+
+        private TypeInfo(MinecraftKeyHandle key, String name, String displayName, Color color) {
+            this.key = key;
+            this.name = name;
+            this.displayName = displayName;
+            this.color = color;
+        }
+
+        // Fallback for unknown types
+        private TypeInfo(MinecraftKeyHandle key) {
+            this.key = key;
+            if (key.getNamespace().equals("minecraft")) {
+                this.name = key.getName().toUpperCase(Locale.ENGLISH);
+                this.displayName = key.getName().replace('_', ' ');
+            } else {
+                this.name = key.toString().toUpperCase(Locale.ENGLISH).replace('.', '_');
+                this.displayName = key.toString().replace('_', ' ');
+            }
+            this.color = Color.WHITE;
         }
     }
 
@@ -334,57 +411,76 @@ public final class MapMarker {
     public static final class Type {
         private final boolean available;
         private final boolean visibleOnItemFrames;
-        private final String name;
-        private final String displayName;
-        private final Color color;
-        private final byte id;
+        private final TypeInfo info;
+        private final Holder<MapDecorationTypeHandle> handle;
+
+        // Registry by Holder. Is by type value on older versions of Minecraft (< 1.20.5)
+        private static final Map<Holder<MapDecorationTypeHandle>, Type> typesByHolder = new HashMap<>();
+        private static final Map<MinecraftKeyHandle, Type> existingTypesByKey = new HashMap<>();
+        private static final Map<Byte, Type> existingTypesByLegacyId = new HashMap<>();
+        static {
+            for (Holder<MapDecorationTypeHandle> holder : MapDecorationTypeHandle.getValues()) {
+                Type type = new Type(holder);
+                typesByHolder.put(holder, type);
+                existingTypesByKey.put(type.info.key, type);
+                existingTypesByLegacyId.put(type.id(), type);
+            }
+        }
 
         // Since oldest version supported by Minecraft
-        public static final Type WHITE_POINTER      = new Type("1.00", "WHITE_POINTER",  "pointer (white)", Color.WHITE, 0, null);
-        public static final Type GREEN_POINTER      = new Type("1.00", "GREEN_POINTER",  "pointer (green)", Color.GREEN, 1, null);
-        public static final Type RED_POINTER        = new Type("1.00", "RED_POINTER",    "pointer (red)",   Color.RED,   2, null);
-        public static final Type BLUE_POINTER       = new Type("1.00", "BLUE_POINTER",   "pointer (blue)",  Color.BLUE,  3, null);
-        public static final Type WHITE_CROSS        = new Type("1.00", "WHITE_CROSS",    "cross (white)",   Color.WHITE, 4, null);
-        public static final Type RED_MARKER         = new Type("1.00", "RED_MARKER",     "marker (red)",    Color.RED,   5, null);
-        public static final Type WHITE_CIRCLE       = new Type("1.00", "WHITE_CIRCLE",   "ball (white)",    Color.WHITE, 6, null);
+        public static final Type WHITE_POINTER = getTypeOrFail("player");
+        public static final Type GREEN_POINTER = getTypeOrFail("frame");
+        public static final Type RED_POINTER = getTypeOrFail("red_marker");
+        public static final Type BLUE_POINTER = getTypeOrFail("blue_marker");
+        public static final Type WHITE_CROSS = getTypeOrFail("target_x");
+        public static final Type RED_MARKER = getTypeOrFail("target_point");
+        public static final Type WHITE_CIRCLE = getTypeOrFail("player_off_map");
 
         // Since Minecraft 1.11
-        public static final Type SMALL_WHITE_CIRCLE = new Type("1.11", "SMALL_WHITE_CIRCLE", "dot (white)", Color.WHITE, 7, WHITE_CIRCLE);
-        public static final Type MANSION            = new Type("1.11", "MANSION",            "mansion",     Color.CYAN,  8, RED_MARKER);
-        public static final Type TEMPLE             = new Type("1.11", "TEMPLE",             "temple",      Color.BROWN, 9, RED_MARKER);
+        public static final Type SMALL_WHITE_CIRCLE = getTypeOrFallback("player_off_limits", WHITE_CIRCLE);
+        public static final Type MANSION = getTypeOrFallback("mansion", RED_MARKER);
+        public static final Type TEMPLE = getTypeOrFallback("monument", RED_MARKER);
 
         // Since Minecraft 1.13
-        public static final Type BANNER_WHITE      = new Type("1.13", "BANNER_WHITE",       "banner (white)",      Color.WHITE,      10, WHITE_POINTER);
-        public static final Type BANNER_ORANGE     = new Type("1.13", "BANNER_ORANGE",      "banner (orange)",     Color.ORANGE,     11, GREEN_POINTER);
-        public static final Type BANNER_MAGENTA    = new Type("1.13", "BANNER_MAGENTA",     "banner (magenta)",    Color.MAGENTA,    12, RED_POINTER);
-        public static final Type BANNER_LIGHT_BLUE = new Type("1.13", "BANNER_LIGHT_BLUE",  "banner (light blue)", Color.LIGHT_BLUE, 13, BLUE_POINTER);
-        public static final Type BANNER_YELLOW     = new Type("1.13", "BANNER_YELLOW",      "banner (yellow)",     Color.YELLOW,     14, GREEN_POINTER);
-        public static final Type BANNER_LIME       = new Type("1.13", "BANNER_LIME",        "banner (lime)",       Color.LIME,       15, GREEN_POINTER);
-        public static final Type BANNER_PINK       = new Type("1.13", "BANNER_PINK",        "banner (pink)",       Color.PINK,       16, RED_POINTER);
-        public static final Type BANNER_GRAY       = new Type("1.13", "BANNER_GRAY",        "banner (gray)",       Color.GRAY,       17, WHITE_POINTER);
-        public static final Type BANNER_LIGHT_GRAY = new Type("1.13", "BANNER_LIGHT_GRAY",  "banner (light gray)", Color.LIGHT_GRAY, 18, WHITE_POINTER);
-        public static final Type BANNER_CYAN       = new Type("1.13", "BANNER_CYAN",        "banner (cyan)",       Color.CYAN,       19, BLUE_POINTER);
-        public static final Type BANNER_PURPLE     = new Type("1.13", "BANNER_PURPLE",      "banner (purple)",     Color.PURPLE,     20, RED_POINTER);
-        public static final Type BANNER_BLUE       = new Type("1.13", "BANNER_BLUE",        "banner (blue)",       Color.BLUE,       21, BLUE_POINTER);
-        public static final Type BANNER_BROWN      = new Type("1.13", "BANNER_BROWN",       "banner (brown)",      Color.BROWN,      22, BLUE_POINTER);
-        public static final Type BANNER_GREEN      = new Type("1.13", "BANNER_GREEN",       "banner (green)",      Color.GREEN,      23, GREEN_POINTER);
-        public static final Type BANNER_RED        = new Type("1.13", "BANNER_RED",         "banner (red)",        Color.RED,        24, RED_POINTER);
-        public static final Type BANNER_BLACK      = new Type("1.13", "BANNER_BLACK",       "banner (black)",      Color.BLACK,      25, WHITE_POINTER);
-        public static final Type RED_X             = new Type("1.13", "RED_X",              "cross (red)",         Color.RED,        26, WHITE_CROSS);
+        public static final Type BANNER_WHITE = getTypeOrFallback("banner_white", WHITE_POINTER);
+        public static final Type BANNER_ORANGE = getTypeOrFallback("banner_orange", GREEN_POINTER);
+        public static final Type BANNER_MAGENTA = getTypeOrFallback("banner_magenta", RED_POINTER);
+        public static final Type BANNER_LIGHT_BLUE = getTypeOrFallback("banner_light_blue", BLUE_POINTER);
+        public static final Type BANNER_YELLOW = getTypeOrFallback("banner_yellow", GREEN_POINTER);
+        public static final Type BANNER_LIME = getTypeOrFallback("banner_lime", GREEN_POINTER);
+        public static final Type BANNER_PINK = getTypeOrFallback("banner_pink", RED_POINTER);
+        public static final Type BANNER_GRAY = getTypeOrFallback("banner_gray", WHITE_POINTER);
+        public static final Type BANNER_LIGHT_GRAY = getTypeOrFallback("banner_light_gray", WHITE_POINTER);
+        public static final Type BANNER_CYAN = getTypeOrFallback("banner_cyan", BLUE_POINTER);
+        public static final Type BANNER_PURPLE = getTypeOrFallback("banner_purple", RED_POINTER);
+        public static final Type BANNER_BLUE = getTypeOrFallback("banner_blue", BLUE_POINTER);
+        public static final Type BANNER_BROWN = getTypeOrFallback("banner_brown", BLUE_POINTER);
+        public static final Type BANNER_GREEN = getTypeOrFallback("banner_green", GREEN_POINTER);
+        public static final Type BANNER_RED = getTypeOrFallback("banner_red", RED_POINTER);
+        public static final Type BANNER_BLACK = getTypeOrFallback("banner_black", WHITE_POINTER);
+        public static final Type RED_X = getTypeOrFallback("red_x", WHITE_CROSS);
 
         private static final EnumMap<Color, Type> pointerByColor = byColors(WHITE_POINTER, GREEN_POINTER, RED_POINTER, BLUE_POINTER);
         private static final EnumMap<Color, Type> bannerByColor = byColors(BANNER_WHITE, BANNER_ORANGE, BANNER_MAGENTA, BANNER_LIGHT_BLUE,
-                                                                           BANNER_YELLOW, BANNER_LIME, BANNER_PINK, BANNER_GRAY,
-                                                                           BANNER_LIGHT_GRAY, BANNER_CYAN, BANNER_PURPLE, BANNER_BLUE,
-                                                                           BANNER_BROWN, BANNER_GREEN, BANNER_RED, BANNER_BLACK);
+                BANNER_YELLOW, BANNER_LIME, BANNER_PINK, BANNER_GRAY,
+                BANNER_LIGHT_GRAY, BANNER_CYAN, BANNER_PURPLE, BANNER_BLUE,
+                BANNER_BROWN, BANNER_GREEN, BANNER_RED, BANNER_BLACK);
 
-        private static final List<Type> all_values_including_unavailable = Stream.of(Type.class.getDeclaredFields())
-                .filter(f -> f.getType() == Type.class && java.lang.reflect.Modifier.isStatic(f.getModifiers()))
-                .map(Type::getTypeConstant)
+        private static final List<Type> all_values = typesByHolder.values().stream()
                 .collect(StreamUtil.toUnmodifiableList());
 
-        private static final List<Type> all_values = all_values_including_unavailable.stream()
-                .filter(Type::isAvailable)
+        private static final List<Type> all_values_including_unavailable = Stream.concat(
+                all_values.stream(),
+                Stream.of(Type.class.getDeclaredFields())
+                        .filter(f -> f.getType() == Type.class && java.lang.reflect.Modifier.isStatic(f.getModifiers()))
+                        .map(field -> {
+                            try {
+                                return (Type) field.get(null);
+                            } catch (Throwable t) {
+                                throw MountiplexUtil.uncheckedRethrow(t);
+                            }
+                        }))
+                .distinct()
                 .collect(StreamUtil.toUnmodifiableList());
 
         private static final Map<String, Type> by_name = all_values_including_unavailable.stream()
@@ -393,7 +489,7 @@ public final class MapMarker {
         /**
          * Gets an unmodifiable List of Type constants that are available for the Minecraft version
          * the server is running. Types that are unavailable are not inside this List.
-         * 
+         *
          * @return values
          */
         public static List<Type> values() {
@@ -404,7 +500,7 @@ public final class MapMarker {
          * Gets an unmodifiable List of all possible Type constants, including those on other
          * versions of Minecraft which are currently not supported. Please avoid using this
          * unless you know what you're doing!
-         * 
+         *
          * @return values, including unavailable ones
          */
         public static List<Type> values_including_unavailable() {
@@ -414,7 +510,7 @@ public final class MapMarker {
         /**
          * Gets the Type matching the {@link #name()} value.
          * May return unavailable types matching the name.
-         * 
+         *
          * @param name Name of the Type to find
          * @return Type by this name, null if not found
          */
@@ -425,7 +521,7 @@ public final class MapMarker {
         /**
          * Gets a Map Marker Type of a pointer by pointer color.
          * Only WHITE, RED, GREEN and BLUE are supported. Other colors return null.
-         * 
+         *
          * @param color
          * @return pointer with the color specified, or null if there is none
          */
@@ -435,7 +531,7 @@ public final class MapMarker {
 
         /**
          * Gets a Map Marker Type of a banner by banner color
-         * 
+         *
          * @param color The color of the banner to find
          * @return banner type with the color specified
          */
@@ -443,60 +539,109 @@ public final class MapMarker {
             return bannerByColor.get(color);
         }
 
-        // Private constructor for initializing the constants
-        private Type(String sinceVersion, String name, String displayName, Color color, int id, Type fallback) {
-            this.available = CommonBootstrap.evaluateMCVersion(">=", sinceVersion);
-            this.name = name;
-            this.displayName = displayName;
-            this.color = color;
-            this.id = this.available ? (byte) id : fallback.id;
-            this.visibleOnItemFrames = this.id != 0 && this.id != 2 && this.id != 3 && this.id != 6 && this.id != 7;
+        /**
+         * Retrieves the Marker Type information from a provided internal NMS Handle
+         *
+         * @param handle Handle
+         * @return Marker Type
+         */
+        public static Type fromHandle(Holder<MapDecorationTypeHandle> handle) {
+            return LogicUtil.getOrComputeDefault(typesByHolder, handle, Type::new);
+        }
+
+        /**
+         * Retrieves the Marker type information by the legacy marker type id. This should
+         * never be used after 1.20.5.
+         *
+         * @param id Legacy Type Id
+         * @return Type by this ID, or a default WHITE_POINTER placeholder if unknown
+         */
+        @Deprecated
+        public static Type fromLegacyId(byte id) {
+            return existingTypesByLegacyId.getOrDefault(id, WHITE_POINTER);
+        }
+
+        private static Type getTypeOrFail(String registryName) {
+            return LogicUtil.getOrSupplyDefault(existingTypesByKey, MinecraftKeyHandle.createNew("minecraft", registryName),
+                    () -> {
+                        throw new IllegalStateException("Marker type does not exist: " + registryName);
+                    });
+        }
+
+        private static Type getTypeOrFallback(String registryName, Type fallback) {
+            return LogicUtil.getOrComputeDefault(existingTypesByKey, MinecraftKeyHandle.createNew("minecraft", registryName),
+                    key -> new Type(key, fallback));
+        }
+
+        private Type(Holder<MapDecorationTypeHandle> handle) {
+            this.available = true;
+            this.handle = handle;
+            this.info = TypeInfo.get(handle.value().getName());
+            this.visibleOnItemFrames = handle.value().isShownOnItemFrame();
+        }
+
+        // Used when a particular type does not exist, to use a fallback icon in that case
+        private Type(MinecraftKeyHandle key, Type fallback) {
+            this.available = false;
+            this.handle = fallback.getHandle();
+            this.info = TypeInfo.get(key);
+            this.visibleOnItemFrames = fallback.isVisibleOnItemFrames();
         }
 
         /**
          * Gets the name of this marker type. This is a unique all-capitalized
          * name that represents this type of marker, and is the same as used
          * by bukkit's MapCursor.Type.
-         * 
+         *
          * @return marker type name
          */
         public String name() {
-            return this.name;
+            return this.info.name;
         }
 
         /**
          * Gets a user-friendly all-lowercase display name for this marker type.
-         * 
+         *
          * @return display name
          */
         public String displayName() {
-            return this.displayName;
+            return this.info.displayName;
         }
 
         /**
          * Gets the primary color of this type of map marker
-         * 
+         *
          * @return color
          */
         public Color color() {
-            return this.color;
+            return this.info.color;
         }
 
         /**
          * Gets the id used internally to represent this type of marker on the map.
          * Should not be used by people. May be different from what is expected
          * when not {@link #isAvailable()}, when a fallback type is used for display.
-         * 
+         *
          * @return type id
          */
+        @Deprecated
         public byte id() {
-            return this.id;
+            return this.handle.value().getId();
+        }
+
+        /**
+         * Gets the internal handle this type represents
+         *
+         * @return Handle Holder
+         */
+        public Holder<MapDecorationTypeHandle> getHandle() {
+            return this.handle;
         }
 
         /**
          * Gets whether this type of map marker is supported on the version of minecraft
          * the current server is running on.
-         * 
+         *
          * @return True if available
          */
         public boolean isAvailable() {
@@ -505,7 +650,7 @@ public final class MapMarker {
 
         /**
          * Gets whether this type of marker is displayed on maps in item frames, or not.
-         * 
+         *
          * @return True if this type of marker is displayed on item frames
          */
         public boolean isVisibleOnItemFrames() {
@@ -517,7 +662,7 @@ public final class MapMarker {
          */
         @Override
         public String toString() {
-            return this.name;
+            return this.name();
         }
 
         private static EnumMap<Color, Type> byColors(Type... types) {

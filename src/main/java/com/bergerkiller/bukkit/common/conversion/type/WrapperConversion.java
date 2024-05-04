@@ -11,7 +11,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.CraftingInventory;
-import org.bukkit.map.MapCursor;
 import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -539,20 +538,6 @@ public class WrapperConversion {
     @ConverterMethod(input="net.minecraft.resources.ResourceKey")
     public static <T> com.bergerkiller.bukkit.common.resources.ResourceKey<T> toResourceKey(Object nmsResourceKeyHandle) {
         return com.bergerkiller.bukkit.common.resources.ResourceKey.fromResourceKeyHandle(nmsResourceKeyHandle);
-    }
-
-    @ConverterMethod(input="net.minecraft.world.level.saveddata.maps.MapIcon")
-    public static MapCursor toMapCursor(Object nmsMapCursorHandle) {
-        return MapIconHandle.createHandle(nmsMapCursorHandle).toCursor();
-    }
-
-    @ConverterMethod(output="net.minecraft.world.level.saveddata.maps.MapIcon.Type", optional=true)
-    public static Object mapIconTypeIdToEnum(byte typeId) {
-        if (MapIconHandle.TypeHandle.T.isValid()) {
-            return MapIconHandle.TypeHandle.T.fromId.raw.invoke(typeId);
-        } else {
-            throw new UnsupportedOperationException("Map Icon Type enum not supported");
-        }
     }
 
     @ConverterMethod(input="net.minecraft.network.chat.IChatBaseComponent")

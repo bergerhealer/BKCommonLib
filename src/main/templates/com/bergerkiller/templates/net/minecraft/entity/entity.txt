@@ -287,9 +287,12 @@ class Entity {
         net.minecraft.network.syncher.DataWatcher dw = instance.getDataWatcher();
 #endif
         if (dw != null) {
-            com.bergerkiller.mountiplex.reflection.declarations.Template.Field field;
-            field = (com.bergerkiller.mountiplex.reflection.declarations.Template.Field) com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle.T.owner.raw;
-            field.set(dw, instance);
+#if version >= 1.20.5
+            #require net.minecraft.network.syncher.DataWatcher private final net.minecraft.network.syncher.SyncedDataHolder dw_owner:owner;
+#else
+            #require net.minecraft.network.syncher.DataWatcher private final net.minecraft.world.entity.Entity dw_owner:owner;
+#endif
+            dw#dw_owner = instance;
         }
 
         // -- Paper LootableInventory field --
