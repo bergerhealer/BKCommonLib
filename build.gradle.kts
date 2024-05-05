@@ -8,15 +8,6 @@ plugins {
 val buildNumber = System.getenv("BUILD_NUMBER") ?: "NO-CI"
 
 repositories {
-    mavenLocal {
-        // Used to access a server JAR for testing
-        // TODO Use Paperclip instead
-        content {
-            includeGroup("org.spigotmc")
-            includeGroup("com.mojang")
-            includeGroup("com.bergerkiller.mountiplex")
-        }
-    }
     mavenCentral()
     maven("https://hub.spigotmc.org/nexus/content/groups/public/")
 
@@ -26,6 +17,18 @@ repositories {
     // - Aikar minecraft-timings
     // - Myles ViaVersion
     maven("https://ci.mg-dev.eu/plugin/repository/everything/")
+
+    maven("https://oss.sonatype.org/content/repositories/snapshots/")
+
+    // Used to access a server JAR for testing
+    // TODO Use Paperclip instead
+    mavenLocal {
+        content {
+            includeGroup("org.spigotmc")
+            includeGroup("com.mojang")
+            includeGroup("com.bergerkiller.mountiplex")
+        }
+    }
 }
 
 // Configuration for shaded dependencies which should not be added to the published Maven .pom
@@ -97,9 +100,9 @@ dependencies {
     // Versions are part of BKCommonLib-bom and are made available automatically
     //
 
-    internal("org.bergerhealer.cloud.commandframework:cloud-paper")
-    internal("org.bergerhealer.cloud.commandframework:cloud-annotations")
-    internal("org.bergerhealer.cloud.commandframework:cloud-minecraft-extras")
+    internal("org.incendo:cloud-paper")
+    internal("org.incendo:cloud-annotations")
+    internal("org.incendo:cloud-minecraft-extras")
     internal(libs.commodore) {
         isTransitive = false
     }
@@ -159,9 +162,9 @@ tasks {
         targetCompatibility = "1.8"
     }
 
-    withType<Test> {
-        this.testLogging {
-            this.showStandardStreams = true
+    withType<Test>().configureEach {
+        testLogging {
+            showStandardStreams = true
         }
 
         // Uncomment to enable SIMD optimizations, to test performance of color conversion
@@ -212,7 +215,7 @@ tasks {
             exclude(dependency("org.checkerframework:checker-qual"))
         }
 
-        destinationDirectory.set(buildDir)
+        destinationDirectory.set(layout.buildDirectory)
         archiveFileName.set("${project.name}-${project.version}-$buildNumber.jar")
 
         isPreserveFileTimestamps = false

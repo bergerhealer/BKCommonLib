@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.cloud.captions;
 
-import cloud.commandframework.captions.Caption;
+import org.incendo.cloud.caption.Caption;
 
 import java.util.Collection;
 import java.util.Collections;

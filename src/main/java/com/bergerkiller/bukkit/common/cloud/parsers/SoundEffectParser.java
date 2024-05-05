@@ -1,15 +1,5 @@
 package com.bergerkiller.bukkit.common.cloud.parsers;
 
-import cloud.commandframework.ArgumentDescription;
-import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.brigadier.BrigadierMappingBuilder;
-import cloud.commandframework.brigadier.CloudBrigadierManager;
-import cloud.commandframework.captions.CaptionVariable;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
-import cloud.commandframework.exceptions.parsing.ParserException;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.cloud.captions.BKCommonLibCaptionKeys;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
@@ -25,13 +15,20 @@ import com.bergerkiller.mountiplex.reflection.util.LambdaBuilder;
 import io.leangen.geantyref.TypeToken;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.incendo.cloud.brigadier.CloudBrigadierManager;
+import org.incendo.cloud.brigadier.argument.BrigadierMappingBuilder;
+import org.incendo.cloud.caption.CaptionVariable;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.context.CommandInput;
+import org.incendo.cloud.exception.parsing.ParserException;
+import org.incendo.cloud.parser.ArgumentParseResult;
+import org.incendo.cloud.parser.ArgumentParser;
+import org.incendo.cloud.parser.ParserDescriptor;
+import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -40,126 +37,32 @@ import java.util.function.Function;
  *
  * @param <C> Command sender type
  */
-public class SoundEffectArgument<C> extends CommandArgument<C, ResourceKey<SoundEffect>> {
-
-    protected SoundEffectArgument(
-            final boolean required,
-            final String name,
-            final String defaultValue,
-            final BiFunction<CommandContext<C>, String,
-                                List<String>> suggestionsProvider,
-            final ArgumentDescription defaultDescription
-    ) {
-        super(required, name,
-                new SoundEffectParser<>(),
-                defaultValue,
-                new TypeToken<ResourceKey<SoundEffect>>() {},
-                suggestionsProvider,
-                defaultDescription);
+public class SoundEffectParser<C> implements ArgumentParser<C, ResourceKey<SoundEffect>>, BlockingSuggestionProvider.Strings<C> {
+    public static <C> @NonNull ParserDescriptor<C, ResourceKey<SoundEffect>> soundEffectParser() {
+        return ParserDescriptor.of(new SoundEffectParser<>(), new TypeToken<ResourceKey<SoundEffect>>() {
+        });
     }
 
-    /**
-     * Create a new {@link Builder}.
-     *
-     * @param name argument name
-     * @param <C>  sender type
-     * @return new {@link Builder}
-     * @since 1.8.0
-     */
-    public static <C> Builder<C> builder(final String name) {
-        return new Builder<>(name);
-    }
-
-    /**
-     * Create a new required argument
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> CommandArgument<C, ResourceKey<SoundEffect>> of(final String name) {
-        return SoundEffectArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional argument
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> CommandArgument<C, ResourceKey<SoundEffect>> optional(final String name) {
-        return SoundEffectArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional argument with a default value
-     *
-     * @param name        Argument name
-     * @param soundEffect Default value
-     * @param <C>         Command sender type
-     * @return Created argument
-     */
-    public static <C> CommandArgument<C, ResourceKey<SoundEffect>> optional(
-            final String name,
-            final ResourceKey<SoundEffect> soundEffect
-    ) {
-        return SoundEffectArgument.<C>builder(name).asOptionalWithDefault(soundEffect.getPath()).build();
-    }
-
-    public static final class Builder<C> extends CommandArgument.Builder<C, ResourceKey<SoundEffect>> {
-
-        private Builder(final String name) {
-            super(new TypeToken<ResourceKey<SoundEffect>>() {}, name);
+    @Override
+    public @NonNull ArgumentParseResult<@NonNull ResourceKey<SoundEffect>> parse(@NonNull CommandContext<@NonNull C> commandContext, @NonNull CommandInput commandInput) {
+        String input = commandInput.peekString();
+        ResourceKey<SoundEffect> result = SoundEffect.fromName(input);
+        if (result == null) {
+            return ArgumentParseResult.failure(new SoundEffectParseException(input, commandContext));
         }
 
-        @Override
-        public CommandArgument<C, ResourceKey<SoundEffect>> build() {
-            return new SoundEffectArgument<>(
-                    this.isRequired(),
-                    this.getName(),
-                    this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
-                    this.getDefaultDescription()
-            );
-        }
+        commandInput.readString();
+        return ArgumentParseResult.success(result);
     }
 
-    public static class SoundEffectParser<C> implements ArgumentParser<C, ResourceKey<SoundEffect>> {
-        @Override
-        public ArgumentParseResult<ResourceKey<SoundEffect>> parse(
-                final CommandContext<C> commandContext,
-                final Queue<String> inputQueue
-        ) {
-            if (inputQueue.isEmpty()) {
-                return ArgumentParseResult.failure(new NoInputProvidedException(
-                        this.getClass(),
-                        commandContext
-                ));
-            }
-
-            String input = inputQueue.peek();
-            ResourceKey<SoundEffect> result = SoundEffect.fromName(input);
-            if (result == null) {
-                return ArgumentParseResult.failure(new SoundEffectParseException(input, commandContext));
-            }
-
-            inputQueue.remove();
-            return ArgumentParseResult.success(result);
+    @Override
+    public @NonNull Iterable<@NonNull String> stringSuggestions(@NonNull CommandContext<C> commandContext, @NonNull CommandInput input) {
+        Collection<MinecraftKeyHandle> keys = SoundEffectHandle.getSoundNames();
+        List<String> suggestions = new ArrayList<>(keys.size());
+        for (MinecraftKeyHandle key : keys) {
+            suggestions.add(key.toString());
         }
-
-        @Override
-        public List<String> suggestions(
-                final CommandContext<C> commandContext,
-                final String input
-        ) {
-            Collection<MinecraftKeyHandle> keys = SoundEffectHandle.getSoundNames();
-            List<String> suggestions = new ArrayList<>(keys.size());
-            for (MinecraftKeyHandle key : keys) {
-                suggestions.add(key.toString());
-            }
-            return suggestions;
-        }
+        return suggestions;
     }
 
     public static final class SoundEffectParseException extends ParserException {
@@ -244,7 +147,7 @@ public class SoundEffectArgument<C> extends CommandArgument<C, ResourceKey<Sound
 
         final BrigadierMappingBuilder.SuggestionProviderSupplier<?, ?> suggestionProvider =
                 LambdaBuilder.of(BrigadierMappingBuilder.SuggestionProviderSupplier.class)
-                             .createConstant(soundSuggestionProvider);
+                        .createConstant(soundSuggestionProvider);
 
         final FastMethod<Object> registerMapping = new FastMethod<>(CloudBrigadierManager.class.getMethod("registerMapping", TypeToken.class, Consumer.class));
         final FastMethod<Object> builderTo = new FastMethod<>(BrigadierMappingBuilder.class.getMethod("to", Function.class));
@@ -253,7 +156,8 @@ public class SoundEffectArgument<C> extends CommandArgument<C, ResourceKey<Sound
         builderTo.forceInitialization();
 
         registerMapping.invoke(brig,
-                new TypeToken<SoundEffectArgument.SoundEffectParser<CommandSender>>() {},
+                new TypeToken<com.bergerkiller.bukkit.common.cloud.parsers.SoundEffectParser<CommandSender>>() {
+                },
                 (Consumer<BrigadierMappingBuilder<?, ?>>) builder -> {
                     builderTo.invoke(builder, (Function<Object, Object>) o -> createResourceLocationArgument.invoke(null));
                     builder.suggestedBy(CommonUtil.unsafeCast(suggestionProvider));
