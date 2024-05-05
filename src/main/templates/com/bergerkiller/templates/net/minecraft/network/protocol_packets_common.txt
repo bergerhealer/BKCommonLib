@@ -7,6 +7,7 @@ import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.PacketDataSerializer;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.common.custom.BukkitCustomPayload;
+import net.minecraft.network.protocol.common.custom.DiscardedPayload;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.world.entity.player.EnumChatVisibility;
 
@@ -169,7 +170,14 @@ optional class ClientboundResourcePackPopPacket {
 class ClientboundCustomPayloadPacket extends Packet {
     // Get channel name (Bukkit custom payload packet only)
     public String getChannel() {
-#if version >= 1.20.2
+#if version >= 1.20.5
+        CustomPacketPayload payload = instance.payload();
+        if (payload instanceof DiscardedPayload) {
+            net.minecraft.resources.MinecraftKey channel = ((DiscardedPayload) payload).id();
+            return (channel == null) ? null : channel.toString();
+        }
+        return null;
+#elseif version >= 1.20.2
         net.minecraft.resources.MinecraftKey channel = instance.payload().id();
         return (channel == null) ? null : channel.toString();
 #elseif version >= 1.13
@@ -190,7 +198,17 @@ class ClientboundCustomPayloadPacket extends Packet {
 
     // Read raw payload
     public byte[] getMessage() {
-#if version >= 1.20.2
+#if version >= 1.20.5
+        CustomPacketPayload payload = instance.payload();
+        if (payload instanceof DiscardedPayload) {
+            io.netty.buffer.ByteBuf payloadData = ((DiscardedPayload) payload).data();
+            byte[] data = new byte[payloadData.readableBytes()];
+            payloadData.readBytes(data);
+            return data;
+        } else {
+            return null; // Ew.
+        }
+#elseif version >= 1.20.2
         CustomPacketPayload payload = instance.payload();
         if (payload instanceof BukkitCustomPayload) {
             #require BukkitCustomPayload private final byte[] message:val$message;
@@ -222,12 +240,16 @@ class ClientboundCustomPayloadPacket extends Packet {
         net.minecraft.resources.MinecraftKey key;
         key = (net.minecraft.resources.MinecraftKey) MinecraftKeyHandle.createNew(channel).getRaw();
 
+  #if version >= 1.20.5
+        CustomPacketPayload payload = new DiscardedPayload(key, Unpooled.wrappedBuffer(message));
+  #elseif exists net.minecraft.network.protocol.common.custom.BukkitCustomPayload BukkitCustomPayload(org.bukkit.craftbukkit.entity.CraftPlayer p, byte[] message, net.minecraft.resources.MinecraftKey channel);
         // Warning: this type is fake and is remapped in CommonBootstrap to an anonymous class in CraftPlayer!
         // If the server was built with a newer JDK the CraftPlayer argument may have been dropped as well - future-proof it!
-  #if exists net.minecraft.network.protocol.common.custom.BukkitCustomPayload BukkitCustomPayload(org.bukkit.craftbukkit.entity.CraftPlayer p, byte[] message, net.minecraft.resources.MinecraftKey channel);
         #require BukkitCustomPayload BukkitCustomPayload createCustom:<init>(org.bukkit.craftbukkit.entity.CraftPlayer p, byte[] message, net.minecraft.resources.MinecraftKey channel);
         CustomPacketPayload payload = BukkitCustomPayload#createCustom(null, message, key);
   #elseif exists net.minecraft.network.protocol.common.custom.BukkitCustomPayload BukkitCustomPayload(byte[] message, net.minecraft.resources.MinecraftKey channel);
+        // Warning: this type is fake and is remapped in CommonBootstrap to an anonymous class in CraftPlayer!
+        // If the server was built with a newer JDK the CraftPlayer argument may have been dropped as well - future-proof it!
         #require BukkitCustomPayload BukkitCustomPayload createCustom:<init>(byte[] message, net.minecraft.resources.MinecraftKey channel);
         CustomPacketPayload payload = BukkitCustomPayload#createCustom(message, key);
   #else
