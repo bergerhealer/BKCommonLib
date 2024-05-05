@@ -4,24 +4,24 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.bergerkiller.bukkit.common.utils.StreamUtil;
+import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapIconHandle;
 import org.bukkit.entity.Player;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.map.MapDisplayTile;
 import com.bergerkiller.bukkit.common.map.MapMarker;
 import com.bergerkiller.bukkit.common.map.MapSession;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.UniqueHash;
 
 public class MapDisplayMarkers {
     public static final UniqueHash RANDOM_NAME_SOURCE = new UniqueHash();
-    public static final MapDisplayMarkerConverter APPLIER = Template.Class.create(MapDisplayMarkerConverter.class, Common.TEMPLATE_RESOLVER);
     private final Map<String, Entry> markersById = new HashMap<>();
     private final Map<IntVector2, MapDisplayMarkerTile> markersByTile = new HashMap<>();
 
@@ -35,6 +35,17 @@ public class MapDisplayMarkers {
     public Collection<MapMarker> values() {
         return Collections.unmodifiableCollection(markersById.values()
                 .stream().map(e -> e.value).collect(Collectors.toList()));
+    }
+
+    List<MapIconHandle> serializeValuesAsMapIcons(MapDisplayMarkerTile tile) {
+        return markersById.values().stream()
+                .map(e -> e.value)
+                .map(marker -> MapIconHandle.createNew(marker.getType(),
+                        tile.encodeX(marker.getPositionX()),
+                        tile.encodeY(marker.getPositionY()),
+                        tile.encodeRotation(marker.getRotation()),
+                        marker.getFormattedCaption()))
+                .collect(StreamUtil.toUnmodifiableList());
     }
 
     public MapMarker get(String id) {
@@ -140,7 +151,7 @@ public class MapDisplayMarkers {
                 // Requires update, ask the tile to do this
                 if (mapUpdate == null) {
                     mapUpdate = new MapDisplayTile.Update(displayedTile.tile, displayedTile.getMapId());
-                    mapUpdate.packet.cursors_raw(APPLIER.getMapIcons(tile));
+                    mapUpdate.packet.cursors_nms(serializeValuesAsMapIcons(tile));
                 }
 
                 // Send to this player. Makes a new packet each time, as the pixels byte[] array is mutable.
@@ -177,7 +188,7 @@ public class MapDisplayMarkers {
             mapUpdate.packet.no_cursors();
             return false;
         } else {
-            mapUpdate.packet.cursors_raw(APPLIER.getMapIcons(tile));
+            mapUpdate.packet.cursors_nms(serializeValuesAsMapIcons(tile));
             return tile.isChangedFor(viewer);
         }
     }

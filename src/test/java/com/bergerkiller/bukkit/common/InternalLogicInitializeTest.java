@@ -19,7 +19,6 @@ import com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializerIni
 import com.bergerkiller.bukkit.common.internal.logic.PlayerFileDataHandler;
 import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
-import com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkers;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 
@@ -85,11 +84,6 @@ public class InternalLogicInitializeTest {
     @Test
     public void testEntityMoveHandler() {
         EntityMoveHandler.assertInitialized();
-    }
-
-    @Test
-    public void testMapDisplayMarkerApplier() {
-        MapDisplayMarkers.APPLIER.forceInitialization();
     }
 
     @Test

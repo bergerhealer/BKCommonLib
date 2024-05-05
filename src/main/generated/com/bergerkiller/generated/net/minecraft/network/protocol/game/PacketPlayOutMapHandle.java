@@ -1,9 +1,12 @@
 package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
-import org.bukkit.map.MapCursor;
+import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapIconHandle;
+import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.List;
+import org.bukkit.map.MapCursor;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.PacketPlayOutMap</b>.
@@ -42,11 +45,23 @@ public abstract class PacketPlayOutMapHandle extends PacketHandle {
         private int mapId = 0;
         private byte scale = (byte) 1;
         private boolean locked = false;
-        private java.util.Optional<java.util.List<Object>> nmsMapIcons = java.util.Optional.empty();
+        private java.util.Optional<java.util.List<MapIconHandle>> mapIcons = java.util.Optional.empty();
         private boolean hasData = false;
         private int startX, startY;
         private int width, height;
         private byte[] colors = null;
+
+        private static final DuplexConverter<MapIconHandle, MapCursor> mapCursorHandleConversion = new DuplexConverter<MapIconHandle, MapCursor>(MapIconHandle.class, MapCursor.class) {
+            @Override
+            public MapCursor convertInput(MapIconHandle mapIconHandle) {
+                return mapIconHandle.toCursor();
+            }
+
+            @Override
+            public MapIconHandle convertOutput(MapCursor mapCursor) {
+                return MapIconHandle.fromCursor(mapCursor);
+            }
+        };
 
         private Builder() {
         }
@@ -64,12 +79,11 @@ public abstract class PacketPlayOutMapHandle extends PacketHandle {
         }
 
         public java.util.Optional<java.util.List<org.bukkit.map.MapCursor>> get_cursors() {
-            return nmsMapIcons.map(list -> new com.bergerkiller.mountiplex.conversion.util.ConvertingList<>(list,
-                com.bergerkiller.bukkit.common.conversion.DuplexConversion.mapCursor));
+            return mapIcons.map(list -> new ConvertingList<>(list, mapCursorHandleConversion));
         }
 
-        public java.util.Optional<java.util.List<Object>> get_cursors_raw() {
-            return nmsMapIcons;
+        public java.util.Optional<java.util.List<MapIconHandle>> get_cursors_nms() {
+            return mapIcons;
         }
 
         public boolean has_data() {
@@ -111,37 +125,36 @@ public abstract class PacketPlayOutMapHandle extends PacketHandle {
             return this;
         }
 
-        private List<Object> convertCursors(java.util.List<org.bukkit.map.MapCursor> cursors) {
-            return new com.bergerkiller.mountiplex.conversion.util.ConvertingList<>(cursors,
-                    com.bergerkiller.bukkit.common.conversion.DuplexConversion.mapCursor.reverse());
+        private List<MapIconHandle> convertCursors(java.util.List<org.bukkit.map.MapCursor> cursors) {
+            return new ConvertingList<>(cursors, mapCursorHandleConversion.reverse());
         }
 
         public Builder no_cursors() {
-            return this.cursors_raw(java.util.Collections.emptyList());
+            return this.cursors_nms(java.util.Collections.emptyList());
         }
 
         public Builder cursors(java.util.List<org.bukkit.map.MapCursor> cursors) {
-            return this.cursors_raw(convertCursors(cursors));
+            return this.cursors_nms(convertCursors(cursors));
         }
 
-        public Builder cursors_raw(java.util.List<Object> rawCursors) {
-            this.nmsMapIcons = java.util.Optional.of(rawCursors);
+        public Builder cursors_nms(java.util.List<MapIconHandle> rawCursors) {
+            this.mapIcons = java.util.Optional.ofNullable(rawCursors);
             return this;
         }
 
         public Builder add_cursors(java.util.List<org.bukkit.map.MapCursor> cursors) {
-            return add_cursors_raw(convertCursors(cursors));
+            return add_cursors_nms(convertCursors(cursors));
         }
 
-        public Builder add_cursors_raw(java.util.List<Object> rawCursors) {
-            if (!this.nmsMapIcons.isPresent()) {
-                this.cursors_raw(rawCursors);
-            } else if (!rawCursors.isEmpty()) {
-                java.util.List<Object> existing = this.nmsMapIcons.get();
-                java.util.List<Object> newList = new java.util.ArrayList<>(existing.size() + rawCursors.size());
+        public Builder add_cursors_nms(java.util.List<MapIconHandle> rawCursors) {
+            if (!this.mapIcons.isPresent()) {
+                this.cursors_nms(rawCursors);
+            } else if (rawCursors != null && !rawCursors.isEmpty()) {
+                java.util.List<MapIconHandle> existing = this.mapIcons.get();
+                java.util.List<MapIconHandle> newList = new java.util.ArrayList<>(existing.size() + rawCursors.size());
                 newList.addAll(existing);
                 newList.addAll(rawCursors);
-                this.nmsMapIcons = java.util.Optional.of(newList);
+                this.mapIcons = java.util.Optional.of(newList);
             }
             return this;
         }
@@ -162,7 +175,7 @@ public abstract class PacketPlayOutMapHandle extends PacketHandle {
             copy.mapId = this.mapId;
             copy.scale = this.scale;
             copy.locked = this.locked;
-            copy.nmsMapIcons = this.nmsMapIcons;
+            copy.mapIcons = this.mapIcons;
             copy.startX = this.startX;
             copy.startY = this.startY;
             copy.width = this.width;
