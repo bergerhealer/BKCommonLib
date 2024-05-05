@@ -15,7 +15,7 @@ public class NMSEntityLiving extends NMSEntity {
 
     public static final DataWatcher.Key<Byte> DATA_LIVING_FLAGS = EntityLivingHandle.DATA_LIVING_FLAGS;
     public static final DataWatcher.Key<Float> DATA_HEALTH = EntityLivingHandle.DATA_HEALTH;
-    public static final DataWatcher.Key<Integer> DATA_PARTICLES_TIMER = EntityLivingHandle.DATA_PARTICLES_TIMER;
+    public static final DataWatcher.Key<Integer> DATA_PARTICLES_COLOR_RGB = EntityLivingHandle.DATA_PARTICLES_COLOR_RGB;
     public static final DataWatcher.Key<Boolean> DATA_PARTICLES_HIDDEN = EntityLivingHandle.DATA_PARTICLES_HIDDEN;
     public static final DataWatcher.Key<Integer> DATA_UNKNOWN1 = EntityLivingHandle.DATA_UNKNOWN1;
 
