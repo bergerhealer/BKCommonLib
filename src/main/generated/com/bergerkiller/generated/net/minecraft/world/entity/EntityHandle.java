@@ -143,17 +143,14 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract WorldHandle getWorld();
     public abstract void setWorld(WorldHandle world);
     public abstract Entity getBukkitEntity();
-
     public com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle getWorldServer() {
         return com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.createHandle(T.getWorld.raw.invoke(getRaw()));
     }
-
 
     @Deprecated
     public boolean isDead() {
         return isDestroyed();
     }
-
 
     public static final DataWatcher.Key<Byte> DATA_FLAGS = DataWatcher.Key.Type.BYTE.createKey(T.DATA_FLAGS, 0);
     public static final DataWatcher.Key<Integer> DATA_AIR_TICKS = DataWatcher.Key.Type.INTEGER.createKey(T.DATA_AIR_TICKS, 1);
@@ -178,7 +175,6 @@ public abstract class EntityHandle extends Template.Handle {
     public static final int DATA_FLAG_GLOWING = (1 << 6);
     public static final int DATA_FLAG_FLYING = (1 << 7);
 
-
     public int getMaxFireTicks() {
         if (T.prop_getMaxFireTicks.isAvailable()) {
             return T.prop_getMaxFireTicks.invoke(getRaw());
@@ -189,7 +185,6 @@ public abstract class EntityHandle extends Template.Handle {
         }
     }
 
-
     public EntityHandle getDriverEntity() {
         if (T.getDriverEntity.isAvailable()) {
             return T.getDriverEntity.invoke(getRaw());
@@ -197,7 +192,6 @@ public abstract class EntityHandle extends Template.Handle {
             return null; // driver feature not a thing on this server
         }
     }
-
 
     public static EntityHandle fromBukkit(org.bukkit.entity.Entity entity) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(entity));

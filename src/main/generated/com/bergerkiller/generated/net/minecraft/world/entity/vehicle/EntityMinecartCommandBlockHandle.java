@@ -20,7 +20,6 @@ public abstract class EntityMinecartCommandBlockHandle extends EntityMinecartAbs
 
     /* ============================================================================== */
 
-
     public static final Key<String> DATA_COMMAND = Key.Type.STRING.createKey(T.DATA_COMMAND, 23);
     public static final Key<com.bergerkiller.bukkit.common.wrappers.ChatText> DATA_PREVIOUS_OUTPUT = Key.Type.CHAT_TEXT.createKey(T.DATA_PREVIOUS_OUTPUT, 24);
     /**

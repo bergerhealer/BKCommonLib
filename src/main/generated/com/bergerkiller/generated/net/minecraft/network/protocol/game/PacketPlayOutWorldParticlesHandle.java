@@ -32,7 +32,6 @@ public abstract class PacketPlayOutWorldParticlesHandle extends PacketHandle {
     public abstract void setPosX(double x);
     public abstract void setPosY(double y);
     public abstract void setPosZ(double z);
-
     public void setParticle(com.bergerkiller.bukkit.common.resources.ParticleType<Void> particleType) {
         setParticle(particleType, null);
     }
@@ -40,7 +39,6 @@ public abstract class PacketPlayOutWorldParticlesHandle extends PacketHandle {
     public <T> void setParticle(com.bergerkiller.bukkit.common.resources.ParticleType<T> particleType, T value) {
         T.setParticle.invoker.invoke(getRaw(), particleType.getRawHandle(), value);
     }
-
 
     public void setPos(double x, double y, double z) {
         setPosX(x);

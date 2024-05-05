@@ -31,7 +31,6 @@ public abstract class PacketPlayOutEntityEquipmentHandle extends PacketHandle {
     public abstract void setEquipmentSlot(OwnerType ownerType, int index, EquipmentSlot slot);
     public abstract ItemStack getItemStack(int index);
     public abstract void setItemStack(int index, ItemStack itemStack);
-
     public enum OwnerType {
         NON_PLAYER(false), PLAYER(true);
 

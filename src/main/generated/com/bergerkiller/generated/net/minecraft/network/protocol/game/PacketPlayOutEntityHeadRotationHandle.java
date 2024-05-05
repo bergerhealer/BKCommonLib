@@ -27,7 +27,6 @@ public abstract class PacketPlayOutEntityHeadRotationHandle extends PacketHandle
 
     public abstract float getHeadYaw();
     public abstract void setHeadYaw(float headYaw);
-
     public static PacketPlayOutEntityHeadRotationHandle createNew() {
         return T.createNewEmpty.invoke();
     }

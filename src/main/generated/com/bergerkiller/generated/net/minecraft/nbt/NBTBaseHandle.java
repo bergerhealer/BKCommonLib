@@ -21,7 +21,6 @@ public abstract class NBTBaseHandle extends Template.Handle {
 
     public abstract byte getTypeId();
     public abstract Object raw_clone();
-
     public com.bergerkiller.bukkit.common.nbt.CommonTag toCommonTag() {
         return new com.bergerkiller.bukkit.common.nbt.CommonTag(this);
     }
@@ -189,7 +188,6 @@ public abstract class NBTBaseHandle extends Template.Handle {
         }
 
         public abstract String getData();
-
         static {
             registerTypeInfo(String.class, T, T.create.raw::invoke, T.getData::invoke);
         }
@@ -233,7 +231,6 @@ public abstract class NBTBaseHandle extends Template.Handle {
         }
 
         public abstract byte getByteData();
-
         static {
             registerTypeInfo(byte.class, T, T.create.raw::invoke, T.getByteData::invoke);
         }
@@ -278,7 +275,6 @@ public abstract class NBTBaseHandle extends Template.Handle {
         }
 
         public abstract short getShortData();
-
         static {
             registerTypeInfo(short.class, T, T.create.raw::invoke, T.getShortData::invoke);
         }
@@ -324,7 +320,6 @@ public abstract class NBTBaseHandle extends Template.Handle {
         }
 
         public abstract int getIntegerData();
-
         static {
             registerTypeInfo(int.class, T, T.create.raw::invoke, T.getIntegerData::invoke);
         }
@@ -369,7 +364,6 @@ public abstract class NBTBaseHandle extends Template.Handle {
         }
 
         public abstract long getLongData();
-
         static {
             registerTypeInfo(long.class, T, T.create.raw::invoke, T.getLongData::invoke);
         }
@@ -414,7 +408,6 @@ public abstract class NBTBaseHandle extends Template.Handle {
         }
 
         public abstract float getFloatData();
-
         static {
             registerTypeInfo(float.class, T, T.create.raw::invoke, T.getFloatData::invoke);
         }
@@ -459,7 +452,6 @@ public abstract class NBTBaseHandle extends Template.Handle {
         }
 
         public abstract double getDoubleData();
-
         static {
             registerTypeInfo(double.class, T, T.create.raw::invoke, T.getDoubleData::invoke);
         }
@@ -504,7 +496,6 @@ public abstract class NBTBaseHandle extends Template.Handle {
         }
 
         public abstract byte[] getData();
-
         static {
             registerTypeInfo(byte[].class, T, T.create.raw::invoke, T.getData::invoke);
         }
@@ -544,7 +535,6 @@ public abstract class NBTBaseHandle extends Template.Handle {
         }
 
         public abstract int[] getData();
-
         static {
             registerTypeInfo(int[].class, T, T.create.raw::invoke, T.getData::invoke);
         }
@@ -585,7 +575,6 @@ public abstract class NBTBaseHandle extends Template.Handle {
         }
 
         public abstract long[] getData();
-
         static {
             if (T.isAvailable()) {
                 registerTypeInfo(long[].class, T, T.create.raw::invoke, T.getData::invoke);

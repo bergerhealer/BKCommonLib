@@ -22,7 +22,6 @@ public abstract class PacketPlayOutNamedSoundEffectHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-
     public float getPitch() {
         if (T.pitch_1_10_2.isAvailable()) {
             return T.pitch_1_10_2.getFloat(getRaw());
@@ -38,7 +37,6 @@ public abstract class PacketPlayOutNamedSoundEffectHandle extends PacketHandle {
             T.pitch_1_8_8.setInteger(getRaw(), (int) (pitch * 63.0f));
         }
     }
-
 
     public String getCategory() {
         if (T.category_1_10_2.isAvailable()) {

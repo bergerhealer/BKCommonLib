@@ -32,7 +32,6 @@ public abstract class PacketPlayOutMapChunkHandle extends PacketHandle {
     public abstract byte[] getBuffer();
     public abstract void setBuffer(byte[] buffer);
     public abstract List<BlockStateChange> getBlockStates();
-
     public void setBlockStates(List<BlockStateChange> states) {
         List<BlockStateChange> baseStates = this.getBlockStates();
         int count = states.size();

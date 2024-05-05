@@ -21,7 +21,6 @@ public abstract class EnumItemSlotHandle extends Template.Handle {
 
     public abstract int getFilterFlag();
     public abstract String getName();
-
     public static Object fromFilterFlagRaw(int index) {
         for (Object value : T.getType().getEnumConstants()) {
             if (T.getFilterFlag.invoke(value).intValue() == index) {

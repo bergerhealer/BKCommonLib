@@ -55,7 +55,6 @@ public abstract class WorldServerHandle extends WorldHandle {
     public abstract MinecraftServerHandle getMinecraftServer();
     public abstract void saveLevel();
     public abstract Location findSafeSpawn(PlayerRespawnPoint respawnPoint, boolean alsoWhenDestroyed, boolean isDeathRespawn);
-
     public static WorldServerHandle fromBukkit(org.bukkit.World world) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
     }

@@ -20,7 +20,6 @@ public abstract class EntityAgeableHandle extends EntityInsentientHandle {
 
     /* ============================================================================== */
 
-
     public static final Key<Boolean> DATA_IS_BABY = Key.Type.BOOLEAN.createKey(T.DATA_IS_BABY, 12);
     /**
      * Stores class members for <b>net.minecraft.world.entity.EntityAgeable</b>.

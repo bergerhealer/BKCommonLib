@@ -25,7 +25,6 @@ public abstract class PacketPlayOutMountHandle extends PacketHandle {
         return T.createNew.invoke();
     }
 
-
     public void addMountedEntityId(int entityId) {
         int[] oldIds = this.getMountedEntityIds();
         if (oldIds == null || oldIds.length == 0) {

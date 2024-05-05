@@ -21,7 +21,6 @@ public abstract class EntitySlimeHandle extends EntityInsentientHandle {
 
     /* ============================================================================== */
 
-
     public static final Key<Integer> DATA_SIZE = Key.Type.SLIME_SIZE_TYPE.createKey(T.DATA_SIZE, 16);
     /**
      * Stores class members for <b>net.minecraft.world.entity.monster.EntitySlime</b>.

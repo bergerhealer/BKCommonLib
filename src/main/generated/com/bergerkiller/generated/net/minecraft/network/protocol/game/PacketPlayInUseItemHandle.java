@@ -38,7 +38,6 @@ public abstract class PacketPlayInUseItemHandle extends PacketHandle {
     public abstract void setDeltaX(float dx);
     public abstract void setDeltaY(float dy);
     public abstract void setDeltaZ(float dz);
-
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
         return com.bergerkiller.bukkit.common.protocol.PacketType.IN_USE_ITEM;

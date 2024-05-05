@@ -21,7 +21,6 @@ public abstract class EntityFishingHookHandle extends EntityHandle {
 
     /* ============================================================================== */
 
-
     public static final Key<java.util.OptionalInt> DATA_HOOKED_ENTITY_ID = Key.Type.ENTITY_ID.createKey(T.DATA_HOOKED_ENTITY_ID, -1);
     /**
      * Stores class members for <b>net.minecraft.world.entity.projectile.EntityFishingHook</b>.

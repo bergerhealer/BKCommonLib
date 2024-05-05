@@ -37,7 +37,6 @@ public abstract class TileEntityHandle extends Template.Handle {
     public abstract Material getType();
     public abstract CommonPacket getUpdatePacket();
     public abstract boolean isRemoved();
-
     @SuppressWarnings("deprecation")
     public org.bukkit.block.BlockState toBukkit() {
         return com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion.INSTANCE.tileEntityToBlockState(getRaw());

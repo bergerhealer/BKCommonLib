@@ -23,7 +23,6 @@ public abstract class MinecraftKeyHandle extends Template.Handle {
         return T.createNew.invoke(keyToken);
     }
 
-
     public static boolean isValid(String key) {
         return createNew(key) != null;
     }

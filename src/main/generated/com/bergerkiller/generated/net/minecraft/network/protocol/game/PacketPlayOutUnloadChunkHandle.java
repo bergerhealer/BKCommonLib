@@ -24,7 +24,6 @@ public abstract class PacketPlayOutUnloadChunkHandle extends PacketHandle {
     public abstract int getCx();
     public abstract int getCz();
     public abstract void setChunk(int cx, int cz);
-
     public void setCx(int cx) {
         setChunk(cx, getCz());
     }

@@ -20,7 +20,6 @@ public abstract class EntityMinecartFurnaceHandle extends EntityMinecartAbstract
 
     /* ============================================================================== */
 
-
     public static final Key<Boolean> DATA_SMOKING = Key.Type.BOOLEAN.createKey(T.DATA_SMOKING, 16);
     public abstract int getFuel();
     public abstract void setFuel(int value);

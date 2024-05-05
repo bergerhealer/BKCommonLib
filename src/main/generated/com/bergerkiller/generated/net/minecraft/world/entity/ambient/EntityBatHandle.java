@@ -21,7 +21,6 @@ public abstract class EntityBatHandle extends EntityInsentientHandle {
 
     /* ============================================================================== */
 
-
     public static final Key<Byte> DATA_BAT_FLAGS = Key.Type.BYTE.createKey(T.DATA_BAT_FLAGS, 16);
     public static final int DATA_BAT_FLAG_HANGING = (1 << 0);
     /**

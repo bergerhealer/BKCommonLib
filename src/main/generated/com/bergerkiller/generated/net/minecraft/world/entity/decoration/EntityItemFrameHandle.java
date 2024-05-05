@@ -29,9 +29,7 @@ public abstract class EntityItemFrameHandle extends EntityHangingHandle {
     public abstract void setItem(ItemStack newItemStack);
     public abstract void refreshItem();
     public abstract int getRotationOrdinal();
-
     public static final Key<org.bukkit.inventory.ItemStack> DATA_ITEM = Key.Type.ITEMSTACK.createKey(T.DATA_ITEM, 8);
-
 
     public static EntityItemFrameHandle fromBukkit(org.bukkit.entity.ItemFrame itemFrame) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(itemFrame));

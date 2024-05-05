@@ -30,7 +30,6 @@ public abstract class PacketPlayOutPositionHandle extends PacketHandle {
         return T.createAbsolute.invoke(x, y, z, yaw, pitch);
     }
 
-
     public int getTeleportWaitTimer() {
         if (T.teleportWaitTimer.isAvailable()) {
             return T.teleportWaitTimer.getInteger(getRaw());
@@ -68,7 +67,6 @@ public abstract class PacketPlayOutPositionHandle extends PacketHandle {
             flags.remove(RelativeMovementHandle.Z);
         }
     }
-
 
     public static PacketPlayOutPositionHandle createAbsolute(org.bukkit.Location location) {
         return createAbsolute(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());

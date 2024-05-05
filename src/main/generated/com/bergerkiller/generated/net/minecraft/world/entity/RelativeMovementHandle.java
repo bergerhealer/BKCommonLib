@@ -24,7 +24,6 @@ public abstract class RelativeMovementHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-
     public static java.util.Set<?> allAbsolute() {
         return java.util.EnumSet.noneOf((Class) T.getType());
     }

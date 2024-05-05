@@ -25,7 +25,6 @@ public abstract class MinecraftServerHandle extends Template.Handle {
     public abstract int getTicksSinceUnixEpoch();
     public abstract int getTicks();
     public abstract boolean isMainThread();
-
     private static MinecraftServerHandle _cached_instance = null;
     public static MinecraftServerHandle instance() {
         if (_cached_instance == null) {

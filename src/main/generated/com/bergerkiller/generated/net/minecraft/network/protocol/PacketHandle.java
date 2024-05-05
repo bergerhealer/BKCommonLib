@@ -23,7 +23,6 @@ public abstract class PacketHandle extends Template.Handle {
         return T.tryUnwrapBundlePacket.invoker.invoke(null,packet);
     }
 
-
     public com.bergerkiller.bukkit.common.protocol.CommonPacket toCommonPacket() {
         return new com.bergerkiller.bukkit.common.protocol.CommonPacket(getRaw(), getPacketType());
     }
@@ -31,7 +30,6 @@ public abstract class PacketHandle extends Template.Handle {
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
         return com.bergerkiller.bukkit.common.protocol.PacketType.getType(getRaw());
     }
-
 
     protected final double getProtocolPosition(Template.Field.Byte field_1_8_8, Template.Field.Integer field_1_10_2) {
         if (field_1_10_2.isAvailable()) {

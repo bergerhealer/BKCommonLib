@@ -21,7 +21,6 @@ public abstract class EnumChatFormatHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract int getId();
-
     public static final Object[] RAW_VALUES = T.getType().getEnumConstants();
     public static final EnumChatFormatHandle[] VALUES;
     static {

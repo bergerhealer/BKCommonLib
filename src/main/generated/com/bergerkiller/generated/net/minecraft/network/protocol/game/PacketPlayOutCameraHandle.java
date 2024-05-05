@@ -24,7 +24,6 @@ public abstract class PacketPlayOutCameraHandle extends PacketHandle {
         return T.createNew.invoke();
     }
 
-
     public static PacketPlayOutCameraHandle createNew(int entityId) {
         PacketPlayOutCameraHandle packet = createNew();
         packet.setEntityId(entityId);

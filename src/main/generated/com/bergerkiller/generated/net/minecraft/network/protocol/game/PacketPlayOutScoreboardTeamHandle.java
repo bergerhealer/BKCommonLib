@@ -41,7 +41,6 @@ public abstract class PacketPlayOutScoreboardTeamHandle extends PacketHandle {
     public abstract void setColor(ChatColor color);
     public abstract int getTeamOptionFlags();
     public abstract void setTeamOptionFlags(int teamOptionFlags);
-
     public static final int METHOD_ADD = 0;
     public static final int METHOD_REMOVE = 1;
     public static final int METHOD_CHANGE = 2;

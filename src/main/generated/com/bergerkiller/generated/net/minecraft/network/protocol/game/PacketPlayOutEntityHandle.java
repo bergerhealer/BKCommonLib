@@ -31,7 +31,6 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
     public abstract void setYaw(float yaw);
     public abstract void setPitch(float pitch);
 
-
     @Deprecated
     public float getDeltaYaw() {
         return getYaw();
@@ -101,7 +100,6 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
             return T.createNew.invoke();
         }
 
-
         @Override
         public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
             return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_LOOK;
@@ -147,7 +145,6 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
         public static PacketPlayOutRelEntityMoveHandle createNew() {
             return T.createNew.invoke();
         }
-
 
         @Override
         public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
@@ -195,7 +192,6 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
         public static PacketPlayOutRelEntityMoveLookHandle createNew() {
             return T.createNew.invoke();
         }
-
 
         @Override
         public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {

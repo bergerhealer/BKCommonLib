@@ -33,7 +33,6 @@ public abstract class BlockPositionHandle extends BaseBlockPositionHandle {
         return T.fromBukkitBlockRaw.invoker.invoke(null,block);
     }
 
-
     public static BlockPositionHandle fromIntVector3(com.bergerkiller.bukkit.common.bases.IntVector3 vector) {
         return createHandle(fromIntVector3Raw(vector));
     }

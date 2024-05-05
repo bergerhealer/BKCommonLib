@@ -37,7 +37,6 @@ public abstract class SoundEffectHandle extends Template.Handle {
         return T.getSoundNames.invoke();
     }
 
-
     @Deprecated
     public static SoundEffectHandle createNew(MinecraftKeyHandle name) {
         return createVariableRangeEvent(name);

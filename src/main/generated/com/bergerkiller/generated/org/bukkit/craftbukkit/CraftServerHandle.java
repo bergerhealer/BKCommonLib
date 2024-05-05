@@ -27,7 +27,6 @@ public abstract class CraftServerHandle extends Template.Handle {
     public abstract DedicatedPlayerListHandle getPlayerList();
     public abstract MinecraftServerHandle getServer();
     public abstract File getPluginsDirectory();
-
     private static CraftServerHandle _instance = null;
     public static CraftServerHandle instance() {
         if (_instance == null) {

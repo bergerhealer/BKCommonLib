@@ -26,7 +26,6 @@ public abstract class PacketPlayOutRemoveEntityEffectHandle extends PacketHandle
         return T.createNew.invoke();
     }
 
-
     public org.bukkit.potion.PotionEffectType getPotionEffectType() {
         return MobEffectListHandle.holderToBukkit(getEffect());
     }

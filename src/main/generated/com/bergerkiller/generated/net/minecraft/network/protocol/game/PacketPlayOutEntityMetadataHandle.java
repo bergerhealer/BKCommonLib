@@ -31,7 +31,6 @@ public abstract class PacketPlayOutEntityMetadataHandle extends PacketHandle {
         return T.createForChanges.invoke(entityId, datawatcher);
     }
 
-
     public static PacketPlayOutEntityMetadataHandle createNew(int entityId, DataWatcher datawatcher, boolean includeUnchangedData) {
         if (includeUnchangedData) {
             return createForSpawn(entityId, datawatcher);

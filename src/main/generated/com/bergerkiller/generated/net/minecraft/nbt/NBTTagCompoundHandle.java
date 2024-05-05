@@ -40,11 +40,9 @@ public abstract class NBTTagCompoundHandle extends NBTBaseHandle {
     public abstract NBTBaseHandle put(String key, NBTBaseHandle value);
     public abstract NBTBaseHandle get(String key);
     public abstract boolean containsKey(String key);
-
     public NBTTagCompoundHandle clone() {
         return createHandle(raw_clone());
     }
-
 
     static {
         registerTypeInfo(java.util.Map.class, T, T.create.raw::invoke, T.data.raw::get);

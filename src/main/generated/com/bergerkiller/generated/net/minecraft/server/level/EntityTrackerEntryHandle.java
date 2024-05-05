@@ -39,7 +39,6 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
     public abstract void removeViewer(Player player);
     public abstract void updatePlayer(Player player);
     public abstract void hideForAll();
-
     @Deprecated
     public static final boolean hasProtocolRotationChanged(float angle1, float angle2) {
         return EntityTrackerEntryStateHandle.hasProtocolRotationChanged(angle1, angle2);

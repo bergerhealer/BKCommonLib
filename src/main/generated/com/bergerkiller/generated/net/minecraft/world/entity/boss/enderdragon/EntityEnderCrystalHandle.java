@@ -22,7 +22,6 @@ public abstract class EntityEnderCrystalHandle extends EntityHandle {
 
     /* ============================================================================== */
 
-
     public static final Key<IntVector3> DATA_BEAM_TARGET = Key.Type.BLOCK_POSITION.createKey(T.DATA_BEAM_TARGET, -1);
     /**
      * Stores class members for <b>net.minecraft.world.entity.boss.enderdragon.EntityEnderCrystal</b>.

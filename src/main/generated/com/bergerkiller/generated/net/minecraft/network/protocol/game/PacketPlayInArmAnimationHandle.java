@@ -20,7 +20,6 @@ public abstract class PacketPlayInArmAnimationHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-
     public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
         return internalGetHand(T.enumHand, humanEntity);
     }

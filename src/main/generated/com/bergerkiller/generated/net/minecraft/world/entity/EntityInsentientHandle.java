@@ -23,7 +23,6 @@ public abstract class EntityInsentientHandle extends EntityLivingHandle {
     public abstract EntityHandle getLeashHolder();
     public abstract Object getNavigation();
     public abstract boolean isSleeping();
-
     public static final Key<Byte> DATA_INSENTIENT_FLAGS = Key.Type.BYTE.createKey(T.DATA_INSENTIENT_FLAGS, 11);
     public static final int DATA_INSENTIENT_FLAG_NOAI = (1 << 0);
     public static final int DATA_INSENTIENT_FLAG_LEFT_HANDED = (1 << 1);

@@ -20,7 +20,6 @@ public abstract class PacketPlayOutSpawnEntityExperienceOrbHandle extends Packet
 
     /* ============================================================================== */
 
-
     public double getPosX() {
         return getProtocolPosition(T.posX_1_8_8, T.posX_1_10_2);
     }

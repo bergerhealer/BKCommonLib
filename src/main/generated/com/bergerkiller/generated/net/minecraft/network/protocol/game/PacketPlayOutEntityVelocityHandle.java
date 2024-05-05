@@ -29,7 +29,6 @@ public abstract class PacketPlayOutEntityVelocityHandle extends PacketHandle {
         return T.createNew.invoke(entityId, motX, motY, motZ);
     }
 
-
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
         return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_VELOCITY;

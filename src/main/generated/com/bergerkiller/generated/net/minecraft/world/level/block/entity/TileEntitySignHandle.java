@@ -24,13 +24,11 @@ public abstract class TileEntitySignHandle extends TileEntityHandle {
     public abstract Object[] getRawBackLines();
     public abstract void setFormattedFrontLine(int index, ChatText text);
     public abstract void setFormattedBackLine(int index, ChatText text);
-
     public static final Object[] ALL_EMPTY_RAW_LINES;
     static {
         Object raw_empty = ChatText.empty().getRawHandle();
         ALL_EMPTY_RAW_LINES = new Object[] {raw_empty, raw_empty, raw_empty, raw_empty};
     }
-
 
     @Override
     public org.bukkit.block.Sign toBukkit() {

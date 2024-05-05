@@ -74,7 +74,6 @@ public abstract class ItemStackHandle extends Template.Handle {
     public abstract void setMapId(int mapId);
     public abstract UUID getMapDisplayDynamicOnlyUUID();
     public abstract UUID getMapDisplayUUID();
-
     public static final ItemStackHandle EMPTY_ITEM;
     static {
         if (T.OPT_EMPTY_ITEM.isAvailable()) {
@@ -83,7 +82,6 @@ public abstract class ItemStackHandle extends Template.Handle {
             EMPTY_ITEM = T.createHandle(null, true);
         }
     }
-
 
     public static ItemStackHandle fromBukkit(org.bukkit.inventory.ItemStack itemStack) {
         if (itemStack == null) {

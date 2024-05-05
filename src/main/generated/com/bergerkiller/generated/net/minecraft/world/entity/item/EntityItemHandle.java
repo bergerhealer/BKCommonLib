@@ -29,7 +29,6 @@ public abstract class EntityItemHandle extends EntityHandle {
 
     public abstract ItemStackHandle getItemStack();
     public abstract void setItemStack(ItemStackHandle itemstack);
-
     public static final Key<org.bukkit.inventory.ItemStack> DATA_ITEM = Key.Type.ITEMSTACK.createKey(T.DATA_ITEM, 10);
     public abstract int getAge();
     public abstract void setAge(int value);

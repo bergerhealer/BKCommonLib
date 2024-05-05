@@ -35,7 +35,6 @@ public abstract class LongHashSetHandle extends Template.Handle {
     public abstract long[] toArray();
     public abstract long[] popAll();
     public abstract void trim();
-
     public static LongHashSetHandle createNew() {
         return createNew(16);
     }

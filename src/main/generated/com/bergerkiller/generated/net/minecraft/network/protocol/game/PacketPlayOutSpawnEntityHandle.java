@@ -30,7 +30,6 @@ public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
     public abstract float getPitch();
     public abstract void setYaw(float yaw);
     public abstract void setPitch(float pitch);
-
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
         return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_SPAWN;

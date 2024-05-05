@@ -31,7 +31,6 @@ public abstract class PacketPlayOutAttachEntityHandle extends PacketHandle {
 
     public abstract boolean isLeash();
     public abstract void setIsLeash(boolean isLeash);
-
     public static PacketPlayOutAttachEntityHandle createNewLeash(int leashedEntityId, int holderEntityId) {
         PacketPlayOutAttachEntityHandle packet = T.newHandleNull();
         packet.setVehicleId(holderEntityId);

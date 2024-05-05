@@ -80,7 +80,6 @@ public abstract class ClientboundPlayerInfoUpdatePacketHandle extends PacketHand
         public abstract int getPing();
         public abstract GameMode getGameMode();
         public abstract ChatText getListName();
-
         public static PlayerInfoDataHandle createNew(ClientboundPlayerInfoUpdatePacketHandle packet, GameProfileHandle profile, int ping, org.bukkit.GameMode gameMode, ChatText listName) {
             return createNew(packet, profile, ping, gameMode, listName, true); // Listed like olden times
         }

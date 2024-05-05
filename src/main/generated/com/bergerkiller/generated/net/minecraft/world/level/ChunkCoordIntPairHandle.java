@@ -29,7 +29,6 @@ public abstract class ChunkCoordIntPairHandle extends Template.Handle {
     }
 
     public abstract IntVector2 toIntVector2();
-
     public static ChunkCoordIntPairHandle fromIntVector2(com.bergerkiller.bukkit.common.bases.IntVector2 vector) {
         return createHandle(fromIntVector2Raw(vector));
     }

@@ -29,7 +29,6 @@ public abstract class Vec3DHandle extends Template.Handle {
     }
 
     public abstract Vector toBukkit();
-
     public static Vec3DHandle fromBukkit(org.bukkit.util.Vector vector) {
         return createHandle(fromBukkitRaw(vector));
     }

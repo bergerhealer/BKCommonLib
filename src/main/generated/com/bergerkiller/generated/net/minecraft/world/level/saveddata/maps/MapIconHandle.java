@@ -35,7 +35,6 @@ public abstract class MapIconHandle extends Template.Handle {
     public abstract byte getX();
     public abstract byte getY();
     public abstract byte getDirection();
-
     public static MapIconHandle createNew(Type type, byte x, byte y, byte direction) {
         return createNew(type, x, y, direction, null);
     }

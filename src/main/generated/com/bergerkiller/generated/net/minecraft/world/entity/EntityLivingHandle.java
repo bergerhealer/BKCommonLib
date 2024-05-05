@@ -40,14 +40,12 @@ public abstract class EntityLivingHandle extends EntityHandle {
     public abstract float getMaxHealth();
     public abstract float getAbsorptionAmount();
     public abstract void setAbsorptionAmount(float extraHealth);
-
     public static final Key<Byte> DATA_LIVING_FLAGS = Key.Type.BYTE.createKey(T.DATA_LIVING_FLAGS, -1);
     public static final Key<Float> DATA_HEALTH = Key.Type.FLOAT.createKey(T.DATA_HEALTH, 6);
     public static final Key<Integer> DATA_PARTICLES_TIMER = Key.Type.INTEGER.createKey(T.DATA_PARTICLES_TIMER, 7);
     public static final Key<Boolean> DATA_PARTICLES_HIDDEN = Key.Type.BOOLEAN.createKey(T.DATA_PARTICLES_HIDDEN, 8);
     public static final Key<Integer> DATA_UNKNOWN1 = Key.Type.INTEGER.createKey(T.DATA_ARROWCOUNT, 9);
     public static final Key<IntVector3> DATA_BEDPOSITION = Key.Type.BLOCK_POSITION.createKey(T.DATA_BEDPOSITION, -1);
-
 
     public static EntityLivingHandle fromBukkit(org.bukkit.entity.LivingEntity livingEntity) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(livingEntity));

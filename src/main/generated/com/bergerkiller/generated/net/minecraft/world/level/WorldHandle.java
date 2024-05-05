@@ -57,11 +57,9 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract int getMaxBuildHeight();
     public abstract int getNetherPortalSearchRadius();
     public abstract int getNetherPortalCreateRadius();
-
     public static final int UPDATE_PHYSICS = 0x1; // flag specifying block physics should occur after the change
     public static final int UPDATE_NOTIFY = 0x2; // flag specifying the change should be updated to players
     public static final int UPDATE_DEFAULT = (UPDATE_PHYSICS | UPDATE_NOTIFY); // default flags used when updating block types
-
 
     public void applyBlockPhysics(IntVector3 position, BlockData causeType, boolean self) {
         applyBlockPhysicsAround(position, causeType);
@@ -69,7 +67,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
             applyBlockPhysics(position, causeType);
         }
     }
-
 
     public org.bukkit.World toBukkit() {
         return com.bergerkiller.bukkit.common.conversion.Conversion.toWorld.convert(getRaw());

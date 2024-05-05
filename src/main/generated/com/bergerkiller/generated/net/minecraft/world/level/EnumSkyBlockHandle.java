@@ -21,7 +21,6 @@ public abstract class EnumSkyBlockHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-
     public int ordinal() {
         return ((Enum<?>) getRaw()).ordinal();
     }

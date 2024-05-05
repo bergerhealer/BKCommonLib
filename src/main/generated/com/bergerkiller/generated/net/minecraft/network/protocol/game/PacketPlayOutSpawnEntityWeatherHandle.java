@@ -21,7 +21,6 @@ public abstract class PacketPlayOutSpawnEntityWeatherHandle extends PacketHandle
 
     /* ============================================================================== */
 
-
     public double getPosX() {
         return getProtocolPosition(T.posX_1_8_8, T.posX_1_10_2);
     }

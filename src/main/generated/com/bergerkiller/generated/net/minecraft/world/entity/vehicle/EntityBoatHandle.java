@@ -21,7 +21,6 @@ public abstract class EntityBoatHandle extends EntityHandle {
 
     /* ============================================================================== */
 
-
     public static final Key<com.bergerkiller.bukkit.common.wrappers.BoatWoodType> DATA_WOOD_TYPE = Key.Type.BOAT_WOOD_TYPE.createKey(T.DATA_WOOD_TYPE, -1);
     /**
      * Stores class members for <b>net.minecraft.world.entity.vehicle.EntityBoat</b>.

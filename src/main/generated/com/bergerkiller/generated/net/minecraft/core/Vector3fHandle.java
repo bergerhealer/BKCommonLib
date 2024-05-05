@@ -32,7 +32,6 @@ public abstract class Vector3fHandle extends Template.Handle {
     public abstract float getY();
     public abstract float getZ();
     public abstract Vector toBukkit();
-
     public static Vector3fHandle fromBukkit(org.bukkit.util.Vector vector) {
         return createHandle(fromBukkitRaw(vector));
     }

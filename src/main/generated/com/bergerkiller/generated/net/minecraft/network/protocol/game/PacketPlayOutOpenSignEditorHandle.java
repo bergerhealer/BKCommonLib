@@ -27,7 +27,6 @@ public abstract class PacketPlayOutOpenSignEditorHandle extends PacketHandle {
 
     public abstract boolean isFrontText();
     public abstract void setFrontText(boolean front);
-
     public static PacketPlayOutOpenSignEditorHandle createNew(IntVector3 signPosition) {
         return createNew(signPosition, true);
     }

@@ -60,7 +60,6 @@ public abstract class EnumDirectionHandle extends Template.Handle {
 
         /* ============================================================================== */
 
-
         public int ordinal() {
             return ((Enum<?>) getRaw()).ordinal();
         }

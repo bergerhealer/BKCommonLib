@@ -22,7 +22,6 @@ public abstract class EntityArmorStandHandle extends EntityLivingHandle {
 
     /* ============================================================================== */
 
-
     public static final Key<Byte> DATA_ARMORSTAND_FLAGS = Key.Type.BYTE.createKey(T.DATA_ARMORSTAND_FLAGS, 10);
     public static final Key<org.bukkit.util.Vector> DATA_POSE_HEAD = Key.Type.ROTATION_VECTOR.createKey(T.DATA_POSE_HEAD, 11);
     public static final Key<org.bukkit.util.Vector> DATA_POSE_BODY = Key.Type.ROTATION_VECTOR.createKey(T.DATA_POSE_BODY, 12);

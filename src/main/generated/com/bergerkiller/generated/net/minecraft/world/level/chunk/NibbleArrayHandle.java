@@ -30,7 +30,6 @@ public abstract class NibbleArrayHandle extends Template.Handle {
     public abstract int get(int x, int y, int z);
     public abstract void set(int x, int y, int z, int nibbleValue);
     public abstract byte[] getData();
-
     public void fill(int nibbleValue) {
         java.util.Arrays.fill(getData(), (byte) (nibbleValue & 0xF));
     }

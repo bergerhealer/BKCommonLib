@@ -21,7 +21,6 @@ public abstract class InteractionHandle extends EntityHandle {
 
     /* ============================================================================== */
 
-
     public static final Key<Float> DATA_WIDTH = Key.Type.FLOAT.createKey(T.DATA_WIDTH_ID, -1);
     public static final Key<Float> DATA_HEIGHT = Key.Type.FLOAT.createKey(T.DATA_HEIGHT_ID, -1);
     public static final Key<Boolean> DATA_RESPONSE = Key.Type.BOOLEAN.createKey(T.DATA_RESPONSE_ID, -1);

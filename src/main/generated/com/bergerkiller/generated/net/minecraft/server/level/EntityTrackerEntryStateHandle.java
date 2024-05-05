@@ -44,11 +44,9 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
     public abstract boolean checkTrackNeeded();
     public abstract CommonPacket getSpawnPacket();
     public abstract void onTick();
-
     public void setVelocity(org.bukkit.util.Vector velocity) {
         setVelocity(velocity.getX(), velocity.getY(), velocity.getZ());
     }
-
 
     public static final double POSITION_STEP;
     public static final float ROTATION_STEP;

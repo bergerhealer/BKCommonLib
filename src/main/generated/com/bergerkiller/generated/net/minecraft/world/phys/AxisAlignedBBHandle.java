@@ -30,7 +30,6 @@ public abstract class AxisAlignedBBHandle extends Template.Handle {
     public abstract double calcSomeX(AxisAlignedBBHandle axisalignedbb, double d0);
     public abstract double calcSomeY(AxisAlignedBBHandle axisalignedbb, double d0);
     public abstract double calcSomeZ(AxisAlignedBBHandle axisalignedbb, double d0);
-
     public AxisAlignedBBHandle growUniform(double size) {
         return grow(size, size, size);
     }

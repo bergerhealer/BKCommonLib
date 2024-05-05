@@ -39,7 +39,6 @@ public abstract class PacketPlayOutCustomSoundEffectHandle extends PacketHandle 
     public abstract long getRandomSeed();
     public abstract void setRandomSeed(long seed);
 
-
     public static final java.util.Random SOUND_RANDOM_SEED_SOURCE = new java.util.Random();
 
     public static PacketPlayOutCustomSoundEffectHandle createNew(com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect> soundEffect, String category, org.bukkit.Location location, float volume, float pitch) {

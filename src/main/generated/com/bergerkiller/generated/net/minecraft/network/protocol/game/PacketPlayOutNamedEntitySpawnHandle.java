@@ -27,7 +27,6 @@ public abstract class PacketPlayOutNamedEntitySpawnHandle extends PacketHandle {
         return T.createNew.invoke();
     }
 
-
     public boolean hasDataWatcherSupport() {
         return T.opt_dataWatcher.isAvailable();
     }

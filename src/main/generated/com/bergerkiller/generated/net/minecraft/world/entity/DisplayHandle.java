@@ -21,7 +21,6 @@ public abstract class DisplayHandle extends EntityHandle {
 
     /* ============================================================================== */
 
-
     public static final Key<Integer> DATA_INTERPOLATION_START_DELTA_TICKS = Key.Type.INTEGER.createKey(T.DATA_INTERPOLATION_START_DELTA_TICKS_ID, -1);
     public static final Key<Integer> DATA_INTERPOLATION_DURATION = Key.Type.INTEGER.createKey(T.DATA_INTERPOLATION_DURATION_ID, -1);
     public static final Key<Integer> DATA_POS_ROT_INTERPOLATION_DURATION = Key.Type.INTEGER.createKey(T.DATA_POS_ROT_INTERPOLATION_DURATION_ID, -1);
@@ -93,7 +92,6 @@ public abstract class DisplayHandle extends EntityHandle {
 
         /* ============================================================================== */
 
-
         public static final byte STYLE_FLAG_SHADOW = 1;
         public static final byte STYLE_FLAG_SEE_THROUGH = 2;
         public static final byte STYLE_FLAG_USE_DEFAULT_BACKGROUND = 4;
@@ -143,7 +141,6 @@ public abstract class DisplayHandle extends EntityHandle {
 
         /* ============================================================================== */
 
-
         public static final Key<com.bergerkiller.bukkit.common.wrappers.BlockData> DATA_BLOCK_STATE = Key.Type.BLOCK_DATA.createKey(T.DATA_BLOCK_STATE_ID, -1);
         /**
          * Stores class members for <b>net.minecraft.world.entity.Display.BlockDisplay</b>.
@@ -174,7 +171,6 @@ public abstract class DisplayHandle extends EntityHandle {
         }
 
         /* ============================================================================== */
-
 
         public static final Key<org.bukkit.inventory.ItemStack> DATA_ITEM_STACK = Key.Type.ITEMSTACK.createKey(T.DATA_ITEM_STACK_ID, -1);
         public static final Key<com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode> DATA_ITEM_DISPLAY_MODE = Key.Type.ITEM_DISPLAY_MODE.createKey(T.DATA_ITEM_DISPLAY_ID, -1);

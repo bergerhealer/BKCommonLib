@@ -41,7 +41,6 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
     public abstract int getCurrentWindowId();
     public abstract InventoryView openAnvilWindow(ChatText titleText);
     public abstract void openSignEditWindow(IntVector3 signPosition, boolean isFrontText);
-
     public void closeSignEditWindow() {
         openSignEditWindow(IntVector3.of(Integer.MAX_VALUE, 0, Integer.MAX_VALUE));
     }
@@ -49,7 +48,6 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
     public void openSignEditWindow(IntVector3 signPosition) {
         openSignEditWindow(signPosition, true);
     }
-
 
     public static EntityPlayerHandle fromBukkit(org.bukkit.entity.Player player) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player));

@@ -26,7 +26,6 @@ public abstract class ClientboundCustomPayloadPacketHandle extends PacketHandle 
 
     public abstract String getChannel();
     public abstract byte[] getMessage();
-
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
         return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_CUSTOM_PAYLOAD;

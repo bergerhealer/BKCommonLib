@@ -51,14 +51,12 @@ public abstract class ChunkHandle extends Template.Handle {
     public abstract boolean checkCanSave(boolean isNotAutosave);
     public abstract void markDirty();
     public abstract void markEntitiesDirty();
-
     public java.util.Collection<org.bukkit.block.BlockState> getTileEntities() {
         java.util.Collection<?> tileEntities = getRawTileEntities();
         com.bergerkiller.bukkit.common.conversion.blockstate.ChunkBlockStateConverter chunkBlockStateConverter;
         chunkBlockStateConverter = new com.bergerkiller.bukkit.common.conversion.blockstate.ChunkBlockStateConverter(getBukkitChunk());
         return new com.bergerkiller.mountiplex.conversion.util.ConvertingCollection(tileEntities, chunkBlockStateConverter);
     }
-
 
     public static ChunkHandle fromBukkit(org.bukkit.Chunk chunk) {
         if (chunk != null) {

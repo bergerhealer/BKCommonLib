@@ -23,7 +23,6 @@ public abstract class PlayerAbilitiesHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-
     public void setFlySpeed(double flySpeed) {
         if (T.flySpeed_double.isAvailable()) {
             T.flySpeed_double.setDouble(getRaw(), flySpeed);

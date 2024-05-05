@@ -73,7 +73,6 @@ public abstract class DamageSourceHandle extends Template.Handle {
     public abstract Entity getEntity();
     public abstract boolean isExplosion();
     public abstract boolean isFireDamage();
-
     public static final java.util.Map<String, Object> INTERNAL_NAME_TO_KEY = new java.util.HashMap<>();
     static {
         try {

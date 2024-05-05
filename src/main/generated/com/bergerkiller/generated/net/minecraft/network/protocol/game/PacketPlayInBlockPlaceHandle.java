@@ -20,7 +20,6 @@ public abstract class PacketPlayInBlockPlaceHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
         return com.bergerkiller.bukkit.common.protocol.PacketType.IN_BLOCK_PLACE;

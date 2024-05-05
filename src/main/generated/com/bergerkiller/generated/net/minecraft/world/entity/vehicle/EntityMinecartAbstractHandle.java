@@ -25,7 +25,6 @@ public abstract class EntityMinecartAbstractHandle extends EntityHandle {
     public abstract void setDamage(float damage);
     public abstract int getHurtTime();
     public abstract void activate(int x, int y, int z, boolean active);
-
     public static final Key<Integer> DATA_SHAKING_FACTOR;
     public static final Key<Integer> DATA_SHAKING_DIRECTION;
     public static final Key<Float> DATA_SHAKING_DAMAGE;

@@ -31,11 +31,9 @@ public abstract class PacketPlayOutEntityEffectHandle extends PacketHandle {
     public abstract void setEffectAmplifier(int amplifier);
     public abstract Holder<MobEffectListHandle> getEffect();
     public abstract void setEffect(Holder<MobEffectListHandle> effect);
-
     public static final int FLAG_AMBIENT = 1;
     public static final int FLAG_VISIBLE = 2;
     public static final int FLAG_SHOW_ICON = 4;
-
 
     public org.bukkit.potion.PotionEffectType getPotionEffectType() {
         return MobEffectListHandle.holderToBukkit(getEffect());

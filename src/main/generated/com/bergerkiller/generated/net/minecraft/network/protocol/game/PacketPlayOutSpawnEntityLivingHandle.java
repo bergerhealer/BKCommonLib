@@ -40,7 +40,6 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
     public abstract void setPosX(double x);
     public abstract void setPosY(double y);
     public abstract void setPosZ(double z);
-
     public boolean hasDataWatcherSupport() {
         return T.opt_dataWatcher.isAvailable();
     }

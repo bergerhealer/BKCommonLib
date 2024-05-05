@@ -40,7 +40,6 @@ public abstract class GameProfileHandle extends Template.Handle {
     public abstract boolean putProperty(String key, PropertyHandle property);
     public abstract void setAllProperties(GameProfileHandle profile);
     public abstract CommonTagCompound serialize();
-
     public static GameProfileHandle getForPlayer(org.bukkit.entity.HumanEntity player) {
         Object handle = com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player);
         return com.bergerkiller.generated.net.minecraft.world.entity.player.EntityHumanHandle.T.gameProfile.get(handle);
