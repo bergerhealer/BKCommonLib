@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapIconHandle;
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;

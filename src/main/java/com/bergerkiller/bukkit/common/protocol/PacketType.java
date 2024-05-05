@@ -14,6 +14,7 @@ import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
+import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPacketClasses.*;
 
 import java.lang.reflect.Field;
@@ -342,93 +343,120 @@ public class PacketType extends ClassTemplate<Object> {
         }
 
         try {
-            Class<?> enumProtocolType = CommonUtil.getClass("net.minecraft.network.EnumProtocol");
-            Class<?> enumProtocolDirectionType = CommonUtil.getClass("net.minecraft.network.protocol.EnumProtocolDirection");
-            Class<?> bimapClass = CommonUtil.getClass("com.google.common.collect.BiMap");
-
-            // Get CLIENTBOUND EnumProtocolDirection constant
-            Object clientBoundDirection;
-            {
-                Field f = Resolver.resolveAndGetDeclaredField(enumProtocolDirectionType, "CLIENTBOUND");
-                clientBoundDirection = f.get(null);
-            }
-
-            // Gets the 'flows' field in EnumProtocol. This is a map by protocol direction.
-            Field flowsField = null;
-            if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
-                flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "flows");
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.20.5")) {
+                return isPacketOutgoing_1_20_5(packetClass);
             } else {
-                // WindSpigot (and maybe others) renamed this field to "packetMap", look for that first
-                flowsField = LogicUtil.tryMake(() -> {
-                    Field f = enumProtocolType.getDeclaredField("packetMap");
-                    return Map.class.isAssignableFrom(f.getType()) ? f : null;
-                }, null);
-
-                if (flowsField == null) {
-                    // Past vanilla field names
-                    if (CommonBootstrap.evaluateMCVersion(">=", "1.10.2")) {
-                        flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "h");
-                    } else if (CommonBootstrap.evaluateMCVersion(">=", "1.8.3")) {
-                        flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "j");
-                    } else {
-                        flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "h");
-                    }
-                }
-            }
-            flowsField.setAccessible(true);
-
-            // Find the packet class in the registry
-            Object[] protocols = enumProtocolType.getEnumConstants();
-            for (Object protocol : protocols) {
-                Object directionFlows = ((Map<?, Object>) flowsField.get(protocol)).get(clientBoundDirection);
-                if (directionFlows == null) {
-                    continue;
-                }
-
-                if (bimapClass.isAssignableFrom(directionFlows.getClass())) {
-                    // Use BiMap containsValue to check it exists or not. Used before MC 1.15.
-                    Method containsValueMethod = bimapClass.getMethod("containsValue", Object.class);
-                    Boolean containsValue = (Boolean) containsValueMethod.invoke(directionFlows, packetClass);
-                    if (containsValue.booleanValue()) {
-                        return true;
-                    }
-                } else if (directionFlows instanceof Map) {
-                    // Used on WindSpigot and maybe other forks on MC 1.8.8 where it uses a netty IntObjectMap
-                    if (((Map<?, ?>) directionFlows).containsValue(packetClass)) {
-                        return true;
-                    }
-                } else {
-                    // After MC 1.20.2 the flows object stores an additional object which has the actual method
-                    // Go by all fields to find it
-                    PacketSearchResult packetContained = tryCheckPacketClassContained(directionFlows, packetClass);
-                    if (packetContained == PacketSearchResult.FAILED) {
-                        // Try fields contained in directionFlows
-                        for (Field f : directionFlows.getClass().getDeclaredFields()) {
-                            if (Modifier.isStatic(f.getModifiers())) {
-                                continue;
-                            }
-                            if (f.getType().getDeclaringClass() != enumProtocolType) {
-                                continue;
-                            }
-
-                            f.setAccessible(true);
-                            Object directionFlowsSub = f.get(directionFlows);
-                            packetContained = tryCheckPacketClassContained(directionFlowsSub, packetClass);
-                            if (packetContained != PacketSearchResult.FAILED) {
-                                break;
-                            }
-                        }
-                    }
-
-                    if (packetContained == PacketSearchResult.FAILED) {
-                        throw new IllegalStateException("Unable to identify packet flow direction");
-                    } else if (packetContained == PacketSearchResult.FOUND) {
-                        return true;
-                    }
-                }
+                return isPacketOutgoing_1_8_to_1_20_4(packetClass);
             }
         } catch (Throwable t) {
             Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to determine outgoing for packet " + packetClass, t);
+            return false;
+        }
+    }
+
+    private static boolean isPacketOutgoing_1_20_5(Class<?> packetClass) throws Throwable {
+        // Im getting too tired of this shit. On 1.20.5 this cannot be assessed without building
+        // an entire fricken connection listener and whatnot. Even then it would be extremely hard to
+        // figure out what CODEC instance belongs to what packet...
+        // For now, just do it by name. Ugh.
+        String name = MPLType.getName(packetClass);
+        if (name.contains("Clientbound") || name.contains("PacketPlayOut")) {
+            return true;
+        } else if (name.contains("Serverbound") || name.contains("PacketPlayIn")) {
+            return false;
+        } else if (packetClass.equals(PacketHandle.T.getType())) {
+            return false; // Invalid packet, technically...
+        } else {
+            throw new IllegalStateException("Unknown packet class name format: " + name);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static boolean isPacketOutgoing_1_8_to_1_20_4(Class<?> packetClass) throws Throwable {
+        Class<?> enumProtocolType = CommonUtil.getClass("net.minecraft.network.EnumProtocol");
+        Class<?> enumProtocolDirectionType = CommonUtil.getClass("net.minecraft.network.protocol.EnumProtocolDirection");
+        Class<?> bimapClass = CommonUtil.getClass("com.google.common.collect.BiMap");
+
+        // Get CLIENTBOUND EnumProtocolDirection constant
+        Object clientBoundDirection;
+        {
+            Field f = Resolver.resolveAndGetDeclaredField(enumProtocolDirectionType, "CLIENTBOUND");
+            clientBoundDirection = f.get(null);
+        }
+
+        // Gets the 'flows' field in EnumProtocol. This is a map by protocol direction.
+        Field flowsField = null;
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
+            flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "flows");
+        } else {
+            // WindSpigot (and maybe others) renamed this field to "packetMap", look for that first
+            flowsField = LogicUtil.tryMake(() -> {
+                Field f = enumProtocolType.getDeclaredField("packetMap");
+                return Map.class.isAssignableFrom(f.getType()) ? f : null;
+            }, null);
+
+            if (flowsField == null) {
+                // Past vanilla field names
+                if (CommonBootstrap.evaluateMCVersion(">=", "1.10.2")) {
+                    flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "h");
+                } else if (CommonBootstrap.evaluateMCVersion(">=", "1.8.3")) {
+                    flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "j");
+                } else {
+                    flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "h");
+                }
+            }
+        }
+        flowsField.setAccessible(true);
+
+        // Find the packet class in the registry
+        Object[] protocols = enumProtocolType.getEnumConstants();
+        for (Object protocol : protocols) {
+            Object directionFlows = ((Map<?, Object>) flowsField.get(protocol)).get(clientBoundDirection);
+            if (directionFlows == null) {
+                continue;
+            }
+
+            if (bimapClass.isAssignableFrom(directionFlows.getClass())) {
+                // Use BiMap containsValue to check it exists or not. Used before MC 1.15.
+                Method containsValueMethod = bimapClass.getMethod("containsValue", Object.class);
+                Boolean containsValue = (Boolean) containsValueMethod.invoke(directionFlows, packetClass);
+                if (containsValue.booleanValue()) {
+                    return true;
+                }
+            } else if (directionFlows instanceof Map) {
+                // Used on WindSpigot and maybe other forks on MC 1.8.8 where it uses a netty IntObjectMap
+                if (((Map<?, ?>) directionFlows).containsValue(packetClass)) {
+                    return true;
+                }
+            } else {
+                // After MC 1.20.2 the flows object stores an additional object which has the actual method
+                // Go by all fields to find it
+                PacketSearchResult packetContained = tryCheckPacketClassContained(directionFlows, packetClass);
+                if (packetContained == PacketSearchResult.FAILED) {
+                    // Try fields contained in directionFlows
+                    for (Field f : directionFlows.getClass().getDeclaredFields()) {
+                        if (Modifier.isStatic(f.getModifiers())) {
+                            continue;
+                        }
+                        if (f.getType().getDeclaringClass() != enumProtocolType) {
+                            continue;
+                        }
+
+                        f.setAccessible(true);
+                        Object directionFlowsSub = f.get(directionFlows);
+                        packetContained = tryCheckPacketClassContained(directionFlowsSub, packetClass);
+                        if (packetContained != PacketSearchResult.FAILED) {
+                            break;
+                        }
+                    }
+                }
+
+                if (packetContained == PacketSearchResult.FAILED) {
+                    throw new IllegalStateException("Unable to identify packet flow direction");
+                } else if (packetContained == PacketSearchResult.FOUND) {
+                    return true;
+                }
+            }
         }
 
         return false;

@@ -65,8 +65,8 @@ class ChunkProviderServer {
         future.thenAccept(consumer);
     }
 
-    public static (org.bukkit.Chunk) net.minecraft.world.level.chunk.IChunkAccess unpackGetChunkAsyncResult((Object) net.minecraft.server.level.ChunkResult result) {
-        return (net.minecraft.world.level.chunk.IChunkAccess) result.orElse((Object) null);
+    public static (org.bukkit.Chunk) net.minecraft.world.level.chunk.Chunk unpackGetChunkAsyncResult((Object) net.minecraft.server.level.ChunkResult result) {
+        return (net.minecraft.world.level.chunk.Chunk) result.orElse((Object) null);
     }
 #elseif version >= 1.14
     public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {
@@ -77,9 +77,9 @@ class ChunkProviderServer {
         future.thenAccept(consumer);
     }
 
-    public static (org.bukkit.Chunk) net.minecraft.world.level.chunk.IChunkAccess unpackGetChunkAsyncResult((Object) com.mojang.datafixers.util.Either result) {
+    public static (org.bukkit.Chunk) net.minecraft.world.level.chunk.Chunk unpackGetChunkAsyncResult((Object) com.mojang.datafixers.util.Either result) {
         java.util.Optional opt = (java.util.Optional) result.left();
-        return (net.minecraft.world.level.chunk.IChunkAccess) opt.orElse(null);
+        return (net.minecraft.world.level.chunk.Chunk) opt.orElse(null);
     }
 #elseif version >= 1.13
     public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {

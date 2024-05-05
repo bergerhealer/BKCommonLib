@@ -6,6 +6,7 @@ import java.lang.reflect.Modifier;
 
 import static org.objectweb.asm.Opcodes.*;
 
+import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -32,36 +33,45 @@ class BlockDataWrapperHook_Impl extends BlockDataWrapperHook {
 
     @Override
     protected void baseEnable() throws Throwable {
-        final Class<?> immutableMapType = getClassVerify("com.google.common.collect.ImmutableMap");
-
-        // Version-specific field names...
+        final Class<?> immutableMapType;
         Field valuesField;
-        if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
-            // Since MC 1.16: Field is stored in the IBlockDataHolder class
+
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.20.5")) {
+            // Reference2ObjectArrayMap after 1.20.5
+            immutableMapType = getClassVerify("it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap");
             Class<?> iBlockDataHolderType = getClassVerify("net.minecraft.world.level.block.state.IBlockDataHolder");
-            if (CommonBootstrap.evaluateMCVersion(">=", "1.18")) {
-                valuesField = Resolver.resolveAndGetDeclaredField(iBlockDataHolderType, "values");
-            } else if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
-                valuesField = Resolver.resolveAndGetDeclaredField(iBlockDataHolderType, "values");
-            } else {
-                valuesField = Resolver.resolveAndGetDeclaredField(iBlockDataHolderType, "b");
-            }
-        } else if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
-            // Since MC 1.13: Field is stored in the BlockDataAbstract class
-            Class<?> blockDataAbstractType = CommonUtil.getClass("net.minecraft.world.level.block.state.BlockDataAbstract");
-            if (CommonBootstrap.evaluateMCVersion(">=", "1.14")) {
-                valuesField = Resolver.resolveAndGetDeclaredField(blockDataAbstractType, "d");
-            } else {
-                valuesField = Resolver.resolveAndGetDeclaredField(blockDataAbstractType, "c");
-            }
+            valuesField = Resolver.resolveAndGetDeclaredField(iBlockDataHolderType, "values");
         } else {
-            // MC 1.8 - 1.12.2: Field is stored in the BlockData class
-            Class<?> blockDataType = CommonUtil.getClass("net.minecraft.world.level.block.state.BlockStateList$BlockData");
-            if (SafeField.contains(blockDataType, "bAsImmutableMap", immutableMapType)) {
-                // Optimization on TacoSpigot / BurritoSpigot
-                valuesField = blockDataType.getDeclaredField("bAsImmutableMap");
+            // ImmutableMap before MC 1.20.5
+            // Version-specific field names...
+            immutableMapType = getClassVerify("com.google.common.collect.ImmutableMap");
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
+                // Since MC 1.16: Field is stored in the IBlockDataHolder class
+                Class<?> iBlockDataHolderType = getClassVerify("net.minecraft.world.level.block.state.IBlockDataHolder");
+                if (CommonBootstrap.evaluateMCVersion(">=", "1.18")) {
+                    valuesField = Resolver.resolveAndGetDeclaredField(iBlockDataHolderType, "values");
+                } else if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
+                    valuesField = Resolver.resolveAndGetDeclaredField(iBlockDataHolderType, "values");
+                } else {
+                    valuesField = Resolver.resolveAndGetDeclaredField(iBlockDataHolderType, "b");
+                }
+            } else if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
+                // Since MC 1.13: Field is stored in the BlockDataAbstract class
+                Class<?> blockDataAbstractType = CommonUtil.getClass("net.minecraft.world.level.block.state.BlockDataAbstract");
+                if (CommonBootstrap.evaluateMCVersion(">=", "1.14")) {
+                    valuesField = Resolver.resolveAndGetDeclaredField(blockDataAbstractType, "d");
+                } else {
+                    valuesField = Resolver.resolveAndGetDeclaredField(blockDataAbstractType, "c");
+                }
             } else {
-                valuesField = Resolver.resolveAndGetDeclaredField(blockDataType, "b");
+                // MC 1.8 - 1.12.2: Field is stored in the BlockData class
+                Class<?> blockDataType = CommonUtil.getClass("net.minecraft.world.level.block.state.BlockStateList$BlockData");
+                if (SafeField.contains(blockDataType, "bAsImmutableMap", immutableMapType)) {
+                    // Optimization on TacoSpigot / BurritoSpigot
+                    valuesField = blockDataType.getDeclaredField("bAsImmutableMap");
+                } else {
+                    valuesField = Resolver.resolveAndGetDeclaredField(blockDataType, "b");
+                }
             }
         }
 
