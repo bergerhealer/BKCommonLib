@@ -631,6 +631,16 @@ public final class CommonItemStack implements Cloneable {
     }
 
     /**
+     * Gets the player profile information for a skull item. If the item lacks such skull information,
+     * returns <i>null</i>.
+     *
+     * @return Skull player GameProfile Handle
+     */
+    public GameProfileHandle getSkullProfile() {
+        return getHandle(true).map(ItemStackHandle::getSkullProfile).orElse(null);
+    }
+
+    /**
      * Sets the player profile information for a skull item, changing the appearance of skull items
      *
      * @param profile Game Profile of the skull. <i>Null</i> to clear skull profile information.

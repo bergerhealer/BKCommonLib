@@ -179,6 +179,7 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
     @Template.Import("net.minecraft.world.level.chunk.storage.IChunkLoader")
     @Template.Import("net.minecraft.world.level.chunk.storage.RegionFile")
     @Template.Import("net.minecraft.world.level.chunk.storage.RegionFileSection")
+    @Template.Import("net.minecraft.world.level.chunk.storage.SimpleRegionStorage")
     @Template.Import("net.minecraft.world.entity.ai.village.poi.VillagePlace")
     @Template.Import("net.minecraft.world.entity.ai.village.poi.VillagePlaceSection")
     @Template.Import("it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap")
@@ -238,24 +239,29 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
          * #if assignable RegionFileCache RegionFileSection
          *     // On 1.14 and PaperMC this can more trivially be accessed
          *     return (RegionFileCache) rfs;
+         * #elseif version >= 1.20.5
+         *     #require RegionFileSection private final SimpleRegionStorage simpleRegionStorage;
+         *     SimpleRegionStorage srs = rfs#simpleRegionStorage;
+         *     #require SimpleRegionStorage private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:worker;
+         *     IOWorker ioworker = srs#ioworker;
          * #else
          *     // Access RegionFileCache inside IOWorker
-         *   #if version >= 1.17
-         *     #require RegionFileSection private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:worker;
-         *   #else
-         *     #require RegionFileSection private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:b;
-         *   #endif
+         *     #if version >= 1.17
+         *         #require RegionFileSection private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:worker;
+         *     #else
+         *         #require RegionFileSection private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:b;
+         *     #endif
          *     IOWorker ioworker = rfs#ioworker;
-         * 
-         *   #if version >= 1.17
-         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:storage;
-         *   #elseif version >= 1.16
-         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:d;
-         *   #else
-         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:e;
-         *   #endif
-         *     return ioworker#cache;
          * #endif
+         *
+         * #if version >= 1.17
+         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:storage;
+         * #elseif version >= 1.16
+         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:d;
+         * #else
+         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:e;
+         * #endif
+         *     return ioworker#cache;
          * }
          */
         @Template.Generated("%FIND_POI_FILE_CACHE%")

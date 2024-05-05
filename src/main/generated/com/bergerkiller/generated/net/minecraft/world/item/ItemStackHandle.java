@@ -56,6 +56,7 @@ public abstract class ItemStackHandle extends Template.Handle {
     public abstract int getPotionColor();
     public abstract int getFireworksFlightDuration();
     public abstract void setFireworksFlightDuration(int duration);
+    public abstract GameProfileHandle getSkullProfile();
     public abstract void setSkullProfile(GameProfileHandle profile);
     public abstract boolean hasCustomModelData();
     public abstract int getCustomModelData();
@@ -127,6 +128,7 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.Method<Integer> getPotionColor = new Template.Method<Integer>();
         public final Template.Method<Integer> getFireworksFlightDuration = new Template.Method<Integer>();
         public final Template.Method<Void> setFireworksFlightDuration = new Template.Method<Void>();
+        public final Template.Method.Converted<GameProfileHandle> getSkullProfile = new Template.Method.Converted<GameProfileHandle>();
         public final Template.Method.Converted<Void> setSkullProfile = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> hasCustomModelData = new Template.Method<Boolean>();
         public final Template.Method<Integer> getCustomModelData = new Template.Method<Integer>();

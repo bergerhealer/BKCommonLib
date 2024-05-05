@@ -1276,8 +1276,6 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutLogin extends NMSPacket {
 
-        public final FieldAccessor<Integer> playerId = PacketPlayOutLoginHandle.T.playerId.toFieldAccessor();
-        public final FieldAccessor<Boolean> hardcore = PacketPlayOutLoginHandle.T.hardcore.toFieldAccessor();
         public final FieldAccessor<GameMode> gameMode = new SafeDirectField<GameMode>() {
             @Override
             public GameMode get(Object instance) {
@@ -1300,10 +1298,7 @@ public class NMSPacketClasses {
                 return false;
             }
         };
-        public final FieldAccessor<Integer> maxPlayers = PacketPlayOutLoginHandle.T.maxPlayers.toFieldAccessor();
-        public final FieldAccessor<Boolean> reducedDebugInfo = PacketPlayOutLoginHandle.T.reducedDebugInfo.toFieldAccessor();
         public final FieldAccessor<Difficulty> difficulty = PacketPlayOutLoginHandle.T.difficulty.toFieldAccessor().ignoreInvalid(Difficulty.NORMAL);
-        public final FieldAccessor<Integer> viewDistance = PacketPlayOutLoginHandle.T.viewDistance.toFieldAccessor().ignoreInvalid(10);
     }
 
     public static class NMSPacketPlayOutMap extends NMSPacket {
@@ -1577,9 +1572,6 @@ public class NMSPacketClasses {
     }
 
     public static class NMSPacketPlayOutRemoveEntityEffect extends NMSPacket {
-
-        public final FieldAccessor<Integer> entityId = PacketPlayOutRemoveEntityEffectHandle.T.entityId.toFieldAccessor();
-        public final FieldAccessor<Holder<MobEffectListHandle>> effect = PacketPlayOutRemoveEntityEffectHandle.T.effect.toFieldAccessor();
 
         public CommonPacket newInstance(int entityId, PotionEffectType effectType) {
             return PacketPlayOutRemoveEntityEffectHandle.createNew(entityId, effectType).toCommonPacket();

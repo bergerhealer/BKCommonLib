@@ -461,7 +461,9 @@ class PlayerChunkMap {
         PlayerChunk chunk = (PlayerChunk) instance.visibleChunks.get(key);
   #endif
 
-  #if version >= 1.18
+  #if version >= 1.20.5
+        if (chunk == null || chunk.getFullChunkNow() == null) {
+  #elseif version >= 1.18
         if (chunk == null || chunk.getFullChunk() == null) {
   #else
         if (chunk == null || chunk.getChunk() == null) {

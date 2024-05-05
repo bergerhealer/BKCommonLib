@@ -89,7 +89,10 @@ class PacketPlayOutEntityTeleport extends Packet {
 #endif
 
     public static (PacketPlayOutEntityTeleportHandle) PacketPlayOutEntityTeleport createNew() {
-#if version >= 1.17
+#if version >= 1.20.5
+        #require net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport private PacketPlayOutEntityTeleport createTeleportPacket:<init>(net.minecraft.network.PacketDataSerializer serializer);
+        return #createTeleportPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#elseif version >= 1.17
         return new PacketPlayOutEntityTeleport(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
         return new PacketPlayOutEntityTeleport();
@@ -385,7 +388,9 @@ class PacketPlayOutEntity extends Packet {
 
     class PacketPlayOutEntity.PacketPlayOutEntityLook extends PacketPlayOutEntity {
         public static (PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle) PacketPlayOutEntity.PacketPlayOutEntityLook createNew() {
-#if version >= 1.18
+#if version >= 1.20.5
+            return new PacketPlayOutEntity$PacketPlayOutEntityLook(0, (byte) 0, (byte) 0, false);
+#elseif version >= 1.18
             return PacketPlayOutEntity$PacketPlayOutEntityLook.read(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #elseif version >= 1.17
             return PacketPlayOutEntity$PacketPlayOutEntityLook.b(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
@@ -413,7 +418,9 @@ class PacketPlayOutEntity extends Packet {
 
     class PacketPlayOutEntity.PacketPlayOutRelEntityMove extends PacketPlayOutEntity {
         public static (PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle) PacketPlayOutEntity.PacketPlayOutRelEntityMove createNew() {
-#if version >= 1.18
+#if version >= 1.20.5
+            return new PacketPlayOutEntity$PacketPlayOutRelEntityMove(0, (short) 0, (short) 0, (short) 0, false);
+#elseif version >= 1.18
             return PacketPlayOutEntity$PacketPlayOutRelEntityMove.read(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #elseif version >= 1.17
             return PacketPlayOutEntity$PacketPlayOutRelEntityMove.b(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
@@ -442,7 +449,9 @@ class PacketPlayOutEntity extends Packet {
 
     class PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook extends PacketPlayOutEntity {
         public static (PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle) PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook createNew() {
-#if version >= 1.18
+#if version >= 1.20.5
+            return new PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook(0, (short) 0, (short) 0, (short) 0, (byte) 0, (byte) 0, false);
+#elseif version >= 1.18
             return PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook.read(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #elseif version >= 1.17
             return PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook.b(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
@@ -480,7 +489,10 @@ class PacketPlayOutEntityHeadRotation extends Packet {
 #endif
 
     public static optional (PacketPlayOutEntityHeadRotationHandle) PacketPlayOutEntityHeadRotation createNewEmpty() {
-#if version >= 1.17
+#if version >= 1.20.5
+        #require net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotation PacketPlayOutEntityHeadRotation createHeadRotationPacket:<init>(net.minecraft.network.PacketDataSerializer serializer);
+        return #createHeadRotationPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#elseif version >= 1.17
         return new PacketPlayOutEntityHeadRotation(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
         return new PacketPlayOutEntityHeadRotation();

@@ -52,7 +52,11 @@ public class NullPacketDataSerializerInit {
         } catch (ClassNotFoundException ex) { /* expected */ }
 
         try {
-            Class<?> dataSerializerType = Resolver.loadClass("net.minecraft.network.PacketDataSerializer", false);
+            // Implement 1.20.5 RegistryFriendlyByteBuf if it exists
+            Class<?> dataSerializerType = Resolver.loadClass("net.minecraft.network.RegistryFriendlyByteBuf", false);
+            if (dataSerializerType == null) {
+                dataSerializerType = Resolver.loadClass("net.minecraft.network.PacketDataSerializer", false);
+            }
             if (dataSerializerType == null) {
                 throw new IllegalStateException("PacketDataSerializer class not found in server");
             }

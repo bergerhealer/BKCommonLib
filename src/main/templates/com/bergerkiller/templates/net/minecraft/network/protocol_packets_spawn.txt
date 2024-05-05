@@ -91,7 +91,10 @@ class PacketPlayOutSpawnEntity extends Packet {
 #endif
 
     public static (PacketPlayOutSpawnEntityHandle) PacketPlayOutSpawnEntity createNew() {
-#if version >= 1.17
+#if version >= 1.20.5
+        #require net.minecraft.network.protocol.game.PacketPlayOutSpawnEntity private PacketPlayOutSpawnEntity createSpawnPacket:<init>(net.minecraft.network.RegistryFriendlyByteBuf serializer);
+        return #createSpawnPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#elseif version >= 1.17
         return new PacketPlayOutSpawnEntity(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
         return new PacketPlayOutSpawnEntity();
@@ -345,7 +348,13 @@ class PacketPlayOutNamedEntitySpawn extends Packet {
 #endif
 
     public static (PacketPlayOutNamedEntitySpawnHandle) PacketPlayOutNamedEntitySpawn createNew() {
-#if version >= 1.20.2
+#if version >= 1.20.5
+        #require net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn private PacketPlayOutNamedEntitySpawn createSpawnPacket:<init>(net.minecraft.network.RegistryFriendlyByteBuf serializer);
+        PacketPlayOutNamedEntitySpawn packet = #createSpawnPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+        #require PacketPlayOutNamedEntitySpawn private final EntityTypes<?> type;
+        packet#type = EntityTypes.PLAYER;
+        return packet;
+#elseif version >= 1.20.2
         PacketPlayOutNamedEntitySpawn packet = new PacketPlayOutNamedEntitySpawn(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
         #require PacketPlayOutNamedEntitySpawn private final EntityTypes<?> type;
         packet#type = EntityTypes.PLAYER;
@@ -492,7 +501,10 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
 #endif
 
     public static (PacketPlayOutSpawnEntityLivingHandle) PacketPlayOutSpawnEntityLiving createNew() {
-#if version >= 1.17
+#if version >= 1.20.5
+        #require net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLiving private PacketPlayOutSpawnEntityLiving createSpawnPacket:<init>(net.minecraft.network.RegistryFriendlyByteBuf serializer);
+        return #createSpawnPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#elseif version >= 1.17
         return new PacketPlayOutSpawnEntityLiving(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
         return new PacketPlayOutSpawnEntityLiving();

@@ -17,6 +17,7 @@ import net.minecraft.nbt.NBTTagLong;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagByte;
 import net.minecraft.nbt.NBTTagString;
+import net.minecraft.nbt.GameProfileSerializer;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
@@ -534,6 +535,29 @@ class ItemStack {
     }
 
 
+    public (GameProfileHandle) GameProfile getSkullProfile() {
+#if version >= 1.20.5
+        net.minecraft.world.item.component.ResolvableProfile resolvableProfile;
+        resolvableProfile = (net.minecraft.world.item.component.ResolvableProfile) instance.get(DataComponents.PROFILE);
+        return (resolvableProfile == null) ? null : resolvableProfile.gameProfile();
+#else
+        NBTTagCompound tag = instance.getTag();
+        if (tag == null) {
+            return null;
+        }
+        NBTBase serializedProfileBase = tag.get("SkullOwner");
+        if (!(serializedProfileBase instanceof NBTTagCompound)) {
+            return null;
+        }
+        NBTTagCompound serializedProfile = (NBTTagCompound) serializedProfileBase;
+  #if version >= 1.18
+        return GameProfileSerializer.readGameProfile(serializedProfile);
+  #else
+        return GameProfileSerializer.deserialize(serializedProfile);
+  #endif
+#endif
+    }
+
     public void setSkullProfile((GameProfileHandle) GameProfile profile) {
 #if version >= 1.20.5
         if (profile != null) {
@@ -544,8 +568,12 @@ class ItemStack {
 #else
         if (profile != null) {
             NBTTagCompound tag = instance#getOrCreateTag();
-            NBTTagCompound serializedProfile = (NBTTagCompound) GameProfileHandle.T.serialize.raw.invoke(profile);
-            NBTTagCompoundHandle.T.put.raw.invoke(tag, serializedProfile);
+  #if version >= 1.18
+            NBTTagCompound serializedProfile = GameProfileSerializer.writeGameProfile(new NBTTagCompound(), profile);
+  #else
+            NBTTagCompound serializedProfile = GameProfileSerializer.serialize(new NBTTagCompound(), profile);
+  #endif
+            tag.put("SkullOwner", (NBTBase) serializedProfile);
     #if version < 1.13
             instance#durabilityField = 3;
     #endif

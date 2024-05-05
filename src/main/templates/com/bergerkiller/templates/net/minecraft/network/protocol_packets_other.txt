@@ -868,7 +868,9 @@ class PacketPlayOutOpenWindow extends Packet {
 #endif
 
     public static (PacketPlayOutOpenWindowHandle) PacketPlayOutOpenWindow createNew() {
-#if version >= 1.17
+#if version >= 1.20.5
+        return new PacketPlayOutOpenWindow(0, (net.minecraft.world.inventory.Containers) null, (IChatBaseComponent) null);
+#elseif version >= 1.17
         return new PacketPlayOutOpenWindow(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
         return new PacketPlayOutOpenWindow();
@@ -1052,71 +1054,140 @@ class PacketPlayOutEntityEffect extends Packet {
 }
 
 class PacketPlayOutRemoveEntityEffect extends Packet {
-#if version >= 1.17
-    private int entityId;
+#if version >= 1.20.5
+    public int getEntityId:entityId();
 #else
-    private int entityId:a;
+    public int getEntityId() {
+  #if version >= 1.17
+        #require PacketPlayOutRemoveEntityEffect private int entityId;
+  #else
+        #require PacketPlayOutRemoveEntityEffect private int entityId:a;
+  #endif
+        return instance#entityId;
+    }
 #endif
 
 #if version >= 1.20.5
-    private (Holder<MobEffectListHandle>) net.minecraft.core.Holder<MobEffectList> effect;
+    public (Holder<MobEffectListHandle>) net.minecraft.core.Holder<MobEffectList> getEffect:effect();
+#elseif version >= 1.18
+    public (Holder<MobEffectListHandle>) MobEffectList getEffect();
 #elseif version >= 1.17
-    private (Holder<MobEffectListHandle>) MobEffectList effect;
+    public (Holder<MobEffectListHandle>) MobEffectList getEffect:b();
 #elseif version >= 1.9
-    private (Holder<MobEffectListHandle>) MobEffectList effect:b;
+    public (Holder<MobEffectListHandle>) MobEffectList getEffect() {
+        #require PacketPlayOutRemoveEntityEffect private MobEffectList effect:b;
+        return instance#effect;
+    }
 #else
-    private (Holder<MobEffectListHandle>) int effect:b;
+    public (Holder<MobEffectListHandle>) int getEffect() {
+        #require PacketPlayOutRemoveEntityEffect private int effect:b;
+        return instance#effect;
+    }
 #endif
 
-    public static (PacketPlayOutRemoveEntityEffectHandle) PacketPlayOutRemoveEntityEffect createNew() {
-#if version >= 1.17
-        return new PacketPlayOutRemoveEntityEffect(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
-#else
-        return new PacketPlayOutRemoveEntityEffect();
-#endif
+#if version >= 1.20.5
+    public static (PacketPlayOutRemoveEntityEffectHandle) PacketPlayOutRemoveEntityEffect createNew(int entityId, (Holder<MobEffectListHandle>) net.minecraft.core.Holder<MobEffectList> effect) {
+        return new PacketPlayOutRemoveEntityEffect(entityId, effect);
     }
+#elseif version >= 1.9
+    public static (PacketPlayOutRemoveEntityEffectHandle) PacketPlayOutRemoveEntityEffect createNew(int entityId, (Holder<MobEffectListHandle>) MobEffectList effect) {
+        return new PacketPlayOutRemoveEntityEffect(entityId, effect);
+    }
+#else
+    public static (PacketPlayOutRemoveEntityEffectHandle) PacketPlayOutRemoveEntityEffect createNew(int entityId, (Holder<MobEffectListHandle>) int effect) {
+        PacketPlayOutRemoveEntityEffect packet = new PacketPlayOutRemoveEntityEffect();
+        #require PacketPlayOutRemoveEntityEffect private int entityId:a;
+        #require PacketPlayOutRemoveEntityEffect private int effectId:b;
+        packet#entityId = entityId;
+        packet#effectId = effect;
+        return packet;
+    }
+#endif
 
     <code>
     public org.bukkit.potion.PotionEffectType getPotionEffectType() {
         return MobEffectListHandle.holderToBukkit(getEffect());
     }
 
-    public void setPotionEffectType(org.bukkit.potion.PotionEffectType effectType) {
-        setEffect(MobEffectListHandle.holderFromBukkit(effectType));
-    }
-
     public static PacketPlayOutRemoveEntityEffectHandle createNew(int entityId, org.bukkit.potion.PotionEffectType effectType) {
-        PacketPlayOutRemoveEntityEffectHandle handle = createNew();
-        handle.setEntityId(entityId);
-        handle.setPotionEffectType(effectType);
-        return handle;
-    }
-
-    public static PacketPlayOutRemoveEntityEffectHandle createNew(int entityId, Holder<MobEffectListHandle> effect) {
-        PacketPlayOutRemoveEntityEffectHandle handle = createNew();
-        handle.setEntityId(entityId);
-        handle.setEffect(effect);
-        return handle;
+        return createNew(entityId, MobEffectListHandle.holderFromBukkit(effectType));
     }
     </code>
 }
 
 class PacketPlayOutLogin extends Packet {
-#if version >= 1.17
-    private int playerId;
+#if version >= 1.19
+    public int getPlayerId:playerId();
+    public boolean isHardcore:hardcore();
+    public int getMaxPlayers:maxPlayers();
+    public int getViewDistance:chunkRadius();
+    public boolean isReducedDebugInfo:reducedDebugInfo();
+
 #else
-    private int playerId:a;
+    public int getPlayerId() {
+  #if version >= 1.17
+        #require PacketPlayOutLogin private readonly int playerId;
+  #else
+        #require PacketPlayOutLogin private readonly int playerId:a;
+  #endif
+        return instance#playerId;
+    }
+
+    public boolean isHardcore() {
+  #if version >= 1.17
+        #require PacketPlayOutLogin private readonly boolean hardcore;
+  #elseif version >= 1.15
+        #require PacketPlayOutLogin private readonly boolean hardcore:c;
+  #else
+        #require PacketPlayOutLogin private readonly boolean hardcore:b;
+  #endif
+        return instance#hardcore;
+    }
+
+    public int getMaxPlayers() {
+  #select version >=
+  #case 1.17:  #require PacketPlayOutLogin private readonly int maxPlayers;
+  #case 1.16:  #require PacketPlayOutLogin private readonly int maxPlayers:j;
+  #case 1.15:  #require PacketPlayOutLogin private readonly int maxPlayers:f;
+  #case 1.14:  #require PacketPlayOutLogin private readonly int maxPlayers:e;
+  #case else:  #require PacketPlayOutLogin private readonly int maxPlayers:f;
+  #endselect
+        return instance#maxPlayers;
+    }
+
+    public int getViewDistance() {
+  #if version >= 1.14
+    #select version >=
+    #case 1.17:  #require PacketPlayOutLogin private readonly int chunkRadius;
+    #case 1.16:  #require PacketPlayOutLogin private readonly int chunkRadius:k;
+    #case 1.15:  #require PacketPlayOutLogin private readonly int chunkRadius:h;
+    #case else:  #require PacketPlayOutLogin private readonly int chunkRadius:g;
+    #endselect
+        return instance#chunkRadius;
+  #else
+        return 10;
+  #endif
+    }
+
+    public boolean isReducedDebugInfo() {
+  #select version >=
+  #case 1.17:  #require PacketPlayOutLogin private readonly boolean reducedDebugInfo;
+  #case 1.16:  #require PacketPlayOutLogin private readonly boolean reducedDebugInfo:l;
+  #case 1.15:  #require PacketPlayOutLogin private readonly boolean reducedDebugInfo:i;
+  #case else:  #require PacketPlayOutLogin private readonly boolean reducedDebugInfo:h;
+  #endselect
+        return instance#reducedDebugInfo;
+    }
 #endif
 
-#if version >= 1.17
-    private boolean hardcore;
-#elseif version >= 1.15
-    private boolean hardcore:c;
-#else
-    private boolean hardcore:b;
-#endif
-
-#if version >= 1.20.2
+#if version >= 1.20.5
+    public (org.bukkit.GameMode) EnumGamemode getGameMode() {
+        return instance.commonPlayerSpawnInfo().gameType();
+    }
+    public (DimensionType) net.minecraft.core.Holder<DimensionManager> getDimensionType() {
+        return instance.commonPlayerSpawnInfo().dimensionType();
+    }
+#elseif version >= 1.20.2
     public (org.bukkit.GameMode) EnumGamemode getGameMode() {
         return instance.commonPlayerSpawnInfo().gameType();
     }
@@ -1182,40 +1253,6 @@ class PacketPlayOutLogin extends Packet {
     private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:e;
 #endif
 
-    // View distance field only exists >= 1.14
-#if version >= 1.17
-    private int maxPlayers;
-    private optional int viewDistance:chunkRadius;
-#elseif version >= 1.16
-    private int maxPlayers:j;
-    private optional int viewDistance:k;
-#elseif version >= 1.15
-    private int maxPlayers:f;
-    //TODO: Removed on 1.16. Keep this?
-    // private (org.bukkit.WorldType) WorldType worldType:g;
-    private optional int viewDistance:h;
-#elseif version >= 1.14
-    private int maxPlayers:e;
-    //TODO: Removed on 1.16. Keep this?
-    // private (org.bukkit.WorldType) WorldType worldType:f;
-    private optional int viewDistance:g;
-#else
-    private int maxPlayers:f;
-    //TODO: Removed on 1.16. Keep this?
-    // private (org.bukkit.WorldType) WorldType worldType:g;
-    private optional int viewDistance:###;
-#endif
-
-#if version >= 1.17
-    private boolean reducedDebugInfo;
-#elseif version >= 1.16
-    private boolean reducedDebugInfo:l;
-#elseif version >= 1.15
-    private boolean reducedDebugInfo:i;
-#else
-    private boolean reducedDebugInfo:h;
-#endif
-
 #if version >= 1.17 && version < 1.20.2
     // private unknown boolean noImmediateRespawn:showDeathScreen;
     // private unknown boolean isDebugWorld:isDebug;
@@ -1251,7 +1288,17 @@ class PacketPlayOutLogin extends Packet {
 }
 
 class PacketPlayOutRespawn extends Packet {
-#if version >= 1.20.2
+#if version >= 1.20.5
+    public (DimensionType) net.minecraft.core.Holder<DimensionManager> getDimensionType() {
+        return instance.commonPlayerSpawnInfo().dimensionType();
+    }
+    public (org.bukkit.GameMode) EnumGamemode getGamemode() {
+        return instance.commonPlayerSpawnInfo().gameType();
+    }
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getWorldName() {
+        return instance.commonPlayerSpawnInfo().dimension();
+    }
+#elseif version >= 1.20.2
     public (DimensionType) ResourceKey<DimensionManager> getDimensionType() {
         return instance.commonPlayerSpawnInfo().dimensionType();
     }
@@ -1430,7 +1477,10 @@ class PacketPlayOutMapChunk extends Packet {
 #endif
 
     public static (PacketPlayOutMapChunkHandle) PacketPlayOutMapChunk createNew() {
-#if version >= 1.17
+#if version >= 1.20.5
+        #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private PacketPlayOutMapChunk createMapChunkPacket:<init>(net.minecraft.network.RegistryFriendlyByteBuf buf);
+        return #createMapChunkPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#elseif version >= 1.17
         return new PacketPlayOutMapChunk(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
         return new PacketPlayOutMapChunk();
@@ -2185,7 +2235,10 @@ optional class PacketPlayOutMount extends Packet {
 #endif
 
     public static (PacketPlayOutMountHandle) PacketPlayOutMount createNew() {
-#if version >= 1.17
+#if version >= 1.20.5
+        #require net.minecraft.network.protocol.game.PacketPlayOutMount private PacketPlayOutMount createMountPacket:<init>(net.minecraft.network.PacketDataSerializer serializer);
+        return #createMountPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#elseif version >= 1.17
         return new PacketPlayOutMount(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
         return new PacketPlayOutMount();
@@ -2848,7 +2901,10 @@ class PacketPlayOutCamera extends Packet {
     </code>
 
     public static (PacketPlayOutCameraHandle) PacketPlayOutCamera createNew() {
-#if version >= 1.17
+#if version >= 1.20.5
+        #require net.minecraft.network.protocol.game.PacketPlayOutCamera private PacketPlayOutCamera createCameraPacket:<init>(net.minecraft.network.PacketDataSerializer serializer);
+        return #createCameraPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#elseif version >= 1.17
         return new PacketPlayOutCamera(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
         return new PacketPlayOutCamera();

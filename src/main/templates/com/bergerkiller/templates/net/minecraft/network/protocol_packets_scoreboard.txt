@@ -52,7 +52,10 @@ class PacketPlayOutScoreboardTeam extends Packet {
 #endif
 
     public static (PacketPlayOutScoreboardTeamHandle) PacketPlayOutScoreboardTeam createNew() {
-#if version >= 1.17
+#if version >= 1.20.5
+        #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam private PacketPlayOutScoreboardTeam createTeamPacket:<init>(String s, int i, java.util.Optional<PacketPlayOutScoreboardTeam.b> opt, java.util.Collection<String> collection);
+        return #createTeamPacket("", 0, java.util.Optional.empty(), java.util.Collections.emptyList());
+#elseif version >= 1.17
         PacketPlayOutScoreboardTeam packet = new PacketPlayOutScoreboardTeam(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
         PacketPlayOutScoreboardTeamHandle.T.players.set(packet, Collections.emptyList());
         return packet;
