@@ -384,56 +384,85 @@ public class ItemMaterialTest {
     }
 
     @Test
-    public void testItemVariants() {
+    public void testArrowVariants() {
+        if (!CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            return;
+        }
+
+        // Retrieve from listing
+        Material tippedArrowMat = getMaterial("TIPPED_ARROW");
+        List<ItemStack> actual = ItemUtil.getItemVariants(tippedArrowMat);
+
+        // Verify all ItemStacks are actually TIPPED_ARROW types
+        for (ItemStack item : actual) {
+            assertEquals(tippedArrowMat, item.getType());
+        }
+
+        // Check all are contained, order does not matter
+        assertTrue("Not enough variants: " + actual.size(), actual.size() >= 38);
+
+        // Add all items to a set. Each item should be unique.
+        HashSet<ItemStack> set = new HashSet<ItemStack>(actual);
+        assertEquals(actual.size(), set.size());
+    }
+
+    @Test
+    public void testPotionVariants() {
+        if (!CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            return;
+        }
+
+        // Retrieve from listing
+        Material potionMat = getMaterial("POTION");
+        List<ItemStack> actual = ItemUtil.getItemVariants(potionMat);
+
+        // Verify all ItemStacks are actually POTION types
+        for (ItemStack item : actual) {
+            assertEquals(potionMat, item.getType());
+        }
+
+        // Check all are contained, order does not matter
+        assertTrue("Not enough variants: " + actual.size(), actual.size() >= 38);
+
+        // Add all items to a set. Each item should be unique.
+        HashSet<ItemStack> set = new HashSet<ItemStack>(actual);
+        assertEquals(actual.size(), set.size());
+    }
+
+    @Test
+    public void testLegacyWoolVariants() {
+        // Only if server < 1.13 is this relevant
         if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
-            // Most variants were removed in 1.13. Only a few remain.
-            // These are mostly items like bottles and arrows
-            // But I guess it is worth testing anyway
+            return;
+        }
 
-            // Retrieve from listing
-            Material tippedArrowMat = getMaterial("TIPPED_ARROW");
-            List<ItemStack> actual = ItemUtil.getItemVariants(tippedArrowMat);
+        // Test using White Whool
+        // All 16 wool colors should be returned here
+        Material woolMat = getLegacyMaterial("WOOL");
+        List<ItemStack> expected = new ArrayList<ItemStack>();
+        for (int dur = 0; dur < 16; dur++) {
+            expected.add(new ItemStack(woolMat, 1, (short) dur));
+        }
 
-            // Verify all ItemStacks are actually TIPPED_ARROW types
-            for (ItemStack item : actual) {
-                assertEquals(tippedArrowMat, item.getType());
+        // Retrieve from listing
+        List<ItemStack> actual = ItemUtil.getItemVariants(woolMat);
+
+        // Check all are contained, order does not matter
+        assertEquals(expected.size(), actual.size());
+        for (ItemStack expectedItem : expected) {
+            boolean contained = false;
+            for (ItemStack actualItem : actual) {
+                if (actualItem.getType() == expectedItem.getType() && actualItem.getDurability() == expectedItem.getDurability()) {
+                    contained = true;
+                    break;
+                }
             }
-
-            // Check all are contained, order does not matter
-            assertEquals(38, actual.size());
-            
-            // Add all items to a set. Each item should be unique.
-            HashSet<ItemStack> set = new HashSet<ItemStack>(actual);
-            assertEquals(actual.size(), set.size());
-        } else {
-            // Test using White Whool
-            // All 16 wool colors should be returned here
-            Material woolMat = getLegacyMaterial("WOOL");
-            List<ItemStack> expected = new ArrayList<ItemStack>();
-            for (int dur = 0; dur < 16; dur++) {
-                expected.add(new ItemStack(woolMat, 1, (short) dur));
-            }
-
-            // Retrieve from listing
-            List<ItemStack> actual = ItemUtil.getItemVariants(woolMat);
-
-            // Check all are contained, order does not matter
-            assertEquals(expected.size(), actual.size());
-            for (ItemStack expectedItem : expected) {
-                boolean contained = false;
+            if (!contained) {
+                System.out.println("Actual: ");
                 for (ItemStack actualItem : actual) {
-                    if (actualItem.getType() == expectedItem.getType() && actualItem.getDurability() == expectedItem.getDurability()) {
-                        contained = true;
-                        break;
-                    }
+                    System.out.println("- " + actualItem.toString());
                 }
-                if (!contained) {
-                    System.out.println("Actual: ");
-                    for (ItemStack actualItem : actual) {
-                        System.out.println("- " + actualItem.toString());
-                    }
-                    fail("Item was not found: " + expectedItem);
-                }
+                fail("Item was not found: " + expectedItem);
             }
         }
     }

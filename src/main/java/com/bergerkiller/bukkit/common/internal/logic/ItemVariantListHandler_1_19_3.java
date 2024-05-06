@@ -96,6 +96,7 @@ class ItemVariantListHandler_1_19_3 extends ItemVariantListHandler {
     @Template.Import("net.minecraft.world.item.alchemy.Potions")
     @Template.Import("net.minecraft.world.item.alchemy.PotionRegistry")
     @Template.Import("net.minecraft.world.item.alchemy.PotionUtil")
+    @Template.Import("net.minecraft.world.item.alchemy.PotionContents")
     @Template.Import("net.minecraft.core.Holder")
     @Template.Import("net.minecraft.tags.TagKey")
     @Template.Import("net.minecraft.core.registries.BuiltInRegistries")
@@ -138,7 +139,11 @@ class ItemVariantListHandler_1_19_3 extends ItemVariantListHandler {
          *     java.util.Iterator iterator = BuiltInRegistries.ENCHANTMENT.iterator();
          *     while (iterator.hasNext()) {
          *         Enchantment enchantment = (Enchantment) iterator.next();
+         * #if version >= 1.20.5
+         *         if (true) {
+         * #else
          *         if (enchantment.category != null) {
+         * #endif
          *             for (int i = enchantment.getMinLevel(); i <= enchantment.getMaxLevel(); ++i) {
          *                 result.add(ItemEnchantedBook.createForEnchantment(new WeightedRandomEnchant(enchantment, i)));
          *             }
@@ -154,6 +159,16 @@ class ItemVariantListHandler_1_19_3 extends ItemVariantListHandler {
          * <GET_POTION_VARIANTS>
          * public static List<ItemStack> getVariants(ItemPotion item) {
          *     List result = new ArrayList();
+         * #if version >= 1.20.5
+         *     java.util.Iterator iterator = BuiltInRegistries.POTION.asHolderIdMap().iterator();
+         *     while (iterator.hasNext()) {
+         *         net.minecraft.core.Holder potionregistryHolder = (net.minecraft.core.Holder) iterator.next();
+         *         PotionRegistry potionregistry = (PotionRegistry) potionregistryHolder.value();
+         *         if (!potionregistry.getEffects().isEmpty()) {
+         *             result.add(PotionContents.createItemStack(item, potionregistryHolder));
+         *         }
+         *     }
+         * #else
          *     java.util.Iterator iterator = BuiltInRegistries.POTION.iterator();
          *     while (iterator.hasNext()) {
          *         PotionRegistry potionregistry = (PotionRegistry) iterator.next();
@@ -161,6 +176,7 @@ class ItemVariantListHandler_1_19_3 extends ItemVariantListHandler {
          *             result.add(PotionUtil.setPotion(new ItemStack(item), potionregistry));
          *         }
          *     }
+         * #endif
          *     return result;
          * }
          */
@@ -171,6 +187,16 @@ class ItemVariantListHandler_1_19_3 extends ItemVariantListHandler {
          * <GET_TIPPED_ARROW_VARIANTS>
          * public static List<ItemStack> getVariants(ItemTippedArrow item) {
          *     List result = new ArrayList();
+         * #if version >= 1.20.5
+         *     java.util.Iterator iterator = BuiltInRegistries.POTION.asHolderIdMap().iterator();
+         *     while (iterator.hasNext()) {
+         *         net.minecraft.core.Holder potionregistryHolder = (net.minecraft.core.Holder) iterator.next();
+         *         PotionRegistry potionregistry = (PotionRegistry) potionregistryHolder.value();
+         *         if (!potionregistry.getEffects().isEmpty()) {
+         *             result.add(PotionContents.createItemStack(item, potionregistryHolder));
+         *         }
+         *     }
+         * #else
          *     java.util.Iterator iterator = BuiltInRegistries.POTION.iterator();
          *     while (iterator.hasNext()) {
          *         PotionRegistry potionregistry = (PotionRegistry) iterator.next();
@@ -178,6 +204,7 @@ class ItemVariantListHandler_1_19_3 extends ItemVariantListHandler {
          *             result.add(PotionUtil.setPotion(new ItemStack(item), potionregistry));
          *         }
          *     }
+         * #endif
          *     return result;
          * }
          */
