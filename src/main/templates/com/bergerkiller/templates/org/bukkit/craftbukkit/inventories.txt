@@ -17,7 +17,7 @@ class CraftItemStack {
     public static (org.bukkit.inventory.ItemStack) CraftItemStack asCraftMirror((Object) net.minecraft.world.item.ItemStack nmsItemStack);
 
     public static org.bukkit.inventory.meta.ItemMeta deserializeItemMeta(java.util.Map<String, Object> values) {
-        return CraftMetaItem$SerializableMeta.deserialize(values);
+        return SerializableMeta.deserialize(values);
     }
 }
 

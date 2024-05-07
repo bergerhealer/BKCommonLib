@@ -6,8 +6,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bergerkiller.bukkit.common.inventory.CommonItemMaterials;
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.junit.Test;
 
@@ -31,7 +32,12 @@ public class ConfigTest {
         }
 
         FileConfiguration config = new FileConfiguration("test.yml");
-        ItemStack testItem = new ItemStack(Material.DIAMOND_SWORD, 1, (short) 100);
+        ItemStack testItem = CommonItemStack.create(CommonItemMaterials.FILLED_MAP, 1)
+                .setFilledMapId(5)
+                .setCustomNameMessage("") // Works around an annoying bukkit bug...
+                .toBukkit();
+        //ItemStack testItem = new ItemStack(Material.GRASS_BLOCK);
+
         config.load();
         config.set("hello", "world");
         config.set("number", 12);
