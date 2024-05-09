@@ -13,6 +13,7 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStac
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -806,6 +807,22 @@ public final class CommonItemStack implements Cloneable {
         getHandle()
                 .orElseThrow(() -> new IllegalStateException("Item is empty and cannot store a map color"))
                 .setMapColor(rgb);
+        return this;
+    }
+
+    /**
+     * Adds a Bukkit Enchantment of a certain level to this item
+     *
+     * @param enchantment Enchantment
+     * @param level Level of the enchantment
+     * @return this CommonItemStack
+     */
+    public CommonItemStack addEnchantment(Enchantment enchantment, int level) {
+        ItemStack bukkitItem = toBukkit();
+        if (bukkitItem == null) {
+            throw new IllegalStateException("Cannot add enchantments to an empty item");
+        }
+        bukkitItem.addEnchantment(enchantment, level);
         return this;
     }
 
