@@ -42,7 +42,6 @@ public abstract class EntityLivingHandle extends EntityHandle {
     public abstract void setAbsorptionAmount(float extraHealth);
     public static final Key<Byte> DATA_LIVING_FLAGS = Key.Type.BYTE.createKey(T.DATA_LIVING_FLAGS, -1);
     public static final Key<Float> DATA_HEALTH = Key.Type.FLOAT.createKey(T.DATA_HEALTH, 6);
-    public static final Key<Integer> DATA_PARTICLES_COLOR_RGB = Key.Type.INTEGER.createKey(T.DATA_PARTICLES_COLOR_RGB, 7);
     public static final Key<Boolean> DATA_PARTICLES_HIDDEN = Key.Type.BOOLEAN.createKey(T.DATA_PARTICLES_HIDDEN, 8);
     public static final Key<Integer> DATA_UNKNOWN1 = Key.Type.INTEGER.createKey(T.DATA_ARROWCOUNT, 9);
     public static final Key<IntVector3> DATA_BEDPOSITION = Key.Type.BLOCK_POSITION.createKey(T.DATA_BEDPOSITION, -1);
@@ -69,8 +68,6 @@ public abstract class EntityLivingHandle extends EntityHandle {
         public final Template.StaticField.Converted<Key<Byte>> DATA_LIVING_FLAGS = new Template.StaticField.Converted<Key<Byte>>();
         @Template.Optional
         public final Template.StaticField.Converted<Key<Float>> DATA_HEALTH = new Template.StaticField.Converted<Key<Float>>();
-        @Template.Optional
-        public final Template.StaticField.Converted<Key<Integer>> DATA_PARTICLES_COLOR_RGB = new Template.StaticField.Converted<Key<Integer>>();
         @Template.Optional
         public final Template.StaticField.Converted<Key<Boolean>> DATA_PARTICLES_HIDDEN = new Template.StaticField.Converted<Key<Boolean>>();
         @Template.Optional
