@@ -239,12 +239,13 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
          * #if assignable RegionFileCache RegionFileSection
          *     // On 1.14 and PaperMC this can more trivially be accessed
          *     return (RegionFileCache) rfs;
-         * #elseif version >= 1.20.5
+         * #else
+         *   #if version >= 1.20.5
          *     #require RegionFileSection private final SimpleRegionStorage simpleRegionStorage;
          *     SimpleRegionStorage srs = rfs#simpleRegionStorage;
          *     #require SimpleRegionStorage private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:worker;
          *     IOWorker ioworker = srs#ioworker;
-         * #else
+         *   #else
          *     // Access RegionFileCache inside IOWorker
          *     #if version >= 1.17
          *         #require RegionFileSection private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:worker;
@@ -252,16 +253,17 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
          *         #require RegionFileSection private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:b;
          *     #endif
          *     IOWorker ioworker = rfs#ioworker;
-         * #endif
+         *   #endif
          *
-         * #if version >= 1.17
+         *   #if version >= 1.17
          *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:storage;
-         * #elseif version >= 1.16
+         *   #elseif version >= 1.16
          *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:d;
-         * #else
+         *   #else
          *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:e;
-         * #endif
+         *   #endif
          *     return ioworker#cache;
+         * #endif
          * }
          */
         @Template.Generated("%FIND_POI_FILE_CACHE%")

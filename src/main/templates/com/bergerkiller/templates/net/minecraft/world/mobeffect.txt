@@ -107,19 +107,27 @@ class MobEffectList {
     }
 #else
     public org.bukkit.potion.PotionEffectType toBukkit() {
-        return org.bukkit.potion.PotionEffectType.getById(((Integer) MobEffectListHandle.T.getId.invoke(instance)).intValue());
+        com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod getIdRaw;
+        getIdRaw = (com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod) MobEffectListHandle.T.getId.raw;
+        return org.bukkit.potion.PotionEffectType.getById(((Integer) getIdRaw.invoke(instance)).intValue());
     }
 
     public static (MobEffectListHandle) MobEffectList fromBukkit(org.bukkit.potion.PotionEffectType effectType) {
-        return (MobEffectList) MobEffectListHandle.T.fromId.raw.invoke(effectType.getId());
+        com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod fromIdRaw;
+        fromIdRaw = (com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod) MobEffectListHandle.T.fromId.raw;
+        return (MobEffectList) fromIdRaw.invoke(Integer.valueOf(effectType.getId()));
     }
 
     public static (Holder<MobEffectListHandle>) MobEffectList holderFromBukkit(org.bukkit.potion.PotionEffectType effectType) {
-        return MobEffectListHandle.byId(effectType.getId());
+        com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod fromIdRaw;
+        fromIdRaw = (com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod) MobEffectListHandle.T.fromId.raw;
+        return (MobEffectList) fromIdRaw.invoke(Integer.valueOf(effectType.getId()));
     }
 
     public static org.bukkit.potion.PotionEffectType holderToBukkit((Holder<MobEffectListHandle>) MobEffectList mobEffectList) {
-        return org.bukkit.potion.PotionEffectType.getById(((Integer) MobEffectListHandle.T.getId.raw.invoke(mobEffectList)).intValue());
+        com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod getIdRaw;
+        getIdRaw = (com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod) MobEffectListHandle.T.getId.raw;
+        return org.bukkit.potion.PotionEffectType.getById(((Integer) getIdRaw.invoke(mobEffectList)).intValue());
     }
 #endif
 

@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
-import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeMapBaseHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeBaseHandle;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
@@ -69,7 +69,6 @@ import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightMapHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.data.CraftBlockDataHandle;
@@ -93,17 +92,17 @@ public class WrapperConversion {
 
     // Plugs a gap 1.8 - 1.16 where some fields used IAttribute (but were really AttributeBase)
     @ConverterMethod(input="net.minecraft.world.entity.ai.attributes.IAttribute", optional=true)
-    public static Holder<AttributeMapBaseHandle> iAttributeToHolder(Object nmsIAttribute) {
+    public static Holder<AttributeBaseHandle> iAttributeToHolder(Object nmsIAttribute) {
         return attributeBaseToHolder(nmsIAttribute);
     }
 
     @ConverterMethod(input="net.minecraft.world.entity.ai.attributes.AttributeBase")
-    public static Holder<AttributeMapBaseHandle> attributeBaseToHolder(Object nmsAttributeBase) {
-        return Holder.directWrap(nmsAttributeBase, AttributeMapBaseHandle::createHandle);
+    public static Holder<AttributeBaseHandle> attributeBaseToHolder(Object nmsAttributeBase) {
+        return Holder.directWrap(nmsAttributeBase, AttributeBaseHandle::createHandle);
     }
 
     @ConverterMethod(output="net.minecraft.world.entity.ai.attributes.AttributeBase")
-    public static Object holderToAttributeBase(Holder<AttributeMapBaseHandle> attributeHolder) {
+    public static Object holderToAttributeBase(Holder<AttributeBaseHandle> attributeHolder) {
         return attributeHolder.rawValue();
     }
 

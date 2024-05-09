@@ -203,8 +203,10 @@ class EntityLiving extends Entity {
     public (AttributeMapBaseHandle) AttributeMapBase getAttributeMap();
 #endif
 
-#if version >= 1.18
+#if version >= 1.20.5
     public (AttributeModifiableHandle) AttributeModifiable getAttribute((Holder<AttributeBaseHandle>) net.minecraft.core.Holder<AttributeBase> attribute);
+#elseif version >= 1.18
+    public (AttributeModifiableHandle) AttributeModifiable getAttribute((Holder<AttributeBaseHandle>) AttributeBase attribute);
 #elseif version >= 1.16
     public (AttributeModifiableHandle) AttributeModifiable getAttribute:getAttributeInstance((Holder<AttributeBaseHandle>) AttributeBase attribute);
 #else

@@ -50,16 +50,7 @@ class ItemStack {
     #require net.minecraft.world.item.ItemStack public void removeTagIfEmpty() {
         net.minecraft.nbt.NBTTagCompound tag = instance.getTag();
         if (tag != null && tag.isEmpty()) {
-            instance.setTag(null);
-        }
-    }
-
-    #require net.minecraft.world.item.ItemStack public void updateTag(net.minecraft.nbt.NBTTagCompound tag) {
-        boolean tagIsNullOrEmpty = tag == null || tag.isEmpty();
-        if (tagIsNullOrEmpty) {
-            instance.setTag(null);
-        } else {
-
+            instance.setTag((net.minecraft.nbt.NBTTagCompound) null);
         }
     }
 #endif
@@ -326,7 +317,7 @@ class ItemStack {
 #else
         NBTTagCompound tag = instance.getTag();
         if (tag != null) {
-            NBTBase unbreakable = instance.get("Unbreakable");
+            NBTBase unbreakable = tag.get("Unbreakable");
             if (unbreakable instanceof NBTTagByte) {
                 return ((NBTTagByte) unbreakable).getAsByte() != 0;
             }
@@ -620,7 +611,7 @@ class ItemStack {
         if (tag != null) {
             NBTBase cmd = tag.get("CustomModelData");
             if (cmd instanceof NBTTagInt) {
-                return cmd.getAsInt();
+                return ((NBTTagInt) cmd).getAsInt();
             }
         }
         return -1;
@@ -692,7 +683,7 @@ class ItemStack {
     public void setCustomData((CommonTagCompound) NBTTagCompound tag) {
         boolean tagIsNullOrEmpty = tag == null || tag.isEmpty();
         if (tagIsNullOrEmpty) {
-            instance.setTag(null);
+            instance.setTag((NBTTagCompound) null);
         } else {
   #if version >= 1.18
             instance.setTag((NBTTagCompound) tag.copy());

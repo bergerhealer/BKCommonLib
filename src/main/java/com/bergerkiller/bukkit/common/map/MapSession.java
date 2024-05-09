@@ -266,7 +266,7 @@ public class MapSession {
         }
 
         private void sendUpdate(MapDisplayTile.Update mapUpdate) {
-            PacketUtil.sendPacket(this.player, mapUpdate.packet, false);
+            PacketUtil.sendPacket(this.player, mapUpdate.packet.create(), false);
             display.getMarkerManager().setMarkersSynchronized(this.player, mapUpdate);
         }
     }
