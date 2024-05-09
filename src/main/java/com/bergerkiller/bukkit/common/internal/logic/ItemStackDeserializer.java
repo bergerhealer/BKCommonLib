@@ -240,8 +240,21 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         // From MC 1.20.4 to 1.20.3
         this.register(3698, NO_CONVERSION);
 
+        // From MC 1.20.5 to 1.20.4
+        // TODO: Did the data components break any of the item meta that needs correcting?
+        this.register(3700, map -> {
+            Object type = map.get("type");
+
+            if ("TURTLE_SCUTE".equals(type)) {
+                map.put("type", "SCUTE");
+                return true;
+            } else {
+                return !Helper.ADDED_MC_1_20_5.contains(type);
+            }
+        });
+
         // Maximum supported data version
-        this.max_version = 3700; // MC 1.20.4
+        this.max_version = 3837; // MC 1.20.5
     }
 
     // Registers a converter if it can convert from a future data version only
@@ -740,6 +753,16 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                 "WEATHERED_COPPER_BULB", "OXIDIZED_COPPER_BULB", "WAXED_COPPER_BULB",
                 "WAXED_EXPOSED_COPPER_BULB", "WAXED_WEATHERED_COPPER_BULB",
                 "WAXED_OXIDIZED_COPPER_BULB", "TRIAL_SPAWNER", "TRIAL_KEY"
+        ));
+
+        // All material names (Material enum) added Minecraft 1.20.4 -> 1.20.5
+        public static final Set<String> ADDED_MC_1_20_5 = new HashSet<>(Arrays.asList(
+                "HEAVY_CORE", "TURTLE_SCUTE", "ARMADILLO_SCUTE", "WOLF_ARMOR",
+                "ARMADILLO_SPAWN_EGG", "BOGGED_SPAWN_EGG", "WIND_CHARGE",
+                "MACE", "FLOW_BANNER_PATTERN", "GUSTER_BANNER_PATTERN",
+                "FLOW_ARMOR_TRIM_SMITHING_TEMPLATE", "BOLT_ARMOR_TRIM_SMITHING_TEMPLATE",
+                "FLOW_POTTERY_SHERD", "GUSTER_POTTERY_SHERD", "SCRAPE_POTTERY_SHERD",
+                "OMINOUS_TRIAL_KEY", "VAULT", "OMINOUS_BOTTLE", "BREEZE_ROD"
         ));
     }
 }
