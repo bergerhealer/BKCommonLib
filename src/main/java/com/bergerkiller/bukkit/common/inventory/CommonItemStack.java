@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.inventory;
 
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
@@ -10,6 +11,7 @@ import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
@@ -593,6 +595,22 @@ public final class CommonItemStack implements Cloneable {
      */
     public CommonItemStack setCustomNameMessage(String displayName) {
         return setCustomName(displayName == null ? null : ChatText.fromMessage(displayName));
+    }
+
+    /**
+     * Sets an empty custom name on this item, so that the original name of the item is not
+     * displayed. An empty String might not as reliably work, so use this method instead
+     * of hiding the original name is important.
+     *
+     * @return this CommonItemStack
+     * @throws IllegalStateException If this item is {@link #isEmpty() empty}.
+     */
+    public CommonItemStack setEmptyCustomName() {
+        if (CommonCapabilities.EMPTY_ITEM_NAME) {
+            return setCustomNameMessage(ChatColor.RESET.toString());
+        } else {
+            return setCustomNameMessage(ChatColor.RESET + "\0");
+        }
     }
 
     /**
