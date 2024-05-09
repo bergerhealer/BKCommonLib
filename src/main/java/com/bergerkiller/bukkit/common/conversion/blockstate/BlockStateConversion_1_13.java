@@ -94,6 +94,11 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                     return ConstantReturningInvoker.of(proxy_nms_world);
                 }
 
+                // Name (usually for logging reasons)
+                if (method.getName().equals("getName")) {
+                    return ConstantReturningInvoker.of("BKCommonLib-BlockState-DummyWorld");
+                }
+
                 // All other method calls fail
                 return non_instrumented_invokable;
             }
