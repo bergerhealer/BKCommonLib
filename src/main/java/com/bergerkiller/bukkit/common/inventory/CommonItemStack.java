@@ -12,12 +12,15 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStac
 
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
@@ -547,12 +550,23 @@ public final class CommonItemStack implements Cloneable {
      * Gets the custom display name of this item, if one is set. Returns <i>null</i>
      * if no special display name is set.
      *
-     * @return Display Name as formatted ChatText component
+     * @return Display Name as formatted ChatText component, or null if not set
      */
     public ChatText getCustomName() {
         return getHandle(true)
                 .map(ItemStackHandle::getCustomName)
                 .orElse(null);
+    }
+
+    /**
+     * Gets the custom display name of this item as a legacy formatted message string,
+     * if one is set. Returns <i>null</i> if no special display name is set.
+     *
+     * @return Display Name as legacy message String, or null if not set
+     */
+    public String getCustomNameMessage() {
+        ChatText text = getCustomName();
+        return text == null ? null : text.getMessage();
     }
 
     /**
@@ -763,6 +777,85 @@ public final class CommonItemStack implements Cloneable {
         getHandle()
                 .orElseThrow(() -> new IllegalStateException("Item is empty and cannot store a map color"))
                 .setMapColor(rgb);
+        return this;
+    }
+
+    /**
+     * Hides all attributes of this item, such as 'unbreakable' and potion effects,
+     * from the tooltip of this item. Equivalent to calling {@link #addItemFlags(ItemFlag...)}
+     * with all the HIDE_ flags.
+     *
+     * @return this CommonItemStack
+     */
+    public CommonItemStack hideAllAttributes() {
+        return addItemFlags(ItemFlag.values());
+    }
+
+    /**
+     * Gets all currently set item flags of this item. This returned set is unmodifiable.
+     *
+     * @return Set item flags, an Empty set if none are set or this item is empty
+     */
+    public Set<ItemFlag> getItemFlags() {
+        ItemStack bukkitItem = toBukkit();
+        if (bukkitItem == null) {
+            return Collections.emptySet();
+        }
+        ItemMeta meta = bukkitItem.getItemMeta();
+        if (meta == null) {
+            return Collections.emptySet();
+        }
+
+        return meta.getItemFlags();
+    }
+
+    /**
+     * Adds all Bukkit ItemFlags specified to this item
+     *
+     * @param itemFlags ItemFlags to add/set
+     * @return this CommonItemStack
+     */
+    public CommonItemStack addItemFlags(ItemFlag... itemFlags) {
+        ItemStack bukkitItem = toBukkit();
+        if (bukkitItem == null) {
+            throw new IllegalStateException("Cannot set item flags on an empty item");
+        }
+        ItemMeta meta = bukkitItem.getItemMeta();
+        if (meta == null) {
+            throw new IllegalStateException("Item of type " + bukkitItem.getType() + " cannot store item flags");
+        }
+        meta.addItemFlags(itemFlags);
+        bukkitItem.setItemMeta(meta);
+        return this;
+    }
+
+    /**
+     * Resets this item so that all item flags are the defaults. This clears all set
+     * item flags.
+     *
+     * @return this CommonItemStack
+     */
+    public CommonItemStack resetItemFlags() {
+        return removeItemFlags(ItemFlag.values());
+    }
+
+    /**
+     * Removes item flags from this item
+     *
+     * @param itemFlags Item Flags to remove
+     * @return this CommonItemStack
+     */
+    public CommonItemStack removeItemFlags(ItemFlag... itemFlags) {
+        ItemStack bukkitItem = toBukkit();
+        if (bukkitItem == null) {
+            throw new IllegalStateException("Cannot set item flags on an empty item");
+        }
+        ItemMeta meta = bukkitItem.getItemMeta();
+        if (meta == null) {
+            throw new IllegalStateException("Item of type " + bukkitItem.getType() + " cannot store item flags");
+        }
+        meta.removeItemFlags(itemFlags);
+        bukkitItem.setItemMeta(meta);
         return this;
     }
 

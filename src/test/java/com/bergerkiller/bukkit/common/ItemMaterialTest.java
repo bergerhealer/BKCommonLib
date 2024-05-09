@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
-import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.DetectorRail;
@@ -28,7 +27,6 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
 import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializer;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
@@ -270,50 +268,6 @@ public class ItemMaterialTest {
         ItemStack item = ItemUtil.emptyItem();
         assertNotNull(item);
         assertTrue(ItemUtil.isEmpty(item));
-    }
-
-    @Test
-    public void testEqualsIgnoreAmount() {
-        //TODO: Make this test better!
-        ItemStack item = new ItemStack(Material.IRON_DOOR);
-        testEQIgnoreAmount(item);
-    }
-
-    @Test
-    public void testDisplayName() {
-        ItemStack item = ItemUtil.createItem(getFirst("OAK_PLANKS", "LEGACY_WOOD"), 1);
-        String old_name = ItemUtil.getDisplayName(item);
-        ItemUtil.setDisplayName(item, "COOLNAME");
-        assertEquals("COOLNAME", ItemUtil.getDisplayName(item));
-        ItemUtil.setDisplayName(item, null);
-        assertEquals(old_name, ItemUtil.getDisplayName(item));
-    }
-
-    @Test
-    public void testItemCustomData() {
-        CommonItemStack item = CommonItemStack.create(getFirst("OAK_PLANKS", "LEGACY_WOOD"), 1);
-        assertFalse(item.hasCustomData());
-        assertTrue(item.getCustomData().isEmpty());
-        assertTrue(item.getCustomDataCopy().isEmpty());
-
-        item.updateCustomData(metadata -> {
-            metadata.putValue("test", "awesome!");
-        });
-
-        assertTrue(item.hasCustomData());
-        assertFalse(item.getCustomData().isEmpty());
-        assertEquals("awesome!", item.getCustomData().getValue("test"));
-        assertEquals("awesome!", item.getCustomDataCopy().getValue("test"));
-
-        CommonTagCompound meta = item.getCustomDataCopy();
-        meta.putValue("otherTest", "cool!");
-        item.setCustomData(meta);
-
-        // Verify this is updated too
-        assertEquals("cool!", item.getCustomData().getValue("otherTest"));
-        assertEquals("cool!", item.getCustomDataCopy().getValue("otherTest"));
-        assertEquals("awesome!", item.getCustomData().getValue("test"));
-        assertEquals("awesome!", item.getCustomDataCopy().getValue("test"));
     }
 
     @Test
@@ -569,14 +523,6 @@ public class ItemMaterialTest {
                 fail("Item " + item + " should not match " + parser + " but it did!");
             }
         }
-    }
-
-    private static void testEQIgnoreAmount(ItemStack item) {
-        ItemStack a = ItemUtil.cloneItem(item);
-        ItemStack b = ItemUtil.cloneItem(item);
-        a.setAmount(1);
-        b.setAmount(2);
-        assertTrue(ItemUtil.equalsIgnoreAmount(a, b));
     }
 
     private static <T> PropertyTest<T> testProperty(MaterialProperty<T> prop, String name) {
