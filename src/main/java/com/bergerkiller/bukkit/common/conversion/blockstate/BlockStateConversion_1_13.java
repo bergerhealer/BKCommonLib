@@ -96,7 +96,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
 
                 // Name (usually for logging reasons)
                 if (method.getName().equals("getName")) {
-                    return ConstantReturningInvoker.of("BKCommonLib-BlockState-DummyWorld");
+                    return (instance, args) -> input_state.block.getWorld().getName();
                 }
 
                 // All other method calls fail
