@@ -6,3 +6,46 @@
 #case 1.9:     #remap net.minecraft.network.syncher.DataWatcher private final net.minecraft.world.entity.Entity owner:b;
 #case else:    #remap net.minecraft.network.syncher.DataWatcher private final net.minecraft.world.entity.Entity owner:a;
 #endselect
+
+#if version >= 1.18
+    #remap net.minecraft.network.syncher.DataWatcher public boolean isDirty();
+#else
+    #remap net.minecraft.network.syncher.DataWatcher public boolean isDirty:a();
+#endif
+
+#if version < 1.19.3
+  #select version >=
+  #case 1.17:    #remap net.minecraft.network.syncher.DataWatcher private boolean isEmpty;
+  #case 1.10.2:  #remap net.minecraft.network.syncher.DataWatcher private boolean isEmpty:f;
+  #case 1.9:     #remap net.minecraft.network.syncher.DataWatcher private boolean isEmpty:e;
+  #case else:    #remap net.minecraft.network.syncher.DataWatcher private boolean isEmpty:b;
+  #endselect
+#endif
+
+#select version >=
+#case 1.17:    #remap net.minecraft.network.syncher.DataWatcher private boolean isDirty;
+#case 1.10.2:  #remap net.minecraft.network.syncher.DataWatcher private boolean isDirty:g;
+#case 1.9:     #remap net.minecraft.network.syncher.DataWatcher private boolean isDirty:f;
+#case else:    #remap net.minecraft.network.syncher.DataWatcher private boolean isDirty:e;
+#endselect
+
+#if version >= 1.18
+    #remap net.minecraft.network.syncher.DataWatcher.Item public net.minecraft.network.syncher.DataWatcherObject<T> getAccessor();
+    #remap net.minecraft.network.syncher.DataWatcher.Item public void setValue(T value);
+    #remap net.minecraft.network.syncher.DataWatcher.Item public T getValue();
+    #remap net.minecraft.network.syncher.DataWatcher.Item public boolean isDirty();
+    #remap net.minecraft.network.syncher.DataWatcher.Item public void setDirty(boolean dirty);
+#elseif version >= 1.9
+    #remap net.minecraft.network.syncher.DataWatcher.Item public net.minecraft.network.syncher.DataWatcherObject<T> getAccessor:a();
+    #remap net.minecraft.network.syncher.DataWatcher.Item public void setValue:a(T value);
+    #remap net.minecraft.network.syncher.DataWatcher.Item public T getValue:b();
+    #remap net.minecraft.network.syncher.DataWatcher.Item public boolean isDirty:c();
+    #remap net.minecraft.network.syncher.DataWatcher.Item public void setDirty:a(boolean dirty);
+#else
+    #remap net.minecraft.network.syncher.DataWatcher.WatchableObject public int getAccessorId:a();
+    #remap net.minecraft.network.syncher.DataWatcher.WatchableObject public void setValue:a(Object value);
+    #remap net.minecraft.network.syncher.DataWatcher.WatchableObject public Object getValue:b();
+    #remap net.minecraft.network.syncher.DataWatcher.WatchableObject public int getValueTypeId:c();
+    #remap net.minecraft.network.syncher.DataWatcher.WatchableObject public boolean isDirty:d();
+    #remap net.minecraft.network.syncher.DataWatcher.WatchableObject public void setDirty:a(boolean dirty);
+#endif

@@ -233,7 +233,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.network.syncher.DataWatcher")
     public static com.bergerkiller.bukkit.common.wrappers.DataWatcher toDataWatcher(Object nmsDataWatcherHandle) {
-        return new com.bergerkiller.bukkit.common.wrappers.DataWatcher(nmsDataWatcherHandle);
+        return com.bergerkiller.bukkit.common.wrappers.DataWatcher.createForHandle(nmsDataWatcherHandle);
     }
 
     @Deprecated

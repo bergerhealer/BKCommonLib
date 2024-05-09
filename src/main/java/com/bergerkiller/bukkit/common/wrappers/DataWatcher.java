@@ -48,7 +48,7 @@ import org.bukkit.util.Vector;
 public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Cloneable {
 
     public DataWatcher(org.bukkit.entity.Entity entityOwner) {
-        setHandle(DataWatcherHandle.createNew(entityOwner));
+        this(DataWatcherHandle.createNew(entityOwner));
     }
 
     /**
@@ -57,11 +57,21 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * Entity-accepting constructor.
      */
     public DataWatcher() {
-        setHandle(DataWatcherHandle.createNew(CommonDisabledEntity.INSTANCE));
+        this(DataWatcherHandle.createNew(CommonDisabledEntity.INSTANCE));
     }
 
-    public DataWatcher(Object handle) {
-        setHandle(DataWatcherHandle.createHandle(handle));
+    /**
+     * Creates a DataWatcher wrapping the NMS DataWatcher raw instance
+     *
+     * @param nmsDataWatcherHandle net.minecraft.network.syncher.DataWatcher
+     * @return DataWatcher
+     */
+    public static DataWatcher createForHandle(Object nmsDataWatcherHandle) {
+        return new DataWatcher(DataWatcherHandle.createHandle(nmsDataWatcherHandle));
+    }
+
+    private DataWatcher(DataWatcherHandle handle) {
+        setHandle(handle);
     }
 
     /**
@@ -268,7 +278,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * Watches an object
      *
      * @param key of the watched item
-     * @param defaultValue of the watched item
+     * @param defaultValue of the watched item. If the value set is this one, then the
+     *                     item is not included in synchronization packets for non-changes.
      */
     public <T> void watch(Key<T> key, T defaultValue) {
         handle.register(key, defaultValue);
@@ -413,11 +424,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      */
     @Override
     public DataWatcher clone() {
-        DataWatcher clone = new DataWatcher();
-        for (Item<?> item : this.getWatchedItems()) {
-            clone.watch(item);
-        }
-        return clone;
+        return new DataWatcher(handle.cloneWithOwner(CommonDisabledEntity.INSTANCE));
     }
 
     // Gets the raw item handle of a key

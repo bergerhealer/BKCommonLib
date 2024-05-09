@@ -21,6 +21,9 @@ class DataWatcher {
     public static final Object UNSET_MARKER_VALUE = new Object();
     </code>
 
+    // Used in a lot of places
+    #require net.minecraft.network.syncher.DataWatcher private boolean dw_isDirty:isDirty;
+
 #if version >= 1.20.5
     #require net.minecraft.network.syncher.DataWatcher public static DataWatcher.Item createDataWatcherDummyItem() {
         return new DataWatcher$Item( (net.minecraft.network.syncher.DataWatcherObject) null,
@@ -71,6 +74,119 @@ class DataWatcher {
         return createHandle(T.createNew.raw.invoke(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(owner)));
     }
     </code>
+
+    public (DataWatcherHandle) DataWatcher cloneWithOwner((EntityHandle) Entity owner) {
+#if version >= 1.20.5
+        // Items are stored in an array keyed by accessor id as index
+        // Take all original items, clone them, and pass them to the constructor
+        #require DataWatcher private final DataWatcher.Item<?>[] itemsById;
+        DataWatcher$Item[] itemsById = instance#itemsById;
+        DataWatcher$Item[] copyItemsById = new DataWatcher$Item[itemsById.length];
+
+        for (int i = 0; i < itemsById.length; i++) {
+            DataWatcher$Item item = itemsById[i];
+
+            #require DataWatcher$Item private final T itemInitialValue:initialValue;
+            Object initialValue = item#itemInitialValue;
+            DataWatcher$Item itemCopy = new DataWatcher$Item(item.getAccessor(), initialValue);
+            itemCopy.setValue(item.getValue());
+            itemCopy.setDirty(item.isDirty());
+            copyItemsById[i] = itemCopy;
+        }
+
+        #require net.minecraft.network.syncher.DataWatcher DataWatcher createDataWatcher:<init>(SyncedDataHolder owner, DataWatcher.Item<?>[] items);
+        DataWatcher copyWatcher = #createDataWatcher((SyncedDataHolder) owner, copyItemsById);
+
+#else
+        // Create a new empty DataWatcher and copy all items (cloned) into it
+        // The backing storage differs wildly between versions, unfortunately
+        DataWatcher copyWatcher = new DataWatcher(owner);
+
+  #if version >= 1.14.4
+        // Items are stored in a FastUtil Int2ObjectMap
+    #if version >= 1.17
+        #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<DataWatcher.Item<?>> itemsById;
+    #else
+        #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<DataWatcher.Item<?>> itemsById:entries;
+    #endif
+        it.unimi.dsi.fastutil.ints.Int2ObjectMap itemsById = instance#itemsById;
+        it.unimi.dsi.fastutil.ints.Int2ObjectMap copyItemsById = copyWatcher#itemsById;
+        it.unimi.dsi.fastutil.objects.ObjectIterator itemIter = itemsById.values().iterator();
+  #elseif version >= 1.9
+        // Items are stored in a java by-Integer HashMap
+    #if version >= 1.10.2
+        #require DataWatcher private final java.util.Map<Integer, DataWatcher.Item<?>> itemsById:d;
+    #else
+        #require DataWatcher private final java.util.Map<Integer, DataWatcher.Item<?>> itemsById:c;
+    #endif
+        java.util.Map itemsById = instance#itemsById;
+        java.util.Map copyItemsById = copyWatcher#itemsById;
+        java.util.Iterator itemIter = itemsById.values().iterator();
+  #else
+        // Items are stored in a Trove IntHashmap
+        #require DataWatcher private final gnu.trove.map.TIntObjectMap itemsById:dataValues;
+        gnu.trove.map.TIntObjectMap itemsById = instance#itemsById;
+        gnu.trove.map.TIntObjectMap copyItemsByid = copyWatcher#itemsById;
+        java.util.Iterator itemIter = itemsById.valueCollection().iterator();
+  #endif
+
+        // Iterate all registered items and register them in the copy
+        // It's important to note that since 1.19.3 there is an 'initial' default value that must be preserved
+        // Because we must also preserve the 'isDirty' state, we can't use getAll() / c() on older versions.
+        while (itemIter.hasNext()) {
+            DataWatcher$Item item = (DataWatcher$Item) itemIter.next();
+  #if version >= 1.9
+            DataWatcherObject accessor = item.getAccessor();
+  #else
+            int accessorId = item.getAccessorId();
+            int valueTypeId = item.getValueTypeId();
+  #endif
+
+            // Clone the item
+  #if version >= 1.19.3
+            #require DataWatcher$Item private final T itemInitialValue:initialValue;
+            Object initialValue = item#itemInitialValue;
+            DataWatcher$Item itemCopy = new DataWatcher$Item(accessor, initialValue);
+            itemCopy.setValue(item.getValue());
+  #elseif version >= 1.18
+            DataWatcher$Item itemCopy = item.copy();
+  #elseif version >= 1.12
+            DataWatcher$Item itemCopy = item.d();
+  #elseif version >= 1.9
+            DataWatcher$Item itemCopy = new DataWatcher$Item(accessor, item.getValue());
+  #else
+            DataWatcher$Item itemCopy = new DataWatcher$Item(valueTypeId, accessorId, item.getValue());
+  #endif
+
+            // Preserve dirty state of the item
+            itemCopy.setDirty(item.isDirty());
+
+            // Add to the by-id mapping
+  #if version >= 1.18
+            copyItemsById.put(accessor.getId(), itemCopy);
+  #elseif version >= 1.14.4
+            copyItemsById.put(accessor.a(), itemCopy);
+  #elseif version >= 1.9
+            copyItemsById.put(Integer.valueOf(accessor.a()), itemCopy);
+  #else
+            copyItemsById.put(accessorId, itemCopy);
+  #endif
+        }
+#endif
+
+        // Preserve DataWatcher 'dirty' state
+        boolean dw_isDirty = instance#dw_isDirty;
+        copyWatcher#dw_isDirty = dw_isDirty;
+
+#if version < 1.19.3
+        // Preserve DataWatcher 'empty' state (if it exists)
+        #require net.minecraft.network.syncher.DataWatcher private boolean dw_isEmpty:isEmpty;
+        boolean dw_isEmpty = instance#dw_isEmpty;
+        copyWatcher#dwIsEmpty = dw_isEmpty;
+#endif
+
+        return copyWatcher;
+    }
 
 #if version >= 1.18
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.PackedItem<?>> packChanges:packDirty();
@@ -259,8 +375,7 @@ class DataWatcher {
             owner.onSyncedDataUpdated(keyObj);
             item.setDirty(true);
 
-            #require net.minecraft.network.syncher.DataWatcher private boolean dwIsDirty:isDirty;
-            instance#dwIsDirty = true;
+            instance#dw_isDirty = true;
         }
 #elseif version >= 1.9
         instance.set((DataWatcherObject) key.getRawHandle(), convertedValue);
@@ -298,8 +413,7 @@ class DataWatcher {
         owner.onSyncedDataUpdated(dwo);
         item.setDirty(true);
 
-        #require net.minecraft.network.syncher.DataWatcher private boolean dwIsDirty:isDirty;
-        instance#dwIsDirty = true;
+        instance#dw_isDirty = true;
 #elseif version >= 1.19.4
         instance.set(dwo, convertedValue, true);
 #else
@@ -326,30 +440,17 @@ class DataWatcher {
         Entity owner = instance#owner;
   #endif
 
-  #if version >= 1.18
         item.setValue(convertedValue);
+  #if version >= 1.18
         owner.onSyncedDataUpdated(dwo);
-        item.setDirty(true);
   #elseif version >= 1.9
-        item.a(convertedValue);
         owner.a(dwo);
-        item.a(true);
   #else
-        item.a(convertedValue);
         owner.i(dwo.getId());
-        item.a(true);
   #endif
+        item.setDirty(true);
 
         // Set DataWatcher itself dirty too
-  #if version >= 1.17
-        #require DataWatcher private boolean dw_isDirty:isDirty;
-  #elseif version >= 1.10.2
-        #require DataWatcher private boolean dw_isDirty:g;
-  #elseif version >= 1.9
-        #require DataWatcher private boolean dw_isDirty:f;
-  #else
-        #require DataWatcher private boolean dw_isDirty:e;
-  #endif
         instance#dw_isDirty = true;
 #endif
     }
@@ -369,17 +470,16 @@ class DataWatcher {
         return key.getType().getConverter().convert(rawValue);
     }
 
-#if version >= 1.20.5
     public boolean isChanged:isDirty();
+
+#if version >= 1.20.5
     public boolean isEmpty() {
         DataWatcher$Item[] itemsById = instance#itemsById;
         return itemsById.length == 0;
     }
 #elseif version >= 1.18
-    public boolean isChanged:isDirty();
     public boolean isEmpty();
 #else
-    public boolean isChanged:a();
     public boolean isEmpty:d();
 #endif
 
@@ -388,33 +488,25 @@ class DataWatcher {
         private optional final int typeId:###;
         private optional final int keyId:###;
         private optional final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key:accessor;
-        private optional T value;
-        private boolean changed:dirty;
 #elseif version >= 1.9
         private optional final int typeId:###;
         private optional final int keyId:###;
         private optional final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key:a;
-        private optional T value:b;
-        private boolean changed:c;
 #else
         private optional final int typeId:a;
         private optional final int keyId:b;
         private optional final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key:###;
-        private optional Object value:c;
-        private boolean changed:d;
 #endif
 
-        // Get/set value, use public methods for faster access
-        // TODO: Verify it is actually faster than using reflection on the value field (!)
-#if version >= 1.18
+        public void setChanged:setDirty(boolean changed);
+        public boolean isChanged:isDirty();
+
+#if version >= 1.9
         public T getValue();
         public void setValue(T value);
-#elseif version >= 1.9
-        public T getValue:b();
-        public void setValue:a(T value);
 #else
-        public Object getValue:b();
-        public void setValue:a(Object value);
+        public Object getValue();
+        public void setValue(Object value);
 #endif
 
         // Creates a snapshot of the current value

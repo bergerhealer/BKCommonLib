@@ -30,6 +30,7 @@ public abstract class DataWatcherHandle extends Template.Handle {
 
     public abstract EntityHandle getOwner();
     public abstract void setOwner(EntityHandle owner);
+    public abstract DataWatcherHandle cloneWithOwner(EntityHandle owner);
     public abstract List<PackedItem<?>> packChanges();
     public abstract List<PackedItem<?>> packNonDefaults();
     public abstract List<PackedItem<?>> packAll();
@@ -55,6 +56,7 @@ public abstract class DataWatcherHandle extends Template.Handle {
 
         public final Template.Method.Converted<EntityHandle> getOwner = new Template.Method.Converted<EntityHandle>();
         public final Template.Method.Converted<Void> setOwner = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<DataWatcherHandle> cloneWithOwner = new Template.Method.Converted<DataWatcherHandle>();
         public final Template.Method.Converted<List<PackedItem<?>>> packChanges = new Template.Method.Converted<List<PackedItem<?>>>();
         public final Template.Method.Converted<List<PackedItem<?>>> packNonDefaults = new Template.Method.Converted<List<PackedItem<?>>>();
         public final Template.Method.Converted<List<PackedItem<?>>> packAll = new Template.Method.Converted<List<PackedItem<?>>>();
@@ -87,11 +89,11 @@ public abstract class DataWatcherHandle extends Template.Handle {
 
         /* ============================================================================== */
 
+        public abstract void setChanged(boolean changed);
+        public abstract boolean isChanged();
         public abstract Object getValue();
         public abstract void setValue(Object value);
         public abstract PackedItemHandle pack();
-        public abstract boolean isChanged();
-        public abstract void setChanged(boolean value);
         /**
          * Stores class members for <b>net.minecraft.network.syncher.DataWatcher.Item</b>.
          * Methods, fields, and constructors can be used without using Handle Objects.
@@ -103,10 +105,9 @@ public abstract class DataWatcherHandle extends Template.Handle {
             public final Template.Field.Integer keyId = new Template.Field.Integer();
             @Template.Optional
             public final Template.Field.Converted<Key<?>> key = new Template.Field.Converted<Key<?>>();
-            @Template.Optional
-            public final Template.Field<Object> value = new Template.Field<Object>();
-            public final Template.Field.Boolean changed = new Template.Field.Boolean();
 
+            public final Template.Method<Void> setChanged = new Template.Method<Void>();
+            public final Template.Method<Boolean> isChanged = new Template.Method<Boolean>();
             public final Template.Method<Object> getValue = new Template.Method<Object>();
             public final Template.Method<Void> setValue = new Template.Method<Void>();
             public final Template.Method.Converted<PackedItemHandle> pack = new Template.Method.Converted<PackedItemHandle>();

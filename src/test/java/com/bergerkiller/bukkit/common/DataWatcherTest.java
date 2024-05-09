@@ -28,6 +28,35 @@ import com.bergerkiller.generated.net.minecraft.world.entity.monster.EntityShulk
 public class DataWatcherTest {
 
     @Test
+    public void testClone() {
+        DataWatcher dataWatcher = new DataWatcher();
+        assertTrue(dataWatcher.isEmpty());
+        assertFalse(dataWatcher.isChanged());
+
+        dataWatcher.watch(EntityHandle.DATA_CUSTOM_NAME, ChatText.fromMessage("original"));
+        dataWatcher.set(EntityHandle.DATA_CUSTOM_NAME, ChatText.fromMessage("custom"));
+        assertFalse(dataWatcher.isEmpty());
+        assertTrue(dataWatcher.isChanged());
+        assertTrue(dataWatcher.getItem(EntityHandle.DATA_CUSTOM_NAME).isChanged());
+
+        // Verify copy has all states copied, INCLUDING changed states
+        DataWatcher copy = dataWatcher.clone();
+        assertFalse(copy.isEmpty());
+        assertTrue(copy.isChanged());
+        assertEquals(ChatText.fromMessage("custom"), copy.get(EntityHandle.DATA_CUSTOM_NAME));
+        assertTrue(copy.getItem(EntityHandle.DATA_CUSTOM_NAME).isChanged());
+
+        // Modify original, verify the copy does not change
+        dataWatcher.set(EntityHandle.DATA_CUSTOM_NAME, ChatText.fromMessage("changed_again"));
+        dataWatcher.packChanges();
+
+        assertFalse(copy.isEmpty());
+        assertTrue(copy.isChanged());
+        assertEquals(ChatText.fromMessage("custom"), copy.get(EntityHandle.DATA_CUSTOM_NAME));
+        assertTrue(copy.getItem(EntityHandle.DATA_CUSTOM_NAME).isChanged());
+    }
+
+    @Test
     public void testConstruction() {
         DataWatcher dataWatcher = new DataWatcher();
         assertTrue(dataWatcher.isEmpty());
