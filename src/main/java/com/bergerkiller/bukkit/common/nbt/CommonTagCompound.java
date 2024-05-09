@@ -419,13 +419,13 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
     }
 
     /**
-     * Obtains a CommonTagCompound at the key, if it does not exist a new one is
-     * created at the key.
+     * Obtains a CommonTagCompound stored at the key. If it does not exist, returns
+     * the read-only {@link #EMPTY} tag. Should only be used for reading NBT contents.
      *
-     * @param key to get or create at
-     * @return CommonTagCompound
+     * @param key to get at
+     * @return CommonTagCompound, or {@link #EMPTY} if not found
      */
-    public CommonTagCompound createCompound(Object key) {
+    public CommonTagCompound getCompoundOrEmpty(Object key) {
         if (key == null) {
             throw new IllegalArgumentException("Can not store elements under null keys");
         }
@@ -435,21 +435,36 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
             tag.readOnly = this.readOnly;
             return tag;
         } else {
-            assertWritable();
-            CommonTagCompound new_compound = new CommonTagCompound();
-            getRawData().put(key.toString(), new_compound.getRawHandle());
-            return new_compound;
+            return EMPTY;
         }
     }
 
     /**
-     * Obtains a CommonTagList at the key, if it does not exist a new one is
-     * created at the key.
+     * Obtains a CommonTagCompound stored at the key, if it does not exist a new one is
+     * created at the key. If this tag is read-only, throws an exception if the tag
+     * does not exist.
      *
      * @param key to get or create at
-     * @return CommonTagList
+     * @return CommonTagCompound
      */
-    public CommonTagList createList(Object key) {
+    public CommonTagCompound createCompound(Object key) {
+        CommonTagCompound tag = getCompoundOrEmpty(key);
+        if (tag == EMPTY) {
+            assertWritable();
+            tag = new CommonTagCompound();
+            getRawData().put(key.toString(), tag.getRawHandle());
+        }
+        return tag;
+    }
+
+    /**
+     * Obtains a CommonTagList stored at the key. If it does not exist, returns
+     * the read-only {@link CommonTagList#EMPTY} tag. Should only be used for reading NBT contents.
+     *
+     * @param key to get at
+     * @return CommonTagList, or {@link CommonTagList#EMPTY} if not found
+     */
+    public CommonTagList getListOrEmpty(Object key) {
         if (key == null) {
             throw new IllegalArgumentException("Can not store elements under null keys");
         }
@@ -459,11 +474,26 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
             list.readOnly = this.readOnly;
             return list;
         } else {
-            assertWritable();
-            CommonTagList new_list = new CommonTagList();
-            getRawData().put(key.toString(), new_list.getRawHandle());
-            return new_list;
+            return CommonTagList.EMPTY;
         }
+    }
+
+    /**
+     * Obtains a CommonTagList at the key, if it does not exist a new one is
+     * created at the key. If this tag is read-only, throws an exception if the tag
+     * does not exist.
+     *
+     * @param key to get or create at
+     * @return CommonTagList
+     */
+    public CommonTagList createList(Object key) {
+        CommonTagList tag = getListOrEmpty(key);
+        if (tag == CommonTagList.EMPTY) {
+            assertWritable();
+            tag = new CommonTagList();
+            getRawData().put(key.toString(), tag.getRawHandle());
+        }
+        return tag;
     }
 
     /**
