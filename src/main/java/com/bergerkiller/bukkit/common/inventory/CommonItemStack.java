@@ -811,6 +811,23 @@ public final class CommonItemStack implements Cloneable {
     }
 
     /**
+     * Adds a Bukkit Enchantment of a certain level to this item, in an unsafe way.
+     * Works when addEnchantment doesn't.
+     *
+     * @param enchantment Enchantment
+     * @param level Level of the enchantment
+     * @return this CommonItemStack
+     */
+    public CommonItemStack addUnsafeEnchantment(Enchantment enchantment, int level) {
+        ItemStack bukkitItem = toBukkit();
+        if (bukkitItem == null) {
+            throw new IllegalStateException("Cannot add enchantments to an empty item");
+        }
+        bukkitItem.addUnsafeEnchantment(enchantment, level);
+        return this;
+    }
+
+    /**
      * Adds a Bukkit Enchantment of a certain level to this item
      *
      * @param enchantment Enchantment
