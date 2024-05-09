@@ -2691,6 +2691,14 @@ class PacketPlayOutWorldParticles extends Packet {
     #endif
   #endif
 
+        } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$ColorOptions) {
+            com.bergerkiller.bukkit.common.resources.ParticleType$ColorOptions color = (com.bergerkiller.bukkit.common.resources.ParticleType$ColorOptions) options;
+  #if version >= 1.20.5
+            param = net.minecraft.core.particles.ColorParticleOption.create(particleType, color.color.asARGB());
+  #else
+            throw new IllegalArgumentException("Incompatible particle options: " + options.getClass().getName());
+  #endif
+
         } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions) {
             com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions dust = (com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions) options;
             float r = (float) dust.color.getRed() / 255.0f;
@@ -2708,6 +2716,14 @@ class PacketPlayOutWorldParticles extends Packet {
             throw new IllegalArgumentException("Unknown particle options: " + options.getClass().getName());
         }
         instance#particle = param;
+
+  #if version < 1.20.5
+        // Set RGB fields when using the (ambient) entity effect particles and having colors specified
+        if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$ColorOptions) {
+            com.bergerkiller.bukkit.common.resources.ParticleType$ColorOptions color = (com.bergerkiller.bukkit.common.resources.ParticleType$ColorOptions) options;
+            //TODO: Implement this!
+        }
+  #endif
     }
 
     public (com.bergerkiller.bukkit.common.resources.ParticleType<?>) Particle<?> getParticleType() {
@@ -2755,6 +2771,13 @@ class PacketPlayOutWorldParticles extends Packet {
             instance#speed = 1.0f;
             instance#count = 0;
             data = new int[0];
+
+        } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$ColorOptions) {
+            // Set RGB fields when using the (ambient) entity effect particles and having colors specified
+            //TODO: Implement this!
+            com.bergerkiller.bukkit.common.resources.ParticleType$ColorOptions color = (com.bergerkiller.bukkit.common.resources.ParticleType$ColorOptions) options;
+            data = new int[0];
+
         } else {
             data = new int[0];
         }

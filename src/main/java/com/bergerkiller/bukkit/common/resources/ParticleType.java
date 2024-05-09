@@ -5,6 +5,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import org.bukkit.Color;
 import org.bukkit.inventory.ItemStack;
 
@@ -59,8 +60,9 @@ public class ParticleType<T> extends BasicWrapper<ParticleHandle> {
     public static final ParticleType<Void> ENCHANT = byName_1_13("enchantmenttable", "enchant");
     public static final ParticleType<Void> ITEM_SLIME = byName_1_13("slime", "item_slime");
     public static final ParticleType<Void> ITEM_SNOWBALL = byName_1_13("snowballpoof", "item_snowball");
-    public static final ParticleType<Void> AMBIENT_ENTITY_EFFECT = byName_1_13("mobSpellAmbient", "ambient_entity_effect");
-    public static final ParticleType<Void> ENTITY_EFFECT = byName_1_13("mobSpell", "entity_effect");
+    public static final ParticleType<ColorOptions> ENTITY_EFFECT = byName_1_13("mobSpell", "entity_effect");
+    public static final ParticleType<ColorOptions> AMBIENT_ENTITY_EFFECT = CommonBootstrap.evaluateMCVersion(">=", "1.20.5")
+            ? ENTITY_EFFECT : byName_1_13("mobSpellAmbient", "ambient_entity_effect");
     public static final ParticleType<DustOptions> DUST = byName_1_13("reddust", "dust");
     public static final ParticleType<Void> POOF = byName_1_13("explode", "poof");
     public static final ParticleType<Void> EXPLOSION = byName_1_13("largeexplode", "explosion");
@@ -321,6 +323,20 @@ public class ParticleType<T> extends BasicWrapper<ParticleHandle> {
         public static SculkChargeOptions create(float roll) {
             SculkChargeOptions opt = new SculkChargeOptions();
             opt.roll = roll;
+            return opt;
+        }
+    }
+
+    public static final class ColorOptions {
+        public Color color = Color.WHITE;
+
+        public static ColorOptions create(int r, int g, int b) {
+            return create(Color.fromRGB(r, g, b));
+        }
+
+        public static ColorOptions create(Color color) {
+            ColorOptions opt = new ColorOptions();
+            opt.color = color;
             return opt;
         }
     }

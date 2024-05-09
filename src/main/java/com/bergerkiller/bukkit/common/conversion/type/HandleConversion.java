@@ -548,7 +548,7 @@ public class HandleConversion {
     }
 
     @ConverterMethod(output="net.minecraft.core.particles.Particle")
-    public static Object toParticleHandle(ParticleType<?> paticleType) {
-        return paticleType.getRawHandle();
+    public static Object toParticleHandle(ParticleType<?> particleType) {
+        return particleType.getRawHandle();
     }
 }

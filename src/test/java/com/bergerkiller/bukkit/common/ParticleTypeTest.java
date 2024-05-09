@@ -31,7 +31,7 @@ public class ParticleTypeTest {
         PacketPlayOutWorldParticlesHandle packet = PacketPlayOutWorldParticlesHandle.createNew();
         assertEquals(ParticleType.UNKNOWN, packet.getParticleType());
 
-        packet.setParticle(ParticleType.AMBIENT_ENTITY_EFFECT);
+        packet.setParticle(ParticleType.AMBIENT_ENTITY_EFFECT, ParticleType.ColorOptions.create(128, 64, 32));
         assertEquals(ParticleType.AMBIENT_ENTITY_EFFECT, packet.getParticleType());
 
         packet.setParticle(ParticleType.BLOCK, BlockData.fromMaterial(MaterialUtil.getFirst("OAK_PLANKS", "LEGACY_WOOD")));
