@@ -1451,6 +1451,42 @@ public final class CommonItemStack implements Cloneable {
     }
 
     /**
+     * Transfers items from an inventory into an item if they match. The filter controls what items are
+     * selected for transferring. Unlimited amount of items are transferred. If the output
+     * item is not empty, and does not match the filter, then no items are taken from the inventory.
+     *
+     * @param from Inventory to take items from
+     * @param to CommonItemStack item to add items taken from the inventory to. Can be empty.
+     * @param filter Filter predicate to select the items that can be transferred. Ignored if null.
+     * @return Total amount (their summed amounts) of items transferred.
+     */
+    public static int transferAll(Inventory from, CommonItemStack to, Predicate<CommonItemStack> filter) {
+        return transfer(from, to, filter, -1);
+    }
+
+    /**
+     * Transfers items from an inventory into an item if they match. The filter controls what items are
+     * selected for transferring. Up to the maximum amount of items are transferred. If the output
+     * item is not empty, and does not match the filter, then no items are taken from the inventory.
+     *
+     * @param from Inventory to take items from
+     * @param to CommonItemStack item to add items taken from the inventory to. Can be empty.
+     * @param filter Filter predicate to select the items that can be transferred. Ignored if null.
+     * @param maxAmount Maximum total amount of items to transfer. -1 for unlimited.
+     * @return Total amount (their summed amounts) of items transferred.
+     */
+    public static int transfer(Inventory from, CommonItemStack to, Predicate<CommonItemStack> filter, int maxAmount) {
+        if (to.isEmpty()) {
+            to.setTo(take(from, filter, maxAmount));
+            return to.getAmount();
+        } else if (filter == null || filter.test(to)) {
+            return to.takeFrom(from, maxAmount);
+        } else {
+            return 0;
+        }
+    }
+
+    /**
      * Transfers all items from one inventory to another. The filter controls what items are selected for transferring.
      * Unlimited amount of items are transferred.
      *
