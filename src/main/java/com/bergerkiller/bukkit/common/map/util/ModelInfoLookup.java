@@ -26,7 +26,7 @@ public class ModelInfoLookup {
     public static ItemRenderOptions lookupItemRenderOptions(CommonItemStack item) {
         // Blocks
         Material type = item.getType();
-        if (type.isBlock()) {
+        if (MaterialUtil.isBlock(type)) {
             BlockRenderOptions blockOpt = BlockData.fromItemStack(item).getDefaultRenderOptions();
             return new ItemRenderOptions(item.toBukkit(), blockOpt);
         }
@@ -218,7 +218,7 @@ public class ModelInfoLookup {
         ItemStack item = options.getItem();
         Material type = item.getType();
         String itemName;
-        if (type.isBlock()) {
+        if (MaterialUtil.isBlock(type)) {
             itemName = lookupBlock(BlockData.fromItemStack(item).getDefaultRenderOptions(), true);
 
             // Perform renames needed to get the correct item block model name

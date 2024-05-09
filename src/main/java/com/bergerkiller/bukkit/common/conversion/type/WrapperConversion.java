@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.conversion.type;
 import java.util.List;
 import java.util.function.Consumer;
 
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeMapBaseHandle;
 import org.bukkit.ChatColor;
@@ -474,7 +475,7 @@ public class WrapperConversion {
     @ConverterMethod
     public static BlockData getBlockData(org.bukkit.inventory.ItemStack item) {
         Material type = item.getType();
-        if (!type.isBlock()) {
+        if (!MaterialUtil.isBlock(type)) {
             return null;
         }
         return BlockData.fromMaterialData(type, item.getDurability());

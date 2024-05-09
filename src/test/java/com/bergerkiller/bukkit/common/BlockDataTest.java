@@ -53,7 +53,7 @@ public class BlockDataTest {
         // ==================================================================================
 
         for (Material material : getAllLegacyMaterials()) {
-            if (!material.isBlock()) {
+            if (!MaterialUtil.isBlock(material)) {
                 continue;
             }
 
@@ -183,7 +183,7 @@ public class BlockDataTest {
     @SuppressWarnings("deprecation")
     public void testBlockData() {
         for (Material mat : getAllMaterials()) {
-            if (!mat.isBlock()) {
+            if (!MaterialUtil.isBlock(mat)) {
                 assertType(Material.AIR, BlockData.fromMaterial(mat).getType());
             } else if (MaterialUtil.isLegacyType(mat)) {
                 assertType(mat, BlockData.fromMaterial(mat).getLegacyType());
@@ -204,7 +204,7 @@ public class BlockDataTest {
         } else {
             // On older versions, the type from fromMaterialData MUST match the type fromMaterial
             for (Material mat : getAllMaterials()) {
-                if (mat.isBlock()) {
+                if (MaterialUtil.isBlock(mat)) {
                     BlockData from_matdata = BlockData.fromMaterialData(mat, 0);
                     BlockData from_mat = BlockData.fromMaterial(mat);
                     assertType(from_matdata.getType(),from_mat.getType());

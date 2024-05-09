@@ -156,7 +156,7 @@ class BlockDataImpl extends BlockData {
         // Also store all possible values of BY_LEGACY_MAT_DATA
         Arrays.fill(BY_LEGACY_MAT_DATA, AIR);
         for (Material mat : CommonLegacyMaterials.getAllMaterials()) {
-            if (!mat.isBlock()) {
+            if (!MaterialsByName.isBlock(mat)) {
                 BY_MATERIAL.put(mat, AIR);
                 continue;
             }

@@ -285,7 +285,7 @@ public class ItemParser implements Predicate<CommonItemStack> {
                 // Convert whichever is not legacy, to legacy
                 if (!typeIsLegacy) {
                     // Input type -> legacy. Update data parameter doing so if a Block.
-                    if (type.isBlock()) {
+                    if (MaterialUtil.isBlock(type)) {
                         BlockData block = BlockData.fromMaterial(type);
                         type = block.getLegacyType();
                         data = block.getRawData();
@@ -396,7 +396,7 @@ public class ItemParser implements Predicate<CommonItemStack> {
         if (amount <= 0) {
             amount = this.getMaxStackSize();
         }
-        if (this.type.isBlock()) {
+        if (MaterialUtil.isBlock(this.type)) {
             // For Block items, use BlockData that supports the legacy Material data API
             BlockData block;
             if (this.hasData()) {

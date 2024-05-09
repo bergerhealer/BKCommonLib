@@ -62,7 +62,7 @@ public class ItemMaterialTest {
                         if (MaterialUtil.isLegacyType(m)) {
                             continue;
                         }
-                        if (m.isBlock() != mlegacy.isBlock()) {
+                        if (MaterialUtil.isBlock(m) != mlegacy.isBlock()) {
                             continue;
                         }
                         if (m.name().equals(legacyName)) {

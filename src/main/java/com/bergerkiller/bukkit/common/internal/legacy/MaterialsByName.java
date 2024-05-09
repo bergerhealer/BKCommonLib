@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import org.bukkit.Material;
 
 import com.bergerkiller.bukkit.common.Logging;
@@ -181,6 +182,22 @@ public class MaterialsByName {
      */
     public static boolean isLegacy(Material material) {
         return isLegacyMethod.invoke(material);
+    }
+
+    /**
+     * Gets whether a Material is a type of Block. Ideally use BlockData instead
+     * if you can.
+     *
+     * @param type Type
+     * @return True if the material is of a type of block, and not of an item.
+     */
+    public static boolean isBlock(Material type) {
+        if (isLegacy(type)) {
+            int id = type.getId();
+            return id >= 0 && id < 256;
+        } else {
+            return type.isBlock();
+        }
     }
 
     /**

@@ -117,6 +117,17 @@ public class MaterialUtil {
     }
 
     /**
+     * Gets whether a Material is a type of Block. Ideally use BlockData instead
+     * if you can.
+     *
+     * @param type Type
+     * @return True if the material is of a type of block, and not of an item.
+     */
+    public static boolean isBlock(Material type) {
+        return MaterialsByName.isBlock(type);
+    }
+
+    /**
      * Checks whether the material of the item is contained in the types
      *
      * @param itemStack containing the material type to check
