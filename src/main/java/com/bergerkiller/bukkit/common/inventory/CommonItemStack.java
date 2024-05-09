@@ -638,6 +638,17 @@ public final class CommonItemStack implements Cloneable {
     }
 
     /**
+     * Adds a new Lore line to this item that is empty, acting as a line spacer
+     * between multiple added lore messages.
+     *
+     * @return this CommonItemStack
+     * @throws IllegalStateException If this item is empty
+     */
+    public CommonItemStack addLoreLine() {
+        return addLore(ChatText.empty());
+    }
+
+    /**
      * Adds a new Lore line to this item
      *
      * @param loreLine Formatted Lore Line ChatText to add as a Lore
