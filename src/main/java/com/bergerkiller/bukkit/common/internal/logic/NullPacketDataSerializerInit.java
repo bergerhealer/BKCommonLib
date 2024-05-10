@@ -6,6 +6,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 import org.objectweb.asm.FieldVisitor;
 
 import com.bergerkiller.bukkit.common.Logging;
@@ -14,6 +16,7 @@ import com.bergerkiller.mountiplex.reflection.ReflectionUtil;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.BoxedType;
 import com.bergerkiller.mountiplex.reflection.util.ExtendedClassWriter;
+import org.objectweb.asm.MethodVisitor;
 
 /**
  * Maintains a PacketDataSerializer instance which reads indefinitely, and always
@@ -71,6 +74,14 @@ public class NullPacketDataSerializerInit {
                 fv.visitEnd();
             }
 
+            // On 1.20.5+ it also may have a method returning the custom registry, where we return the server one
+            final Class<?> customRegistryType;
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.20.5")) {
+                customRegistryType = CommonUtil.getClass("net.minecraft.core.IRegistryCustom");
+            } else {
+                customRegistryType = null;
+            }
+
             // Override all non-final non-private member methods of PacketDataSerializer
             ReflectionUtil.getAllMethods(dataSerializerType)
                 .filter(m -> {
@@ -80,7 +91,20 @@ public class NullPacketDataSerializerInit {
                             && !Modifier.isFinal(modifiers);
                 })
                 .forEach(m -> {
-                    cw.visitMethodReturnConstant(m, BoxedType.getDefaultValue(m.getReturnType()));
+                    if (m.getReturnType().equals(customRegistryType)) {
+                        Class<?> minecraftServerClass = CommonUtil.getClass("net.minecraft.server.MinecraftServer");
+                        String methodName = Resolver.resolveMethodName(minecraftServerClass, "getDefaultRegistryAccess", new Class<?>[0]);
+
+                        MethodVisitor mv = cw.visitMethod(1, MPLType.getName(m), MPLType.getMethodDescriptor(m), (String)null, (String[])null);
+                        mv.visitCode();
+                        mv.visitMethodInsn(INVOKESTATIC, MPLType.getInternalName(minecraftServerClass), methodName,
+                                "()" + MPLType.getDescriptor(customRegistryType), false);
+                        mv.visitInsn(ARETURN);
+                        mv.visitMaxs(MPLType.getType(customRegistryType).getSize(), 1);
+                        mv.visitEnd();
+                    } else {
+                        cw.visitMethodReturnConstant(m, BoxedType.getDefaultValue(m.getReturnType()));
+                    }
                 });
 
             // Instantiate and assign to the INSTANCE field

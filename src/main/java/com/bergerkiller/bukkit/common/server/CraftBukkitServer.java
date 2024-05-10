@@ -172,6 +172,11 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
             // On this server, we only need to translate spigot class names to mojang class names
             mojangSpigotRemapper = null;
             spigotToMojangClassRemapper = SpigotMappings.fromCacheOrDownload(MC_VERSION);
+
+            // Additional mappings required due to Paper changes
+            spigotToMojangClassRemapper.remapSubClass("net.minecraft.network.NetworkManager", "WrappedConsumer");
+            spigotToMojangClassRemapper.remapSubClass("net.minecraft.network.NetworkManager", "PacketSendAction");
+
             HAS_MOJANG_FIELD_MAPPINGS = false;
             HAS_MOJANG_METHOD_MAPPINGS = false;
         } else if (HAS_MOJANG_FIELD_MAPPINGS || HAS_MOJANG_METHOD_MAPPINGS) {

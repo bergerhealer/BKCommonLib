@@ -49,6 +49,10 @@ optional class PacketPlayOutVehicleMove extends Packet {
 }
 
 class PacketPlayOutEntityTeleport extends Packet {
+#if version >= 1.20.5
+    #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
+#endif
+
 #if version >= 1.17
     private int entityId:id;
 #else

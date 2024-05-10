@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.server;
 
+import java.util.Map;
+
 public class SpigotServer extends CraftBukkitServer {
     private boolean _paper;
 
@@ -48,6 +50,14 @@ public class SpigotServer extends CraftBukkitServer {
      */
     public boolean isPaperServer() {
         return _paper;
+    }
+
+    @Override
+    public void addVariables(Map<String, String> variables) {
+        super.addVariables(variables);
+        if (_paper) {
+            variables.put("paper", "true");
+        }
     }
 
     @Override

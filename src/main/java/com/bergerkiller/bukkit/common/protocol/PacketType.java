@@ -30,7 +30,7 @@ import java.util.logging.Level;
 
 public class PacketType extends ClassTemplate<Object> {
     static {
-        CommonBootstrap.initTemplates();
+        CommonBootstrap.initServer();
     }
 
     private static Map<Class<?>, PacketTypeOptions> typesByPacketClassVisible = Collections.emptyMap();

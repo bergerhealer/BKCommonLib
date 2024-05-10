@@ -4,6 +4,10 @@ import static org.junit.Assert.*;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMountHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeamHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLivingHandle;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -62,5 +66,26 @@ public class PacketTest {
     @Test
     public void testPacketTeleportCreateNew() {
         assertNotNull(PacketPlayOutEntityTeleportHandle.createNew());
+        assertNotNull(PacketType.OUT_ENTITY_TELEPORT.newInstance());
+    }
+
+    @Test
+    public void testPacketEntityLivingCreateNew() {
+        assertNotNull(PacketPlayOutSpawnEntityLivingHandle.createNew());
+        assertNotNull(PacketType.OUT_ENTITY_SPAWN_LIVING.newInstance());
+    }
+
+    @Test
+    public void testPacketMountCreateNew() {
+        assertNotNull(PacketPlayOutMountHandle.createNew());
+        assertNotNull(PacketType.OUT_MOUNT.newInstance());
+    }
+
+    @Test
+    public void testPacketScoreboardTeamParameters() {
+        PacketPlayOutScoreboardTeamHandle packet = PacketPlayOutScoreboardTeamHandle.createNew();
+        assertNotNull(packet);
+        packet.setDisplayName(ChatText.fromMessage("Dummy"));
+        assertEquals(ChatText.fromMessage("Dummy"), packet.getDisplayName());
     }
 }

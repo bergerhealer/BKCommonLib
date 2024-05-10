@@ -55,6 +55,9 @@ class NetworkManager {
         #require net.minecraft.network.NetworkManager.PacketSendAction private net.minecraft.network.NetworkManager.PacketSendAction createQueuedPacket:<init>(net.minecraft.network.protocol.Packet<?> packet, net.minecraft.network.PacketSendListener listener, boolean flush);
         queuedPacket = #createQueuedPacket((net.minecraft.network.protocol.Packet) packet, (net.minecraft.network.PacketSendListener) null, false);
     #else
+        #if version >= 1.20.5 && paper
+            #warning Connection PacketSendAction class was not identified, errors might occur queueing packets!
+        #endif
         queuedPacket = new com.bergerkiller.bukkit.common.internal.proxy.QueuedPacket_1_20_2(packet, null, false);
     #endif
   #elseif exists net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket(net.minecraft.network.protocol.Packet<?> packet, io.netty.util.concurrent.GenericFutureListener listener)

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.ReflectionUtil;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
 import org.bukkit.Chunk;
@@ -96,7 +97,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
 
                 // Name (usually for logging reasons)
                 if (method.getName().equals("getName")) {
-                    return (instance, args) -> input_state.block.getWorld().getName();
+                    return (instance, args) -> input_state.world.getName();
                 }
 
                 // All other method calls fail
@@ -264,12 +265,14 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
     private static final class TileState {
         public final Block block;
         public final Chunk chunk;
+        public final World world;
         public final Object tileEntity;
         public final BlockData blockData;
 
         public TileState(Chunk chunk, Block block, Object nmsTileEntity, BlockData blockData) {
             this.block = block;
             this.chunk = (chunk == null) ? block.getChunk() : chunk;
+            this.world = block.getWorld();
             this.tileEntity = nmsTileEntity;
             this.blockData = blockData;
         }
@@ -311,6 +314,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         private final BlockStateConversion_1_13 conversion;
         private static final Class<?> tileEntityType = CommonUtil.getClass("net.minecraft.world.level.block.entity.TileEntity");
         private static final Class<?> iBlockDataType = CommonUtil.getClass("net.minecraft.world.level.block.state.IBlockData");
+        private static final Class<?> customRegistryType = CommonUtil.getClass("net.minecraft.core.IRegistryCustom");
         private static final Class<?> minecraftServerType = CommonUtil.getClass("net.minecraft.server.MinecraftServer");
 
         public WorldServerHook(BlockStateConversion_1_13 conversion) {
@@ -343,6 +347,17 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
             // For all methods returning IBlockData, return our tile's block data
             if (method.getReturnType().equals(iBlockDataType)) {
                 return (instance, args) -> this.conversion.input_state.blockData.getData();
+            }
+
+            // For all methods returning IRegistryCustom, forward the call to the tile entity NMS world
+            if (method.getReturnType().equals(customRegistryType)) {
+                return (instance, args) -> {
+                    try {
+                        return method.invoke(HandleConversion.toWorldHandle(this.conversion.input_state.world), args);
+                    } catch (Throwable t) {
+                        throw MountiplexUtil.uncheckedRethrow(t);
+                    }
+                };
             }
 
             // For all methods returning MinecraftServer or a derivative, return the server

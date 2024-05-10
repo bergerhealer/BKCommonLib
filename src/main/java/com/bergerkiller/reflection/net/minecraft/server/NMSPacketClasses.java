@@ -90,12 +90,20 @@ public class NMSPacketClasses {
                 resolver.addImport(CommonPacket.class.getName());
                 resolver.setDeclaredClass(this.getType());
                 resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
-                MethodDeclaration mDec = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
+
+                MethodDeclaration mDec = new MethodDeclaration(resolver, SourceDeclaration.preprocess("" +
                         "public static CommonPacket newInstance() {\n" +
-                        "#if version >= 1.17\n" +
-                        "    Object packet = new " + this.getType().getName() + "(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);\n" +
+                        "#if exists " + this.getType().getName() + " private " + this.getType().getSimpleName() + "();\n" +
+                        "    #require " + this.getType().getName() + " private " + this.getType().getSimpleName() + " createPacket:<init>()\n" +
+                        "    Object packet = #createPacket();\n" +
+                        "#elseif exists " + this.getType().getName() + " private " + this.getType().getSimpleName() + " (net.minecraft.network.PacketDataSerializer serializer)\n" +
+                        "    #require " + this.getType().getName() + " private " + this.getType().getSimpleName() + " createPacket:<init>(net.minecraft.network.PacketDataSerializer serializer)\n" +
+                        "    Object packet = #createPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);\n" +
+                        "#elseif exists " + this.getType().getName() + " private " + this.getType().getSimpleName() + " (net.minecraft.network.RegistryFriendlyByteBuf byteBuf)\n" +
+                        "    #require " + this.getType().getName() + " private " + this.getType().getSimpleName() + " createPacket:<init>(net.minecraft.network.RegistryFriendlyByteBuf byteBuf)\n" +
+                        "    Object packet = #createPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);\n" +
                         "#else\n" +
-                        "    Object packet = new " + this.getType().getName() + "();\n" +
+                        "    #error No " + this.getType().getName() + " packet constructor found\n" +
                         "#endif\n" +
                         "    return new CommonPacket(packet);\n" +
                         "}", resolver));

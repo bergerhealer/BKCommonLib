@@ -28,6 +28,10 @@ class PacketPlayOutScoreboardTeam extends Packet {
     </code>
 
 #if version >= 1.17
+    #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
+#endif
+
+#if version >= 1.17
     private final int method;
 #endif
 
@@ -92,7 +96,13 @@ class PacketPlayOutScoreboardTeam extends Packet {
         }
 
         // Create new with default values
+  #if version >= 1.20.5
+        // It does a bunch of byte stream reading now for NBT, which is incompatible with our null serializer
+        // Create a new scoreboard team, which seems to work ok. Will need a null instantiator otherwise though.
+        PacketPlayOutScoreboardTeam$b parameters = new PacketPlayOutScoreboardTeam$b(new net.minecraft.world.scores.ScoreboardTeam((net.minecraft.world.scores.Scoreboard) null, "unset"));
+  #else
         PacketPlayOutScoreboardTeam$b parameters = new PacketPlayOutScoreboardTeam$b(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+  #endif
   #if version >= 1.19
         parameters#displayName = IChatBaseComponent.empty();
         parameters#prefix = IChatBaseComponent.empty();

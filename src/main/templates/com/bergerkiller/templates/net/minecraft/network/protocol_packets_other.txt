@@ -2226,6 +2226,10 @@ class PacketPlayOutEntityEquipment extends Packet {
 
 // Only available >= MC 1.9
 optional class PacketPlayOutMount extends Packet {
+#if version >= 1.20.5
+    #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
+#endif
+
 #if version >= 1.17
     private int entityId:vehicle;
     private int[] mountedEntityIds:passengers;

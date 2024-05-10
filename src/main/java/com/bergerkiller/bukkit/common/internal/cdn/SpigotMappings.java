@@ -272,6 +272,21 @@ public class SpigotMappings {
             this.mojangToSpigot = this.spigotToMojang.inverse();
         }
 
+        public void put(String spigotClassName, String mojangClassName) {
+            this.spigotToMojang.put(spigotClassName, mojangClassName);
+        }
+
+        /**
+         * Stores a new mapping from a sub-class of a spigot class name, remapping to the same
+         * sub-class name but with mojang mappings instead.
+         *
+         * @param spigotClassName Spigot class name
+         * @param subClassName Sub-class name for under the spigot/mojang class name
+         */
+        public void remapSubClass(String spigotClassName, String subClassName) {
+            put(spigotClassName + "$" + subClassName, toMojang(spigotClassName) + "$" + subClassName);
+        }
+
         public String toMojang(String spigotClassName) {
             return spigotToMojang.getOrDefault(spigotClassName, spigotClassName);
         }
