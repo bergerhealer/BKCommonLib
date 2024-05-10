@@ -21,17 +21,21 @@ public abstract class PacketPlayInSetCreativeSlotHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public abstract int getSlot();
-    public abstract void setSlot(int value);
+    public static PacketPlayInSetCreativeSlotHandle createNew(int slotIndex, ItemStack item) {
+        return T.createNew.invoke(slotIndex, item);
+    }
+
     public abstract ItemStack getItem();
-    public abstract void setItem(ItemStack value);
+    public abstract int getSlotIndex();
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.PacketPlayInSetCreativeSlot</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayInSetCreativeSlotClass extends Template.Class<PacketPlayInSetCreativeSlotHandle> {
-        public final Template.Field.Converted<Integer> slot = new Template.Field.Converted<Integer>();
-        public final Template.Field.Converted<ItemStack> item = new Template.Field.Converted<ItemStack>();
+        public final Template.StaticMethod.Converted<PacketPlayInSetCreativeSlotHandle> createNew = new Template.StaticMethod.Converted<PacketPlayInSetCreativeSlotHandle>();
+
+        public final Template.Method.Converted<ItemStack> getItem = new Template.Method.Converted<ItemStack>();
+        public final Template.Method<Integer> getSlotIndex = new Template.Method<Integer>();
 
     }
 

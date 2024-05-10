@@ -68,6 +68,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockDigHandle.EnumPlayerDigTypeHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutOpenWindowHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPositionHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSetCreativeSlotHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutUpdateAttributesHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTitleHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTileEntityDataHandle;
@@ -2312,15 +2313,38 @@ optional class PacketPlayOutSetCooldown extends Packet {
 // }
 
 class PacketPlayInSetCreativeSlot extends Packet {
+
+    public static (PacketPlayInSetCreativeSlotHandle) PacketPlayInSetCreativeSlot createNew(int slotIndex, (org.bukkit.inventory.ItemStack) ItemStack item) {
 #if version >= 1.20.5
-    private (int) short slot:slotNum;
-    private (org.bukkit.inventory.ItemStack) ItemStack item:itemStack;
+        return new PacketPlayInSetCreativeSlot((short) slotIndex, item);
 #elseif version >= 1.17
-    private (int) int slot:slotNum;
-    private (org.bukkit.inventory.ItemStack) ItemStack item:itemStack;
+        return new PacketPlayInSetCreativeSlot(slotIndex, item);
 #else
-    private (int) int slot;
-    private (org.bukkit.inventory.ItemStack) ItemStack item:b;
+        PacketPlayInSetCreativeSlot packet = new PacketPlayInSetCreativeSlot();
+        #require PacketPlayInSetCreativeSlot private int slotIndex:slot;
+        #require PacketPlayInSetCreativeSlot private ItemStack item:b;
+        packet#slotIndex = slotIndex;
+        packet#item = item;
+        return packet;
+#endif
+    }
+
+#select version >=
+#case 1.20.5:     public (org.bukkit.inventory.ItemStack) ItemStack getItem:itemStack();
+#case 1.18:       public (org.bukkit.inventory.ItemStack) ItemStack getItem();
+#case else:       public (org.bukkit.inventory.ItemStack) ItemStack getItem:getItemStack();
+#endselect
+
+#if version >= 1.20.5
+    public int getSlotIndex() {
+        return (int) instance.slotNum();
+    }
+#else
+  #select version >=
+  #case 1.18:   public int getSlotIndex:getSlotNum();
+  #case 1.13:   public int getSlotIndex:b();
+  #case else:   public int getSlotIndex:a();
+  #endselect
 #endif
 }
 

@@ -419,9 +419,6 @@ public class NMSPacketClasses {
     }
 
     public static class NMSPacketPlayInSetCreativeSlot extends NMSPacket {
-
-        public final FieldAccessor<Integer> slot = PacketPlayInSetCreativeSlotHandle.T.slot.toFieldAccessor();
-        public final FieldAccessor<ItemStack> item = PacketPlayInSetCreativeSlotHandle.T.item.toFieldAccessor();
     }
 
     public static class NMSServerboundClientInformationPacket extends NMSPacket {

@@ -19,6 +19,7 @@ import java.util.function.Predicate;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSetCreativeSlotHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import org.bukkit.Bukkit;
@@ -895,7 +896,8 @@ public final class CommonMapController implements PacketListener, Listener {
         // When in creative mode, players may accidentally set the 'virtual' map Id as the actual Id in their inventory
         // We have to prevent that in here
         if (event.getType() == PacketType.IN_SET_CREATIVE_SLOT) {
-            CommonItemStack item = CommonItemStack.of(event.getPacket().read(PacketType.IN_SET_CREATIVE_SLOT.item));
+            PacketPlayInSetCreativeSlotHandle packet = PacketPlayInSetCreativeSlotHandle.createHandle(event.getPacket().getHandle());
+            CommonItemStack item = CommonItemStack.of(packet.getItem());
             UUID mapUUID = CommonMapUUIDStore.getMapUUID(item);
             if (mapUUID != null && CommonMapUUIDStore.getStaticMapId(mapUUID) == -1) {
                 // Dynamic Id map. Since we do not refresh NBT data over the network, this packet contains incorrect data
@@ -916,16 +918,24 @@ public final class CommonMapController implements PacketListener, Listener {
                         }
                     }
                 }
+
+                // Modify the item
+                CommonItemStack newItem = item.clone();
                 if (originalMapItem != null) {
                     // Original item was found. Restore all properties of that item.
                     // Keep metadata the player can control, replace everything else
-                    item.setCustomData(originalMapItem.getCustomData());
-                    event.getPacket().write(PacketType.IN_SET_CREATIVE_SLOT.item, item.toBukkit());
+                    newItem.setCustomData(originalMapItem.getCustomData());
                 } else {
                     // Dynamic Id. Force a map id value of 0 to prevent creation of new World Map instances
-                    item = item.clone();
-                    item.setFilledMapId(0);
-                    event.getPacket().write(PacketType.IN_SET_CREATIVE_SLOT.item, item.toBukkit());
+                    newItem.setFilledMapId(0);
+                }
+
+                // Cancel original packet, we send a replacement (immutable) if changed
+                // Equals check avoids infinite loop
+                if (!item.equals(newItem)) {
+                    event.setCancelled(true);
+                    PacketUtil.receivePacket(event.getPlayer(), PacketPlayInSetCreativeSlotHandle.createNew(
+                            packet.getSlotIndex(), newItem.toBukkit()));
                 }
             }
         }
