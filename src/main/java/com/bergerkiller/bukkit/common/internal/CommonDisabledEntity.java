@@ -21,7 +21,7 @@ public class CommonDisabledEntity {
             entity = new ClassInterceptor() {
                 @Override
                 protected Invoker<?> getCallback(Method method) {
-                    if (method.getName().equals("a") && method.getParameterCount() == 1) {
+                    if (method.getParameterCount() == 1) {
                         Class<?> argType = method.getParameters()[0].getType();
                         if (DataWatcherObjectHandle.T.isAssignableFrom(argType)) {
                             return new NullInvoker<Object>();
