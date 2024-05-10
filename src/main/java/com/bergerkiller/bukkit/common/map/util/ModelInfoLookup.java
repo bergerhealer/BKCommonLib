@@ -23,6 +23,10 @@ import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
  */
 public class ModelInfoLookup {
 
+    public static ItemRenderOptions lookupItemRenderOptions(ItemStack item) {
+        return lookupItemRenderOptions(CommonItemStack.of(item));
+    }
+
     public static ItemRenderOptions lookupItemRenderOptions(CommonItemStack item) {
         // Blocks
         Material type = item.getType();

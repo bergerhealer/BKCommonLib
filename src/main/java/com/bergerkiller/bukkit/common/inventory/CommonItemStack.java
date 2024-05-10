@@ -2,10 +2,12 @@ package com.bergerkiller.bukkit.common.inventory;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.map.util.ModelInfoLookup;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.bukkit.common.wrappers.ItemRenderOptions;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
@@ -759,6 +761,16 @@ public final class CommonItemStack implements Cloneable {
         return getHandleIfCraftItemStack()
                 .map(ItemStackHandle::hasCustomData)
                 .orElse(Boolean.FALSE);
+    }
+
+    /**
+     * Looks up the item render options using the {@link ModelInfoLookup}. This is used to
+     * display the icons of items on map displays.
+     *
+     * @return Render options for displaying this item
+     */
+    public ItemRenderOptions lookupRenderOptions() {
+        return ModelInfoLookup.lookupItemRenderOptions(this);
     }
 
     /**
