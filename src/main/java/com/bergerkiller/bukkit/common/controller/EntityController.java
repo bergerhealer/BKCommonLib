@@ -154,7 +154,7 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
     }
 
     public void onPush(double dx, double dy, double dz) {
-        hook.base.onPush(dx, dy, dz);
+        hook.baseOnPush(dx, dy, dz);
     }
 
     /**
