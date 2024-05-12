@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.DetectorRail;
@@ -39,6 +40,16 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersH
  * Tests whether the material properties and ItemStack-related utilities are functional
  */
 public class ItemMaterialTest {
+
+    @Test
+    public void testItemSetMaxStackSize() {
+        ItemHandle item = ItemHandle.fromMaterial(Material.MINECART);
+        assertEquals(1, item.getMaxStackSize());
+        item.setMaxStackSize(64);
+        assertEquals(64, item.getMaxStackSize());
+        item.setMaxStackSize(1);
+        assertEquals(1, item.getMaxStackSize());
+    }
 
     @Test
     @Ignore

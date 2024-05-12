@@ -3,6 +3,8 @@ package net.minecraft.world.item;
 import net.minecraft.core.RegistryMaterials;
 import net.minecraft.resources.MinecraftKey;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.PatchedDataComponentMap;
 
 class Item {
     public static Iterable<?> getRegistry() {
@@ -23,7 +25,23 @@ class Item {
     public int getMaxStackSize:getDefaultMaxStackSize();
 
     public void setMaxStackSize(int maxStackSize) {
-        //TODO: Gotta build a new components mapping with an updated DataComponents.MAX_STACK_SIZE
+        // Read current item components
+        #require Item private final DataComponentMap components;
+        DataComponentMap components = instance#components;
+
+        // Make writable and modify the max stack size
+        PatchedDataComponentMap writable = (components instanceof PatchedDataComponentMap)
+                ? (PatchedDataComponentMap) components : new PatchedDataComponentMap(components);
+        if (maxStackSize == 1) {
+            writable.remove(DataComponents.MAX_STACK_SIZE);
+        } else {
+            writable.set(DataComponents.MAX_STACK_SIZE, (Object) Integer.valueOf(maxStackSize));
+        }
+
+        // Make read-only again and set it in the item
+        // TODO: Is there a way to make a read-only version?
+        components = writable.isEmpty() ? DataComponentMap.EMPTY : writable;
+        instance#components = components;
     }
 #else
     public int getMaxStackSize();
@@ -62,4 +80,10 @@ class Item {
 #case 1.8.5:  public String getInternalName:f_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
 #case else:   public String getInternalName:e_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
 #endselect
+
+    <code>
+    public static ItemHandle fromMaterial(org.bukkit.Material material) {
+        return createHandle(com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle.getItemFromMaterial(material));
+    }
+    </code>
 }

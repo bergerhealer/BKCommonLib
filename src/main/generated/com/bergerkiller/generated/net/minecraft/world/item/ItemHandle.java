@@ -29,6 +29,9 @@ public abstract class ItemHandle extends Template.Handle {
     public abstract int getMaxDurability();
     public abstract boolean usesDurability();
     public abstract String getInternalName(ItemStack itemstack);
+    public static ItemHandle fromMaterial(org.bukkit.Material material) {
+        return createHandle(com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle.getItemFromMaterial(material));
+    }
     /**
      * Stores class members for <b>net.minecraft.world.item.Item</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
