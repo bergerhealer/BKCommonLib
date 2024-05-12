@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.internal.logic;
 import java.io.File;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import org.bukkit.World;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -35,26 +36,18 @@ public abstract class PlayerFileDataHandler implements LazyInitializedObject, Li
     public abstract File getPlayerDataFolder(World world);
 
     public static interface Hook {
-        String[] base_getSeenPlayers();
         CommonTagCompound base_load(HumanEntity human);
         void base_save(HumanEntity human);
     }
 
     @ClassHook.HookPackage("net.minecraft.server")
     protected static class PlayerFileDataHook extends ClassHook<PlayerFileDataHook> implements PlayerFileDataHandler.Hook {
+        private static final boolean LOAD_RETURNS_OPTIONAL = CommonBootstrap.evaluateMCVersion(">=", "1.20.5");
         public PlayerDataController controller = null;
 
-        @HookMethod("public abstract String[] getSeenPlayers()")
-        public String[] getSeenPlayers() {
-            if (this.controller == null) {
-                return this.base.getSeenPlayers();
-            } else {
-                return this.controller.getSeenPlayers();
-            }
-        }
-
-        @HookMethod("public abstract net.minecraft.nbt.NBTTagCompound load(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
-        public Object load(Object entityHuman) {
+        @HookMethodCondition("version >= 1.20.5")
+        @HookMethod("public abstract java.util.Optional<net.minecraft.nbt.NBTTagCompound> load(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
+        public java.util.Optional<Object> loadOpt(Object entityHuman) {
             if (this.controller != null) {
                 Player player = CommonUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);
                 if (player != null) {
@@ -64,10 +57,17 @@ public abstract class PlayerFileDataHandler implements LazyInitializedObject, Li
                     } catch (Throwable t) {
                         Logging.LOGGER.log(Level.SEVERE, "Failed to handle onLoad() on " + this.controller, t);
                     }
-                    return (compound == null) ? null : compound.getRawHandle();
+                    return (compound == null) ? java.util.Optional.empty()
+                                              : java.util.Optional.of(compound.getRawHandle());
                 }
             }
-            return this.base.load(entityHuman);
+            return base_load_raw(entityHuman);
+        }
+
+        @HookMethodCondition("version < 1.20.5")
+        @HookMethod("public abstract net.minecraft.nbt.NBTTagCompound load(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
+        public Object load(Object entityHuman) {
+            return this.loadOpt(entityHuman).orElse(null);
         }
 
         @HookMethod("public abstract void save(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
@@ -87,13 +87,17 @@ public abstract class PlayerFileDataHandler implements LazyInitializedObject, Li
         }
 
         @Override
-        public String[] base_getSeenPlayers() {
-            return base.getSeenPlayers();
+        public CommonTagCompound base_load(HumanEntity human) {
+            return base_load_raw(HandleConversion.toEntityHandle(human))
+                    .map(CommonTagCompound::create).orElse(null);
         }
 
-        @Override
-        public CommonTagCompound base_load(HumanEntity human) {
-            return CommonTagCompound.create(base.load(HandleConversion.toEntityHandle(human)));
+        private java.util.Optional<Object> base_load_raw(Object entityHuman) {
+            if (LOAD_RETURNS_OPTIONAL) {
+                return base.loadOpt(entityHuman);
+            } else {
+                return java.util.Optional.ofNullable(base.load(entityHuman));
+            }
         }
 
         @Override

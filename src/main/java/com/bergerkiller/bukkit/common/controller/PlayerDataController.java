@@ -12,10 +12,6 @@ import org.bukkit.entity.Player;
 public class PlayerDataController {
     private PlayerFileDataHandler.Hook hook = null;
 
-    public String[] getSeenPlayers() {
-        return hook.base_getSeenPlayers();
-    }
-
     /**
      * Called when the entity data for a player has to be loaded. By
      * default, this method redirects to the underlying implementation.
