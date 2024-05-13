@@ -774,7 +774,9 @@ public class CommonBootstrap {
             // Before 1.20.5, ChunkStatus was elsewhere
             remappings.put("net.minecraft.world.level.chunk.status.ChunkStatus", "net.minecraft.world.level.chunk.ChunkStatus");
             // Before 1.20.5, MapDecorationType was an enum and not in a registry
-            remappings.put("net.minecraft.world.level.saveddata.maps.MapDecorationType", "net.minecraft.world.level.saveddata.maps.MapIcon$Type");
+            remappings.put("net.minecraft.world.level.saveddata.maps.MapDecorationType",
+                    remappings.getOrDefault("net.minecraft.world.level.saveddata.maps.MapDecorationType",
+                                 "net.minecraft.world.level.saveddata.maps.MapIcon$Type"));
             // Before 1.20.5, SerializableMeta was a subclass of CraftMetaItem
             remappings.put("org.bukkit.craftbukkit.inventory.SerializableMeta", "org.bukkit.craftbukkit.inventory.CraftMetaItem$SerializableMeta");
         }

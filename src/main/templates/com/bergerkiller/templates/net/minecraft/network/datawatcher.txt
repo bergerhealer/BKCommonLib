@@ -462,7 +462,7 @@ class DataWatcher {
         #require DataWatcher private DataWatcher.WatchableObject dw_getItem:getItem(int key);
         DataWatcherObject dwo = (DataWatcherObject) key.getRawHandle();
         DataWatcher$Item item = instance#dw_getItem(dwo.getId());
-        return item.getValue();
+        Object rawValue = item.getValue();
 #endif
         return key.getType().getConverter().convert(rawValue);
     }
