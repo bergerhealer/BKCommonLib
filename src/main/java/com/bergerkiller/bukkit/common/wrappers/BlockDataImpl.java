@@ -592,7 +592,7 @@ class BlockDataImpl extends BlockData {
 
     @Override
     public final AxisAlignedBBHandle getBoundingBox(Block block) {
-        return this.block.getBoundingBox(this.data, WorldHandle.fromBukkit(block.getWorld()), new IntVector3(block));
+        return this.data.getBoundingBox(WorldHandle.fromBukkit(block.getWorld()), new IntVector3(block));
     }
 
     @Override

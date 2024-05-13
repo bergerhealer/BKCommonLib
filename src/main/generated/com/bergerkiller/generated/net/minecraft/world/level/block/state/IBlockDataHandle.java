@@ -1,10 +1,13 @@
 package com.bergerkiller.generated.net.minecraft.world.level.block.state;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.collections.BlockFaceSet;
+import com.bergerkiller.generated.net.minecraft.world.level.IBlockAccessHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.SoundEffectTypeHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.IBlockStateHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import java.util.Map;
 
 /**
@@ -30,6 +33,7 @@ public abstract class IBlockDataHandle extends Template.Handle {
     public abstract boolean isPowerSource();
     public abstract SoundEffectTypeHandle getSoundType();
     public abstract boolean isSolid();
+    public abstract AxisAlignedBBHandle getBoundingBox(IBlockAccessHandle iblockaccess, IntVector3 blockposition);
     public abstract Object get(IBlockStateHandle state);
     public abstract IBlockDataHandle set(IBlockStateHandle state, Object value);
     public abstract Map<IBlockStateHandle, Comparable<?>> getStates();
@@ -70,6 +74,7 @@ public abstract class IBlockDataHandle extends Template.Handle {
         public final Template.Method<Boolean> isPowerSource = new Template.Method<Boolean>();
         public final Template.Method.Converted<SoundEffectTypeHandle> getSoundType = new Template.Method.Converted<SoundEffectTypeHandle>();
         public final Template.Method<Boolean> isSolid = new Template.Method<Boolean>();
+        public final Template.Method.Converted<AxisAlignedBBHandle> getBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<Object> get = new Template.Method.Converted<Object>();
         public final Template.Method.Converted<IBlockDataHandle> set = new Template.Method.Converted<IBlockDataHandle>();
         public final Template.Method.Converted<Map<IBlockStateHandle, Comparable<?>>> getStates = new Template.Method.Converted<Map<IBlockStateHandle, Comparable<?>>>();

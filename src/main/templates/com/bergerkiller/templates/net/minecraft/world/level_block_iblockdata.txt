@@ -4,18 +4,26 @@ import net.minecraft.core.BlockPosition;
 import net.minecraft.core.EnumDirection;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BlockCarpet;
+import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.level.block.SoundEffectType;
 import net.minecraft.world.level.block.state.properties.IBlockState;
 import net.minecraft.world.level.IBlockAccess;
+
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.VoxelShapeCollision;
 
 import com.google.common.collect.ImmutableMap;
 
 import com.bergerkiller.bukkit.common.collections.BlockFaceSet;
 
+import com.bergerkiller.bukkit.common.bases.IntVector3
+
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.IBlockAccessHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.SoundEffectTypeHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.IBlockStateHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 
 interface IBlockData {
     public abstract (BlockHandle) Block getBlock();
@@ -259,6 +267,56 @@ interface IBlockData {
         return instance.getBlock().getMaterial().isBuildable();
 #endif
     }
+
+#if version >= 1.13
+    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox((IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition) {
+  #if version >= 1.18
+        VoxelShape shape = instance.getVisualShape(iblockaccess, blockposition, VoxelShapeCollision.empty());
+  #elseif version >= 1.16
+        VoxelShape shape = instance.getShape(iblockaccess, blockposition);
+  #elseif version >= 1.14
+        VoxelShape shape = instance.getBlock().a(instance, iblockaccess, blockposition, VoxelShapeCollision.a());
+  #else
+        VoxelShape shape = instance.getBlock().a(instance, iblockaccess, blockposition);
+  #endif
+  #if version >= 1.13.2
+        if (shape == null || shape.isEmpty()) {
+  #else
+        if (shape == null || shape.b()) {
+  #endif
+            return null;
+        } else {
+  #if version >= 1.18
+            return shape.bounds();
+  #elseif methodexists net.minecraft.world.phys.shapes.VoxelShape public net.minecraft.world.phys.AxisAlignedBB getBoundingBox();
+            return shape.getBoundingBox();
+  #else
+            return shape.a();
+  #endif
+        }
+    }
+
+#elseif version >= 1.12
+    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox:d((IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition);
+#elseif version >= 1.11
+    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox:c((IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition);
+#elseif version >= 1.9
+    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox((IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition) {
+        return instance.d((net.minecraft.world.level.World) iblockaccess, blockposition);
+    }
+#else
+    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox((IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition) {
+        net.minecraft.world.level.block.Block block = instance.getBlock();
+        block.updateShape(iblockaccess, blockposition);
+        AxisAlignedBB bounds_abs = block.a((net.minecraft.world.level.World) iblockaccess, blockposition, instance);
+        if (bounds_abs == null) {
+            return null;
+        } else {
+            // c() = add(x,y,z)  ->  make block-relative coordinates
+            return bounds_abs.c((double) -blockposition.getX(), (double) -blockposition.getY(), (double) -blockposition.getZ());
+        }
+    }
+#endif
 
     public Object get((IBlockStateHandle) IBlockState state) {
         if (state != null) {
