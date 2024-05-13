@@ -622,11 +622,7 @@ class NBTTagCompound extends NBTBase {
                 } else {
                     nbt_value = (NBTBase) com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.createRawHandleForData(value);
                 }
-#if version >= 1.18
                 result.put((String) entry.getKey(), nbt_value);
-#else
-                result.set((String) entry.getKey(), nbt_value);
-#endif
             }
         }
         return result;
@@ -662,14 +658,12 @@ class NBTTagCompound extends NBTBase {
 
     public void remove(String key);
 
-#if version >= 1.18
+#if version >= 1.14
     public (NBTBaseHandle) NBTBase put(String key, (NBTBaseHandle) NBTBase value);
-#elseif version >= 1.14
-    public (NBTBaseHandle) NBTBase put:set(String key, (NBTBaseHandle) NBTBase value);
 #else
     public (NBTBaseHandle) NBTBase put(String key, (NBTBaseHandle) NBTBase value) {
         NBTBase prev_value = instance.get(key);
-        instance.set(key, value);
+        instance.put(key, value);
         return prev_value;
     }
 #endif

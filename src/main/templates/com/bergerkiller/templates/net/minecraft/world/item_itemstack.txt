@@ -262,7 +262,7 @@ class ItemStack {
         // Use ChatText for this as it contains a lot of hacky crap
         ChatText text = ChatText.fromComponent(line);
         if (text != null) {
-            loreList.add(new NBTTagString(text.getMessage()));
+            loreList.add((NBTBase) new NBTTagString(text.getMessage()));
         }
   #endif
     }

@@ -13,6 +13,15 @@
     #remap net.minecraft.network.syncher.DataWatcher public boolean isDirty:a();
 #endif
 
+#if version < 1.20.5
+  #select version >=
+  #case 1.18:  #remap net.minecraft.network.syncher.DataWatcher private DataWatcher.Item<T> getItem(DataWatcherObject<T> key);
+  #case 1.13:  #remap net.minecraft.network.syncher.DataWatcher private DataWatcher.Item<T> getItem:b(DataWatcherObject<T> key);
+  #case 1.9:   #remap net.minecraft.network.syncher.DataWatcher private DataWatcher.Item<T> getItem:c(DataWatcherObject<T> key);
+  #case else:  #remap net.minecraft.network.syncher.DataWatcher private DataWatcher.WatchableObject getItem:j(int key);
+  #endselect
+#endif
+
 #if version < 1.19.3
   #select version >=
   #case 1.17:    #remap net.minecraft.network.syncher.DataWatcher private boolean isEmpty;

@@ -390,19 +390,19 @@ class PacketPlayOutMap extends Packet {
 #elseif version >= 1.14
         boolean track = false;
         return new PacketPlayOutMap(builder.get_mapId(), builder.get_scale(), track, builder.get_locked(), mapIconsList,
+                builder.get_data_colors(),
                 builder.get_data_startX(), builder.get_data_startY(),
-                builder.get_data_width(), builder.get_data_height(),
-                builder.get_data_colors());
+                builder.get_data_width(), builder.get_data_height());
 #elseif version >= 1.9
         return new PacketPlayOutMap(builder.get_mapId(), builder.get_scale(), builder.get_locked(), mapIconsList,
+                builder.get_data_colors(),
                 builder.get_data_startX(), builder.get_data_startY(),
-                builder.get_data_width(), builder.get_data_height(),
-                builder.get_data_colors());
+                builder.get_data_width(), builder.get_data_height());
 #else
         return new PacketPlayOutMap(builder.get_mapId(), builder.get_scale(), mapIconsList,
+                builder.get_data_colors(),
                 builder.get_data_startX(), builder.get_data_startY(),
-                builder.get_data_width(), builder.get_data_height(),
-                builder.get_data_colors());
+                builder.get_data_width(), builder.get_data_height());
 #endif
     }
 }

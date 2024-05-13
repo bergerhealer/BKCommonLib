@@ -2975,7 +2975,7 @@ class PacketPlayOutHeldItemSlot extends Packet {
 #if version >= 1.17
     private final int itemInHandIndex:slot;
 #else
-    private int itemInHandIndex;
+    private int itemInHandIndex:a;
 #endif
 }
 

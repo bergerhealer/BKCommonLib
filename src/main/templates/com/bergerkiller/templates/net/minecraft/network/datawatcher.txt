@@ -182,7 +182,7 @@ class DataWatcher {
         // Preserve DataWatcher 'empty' state (if it exists)
         #require net.minecraft.network.syncher.DataWatcher private boolean dw_isEmpty:isEmpty;
         boolean dw_isEmpty = instance#dw_isEmpty;
-        copyWatcher#dwIsEmpty = dw_isEmpty;
+        copyWatcher#dw_isEmpty = dw_isEmpty;
 #endif
 
         return copyWatcher;
@@ -302,14 +302,10 @@ class DataWatcher {
         }
         return item;
     }
-#elseif version >= 1.18
-    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>) DataWatcher.Item<T> read:getItem((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
-#elseif version >= 1.13
-    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>) DataWatcher.Item<T> read:b((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
 #elseif version >= 1.9
-    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>) DataWatcher.Item<T> read:c((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
+    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>) DataWatcher.Item<T> read:getItem((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
 #else
-    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>) DataWatcher.WatchableObject read:j((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key);
+    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>) DataWatcher.WatchableObject read:getItem((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key);
 #endif
 
     public void register(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> key, Object defaultValue) {
@@ -420,12 +416,13 @@ class DataWatcher {
         // API doesn't exist yet, but it's also not too important as it isn't used at all.
         // Use the read API to get the item object, which might return null
         // We throw in that case as that's what is expected to happen in that case...
-        com.bergerkiller.mountiplex.reflection.declarations.Template.Method readRaw;
-        readRaw = (com.bergerkiller.mountiplex.reflection.declarations.Template.Method) DataWatcherHandle.T.read.raw;
+
   #if version >= 1.9
-        DataWatcher$Item item = (DataWatcher$Item) readRaw.invoke(instance, dwo);
+        #require DataWatcher private DataWatcher.Item<T> dw_getItem:getItem(DataWatcherObject<T> key);
+        DataWatcher$Item item = instance#dw_getItem(dwo);
   #else
-        DataWatcher$Item item = (DataWatcher$Item) readRaw.invoke(instance, Integer.valueOf(dwo.getId()));
+        #require DataWatcher private DataWatcher.WatchableObject dw_getItem:getItem(int key);
+        DataWatcher$Item item = instance#dw_getItem(dwo.getId());
   #endif
         if (item == null) {
             throw new NullPointerException();
@@ -462,10 +459,10 @@ class DataWatcher {
 #if version >= 1.9
         Object rawValue = instance.get((DataWatcherObject) key.getRawHandle());
 #else
-        com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item item;
-        Object itemRaw = DataWatcherHandle.T.read.invoke(instance, key);
-        item = (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item) itemRaw;
-        Object rawValue = com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item.getRawValue(item);
+        #require DataWatcher private DataWatcher.WatchableObject dw_getItem:getItem(int key);
+        DataWatcherObject dwo = (DataWatcherObject) key.getRawHandle();
+        DataWatcher$Item item = instance#dw_getItem(dwo.getId());
+        return item.getValue();
 #endif
         return key.getType().getConverter().convert(rawValue);
     }
