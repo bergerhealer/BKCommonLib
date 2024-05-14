@@ -32,9 +32,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 /**
- * This class is a wrapper of the DataWatcher class from CraftBukkit<br>
- * It is used to store data and to keep track of changes so they can be
- * synchronized
+ * The DataWatcher tracks changes of Entity metadata and handles the creation of
+ * metadata update packets. Entity metadata {@link Key} instances, which are stored
+ * as static constants in {@link EntityHandle} and extended types of it, can be used
+ * to get and set values assigned to them.<br>
+ * <br>
+ * You can create a new DataWatcher instance and begin setting up these (initial) values.
+ * For better performance it is recommended to use the {@link Prototype} class builder
+ * pattern, so that it minimizes the amount of times internal collections have to resize
+ * and initialize.
  */
 public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Cloneable {
 
@@ -280,20 +286,21 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
     }
 
     /**
-     * Watches an object
+     * Watches an object. Equivalent to just {@link #set(Key, Object)}.
      *
      * @param key of the watched item
-     * @param defaultValue of the watched item. If the value set is this one, then the
-     *                     item is not included in synchronization packets for non-changes.
-     * @deprecated Use {@link #setClientDefault(Key, Object)} instead
+     * @param defaultValue initial value of the watched item
+     * @deprecated Use {@link #setClientDefault(Key, Object)} instead if you want to optimize
+     *             client defaults when synchronizing. If you just want to set an initial value,
+     *             use {@link #set(Key, Object)}.
      */
     @Deprecated
     public <T> void watch(Key<T> key, T defaultValue) {
-        this.setClientDefault(key, defaultValue);
+        this.set(key, defaultValue);
     }
 
     /**
-     * Watches a single DataWatcher item
+     * Watches a single DataWatcher item. Equivalent to just {@link #set(Key, Object)}.
      * 
      * @param item to watch
      * @deprecated This method made no sense, use {@link #clone()} instead of you want to clone a DataWatcher
@@ -301,7 +308,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
     @Deprecated
     @SuppressWarnings("unchecked")
     public void watch(Item<?> item) {
-        this.setClientDefault((Key<Object>) item.getKey(), item.getValue());
+        this.set((Key<Object>) item.getKey(), item.getValue());
     }
 
     /**
