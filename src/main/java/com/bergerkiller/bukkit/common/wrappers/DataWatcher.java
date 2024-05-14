@@ -91,7 +91,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             // When this occurs, and after verifying it is indeed not watched, watch() it instead.
             // This preserves performance of the most common set case
             try {
-                handle.set(key, value);
+                handle.set(key, value, false);
             } catch (NullPointerException ex) {
                 if (isWatched(key)) {
                     throw ex;
@@ -100,7 +100,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
                     // It's essential we force-set afterwards, because otherwise this
                     // updated value isn't going to be sent to clients.
-                    handle.forceSet(key, value);
+                    handle.set(key, value, true);
                 }
             }
         }
@@ -129,13 +129,13 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             // When this occurs, and after verifying it is indeed not watched, watch() it instead.
             // This preserves performance for the most common set case
             try {
-                handle.forceSet(key, value);
+                handle.set(key, value, true);
             } catch (NullPointerException ex) {
                 if (isWatched(key)) {
                     throw ex;
                 } else {
                     watch(key, value);
-                    handle.forceSet(key, value); // Must set as changed!
+                    handle.set(key, value, true); // Must set as changed!
                 }
             }
         }
@@ -654,7 +654,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
          * @param value to set to
          */
         public void set(V value) {
-            this.datawatcher.set(this.key, value);
+            this.datawatcher.set(this.key, value, false);
         }
 
         /**

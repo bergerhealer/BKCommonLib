@@ -343,45 +343,7 @@ class DataWatcher {
 #endif
     }
 
-    public void set(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> key, Object value) {
-        if (key == null) {
-            throw new IllegalArgumentException("key is null");
-        }
-        Object convertedValue = key.getType().getConverter().convertReverse(value);
-#if version >= 1.20.5
-        // Make sure altering dummy items is forbidden, requiring a register first
-        DataWatcher$Item[] itemsById = instance#itemsById;
-        DataWatcherObject keyObj = (DataWatcherObject) key.getRawHandle();
-        int keyIndex = keyObj.id();
-        if (keyIndex < 0 || keyIndex >= itemsById.length) {
-            throw new NullPointerException(); // Signals that it doesn't exist...
-        }
-
-        DataWatcher$Item item = itemsById[keyIndex];
-        Object currValue = item.getValue();
-        if (currValue == DataWatcherHandle.UNSET_MARKER_VALUE) {
-            throw new NullPointerException(); // Signals that it doesn't exist...
-        }
-
-        // Vanilla logic
-        if (org.apache.commons.lang3.ObjectUtils.notEqual(convertedValue, currValue)) {
-            item.setValue(convertedValue);
-
-            net.minecraft.network.syncher.SyncedDataHolder owner = instance#owner;
-            owner.onSyncedDataUpdated(keyObj);
-            item.setDirty(true);
-
-            instance#dw_isDirty = true;
-        }
-#elseif version >= 1.9
-        instance.set((DataWatcherObject) key.getRawHandle(), convertedValue);
-#else
-        int id = ((com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject) key.getRawHandle()).getId();
-        instance.watch(id, convertedValue);
-#endif
-    }
-
-    public void forceSet(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> key, Object value) {
+    public void set(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> key, Object value, boolean force) {
         if (key == null) {
             throw new IllegalArgumentException("key is null");
         }
@@ -403,52 +365,63 @@ class DataWatcher {
         }
 
         // Vanilla logic
-        item.setValue(convertedValue);
+        if (force || org.apache.commons.lang3.ObjectUtils.notEqual(convertedValue, currValue)) {
+            item.setValue(convertedValue);
 
-        net.minecraft.network.syncher.SyncedDataHolder owner = instance#owner;
-        owner.onSyncedDataUpdated(dwo);
-        item.setDirty(true);
+            net.minecraft.network.syncher.SyncedDataHolder owner = instance#owner;
+            owner.onSyncedDataUpdated(dwo);
+            item.setDirty(true);
 
-        instance#dw_isDirty = true;
+            instance#dw_isDirty = true;
+        }
 #elseif version >= 1.19.4
-        instance.set(dwo, convertedValue, true);
+        instance.set(dwo, convertedValue, force);
 #else
-        // API doesn't exist yet, but it's also not too important as it isn't used at all.
-        // Use the read API to get the item object, which might return null
-        // We throw in that case as that's what is expected to happen in that case...
+        if (force) {
+            // API doesn't exist yet, but it's also not too important as it isn't used at all.
+            // Use the read API to get the item object, which might return null
+            // We throw in that case as that's what is expected to happen in that case...
 
   #if version >= 1.9
-        #require DataWatcher private DataWatcher.Item<T> dw_getItem:getItem(DataWatcherObject<T> key);
-        DataWatcher$Item item = instance#dw_getItem(dwo);
+            #require DataWatcher private DataWatcher.Item<T> dw_getItem:getItem(DataWatcherObject<T> key);
+            DataWatcher$Item item = instance#dw_getItem(dwo);
   #else
-        #require DataWatcher private DataWatcher.WatchableObject dw_getItem:getItem(int key);
-        DataWatcher$Item item = instance#dw_getItem(dwo.getId());
+            #require DataWatcher private DataWatcher.WatchableObject dw_getItem:getItem(int key);
+            DataWatcher$Item item = instance#dw_getItem(dwo.getId());
   #endif
-        if (item == null) {
-            throw new NullPointerException();
-        }
+            if (item == null) {
+                throw new NullPointerException();
+            }
 
-        // Get Entity owner that should be notified of the datawatcher change
+            // Get Entity owner that should be notified of the datawatcher change
   #if version >= 1.20.5
-        #require net.minecraft.network.syncher.DataWatcher private final net.minecraft.network.syncher.SyncedDataHolder owner;
-        net.minecraft.network.syncher.SyncedDataHolder owner = instance#owner;
+            #require net.minecraft.network.syncher.DataWatcher private final net.minecraft.network.syncher.SyncedDataHolder owner;
+            net.minecraft.network.syncher.SyncedDataHolder owner = instance#owner;
   #else
-        #require net.minecraft.network.syncher.DataWatcher private final Entity owner;
-        Entity owner = instance#owner;
+            #require net.minecraft.network.syncher.DataWatcher private final Entity owner;
+            Entity owner = instance#owner;
   #endif
 
-        item.setValue(convertedValue);
+            item.setValue(convertedValue);
   #if version >= 1.18
-        owner.onSyncedDataUpdated(dwo);
+            owner.onSyncedDataUpdated(dwo);
   #elseif version >= 1.9
-        owner.a(dwo);
+            owner.a(dwo);
   #else
-        owner.i(dwo.getId());
+            owner.i(dwo.getId());
   #endif
-        item.setDirty(true);
+            item.setDirty(true);
 
-        // Set DataWatcher itself dirty too
-        instance#dw_isDirty = true;
+            // Set DataWatcher itself dirty too
+            instance#dw_isDirty = true;
+        } else {
+  #if version >= 1.9
+            instance.set((DataWatcherObject) key.getRawHandle(), convertedValue);
+  #else
+            int id = ((com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject) key.getRawHandle()).getId();
+            instance.watch(id, convertedValue);
+  #endif
+        }
 #endif
     }
 
