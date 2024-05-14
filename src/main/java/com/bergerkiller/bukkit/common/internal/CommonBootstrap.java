@@ -12,6 +12,7 @@ import com.bergerkiller.bukkit.common.conversion.type.JOMLConversion;
 import com.bergerkiller.bukkit.common.conversion.type.MapConversion;
 import com.bergerkiller.bukkit.common.conversion.type.ScoreboardDisplaySlotConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
+import com.bergerkiller.bukkit.common.internal.logic.UnsetDataWatcherItemInit;
 import com.bergerkiller.bukkit.common.wrappers.Brightness;
 import com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode;
 import org.bukkit.Bukkit;
@@ -854,6 +855,7 @@ public class CommonBootstrap {
 
         // Initialize this one right away, as it's used in generated code
         NullPacketDataSerializerInit.initialize();
+        UnsetDataWatcherItemInit.initialize();
 
         // Register converters
         Conversion.registerConverters(WrapperConversion.class);

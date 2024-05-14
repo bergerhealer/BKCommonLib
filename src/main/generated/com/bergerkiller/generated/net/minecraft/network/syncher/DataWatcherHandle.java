@@ -41,7 +41,7 @@ public abstract class DataWatcherHandle extends Template.Handle {
     public abstract Object get(Key<?> key);
     public abstract boolean isChanged();
     public abstract boolean isEmpty();
-    public static final Object UNSET_MARKER_VALUE = new Object();
+    public static final Object UNSET_MARKER_VALUE = com.bergerkiller.bukkit.common.internal.logic.UnsetDataWatcherItemInit.UNSET_MARKER_VALUE;
 
     public static DataWatcherHandle createNew(org.bukkit.entity.Entity owner) {
         return createHandle(T.createNew.raw.invoke(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(owner)));

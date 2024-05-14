@@ -18,19 +18,11 @@ class DataWatcher {
     // This, as opposed to using register, which uses that value's default value. This could be
     // more efficient as then no metadata packets are sent when they're the default.
     <code>
-    public static final Object UNSET_MARKER_VALUE = new Object();
+    public static final Object UNSET_MARKER_VALUE = com.bergerkiller.bukkit.common.internal.logic.UnsetDataWatcherItemInit.UNSET_MARKER_VALUE;
     </code>
 
     // Used in a lot of places
     #require net.minecraft.network.syncher.DataWatcher private boolean dw_isDirty:isDirty;
-
-#if version >= 1.20.5
-    #require net.minecraft.network.syncher.DataWatcher public static DataWatcher.Item createDataWatcherDummyItem() {
-        return new DataWatcher$Item( (net.minecraft.network.syncher.DataWatcherObject) null,
-                                     DataWatcherHandle.UNSET_MARKER_VALUE );
-
-    }
-#endif
 
 #if version >= 1.20.5
     #require net.minecraft.network.syncher.DataWatcher private final net.minecraft.network.syncher.SyncedDataHolder owner;
@@ -316,7 +308,7 @@ class DataWatcher {
             int startIndex = itemsById.length;
             itemsById = (DataWatcher$Item[]) java.util.Arrays.copyOf(itemsById, keyIndex + 1);
             for (int i = startIndex; i < keyIndex; i++) {
-                itemsById[i] = #createDataWatcherDummyItem();
+                itemsById[i] = com.bergerkiller.bukkit.common.internal.logic.UnsetDataWatcherItem.INSTANCE;
             }
             itemsById[keyIndex] = new DataWatcher$Item(dwo, rawDefaultValue);
             instance#itemsById = itemsById;
@@ -338,19 +330,22 @@ class DataWatcher {
     public void setRaw((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject dwo, Object rawValue, boolean force) {
 #if version >= 1.20.5
         try {
-            // Get first to verify the key was registered. If it was, set it the normal way.
-            // If not, swap out the item with one that has the correct DWO assigned
-            if (instance.get(dwo) != DataWatcherHandle.UNSET_MARKER_VALUE) {
-                instance.set(dwo, rawValue, force);
-            } else {
-                // Register properly with the right DWO accessor
-                DataWatcher$Item[] itemsById = instance#itemsById;
-                int keyIndex = dwo.id();
-                itemsById[keyIndex] = new DataWatcher$Item(dwo, DataWatcherHandle.UNSET_MARKER_VALUE);
+            // Attempt to set the value. If the item stored here is the UnsetDataWatcherItem singleton,
+            // this will throw an UnsetDataWatcherItemException. If the index of the DWO is out
+            // of bounds of the internal array, an ArrayIndexOutOfBoundsException will be thrown.
+            //
+            // Exceptions for flow control suck, but this way we have maximum performance in the
+            // most general use case. The exceptions are only really used when building up the
+            // DataWatcher Prototype.
+            instance.set(dwo, rawValue, force);
+        } catch (com.bergerkiller.bukkit.common.internal.logic.UnsetDataWatcherItemException ex) {
+            // Register properly with the right DWO accessor
+            DataWatcher$Item[] itemsById = instance#itemsById;
+            int keyIndex = dwo.id();
+            itemsById[keyIndex] = new DataWatcher$Item(dwo, DataWatcherHandle.UNSET_MARKER_VALUE);
 
-                // Force-set with the proper value
-                instance.set(dwo, rawValue, true);
-            }
+            // Force-set with the proper value
+            instance.set(dwo, rawValue, true);
         } catch (ArrayIndexOutOfBoundsException ex) {
             // Key probably has not yet been registered. Register it now.
             DataWatcher$Item[] itemsById = instance#itemsById;
@@ -364,7 +359,7 @@ class DataWatcher {
             int startIndex = itemsById.length;
             itemsById = (DataWatcher$Item[]) java.util.Arrays.copyOf(itemsById, keyIndex + 1);
             for (int i = startIndex; i < keyIndex; i++) {
-                itemsById[i] = #createDataWatcherDummyItem();
+                itemsById[i] = com.bergerkiller.bukkit.common.internal.logic.UnsetDataWatcherItem.INSTANCE;
             }
             itemsById[keyIndex] = new DataWatcher$Item(dwo, DataWatcherHandle.UNSET_MARKER_VALUE);
             instance#itemsById = itemsById;
