@@ -125,6 +125,18 @@ class DataWatcher {
         java.util.Iterator itemIter = itemsById.valueCollection().iterator();
   #endif
 
+        // Paper servers have this special by-id array in addition, mimicking what happens on 1.20.5+
+        // When cloning this array must be updated too
+  #if exists net.minecraft.network.syncher.DataWatcher private DataWatcher.Item<?>[] itemsArray;
+        #require DataWatcher private DataWatcher.Item<?>[] itemsArray;
+        DataWatcher$Item[] itemsArray = instance#itemsArray;
+        DataWatcher$Item[] itemsArrayCopy = copyWatcher#itemsArray;
+        if (itemsArray.length > itemsArrayCopy.length) {
+            itemsArrayCopy = new DataWatcher$Item[itemsArray.length];
+            copyWatcher#itemsArray = itemsArrayCopy;
+        }
+  #endif
+
         // Iterate all registered items and register them in the copy
         // It's important to note that since 1.19.3 there is an 'initial' default value that must be preserved
         // Because we must also preserve the 'isDirty' state, we can't use getAll() / c() on older versions.
@@ -132,6 +144,11 @@ class DataWatcher {
             DataWatcher$Item item = (DataWatcher$Item) itemIter.next();
   #if version >= 1.9
             DataWatcherObject accessor = item.getAccessor();
+    #if version >= 1.18
+            int accessorId = accessor.getId();
+    #else
+            int accessorId = accessor.a();
+    #endif
   #else
             int accessorId = item.getAccessorId();
             int valueTypeId = item.getValueTypeId();
@@ -157,14 +174,17 @@ class DataWatcher {
             itemCopy.setDirty(item.isDirty());
 
             // Add to the by-id mapping
-  #if version >= 1.18
-            copyItemsById.put(accessor.getId(), itemCopy);
-  #elseif version >= 1.14.4
-            copyItemsById.put(accessor.a(), itemCopy);
+  #if version >= 1.14.4
+            copyItemsById.put(accessorId, itemCopy);
   #elseif version >= 1.9
-            copyItemsById.put(Integer.valueOf(accessor.a()), itemCopy);
+            copyItemsById.put(Integer.valueOf(accessorId), itemCopy);
   #else
             copyItemsById.put(accessorId, itemCopy);
+  #endif
+
+            // If it exists, also store it in the by-id array mapping on Paper
+  #if exists net.minecraft.network.syncher.DataWatcher private DataWatcher.Item<?>[] itemsArray;
+            itemsArrayCopy[accessorId] = itemCopy;
   #endif
         }
 #endif
