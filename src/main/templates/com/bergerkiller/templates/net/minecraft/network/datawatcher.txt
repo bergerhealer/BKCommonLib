@@ -339,16 +339,10 @@ class DataWatcher {
 #endif
     }
 
-    public void set(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> key, Object value, boolean force) {
-        if (key == null) {
-            throw new IllegalArgumentException("key is null");
-        }
-        Object convertedValue = key.getType().getConverter().convertReverse(value);
-        DataWatcherObject dwo = (DataWatcherObject) key.getRawHandle();
-
+    public void setRaw((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject dwo, Object rawValue, boolean force) {
 #if version >= 1.20.5
         try {
-            instance.set(dwo, convertedValue, force);
+            instance.set(dwo, rawValue, force);
         } catch (ArrayIndexOutOfBoundsException ex) {
             // Key probably has not yet been registered. Register it now.
             DataWatcher$Item[] itemsById = instance#itemsById;
@@ -368,13 +362,13 @@ class DataWatcher {
             instance#itemsById = itemsById;
 
             // Force set the item to make sure it is marked changed
-            instance.set(dwo, convertedValue, true);
+            instance.set(dwo, rawValue, true);
         }
 #elseif version >= 1.19.4
         // Try to set it. If this fails with a NPE, then internally the value might not be registered yet
         // In that case, register the key with the unset marker value and try setting again
         try {
-            instance.set(dwo, convertedValue, force);
+            instance.set(dwo, rawValue, force);
         } catch (NullPointerException ex) {
             // Verify not watched yet
             #require DataWatcher private DataWatcher.Item<T> dw_getItem:getItem(DataWatcherObject<T> key);
@@ -388,7 +382,7 @@ class DataWatcher {
             instance#register(dwo, DataWatcherHandle.UNSET_MARKER_VALUE);
 
             // Force-set to mark the value and this datawatcher as changed
-            instance.set(dwo, convertedValue, true);
+            instance.set(dwo, rawValue, true);
         }
 #else
 
@@ -408,10 +402,10 @@ class DataWatcher {
             // This force setting also ensures that the value is set as changed. (dirty true)
             try {
   #if version >= 1.9
-                instance.set((DataWatcherObject) key.getRawHandle(), convertedValue);
+                instance.set(dwo, rawValue);
   #else
-                int id = ((com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject) key.getRawHandle()).getId();
-                instance.watch(id, convertedValue);
+                int id = dwo.getId();
+                instance.watch(id, rawValue);
   #endif
                 return; // All good!
             } catch (NullPointerException ex) {
@@ -438,7 +432,7 @@ class DataWatcher {
   #if version >= 1.19.3
             instance#register(dwo, DataWatcherHandle.UNSET_MARKER_VALUE);
   #else
-            instance#register(dwo, convertedValue);
+            instance#register(dwo, rawValue);
   #endif
             item = instance#dw_getItem(dwo);
         }
@@ -447,7 +441,7 @@ class DataWatcher {
         #require net.minecraft.network.syncher.DataWatcher private final Entity owner;
         Entity owner = instance#owner;
 
-        item.setValue(convertedValue);
+        item.setValue(rawValue);
   #if version >= 1.18
         owner.onSyncedDataUpdated(dwo);
   #elseif version >= 1.9

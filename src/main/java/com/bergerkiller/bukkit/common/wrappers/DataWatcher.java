@@ -87,7 +87,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         } else if (key instanceof Key.Disabled) {
             // Pass. Do nothing.
         } else {
-            handle.set(key, value, false);
+            handle.setRaw(key, key.getType().getConverter().convertReverse(value), false);
         }
     }
 
@@ -110,10 +110,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         } else if (key instanceof Key.Disabled) {
             // Pass. Do nothing.
         } else {
-            // Note: throws a NPE when the key is not watched inside the datawatcher
-            // When this occurs, and after verifying it is indeed not watched, watch() it instead.
-            // This preserves performance for the most common set case
-            handle.set(key, value, true);
+            handle.setRaw(key, key.getType().getConverter().convertReverse(value), true);
         }
     }
 
@@ -656,7 +653,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
          * @param value to set to
          */
         public void set(V value) {
-            this.datawatcher.set(this.key, value, false);
+            this.datawatcher.setRaw(key, key.getType().getConverter().convertReverse(value), false);
         }
 
         /**
