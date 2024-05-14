@@ -2367,19 +2367,12 @@ class PacketPlayOutEntityMetadata extends Packet {
         // Pack all datawatcher values, and do NOT reset dirty on the datawatcher or the values
         // A spawn shouldn't affect the 'dirty' elements that still need to be synchronized to
         // other players
-        java.util.List values = (java.util.List) 
-                ((com.bergerkiller.mountiplex.reflection.declarations.Template.Method)
-                        com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle.T.packAll.raw)
-                        .invoke(datawatcher);
+        java.util.List values = datawatcher.getNonDefaultValues();
         if (values == null) {
             values = java.util.Collections.emptyList();
         }
 
 #if version >= 1.19.3
-        // Cant use these. Breaks plugins that create a new DataWatcher and set values,
-        // because then all set values are the initial ones (and thus not sent)
-        //java.util.List values = datawatcher.getNonDefaultValues();
-
         return new PacketPlayOutEntityMetadata(entityId, values);
 #else
         // Cannot use the metadata packet constructor, because then it resets dirty on the datawatcher.

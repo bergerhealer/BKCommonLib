@@ -58,3 +58,11 @@
     #remap net.minecraft.network.syncher.DataWatcher.WatchableObject public boolean isDirty:d();
     #remap net.minecraft.network.syncher.DataWatcher.WatchableObject public void setDirty:a(boolean dirty);
 #endif
+
+    // Note: only filters non-default elements on 1.19.3 and later, as this mechanism was absent prior
+#select version >=
+#case 1.19.3:  #remap net.minecraft.network.syncher.DataWatcher public List<DataWatcher.PackedItem<?>> getNonDefaultValues();
+#case 1.17:    #remap net.minecraft.network.syncher.DataWatcher public List<DataWatcher.PackedItem<?>> getNonDefaultValues:getAll();
+#case 1.9:     #remap net.minecraft.network.syncher.DataWatcher public List<DataWatcher.PackedItem<?>> getNonDefaultValues:c();
+#case else:    #remap net.minecraft.network.syncher.DataWatcher public List<DataWatcher.WatchableObject> getNonDefaultValues:c();
+#endselect

@@ -197,14 +197,10 @@ class DataWatcher {
 #endif
 
     // Note: only filters non-default elements on 1.19.3 and later, as this mechanism was absent prior
-#if version >= 1.19.3
+#if version >= 1.9
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.PackedItem<?>> packNonDefaults:getNonDefaultValues();
-#elseif version >= 1.17
-    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.PackedItem<?>> packNonDefaults:getAll();
-#elseif version >= 1.9
-    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.PackedItem<?>> packNonDefaults:c();
 #else
-    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.WatchableObject> packNonDefaults:c();
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.WatchableObject> packNonDefaults:getNonDefaultValues();
 #endif
 
 #if version >= 1.20.5
