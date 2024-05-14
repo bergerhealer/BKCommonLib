@@ -41,6 +41,7 @@ public abstract class PlayerFileDataHandler implements LazyInitializedObject, Li
     }
 
     @ClassHook.HookPackage("net.minecraft.server")
+    @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
     protected static class PlayerFileDataHook extends ClassHook<PlayerFileDataHook> implements PlayerFileDataHandler.Hook {
         private static final boolean LOAD_RETURNS_OPTIONAL = CommonBootstrap.evaluateMCVersion(">=", "1.20.5");
         public PlayerDataController controller = null;
