@@ -87,22 +87,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         } else if (key instanceof Key.Disabled) {
             // Pass. Do nothing.
         } else {
-            // Note: throws a NPE when the key is not watched inside the datawatcher
-            // When this occurs, and after verifying it is indeed not watched, watch() it instead.
-            // This preserves performance of the most common set case
-            try {
-                handle.set(key, value, false);
-            } catch (NullPointerException ex) {
-                if (isWatched(key)) {
-                    throw ex;
-                } else {
-                    watch(key, value);
-
-                    // It's essential we force-set afterwards, because otherwise this
-                    // updated value isn't going to be sent to clients.
-                    handle.set(key, value, true);
-                }
-            }
+            handle.set(key, value, false);
         }
     }
 
@@ -128,16 +113,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             // Note: throws a NPE when the key is not watched inside the datawatcher
             // When this occurs, and after verifying it is indeed not watched, watch() it instead.
             // This preserves performance for the most common set case
-            try {
-                handle.set(key, value, true);
-            } catch (NullPointerException ex) {
-                if (isWatched(key)) {
-                    throw ex;
-                } else {
-                    watch(key, value);
-                    handle.set(key, value, true); // Must set as changed!
-                }
-            }
+            handle.set(key, value, true);
         }
     }
 
@@ -275,24 +251,50 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
     }
 
     /**
+     * Sets the default value of a watched key. If the value is equal to this value, then the metadata
+     * is not sent to clients when spawning the object. Call this before calling
+     * {@link #set(Key, Object)} or {@link #forceSet(Key, Object)} to reduce the amount of data
+     * sent in metadata packets that, to the client, are already set that way for new entities.
+     *
+     * @param key of the watched item
+     * @param defaultValue of the watched item. If the value set is this one, then the
+     *                     item is not included in synchronization packets for non-changes.
+     * @see #packNonDefaults()
+     */
+    public <T> void setClientDefault(Key<T> key, T defaultValue) {
+        if (key == null) {
+            throw new IllegalArgumentException("key is null");
+        } else if (key instanceof Key.Disabled) {
+            return; // Ignore
+        }
+
+        Object defaultValueConv = key.getType().getConverter().convertReverse(defaultValue);
+        handle.setRawDefault(key, defaultValueConv);
+    }
+
+    /**
      * Watches an object
      *
      * @param key of the watched item
      * @param defaultValue of the watched item. If the value set is this one, then the
      *                     item is not included in synchronization packets for non-changes.
+     * @deprecated Use {@link #setClientDefault(Key, Object)} instead
      */
+    @Deprecated
     public <T> void watch(Key<T> key, T defaultValue) {
-        handle.register(key, defaultValue);
+        this.setClientDefault(key, defaultValue);
     }
 
     /**
      * Watches a single DataWatcher item
      * 
      * @param item to watch
+     * @deprecated This method made no sense, use {@link #clone()} instead of you want to clone a DataWatcher
      */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public void watch(Item<?> item) {
-        this.watch((Key<Object>) item.getKey(), item.getValue());
+        this.setClientDefault((Key<Object>) item.getKey(), item.getValue());
     }
 
     /**

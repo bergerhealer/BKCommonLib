@@ -33,7 +33,7 @@ public class DataWatcherTest {
         assertTrue(dataWatcher.isEmpty());
         assertFalse(dataWatcher.isChanged());
 
-        dataWatcher.watch(EntityHandle.DATA_CUSTOM_NAME, ChatText.fromMessage("original"));
+        dataWatcher.setClientDefault(EntityHandle.DATA_CUSTOM_NAME, ChatText.fromMessage("original"));
         dataWatcher.set(EntityHandle.DATA_CUSTOM_NAME, ChatText.fromMessage("custom"));
         assertFalse(dataWatcher.isEmpty());
         assertTrue(dataWatcher.isChanged());
@@ -68,7 +68,7 @@ public class DataWatcherTest {
 
         // Do a single test run with a String type, which is quite safe
         assertFalse(dataWatcher.isWatched(EntityHandle.DATA_CUSTOM_NAME));
-        dataWatcher.watch(EntityHandle.DATA_CUSTOM_NAME, ChatText.fromMessage("original"));
+        dataWatcher.setClientDefault(EntityHandle.DATA_CUSTOM_NAME, ChatText.fromMessage("original"));
         assertTrue(dataWatcher.isWatched(EntityHandle.DATA_CUSTOM_NAME));
         assertEquals("original", dataWatcher.get(EntityHandle.DATA_CUSTOM_NAME).getMessage());
         dataWatcher.set(EntityHandle.DATA_CUSTOM_NAME, ChatText.fromMessage("new"));
@@ -157,7 +157,7 @@ public class DataWatcherTest {
         DataWatcher dataWatcher = new DataWatcher();
         assertFalse(dataWatcher.isChanged());
 
-        dataWatcher.watch(EntityHandle.DATA_AIR_TICKS, 500);
+        dataWatcher.setClientDefault(EntityHandle.DATA_AIR_TICKS, 500);
         assertFalse(dataWatcher.isChanged());
 
         dataWatcher.set(EntityHandle.DATA_AIR_TICKS, 500);
@@ -166,7 +166,7 @@ public class DataWatcherTest {
         dataWatcher.set(EntityHandle.DATA_AIR_TICKS, 200);
         assertTrue(dataWatcher.isChanged());
 
-        dataWatcher.watch(EntityHandle.DATA_CUSTOM_NAME, ChatText.fromMessage("frank"));
+        dataWatcher.setClientDefault(EntityHandle.DATA_CUSTOM_NAME, ChatText.fromMessage("frank"));
 
         // debug
         //for (DataWatcher.Item<?> item : dataWatcher.getWatchedItems()) {

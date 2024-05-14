@@ -308,29 +308,25 @@ class DataWatcher {
     private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>) DataWatcher.WatchableObject read:getItem((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key);
 #endif
 
-    public void register(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> key, Object defaultValue) {
-        if (key == null) {
-            throw new IllegalArgumentException("key is null");
-        }
-
-        Object defaultValueConv = key.getType().getConverter().convertReverse(defaultValue);
-
+    public void setRawDefault((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject dwo, Object rawDefaultValue) {
 #if version >= 1.20.5
         // Grow the internal array of items as required
         // Insert dummy items in gaps that form so no NPEs can occur
-        DataWatcherObject keyObj = (DataWatcherObject) key.getRawHandle();
-        int index = keyObj.id();
+        int keyIndex = dwo.id();
         DataWatcher$Item[] itemsById = instance#itemsById;
-        if (index >= itemsById.length) {
-            // Grow array. Fill intermediate items with dummy items
+
+        // Grow array. Fill intermediate items with dummy items
+        if (keyIndex >= itemsById.length) {
             int startIndex = itemsById.length;
-            itemsById = (DataWatcher$Item[]) java.util.Arrays.copyOf(itemsById, index + 1);
-            for (int i = startIndex; i < index; i++) {
+            itemsById = (DataWatcher$Item[]) java.util.Arrays.copyOf(itemsById, keyIndex + 1);
+            for (int i = startIndex; i < keyIndex; i++) {
                 itemsById[i] = #createDataWatcherDummyItem();
             }
+            itemsById[keyIndex] = new DataWatcher$Item(dwo, rawDefaultValue);
+            instance#itemsById = itemsById;
+        } else {
+            itemsById[keyIndex] = new DataWatcher$Item(dwo, rawDefaultValue);
         }
-        itemsById[index] = new DataWatcher$Item(keyObj, defaultValueConv);
-        instance#itemsById = itemsById;
 #else
   #if version >= 1.18
         #require net.minecraft.network.syncher.DataWatcher private void register:define(DataWatcherObject<T> key, Object defaultValue);
@@ -339,7 +335,7 @@ class DataWatcher {
   #else
         #require net.minecraft.network.syncher.DataWatcher private void register:a((DataWatcherObject<T>) int key, Object defaultValue);
   #endif
-        instance#register((DataWatcherObject) key.getRawHandle(), defaultValueConv);
+        instance#register(dwo, rawDefaultValue);
 #endif
     }
 
@@ -351,18 +347,22 @@ class DataWatcher {
         DataWatcherObject dwo = (DataWatcherObject) key.getRawHandle();
 
 #if version >= 1.20.5
-        // Make sure altering dummy items is forbidden, requiring a register first
         DataWatcher$Item[] itemsById = instance#itemsById;
         int keyIndex = dwo.id();
-        if (keyIndex < 0 || keyIndex >= itemsById.length) {
-            throw new NullPointerException(); // Signals that it doesn't exist...
+
+        // Grow array. Fill intermediate items with dummy items
+        if (keyIndex >= itemsById.length) {
+            int startIndex = itemsById.length;
+            itemsById = (DataWatcher$Item[]) java.util.Arrays.copyOf(itemsById, keyIndex + 1);
+            for (int i = startIndex; i < keyIndex; i++) {
+                itemsById[i] = #createDataWatcherDummyItem();
+            }
+            itemsById[keyIndex] = new DataWatcher$Item(dwo, DataWatcherHandle.UNSET_MARKER_VALUE);
+            instance#itemsById = itemsById;
         }
 
         DataWatcher$Item item = itemsById[keyIndex];
         Object currValue = item.getValue();
-        if (currValue == DataWatcherHandle.UNSET_MARKER_VALUE) {
-            throw new NullPointerException(); // Signals that it doesn't exist...
-        }
 
         // Vanilla logic
         if (force || org.apache.commons.lang3.ObjectUtils.notEqual(convertedValue, currValue)) {
@@ -375,53 +375,94 @@ class DataWatcher {
             instance#dw_isDirty = true;
         }
 #elseif version >= 1.19.4
-        instance.set(dwo, convertedValue, force);
-#else
-        if (force) {
-            // API doesn't exist yet, but it's also not too important as it isn't used at all.
-            // Use the read API to get the item object, which might return null
-            // We throw in that case as that's what is expected to happen in that case...
-
-  #if version >= 1.9
+        // Try to set it. If this fails with a NPE, then internally the value might not be registered yet
+        // In that case, register the key with the unset marker value and try setting again
+        try {
+            instance.set(dwo, convertedValue, force);
+        } catch (NullPointerException ex) {
+            // Verify not watched yet
             #require DataWatcher private DataWatcher.Item<T> dw_getItem:getItem(DataWatcherObject<T> key);
             DataWatcher$Item item = instance#dw_getItem(dwo);
-  #else
-            #require DataWatcher private DataWatcher.WatchableObject dw_getItem:getItem(int key);
-            DataWatcher$Item item = instance#dw_getItem(dwo.getId());
-  #endif
-            if (item == null) {
-                throw new NullPointerException();
+            if (item != null) {
+                throw ex; // Is actually watched
             }
 
-            // Get Entity owner that should be notified of the datawatcher change
-  #if version >= 1.20.5
-            #require net.minecraft.network.syncher.DataWatcher private final net.minecraft.network.syncher.SyncedDataHolder owner;
-            net.minecraft.network.syncher.SyncedDataHolder owner = instance#owner;
-  #else
-            #require net.minecraft.network.syncher.DataWatcher private final Entity owner;
-            Entity owner = instance#owner;
-  #endif
+            // Register the key with the unset marker value
+            #require net.minecraft.network.syncher.DataWatcher private void register:define(DataWatcherObject<T> key, Object defaultValue);
+            instance#register(dwo, DataWatcherHandle.UNSET_MARKER_VALUE);
 
-            item.setValue(convertedValue);
-  #if version >= 1.18
-            owner.onSyncedDataUpdated(dwo);
-  #elseif version >= 1.9
-            owner.a(dwo);
-  #else
-            owner.i(dwo.getId());
-  #endif
-            item.setDirty(true);
-
-            // Set DataWatcher itself dirty too
-            instance#dw_isDirty = true;
-        } else {
-  #if version >= 1.9
-            instance.set((DataWatcherObject) key.getRawHandle(), convertedValue);
-  #else
-            int id = ((com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject) key.getRawHandle()).getId();
-            instance.watch(id, convertedValue);
-  #endif
+            // Force-set to mark the value and this datawatcher as changed
+            instance.set(dwo, convertedValue, true);
         }
+#else
+
+  #if version >= 1.9
+        #require DataWatcher private DataWatcher.Item<T> dw_getItem:getItem(DataWatcherObject<T> key);
+  #else
+        #require DataWatcher private DataWatcher.WatchableObject dw_getItem:getItem((DataWatcherObject<T>) int key);
+  #endif
+
+        DataWatcher$Item item;
+        if (force) {
+            item = instance#dw_getItem(dwo);
+        } else {
+            // If not forced (the usual way), try to set it normally
+            // Internally this will fail with an NPE if this key hasn't been registered yet
+            // Catch this (rare, single-time) event and in that case do a force-set instead, which also registers it
+            // This force setting also ensures that the value is set as changed. (dirty true)
+            try {
+  #if version >= 1.9
+                instance.set((DataWatcherObject) key.getRawHandle(), convertedValue);
+  #else
+                int id = ((com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject) key.getRawHandle()).getId();
+                instance.watch(id, convertedValue);
+  #endif
+                return; // All good!
+            } catch (NullPointerException ex) {
+                item = instance#dw_getItem(dwo);
+                if (item != null) {
+                    throw ex; // Item is registered and yet we get NPE - wrong!
+                }
+                force = true;
+            }
+        }
+
+        // Force-setting of a value. It will always be marked changed.
+        // Use the read item API to get the item object, which might return null
+        // Register a (default) value in that case
+        if (item == null) {
+            // Create a new item with a default marker value, or the input value if there are no defaults on this version
+  #if version >= 1.18
+            #require net.minecraft.network.syncher.DataWatcher private void register:define(DataWatcherObject<T> key, Object defaultValue);
+  #elseif version >= 1.9
+            #require net.minecraft.network.syncher.DataWatcher private void register:registerObject(DataWatcherObject<T> key, Object defaultValue);
+  #else
+            #require net.minecraft.network.syncher.DataWatcher private void register:a((DataWatcherObject<T>) int key, Object defaultValue);
+  #endif
+  #if version >= 1.19.3
+            instance#register(dwo, DataWatcherHandle.UNSET_MARKER_VALUE);
+  #else
+            instance#register(dwo, convertedValue);
+  #endif
+            item = instance#dw_getItem(dwo);
+        }
+
+        // Get Entity owner that should be notified of the datawatcher change
+        #require net.minecraft.network.syncher.DataWatcher private final Entity owner;
+        Entity owner = instance#owner;
+
+        item.setValue(convertedValue);
+  #if version >= 1.18
+        owner.onSyncedDataUpdated(dwo);
+  #elseif version >= 1.9
+        owner.a(dwo);
+  #else
+        owner.i(dwo.getId());
+  #endif
+        item.setDirty(true);
+
+        // Set DataWatcher itself dirty too
+        instance#dw_isDirty = true;
 #endif
     }
 

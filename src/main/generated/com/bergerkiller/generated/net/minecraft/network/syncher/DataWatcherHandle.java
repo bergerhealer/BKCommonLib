@@ -36,7 +36,7 @@ public abstract class DataWatcherHandle extends Template.Handle {
     public abstract List<PackedItem<?>> packAll();
     public abstract List<Item<?>> getCopyOfAllItems();
     public abstract Item<Object> read(Key<?> key);
-    public abstract void register(Key<?> key, Object defaultValue);
+    public abstract void setRawDefault(Key<?> dwo, Object rawDefaultValue);
     public abstract void set(Key<?> key, Object value, boolean force);
     public abstract Object get(Key<?> key);
     public abstract boolean isChanged();
@@ -61,7 +61,7 @@ public abstract class DataWatcherHandle extends Template.Handle {
         public final Template.Method.Converted<List<PackedItem<?>>> packAll = new Template.Method.Converted<List<PackedItem<?>>>();
         public final Template.Method.Converted<List<Item<?>>> getCopyOfAllItems = new Template.Method.Converted<List<Item<?>>>();
         public final Template.Method.Converted<Item<Object>> read = new Template.Method.Converted<Item<Object>>();
-        public final Template.Method<Void> register = new Template.Method<Void>();
+        public final Template.Method.Converted<Void> setRawDefault = new Template.Method.Converted<Void>();
         public final Template.Method<Void> set = new Template.Method<Void>();
         public final Template.Method<Object> get = new Template.Method<Object>();
         public final Template.Method<Boolean> isChanged = new Template.Method<Boolean>();
