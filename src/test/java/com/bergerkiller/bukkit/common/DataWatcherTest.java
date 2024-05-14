@@ -28,6 +28,68 @@ import com.bergerkiller.generated.net.minecraft.world.entity.monster.EntityShulk
 public class DataWatcherTest {
 
     @Test
+    public void testPrototype() {
+        // Create a Prototype configuration of flags and no_gravity
+        final DataWatcher.Prototype myPrototype = DataWatcher.Prototype.build()
+                .setClientByteDefault(EntityHandle.DATA_FLAGS, 0)
+                .setFlag(EntityHandle.DATA_FLAGS, EntityHandle.DATA_FLAG_INVISIBLE, true)
+                .set(EntityHandle.DATA_NO_GRAVITY, true)
+                .create();
+
+        // Create a new instance and verify all is correct inside
+        {
+            DataWatcher dataWatcher = myPrototype.create();
+            assertFalse(dataWatcher.isChanged());
+            assertFalse(dataWatcher.isEmpty());
+            assertEquals(EntityHandle.DATA_FLAG_INVISIBLE, dataWatcher.getByte(EntityHandle.DATA_FLAGS));
+            assertEquals(true, dataWatcher.get(EntityHandle.DATA_NO_GRAVITY));
+            assertFalse(dataWatcher.getItem(EntityHandle.DATA_FLAGS).isChanged());
+            assertFalse(dataWatcher.getItem(EntityHandle.DATA_NO_GRAVITY).isChanged());
+
+            // Should include both keys as non-defaults, since the flag was changed from the 0 client default
+            assertEquals(2, dataWatcher.packNonDefaults().size());
+        }
+
+        // Modify the prototype, changing flags to 0 so it is the same as defaults
+        final DataWatcher.Prototype myUpdatedPrototype = myPrototype.modify()
+                .setByte(EntityHandle.DATA_FLAGS, 0)
+                .create();
+
+        // Create a new instance and verify all is correct inside
+        {
+            DataWatcher dataWatcher = myUpdatedPrototype.create();
+            assertFalse(dataWatcher.isChanged());
+            assertFalse(dataWatcher.isEmpty());
+            assertEquals(0, dataWatcher.getByte(EntityHandle.DATA_FLAGS));
+            assertEquals(true, dataWatcher.get(EntityHandle.DATA_NO_GRAVITY));
+            assertFalse(dataWatcher.getItem(EntityHandle.DATA_FLAGS).isChanged());
+            assertFalse(dataWatcher.getItem(EntityHandle.DATA_NO_GRAVITY).isChanged());
+
+            // Should include only no_gravity as non-defaults, since the flag is 0
+            // This only applies on MC 1.19.3 and beyond when this default logic was added
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.19.3")) {
+                assertEquals(1, dataWatcher.packNonDefaults().size());
+            } else {
+                assertEquals(2, dataWatcher.packNonDefaults().size());
+            }
+        }
+
+        // Quick check that the original prototype was not modified
+        {
+            DataWatcher dataWatcher = myPrototype.create();
+            assertFalse(dataWatcher.isChanged());
+            assertFalse(dataWatcher.isEmpty());
+            assertEquals(EntityHandle.DATA_FLAG_INVISIBLE, dataWatcher.getByte(EntityHandle.DATA_FLAGS));
+            assertEquals(true, dataWatcher.get(EntityHandle.DATA_NO_GRAVITY));
+            assertFalse(dataWatcher.getItem(EntityHandle.DATA_FLAGS).isChanged());
+            assertFalse(dataWatcher.getItem(EntityHandle.DATA_NO_GRAVITY).isChanged());
+
+            // Should include both keys as non-defaults, since the flag was changed from the 0 client default
+            assertEquals(2, dataWatcher.packNonDefaults().size());
+        }
+    }
+
+    @Test
     public void testClone() {
         DataWatcher dataWatcher = new DataWatcher();
         assertTrue(dataWatcher.isEmpty());

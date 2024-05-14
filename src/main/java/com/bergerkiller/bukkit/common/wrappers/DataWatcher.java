@@ -66,11 +66,12 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
     }
 
     /**
-     * Write a new value to the watched objects.
-     * If the key does not yet exist, the key is added with the value specified.
+     * Sets a value bound to a DataWatcher key. If the key was not previously registered, it is
+     * registered with a disabled default so this new value is always sent. If you want to omit
+     * a value when it is the client default value, see {@link #setClientDefault(Key, Object)}.
      *
-     * @param key Object key
-     * @param value Value to set to
+     * @param key DataWatcher Key
+     * @param value Value to assign at this key
      */
     public <V> void set(Key<V> key, V value) {
         if (key == null) {
@@ -106,10 +107,11 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
     }
 
     /**
-     * Write a new value to the watched objects.
-     * If the key does not yet exist, the key is added with the value specified.
+     * Sets a value bound to a DataWatcher key. If the key was not previously registered, it is
+     * registered with a disabled default so this new value is always sent. If you want to omit
+     * a value when it is the client default value, see {@link #setClientDefault(Key, Object)}.
      * This is a special overload for Byte keys that can be set using an int without a cast.
-     * 
+     *
      * @param key Object key
      * @param value Value to set to, is cast to a byte (0-255)
      */
@@ -134,6 +136,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * @param key of the flag to set
      * @param flag to set (can be multiple bits)
      * @param set True to set the flags, False to clear them
+     * @see #setByte(Key, int)
      */
     public void setFlag(Key<Byte> key, int flag, boolean set) {
         int old_flags = this.tryGetByte(key, 0);
@@ -258,6 +261,22 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
         Object defaultValueConv = key.getType().getConverter().convertReverse(defaultValue);
         handle.setRawDefault(key, defaultValueConv);
+    }
+
+    /**
+     * Sets the default value of a watched key. If the value is equal to this value, then the metadata
+     * is not sent to clients when spawning the object. Call this before calling
+     * {@link #set(Key, Object)} or {@link #forceSet(Key, Object)} to reduce the amount of data
+     * sent in metadata packets that, to the client, are already set that way for new entities.
+     * This is a special overload for Byte keys that can be set using an int without a cast.
+     *
+     * @param key of the watched item
+     * @param defaultValue of the watched item. If the value set is this one, then the
+     *                     item is not included in synchronization packets for non-changes.
+     * @see #packNonDefaults()
+     */
+    public void setClientByteDefault(Key<Byte> key, int defaultValue) {
+        setClientDefault(key, Byte.valueOf((byte) (defaultValue & 0xFF)));
     }
 
     /**
@@ -423,6 +442,154 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             return DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getRawHandle());
         } else {
             return DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getId());
+        }
+    }
+
+    /**
+     * Creates new DataWatcher instances based on a known configuration of keys and their default/initial values.
+     *
+     * @see #build() For creating a new Prototype
+     */
+    @FunctionalInterface
+    public interface Prototype {
+        /**
+         * Creates a new DataWatcher instance with the previously set configured key defaults and values,
+         * for an anonymous (none) entity. Can be used for sending metadata packets.
+         *
+         * @return new DataWatcher based on this prototype configuration
+         */
+        DataWatcher create();
+
+        /**
+         * Creates a new Builder with the initial DataWatcher configuration of this Prototype. This can be
+         * used to make a new prototype with some alterations.
+         *
+         * @return Builder
+         */
+        default PrototypeBuilder modify() {
+            return new PrototypeBuilder(this.create());
+        }
+
+        /**
+         * Starts building a new DataWatcher Prototype configuration
+         *
+         * @return Builder
+         */
+        static PrototypeBuilder build() {
+            return new PrototypeBuilder(new DataWatcher());
+        }
+    }
+
+    /**
+     * Builds a new DataWatcher Prototype based on keys, their client default values,
+     * and initial value. After creating a Prototype with it, new DataWatchers can be
+     * efficiently created that uses this configuration.
+     */
+    public static final class PrototypeBuilder {
+        private final DataWatcher dataWatcher;
+        private boolean created = false;
+
+        private PrototypeBuilder(DataWatcher dataWatcher) {
+            this.dataWatcher = dataWatcher;
+        }
+
+        /**
+         * Sets the default value of a watched key. If the value is equal to this value, then the metadata
+         * is not sent to clients when spawning the object. Call this before calling
+         * {@link #set(Key, Object)} or {@link #forceSet(Key, Object)} to reduce the amount of data
+         * sent in metadata packets that, to the client, are already set that way for new entities.
+         *
+         * @param key of the watched item
+         * @param defaultValue of the watched item. If the value set is this one, then the
+         *                     item is not included in synchronization packets for non-changes.
+         * @see #packNonDefaults()
+         * @return this Builder
+         */
+        public <T> PrototypeBuilder setClientDefault(Key<T> key, T defaultValue) {
+            this.dataWatcher.setClientDefault(key, defaultValue);
+            return this;
+        }
+
+        /**
+         * Sets the default value of a watched key. If the value is equal to this value, then the metadata
+         * is not sent to clients when spawning the object. Call this before calling
+         * {@link #set(Key, Object)} or {@link #forceSet(Key, Object)} to reduce the amount of data
+         * sent in metadata packets that, to the client, are already set that way for new entities.
+         * This is a special overload for Byte keys that can be set using an int without a cast.
+         *
+         * @param key of the watched item
+         * @param defaultValue of the watched item. If the value set is this one, then the
+         *                     item is not included in synchronization packets for non-changes.
+         * @see #packNonDefaults()
+         * @return this Builder
+         */
+        public PrototypeBuilder setClientByteDefault(Key<Byte> key, int defaultValue) {
+            this.dataWatcher.setClientByteDefault(key, defaultValue);
+            return this;
+        }
+
+        /**
+         * Sets a value bound to a DataWatcher key. If the key was not previously registered, it is
+         * registered with a disabled default so this new value is always sent. If you want to omit
+         * a value when it is the client default value, see {@link #setClientDefault(Key, Object)}.
+         *
+         * @param key DataWatcher Key
+         * @param value Value to assign at this key
+         * @return this Builder
+         */
+        public <T> PrototypeBuilder set(Key<T> key, T value) {
+            this.dataWatcher.set(key, value);
+            return this;
+        }
+
+        /**
+         * Sets a value bound to a DataWatcher key. If the key was not previously registered, it is
+         * registered with a disabled default so this new value is always sent. If you want to omit
+         * a value when it is the client default value, see {@link #setClientDefault(Key, Object)}.
+         * This is a special overload for Byte keys that can be set using an int without a cast.
+         *
+         * @param key Object key
+         * @param value Value to set to, is cast to a byte (0-255)
+         * @return this Builder
+         */
+        public PrototypeBuilder setByte(Key<Byte> key, int value) {
+            this.dataWatcher.setByte(key, value);
+            return this;
+        }
+
+        /**
+         * Toggles a metadata flag on or off
+         *
+         * @param key of the flag to set
+         * @param flag to set (can be multiple bits)
+         * @param set True to set the flags, False to clear them
+         * @return this Builder
+         * @see #setByte(Key, int)
+         */
+        public PrototypeBuilder setFlag(Key<Byte> key, int flag, boolean set) {
+            this.dataWatcher.setFlag(key, flag, set);
+            return this;
+        }
+
+        /**
+         * Creates a DataWatcher Prototype configuration based on the key-values set so
+         * far. The prototype can then be used to create new DataWatcher instances.
+         * This method cannot be called more than once!
+         *
+         * @return DataWatcher Prototype configuration
+         */
+        public Prototype create() {
+            if (created) {
+                throw new IllegalStateException("DataWatcher Prototype Builder was already used to create a new ProtoType!");
+            } else {
+                created = true;
+            }
+
+            // Ensure not initially changed
+            dataWatcher.packChanges();
+
+            // Use clone() to create identical copies of this prototype configuration
+            return dataWatcher::clone;
         }
     }
 
