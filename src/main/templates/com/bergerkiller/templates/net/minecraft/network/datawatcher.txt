@@ -77,13 +77,16 @@ class DataWatcher {
 
         for (int i = 0; i < itemsById.length; i++) {
             DataWatcher$Item item = itemsById[i];
-
-            #require DataWatcher$Item private final T itemInitialValue:initialValue;
-            Object initialValue = item#itemInitialValue;
-            DataWatcher$Item itemCopy = new DataWatcher$Item(item.getAccessor(), initialValue);
-            itemCopy.setValue(item.getValue());
-            itemCopy.setDirty(item.isDirty());
-            copyItemsById[i] = itemCopy;
+            if (item == com.bergerkiller.bukkit.common.internal.logic.UnsetDataWatcherItem.INSTANCE) {
+                copyItemsById[i] = item;
+            } else {
+                #require DataWatcher$Item private final T itemInitialValue:initialValue;
+                Object initialValue = item#itemInitialValue;
+                DataWatcher$Item itemCopy = new DataWatcher$Item(item.getAccessor(), initialValue);
+                itemCopy.setValue(item.getValue());
+                itemCopy.setDirty(item.isDirty());
+                copyItemsById[i] = itemCopy;
+            }
         }
 
         #require net.minecraft.network.syncher.DataWatcher DataWatcher createDataWatcher:<init>(SyncedDataHolder owner, DataWatcher.Item<?>[] items);
