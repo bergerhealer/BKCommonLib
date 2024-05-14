@@ -8,20 +8,14 @@ import com.bergerkiller.bukkit.common.conversion.type.JOMLConversion;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonDisabledEntity;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.math.Quaternion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle;
 import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
-import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherObjectHandle;
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherRegistryHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
@@ -29,12 +23,9 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.BoxedType;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
 
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
@@ -708,7 +699,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         public Key(Object handle, Type<V> serializer) {
             setHandle(DataWatcherObjectHandle.createHandle(handle));
             Object token = this.handle.getSerializer();
-            DataSerializerRegistry.InternalType internalType = DataSerializerRegistry.getInternalTypeFromToken(token);
+            DataWatcherSerializers.InternalType internalType = DataWatcherSerializers.getInternalTypeFromToken(token);
 
             if (internalType != null) {
                 if (serializer == null) {
@@ -725,7 +716,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
         /**
          * Gets the Serializer used when storing/restoring values bound to this key from the DataWatcher
-         * 
+         *
          * @return serializer
          */
         public Type<V> getType() {
@@ -734,7 +725,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
         /**
          * Gets the value type that is internally stored under this Key
-         * 
+         *
          * @return internal key type
          */
         public Class<?> getInternalType() {
@@ -744,7 +735,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         /**
          * Gets the unique global serializer Id of this key.
          * This id is unique for this data value type.
-         * 
+         *
          * @return Serializer Id
          */
         public int getSerializerId() {
@@ -754,7 +745,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
         /**
          * Gets the datawatcher object Id of this key
-         * 
+         *
          * @return Id
          */
         public int getId() {
@@ -829,10 +820,10 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             public static final Type<ChatText> CHAT_TEXT = getForType(ChatText.class);
             public static final Type<ItemStack> ITEMSTACK = getForType(ItemStack.class);
             public static final Type<BlockFace> DIRECTION = getForType(BlockFace.class);
-            public static final Type<java.util.OptionalInt> ENTITY_ID = new Type<java.util.OptionalInt>(INTEGER._token, new EntityIdTypeConverter());
-            public static final Type<BoatWoodType> BOAT_WOOD_TYPE = new Type<BoatWoodType>(INTEGER._token, new BoatWoodTypeIdConverter());
+            public static final Type<java.util.OptionalInt> ENTITY_ID = new Type<java.util.OptionalInt>(INTEGER._token, DataWatcherSerializers.ENTITY_ID_TYPE_CONVERTER);
+            public static final Type<BoatWoodType> BOAT_WOOD_TYPE = new Type<BoatWoodType>(INTEGER._token, DataWatcherSerializers.BOAT_WOOD_TYPE_CONVERTER);
             public static final Type<Integer> SLIME_SIZE_TYPE = CommonCapabilities.DATAWATCHER_OBJECTS
-                    ? INTEGER : new Type<Integer>(BYTE._token, new SlimeSizeByteConverter());
+                    ? INTEGER : new Type<Integer>(BYTE._token, DataWatcherSerializers.SLIME_SIZE_CONVERTER);
             public static final Type<BlockData> BLOCK_DATA = CommonCapabilities.HAS_BLOCKDATA_METADATA
                     ? getForType(BlockData.class) : missing();
             public static final Type<ItemDisplayMode> ITEM_DISPLAY_MODE = BYTE.translate(ItemDisplayMode.class);
@@ -862,40 +853,15 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                 this._converter = converter;
             }
 
-            @SuppressWarnings("unchecked")
             private Type(Class<?> internalType, Class<T> externalType) {
-                boolean optional = false;
-                Object token = DataSerializerRegistry.getSerializerToken(internalType, optional);
-                if (token == null) {
-                    // Try optional
-                    optional = true;
-                    token = DataSerializerRegistry.getSerializerToken(internalType, optional);
-                }
-                if (token == null) {
-                    throw new RuntimeException("No token found for internal type " + internalType.getName());
-                }
-                if (!CommonCapabilities.DATAWATCHER_OBJECTS && !(token instanceof Integer)) {
-                    throw new RuntimeException("Legacy type serializer tokens must be Integers!");
-                }
-
-                this._token = token;
-
-                DuplexConverter<Object, T> converter = Conversion.findDuplex((Class<Object>) internalType, externalType);
-                if (converter == null) {
-                    throw new RuntimeException("Failed to find converter from internal type " + 
-                            internalType.getName() + " to " + externalType.getName());
-                }
-
-                if (optional) {
-                    converter = new OptionalDuplexConverter<T>(converter);
-                }
-
-                this._converter = converter;
+                DataWatcherSerializers.ConvertedToken<T> convToken = DataWatcherSerializers.getConvertedSerializerToken(internalType, externalType);
+                this._token = convToken.token;
+                this._converter = convToken.converter;
             }
 
             /**
              * Searches and then uses a duplex converter to translate the type exposed to the API.
-             * 
+             *
              * @param exposedType that is used
              * @return translated type
              */
@@ -906,7 +872,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
             /**
              * Searches and then uses a duplex converter to translate the type exposed to the API.
-             * 
+             *
              * @param exposedType that is used
              * @return translated type
              */
@@ -917,7 +883,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
             /**
              * Uses a duplex converter to translate the type exposed to the API.
-             * 
+             *
              * @param converter to use
              * @return translated Type
              */
@@ -942,12 +908,12 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
             /**
              * Sets whether the internal type representation is Optional
-             * 
+             *
              * @param optional
              * @return modified type, if needed
              */
-            public Type<T> setInternalOptional(boolean optional) {
-                boolean selfIsOptional = (this._converter instanceof OptionalDuplexConverter);
+            private Type<T> setInternalOptional(boolean optional) {
+                boolean selfIsOptional = (this._converter instanceof DataWatcherSerializers.OptionalDuplexConverter);
                 if (selfIsOptional == optional) {
                     return this; // Already correct
                 }
@@ -955,9 +921,9 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                 // Cache this to better deal with repeated calls
                 if (this._optional_opposite == null) {
                     if (selfIsOptional) {
-                        this._optional_opposite = new Type<T>(this._token, ((OptionalDuplexConverter<T>) this._converter)._baseConverter);
+                        this._optional_opposite = new Type<T>(this._token, ((DataWatcherSerializers.OptionalDuplexConverter<T>) this._converter).getBase());
                     } else {
-                        this._optional_opposite = new Type<T>(this._token, new OptionalDuplexConverter<T>(this._converter));
+                        this._optional_opposite = new Type<T>(this._token, new DataWatcherSerializers.OptionalDuplexConverter<T>(this._converter));
                     }
                 }
                 return this._optional_opposite;
@@ -965,8 +931,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
             /**
              * Creates a new Serializer Key. Only for internal use.
-             * 
-             * @param tokenField the field where the internal Key Handle can be read from
+             *
+             * @param tokenField    the field where the internal Key Handle can be read from
              * @param alternativeId to use when the field is unavailable (MC 1.8.8)
              * @return Key for accessing the item in the DataWatcher
              */
@@ -975,7 +941,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                     if (!tokenField.isAvailable()) {
                         if (alternativeId != -1) {
                             // This can not be! It should really exist if it also existed on 1.8.x...
-                            System.err.println("DataWatcher key not found: " + tokenField.getElementName());
+                            Logging.LOGGER_REGISTRY.warning("DataWatcher key not found: " + tokenField.getElementName());
                         }
                         return new Key.Disabled<T>(this);
                     } else {
@@ -993,7 +959,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             /**
              * Gets the Serializer Token Object that is used as a key to identify this Serializer internal type.
              * On >= MC 1.10.2 this points to an internal Serializer type, on MC 1.8.8 it is the Type Id Integer.
-             * 
+             *
              * @return serializer key object
              */
             public Object getToken() {
@@ -1002,7 +968,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
             /**
              * Retrieves the duplex converter used to convert from/to the internally stored type
-             * 
+             *
              * @return duplex converter
              */
             public DuplexConverter<Object, T> getConverter() {
@@ -1011,7 +977,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
             /**
              * Gets the type that is internally stored
-             * 
+             *
              * @return internal type
              */
             public Class<?> getInternalType() {
@@ -1020,7 +986,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
             /**
              * Gets the type that is externally used (as input / output of getters / setters)
-             * 
+             *
              * @return external type
              */
             public Class<?> getExternalType() {
@@ -1030,12 +996,12 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             @Override
             public String toString() {
                 return "Type{internal=" + this._converter.input.toString(true) + ", " +
-                       "external=" + this._converter.output + "}";
+                        "external=" + this._converter.output + "}";
             }
 
             /**
              * Retrieves the Serializer that is used to externally expose a particular type.
-             * 
+             *
              * @param externalType that is being serialized/deserialized from/to.
              * @return serializer, or null if not found
              */
@@ -1043,7 +1009,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             public static <V> Type<V> getForType(Class<V> externalType) {
                 Type<?> result = byTypeMapping.get(externalType);
                 if (result == null) {
-                    Class<?> internalType = DataSerializerRegistry.getInternalType(externalType);
+                    Class<?> internalType = DataWatcherSerializers.getInternalType(externalType);
                     if (internalType == null) {
                         throw new IllegalArgumentException("Object of type " + externalType.getName() + " can not be stored in a DataWatcher");
                     }
@@ -1057,8 +1023,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
              * Gets the MISSING type. This is for types that don't exist at runtime.
              * Keys created using this type don't do anything, and always return null.
              *
-             * @return Missing Type
              * @param <T> Type of value (unused)
+             * @return Missing Type
              */
             public static <T> Type<T> missing() {
                 return LogicUtil.unsafeCast(MISSING_TYPE);
@@ -1069,7 +1035,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
          * A disabled key for a datawatcher object that doesn't actually exist anymore.
          * Attempts to set a datawatcher value of this key will result in a No-Op.
          * Getting will return the default value for the value type (0, false, null).
-         * 
+         *
          * @param <T> key type
          */
         public static final class Disabled<T> extends Key<T> {
@@ -1088,284 +1054,12 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
             /**
              * Gets the default value that will be returned by get calls
-             * 
+             *
              * @return default value
              */
             public T getDefaultValue() {
                 return this._defaultValue;
             }
-        }
-
-        /**
-         * Used to convert between Integer and Optional<Integer>.
-         * Internally it stores the int value incremented or decremented by one, to allow for 0 as 'not set'
-         */
-        private static final class EntityIdTypeConverter extends DuplexConverter<Object, java.util.OptionalInt> {
-
-            public EntityIdTypeConverter() {
-                super(Integer.class, java.util.OptionalInt.class);
-            }
-
-            @Override
-            public java.util.OptionalInt convertInput(Object value) {
-                if (value instanceof Integer) {
-                    int intValue = ((Integer) value).intValue();
-                    if (intValue > 0) {
-                        return java.util.OptionalInt.of(intValue - 1);
-                    }
-                }
-                return java.util.OptionalInt.empty();
-            }
-
-            @Override
-            public Object convertOutput(java.util.OptionalInt value) {
-                if (value != null && value.isPresent()) {
-                    return Integer.valueOf(value.getAsInt() + 1);
-                } else {
-                    return Integer.valueOf(0);
-                }
-            }
-
-            @Override
-            public boolean acceptsNullInput() {
-                return true;
-            }
-
-            @Override
-            public boolean acceptsNullOutput() {
-                return true;
-            }
-        }
-    }
-
-    private static final class BoatWoodTypeIdConverter extends DuplexConverter<Object, BoatWoodType> {
-
-        public BoatWoodTypeIdConverter() {
-            super(Integer.class, BoatWoodType.class);
-        }
-
-        @Override
-        public BoatWoodType convertInput(Object value) {
-            if (value instanceof Integer) {
-                return BoatWoodType.byId(((Integer) value).intValue());
-            } else {
-                return BoatWoodType.OAK;
-            }
-        }
-
-        @Override
-        public Object convertOutput(BoatWoodType value) {
-            return Integer.valueOf((value == null) ? 0 : value.getId());
-        }
-
-        @Override
-        public boolean acceptsNullInput() {
-            return true;
-        }
-
-        @Override
-        public boolean acceptsNullOutput() {
-            return true;
-        }
-    }
-
-    private static final class SlimeSizeByteConverter extends DuplexConverter<Object, Integer> {
-
-        public SlimeSizeByteConverter() {
-            super(byte.class, int.class);
-        }
-
-        @Override
-        public Integer convertInput(Object value) {
-            return Integer.valueOf(((Number) value).byteValue() & 0xFF);
-        }
-
-        @Override
-        public Object convertOutput(Integer integer) {
-            return Byte.valueOf(integer.byteValue());
-        }
-    }
-
-    // Stores the internal type Serializer mapping, and how exposed types (IntVector3) are internally stored (BlockPosition)
-    private static class DataSerializerRegistry {
-        private static final HashMap<Object, InternalType> tokenRegistryRev = new HashMap<Object, InternalType>();
-        private static final HashMap<Class<?>, Object> tokenRegistry = new HashMap<Class<?>, Object>();
-        private static final HashMap<Class<?>, Object> tokenRegistry_optional = new HashMap<Class<?>, Object>();
-        private static final HashMap<Class<?>, Class<?>> typeMapping = new HashMap<Class<?>, Class<?>>();
-
-        static {
-            // This MUST be done first, or we get bootstrap errors!
-            CommonBootstrap.initServer();
-
-            Class<?> registryClass = CommonUtil.getClass("net.minecraft.network.syncher.DataWatcherRegistry");
-            Class<?> serializerClass = CommonUtil.getClass("net.minecraft.network.syncher.DataWatcherSerializer");
-            if (registryClass != null && serializerClass != null) {
-                // Since MC 1.9
-                for (Field f : registryClass.getDeclaredFields()) {
-                    if (f.getType().equals(serializerClass) && Modifier.isStatic(f.getModifiers())) {
-                        try {
-                            if (!(Modifier.isPublic(f.getModifiers()))) {
-                                f.setAccessible(true);
-                            }
-                            TypeDeclaration typeDec = TypeDeclaration.fromType(f.getGenericType());
-                            if (typeDec.genericTypes.length == 1) {
-                                TypeDeclaration dataType = typeDec.genericTypes[0];
-
-                                // Sometimes google Optional is used to wrap null values. We aren't interested in that ourselves.
-                                boolean isOptional = CommonNMS.isDWROptionalType(dataType.type) && (dataType.genericTypes.length == 1);
-                                if (isOptional) {
-                                    dataType = dataType.genericTypes[0];
-                                }
-
-                                // Store in map for future use, mapped to the serializer instance
-                                register(dataType.type, f.get(null), isOptional);
-                            }
-                        } catch (Throwable t) {
-                            Logging.LOGGER_REGISTRY.log(Level.SEVERE, "Error registering Datawatcher serializer " + f, t);
-                        }
-                    }
-                }
-
-                // ChatText -> IChatbaseComponent
-                typeMapping.put(ChatText.class, IChatBaseComponentHandle.T.getType());
-
-                // Bukkit BlockFace -> nms EnumDirection
-                typeMapping.put(BlockFace.class, EnumDirectionHandle.T.getType());
-            } else {
-                // Use our own kind of tokens on MC 1.8.8 and before
-                register(Byte.class, 0);
-                register(Short.class, 1);
-                register(Integer.class, 2);
-                register(Float.class, 3);
-                register(String.class, 4);
-                register(ItemStackHandle.T.getType(), 5);
-                register(BlockPositionHandle.T.getType(), 6);
-                register(Vector3fHandle.T.getType(), 7);
-
-                // Booleans are stored as Byte
-                typeMapping.put(Boolean.class, Byte.class);
-
-                // IChatBaseComponent -> String
-                typeMapping.put(IChatBaseComponentHandle.T.getType(), String.class);
-
-                // ChatText -> String
-                typeMapping.put(ChatText.class, String.class);
-
-                // Bukkit BlockFace -> int (not really used anywhere)
-                typeMapping.put(BlockFace.class, Integer.class);
-            }
-
-            // Add all type mappings to self
-            for (Class<?> type : tokenRegistry.keySet()) {
-                typeMapping.put(type, type);
-            }
-            for (Class<?> type : tokenRegistry_optional.keySet()) {
-                typeMapping.put(type, type);
-            }
-
-            // Vector -> Vector3f
-            typeMapping.put(Vector.class, Vector3fHandle.T.getType());
-            // IntVector3 -> BlockPosition
-            typeMapping.put(IntVector3.class, BlockPositionHandle.T.getType());
-            // Bukkit ItemStack -> nms ItemStack
-            typeMapping.put(ItemStack.class, ItemStackHandle.T.getType());
-            // BlockData -> nms IBlockData
-            typeMapping.put(BlockData.class, IBlockDataHandle.T.getType());
-        }
-
-        private static void register(Class<?> type, Object token) {
-            register(type, token, false);
-        }
-
-        private static void register(Class<?> type, Object token, boolean optional) {
-            register(new InternalType(token, type, optional));
-        }
-
-        private static void register(InternalType type) {
-            if (type.optional) {
-                tokenRegistry_optional.put(type.type, type.token);
-            } else {
-                tokenRegistry.put(type.type, type.token);
-            }
-            tokenRegistryRev.put(type.token, type);
-        }
-
-        public static Class<?> getInternalType(Class<?> exposedType) {
-            return typeMapping.get(exposedType);
-        }
-
-        public static Object getSerializerToken(Class<?> type, boolean optional) {
-            return (optional ? tokenRegistry_optional : tokenRegistry).get(type);
-        }
-
-        public static InternalType getInternalTypeFromToken(Object token) {
-            return tokenRegistryRev.get(token);
-        }
-
-        public static final class InternalType {
-            public final Object token;
-            public final Class<?> type;
-            public final boolean optional;
-
-            private InternalType(Object token, Class<?> type, boolean optional) {
-                this.token = token;
-                this.type = type;
-                this.optional = optional;
-            }
-
-            @Override
-            public String toString() {
-                String s = this.type.getName();
-                if (this.optional) {
-                    s = "Optional<" + s + ">";
-                }
-                return s + ":" + this.token;
-            }
-        }
-    }
-
-    private static final class OptionalDuplexConverter<T> extends DuplexConverter<Object, T> {
-        private final DuplexConverter<Object, T> _baseConverter;
-
-        public OptionalDuplexConverter(DuplexConverter<Object, T> baseConverter) {
-            super(makeOptional(baseConverter.input), baseConverter.output);
-            this._baseConverter = baseConverter;
-        }
-
-        @Override
-        public T convertInput(Object value) {
-            value = CommonNMS.unwrapDWROptional(value);
-            if (value == null && !this._baseConverter.acceptsNullInput()) {
-                return null;
-            } else {
-                return this._baseConverter.convertInput(value);
-            }
-        }
-
-        @Override
-        public Object convertOutput(T value) {
-            Object result;
-            if (value != null || this._baseConverter.acceptsNullOutput()) {
-                result = this._baseConverter.convertOutput(value);
-            } else {
-                result = null;
-            }
-            result = CommonNMS.wrapDWROptional(result);
-            return result;
-        }
-
-        @Override
-        public boolean acceptsNullInput() {
-            return true;
-        }
-
-        @Override
-        public boolean acceptsNullOutput() {
-            return true;
-        }
-
-        private static TypeDeclaration makeOptional(TypeDeclaration type) {
-            return TypeDeclaration.createGeneric(CommonNMS.DWR_OPTIONAL_TYPE, type);
         }
     }
 }
