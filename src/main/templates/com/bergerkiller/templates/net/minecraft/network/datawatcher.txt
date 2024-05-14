@@ -338,7 +338,19 @@ class DataWatcher {
     public void setRaw((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject dwo, Object rawValue, boolean force) {
 #if version >= 1.20.5
         try {
-            instance.set(dwo, rawValue, force);
+            // Get first to verify the key was registered. If it was, set it the normal way.
+            // If not, swap out the item with one that has the correct DWO assigned
+            if (instance.get(dwo) != DataWatcherHandle.UNSET_MARKER_VALUE) {
+                instance.set(dwo, rawValue, force);
+            } else {
+                // Register properly with the right DWO accessor
+                DataWatcher$Item[] itemsById = instance#itemsById;
+                int keyIndex = dwo.id();
+                itemsById[keyIndex] = new DataWatcher$Item(dwo, DataWatcherHandle.UNSET_MARKER_VALUE);
+
+                // Force-set with the proper value
+                instance.set(dwo, rawValue, true);
+            }
         } catch (ArrayIndexOutOfBoundsException ex) {
             // Key probably has not yet been registered. Register it now.
             DataWatcher$Item[] itemsById = instance#itemsById;
