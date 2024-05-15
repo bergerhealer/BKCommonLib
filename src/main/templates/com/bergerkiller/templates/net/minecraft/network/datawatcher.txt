@@ -79,13 +79,10 @@ class DataWatcher {
         // Take all original items, clone them, and pass them to the constructor
         #require DataWatcher private final DataWatcher.Item<?>[] itemsById;
         DataWatcher$Item[] itemsById = instance#itemsById;
-        DataWatcher$Item[] copyItemsById = new DataWatcher$Item[itemsById.length];
-
-        for (int i = 0; i < itemsById.length; i++) {
-            DataWatcher$Item item = itemsById[i];
-            if (item == com.bergerkiller.bukkit.common.internal.logic.UnsetDataWatcherItem.INSTANCE) {
-                copyItemsById[i] = item;
-            } else {
+        DataWatcher$Item[] copyItemsById = (DataWatcher$Item[]) itemsById.clone();
+        for (int i = 0; i < copyItemsById.length; i++) {
+            DataWatcher$Item item = copyItemsById[i];
+            if (item != com.bergerkiller.bukkit.common.internal.logic.UnsetDataWatcherItem.INSTANCE) {
                 #require DataWatcher$Item private final T itemInitialValue:initialValue;
                 Object initialValue = item#itemInitialValue;
                 DataWatcher$Item itemCopy = new DataWatcher$Item(item.getAccessor(), initialValue);
