@@ -28,6 +28,42 @@ import com.bergerkiller.generated.net.minecraft.world.entity.monster.EntityShulk
 public class DataWatcherTest {
 
     @Test
+    public void testRepeatedClientDefault() {
+        DataWatcher dataWatcher = new DataWatcher();
+
+        // Set default, should be set as the initial value.
+        // On version 1.19.3+ it should no longer be included in packNonDefaults
+        dataWatcher.setClientByteDefault(EntityHandle.DATA_FLAGS, 1);
+        assertEquals(1, dataWatcher.getByte(EntityHandle.DATA_FLAGS));
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.19.3")) {
+            assertEquals(0, dataWatcher.packNonDefaults().size());
+        }
+
+        // Update the value to be non-default
+        // On version 1.19.3+ it should now be included in packNonDefaults
+        dataWatcher.setByte(EntityHandle.DATA_FLAGS, 2);
+        assertEquals(2, dataWatcher.getByte(EntityHandle.DATA_FLAGS));
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.19.3")) {
+            assertEquals(1, dataWatcher.packNonDefaults().size());
+        }
+
+        // Set a new default. This should not change the value.
+        dataWatcher.setClientByteDefault(EntityHandle.DATA_FLAGS, 8);
+        assertEquals(2, dataWatcher.getByte(EntityHandle.DATA_FLAGS));
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.19.3")) {
+            assertEquals(1, dataWatcher.packNonDefaults().size());
+        }
+
+        // Set the default equal to the current value
+        // On version 1.19.3+ it should now no longer be included in packNonDefaults, because it's equal
+        dataWatcher.setClientByteDefault(EntityHandle.DATA_FLAGS, 2);
+        assertEquals(2, dataWatcher.getByte(EntityHandle.DATA_FLAGS));
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.19.3")) {
+            assertEquals(0, dataWatcher.packNonDefaults().size());
+        }
+    }
+
+    @Test
     public void testPrototype() {
         // Create a Prototype configuration of flags and no_gravity
         final DataWatcher.Prototype myPrototype = DataWatcher.Prototype.build()

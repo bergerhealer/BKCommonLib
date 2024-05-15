@@ -24,6 +24,12 @@ class DataWatcher {
     // Used in a lot of places
     #require net.minecraft.network.syncher.DataWatcher private boolean dw_isDirty:isDirty;
 
+#if version >= 1.9
+    #require DataWatcher private DataWatcher.Item<T> dw_getItem:getItem(DataWatcherObject<T> key);
+#else
+    #require DataWatcher private DataWatcher.WatchableObject dw_getItem:getItem((DataWatcherObject<T>) int key);
+#endif
+
 #if version >= 1.20.5
     #require net.minecraft.network.syncher.DataWatcher private final net.minecraft.network.syncher.SyncedDataHolder owner;
 
@@ -326,7 +332,7 @@ class DataWatcher {
         int keyIndex = dwo.id();
         DataWatcher$Item[] itemsById = instance#itemsById;
 
-        // Grow array. Fill intermediate items with dummy items
+        // Grow array. Fill intermediate items with dummy items.
         if (keyIndex >= itemsById.length) {
             int startIndex = itemsById.length;
             itemsById = (DataWatcher$Item[]) java.util.Arrays.copyOf(itemsById, keyIndex + 1);
@@ -335,8 +341,15 @@ class DataWatcher {
             }
             itemsById[keyIndex] = new DataWatcher$Item(dwo, rawDefaultValue);
             instance#itemsById = itemsById;
-        } else {
+        } else if (itemsById[keyIndex] == com.bergerkiller.bukkit.common.internal.logic.UnsetDataWatcherItem.INSTANCE) {
             itemsById[keyIndex] = new DataWatcher$Item(dwo, rawDefaultValue);
+        } else {
+            // Already registered. Only update the initialValue
+            #require net.minecraft.network.syncher.DataWatcher.Item private final T initialValue;
+            DataWatcher$Item item = itemsById[keyIndex];
+            item#initialValue = rawDefaultValue;
+            item.setDirty(true);
+            instance#dw_isDirty = true;
         }
 #else
   #if version >= 1.18
@@ -346,7 +359,23 @@ class DataWatcher {
   #else
         #require net.minecraft.network.syncher.DataWatcher private void register:a((DataWatcherObject<T>) int key, Object defaultValue);
   #endif
-        instance#register(dwo, rawDefaultValue);
+        try {
+            instance#register(dwo, rawDefaultValue);
+        } catch (IllegalArgumentException ex) {
+            // If item doesn't already exist, then this error is unrelated to double-registering
+            DataWatcher$Item item = instance#dw_getItem(dwo);
+            if (item == null) {
+                throw ex;
+            }
+
+            // Update client default on versions where such a default value exists
+  #if version >= 1.19.3
+            #require net.minecraft.network.syncher.DataWatcher.Item private final T initialValue;
+            item#initialValue = rawDefaultValue;
+            item.setDirty(true);
+            instance#dw_isDirty = true;
+  #endif
+        }
 #endif
     }
 
@@ -397,7 +426,6 @@ class DataWatcher {
             instance.set(dwo, rawValue, force);
         } catch (NullPointerException ex) {
             // Verify not watched yet
-            #require DataWatcher private DataWatcher.Item<T> dw_getItem:getItem(DataWatcherObject<T> key);
             DataWatcher$Item item = instance#dw_getItem(dwo);
             if (item != null) {
                 throw ex; // Is actually watched
@@ -411,13 +439,6 @@ class DataWatcher {
             instance.set(dwo, rawValue, true);
         }
 #else
-
-  #if version >= 1.9
-        #require DataWatcher private DataWatcher.Item<T> dw_getItem:getItem(DataWatcherObject<T> key);
-  #else
-        #require DataWatcher private DataWatcher.WatchableObject dw_getItem:getItem((DataWatcherObject<T>) int key);
-  #endif
-
         DataWatcher$Item item;
         if (force) {
             item = instance#dw_getItem(dwo);
@@ -489,9 +510,8 @@ class DataWatcher {
 #if version >= 1.9
         Object rawValue = instance.get((DataWatcherObject) key.getRawHandle());
 #else
-        #require DataWatcher private DataWatcher.WatchableObject dw_getItem:getItem(int key);
         DataWatcherObject dwo = (DataWatcherObject) key.getRawHandle();
-        DataWatcher$Item item = instance#dw_getItem(dwo.getId());
+        DataWatcher$Item item = instance#dw_getItem(dwo);
         Object rawValue = item.getValue();
 #endif
         return key.getType().getConverter().convert(rawValue);

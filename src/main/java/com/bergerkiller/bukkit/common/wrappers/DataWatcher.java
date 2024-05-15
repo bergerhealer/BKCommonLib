@@ -290,9 +290,9 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      *
      * @param key of the watched item
      * @param defaultValue initial value of the watched item
-     * @deprecated Use {@link #setClientDefault(Key, Object)} instead if you want to optimize
-     *             client defaults when synchronizing. If you just want to set an initial value,
-     *             use {@link #set(Key, Object)}.
+     * @deprecated Use {@link #set(Key, Object)} instead for the original legacy behavior.
+     *             If this was called for performance reasons, it is better to use the
+     *             {@link Prototype} builder to efficiently construct new DataWatchers.
      */
     @Deprecated
     public <T> void watch(Key<T> key, T defaultValue) {
