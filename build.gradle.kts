@@ -197,7 +197,7 @@ tasks {
         relocate("com.google.gson", "$prefix.gson")
 
         // Cloud command framework and its dependencies
-        relocate("cloud.commandframework", "$prefix.cloud")
+        relocate("org.incendo.cloud", "$prefix.cloud")
         relocate("io.leangen.geantyref", "$prefix.typetoken")
         relocate("me.lucko.commodore", "$prefix.me.lucko.commodore")
         relocate("net.kyori", "$prefix.net.kyori")
