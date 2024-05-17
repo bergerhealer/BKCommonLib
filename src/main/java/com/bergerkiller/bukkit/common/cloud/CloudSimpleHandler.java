@@ -1,10 +1,11 @@
 package com.bergerkiller.bukkit.common.cloud;
 
 import java.lang.annotation.Annotation;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -42,18 +43,15 @@ import org.incendo.cloud.caption.Caption;
 import org.incendo.cloud.caption.CaptionProvider;
 import org.incendo.cloud.component.CommandComponent;
 import org.incendo.cloud.component.preprocessor.ComponentPreprocessor;
-import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.description.Description;
 import org.incendo.cloud.exception.CommandExecutionException;
 import org.incendo.cloud.exception.InjectionException;
-import org.incendo.cloud.exception.handling.ExceptionHandler;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.execution.postprocessor.CommandPostprocessor;
 import org.incendo.cloud.injection.ParameterInjector;
 import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.minecraft.extras.MinecraftHelp;
 import org.incendo.cloud.paper.PaperCommandManager;
-import org.incendo.cloud.parser.ArgumentParseResult;
 import org.incendo.cloud.parser.ArgumentParser;
 import org.incendo.cloud.parser.ParserDescriptor;
 import org.incendo.cloud.parser.ParserParameter;
@@ -61,7 +59,6 @@ import org.incendo.cloud.parser.ParserParameters;
 import org.incendo.cloud.parser.standard.StringParser;
 import org.incendo.cloud.services.PipelineException;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
-import org.incendo.cloud.suggestion.SuggestionProvider;
 
 /**
  * Configures the Cloud Command Framework for basic use inside a Bukkit Paper or
@@ -167,7 +164,9 @@ public class CloudSimpleHandler {
 
         // Shows the argname as <argname> as a suggestion
         // Fix for numeric arguments on the broken brigadier system
-        // TODO
+        // TODO: This no longer works!
+        //suggest("argname", (context,b) -> Collections.singletonList("<" + context.getCurrentArgument().getName() + ">"));
+        suggest("argname", (context,b) -> Collections.singletonList("<argument>"));
 
         // Fixes incorrect exception handling in Cloud, so that user-specified
         // exception types can be used instead.
@@ -175,10 +174,10 @@ public class CloudSimpleHandler {
         handle(PipelineException.class, this::handleException);
         handle(InjectionException.class, this::handleException);
 
-        // Makes LocalizedParserException functional
-//        handle(CloudLocalizedException.class, (sender, ex) -> {
-//            sender.sendMessage(ex.getMessage());
-//        });
+        // Makes CloudLocalizedException functional
+        handle(CloudLocalizedException.class, (sender, exception) -> {
+            sender.sendMessage(exception.getMessage());
+        });
 
         // Suggests a player name, either of a player that is online right now,
         // or of a player that was online in the past.
@@ -199,6 +198,7 @@ public class CloudSimpleHandler {
             // TODO: Doesnt work? Weird.
             return Stream.of(Bukkit.getOfflinePlayers())
                 .map(OfflinePlayer::getName)
+                .filter(Objects::nonNull)
                 .filter(p -> p.startsWith(prefix))
                 .collect(Collectors.toList());
         });
