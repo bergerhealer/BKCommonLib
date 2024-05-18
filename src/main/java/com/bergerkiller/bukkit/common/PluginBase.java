@@ -987,13 +987,14 @@ public abstract class PluginBase extends JavaPlugin {
         // Figure out all commands the plugin would normally register
         // Use plugin.yml for this, as well use a preloader commands section if set
         // If truly no command is set, make one up (plugin name)
-        List<CommonDependencyStartupLogHandler.CriticalAltCommand> altCommands;
-        altCommands = this.getDescription().getCommands().keySet().stream()
-                .map(Bukkit::getPluginCommand)
-                .filter(Objects::nonNull)
-                .map(CommonDependencyStartupLogHandler.CriticalAltCommand::new)
-                .collect(Collectors.toCollection(ArrayList::new));
-        {
+        List<CommonDependencyStartupLogHandler.CriticalAltCommand> altCommands = Collections.emptyList();
+        try {
+            altCommands = this.getDescription().getCommands().keySet().stream()
+                    .map(Bukkit::getPluginCommand)
+                    .filter(Objects::nonNull)
+                    .map(CommonDependencyStartupLogHandler.CriticalAltCommand::new)
+                    .collect(Collectors.toCollection(ArrayList::new));
+
             List<String> preloaderCommands = this.pluginLoaderHandler.getPluginConfig().getStringList("preloader.commands");
             if (preloaderCommands != null && !preloaderCommands.isEmpty()) {
                 for (String preloaderCommand : preloaderCommands) {
@@ -1009,7 +1010,10 @@ public abstract class PluginBase extends JavaPlugin {
                     }
                 }
             }
+        } catch (Throwable t) {
+            /* Ignore ... */
         }
+
         if (altCommands.isEmpty()) {
             altCommands.add(new CommonDependencyStartupLogHandler.CriticalAltCommand(
                     getName().toLowerCase(Locale.ENGLISH)));
