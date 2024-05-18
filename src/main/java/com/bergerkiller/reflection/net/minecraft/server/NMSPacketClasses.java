@@ -679,6 +679,15 @@ public class NMSPacketClasses {
 
         public final TranslatorFieldAccessor<IntVector3> position = PacketPlayOutBlockChangeHandle.T.position.toFieldAccessor();
         public final TranslatorFieldAccessor<BlockData> blockData = PacketPlayOutBlockChangeHandle.T.blockData.toFieldAccessor();
+
+        @Override
+        public CommonPacket newInstance() {
+            return PacketPlayOutBlockChangeHandle.createNewNull().toCommonPacket();
+        }
+
+        public CommonPacket newInstance(IntVector3 position, BlockData blockData) {
+            return PacketPlayOutBlockChangeHandle.createNew(position, blockData).toCommonPacket();
+        }
     }
 
     @Deprecated

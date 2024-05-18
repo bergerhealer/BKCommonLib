@@ -2889,6 +2889,14 @@ class PacketPlayOutBlockChange extends Packet {
     public (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData blockData:block;
 #endif
 
+    public static (PacketPlayOutBlockChangeHandle) PacketPlayOutBlockChange createNewNull() {
+#if version >= 1.16.2
+        return new PacketPlayOutBlockChange((BlockPosition) null, (IBlockData) null);
+#else
+        return new PacketPlayOutBlockChange();
+#endif
+    }
+
     public static (PacketPlayOutBlockChangeHandle) PacketPlayOutBlockChange createNew((IntVector3) BlockPosition position, (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData blockData) {
 #if version >= 1.16.2
         return new PacketPlayOutBlockChange(position, blockData);
