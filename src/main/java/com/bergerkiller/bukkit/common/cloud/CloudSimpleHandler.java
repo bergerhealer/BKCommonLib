@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.cloud;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -134,6 +135,21 @@ public class CloudSimpleHandler {
                     CloudBrigadierManager<?, ?> brig = manager.brigadierManager();
 
                     brig.setNativeNumberSuggestions(false);
+
+                    // I rather hide the proxy class so we use reflection to set it all up
+                    // Kinda ugly...
+                    try {
+                        java.lang.reflect.Method registerMethod = Class.forName("com.bergerkiller.bukkit.common.cloud.parsers.QuotedArgumentParserProxy")
+                                .getMethod("registerBrigadier", CloudBrigadierManager.class);
+                        registerMethod.setAccessible(true);
+                        try {
+                            registerMethod.invoke(null, brig);
+                        } catch (InvocationTargetException ex) {
+                            throw ex.getCause();
+                        }
+                    } catch (Throwable t) {
+                        plugin.getLogger().log(Level.WARNING, "Failed to register the quoted argument parser with brigadier", t);
+                    }
 
                     // Register a 'sound effect name' auto-completion provider for brigadier
                     // This is automatically used for ResourceKey<SoundEffect> types so clients see their client-side sound names.
