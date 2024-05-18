@@ -72,9 +72,9 @@
 #if version >= 1.15 && version < 1.18
     #remap net.minecraft.nbt.NBTTagString   public static NBTTagString valueOf:a(String data);
     #remap net.minecraft.nbt.NBTTagByte     public static NBTTagByte valueOf:a(byte data);
-    #remap net.minecraft.nbt.NBTTagShort    public static NBTTagShort valueOf:a(byte data);
-    #remap net.minecraft.nbt.NBTTagInt      public static NBTTagInt valueOf:a(byte data);
-    #remap net.minecraft.nbt.NBTTagLong     public static NBTTagLong valueOf:a(byte data);
-    #remap net.minecraft.nbt.NBTTagFloat    public static NBTTagFloat valueOf:a(byte data);
-    #remap net.minecraft.nbt.NBTTagDouble   public static NBTTagDouble valueOf:a(byte data);
+    #remap net.minecraft.nbt.NBTTagShort    public static NBTTagShort valueOf:a(short data);
+    #remap net.minecraft.nbt.NBTTagInt      public static NBTTagInt valueOf:a(int data);
+    #remap net.minecraft.nbt.NBTTagLong     public static NBTTagLong valueOf:a(long data);
+    #remap net.minecraft.nbt.NBTTagFloat    public static NBTTagFloat valueOf:a(float data);
+    #remap net.minecraft.nbt.NBTTagDouble   public static NBTTagDouble valueOf:a(double data);
 #else
