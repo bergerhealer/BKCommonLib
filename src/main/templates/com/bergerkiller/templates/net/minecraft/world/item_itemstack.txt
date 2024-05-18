@@ -53,6 +53,17 @@ class ItemStack {
             instance.setTag((net.minecraft.nbt.NBTTagCompound) null);
         }
     }
+
+    #require net.minecraft.world.item.ItemStack public net.minecraft.nbt.NBTTagCompound getDisplayTag() {
+        net.minecraft.nbt.NBTTagCompound tag = instance.getTag();
+        if (tag != null) {
+            net.minecraft.nbt.NBTBase displayTag = tag.get("display");
+            if (displayTag instanceof net.minecraft.nbt.NBTTagCompound) {
+                return (net.minecraft.nbt.NBTTagCompound) displayTag;
+            }
+        }
+        return null;
+    }
 #endif
 
 #if version >= 1.17
@@ -121,13 +132,54 @@ class ItemStack {
 #endif
     }
 
+#if version >= 1.20.5
+    public (ChatText) IChatBaseComponent getCustomName() {
+        return (IChatBaseComponent) instance.get(DataComponents.CUSTOM_NAME);
+    }
+#elseif version >= 1.13
+    public (ChatText) IChatBaseComponent getCustomName() {
+        // getHoverName() doesn't return null if none is set...
+        // ChatSerializer fromJson returns null if parsing the string fails
+        NBTTagCompound displayTag = instance#getDisplayTag();
+        NBTBase nameTag;
+        if (displayTag != null && (nameTag = displayTag.get("Name")) instanceof NBTTagString) {
+            String jsonContent = ((NBTTagString) nameTag).getAsString();
+            return IChatBaseComponent.ChatSerializer.fromJson(jsonContent);
+        }
+        return null;
+    }
+#else
+    public (ChatText) String getCustomName() {
+        // getName() doesn't return null if none is set...
+        NBTTagCompound displayTag = instance#getDisplayTag();
+        if (displayTag != null) {
+            NBTBase nameTag;
+            if ((nameTag = displayTag.get("Name")) instanceof NBTTagString) {
+                return ((NBTTagString) nameTag).getAsString();
+            }
+
+  #if version >= 1.11
+            NBTBase locName;
+            if ((locName = displayTag.get("LocName")) instanceof NBTTagString) {
+                String localeKey = ((NBTTagString) locName).getAsString();
+                return net.minecraft.locale.LocaleI18n.get(localeKey);
+            }
+  #endif
+        }
+        return null;
+   }
+#endif
 
 #if version >= 1.20.5
+    public (ChatText) IChatBaseComponent getDisplayName() {
+        IChatBaseComponent customName = instance.get(DataComponents.CUSTOM_NAME);
+        if (customName == null) {
+            customName = instance.getItem().getName(instance);
+        }
+        return customName;
+    }
     public boolean hasCustomName() {
         return instance.has(DataComponents.CUSTOM_NAME);
-    }
-    public (ChatText) IChatBaseComponent getCustomName() {
-        return instance.get(DataComponents.CUSTOM_NAME);
     }
     public void setCustomName:setHoverName((ChatText) IChatBaseComponent name) {
         if (name != null) {
@@ -137,16 +189,16 @@ class ItemStack {
         }
     }
 #elseif version >= 1.18
+    public (ChatText) IChatBaseComponent getDisplayName:getHoverName();
     public boolean hasCustomName:hasCustomHoverName();
-    public (ChatText) IChatBaseComponent getCustomName:getHoverName();
     public (void) ItemStack setCustomName:setHoverName((ChatText) IChatBaseComponent name);
 #elseif version >= 1.13
+    public (ChatText) IChatBaseComponent getDisplayName:getName();
     public boolean hasCustomName:hasName();
-    public (ChatText) IChatBaseComponent getCustomName:getName();
     public (void) ItemStack setCustomName:a((ChatText) IChatBaseComponent name);
 #else
+    public (ChatText) String getDisplayName:getName();
     public boolean hasCustomName:hasName();
-    public (ChatText) String getCustomName:getName();
     public void setCustomName((ChatText) String name) {
   #if version >= 1.11
         if (name != null) {
@@ -189,44 +241,43 @@ class ItemStack {
     }
 #else
     public (List<ChatText>) List<IChatBaseComponent> getLores() {
-        NBTTagCompound tag = instance.getTag();
-        if (tag != null) {
-            NBTBase displayBase = tag.get("display");
-            if (displayBase instanceof NBTTagCompound) {
-                NBTBase loreListBase = ((NBTTagCompound) displayBase).get("Lore");
-                if (loreListBase instanceof NBTTagList) {
-                    NBTTagList loreList = (NBTTagList) loreListBase;
-                    int loreCount = loreList.size();
-                    java.util.List result = new java.util.ArrayList(loreCount);
-                    for (int i = 0; i < loreCount; i++) {
-                        NBTBase loreLine = loreList.get(i);
-                        if (loreLine instanceof NBTTagString) {
-                            String line = ((NBTTagString) loreLine).getAsString();
-                            IChatBaseComponent lineComponent;
+        NBTTagCompound displayTag = instance#getDisplayTag();
+        if (displayTag == null) {
+            return java.util.Collections.emptyList();
+        }
+
+        NBTBase loreListBase = displayTag.get("Lore");
+        if (!(loreListBase instanceof NBTTagList)) {
+            return java.util.Collections.emptyList();
+        }
+
+        NBTTagList loreList = (NBTTagList) loreListBase;
+        int loreCount = loreList.size();
+        java.util.List result = new java.util.ArrayList(loreCount);
+        for (int i = 0; i < loreCount; i++) {
+            NBTBase loreLine = loreList.get(i);
+            if (loreLine instanceof NBTTagString) {
+                String line = ((NBTTagString) loreLine).getAsString();
+                IChatBaseComponent lineComponent;
   #if version >= 1.20.5
-                            // Decode JSON into chat component (uses Minecraft's main server registry)
-                            lineComponent = net.minecraft.network.chat.IChatBaseComponent$ChatSerializer.fromJson(line,
-                                    net.minecraft.server.MinecraftServer.getDefaultRegistryAccess());
+                // Decode JSON into chat component (uses Minecraft's main server registry)
+                lineComponent = net.minecraft.network.chat.IChatBaseComponent$ChatSerializer.fromJson(line,
+                        net.minecraft.server.MinecraftServer.getDefaultRegistryAccess());
   #elseif version >= 1.14
-                            // Decode JSON into chat component
-                            lineComponent = net.minecraft.network.chat.IChatBaseComponent$ChatSerializer.fromJson(line);
+                // Decode JSON into chat component
+                lineComponent = net.minecraft.network.chat.IChatBaseComponent$ChatSerializer.fromJson(line);
   #else
-                            // Wrap String message into chat component
-                            // Has a lot of bukkit-esque crap in it, so we use our own ChatText for parsing it
-                            ChatText text = ChatText.fromMessage(line);
-                            lineComponent = (text == null) ? null : (IChatBaseComponent) text.getRawHandle();
+                // Wrap String message into chat component
+                // Has a lot of bukkit-esque crap in it, so we use our own ChatText for parsing it
+                ChatText text = ChatText.fromMessage(line);
+                lineComponent = (text == null) ? null : (IChatBaseComponent) text.getRawHandle();
   #endif
-                            if (lineComponent != null) {
-                                result.add(lineComponent);
-                            }
-                        }
-                    }
-                    return java.util.Collections.unmodifiableList(result);
+                if (lineComponent != null) {
+                    result.add(lineComponent);
                 }
             }
         }
-
-        return java.util.Collections.emptyList();
+        return java.util.Collections.unmodifiableList(result);
     }
 
     public void addLore((ChatText) IChatBaseComponent line) {
@@ -375,14 +426,11 @@ class ItemStack {
         color = (net.minecraft.world.item.component.MapItemColor) instance.get(DataComponents.MAP_COLOR);
         return (color == null) ? -1 : color.rgb();
 #else
-        NBTTagCompound tag = instance.getTag();
-        if (tag != null) {
-            NBTBase baseDisplayTag = tag.get("display");
-            if (baseDisplayTag instanceof NBTTagCompound) {
-                NBTBase color = ((NBTTagCompound) baseDisplayTag).get("MapColor");
-                if (color instanceof NBTTagInt) {
-                    return ((NBTTagInt) color).getAsInt();
-                }
+        NBTTagCompound displayTag = instance#getDisplayTag();
+        if (displayTag != null) {
+            NBTBase color = displayTag.get("MapColor");
+            if (color instanceof NBTTagInt) {
+                return ((NBTTagInt) color).getAsInt();
             }
         }
         return -1;
@@ -430,14 +478,11 @@ class ItemStack {
             rgb = color.rgb();
         }
 #else
-        NBTTagCompound tag = instance.getTag();
-        if (tag != null) {
-            NBTBase display = tag.get("display");
-            if (display instanceof NBTTagCompound) {
-                NBTBase color = ((NBTTagCompound) display).get("color");
-                if (color instanceof NBTTagInt) {
-                    rgb = ((NBTTagInt) color).getAsInt();
-                }
+        NBTTagCompound displayTag = instance#getDisplayTag();
+        if (displayTag != null) {
+            NBTBase color = displayTag.get("color");
+            if (color instanceof NBTTagInt) {
+                rgb = ((NBTTagInt) color).getAsInt();
             }
         }
 #endif

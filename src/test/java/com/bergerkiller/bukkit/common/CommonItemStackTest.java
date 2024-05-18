@@ -17,6 +17,18 @@ public class CommonItemStackTest {
     @Test
     public void testDisplayName() {
         CommonItemStack item = CommonItemStack.create(getFirst("OAK_PLANKS", "LEGACY_WOOD"), 1);
+        assertEquals("Oak planks", item.getDisplayNameMessage());
+
+        item.setCustomNameMessage("Fake planks");
+        assertEquals("Fake planks", item.getDisplayNameMessage());
+
+        item.setCustomNameMessage(null);
+        assertEquals("Oak planks", item.getDisplayNameMessage());
+    }
+
+    @Test
+    public void testCustomName() {
+        CommonItemStack item = CommonItemStack.create(getFirst("OAK_PLANKS", "LEGACY_WOOD"), 1);
         String old_name = item.getCustomNameMessage();
         item.setCustomNameMessage("COOLNAME");
         assertEquals("COOLNAME", item.getCustomNameMessage());

@@ -507,12 +507,11 @@ public class ItemUtil {
      *
      * @param stack to get the display name of
      * @return display name
-     * @deprecated Use {@link CommonItemStack#getCustomName()} instead
+     * @deprecated Use {@link CommonItemStack#getDisplayNameMessage()} instead
      */
     @Deprecated
     public static String getDisplayName(org.bukkit.inventory.ItemStack stack) {
-        ChatText text = getDisplayChatText(stack);
-        return (text == null) ? null : text.getMessage();
+        return CommonItemStack.of(stack).getDisplayNameMessage();
     }
 
     /**
@@ -522,11 +521,11 @@ public class ItemUtil {
      *
      * @param stack to get the display name of
      * @return display name ChatText
-     * @deprecated Use {@link CommonItemStack#getCustomName()} instead
+     * @deprecated Use {@link CommonItemStack#getDisplayName()} instead
      */
     @Deprecated
     public static ChatText getDisplayChatText(org.bukkit.inventory.ItemStack stack) {
-        return CommonItemStack.of(stack).getCustomName();
+        return CommonItemStack.of(stack).getDisplayName();
     }
 
     /**

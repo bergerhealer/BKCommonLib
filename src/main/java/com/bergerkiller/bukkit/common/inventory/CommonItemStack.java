@@ -541,6 +541,31 @@ public final class CommonItemStack implements Cloneable {
     }
 
     /**
+     * Gets the display name of this item. If a {@link #hasCustomName() custom display name is set}
+     * then this name is returned, otherwise it returns the Vanilla Minecraft display name
+     * (in English). If this item is empty (null), returns empty text.
+     *
+     * @return Display name of this item.
+     */
+    public ChatText getDisplayName() {
+        return getHandle(true)
+                .map(ItemStackHandle::getDisplayName)
+                .orElse(ChatText.empty());
+    }
+
+    /**
+     * Gets the display name of this item as a legacy formatted message String.
+     * If a {@link #hasCustomName() custom display name is set}
+     * then this name is returned, otherwise it returns the Vanilla Minecraft display name
+     * (in English). If this item is empty (null), returns an empty String.
+     *
+     * @return Display name message of this item.
+     */
+    public String getDisplayNameMessage() {
+        return getDisplayName().getMessage();
+    }
+
+    /**
      * Gets whether a custom display name is set on this item.
      *
      * @return True if a display name is set

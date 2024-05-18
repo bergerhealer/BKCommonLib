@@ -38,8 +38,9 @@ public abstract class ItemStackHandle extends Template.Handle {
 
     public abstract Object getItem();
     public abstract Material getTypeField();
-    public abstract boolean hasCustomName();
     public abstract ChatText getCustomName();
+    public abstract ChatText getDisplayName();
+    public abstract boolean hasCustomName();
     public abstract void setCustomName(ChatText name);
     public abstract List<ChatText> getLores();
     public abstract void addLore(ChatText line);
@@ -110,8 +111,9 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
         public final Template.Method<Object> getItem = new Template.Method<Object>();
         public final Template.Method.Converted<Material> getTypeField = new Template.Method.Converted<Material>();
-        public final Template.Method<Boolean> hasCustomName = new Template.Method<Boolean>();
         public final Template.Method.Converted<ChatText> getCustomName = new Template.Method.Converted<ChatText>();
+        public final Template.Method.Converted<ChatText> getDisplayName = new Template.Method.Converted<ChatText>();
+        public final Template.Method<Boolean> hasCustomName = new Template.Method<Boolean>();
         public final Template.Method.Converted<Void> setCustomName = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<List<ChatText>> getLores = new Template.Method.Converted<List<ChatText>>();
         public final Template.Method.Converted<Void> addLore = new Template.Method.Converted<Void>();
