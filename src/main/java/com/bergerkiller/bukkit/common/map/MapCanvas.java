@@ -1067,10 +1067,13 @@ public abstract class MapCanvas {
      * Calculates the width and height bounding boxes of contents drawn with a font
      * 
      * @param font
-     * @param characters
+     * @param characters Text Characters. Must not be null.
      * @return width and height of the drawn font bounding box
      */
     public final <T> Dimension calcFontSize(MapFont<T> font, T... characters) {
+        if (characters == null) {
+            throw new IllegalArgumentException("Null characters array specified");
+        }
         return this.calcFontSize(font, Arrays.asList(characters));
     }
 
@@ -1078,10 +1081,13 @@ public abstract class MapCanvas {
      * Calculates the width and height bounding boxes of contents drawn with a font
      * 
      * @param font
-     * @param characters
+     * @param characters Text Characters. Must not be null.
      * @return width and height of the drawn font bounding box
      */
     public final Dimension calcFontSize(MapFont<Character> font, CharSequence characters) {
+        if (characters == null) {
+            throw new IllegalArgumentException("Null String specified");
+        }
         return this.calcFontSize(font, new CharacterIterable(characters));
     }
 
@@ -1089,10 +1095,14 @@ public abstract class MapCanvas {
      * Calculates the width and height bounding boxes of contents drawn with a font
      * 
      * @param font
-     * @param characters
+     * @param characters Text Characters. Must not be null.
      * @return width and height of the drawn font bounding box
      */
     public final <T> Dimension calcFontSize(MapFont<T> font, Iterable<T> characters) {
+        if (characters == null) {
+            throw new IllegalArgumentException("Null Character Iterable specified");
+        }
+
         int maxWidth = 0;
         int height = 0;
         int currWidth = 0;
@@ -1130,11 +1140,15 @@ public abstract class MapCanvas {
      * @param font to draw
      * @param x - coordinate of the top-left corner of the first character drawn
      * @param y - coordinate of the top-left corner of the first character drawn
-     * @param characters to draw
+     * @param characters to draw. Must not be null.
      * @return this canvas
      */
     @SafeVarargs
     public final <T> MapCanvas draw(MapFont<T> font, int x, int y, T... characters) {
+        if (characters == null) {
+            throw new IllegalArgumentException("Null characters array specified");
+        }
+
         return this.draw(font, x, y, (byte) 0, Arrays.asList(characters));
     }
 
@@ -1146,10 +1160,14 @@ public abstract class MapCanvas {
      * @param x - coordinate of the top-left corner of the first character drawn
      * @param y - coordinate of the top-left corner of the first character drawn
      * @param color - color text
-     * @param characters to draw
+     * @param characters to draw. Must not be null.
      * @return this canvas
      */
     public final MapCanvas draw(MapFont<Character> font, int x, int y, byte color, CharSequence characters) {
+        if (characters == null) {
+            throw new IllegalArgumentException("Null String characters specified");
+        }
+
         return this.draw(font, x, y, color, new CharacterIterable(characters));
     }
 
@@ -1162,10 +1180,14 @@ public abstract class MapCanvas {
      * @param x - coordinate to start drawing
      * @param y - coordinate to start drawing
      * @param color - color to use when drawing the font
-     * @param characters to draw
+     * @param characters to draw. Must not be null.
      * @return this canvas
      */
     public final <T> MapCanvas draw(MapFont<T> font, int x, int y, byte color, Iterable<T> characters) {
+        if (characters == null) {
+            throw new IllegalArgumentException("Null characters Iterable specified");
+        }
+
         // Offset drawn text based on text alignment
         if (fontAlignment == MapFont.Alignment.RIGHT) {
             x -= this.calcFontSize(font, characters).width;
