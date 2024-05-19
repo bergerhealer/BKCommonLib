@@ -113,7 +113,7 @@ final class QuotedArgumentParserProxy<C, T> implements ArgumentParser<C, T>, Sug
         //TODO: Flags seem to allow all characters
         //      So for the moment, we just only disallow spaces
 
-        return c != ' ';
+        return c != ' ' && c != '"';
 
         /*
         return c >= '0' && c <= '9'
