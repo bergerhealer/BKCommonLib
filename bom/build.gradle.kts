@@ -5,11 +5,18 @@ plugins {
 
 publishing {
     publications {
+        repositories {
+            maven("https://ci.mg-dev.eu/plugin/repository/everything") {
+                name = "MGDev"
+                credentials(PasswordCredentials::class)
+                authentication {
+                    create<BasicAuthentication>("basic")
+                }
+            }
+        }
+
         create<MavenPublication>("bom") {
             from(components["javaPlatform"])
-            groupId = "com.bergerkiller.bukkit"
-            artifactId = "BKCommonLib-bom"
-            version = "1.20.6-v1-SNAPSHOT"
         }
     }
 }
