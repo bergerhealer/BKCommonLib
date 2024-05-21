@@ -5,6 +5,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.execution.CommandExecutor;
 import org.incendo.cloud.parser.ArgumentParseResult;
+import org.incendo.cloud.parser.ArgumentParser;
 import org.incendo.cloud.parser.ParserDescriptor;
 import org.incendo.cloud.suggestion.SuggestionFactory;
 import org.incendo.cloud.suggestion.SuggestionProvider;
@@ -21,13 +22,23 @@ import org.incendo.cloud.suggestion.SuggestionProviderHolder;
 public interface QuotedArgumentParser<C, T> extends SuggestionProviderHolder<C> {
 
     /**
+     * Creates the ArgumentParser that parses command input as a quoted string, and then
+     * calls into this parser.
+     *
+     * @return ArgumentParser
+     */
+    default ArgumentParser<C, T> createParser() {
+        return new QuotedArgumentParserProxy<>(this);
+    }
+
+    /**
      * Creates a Parser Descriptor that uses this parser to parse the quoted string
      *
      * @param outputType Output TypeToken type of this parser
      * @return Parser Descriptor
      */
     default ParserDescriptor<C, T> createDescriptor(TypeToken<T> outputType) {
-        return ParserDescriptor.of(new QuotedArgumentParserProxy<>(this), outputType);
+        return ParserDescriptor.of(createParser(), outputType);
     }
 
     /**
@@ -37,7 +48,7 @@ public interface QuotedArgumentParser<C, T> extends SuggestionProviderHolder<C> 
      * @return Parser Descriptor
      */
     default ParserDescriptor<C, T> createDescriptor(Class<T> outputType) {
-        return ParserDescriptor.of(new QuotedArgumentParserProxy<>(this), outputType);
+        return ParserDescriptor.of(createParser(), outputType);
     }
 
     /**
