@@ -21,10 +21,14 @@ publishing {
     }
 }
 
+javaPlatform.allowDependencies()
+
 dependencies {
+    api(platform(libs.cloud.core.bom))
+    api(platform(libs.cloud.minecraft.bom))
+
     constraints {
-        api("org.bergerhealer.cloud.commandframework:cloud-paper:1.8.4")
-        api("org.bergerhealer.cloud.commandframework:cloud-annotations:1.8.4")
-        api("org.bergerhealer.cloud.commandframework:cloud-minecraft-extras:1.8.4")
+        api(libs.adventure.api)
+        api(libs.adventure.platform.bukkit)
     }
 }

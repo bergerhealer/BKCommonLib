@@ -50,6 +50,15 @@ dependencies {
     compileOnly(libs.log4j.core)
 
     //
+    // Publish a BKCommonLib-bom that tells projects using this library what versions of cloud to bring in
+    // These still require remapping done by the user, but having the version makes it easier for them to stay up to date
+    // This now allows specifying the cloud library without specifying a version
+    //
+
+    api(platform(project(":BKCommonLib-bom")))
+    internal(platform(project(":BKCommonLib-bom")))
+
+    //
     // Dependencies shaded into the library for internal use
     //
 
@@ -85,10 +94,12 @@ dependencies {
     //
     // Cloud command framework
     // Is relocated - requires appropriate relocation in plugins using it
+    // Versions are part of BKCommonLib-bom and are made available automatically
     //
-    internal(libs.cloud.paper)
-    internal(libs.cloud.annotations)
-    internal(libs.cloud.minecraft.extras)
+
+    internal("org.bergerhealer.cloud.commandframework:cloud-paper")
+    internal("org.bergerhealer.cloud.commandframework:cloud-annotations")
+    internal("org.bergerhealer.cloud.commandframework:cloud-minecraft-extras")
     internal(libs.commodore) {
         isTransitive = false
     }

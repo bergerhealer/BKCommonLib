@@ -13,7 +13,8 @@ viaversion = "3.2.1"
 vault = "1.7"
 luckperms = "5.4"
 protocollib = "4.4.0"
-cloud = "1.8.4"
+cloud_core = "1.8.4"
+cloud_minecraft = "1.8.4"
 commodore = "1.13"
 adventure = "4.14.0"
 adventure-platform-bukkit = "4.3.2-PR144-fix"
@@ -28,6 +29,8 @@ netty-all = { module = "io.netty:netty-all", version.ref = "netty" }
 log4j-api = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4j" }
 log4j-core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
 mountiplex = { module = "com.bergerkiller.mountiplex:Mountiplex", version.ref = "mountiplex" }
+cloud-core-bom = { module = "org.bergerhealer.cloud.commandframework:cloud-bom", version.ref = "cloud_core" }
+cloud-minecraft-bom = { module = "org.bergerhealer.cloud.commandframework:cloud-bom", version.ref = "cloud_minecraft" }
 regionchangetracker = { module = "com.bergerkiller.bukkit.regionchangetracker:BKCommonLib-RegionChangeTracker-Core", version.ref = "regionchangetracker" }
 colorconversionhelper = { module = "com.bergerkiller.bukkit.colorconversionhelper:BKCommonLib-ColorConversionHelper", version.ref = "colorconversionhelper" }
 softdependency = { module = "com.bergerkiller.bukkit.softdependency:SoftDependency", version.ref = "softdependencylib" }
@@ -37,9 +40,6 @@ viaversion = { module = "us.myles:viaversion", version.ref = "viaversion" }
 vault = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
 luckperms = { module = "net.luckperms:api", version.ref = "luckperms" }
 protocollib = { module = "com.comphenix.protocol:ProtocolLib-API", version.ref = "protocollib" }
-cloud-paper = { module = "org.bergerhealer.cloud.commandframework:cloud-paper", version.ref = "cloud" }
-cloud-annotations = { module = "org.bergerhealer.cloud.commandframework:cloud-annotations", version.ref = "cloud" }
-cloud-minecraft-extras = { module = "org.bergerhealer.cloud.commandframework:cloud-minecraft-extras", version.ref = "cloud" }
 commodore = { module = "me.lucko:commodore", version.ref = "commodore" }
 adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure" }
 adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform-bukkit" }
