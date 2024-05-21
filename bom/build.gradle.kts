@@ -1,5 +1,17 @@
 plugins {
     id("java-platform")
+    id("maven-publish")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("bom") {
+            from(components["javaPlatform"])
+            groupId = "com.bergerkiller.bukkit"
+            artifactId = "BKCommonLib-bom"
+            version = "1.20.6-v1-SNAPSHOT"
+        }
+    }
 }
 
 dependencies {
