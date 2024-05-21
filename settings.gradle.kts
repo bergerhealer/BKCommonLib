@@ -11,3 +11,6 @@ pluginManagement {
         }
     }
 }
+
+include(":bom")
+project(":bom").name = "BKCommonLib-bom"
