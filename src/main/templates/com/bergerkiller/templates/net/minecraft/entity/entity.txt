@@ -1818,7 +1818,21 @@ class Entity {
     public void onTick:s_();
 #endif
 
-#if version >= 1.18
+#if version >= 1.20.5
+    public void loadFromNBT((CommonTagCompound) NBTTagCompound compound) {
+        // For players this must be processed with the data migration DFU stuff
+        if (instance instanceof net.minecraft.server.level.EntityPlayer) {
+            #require net.minecraft.world.level.storage.WorldNBTStorage protected final com.mojang.datafixers.DataFixer fixerUpper;
+            net.minecraft.world.level.storage.WorldNBTStorage storage = instance.getServer().getPlayerList().playerIo;
+            com.mojang.datafixers.DataFixer fixerUpper = storage#fixerUpper;
+
+            int dataVersion = net.minecraft.nbt.GameProfileSerializer.getDataVersion(compound, -1);
+            compound = net.minecraft.util.datafix.DataFixTypes.PLAYER.updateToCurrentVersion(fixerUpper, compound, dataVersion);
+        }
+        instance.load(compound);
+    }
+    public boolean onEntitySave:saveAsPassenger((CommonTagCompound) NBTTagCompound compound);
+#elseif version >= 1.18
     public void loadFromNBT:load((CommonTagCompound) NBTTagCompound compound);
     public boolean onEntitySave:saveAsPassenger((CommonTagCompound) NBTTagCompound compound);
 #elseif version >= 1.17
