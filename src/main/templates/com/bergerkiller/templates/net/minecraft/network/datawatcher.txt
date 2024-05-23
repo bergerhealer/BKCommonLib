@@ -73,8 +73,35 @@ class DataWatcher {
     }
     </code>
 
-    public (DataWatcherHandle) DataWatcher cloneWithOwner((EntityHandle) Entity owner) {
+    // Type of backing hashmap used for the datawatcher
 #if version >= 1.20.5
+    #set datawatcher_storage array
+    #require DataWatcher private final DataWatcher.Item<?>[] itemsById;
+#elseif version >= 1.14
+    #set datawatcher_storage fastutil_map
+    #if version >= 1.17
+        #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<DataWatcher.Item<?>> itemsById;
+    #else
+        #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<DataWatcher.Item<?>> itemsById:entries;
+    #endif
+#elseif exists net.minecraft.network.syncher.DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<DataWatcher.Item<?>> dataValues;
+    // Some server forks (1.8) do this
+    #set datawatcher_storage fastutil_map
+    #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<DataWatcher.Item<?>> itemsById:dataValues;
+#elseif version >= 1.9
+    #set datawatcher_storage java_map
+    #if version >= 1.10.2
+        #require DataWatcher private final java.util.Map<Integer, DataWatcher.Item<?>> itemsById:d;
+    #else
+        #require DataWatcher private final java.util.Map<Integer, DataWatcher.Item<?>> itemsById:c;
+    #endif
+#else
+    #set datawatcher_storage trove_map
+    #require DataWatcher private final gnu.trove.map.TIntObjectMap itemsById:dataValues;
+#endif
+
+    public (DataWatcherHandle) DataWatcher cloneWithOwner((EntityHandle) Entity owner) {
+#if datawatcher_storage == array
         // Items are stored in an array keyed by accessor id as index
         // Take all original items, clone them, and pass them to the constructor
         #require DataWatcher private final DataWatcher.Item<?>[] itemsById;
@@ -100,32 +127,24 @@ class DataWatcher {
         // The backing storage differs wildly between versions, unfortunately
         DataWatcher copyWatcher = new DataWatcher(owner);
 
-  #if version >= 1.14.4
+  #if datawatcher_storage == fastutil_map
         // Items are stored in a FastUtil Int2ObjectMap
-    #if version >= 1.17
-        #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<DataWatcher.Item<?>> itemsById;
-    #else
-        #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<DataWatcher.Item<?>> itemsById:entries;
-    #endif
         it.unimi.dsi.fastutil.ints.Int2ObjectMap itemsById = instance#itemsById;
         it.unimi.dsi.fastutil.ints.Int2ObjectMap copyItemsById = copyWatcher#itemsById;
         it.unimi.dsi.fastutil.objects.ObjectIterator itemIter = itemsById.values().iterator();
-  #elseif version >= 1.9
+  #elseif datawatcher_storage == java_map
         // Items are stored in a java by-Integer HashMap
-    #if version >= 1.10.2
-        #require DataWatcher private final java.util.Map<Integer, DataWatcher.Item<?>> itemsById:d;
-    #else
-        #require DataWatcher private final java.util.Map<Integer, DataWatcher.Item<?>> itemsById:c;
-    #endif
         java.util.Map itemsById = instance#itemsById;
         java.util.Map copyItemsById = copyWatcher#itemsById;
         java.util.Iterator itemIter = itemsById.values().iterator();
-  #else
+  #elseif datawatcher_storage == trove_map
         // Items are stored in a Trove IntHashmap
         #require DataWatcher private final gnu.trove.map.TIntObjectMap itemsById:dataValues;
         gnu.trove.map.TIntObjectMap itemsById = instance#itemsById;
         gnu.trove.map.TIntObjectMap copyItemsByid = copyWatcher#itemsById;
         java.util.Iterator itemIter = itemsById.valueCollection().iterator();
+  #else
+        #error Unknown datawatcher storage method
   #endif
 
         // Paper servers have this special by-id array in addition, mimicking what happens on 1.20.5+
@@ -177,12 +196,12 @@ class DataWatcher {
             itemCopy.setDirty(item.isDirty());
 
             // Add to the by-id mapping
-  #if version >= 1.14.4
+  #if datawatcher_storage == fastutil_map || datawatcher_storage == trove_map
             copyItemsById.put(accessorId, itemCopy);
-  #elseif version >= 1.9
+  #elseif datawatcher_storage == java_map
             copyItemsById.put(Integer.valueOf(accessorId), itemCopy);
   #else
-            copyItemsById.put(accessorId, itemCopy);
+            #error Unknown datawatcher storage type, cannot put
   #endif
 
             // If it exists, also store it in the by-id array mapping on Paper
