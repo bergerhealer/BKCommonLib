@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.io.File;
 
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
@@ -96,6 +97,12 @@ class PlayerFileDataHandler_1_16 extends PlayerFileDataHandler {
     @Override
     public File getPlayerDataFolder(World world) {
         return getPlayerFolderOfWorld.invoke(HandleConversion.toWorldHandle(world));
+    }
+
+    @Override
+    public CommonTagCompound migratePlayerData(CommonTagCompound playerProfileData) {
+        Object playerList = CBCraftServer.getPlayerList.invoke(Bukkit.getServer());
+        return PlayerListHandle.createHandle(playerList).migratePlayerData(playerProfileData);
     }
 
     public PlayerFileDataHook update(HookAction action) {

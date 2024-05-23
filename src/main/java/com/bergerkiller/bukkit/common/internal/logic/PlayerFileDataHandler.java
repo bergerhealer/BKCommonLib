@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import org.bukkit.World;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -34,6 +35,8 @@ public abstract class PlayerFileDataHandler implements LazyInitializedObject, Li
     public abstract void unhook(Hook hook, PlayerDataController controller);
 
     public abstract File getPlayerDataFolder(World world);
+
+    public abstract CommonTagCompound migratePlayerData(CommonTagCompound playerProfileData);
 
     public static interface Hook {
         CommonTagCompound base_load(HumanEntity human);

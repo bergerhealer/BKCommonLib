@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.io.File;
 
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
@@ -89,6 +90,10 @@ class PlayerFileDataHandler_1_8_to_1_15_2 extends PlayerFileDataHandler {
     @Override
     public File getPlayerDataFolder(World world) {
         return getPlayerFolderOfWorld.invoke(HandleConversion.toWorldHandle(world));
+    }
+
+    public CommonTagCompound migratePlayerData(CommonTagCompound playerProfileData) {
+        return playerProfileData;
     }
 
     public PlayerFileDataHook update(HookAction action) {

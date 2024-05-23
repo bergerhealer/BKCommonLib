@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.logic.PlayerFileDataHandler;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
@@ -14,6 +15,7 @@ import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEnt
 import com.bergerkiller.generated.org.bukkit.block.BlockStateHandle;
 
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
 /**
@@ -54,6 +56,19 @@ public class NBTUtil {
      */
     public static void loadEntity(org.bukkit.entity.Entity entity, CommonTagCompound compound) {
         EntityHandle.fromBukkit(entity).loadFromNBT(compound);
+    }
+
+    /**
+     * Migrates the player profile data so that it can run on the current version of the server.
+     * This performs data migrations (DFU).
+     * Should be called before calling {@link #loadEntity(Entity, CommonTagCompound)} when loading
+     * data for players.
+     *
+     * @param playerProfileData Player Profile NBT Data
+     * @return Migrated NBT Data. Can be the same as the input tag.
+     */
+    public static CommonTagCompound migratePlayerProfileData(CommonTagCompound playerProfileData) {
+        return PlayerFileDataHandler.INSTANCE.migratePlayerData(playerProfileData);
     }
 
     // Method is gone as of 1.20.5 because of data components

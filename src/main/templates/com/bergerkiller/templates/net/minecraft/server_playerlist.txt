@@ -4,11 +4,27 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.entity.player.EntityHuman;
+import net.minecraft.nbt.NBTTagCompound;
+
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 class PlayerList {
     public final (List<org.bukkit.entity.Player) List<EntityPlayer> players;
 
     protected int maxPlayers;
+
+    public (CommonTagCompound) NBTTagCompound migratePlayerData((CommonTagCompound) NBTTagCompound playerProfileData) {
+#if version >= 1.20.5
+        #require net.minecraft.world.level.storage.WorldNBTStorage protected final com.mojang.datafixers.DataFixer fixerUpper;
+        net.minecraft.world.level.storage.WorldNBTStorage storage = instance.playerIo;
+        com.mojang.datafixers.DataFixer fixerUpper = storage#fixerUpper;
+
+        int dataVersion = net.minecraft.nbt.GameProfileSerializer.getDataVersion(playerProfileData, -1);
+        return net.minecraft.util.datafix.DataFixTypes.PLAYER.updateToCurrentVersion(fixerUpper, playerProfileData, dataVersion);
+#else
+        return playerProfileData;
+#endif
+    }
 
 #if version >= 1.18
     public void savePlayers:saveAll();

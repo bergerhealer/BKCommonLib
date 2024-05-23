@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.server.players;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import java.util.List;
@@ -22,6 +23,7 @@ public abstract class PlayerListHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract CommonTagCompound migratePlayerData(CommonTagCompound playerProfileData);
     public abstract void savePlayers();
     public abstract void savePlayerFile(Player entityplayer);
     public abstract void sendRawPacketNearby(World world, double x, double y, double z, double radius, Object packet);
@@ -37,6 +39,7 @@ public abstract class PlayerListHandle extends Template.Handle {
         public final Template.Field.Converted<List<Player>> players = new Template.Field.Converted<List<Player>>();
         public final Template.Field.Integer maxPlayers = new Template.Field.Integer();
 
+        public final Template.Method.Converted<CommonTagCompound> migratePlayerData = new Template.Method.Converted<CommonTagCompound>();
         public final Template.Method<Void> savePlayers = new Template.Method<Void>();
         public final Template.Method.Converted<Void> savePlayerFile = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> sendRawPacketNearby = new Template.Method.Converted<Void>();
