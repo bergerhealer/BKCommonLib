@@ -8,10 +8,10 @@ Cloud is shaded at a different package path (to avoid conflicts), so using the i
 Currently the 2.0.0 beta/release-candidate of Cloud is included.
 
 ### Maven
-BKCommonLib has a BOM (Bill of materials) hosted on the same repository BKCommonLib is, that includes information about the cloud dependency and its version.
+BKCommonLib has a BOM (Bill of materials) hosted on the same repository BKCommonLib is, that includes information about the cloud dependency and its version. The below snippets are for your project's `pom.xml`.
 
 Begin by adding the repository where BKCommonLib is hosted:
-```pom.xml
+```xml
     <repositories>
         <repository>
             <id>MG-Dev Jenkins CI Maven Repository</id>
@@ -20,7 +20,7 @@ Begin by adding the repository where BKCommonLib is hosted:
     </repositories>
 ```
 Next, add BKCommonLib-bom under **dependencyManagement** (!). This automatically loads the information about what cloud version and its dependencies are used for a particular version of BKCommonLib. Next just add all the dependencies without specifying the version. The version is taken from the bom.
-```pom.xml
+```xml
     <properties>
         <project.bkcommonlib.version>1.20.6-v1-SNAPSHOT</project.bkcommonlib.version>
     </properties>
@@ -63,7 +63,7 @@ Next, add BKCommonLib-bom under **dependencyManagement** (!). This automatically
     </dependencies>
 ```
 However, the library and its dependencies are shaded in at a different package than normal. So, you will have to include the maven shade plugin in your project to relocate them. Not doing so will cause a failure at runtime.
-```pom.xml
+```xml
     <build>
         <plugins>
             <!-- Relocates references to the Cloud command framework to where they are in BKCommonLib -->
@@ -107,16 +107,16 @@ However, the library and its dependencies are shaded in at a different package t
 ```
 
 ### Gradle
-Depending on BKCommonLib will automatically tell Gradle what versions of Cloud and its dependencies to use. The below configuration assumes kotlin gradle syntax.
+Depending on BKCommonLib will automatically tell Gradle what versions of Cloud and its dependencies to use. The below configuration assumes kotlin gradle syntax, and are for your project's `build.gradle.kts` file.
 
 Begin by adding the repository where BKCommonLib is hosted:
-```build.gradle.kts
+```kotlin
 repositories {
     maven("https://ci.mg-dev.eu/plugin/repository/everything/")
 }
 ```
 Next add the BKCommonLib dependency and the cloud dependencies. For cloud, no version has to be specified, which will be provided by BKCommonLib. It is recommended to make use of [version catalogs](https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format) to make this look cleaner, but this is optional.
-```build.gradle.kts
+```kotlin
 dependencies {
     compileOnlyApi("com.bergerkiller.bukkit:BKCommonLib:1.20.6-v1-SNAPSHOT")
 
@@ -126,7 +126,7 @@ dependencies {
 }
 ```
 Finally, make sure the cloud dependency is shaded correctly when compiling your plugin:
-```build.gradle.kts
+```kotlin
 plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
