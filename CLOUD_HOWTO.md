@@ -1,55 +1,72 @@
 # Using Cloud Command Framework
-BKCommonLib shades in a custom fork of the [Cloud Command Framework](https://github.com/bergerhealer/cloud "Cloud Command Framework") library so that depending plugins can use it. If you are new to Cloud, look through their [documentation](https://incendo.github.io/cloud/ "documentation") first.
+BKCommonLib shades in the [Cloud Command Framework](https://github.com/Incendo/cloud "Cloud Command Framework") library so that depending plugins can use it. If you are new to Cloud, look through their [documentation](https://cloud.incendo.org/ "documentation") first.
+
+### Technical
+Cloud is shaded at a different package path (to avoid conflicts), so using the integrated cloud requires remapping it using the maven shade or gradle shadow plugin. BKCommonLib has a BOM (Bill of materials) hosted on the same repository BKCommonLib is, that includes information about the cloud dependency and its version. The below maven and gradle configurations make use of this.
+
+Incendo Cloud jars can be found on the maven central repository, so they should be available automatically.
 
 ### Version
-Currently the 1.8.4 release of Cloud is included.
+Currently the 2.0.0 beta/release-candidate of Cloud is included.
 
 ### Maven
-The bergerhealer cloud fork is hosted on the same repository as BKCommonLib:
+BKCommonLib has a BOM (Bill of materials) hosted on the same repository BKCommonLib is, that includes information about the cloud dependency and its version. The below snippets are for your project's `pom.xml`.
+
+Begin by adding the repository where BKCommonLib is hosted:
 ```xml
-    <repository>
-        <id>MG-Dev Jenkins CI Maven Repository</id>
-        <url>https://ci.mg-dev.eu/plugin/repository/everything</url>
-    </repository>
+    <repositories>
+        <repository>
+            <id>MG-Dev Jenkins CI Maven Repository</id>
+            <url>https://ci.mg-dev.eu/plugin/repository/everything</url>
+        </repository>
+    </repositories>
 ```
-Depend on BKCommonLib and the (fork) cloud command framework libraries:
+Next, add BKCommonLib-bom under **dependencyManagement** (!). This automatically loads the information about what cloud version and its dependencies are used for a particular version of BKCommonLib. Next just add all the dependencies without specifying the version. The version is taken from the bom.
 ```xml
     <properties>
-        <project.bkcommonlib.version>1.20.2-v1-SNAPSHOT</project.bkcommonlib.version>
-        <project.cloud.version>1.8.4</project.cloud.version>
+        <project.bkcommonlib.version>1.20.6-v1-SNAPSHOT</project.bkcommonlib.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.bergerkiller.bukkit</groupId>
+                <artifactId>BKCommonLib-bom</artifactId>
+                <version>${project.bkcommonlib.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>com.bergerkiller.bukkit</groupId>
             <artifactId>BKCommonLib</artifactId>
-            <version>${project.bkcommonlib.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <!-- Cloud Command Framework -->
         <dependency>
-            <groupId>org.bergerhealer.cloud.commandframework</groupId>
+            <groupId>org.incendo</groupId>
             <artifactId>cloud-paper</artifactId>
-            <version>${project.cloud.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.bergerhealer.cloud.commandframework</groupId>
+            <groupId>org.incendo</groupId>
             <artifactId>cloud-annotations</artifactId>
-            <version>${project.cloud.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.bergerhealer.cloud.commandframework</groupId>
+            <groupId>org.incendo</groupId>
             <artifactId>cloud-minecraft-extras</artifactId>
-            <version>${project.cloud.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
 ```
 However, the library and its dependencies are shaded in at a different package than normal. So, you will have to include the maven shade plugin in your project to relocate them. Not doing so will cause a failure at runtime.
 ```xml
+    <build>
         <plugins>
             <!-- Relocates references to the Cloud command framework to where they are in BKCommonLib -->
             <plugin>
@@ -69,7 +86,7 @@ However, the library and its dependencies are shaded in at a different package t
                     <relocations>
                         <!-- BKCommonLib relocations of Cloud command framework -->
                         <relocation>
-                            <pattern>cloud.commandframework</pattern>
+                            <pattern>org.incendo.cloud</pattern>
                             <shadedPattern>com.bergerkiller.bukkit.common.dep.cloud</shadedPattern>
                         </relocation>
                         <relocation>
@@ -87,4 +104,43 @@ However, the library and its dependencies are shaded in at a different package t
                     </relocations>
                 </configuration>
             </plugin>
-        </plugins>```
+        </plugins>
+    </build>
+```
+
+### Gradle
+Depending on BKCommonLib will automatically tell Gradle what versions of Cloud and its dependencies to use. The below configuration assumes kotlin gradle syntax, and are for your project's `build.gradle.kts` file.
+
+Begin by adding the repository where BKCommonLib is hosted:
+```kotlin
+repositories {
+    maven("https://ci.mg-dev.eu/plugin/repository/everything/")
+}
+```
+Next add the BKCommonLib dependency and the cloud dependencies. For cloud, no version has to be specified, which will be provided by BKCommonLib. It is recommended to make use of [version catalogs](https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format) to make this look cleaner, but this is optional.
+```kotlin
+dependencies {
+    compileOnlyApi("com.bergerkiller.bukkit:BKCommonLib:1.20.6-v1-SNAPSHOT")
+
+    // Cloud integrated in BKCommonLib
+    compileOnly("org.incendo:cloud-bom")
+    compileOnly("org.incendo:cloud-minecraft-bom")
+}
+```
+Finally, make sure the cloud dependency is shaded correctly when compiling your plugin:
+```kotlin
+plugins {
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+}
+
+tasks {
+    shadowJar {
+        val commonPrefix = "com.bergerkiller.bukkit.common.dep"
+        relocate("org.incendo.cloud", "$commonPrefix.cloud")
+        relocate("io.leangen.geantyref", "$commonPrefix.typetoken")
+        relocate("me.lucko.commodore", "$commonPrefix.me.lucko.commodore")
+        relocate("net.kyori", "$commonPrefix.net.kyori")
+    }
+}
+```
+

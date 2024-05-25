@@ -1,8 +1,7 @@
 package com.bergerkiller.bukkit.common.cloud;
 
 import com.bergerkiller.bukkit.common.localization.ILocalizationEnum;
-
-import cloud.commandframework.context.CommandContext;
+import org.incendo.cloud.context.CommandContext;
 
 /**
  * An exception that, when thrown, will result in a localized message

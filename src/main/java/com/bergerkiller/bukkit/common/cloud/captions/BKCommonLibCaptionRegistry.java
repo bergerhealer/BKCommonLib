@@ -1,25 +1,17 @@
 package com.bergerkiller.bukkit.common.cloud.captions;
 
-import cloud.commandframework.captions.SimpleCaptionRegistry;
+import org.incendo.cloud.caption.CaptionProvider;
 
 /**
  * Caption registry that uses bi-functions to produce messages
- *
- * @param <C> Command sender type
  */
-public class BKCommonLibCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
+public class BKCommonLibCaptionRegistry {
+    public static <C> CaptionProvider<C> provider() {
+        return CaptionProvider.forCaption(BKCommonLibCaptionKeys.ARGUMENT_PARSE_FAILURE_SOUNDEFFECT, r -> ARGUMENT_PARSE_FAILURE_SOUNDEFFECT);
+    }
 
     /**
      * Default caption for {@link BKCommonLibCaptionKeys#ARGUMENT_PARSE_FAILURE_SOUNDEFFECT}
      */
     public static final String ARGUMENT_PARSE_FAILURE_SOUNDEFFECT = "'{input}' is not a valid sound effect name";
-
-    @SuppressWarnings("deprecation")
-    protected BKCommonLibCaptionRegistry() {
-        super();
-        this.registerMessageFactory(
-                BKCommonLibCaptionKeys.ARGUMENT_PARSE_FAILURE_SOUNDEFFECT,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_SOUNDEFFECT
-        );
-    }
 }

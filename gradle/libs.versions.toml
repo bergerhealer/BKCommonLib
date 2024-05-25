@@ -13,8 +13,8 @@ viaversion = "3.2.1"
 vault = "1.7"
 luckperms = "5.4"
 protocollib = "4.4.0"
-cloud_core = "1.8.4"
-cloud_minecraft = "1.8.4"
+cloud_core = "2.0.0-rc.1"
+cloud_minecraft = "2.0.0-beta.7"
 commodore = "1.13"
 adventure = "4.14.0"
 adventure-platform-bukkit = "4.3.2-PR144-fix"
@@ -29,8 +29,8 @@ netty-all = { module = "io.netty:netty-all", version.ref = "netty" }
 log4j-api = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4j" }
 log4j-core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
 mountiplex = { module = "com.bergerkiller.mountiplex:Mountiplex", version.ref = "mountiplex" }
-cloud-core-bom = { module = "org.bergerhealer.cloud.commandframework:cloud-bom", version.ref = "cloud_core" }
-cloud-minecraft-bom = { module = "org.bergerhealer.cloud.commandframework:cloud-bom", version.ref = "cloud_minecraft" }
+cloud-core-bom = { module = "org.incendo:cloud-bom", version.ref = "cloud_core" }
+cloud-minecraft-bom = { module = "org.incendo:cloud-minecraft-bom", version.ref = "cloud_minecraft" }
 regionchangetracker = { module = "com.bergerkiller.bukkit.regionchangetracker:BKCommonLib-RegionChangeTracker-Core", version.ref = "regionchangetracker" }
 colorconversionhelper = { module = "com.bergerkiller.bukkit.colorconversionhelper:BKCommonLib-ColorConversionHelper", version.ref = "colorconversionhelper" }
 softdependency = { module = "com.bergerkiller.bukkit.softdependency:SoftDependency", version.ref = "softdependencylib" }
