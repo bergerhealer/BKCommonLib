@@ -17,6 +17,11 @@ public final class ItemParserMetaRule {
     private static final Map<String, Function<CommonItemStack, Object>> valueExtractors = new StringMapCaseInsensitive<>();
     static {
         valueExtractors.put("damage", item -> item.isDamageSupported() ? item.getDamage() : null);
+        valueExtractors.put("durability", item -> item.isDamageSupported() ? item.getDamage() : null);
+        valueExtractors.put("name", item -> item.hasCustomName() ? item.getCustomNameMessage() : null);
+        valueExtractors.put("custommodeldata", item -> item.hasCustomModelData() ? item.getCustomModelData() : null);
+        valueExtractors.put("custom_model_data", item -> item.hasCustomModelData() ? item.getCustomModelData() : null);
+        valueExtractors.put("map", item -> item.isFilledMap() ? item.getFilledMapId() : null);
     }
 
     private final Function<CommonItemStack, Object> _valueExtractor;
