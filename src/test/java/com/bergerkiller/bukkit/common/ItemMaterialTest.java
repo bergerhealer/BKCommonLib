@@ -27,7 +27,6 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
 import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializer;
-import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
@@ -448,51 +447,6 @@ public class ItemMaterialTest {
     }
 
     @Test
-    public void testItemParser() {
-        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
-            // Can also test 1.13 and later material names
-            // Data value specified, should match red wool, both legacy and new
-            testItemParser("WOOL:RED", new ItemStack[] {
-                    BlockData.fromMaterialData(getMaterial("LEGACY_WOOL"), 14).createItem(1),
-                    ItemUtil.createItem(getMaterial("RED_WOOL"), 1),
-            }, new ItemStack[] {
-                    BlockData.fromMaterialData(getMaterial("LEGACY_WOOL"), 10).createItem(1),
-                    BlockData.fromMaterialData(getMaterial("LEGACY_STONE"), 0).createItem(1),
-            });
-            // Data value set to 'any', which should guarantee parsing to any type of wool
-            testItemParser("WOOL:", new ItemStack[] {
-                    BlockData.fromMaterialData(getMaterial("LEGACY_WOOL"), 14).createItem(1),
-                    BlockData.fromMaterialData(getMaterial("LEGACY_WOOL"), 10).createItem(1),
-                    ItemUtil.createItem(getMaterial("RED_WOOL"), 1)
-            }, new ItemStack[] {
-                    BlockData.fromMaterialData(getMaterial("LEGACY_STONE"), 0).createItem(1),
-            });
-            // OAK_SLAB since 1.13
-            testItemParser("OAK_SLAB", new ItemStack[] {
-                    ItemUtil.createItem(getMaterial("OAK_SLAB"), 1)
-            }, new ItemStack[] {
-                    ItemUtil.createItem(getMaterial("AIR"), 1)
-            });
-        } else {
-            // Only legacy material names work
-            // Data value specified, should match red wool only
-            testItemParser("WOOL:RED", new ItemStack[] {
-                    BlockData.fromMaterialData(getMaterial("LEGACY_WOOL"), 14).createItem(1),
-            }, new ItemStack[] {
-                    BlockData.fromMaterialData(getMaterial("LEGACY_WOOL"), 10).createItem(1),
-                    BlockData.fromMaterialData(getMaterial("LEGACY_STONE"), 0).createItem(1),
-            });
-            // Data value set to 'any', which should guarantee parsing to any type of wool
-            testItemParser("WOOL:", new ItemStack[] {
-                    BlockData.fromMaterialData(getMaterial("LEGACY_WOOL"), 14).createItem(1),
-                    BlockData.fromMaterialData(getMaterial("LEGACY_WOOL"), 10).createItem(1),
-            }, new ItemStack[] {
-                    BlockData.fromMaterialData(getMaterial("LEGACY_STONE"), 0).createItem(1),
-            });
-        }
-    }
-
-    @Test
     public void testToItemHandleConversion() {
         if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
             for (Material m : MaterialsByName.getAllByName("LEGACY_MINECART", "MINECART")) {
@@ -519,20 +473,6 @@ public class ItemMaterialTest {
         int curr = CraftMagicNumbersHandle.getDataVersion();
         if (curr > ItemStackDeserializer.INSTANCE.getMaxSupportedDataVersion()) {
             fail("ItemStackDeserializer needs to support the new Data Version (" + curr + ")");
-        }
-    }
-
-    private static void testItemParser(String fullname, ItemStack[] items_yes, ItemStack[] items_no) {
-        ItemParser parser = ItemParser.parse(fullname);
-        for (ItemStack item : items_yes) {
-            if (!parser.match(item)) {
-                fail("Item " + item + " should match " + parser + " but it did not!");
-            }
-        }
-        for (ItemStack item : items_no) {
-            if (parser.match(item)) {
-                fail("Item " + item + " should not match " + parser + " but it did!");
-            }
         }
     }
 

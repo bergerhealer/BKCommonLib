@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.inventory;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.*;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
@@ -211,12 +210,22 @@ public class ItemParser implements Predicate<CommonItemStack> {
 
     /**
      * Checks whether an ItemStack matches this Item Parser
-     * 
-     * @param stack
+     *
+     * @param stack Bukkit ItemStack. Null for an empty item slot.
      * @return True if it matches
      */
     public boolean match(ItemStack stack) {
-        if (stack == null) {
+        return match(CommonItemStack.of(stack));
+    }
+
+    /**
+     * Checks whether a CommonItemStack matches this Item Parser
+     * 
+     * @param stack CommonItemStack. Must not be null.
+     * @return True if it matches
+     */
+    public boolean match(CommonItemStack stack) {
+        if (stack.isEmpty()) {
             return false;
         }
 
@@ -226,26 +235,17 @@ public class ItemParser implements Predicate<CommonItemStack> {
                 return false;
         } else {
             // 1.12.2 or before, supply durability also
-            if (!this.match(stack.getType(), stack.getDurability()))
+            // TODO: Make this less uggo? Does getDamage() work on 1.12?
+            if (!this.match(stack.getType(), stack.toBukkit().getDurability()))
                 return false;
         }
 
         // Metadata rules
-        // TODO: Broken as of 1.20.5!
-        /*
-        if (!this.rules.isEmpty()) {
-            CommonTagCompound meta = ItemUtil.getMetaTag(stack, false);
-            if (meta == null) {
-                meta = new CommonTagCompound();
-            }
-
-            for (ItemParserMetaRule rule : this.rules) {
-                if (!rule.match(meta)) {
-                    return false;
-                }
+        for (ItemParserMetaRule rule : this.rules) {
+            if (!rule.match(stack)) {
+                return false;
             }
         }
-         */
 
         return true;
     }

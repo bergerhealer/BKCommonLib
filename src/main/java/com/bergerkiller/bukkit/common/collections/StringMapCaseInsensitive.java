@@ -9,11 +9,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * A high-performance HashMap implementation that ignores the case of keys. The
  * keys are stored in the original case. This map violates it general contract
- * for that reason, as keys no longer have to equal one another.
+ * for that reason, as keys no longer have to equal one another.<br>
+ * <br>
+ * Not multithread-safe!
  *
  * @param <V> - Value type to map to String keys
  */
@@ -95,6 +98,17 @@ public class StringMapCaseInsensitive<V> implements Map<String, V> {
     public void putAll(Map<? extends String, ? extends V> m) {
         for (Entry<? extends String, ? extends V> entry : m.entrySet()) {
             put(entry.getKey(), entry.getValue());
+        }
+    }
+
+    @Override
+    public V getOrDefault(Object key, V defaultValue) {
+        if (key == null) {
+            return base.getOrDefault(null, defaultValue);
+        } else if (key instanceof String) {
+            return base.getOrDefault(tmpWrap.fill((String) key), defaultValue);
+        } else {
+            return defaultValue;
         }
     }
 

@@ -1,25 +1,33 @@
 package com.bergerkiller.bukkit.common.inventory;
 
+import java.util.Map;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.collections.StringMapCaseInsensitive;
 
 /**
  * A single metadata rule for the ItemParser.
  * Represents, for example, that a particular key should equal a certain value.
  */
-public class ItemParserMetaRule {
-    private static final String[] OPERATOR_TYPES = {">=", "<=", "!=", "==", "=", ">", "<"};
+public final class ItemParserMetaRule {
+    private static final Map<String, Function<CommonItemStack, Object>> valueExtractors = new StringMapCaseInsensitive<>();
+    static {
+        valueExtractors.put("damage", item -> item.isDamageSupported() ? item.getDamage() : null);
+    }
+
+    private final Function<CommonItemStack, Object> _valueExtractor;
     private String _name;
-    private String _operator;
+    private Operator _operator;
     private String _value;
     private boolean _valuePatternCheck;
     private Pattern _valuePattern;
 
-    public ItemParserMetaRule(String name, String operator, String value) {
+    private ItemParserMetaRule(Function<CommonItemStack, Object> valueExtractor, String name, Operator operator, String value) {
+        this._valueExtractor = valueExtractor;
         this._name = name;
         this._operator = operator;
         this._value = value;
@@ -31,7 +39,7 @@ public class ItemParserMetaRule {
         return this._name;
     }
 
-    public String getOperator() {
+    public Operator getOperator() {
         return this._operator;
     }
 
@@ -40,13 +48,13 @@ public class ItemParserMetaRule {
     }
 
     /**
-     * Checks whether this metadata rule matches the metadata of an Item
+     * Checks whether this metadata rule matches an item
      * 
-     * @param tag
+     * @param item
      * @return True if matches
      */
-    public boolean match(CommonTagCompound tag) {
-        Object value = tag.getValue(this._name);
+    public final boolean match(CommonItemStack item) {
+        Object value = this._valueExtractor.apply(item);
         if (value == null) {
             // 'not exists' match
             return "!=".equals(this._operator);
@@ -68,17 +76,10 @@ public class ItemParserMetaRule {
                 } else {
                     num_expect = (double) Float.parseFloat(this._value);
                 }
-                switch (this._operator) {
-                case "=":
-                case "==": return num_value == num_expect;
-                case "!=": return num_value != num_expect;
-                case ">=": return num_value >= num_expect;
-                case "<=": return num_value <= num_expect;
-                case ">": return num_value > num_expect;
-                case "<": return num_value < num_expect;
-                }
-            } catch (NumberFormatException ex) {}
-            return false;
+                return this._operator.compare(num_value, num_expect);
+            } catch (NumberFormatException ex) {
+                return false;
+            }
         }
 
         // Deals with byte, short, int, long cases (integer)
@@ -87,25 +88,18 @@ public class ItemParserMetaRule {
             try {
                 long num_value = ((Number) value).longValue();
                 long num_expect = Long.parseLong(this._value);
-                switch (this._operator) {
-                case "=":
-                case "==": return num_value == num_expect;
-                case "!=": return num_value != num_expect;
-                case ">=": return num_value >= num_expect;
-                case "<=": return num_value <= num_expect;
-                case ">": return num_value > num_expect;
-                case "<": return num_value < num_expect;
-                }
-            } catch (NumberFormatException ex) {}
-            return false;
+                return this._operator.compare(num_value, num_expect);
+            } catch (NumberFormatException ex) {
+                return false;
+            }
         }
 
         // String
         if (value instanceof String) {
             String str_value = (String) value;
 
-            boolean isNotEquals = this._operator.equals("!=");
-            if (isNotEquals || this._operator.equals("=") || this._operator.equals("==")) {
+            boolean isNotEquals = this._operator == Operator.NOT_EQUAL;
+            if (isNotEquals || this._operator == Operator.EQUAL || this._operator == Operator.EQUAL_ALT) {
                 // Check if this._value contains wildcard character
                 // If so, we must use regex to do all this
                 if (!this._valuePatternCheck) {
@@ -164,14 +158,7 @@ public class ItemParserMetaRule {
             }
 
             // Other cases
-            int compare = str_value.compareTo(this._value);
-            switch (this._operator) {
-            case ">=": return compare >= 0;
-            case "<=": return compare <= 0;
-            case ">": return compare > 0;
-            case "<": return compare < 0;
-            }
-            return false;
+            return this._operator.compare(str_value, this._value);
         }
 
         // List, Map, byte[], int[]
@@ -195,20 +182,99 @@ public class ItemParserMetaRule {
      * @return meta rule
      */
     public static ItemParserMetaRule parse(String text) {
-        for (String op : OPERATOR_TYPES) {
-            int index = text.indexOf(op);
+        // ! prefixes means opposite
+        boolean opposite = false;
+        while (text.startsWith("!")) {
+            opposite = !opposite;
+            text = text.substring(1);
+        }
+
+        // Extract the operator and operator value from the expression
+        Operator operator = Operator.EQUAL;
+        String value = null; // null means 'any' non-null value
+        for (Operator operatorCandidate : Operator.values()) {
+            int index = text.indexOf(operatorCandidate.getOperatorName());
             if (index != -1) {
-                return new ItemParserMetaRule(
-                        text.substring(0, index), /* name */
-                        op, /* operator */
-                        text.substring(index + op.length())); /* value */
+                operator = operatorCandidate;
+                value = text.substring(index + operatorCandidate.getOperatorName().length());
+                text = text.substring(0, index); /* name */
+                break;
             }
         }
-        if (text.startsWith("!")) {
-            return new ItemParserMetaRule(text.substring(1), "!=", null);
-        } else {
-            return new ItemParserMetaRule(text, "==", null);
+
+        // Inverted?
+        if (opposite) {
+            operator = operator.opposite();
         }
+
+        Function<CommonItemStack, Object> valueExtractor = null;
+        synchronized (valueExtractors) {
+            valueExtractor = valueExtractors.get(text);
+        }
+        if (valueExtractor == null) {
+            final String name = text;
+            valueExtractor = item -> {
+                if (item.hasCustomData()) {
+                    return item.getCustomData().getValue(name);
+                } else {
+                    return null;
+                }
+            };
+        }
+        return new ItemParserMetaRule(valueExtractor, text, operator, value);
     }
 
+    public enum Operator {
+        GREATER_EQUAL_THAN(">=", c -> c >= 0),
+        LESS_EQUAL_THAN("<=", c -> c <= 0),
+        NOT_EQUAL("!=", c -> c != 0),
+        EQUAL("==", c -> c == 0),
+        EQUAL_ALT("=", c -> c == 0),
+        GREATER_THAN(">", c -> c > 0),
+        LESS_THAN("<", c -> c < 0);
+
+        static {
+            GREATER_EQUAL_THAN.opposite = LESS_THAN;
+            LESS_EQUAL_THAN.opposite = GREATER_THAN;
+            NOT_EQUAL.opposite = EQUAL;
+            EQUAL.opposite = NOT_EQUAL;
+            EQUAL_ALT.opposite = NOT_EQUAL;
+            GREATER_THAN.opposite = LESS_EQUAL_THAN;
+            LESS_THAN.opposite = GREATER_EQUAL_THAN;
+        }
+
+        private final String name;
+        private final ComparatorRule comparatorRule;
+        private Operator opposite;
+
+        Operator(String name, ComparatorRule comparatorRule) {
+            this.name = name;
+            this.comparatorRule = comparatorRule;
+        }
+
+        public String getOperatorName() {
+            return name;
+        }
+
+        public Operator opposite() {
+            return opposite;
+        }
+
+        public boolean compare(double lhs, double rhs) {
+            return comparatorRule.test(Double.compare(lhs, rhs));
+        }
+
+        public boolean compare(long lhs, long rhs) {
+            return comparatorRule.test(Long.compare(lhs, rhs));
+        }
+
+        public boolean compare(String lhs, String rhs) {
+            return comparatorRule.test(lhs.compareTo(rhs));
+        }
+
+        @FunctionalInterface
+        private interface ComparatorRule {
+            boolean test(int comparator);
+        }
+    }
 }
