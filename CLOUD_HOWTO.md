@@ -4,7 +4,7 @@ BKCommonLib shades in the [Cloud Command Framework](https://github.com/Incendo/c
 ### Technical
 Cloud is shaded at a different package path (to avoid conflicts), so using the integrated cloud requires remapping it using the maven shade or gradle shadow plugin. BKCommonLib has a BOM (Bill of materials) hosted on the same repository BKCommonLib is, that includes information about the cloud dependency and its version. The below maven and gradle configurations make use of this.
 
-Incendo Cloud jars can be found on the maven central repository, so they should be available automatically.
+Incendo Cloud jars can be found on the maven central repository, so they should be available automatically. The ci.mg-dev.eu repository proxies and caches the Cloud dependencies too.
 
 ### Version
 Currently the 2.0.0 beta/release-candidate of Cloud is included.
@@ -110,6 +110,8 @@ However, the library and its dependencies are shaded in at a different package t
 
 ### Gradle
 Depending on BKCommonLib will automatically tell Gradle what versions of Cloud and its dependencies to use. The below configuration assumes kotlin gradle syntax, and are for your project's `build.gradle.kts` file.
+
+This does not work well with older versions of Gradle. Make sure to use **gradle 8.5** at least.
 
 Begin by adding the repository where BKCommonLib is hosted:
 ```kotlin
