@@ -18,8 +18,6 @@ repositories {
     // - Myles ViaVersion
     maven("https://ci.mg-dev.eu/plugin/repository/everything/")
 
-    maven("https://oss.sonatype.org/content/repositories/snapshots/")
-
     // Used to access a server JAR for testing
     // TODO Use Paperclip instead
     mavenLocal {
