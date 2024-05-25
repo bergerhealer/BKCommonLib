@@ -68,8 +68,8 @@ This means you don't have to compile different classes for every different permu
 <summary>Includes Cloud Command Framework</summary>
 
 #####
-BKCommonLib includes the [**Cloud Command Framework**](https://github.com/bergerhealer/cloud). Write clean commands with annotations or builder pattern, complete with suggestions, permission handling and localization.
-BKCommonLib adds a few default utilities to get set up for Paper/Spigot servers even faster.
+BKCommonLib includes the [**Cloud Command Framework**](https://cloud.incendo.org/). Write clean commands with annotations or builder pattern, complete with suggestions, permission handling and localization.
+BKCommonLib adds a few default utilities to get set up for Paper/Spigot servers even faster. [Dependency information is here](https://github.com/bergerhealer/BKCommonLib/blob/master/CLOUD_HOWTO.md).
 ******
 </details>
 <details>
@@ -398,7 +398,7 @@ There are many more features hidden inside utility classes. Look around.
 ## Dependency Information
 Want to use BKCommonLib in your own projects? Use the following repository and dependency information. Remember to update the version as necessary.
 
-Want to use the included [Cloud Command Framework](https://github.com/bergerhealer/cloud)? Follow [these instructions](https://github.com/bergerhealer/BKCommonLib/blob/master/CLOUD_HOWTO.md) to properly relocate your imports.
+Want to use the included [Cloud Command Framework](https://cloud.incendo.org/)? Follow [these instructions](https://github.com/bergerhealer/BKCommonLib/blob/master/CLOUD_HOWTO.md) to properly relocate your imports.
 
 <details open>
 <summary>Maven</summary>
@@ -448,7 +448,7 @@ Bergerkiller, the project owner, is generally fine with people copy-pasting code
 If you're unsure, ask in our Discord server.
 
 BKCommonLib shades in/uses the following libraries, further License conditions may apply:
-- [Cloud Command Framework](https://github.com/incendo/cloud) (custom fork)
+- [Cloud Command Framework](https://github.com/incendo/cloud)
 - [ASM](https://github.com/llbit/ow2-asm)
 - [Javassist](https://github.com/jboss-javassist/javassist)
 - [Objenesis](http://objenesis.org/)
