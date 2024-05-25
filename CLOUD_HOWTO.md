@@ -12,10 +12,12 @@ BKCommonLib has a BOM (Bill of materials) hosted on the same repository BKCommon
 
 Begin by adding the repository where BKCommonLib is hosted:
 ```pom.xml
-    <repository>
-        <id>MG-Dev Jenkins CI Maven Repository</id>
-        <url>https://ci.mg-dev.eu/plugin/repository/everything</url>
-    </repository>
+    <repositories>
+        <repository>
+            <id>MG-Dev Jenkins CI Maven Repository</id>
+            <url>https://ci.mg-dev.eu/plugin/repository/everything</url>
+        </repository>
+    </repositories>
 ```
 Next, add BKCommonLib-bom under **dependencyManagement** (!). This automatically loads the information about what cloud version and its dependencies are used for a particular version of BKCommonLib. Next just add all the dependencies without specifying the version. The version is taken from the bom.
 ```pom.xml
