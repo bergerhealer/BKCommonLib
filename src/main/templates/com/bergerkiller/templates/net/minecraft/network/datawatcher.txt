@@ -141,7 +141,7 @@ class DataWatcher {
         // Items are stored in a Trove IntHashmap
         #require DataWatcher private final gnu.trove.map.TIntObjectMap itemsById:dataValues;
         gnu.trove.map.TIntObjectMap itemsById = instance#itemsById;
-        gnu.trove.map.TIntObjectMap copyItemsByid = copyWatcher#itemsById;
+        gnu.trove.map.TIntObjectMap copyItemsById = copyWatcher#itemsById;
         java.util.Iterator itemIter = itemsById.valueCollection().iterator();
   #else
         #error Unknown datawatcher storage method
