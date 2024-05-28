@@ -125,8 +125,9 @@ dependencies {
     compileOnlyApi("com.bergerkiller.bukkit:BKCommonLib:1.20.6-v1-SNAPSHOT")
 
     // Cloud integrated in BKCommonLib
-    compileOnly("org.incendo:cloud-bom")
-    compileOnly("org.incendo:cloud-minecraft-bom")
+    compileOnly("org.incendo:cloud-paper")
+    compileOnly("org.incendo:cloud-annotations")
+    compileOnly("org.incendo:cloud-minecraft-extras")
 }
 ```
 Finally, make sure the cloud dependency is shaded correctly when compiling your plugin:
