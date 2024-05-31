@@ -9,7 +9,7 @@ colorconversionhelper = "1.03"
 softdependencylib = "1.03"
 timings = "1.0.4"
 gson = "2.8.9"
-viaversion = "3.2.1"
+viaversion = "4.0.0"
 vault = "1.7"
 luckperms = "5.4"
 protocollib = "4.4.0"
@@ -36,7 +36,7 @@ colorconversionhelper = { module = "com.bergerkiller.bukkit.colorconversionhelpe
 softdependency = { module = "com.bergerkiller.bukkit.softdependency:SoftDependency", version.ref = "softdependencylib" }
 timings = { module = "co.aikar:minecraft-timings", version.ref = "timings" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-viaversion = { module = "us.myles:viaversion", version.ref = "viaversion" }
+viaversion = { module = "com.viaversion:viaversion-api", version.ref = "viaversion" }
 vault = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
 luckperms = { module = "net.luckperms:api", version.ref = "luckperms" }
 protocollib = { module = "com.comphenix.protocol:ProtocolLib-API", version.ref = "protocollib" }

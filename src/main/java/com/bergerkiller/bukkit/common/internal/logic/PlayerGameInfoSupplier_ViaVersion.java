@@ -6,13 +6,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.bergerkiller.bukkit.common.protocol.PlayerGameInfo;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.ViaAPI;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
-
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.ViaAPI;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 
 /**
  * Detects the game version of the player by communicating with the ViaVersion API.
