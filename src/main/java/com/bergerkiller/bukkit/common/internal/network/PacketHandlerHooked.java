@@ -170,7 +170,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
      * @return True if the packet is allowed to be sent, False if not
      */
     public boolean handlePacketSend(Player player, Object packet, boolean wasCancelled) {
-        if (player == null || packet == null) {
+        if (player == null || !PacketHandle.T.isAssignableFrom(packet)) {
             return true;
         }
 

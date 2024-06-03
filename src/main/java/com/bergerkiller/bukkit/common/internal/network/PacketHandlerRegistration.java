@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundBundlePacketHandle;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -245,7 +246,7 @@ class PacketHandlerRegistration {
      * @return True if the packet is allowed to be received, False if not
      */
     public boolean handlePacketReceive(Player player, Object packet, boolean wasCancelled) {
-        if (player == null || packet == null) {
+        if (player == null || !PacketHandle.T.isAssignableFrom(packet)) {
             return true;
         }
         // Handle listeners
