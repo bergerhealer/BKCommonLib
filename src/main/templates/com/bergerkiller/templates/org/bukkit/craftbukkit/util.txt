@@ -1,6 +1,5 @@
 package org.bukkit.craftbukkit.util;
 
-import net.minecraft.EnumChatFormat;
 import net.minecraft.network.chat.IChatBaseComponent;
 
 import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
@@ -148,98 +147,8 @@ class CraftChatMessage {
             return "";
         }
 
-        StringBuilder out = new StringBuilder();
-        java.util.Iterator iter = ((Iterable) component).iterator();
-
-        EnumChatFormat prev_color_format = null;
-        boolean prev_was_bold = false;
-        boolean prev_was_italic = false;
-        boolean prev_was_underlined = false;
-        boolean prev_was_strikeThrough = false;
-        boolean prev_was_obfuscated = false;
-
-        while (iter.hasNext()) {
-            IChatBaseComponent c = (IChatBaseComponent) iter.next();
-            net.minecraft.network.chat.ChatModifier modi = c.getStyle();
-
-            // Place reset character when too many style flags are active
-            if ((prev_was_bold && !modi.isBold()) ||
-                (prev_was_italic && !modi.isItalic()) ||
-                (prev_was_underlined && !modi.isUnderlined()) ||
-                (prev_was_strikeThrough && !modi.isStrikethrough()) ||
-                (prev_was_obfuscated && !modi.isObfuscated()))
-            {
-                prev_color_format = null;
-                prev_was_bold = false;
-                prev_was_italic = false;
-                prev_was_underlined = false;
-                prev_was_strikeThrough = false;
-                prev_was_obfuscated = false;
-                out.append(EnumChatFormat.RESET);
-            }
-
-            if (modi.getColor() != null) {
-#if version >= 1.16
-                EnumChatFormat color_format = modi.getColor().format;
-                if (color_format != null) {
-                    // Track as 16 color format, omit duplicates
-                    if (prev_color_format != color_format) {
-                        prev_color_format = color_format;
-                        out.append(color_format);
-                    }
-                } else {
-                    // Get color RGB value
-  #if version >= 1.17
-                    int rgb = modi.getColor().getValue();
-  #else
-                    #require net.minecraft.network.chat.ChatHexColor private final int chc_rgb:rgb;
-                    net.minecraft.network.chat.ChatHexColor hexcolor = modi.getColor();
-                    int rgb = hexcolor#chc_rgb;
-  #endif
-
-                    // Append hex color bungee style syntax
-                    // Technically we could use bungeecord ChatColor for this, but I don't know
-                    // whether all versions of spigot/paper/etc. actually include that class.
-                    final char style_char = com.bergerkiller.bukkit.common.utils.StringUtil.CHAT_STYLE_CHAR;
-                    out.append(style_char).append('x');
-                    int rgb_remaining = rgb;
-                    for (int n = 0; n < 6; n++) {
-                        rgb_remaining <<= 4;
-                        out.append(style_char).append(Character.forDigit((rgb_remaining >> 24) & 0xF, 16));
-                    }
-
-                    // Reset color format
-                    prev_color_format = null;
-                }
-#else
-                out.append(modi.getColor());
-#endif
-            }
-            if (modi.isBold() && !prev_was_bold) {
-                prev_was_bold = true;
-                out.append(EnumChatFormat.BOLD);
-            }
-            if (modi.isItalic() && !prev_was_italic) {
-                prev_was_italic = true;
-                out.append(EnumChatFormat.ITALIC);
-            }
-            if (modi.isUnderlined() && !prev_was_underlined) {
-                prev_was_underlined = true;
-                out.append(EnumChatFormat.UNDERLINE);
-            }
-            if (modi.isStrikethrough() && !prev_was_strikeThrough) {
-                prev_was_strikeThrough = true;
-                out.append(EnumChatFormat.STRIKETHROUGH);
-            }
-            if (modi.isObfuscated() && !prev_was_obfuscated) {
-                prev_was_obfuscated = true;
-                out.append(EnumChatFormat.OBFUSCATED);
-            }
-
-            String text = (String) IChatBaseComponentHandle.T.getText.invoke(c);
-            out.append(text);
-        }
-        return out.toString();
+        // Macro defined in global.txt
+        return component#formatAsLegacyString();
     }
 
     public static (IChatBaseComponentHandle[]) IChatBaseComponent[] fromString(String message, boolean keepNewlines);

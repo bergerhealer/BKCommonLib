@@ -1,7 +1,6 @@
 package net.minecraft.network.chat;
 
 import net.minecraft.EnumChatFormat;
-import net.minecraft.network.chat.contents.TranslatableContents;
 
 import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
 
@@ -37,48 +36,8 @@ class IChatBaseComponent {
 
 #if version >= 1.19
     public String getText() {
-        net.minecraft.network.chat.ComponentContents contents = instance.getContents();
-        if (contents instanceof net.minecraft.network.chat.contents.LiteralContents) {
-            return ((net.minecraft.network.chat.contents.LiteralContents) contents).text();
-        } else if (contents instanceof TranslatableContents) {
-  #if exists io.papermc.paper.adventure.PaperAdventure
-            return io.papermc.paper.adventure.PaperAdventure.asPlain(io.papermc.paper.adventure.PaperAdventure.asAdventure(instance), null);
-  #else
-            TranslatableContents trans = (TranslatableContents) contents;
-            String key = trans.getKey();
-            if (key == null) {
-                return "null";
-            }
-            int namespaceOffset = 0;
-            if (key.startsWith("block.minecraft.")) {
-                namespaceOffset = 16;
-            } else if (key.startsWith("item.minecraft.")) {
-                namespaceOffset = 15;
-            }
-            key = key.substring(namespaceOffset);
-            if (namespaceOffset > 0) {
-                // Replace _ with " ", capitalize first letter
-                key = key.replace('_', ' ');
-                if (!key.isEmpty()) {
-                    key = key.substring(0, 1).toUpperCase(java.util.Locale.ENGLISH) + key.substring(1);
-                }
-            }
-            return key;
-  #endif
-
-  #if version >= 1.20.3
-        } else if (contents != null && contents != net.minecraft.network.chat.CommonComponents.EMPTY) {
-            // Unsupported / dont care
-            return contents.toString();
-  #else
-        } else if (contents != null && contents != net.minecraft.network.chat.ComponentContents.EMPTY) {
-            // Unsupported / dont care
-            return contents.toString();
-  #endif
-
-        } else {
-            return "";
-        }
+        // Macro defined in global.txt
+        return instance#getComponentText();
     }
 #elseif version >= 1.18
     public abstract String getText:getContents();
