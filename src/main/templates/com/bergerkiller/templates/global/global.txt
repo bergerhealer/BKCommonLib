@@ -2,6 +2,7 @@
 // This file is loaded in at the very beginning
 
 import net.minecraft.EnumChatFormat;
+import net.minecraft.network.chat.ChatModifier;
 import net.minecraft.network.chat.contents.TranslatableContents;
 
 // Gets the text representation of a chat component (and only that component. It is not recursive.)
@@ -58,10 +59,34 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 
 // Formats a chat component, and its siblings/children, as a legacy-color-formatted message String
 #require net.minecraft.network.chat.IChatBaseComponent public String formatAsLegacyString() {
-    //TODO: Avoid stringbuilder if its an unformatted single component already
+    IChatBaseComponent component = instance;
+
+    // Some optimizations
+    {
+        java.util.List siblings = component.getSiblings();
+        int numSiblings = siblings.size();
+
+        // Due to immutable chat components, very often the root is a modifiable chat component
+        // with empty text content and no defined style. This checks for that common case.
+        // If there is no sibling or only one, resume with that one instead.
+        if (numSiblings == 1 && component.getStyle().isEmpty()) {
+            String text = component#getComponentText();
+            if (text.isEmpty()) {
+                component = (IChatBaseComponent) siblings.get(0);
+                siblings = component.getSiblings();
+                numSiblings = siblings.size();
+            }
+        }
+
+        // If component has default style, and no siblings, we can return the text value directly
+        // This avoids the overhead of creating a stream and filling a StringBuilder
+        if (numSiblings == 0 && component.getStyle().isEmpty()) {
+            return component#getComponentText();
+        }
+    }
 
     StringBuilder out = new StringBuilder();
-    java.util.Iterator iter = ((Iterable) instance).iterator();
+    java.util.Iterator iter = ((Iterable) component).iterator();
 
     EnumChatFormat prev_color_format = null;
     boolean prev_was_bold = false;
@@ -72,7 +97,7 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 
     while (iter.hasNext()) {
         IChatBaseComponent c = (IChatBaseComponent) iter.next();
-        net.minecraft.network.chat.ChatModifier modi = c.getStyle();
+        ChatModifier modi = c.getStyle();
 
         // Place reset character when too many style flags are active
         if ((prev_was_bold && !modi.isBold()) ||

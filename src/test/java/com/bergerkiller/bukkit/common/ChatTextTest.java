@@ -17,6 +17,12 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 public class ChatTextTest {
 
     @Test
+    public void testUnformattedText() {
+        ChatText text = ChatText.fromMessage("Hello, world!");
+        assertEquals("Hello, world!", text.getMessage());
+    }
+
+    @Test
     public void testChatText() {
         String msg = "Hello, " + ChatColor.RED + "World!";
         ChatText text = ChatText.fromMessage(msg);
