@@ -7,3 +7,17 @@
   #endif
   #remap net.minecraft.network.chat.IChatBaseComponent.ChatSerializer public static String toJson:a(net.minecraft.network.chat.IChatBaseComponent chatComponent);
 #endif
+
+#if version >= 1.18
+  #remap net.minecraft.network.chat.ChatModifier public boolean isObfuscated();
+  #remap net.minecraft.network.chat.IChatBaseComponent public net.minecraft.network.chat.ChatModifier getStyle();
+#else
+  #remap net.minecraft.network.chat.ChatModifier public boolean isObfuscated:isRandom();
+  #remap net.minecraft.network.chat.IChatBaseComponent public net.minecraft.network.chat.ChatModifier getStyle:getChatModifier();
+#endif
+
+#if version >= 1.18
+  #remap net.minecraft.network.chat.ChatHexColor public int getValue();
+#elseif version >= 1.17
+  #remap net.minecraft.network.chat.ChatHexColor public int getValue:a();
+#endif
