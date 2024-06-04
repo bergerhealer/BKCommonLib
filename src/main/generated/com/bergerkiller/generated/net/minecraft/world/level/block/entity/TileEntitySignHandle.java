@@ -21,13 +21,17 @@ public abstract class TileEntitySignHandle extends TileEntityHandle {
     /* ============================================================================== */
 
     public abstract Object[] getRawFrontLines();
+    public abstract String[] getMessageFrontLines();
     public abstract Object[] getRawBackLines();
+    public abstract String[] getMessageBackLines();
     public abstract void setFormattedFrontLine(int index, ChatText text);
     public abstract void setFormattedBackLine(int index, ChatText text);
     public static final Object[] ALL_EMPTY_RAW_LINES;
+    public static final String[] ALL_EMPTY_STRING_LINES;
     static {
         Object raw_empty = ChatText.empty().getRawHandle();
         ALL_EMPTY_RAW_LINES = new Object[] {raw_empty, raw_empty, raw_empty, raw_empty};
+        ALL_EMPTY_STRING_LINES = new String[] { "", "", "", "" };
     }
 
     @Override
@@ -44,7 +48,9 @@ public abstract class TileEntitySignHandle extends TileEntityHandle {
      */
     public static final class TileEntitySignClass extends Template.Class<TileEntitySignHandle> {
         public final Template.Method<Object[]> getRawFrontLines = new Template.Method<Object[]>();
+        public final Template.Method<String[]> getMessageFrontLines = new Template.Method<String[]>();
         public final Template.Method<Object[]> getRawBackLines = new Template.Method<Object[]>();
+        public final Template.Method<String[]> getMessageBackLines = new Template.Method<String[]>();
         public final Template.Method.Converted<Void> setFormattedFrontLine = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> setFormattedBackLine = new Template.Method.Converted<Void>();
 

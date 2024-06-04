@@ -19,31 +19,47 @@ public enum SignSide {
     /**
      * Front side of the sign. Supported on all versions of Minecraft.
      */
-    FRONT(SignHandle::getFrontLines, SignHandle::getFrontLine, SignHandle::setFrontLine, true),
+    FRONT(SignHandle::getFrontLines, SignHandle::getFrontLine, SignHandle::setFrontLine,
+            SignChangeTracker::getFrontLines, SignChangeTracker::getFrontLine, SignChangeTracker::setFrontLine,
+            true),
     /**
      * Back side of the sign. Only supported on Minecraft 1.20+.
      */
-    BACK(SignHandle::getBackLines, SignHandle::getBackLine, SignHandle::setBackLine, CommonCapabilities.HAS_SIGN_BACK_TEXT);
+    BACK(SignHandle::getBackLines, SignHandle::getBackLine, SignHandle::setBackLine,
+            SignChangeTracker::getBackLines, SignChangeTracker::getBackLine, SignChangeTracker::setBackLine,
+            CommonCapabilities.HAS_SIGN_BACK_TEXT);
 
     static {
         FRONT.opposite = BACK;
         BACK.opposite = FRONT;
     }
 
-    private final Function<SignHandle, String[]> allLinesGetter;
-    private final LineGetterFunc lineGetter;
-    private final LineSetterFunc lineSetter;
+    // Bukkit (Deprecated. Slow. Bad.)
+    private final Function<SignHandle, String[]> bukkitAllLinesGetter;
+    private final BukkitLineGetterFunc bukkitLineGetter;
+    private final BukkitLineSetterFunc bukkitLineSetter;
+    // BKCommonLib SignChangeTracker (Good. Fast. Awesome.)
+    private final Function<SignChangeTracker, String[]> trackerAllLinesGetter;
+    private final SignTrackerLineGetterFunc trackerLineGetter;
+    private final SignTrackerLineSetterFunc trackerLineSetter;
     private final boolean supported;
     private SignSide opposite;
 
-    SignSide(Function<SignHandle, String[]> allLinesGetter,
-             LineGetterFunc lineGetter,
-             LineSetterFunc lineSetter,
-             boolean supported
+    SignSide(
+            final Function<SignHandle, String[]> bukkitAllLinesGetter,
+            final BukkitLineGetterFunc bukkitLineGetter,
+            final BukkitLineSetterFunc bukkitLineSetter,
+            final Function<SignChangeTracker, String[]> trackerAllLinesGetter,
+            final SignTrackerLineGetterFunc trackerLineGetter,
+            final SignTrackerLineSetterFunc trackerLineSetter,
+            final boolean supported
     ) {
-        this.allLinesGetter = allLinesGetter;
-        this.lineGetter = lineGetter;
-        this.lineSetter = lineSetter;
+        this.bukkitAllLinesGetter = bukkitAllLinesGetter;
+        this.bukkitLineGetter = bukkitLineGetter;
+        this.bukkitLineSetter = bukkitLineSetter;
+        this.trackerAllLinesGetter = trackerAllLinesGetter;
+        this.trackerLineGetter = trackerLineGetter;
+        this.trackerLineSetter = trackerLineSetter;
         this.supported = supported;
     }
 
@@ -136,11 +152,11 @@ public enum SignSide {
      * Returns an array of empty lines for the back side on Minecraft versions
      * below 1.20.
      *
-     * @param sign Sign to get lines of
+     * @param signChangeTracker SignChangeTracker to get lines of
      * @return lines
      */
-    public String[] getLines(Sign sign) {
-        return allLinesGetter.apply(SignHandle.createHandle(sign));
+    public String[] getLines(SignChangeTracker signChangeTracker) {
+        return trackerAllLinesGetter.apply(signChangeTracker);
     }
 
     /**
@@ -148,11 +164,11 @@ public enum SignSide {
      * Returns an empty line for the back side on Minecraft versions
      * below 1.20.
      *
-     * @param sign Sign to get a line of
+     * @param signChangeTracker SignChangeTracker to get a line of
      * @return line
      */
-    public String getLine(Sign sign, int index) {
-        return lineGetter.get(SignHandle.createHandle(sign), index);
+    public String getLine(SignChangeTracker signChangeTracker, int index) {
+        return trackerLineGetter.get(signChangeTracker, index);
     }
 
     /**
@@ -160,11 +176,11 @@ public enum SignSide {
      * Does nothing for the back side on Minecraft versions
      * below 1.20.
      *
-     * @param sign Sign to set a line of
+     * @param signChangeTracker SignChangeTracker to set a line of
      * @param text Line to put
      */
-    public void setLine(Sign sign, int index, String text) {
-        lineSetter.set(SignHandle.createHandle(sign), index, text);
+    public void setLine(SignChangeTracker signChangeTracker, int index, String text) {
+        trackerLineSetter.set(signChangeTracker, index, text);
     }
 
     /**
@@ -174,9 +190,11 @@ public enum SignSide {
      *
      * @param sign Sign to get lines of
      * @return lines
+     * @deprecated Bukkit Sign legacy lines are very slow. Use {@link SignChangeTracker} instead.
      */
-    public String[] getLines(SignHandle sign) {
-        return allLinesGetter.apply(sign);
+    @Deprecated
+    public String[] getLines(Sign sign) {
+        return bukkitAllLinesGetter.apply(SignHandle.createHandle(sign));
     }
 
     /**
@@ -186,9 +204,11 @@ public enum SignSide {
      *
      * @param sign Sign to get a line of
      * @return line
+     * @deprecated Bukkit Sign legacy lines are very slow. Use {@link SignChangeTracker} instead.
      */
-    public String getLine(SignHandle sign, int index) {
-        return lineGetter.get(sign, index);
+    @Deprecated
+    public String getLine(Sign sign, int index) {
+        return bukkitLineGetter.get(SignHandle.createHandle(sign), index);
     }
 
     /**
@@ -198,9 +218,53 @@ public enum SignSide {
      *
      * @param sign Sign to set a line of
      * @param text Line to put
+     * @deprecated Bukkit Sign legacy lines are very slow. Use {@link SignChangeTracker} instead.
      */
+    @Deprecated
+    public void setLine(Sign sign, int index, String text) {
+        bukkitLineSetter.set(SignHandle.createHandle(sign), index, text);
+    }
+
+    /**
+     * Gets all the lines put on this side of the sign.
+     * Returns an array of empty lines for the back side on Minecraft versions
+     * below 1.20.
+     *
+     * @param sign Sign to get lines of
+     * @return lines
+     * @deprecated Bukkit Sign legacy lines are very slow. Use {@link SignChangeTracker} instead.
+     */
+    @Deprecated
+    public String[] getLines(SignHandle sign) {
+        return bukkitAllLinesGetter.apply(sign);
+    }
+
+    /**
+     * Gets a line put on this side of the sign.
+     * Returns an empty line for the back side on Minecraft versions
+     * below 1.20.
+     *
+     * @param sign Sign to get a line of
+     * @return line
+     * @deprecated Bukkit Sign legacy lines are very slow. Use {@link SignChangeTracker} instead.
+     */
+    @Deprecated
+    public String getLine(SignHandle sign, int index) {
+        return bukkitLineGetter.get(sign, index);
+    }
+
+    /**
+     * Sets a line on this side of the sign.
+     * Does nothing for the back side on Minecraft versions
+     * below 1.20.
+     *
+     * @param sign Sign to set a line of
+     * @param text Line to put
+     * @deprecated Bukkit Sign legacy lines are very slow. Use {@link SignChangeTracker} instead.
+     */
+    @Deprecated
     public void setLine(SignHandle sign, int index, String text) {
-        lineSetter.set(sign, index, text);
+        bukkitLineSetter.set(sign, index, text);
     }
 
     /**
@@ -225,12 +289,22 @@ public enum SignSide {
     }
 
     @FunctionalInterface
-    private interface LineGetterFunc {
+    private interface SignTrackerLineGetterFunc {
+        String get(SignChangeTracker tracker, int index);
+    }
+
+    @FunctionalInterface
+    private interface SignTrackerLineSetterFunc {
+        void set(SignChangeTracker tracker, int index, String text);
+    }
+
+    @FunctionalInterface
+    private interface BukkitLineGetterFunc {
         String get(SignHandle sign, int index);
     }
 
     @FunctionalInterface
-    private interface LineSetterFunc {
+    private interface BukkitLineSetterFunc {
         void set(SignHandle sign, int index, String text);
     }
 }

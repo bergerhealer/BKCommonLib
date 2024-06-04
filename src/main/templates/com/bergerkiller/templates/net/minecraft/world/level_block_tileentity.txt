@@ -251,11 +251,24 @@ class TileEntitySign extends TileEntity {
 #endif
     }
 
+    public String[] getMessageFrontLines() {
+#if version >= 1.20
+        IChatBaseComponent[] lines = instance.getFrontText().getMessages(false);
+#elseif version >= 1.17
+        IChatBaseComponent[] lines = instance.messages;
+#else
+        IChatBaseComponent[] lines = instance.lines;
+#endif
+        return #formatLinesAsLegacyStrings(lines);
+    }
+
 <code>
     public static final Object[] ALL_EMPTY_RAW_LINES;
+    public static final String[] ALL_EMPTY_STRING_LINES;
     static {
         Object raw_empty = ChatText.empty().getRawHandle();
         ALL_EMPTY_RAW_LINES = new Object[] {raw_empty, raw_empty, raw_empty, raw_empty};
+        ALL_EMPTY_STRING_LINES = new String[] { "", "", "", "" };
     }
 </code>
 
@@ -264,6 +277,15 @@ class TileEntitySign extends TileEntity {
         return instance.getBackText().getMessages(false);
 #else
         return TileEntitySignHandle.ALL_EMPTY_RAW_LINES;
+#endif
+    }
+
+    public String[] getMessageBackLines() {
+#if version >= 1.20
+        IChatBaseComponent[] lines = instance.getBackText().getMessages(false);
+        return #formatLinesAsLegacyStrings(lines);
+#else
+        return TileEntitySignHandle.ALL_EMPTY_STRING_LINES;
 #endif
     }
 

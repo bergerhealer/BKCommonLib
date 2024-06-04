@@ -41,6 +41,8 @@ public class SignChangeTracker implements Cloneable {
     private TileEntitySignHandle tileEntity;
     private Object[] lastRawFrontLines;
     private Object[] lastRawBackLines;
+    private String[] lastMessageFrontLines;
+    private String[] lastMessageBackLines;
 
     // Need to swap what implementation we're using for certain server types
     private static final Function<Block, SignChangeTracker> constructor;
@@ -82,6 +84,8 @@ public class SignChangeTracker implements Cloneable {
             this.lastRawFrontLines = tile.getRawFrontLines().clone();
             this.lastRawBackLines = CommonCapabilities.HAS_SIGN_BACK_TEXT
                     ? tile.getRawBackLines().clone() : null;
+            this.lastMessageFrontLines = null;
+            this.lastMessageBackLines = null;
 
             // Note: it is possible for a TileEntity to be retrieved while it's added to a Chunk,
             // but not yet to a World. Especially on 1.12.2 and before. For that reason, we got to
@@ -95,6 +99,8 @@ public class SignChangeTracker implements Cloneable {
         this.tileEntity = null;
         this.lastRawFrontLines = null;
         this.lastRawBackLines = null;
+        this.lastMessageFrontLines = null;
+        this.lastMessageBackLines = null;
         this.blockData = null;
     }
 
@@ -141,8 +147,7 @@ public class SignChangeTracker implements Cloneable {
      * @return Line at this index
      */
     public String getLine(SignSide side, int index) {
-        checkRemoved();
-        return side.getLine(stateHandle, index);
+        return side.getLine(this, index);
     }
 
     /**
@@ -153,9 +158,7 @@ public class SignChangeTracker implements Cloneable {
      * @param text New text to put at this index
      */
     public void setLine(SignSide side, int index, String text) {
-        checkRemoved();
-        side.setLine(stateHandle, index, text);
-        state.update(true);
+        side.setLine(this, index, text);
     }
 
     /**
@@ -164,8 +167,7 @@ public class SignChangeTracker implements Cloneable {
      * @return Sign lines
      */
     public String[] getLines(SignSide side) {
-        checkRemoved();
-        return side.getLines(stateHandle);
+        return side.getLines(this);
     }
 
     /**
@@ -175,8 +177,7 @@ public class SignChangeTracker implements Cloneable {
      * @return Line at this index at the front of the sign
      */
     public String getFrontLine(int index) {
-        checkRemoved();
-        return stateHandle.getFrontLine(index);
+        return getFrontLines()[index];
     }
 
     /**
@@ -188,6 +189,9 @@ public class SignChangeTracker implements Cloneable {
      */
     public void setFrontLine(int index, String text) {
         checkRemoved();
+        if (lastMessageFrontLines != null) {
+            lastMessageFrontLines[index] = text;
+        }
         stateHandle.setFrontLine(index, text);
         state.update(true);
     }
@@ -199,7 +203,11 @@ public class SignChangeTracker implements Cloneable {
      */
     public String[] getFrontLines() {
         checkRemoved();
-        return stateHandle.getFrontLines();
+        String[] lines = lastMessageFrontLines;
+        if (lines == null) {
+            lastMessageFrontLines = lines = this.tileEntity.getMessageFrontLines();
+        }
+        return lines;
     }
 
     /**
@@ -225,6 +233,7 @@ public class SignChangeTracker implements Cloneable {
         this.tileEntity.setFormattedFrontLine(index, text);
 
         // Must recreate sign state, as that one caches the sign lines which are now outdated
+        this.lastMessageFrontLines = null;
         this.state = this.tileEntity.toBukkit();
         this.stateHandle = SignHandle.createHandle(this.state);
     }
@@ -247,8 +256,7 @@ public class SignChangeTracker implements Cloneable {
      * @return Line at this index at the back of the sign
      */
     public String getBackLine(int index) {
-        checkRemoved();
-        return stateHandle.getBackLine(index);
+        return getBackLines()[index];
     }
 
     /**
@@ -262,6 +270,9 @@ public class SignChangeTracker implements Cloneable {
     public void setBackLine(int index, String text) {
         checkRemoved();
         if (CommonCapabilities.HAS_SIGN_BACK_TEXT) {
+            if (lastMessageBackLines != null) {
+                lastMessageBackLines[index] = text;
+            }
             stateHandle.setBackLine(index, text);
             state.update(true);
         }
@@ -275,7 +286,11 @@ public class SignChangeTracker implements Cloneable {
      */
     public String[] getBackLines() {
         checkRemoved();
-        return stateHandle.getBackLines();
+        String[] lines = lastMessageBackLines;
+        if (lines == null) {
+            lastMessageBackLines = lines = this.tileEntity.getMessageBackLines();
+        }
+        return lines;
     }
 
     /**
@@ -304,6 +319,7 @@ public class SignChangeTracker implements Cloneable {
             this.tileEntity.setFormattedBackLine(index, text);
 
             // Must recreate sign state, as that one caches the sign lines which are now outdated
+            this.lastMessageBackLines = null;
             this.state = this.tileEntity.toBukkit();
             this.stateHandle = SignHandle.createHandle(this.state);
         }
@@ -387,7 +403,10 @@ public class SignChangeTracker implements Cloneable {
 
     /**
      * Gets a live-updated Sign instance.
-     * Only {@link #update()} updates the return value of this method.
+     * Only {@link #update()} updates the return value of this method.<br>
+     * <br>
+     * This object should <b>not</b> be used for getting and setting String text,
+     * because this is very laggy on Paper and partially broken on Spigot.
      *
      * @return Sign
      */
@@ -468,14 +487,12 @@ public class SignChangeTracker implements Cloneable {
         if (oldRawFrontLines.length != newRawFrontLines.length ||
                 (CommonCapabilities.HAS_SIGN_BACK_TEXT && oldRawBackLines.length != newRawBackLines.length)
         ) {
+            // Never happens, really
             this.lastRawFrontLines = newRawFrontLines.clone();
             if (CommonCapabilities.HAS_SIGN_BACK_TEXT) {
                 this.lastRawBackLines = newRawBackLines.clone();
             }
-            return true; // Never happens, really
-        }
-
-        if (!copyLinesCheckChanges(oldRawFrontLines, newRawFrontLines)) {
+        } else if (!copyLinesCheckChanges(oldRawFrontLines, newRawFrontLines)) {
             if (!CommonCapabilities.HAS_SIGN_BACK_TEXT || !copyLinesCheckChanges(oldRawBackLines, newRawBackLines)) {
                 // No changes.
                 return false;
@@ -484,6 +501,10 @@ public class SignChangeTracker implements Cloneable {
             // Front changed, take over changes of back blindly as we haven't done the copy for thise
             System.arraycopy(oldRawBackLines, 0, newRawBackLines, 0, newRawBackLines.length);
         }
+
+        // Reset cached 'stringified' lines
+        this.lastMessageFrontLines = null;
+        this.lastMessageBackLines = null;
 
         // Detected a change. Re-create the Sign state with the updated lines,
         // and return true to indicate the change.
@@ -572,6 +593,8 @@ public class SignChangeTracker implements Cloneable {
         clone.tileEntity = this.tileEntity;
         clone.lastRawFrontLines = this.lastRawFrontLines;
         clone.lastRawBackLines = this.lastRawBackLines;
+        clone.lastMessageFrontLines = this.lastMessageFrontLines;
+        clone.lastMessageBackLines = this.lastMessageBackLines;
         return clone;
     }
 
