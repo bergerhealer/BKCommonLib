@@ -65,9 +65,7 @@ public class SignChangeTracker implements Cloneable {
         this.block = block;
         this.state = null;
         this.stateHandle = null;
-        this.tileEntity = null;
-        this.lastRawFrontLines = null;
-        this.lastRawBackLines = null;
+        this.resetTileEntity();
     }
 
     private void initState(Sign state) {
@@ -78,10 +76,7 @@ public class SignChangeTracker implements Cloneable {
 
     private void loadTileEntity(TileEntitySignHandle tile) {
         if (tile == null) {
-            this.tileEntity = null;
-            this.lastRawFrontLines = null;
-            this.lastRawBackLines = null;
-            this.blockData = null;
+            this.resetTileEntity();
         } else {
             this.tileEntity = tile;
             this.lastRawFrontLines = tile.getRawFrontLines().clone();
@@ -94,6 +89,13 @@ public class SignChangeTracker implements Cloneable {
             // entity's property method, as it throws a NPE.
             this.blockData = this.isTileRemoved(tile) ? WorldUtil.getBlockData(this.block) : tile.getBlockData();
         }
+    }
+
+    private void resetTileEntity() {
+        this.tileEntity = null;
+        this.lastRawFrontLines = null;
+        this.lastRawBackLines = null;
+        this.blockData = null;
     }
 
     /**
@@ -421,10 +423,7 @@ public class SignChangeTracker implements Cloneable {
             } else {
                 this.state = null;
                 this.stateHandle = null;
-                this.tileEntity = null;
-                this.blockData = null;
-                this.lastRawFrontLines = null;
-                this.lastRawBackLines = null;
+                this.resetTileEntity();
                 return true; // Sign is gone
             }
         }
