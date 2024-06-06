@@ -153,6 +153,23 @@ class Entity {
         }
 #endif
     }
+
+    public boolean isEquipmentSlotSupported(org.bukkit.inventory.EquipmentSlot slot) {
+        // Must be a living entity (TODO: Always?)
+        if (!(instance instanceof org.bukkit.entity.LivingEntity)) {
+            return false;
+        }
+
+#if version >= 1.20.5
+        //BODY slot is not valid for players and armorstands!
+        if (slot == org.bukkit.inventory.EquipmentSlot.BODY) {
+            return !(instance instanceof org.bukkit.entity.HumanEntity ||
+                     instance instanceof org.bukkit.entity.ArmorStand);
+        }
+#endif
+
+        return true;
+    }
 }
 
 class HumanEntity extends Entity {

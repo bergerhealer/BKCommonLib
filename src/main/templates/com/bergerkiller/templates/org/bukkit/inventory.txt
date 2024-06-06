@@ -42,17 +42,10 @@ class PlayerInventory extends Inventory {
 
 #if version >= 1.20.5
     #require org.bukkit.inventory.PlayerInventory public boolean isEquipmentSlotSupported(EquipmentSlot slot) {
-        // BODY slot isn't supported for players (and armorstands, but they're not human entities)
-        if (slot == EquipmentSlot.BODY) {
-            org.bukkit.entity.HumanEntity entity = instance.getHolder();
-            return !(entity instanceof org.bukkit.entity.Player);
-        }
-        return true;
+        // BODY slot isn't supported for players
+        return slot != EquipmentSlot.BODY;
     }
 
-    public boolean isEquipmentSlotSupported(EquipmentSlot slot) {
-        return instance#isEquipmentSlotSupported(slot);
-    }
     public void setItem(EquipmentSlot slot, ItemStack item) {
         if (instance#isEquipmentSlotSupported(slot)) {
             instance.setItem(slot, item);

@@ -653,9 +653,11 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 
             // Entity Equipment
             for (EquipmentSlot slot : EquipmentSlot.values()) {
-                org.bukkit.inventory.ItemStack itemstack = living.getEquipment(slot);
-                if (itemstack != null) {
-                    PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_EQUIPMENT.newInstance(entity.getEntityId(), slot, itemstack));
+                if (EntityUtil.isEquipmentSupported(entity.getEntity(), slot)) {
+                    org.bukkit.inventory.ItemStack itemstack = living.getEquipment(slot);
+                    if (itemstack != null) {
+                        PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_EQUIPMENT.newInstance(entity.getEntityId(), slot, itemstack));
+                    }
                 }
             }
 

@@ -3,6 +3,7 @@ package com.bergerkiller.generated.org.bukkit.entity;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import java.util.List;
 
 /**
@@ -26,6 +27,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract boolean addPassenger(Entity passenger);
     public abstract boolean removePassenger(Entity passenger);
     public abstract boolean isSeenBy(Player player);
+    public abstract boolean isEquipmentSlotSupported(EquipmentSlot slot);
     /**
      * Stores class members for <b>org.bukkit.entity.Entity</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -35,6 +37,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Boolean> addPassenger = new Template.Method<Boolean>();
         public final Template.Method<Boolean> removePassenger = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isSeenBy = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> isEquipmentSlotSupported = new Template.Method<Boolean>();
 
     }
 

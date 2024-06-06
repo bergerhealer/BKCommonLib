@@ -15,6 +15,7 @@ import com.bergerkiller.generated.org.bukkit.inventory.PlayerInventoryHandle;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
@@ -207,12 +208,15 @@ public class EntityUtil extends EntityPropertyUtil {
      * Gets whether a particular equipment slot is supported by the entity specified.
      * If not, {@link #getEquipment(HumanEntity, EquipmentSlot)} will always return null,
      * and {@link #setEquipment(HumanEntity, EquipmentSlot, ItemStack)} will be a no-op.
+     * Bukkits equipment methods should not be called if this returns false.
+     * This should also be checked when interacting with the equipment slots of other
+     * (living) entities.
      *
-     * @param humanEntity Entity
+     * @param entity Entity
      * @param slot EquipmentSlot
      * @return True if this particular equipment slot is supported by the entity
      */
-    public static boolean isEquipmentSupported(HumanEntity humanEntity, EquipmentSlot slot) {
-        return PlayerInventoryHandle.T.isEquipmentSlotSupported.invoke(humanEntity.getInventory(), slot);
+    public static boolean isEquipmentSupported(Entity entity, EquipmentSlot slot) {
+        return com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.isEquipmentSlotSupported.invoke(entity, slot);
     }
 }
