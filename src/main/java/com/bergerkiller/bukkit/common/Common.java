@@ -54,7 +54,8 @@ public class Common {
             "Common:SignChangeTracker:FormattedText",
             "Common:ConnectionResetAwaitTeleport",
             "Common:EntityController:PositionPassenger",
-            "Common:CommonItemStack"
+            "Common:CommonItemStack",
+            "Common:EquipmentSlot:IsSupportedCheck"
     ).collect(Collectors.toSet());
 
     /**

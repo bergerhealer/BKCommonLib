@@ -202,4 +202,17 @@ public class EntityUtil extends EntityPropertyUtil {
     public static void setEquipment(HumanEntity humanEntity, EquipmentSlot slot, ItemStack item) {
         PlayerInventoryHandle.T.setItem.invoke(humanEntity.getInventory(), slot, item);
     }
+
+    /**
+     * Gets whether a particular equipment slot is supported by the entity specified.
+     * If not, {@link #getEquipment(HumanEntity, EquipmentSlot)} will always return null,
+     * and {@link #setEquipment(HumanEntity, EquipmentSlot, ItemStack)} will be a no-op.
+     *
+     * @param humanEntity Entity
+     * @param slot EquipmentSlot
+     * @return True if this particular equipment slot is supported by the entity
+     */
+    public static boolean isEquipmentSupported(HumanEntity humanEntity, EquipmentSlot slot) {
+        return PlayerInventoryHandle.T.isEquipmentSlotSupported.invoke(humanEntity.getInventory(), slot);
+    }
 }

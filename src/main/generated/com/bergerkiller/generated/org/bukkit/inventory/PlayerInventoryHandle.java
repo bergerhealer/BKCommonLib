@@ -23,6 +23,7 @@ public abstract class PlayerInventoryHandle extends InventoryHandle {
 
     public abstract ItemStack getItemInMainHand();
     public abstract ItemStack getItemInOffHand();
+    public abstract boolean isEquipmentSlotSupported(EquipmentSlot slot);
     public abstract void setItem(EquipmentSlot slot, ItemStack item);
     public abstract ItemStack getItem(EquipmentSlot slot);
     /**
@@ -40,6 +41,7 @@ public abstract class PlayerInventoryHandle extends InventoryHandle {
         public final Template.Method<Void> setItemInHand = new Template.Method<Void>();
         public final Template.Method<ItemStack> getItemInMainHand = new Template.Method<ItemStack>();
         public final Template.Method<ItemStack> getItemInOffHand = new Template.Method<ItemStack>();
+        public final Template.Method<Boolean> isEquipmentSlotSupported = new Template.Method<Boolean>();
         public final Template.Method<Void> setItem = new Template.Method<Void>();
         public final Template.Method<ItemStack> getItem = new Template.Method<ItemStack>();
 
