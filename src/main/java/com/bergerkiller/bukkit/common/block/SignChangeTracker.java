@@ -36,7 +36,6 @@ import com.bergerkiller.mountiplex.reflection.util.FastField;
 public class SignChangeTracker implements Cloneable {
     private final Block block;
     private Sign state;
-    private SignHandle stateHandle;
     private BlockData blockData;
     private TileEntitySignHandle tileEntity;
     private Object[] lastRawFrontLines;
@@ -66,13 +65,11 @@ public class SignChangeTracker implements Cloneable {
     protected SignChangeTracker(Block block) {
         this.block = block;
         this.state = null;
-        this.stateHandle = null;
         this.resetTileEntity();
     }
 
     private void initState(Sign state) {
         this.state = state;
-        this.stateHandle = SignHandle.createHandle(state);
         this.loadTileEntity(TileEntitySignHandle.fromBukkit(state));
     }
 
@@ -192,7 +189,7 @@ public class SignChangeTracker implements Cloneable {
         if (lastMessageFrontLines != null) {
             lastMessageFrontLines[index] = text;
         }
-        stateHandle.setFrontLine(index, text);
+        SignHandle.T.setFrontLine.invoke(state, index, text);
         state.update(true);
     }
 
@@ -235,7 +232,6 @@ public class SignChangeTracker implements Cloneable {
         // Must recreate sign state, as that one caches the sign lines which are now outdated
         this.lastMessageFrontLines = null;
         this.state = this.tileEntity.toBukkit();
-        this.stateHandle = SignHandle.createHandle(this.state);
     }
 
     /**
@@ -273,7 +269,7 @@ public class SignChangeTracker implements Cloneable {
             if (lastMessageBackLines != null) {
                 lastMessageBackLines[index] = text;
             }
-            stateHandle.setBackLine(index, text);
+            SignHandle.T.setBackLine.invoke(state, index, text);
             state.update(true);
         }
     }
@@ -321,7 +317,6 @@ public class SignChangeTracker implements Cloneable {
             // Must recreate sign state, as that one caches the sign lines which are now outdated
             this.lastMessageBackLines = null;
             this.state = this.tileEntity.toBukkit();
-            this.stateHandle = SignHandle.createHandle(this.state);
         }
     }
 
@@ -441,7 +436,6 @@ public class SignChangeTracker implements Cloneable {
                 return true; // Backing TileEntity instance changed, so probably changed
             } else {
                 this.state = null;
-                this.stateHandle = null;
                 this.resetTileEntity();
                 return true; // Sign is gone
             }
@@ -509,7 +503,6 @@ public class SignChangeTracker implements Cloneable {
         // Detected a change. Re-create the Sign state with the updated lines,
         // and return true to indicate the change.
         this.state = this.tileEntity.toBukkit();
-        this.stateHandle = SignHandle.createHandle(this.state);
         return true;
     }
 
@@ -543,7 +536,6 @@ public class SignChangeTracker implements Cloneable {
         ) {
             TileEntitySignHandle tileEntity = TileEntitySignHandle.createHandle(rawTileEntity);
             this.state = tileEntity.toBukkit();
-            this.stateHandle = SignHandle.createHandle(this.state);
             this.loadTileEntity(tileEntity);
             return true;
         }
@@ -588,7 +580,6 @@ public class SignChangeTracker implements Cloneable {
     public SignChangeTracker clone() {
         SignChangeTracker clone = new SignChangeTracker(this.block);
         clone.state = this.state;
-        clone.stateHandle = this.stateHandle;
         clone.blockData = this.blockData;
         clone.tileEntity = this.tileEntity;
         clone.lastRawFrontLines = this.lastRawFrontLines;
