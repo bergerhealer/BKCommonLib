@@ -256,8 +256,14 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         // From MC 1.20.6 to 1.20.5
         this.register(3837, NO_CONVERSION);
 
+        // From MC 1.21 to 1.20.6
+        this.register(3839, map -> {
+            Object type = map.get("type");
+            return !Helper.ADDED_MC_1_21.contains(type);
+        });
+
         // Maximum supported data version
-        this.max_version = 3839; // MC 1.20.6
+        this.max_version = 3953; // MC 1.21
     }
 
     // Registers a converter if it can convert from a future data version only
@@ -766,6 +772,11 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                 "FLOW_ARMOR_TRIM_SMITHING_TEMPLATE", "BOLT_ARMOR_TRIM_SMITHING_TEMPLATE",
                 "FLOW_POTTERY_SHERD", "GUSTER_POTTERY_SHERD", "SCRAPE_POTTERY_SHERD",
                 "OMINOUS_TRIAL_KEY", "VAULT", "OMINOUS_BOTTLE", "BREEZE_ROD"
+        ));
+
+        // All material names (Material enum) added Minecraft 1.20.6 -> 1.21
+        public static final Set<String> ADDED_MC_1_21 = new HashSet<>(Arrays.asList(
+                "MUSIC_DISC_CREATOR", "MUSIC_DISC_CREATOR_MUSIC_BOX", "MUSIC_DISC_PRECIPICE"
         ));
     }
 }
