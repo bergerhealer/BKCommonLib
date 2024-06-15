@@ -160,8 +160,9 @@ class ItemVariantListHandler_1_19_3 extends ItemVariantListHandler {
          *             }
          *         }
          *     }
-         *     return result;
          * #endif
+         *
+         *     return result;
          * }
          */
         @Template.Generated("%GET_ENCHANTED_BOOK_VARIANTS%")
