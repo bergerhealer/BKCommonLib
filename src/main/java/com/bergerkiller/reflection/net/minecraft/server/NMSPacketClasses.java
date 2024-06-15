@@ -15,10 +15,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.map.MapCursor;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -2035,10 +2033,6 @@ public class NMSPacketClasses {
                 return true;
             }
         };
-
-        public CommonPacket newInstance(LivingEntity livingEntity) {
-            return PacketPlayOutSpawnEntityLivingHandle.createNew(livingEntity).toCommonPacket();
-        }
 
         @Override
         protected boolean matchPacket(Object packetHandle) {

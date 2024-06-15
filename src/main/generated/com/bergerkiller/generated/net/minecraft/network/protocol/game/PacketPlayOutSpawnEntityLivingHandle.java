@@ -4,7 +4,6 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
-import org.bukkit.entity.LivingEntity;
 import java.util.UUID;
 
 /**
@@ -20,10 +19,6 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
 
     public static PacketPlayOutSpawnEntityLivingHandle createHandle(Object handleInstance) {
         return T.createHandle(handleInstance);
-    }
-
-    public static final PacketPlayOutSpawnEntityLivingHandle createNew(LivingEntity entity) {
-        return T.constr_entity.newInstance(entity);
     }
 
     /* ============================================================================== */
@@ -144,8 +139,6 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutSpawnEntityLivingClass extends Template.Class<PacketPlayOutSpawnEntityLivingHandle> {
-        public final Template.Constructor.Converted<PacketPlayOutSpawnEntityLivingHandle> constr_entity = new Template.Constructor.Converted<PacketPlayOutSpawnEntityLivingHandle>();
-
         public final Template.Field.Integer entityId = new Template.Field.Integer();
         @Template.Optional
         public final Template.Field<UUID> entityUUID = new Template.Field<UUID>();
