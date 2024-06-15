@@ -249,7 +249,14 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
          *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
          *     PortalTravelAgent agent = new PortalTravelAgent(world);
-         * #if version >= 1.16.2
+         * #if version >= 1.21
+         *     java.util.Optional opt_result = agent.findClosestPortalPosition(blockposition, world.getWorldBorder(), radius);
+         *     if (!opt_result.isPresent()) {
+         *         return null;
+         *     }
+         *     net.minecraft.core.BlockPosition position = (net.minecraft.core.BlockPosition) opt_result.get();
+         *     return startBlock.getWorld().getBlockAt(position.getX(), position.getY(), position.getZ());
+         * #elseif version >= 1.16.2
          *   #if version >= 1.18
          *     java.util.Optional opt_result = agent.findPortalAround(blockposition, world.getWorldBorder(), radius);
          *   #else
@@ -428,8 +435,11 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          * #elseif version >= 1.16
          *     BlockPosition platformPos = WorldServer.a;
          * #endif
-         * 
-         * #if version >= 1.18
+         *
+         * #if version >= 1.21
+         *     net.minecraft.world.level.levelgen.feature.EndPlatformFeature.createEndPlatform(world, platformPos, true);
+         *
+         * #elseif version >= 1.18
          *   #if exists net.minecraft.server.level.WorldServer public static void makeObsidianPlatform(net.minecraft.server.level.WorldServer worldserver, net.minecraft.world.entity.Entity entity);
          *     WorldServer.makeObsidianPlatform(world, entityInitiator);
          *   #else

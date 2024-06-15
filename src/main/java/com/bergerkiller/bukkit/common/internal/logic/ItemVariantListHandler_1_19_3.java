@@ -100,6 +100,7 @@ class ItemVariantListHandler_1_19_3 extends ItemVariantListHandler {
     @Template.Import("net.minecraft.core.Holder")
     @Template.Import("net.minecraft.tags.TagKey")
     @Template.Import("net.minecraft.core.registries.BuiltInRegistries")
+    @Template.Import("org.bukkit.craftbukkit.CraftRegistry")
     @Template.InstanceType("net.minecraft.world.item.Item")
     public static abstract class HandlerLogic extends Template.Class<Template.Handle> {
 
@@ -136,6 +137,16 @@ class ItemVariantListHandler_1_19_3 extends ItemVariantListHandler {
          * <GET_ENCHANTED_BOOK_VARIANTS>
          * public static List<ItemStack> getVariants(ItemEnchantedBook item) {
          *     List result = new ArrayList();
+         * #if version >= 1.21
+         *     java.util.Iterator iterator = CraftRegistry.getMinecraftRegistry(net.minecraft.core.registries.Registries.ENCHANTMENT).asHolderIdMap().iterator();
+         *     while (iterator.hasNext()) {
+         *         net.minecraft.core.Holder holder = (net.minecraft.core.Holder) iterator.next();
+         *         Enchantment enchantment = (Enchantment) holder.value();
+         *         for (int i = enchantment.getMinLevel(); i <= enchantment.getMaxLevel(); ++i) {
+         *             result.add(ItemEnchantedBook.createForEnchantment(new WeightedRandomEnchant(holder, i)));
+         *         }
+         *     }
+         * #else
          *     java.util.Iterator iterator = BuiltInRegistries.ENCHANTMENT.iterator();
          *     while (iterator.hasNext()) {
          *         Enchantment enchantment = (Enchantment) iterator.next();
@@ -150,6 +161,7 @@ class ItemVariantListHandler_1_19_3 extends ItemVariantListHandler {
          *         }
          *     }
          *     return result;
+         * #endif
          * }
          */
         @Template.Generated("%GET_ENCHANTED_BOOK_VARIANTS%")
