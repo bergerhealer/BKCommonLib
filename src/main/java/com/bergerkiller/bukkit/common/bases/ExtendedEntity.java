@@ -871,23 +871,40 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     /**
-     * Sets whether an Entity is allowed to teleport upon entering a portal
-     * right now. This state is live-updated based on whether the Entity moved
-     * into/away from a portal.
-     *
-     * @param allow whether to allow portal entering
+     * Suppresses use of portals for this current tick. Causes {@link #isInsidePortalThisTick()}
+     * to return false.
      */
-    public void setAllowTeleportation(boolean allow) {
-        EntityUtil.setAllowTeleportation(entity, allow);
+    public void suppressPortalTeleportationThisTick() {
+        handle.suppressPortalThisTick();
     }
 
     /**
-     * Gets whether an Entity is allowed to teleport upon entering a portal
-     * right now. This state is live-updated based on whether the Entity moved
-     * into/away from a portal.
+     * Gets whether this entity is inside a portal this current tick. If true, and the portal time
+     * exceeds the portal wait delay, then the entity will be teleported.
+     *
+     * @return True if this Entity is inside a portal this tick
      */
+    public boolean isInsidePortalThisTick() {
+        return handle.isInsidePortalThisTick();
+    }
+
+    /**
+     * @deprecated Use {@link #suppressPortalTeleportationThisTick()} instead. Allow=true isn't supported
+     * anymore because it requires the information of the tracked portal.
+     */
+    @Deprecated
+    public void setAllowTeleportation(boolean allow) {
+        if (!allow) {
+            this.suppressPortalTeleportationThisTick();
+        }
+    }
+
+    /**
+     * @deprecated Use {@link #isInsidePortalThisTick()} instead
+     */
+    @Deprecated
     public boolean getAllowTeleportation() {
-        return EntityUtil.getAllowTeleportation(entity);
+        return isInsidePortalThisTick();
     }
 
     /**
@@ -900,7 +917,8 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     /**
-     * Sets the entity portal enter cooldown ticks
+     * Sets the entity portal enter cooldown ticks.
+     * Does nothing if the Entity wasn't inside a Portal recently.
      *
      * @param cooldownTicks to set to
      */
@@ -922,6 +940,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     /**
      * Sets the number of ticks this entity spent inside a portal.
      * This is used for a portal teleport delay.
+     * Returns 0 if the Entity wasn't inside a portal recently.
      *
      * @param timeTicks Number of ticks to set to
      */

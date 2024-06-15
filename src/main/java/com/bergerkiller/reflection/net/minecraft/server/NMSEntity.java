@@ -84,9 +84,7 @@ public class NMSEntity {
     public static final int DATA_FLAG_FLYING = EntityHandle.DATA_FLAG_FLYING;
 
     public static final FieldAccessor<Boolean> positionChanged = EntityHandle.T.positionChanged.toFieldAccessor();
-
     public static final FieldAccessor<Integer> portalCooldown = EntityHandle.T.portalCooldown.toFieldAccessor();
-    public static final FieldAccessor<Boolean> allowTeleportation = EntityHandle.T.allowTeleportation.toFieldAccessor();
 
     /* Used in the move() function; unknown function. */
     public static final FieldAccessor<double[]> move_SomeArray = EntityHandle.T.move_SomeArray.toFieldAccessor();

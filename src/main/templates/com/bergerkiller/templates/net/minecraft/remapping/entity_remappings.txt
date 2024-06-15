@@ -4,3 +4,41 @@
 #else
     #remap net.minecraft.world.entity.Entity private int remainingFireTicks:fireTicks;
 #endif
+
+// Portal handling fields exist in Entity from MC 1.8 to 1.20.6
+#if version < 1.21
+  #select version >=
+  #case 1.17:   #remap net.minecraft.world.entity.Entity protected boolean insidePortalThisTick:isInsidePortal;
+  #case 1.16:   #remap net.minecraft.world.entity.Entity protected boolean insidePortalThisTick:inPortal;
+  #case 1.15:   #remap net.minecraft.world.entity.Entity protected boolean insidePortalThisTick:af;
+  #case 1.14:   #remap net.minecraft.world.entity.Entity protected boolean insidePortalThisTick:ai;
+  #case 1.13:   #remap net.minecraft.world.entity.Entity protected boolean insidePortalThisTick:an;
+  #case 1.11:   #remap net.minecraft.world.entity.Entity protected boolean insidePortalThisTick:ak;
+  #case 1.10.2: #remap net.minecraft.world.entity.Entity protected boolean insidePortalThisTick:al;
+  #case else:   #remap net.minecraft.world.entity.Entity protected boolean insidePortalThisTick:ak;
+  #endselect
+
+  #select version >=
+  #case 1.17:   #remap net.minecraft.world.entity.Entity protected int portalTime;
+  #case 1.16:   #remap net.minecraft.world.entity.Entity protected int portalTime:portalTicks;
+  #case 1.15:   #remap net.minecraft.world.entity.Entity protected int portalTime:ag;
+  #case 1.14:   #remap net.minecraft.world.entity.Entity protected int portalTime:aj;
+  #case 1.13:   #remap net.minecraft.world.entity.Entity protected int portalTime:ao;
+  #case 1.11:   #remap net.minecraft.world.entity.Entity protected int portalTime:al;
+  #case 1.10.2: #remap net.minecraft.world.entity.Entity protected int portalTime:am;
+  #case else:   #remap net.minecraft.world.entity.Entity protected int portalTime:al;
+  #endselect
+
+  #select version >=
+  #case 1.18:   #remap net.minecraft.world.entity.Entity public int getPortalWaitTime();
+  #case 1.17:   #remap net.minecraft.world.entity.Entity public int getPortalWaitTime:am();
+  #case 1.16.4: #remap net.minecraft.world.entity.Entity public int getPortalWaitTime:aj();
+  #case 1.16.2: #remap net.minecraft.world.entity.Entity public int getPortalWaitTime:ai();
+  #case 1.16:   #remap net.minecraft.world.entity.Entity public int getPortalWaitTime:ae();
+  #case 1.14:   #remap net.minecraft.world.entity.Entity public int getPortalWaitTime:ab();
+  #case 1.13:   #remap net.minecraft.world.entity.Entity public int getPortalWaitTime:X();
+  #case 1.12:   #remap net.minecraft.world.entity.Entity public int getPortalWaitTime:Z();
+  #case 1.9:    #remap net.minecraft.world.entity.Entity public int getPortalWaitTime:V();
+  #case else:   #remap net.minecraft.world.entity.Entity public int getPortalWaitTime:L();
+  #endselect
+#endif

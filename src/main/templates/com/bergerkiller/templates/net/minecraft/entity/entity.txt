@@ -1201,28 +1201,6 @@ class Entity {
 
     public int portalCooldown;
 
-#select version >=
-#case 1.17:   protected boolean allowTeleportation:isInsidePortal;
-#case 1.16:   protected boolean allowTeleportation:inPortal;
-#case 1.15:   protected boolean allowTeleportation:af;
-#case 1.14:   protected boolean allowTeleportation:ai;
-#case 1.13:   protected boolean allowTeleportation:an;
-#case 1.11:   protected boolean allowTeleportation:ak;
-#case 1.10.2: protected boolean allowTeleportation:al;
-#case else:   protected boolean allowTeleportation:ak;
-#endselect
-
-#select version >=
-#case 1.17:   protected int portalTime;
-#case 1.16:   protected int portalTime:portalTicks;
-#case 1.15:   protected int portalTime:ag;
-#case 1.14:   protected int portalTime:aj;
-#case 1.13:   protected int portalTime:ao;
-#case 1.11:   protected int portalTime:al;
-#case 1.10.2: protected int portalTime:am;
-#case else:   protected int portalTime:al;
-#endselect
-
 #if version >= 1.17
     optional private final double[] move_SomeArray:pistonDeltas;
     optional private long move_SomeState:pistonDeltasGameTime;
@@ -1936,27 +1914,68 @@ class Entity {
 #case else:   public int getPortalCooldownMaximum:ar();
 #endselect
 
-    /*
-     * Entity class:
-     *
-     * public int ##METHODNAME##() {
-     *     return 0; // 1; < 1.16
-     * }
-     *
-     * public void burnFromLava() {}
-     */
-#select version >=
-#case 1.18:   public int getPortalWaitTime();
-#case 1.17:   public int getPortalWaitTime:am();
-#case 1.16.4: public int getPortalWaitTime:aj();
-#case 1.16.2: public int getPortalWaitTime:ai();
-#case 1.16: public int getPortalWaitTime:ae();
-#case 1.14:   public int getPortalWaitTime:ab();
-#case 1.13:   public int getPortalWaitTime:X();
-#case 1.12:   public int getPortalWaitTime:Z();
-#case 1.9:    public int getPortalWaitTime:V();
-#case else:   public int getPortalWaitTime:L();
-#endselect
+#if version >= 1.21
+    public boolean isInsidePortalThisTick() {
+        PortalProcessor processor = instance.portalProcess;
+        return processor != null && processor.isInsidePortalThisTick();
+    }
+
+    public void suppressPortalThisTick() {
+        PortalProcessor processor = instance.portalProcess;
+        if (processor != null) {
+            processor.setAsInsidePortalThisTick(false);
+        }
+    }
+
+    public int getPortalTime() {
+        PortalProcessor processor = instance.portalProcess;
+        return processor == null ? 0 : processor.getPortalTime();
+    }
+
+    public boolean setPortalTime(int portalTimeTicks) {
+        PortalProcessor processor = instance.portalProcess;
+        if (processor != null) {
+            #require net.minecraft.world.entity.PortalProcessor private int portalTime;
+            processor#portalTime = portalTimeTicks;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public int getPortalWaitTime() {
+        PortalProcessor processor = instance.portalProcess;
+        if (processor == null) {
+            return 0;
+        }
+
+        #require PortalProcessor private net.minecraft.world.level.block.Portal portalProcessorPortal:portal;
+        net.minecraft.world.level.block.Portal portal = processor#portalProcessorPortal;
+        return portal.getPortalTransitionTime((WorldServer) instance.level(), instance);
+    }
+#else
+    #require Entity protected boolean insidePortalThisTick;
+    #require Entity protected int portalTime;
+
+    public boolean isInsidePortalThisTick() {
+        return instance#insidePortalThisTick;
+    }
+
+    public void suppressPortalThisTick() {
+        instance#insidePortalThisTick = false;
+    }
+
+    public int getPortalTime() {
+        return instance#portalTime;
+    }
+
+    public boolean setPortalTime(int portalTimeTicks) {
+        instance#portalTime = portalTimeTicks;
+        return true;
+    }
+
+    public int getPortalWaitTime();
+#endif
 
     // On some versions of the server, entities push items into hoppers instead of hoppers pulling from entities
     // This is normally done in onTick, but if overrided, it wouldn't run anymore. Call this method

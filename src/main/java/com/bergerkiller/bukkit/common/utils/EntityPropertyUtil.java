@@ -210,15 +210,24 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
     }
 
     /**
-     * Sets whether an Entity is allowed to teleport upon entering a portal
-     * right now. This state is live-updated based on whether the Entity moved
-     * into/away from a portal.
+     * Suppresses an Entity using a portal for this current tick
      *
-     * @param entity to set it for
-     * @param state to set to
+     * @param entity Entity
      */
+    public static void suppressPortalTeleportationThisTick(Entity entity) {
+        EntityHandle.fromBukkit(entity).suppressPortalThisTick();
+    }
+
+    /**
+     * @deprecated Use {@link #suppressPortalTeleportationThisTick(Entity)} instead.
+     *             Enabling teleportation isn't supported anymore, as it requires portal
+     *             information.
+     */
+    @Deprecated
     public static void setAllowTeleportation(Entity entity, boolean state) {
-        EntityHandle.T.allowTeleportation.setBoolean(h(entity), state);
+        if (!state) {
+            suppressPortalTeleportationThisTick(entity);
+        }
     }
 
     /**
@@ -228,8 +237,16 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      *
      * @param entity to get it for
      */
+    public static boolean isInsidePortalThisTick(Entity entity) {
+        return EntityHandle.fromBukkit(entity).isInsidePortalThisTick();
+    }
+
+    /**
+     * @deprecated Use {@link #isInsidePortalThisTick(Entity)} instead.
+     */
+    @Deprecated
     public static boolean getAllowTeleportation(Entity entity) {
-        return EntityHandle.T.allowTeleportation.getBoolean(h(entity));
+        return isInsidePortalThisTick(entity);
     }
 
     /**
@@ -266,23 +283,25 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
     /**
      * Sets the number of ticks an entity spent inside a portal.
      * This is used for a portal teleport delay.
+     * Does nothing if the Entity wasn't inside a Portal recently.
      *
      * @param entity to set it for
      * @param timeTicks Number of ticks to set to
      */
     public static void setPortalTime(Entity entity, int timeTicks) {
-        EntityHandle.T.portalTime.setInteger(h(entity), timeTicks);
+        EntityHandle.fromBukkit(entity).setPortalTime(timeTicks);
     }
 
     /**
      * Gets the number of ticks an entity spent inside a portal.
      * This is used for a portal teleport delay.
+     * Returns 0 if the Entity wasn't inside a portal recently.
      *
      * @param entity to get it for
      * @return entity portal time duration
      */
     public static int getPortalTime(Entity entity) {
-        return EntityHandle.T.portalTime.getInteger(h(entity));
+        return EntityHandle.fromBukkit(entity).getPortalTime();
     }
 
     /**
@@ -293,6 +312,6 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      * @return portal wait time
      */
     public static int getPortalWaitTime(Entity entity) {
-        return EntityHandle.T.getPortalWaitTime.invoke(h(entity));
+        return EntityHandle.fromBukkit(entity).getPortalWaitTime();
     }
 }
