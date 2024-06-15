@@ -544,7 +544,19 @@ class WorldServer extends World {
         // If isDeathRespawn is true, removes one use tick from a bed respawn anchor, if used
         boolean ignoreRespawnAnchorUses = !isDeathRespawn;
 
-#if version >= 1.14
+#if version >= 1.21
+        // Optional<EntityPlayer.RespawnPosAngle>
+        java.util.Optional result = EntityPlayer.findRespawnAndUseSpawnBlock(instance, blockposition, respawnPoint.getAngle(), alsoWhenDestroyed, ignoreRespawnAnchorUses);
+        EntityPlayer$RespawnPosAngle respawnPos = (EntityPlayer$RespawnPosAngle) result.orElse(null);
+        if (respawnPos == null) {
+            return null;
+        } else {
+            // public static record RespawnPosAngle(Vec3D position, float yaw, boolean isBedSpawn, boolean isAnchorSpawn)
+            Vec3D vec3d = respawnPos.position();
+            return new org.bukkit.Location(respawnPoint.getWorld(),vec3d.x(), vec3d.y(), vec3d.z(), respawnPos.yaw(), 0.0f);
+        }
+
+#elseif version >= 1.14
         // Optional<Vec3D>
   #if version >= 1.18
         java.util.Optional result = EntityHuman.findRespawnPositionAndUseSpawnBlock(instance, blockposition, respawnPoint.getAngle(), alsoWhenDestroyed, ignoreRespawnAnchorUses);
