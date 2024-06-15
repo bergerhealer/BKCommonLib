@@ -27,20 +27,18 @@ public abstract class PlayerChunkHandle extends Template.Handle {
     public abstract boolean resendChunk();
     public abstract boolean resendAllLighting();
     public abstract Collection<Player> getPlayers();
-    public abstract Chunk getChunkIfLoaded();
     public abstract IntVector2 getLocation();
-    public abstract void setLocation(IntVector2 value);
+    public abstract Chunk getChunkIfLoaded();
     /**
      * Stores class members for <b>net.minecraft.server.level.PlayerChunk</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PlayerChunkClass extends Template.Class<PlayerChunkHandle> {
-        public final Template.Field.Converted<IntVector2> location = new Template.Field.Converted<IntVector2>();
-
         public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
         public final Template.Method<Boolean> resendChunk = new Template.Method<Boolean>();
         public final Template.Method<Boolean> resendAllLighting = new Template.Method<Boolean>();
         public final Template.Method.Converted<Collection<Player>> getPlayers = new Template.Method.Converted<Collection<Player>>();
+        public final Template.Method.Converted<IntVector2> getLocation = new Template.Method.Converted<IntVector2>();
         public final Template.Method.Converted<Chunk> getChunkIfLoaded = new Template.Method.Converted<Chunk>();
 
     }

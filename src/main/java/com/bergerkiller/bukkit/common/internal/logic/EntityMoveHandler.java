@@ -578,20 +578,11 @@ public abstract class EntityMoveHandler {
             boolean flag1 = that.isWet();
 
             // Handle damage here
+            // TODO: This code probably isn't needed anymore since on recent versions this is handled using fire block collisions
             if (this.blockCollisionEnabled && world.isBurnArea(that.getBoundingBox().shrinkUniform(0.001))) {
                 that.burn(1.0f);
                 if (!flag1) {
-                    that.setFireTicks(that.getFireTicks() + 1);
-                    if (that.getFireTicks() == 0) {
-                        // CraftBukkit start
-                        EntityCombustEvent event = new org.bukkit.event.entity.EntityCombustByBlockEvent(null, entity.getEntity(), 8);
-                        Bukkit.getPluginManager().callEvent(event);
-
-                        if (!event.isCancelled()) {
-                            that.setOnFire(event.getDuration());
-                        }
-                        // CraftBukkit end
-                    }
+                    that.handleFireBlockTick();
                 }
             } else if (that.getFireTicks() <= 0) {
                 that.setFireTicks(-that.getMaxFireTicks());

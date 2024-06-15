@@ -230,7 +230,11 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          * #if fieldexists net.minecraft.world.level.World private final io.papermc.paper.configuration.WorldConfiguration paperConfig;
          *     #require net.minecraft.world.level.World private final io.papermc.paper.configuration.WorldConfiguration paperConfig;
          *     #require io.papermc.paper.configuration.WorldConfiguration WorldConfiguration create_paper_wc:<init>(org.spigotmc.SpigotWorldConfig spigotWC, net.minecraft.resources.MinecraftKey worldKey);
+         *   #if version >= 1.21
+         *     net.minecraft.resources.MinecraftKey worldKey = net.minecraft.resources.MinecraftKey.parse(dummyWorldName);
+         *   #else
          *     net.minecraft.resources.MinecraftKey worldKey = new net.minecraft.resources.MinecraftKey(dummyWorldName);
+         *   #endif
          *     io.papermc.paper.configuration.WorldConfiguration paperWorldConfig = #create_paper_wc(spigotConfig, worldKey);
          *     com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler.initConfigurationPartRecurse(paperWorldConfig);
          *

@@ -188,3 +188,12 @@ import net.minecraft.network.chat.contents.TranslatableContents;
     }
     return legacyLines;
 }
+
+// Creates a new MinecraftKey from a key or namespace:key formatted String
+#require net.minecraft.resources.MinecraftKey public static MinecraftKey parseMinecraftKey(String keyStr) {
+#if version >= 1.21
+    return MinecraftKey.parse(keyStr);
+#else
+    return new MinecraftKey(keyStr);
+#endif
+}

@@ -442,7 +442,15 @@ class EntityTrackerEntry {
 // Alias for EntityTrackerEntry, but because we're using PlayerChunkMap$EntityTracker as
 // main handle on 1.14 it is renamed to differentiate the two.
 class EntityTrackerEntryState {
-#if version >= 1.17
+#if version >= 1.21
+    private final (EntityHandle) Entity entity;
+    private final int updateInterval;
+    private final boolean isMobile:trackDelta;
+    private optional final java.util.function.Consumer broadcastMethod:broadcast;
+    public int raw_xRot:lastSentYRot;
+    public int raw_yRot:lastSentXRot;
+    public int raw_headYaw:lastSentYHeadRot;
+#elseif version >= 1.17
     private final (EntityHandle) Entity entity;
     private final int updateInterval;
     private final boolean isMobile:trackDelta;
@@ -613,7 +621,9 @@ class EntityTrackerEntryState {
 
 #if version >= 1.14
     // Velocity is a Vec3D
-  #if version >= 1.17
+  #if version >= 1.21
+    #require net.minecraft.server.level.EntityTrackerEntryState private Vec3D vel:lastSentMovement;
+  #elseif version >= 1.17
     #require net.minecraft.server.level.EntityTrackerEntryState private Vec3D vel:ap;
   #else
     #require net.minecraft.server.level.EntityTrackerEntryState private Vec3D vel:m;
@@ -902,6 +912,7 @@ class EntityTrackerEntryState {
   #endif
         Entity entity = instance#entity;
   #select version >=
+  #case 1.21:   return entity.getAddEntityPacket(instance);
   #case 1.18:   return entity.getAddEntityPacket();
   #case 1.17:   return entity.getPacket();
   #case 1.16.2: return entity.P();

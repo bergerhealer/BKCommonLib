@@ -23,7 +23,10 @@ class AttributeModifiable {
 }
 
 class AttributeMapBase {
-#if version >= 1.18
+#if version >= 1.21
+    public (Set<AttributeModifiableHandle>) Set<AttributeModifiable> getAttributes:getAttributesToSync();
+    public (Collection<AttributeModifiableHandle>) Collection<AttributeModifiable> getSynchronizedAttributes:getSyncableAttributes();
+#elseif version >= 1.18
     public (Set<AttributeModifiableHandle>) Set<AttributeModifiable> getAttributes:getDirtyAttributes();
     public (Collection<AttributeModifiableHandle>) Collection<AttributeModifiable> getSynchronizedAttributes:getSyncableAttributes();
 #elseif version >= 1.16

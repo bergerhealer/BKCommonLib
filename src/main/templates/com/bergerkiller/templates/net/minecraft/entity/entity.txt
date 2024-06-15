@@ -1066,15 +1066,15 @@ class Entity {
 
     protected (RandomSourceHandle) net.minecraft.util.RandomSource random;
 
+    private int fireTicks:remainingFireTicks;
+
 #if version >= 1.17
     public int ticksLived:tickCount;
     public optional int field_maxFireTicks:maxFireTicks;
-    public int fireTicks:remainingFireTicks;
     protected final (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.network.syncher.DataWatcher datawatcherField:entityData;
 #else
     public int ticksLived;
     public optional int field_maxFireTicks:maxFireTicks;
-    public int fireTicks;
     protected (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.network.syncher.DataWatcher datawatcherField:datawatcher;
 #endif
 
@@ -1744,17 +1744,60 @@ class Entity {
     private void setPositionFromBoundingBox:recalcPosition();
 #endif
 
-#if version >= 1.20.5
+    public void handleFireBlockTick() {
+        #require Entity private int remainingFireTicks;
+
+        int newFireTicks = instance#remainingFireTicks;
+        newFireTicks++;
+        instance#remainingFireTicks = newFireTicks;
+
+        if (newFireTicks == 0) {
+            // CraftBukkit start
+#if version >= 1.21
+            org.bukkit.event.entity.EntityCombustEvent event = new org.bukkit.event.entity.EntityCombustByBlockEvent((org.bukkit.block.Block) null, instance.getBukkitEntity(), 8.0F);
+#else
+            org.bukkit.event.entity.EntityCombustEvent event = new org.bukkit.event.entity.EntityCombustByBlockEvent((org.bukkit.block.Block) null, instance.getBukkitEntity(), 8);
+#endif
+            org.bukkit.Bukkit.getPluginManager().callEvent(event);
+
+            if (!event.isCancelled()) {
+#if version >= 1.21
+                float duration = event.getDuration();
+#else
+                int duration = event.getDuration();
+#endif
+
+#if version >= 1.21
+                instance.igniteForSeconds(duration, false);
+#elseif version >= 1.20.5
+                instance.igniteForSeconds(duration, false);
+#elseif version >= 1.18
+                instance.setSecondsOnFire(duration, false);
+#elseif version >= 1.13.2
+                instance.setOnFire(duration, false);
+#else
+                instance.setOnFire(duration);
+#endif
+            }
+            // CraftBukkit end
+        }
+    }
+
+#if version >= 1.21
     public boolean isBurning:isOnFire();
-    public void setOnFire:igniteForSeconds(int numSeconds);
+    public void setOnFire:igniteForSeconds((float) float numSeconds);
+    public optional int prop_getMaxFireTicks:getFireImmuneTicks();
+#elseif version >= 1.20.5
+    public boolean isBurning:isOnFire();
+    public void setOnFire:igniteForSeconds((float) int numSeconds);
     public optional int prop_getMaxFireTicks:getFireImmuneTicks();
 #elseif version >= 1.18
     public boolean isBurning:isOnFire();
-    public void setOnFire:setSecondsOnFire(int numSeconds);
+    public void setOnFire:setSecondsOnFire((float) int numSeconds);
     public optional int prop_getMaxFireTicks:getFireImmuneTicks();
 #else
     public boolean isBurning();
-    public void setOnFire(int numSeconds);
+    public void setOnFire((float) int numSeconds);
     public optional int prop_getMaxFireTicks:getMaxFireTicks();
 #endif
 

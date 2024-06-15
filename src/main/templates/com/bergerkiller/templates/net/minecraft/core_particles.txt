@@ -30,7 +30,7 @@ public class Particle {
     public static (Object) Particle byName(String name) {
         MinecraftKey key;
         try {
-            key = new MinecraftKey(name);
+            key = #parseMinecraftKey(name);
         } catch (net.minecraft.ResourceKeyInvalidException ex) {
             return null;
         }

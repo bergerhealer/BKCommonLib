@@ -1,0 +1,6 @@
+
+#if version >= 1.17
+    #remap net.minecraft.world.entity.Entity private int remainingFireTicks;
+#else
+    #remap net.minecraft.world.entity.Entity private int remainingFireTicks:fireTicks;
+#endif

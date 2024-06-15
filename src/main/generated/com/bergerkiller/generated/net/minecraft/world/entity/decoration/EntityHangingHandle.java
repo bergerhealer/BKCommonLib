@@ -22,17 +22,15 @@ public abstract class EntityHangingHandle extends EntityHandle {
 
     /* ============================================================================== */
 
+    public abstract void setBlockPositionField(IntVector3 blockPosition);
     public abstract IntVector3 getBlockPosition();
     public abstract BlockFace getFacing();
-    public abstract IntVector3 getBlockPositionField();
-    public abstract void setBlockPositionField(IntVector3 value);
     /**
      * Stores class members for <b>net.minecraft.world.entity.decoration.EntityHanging</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityHangingClass extends Template.Class<EntityHangingHandle> {
-        public final Template.Field.Converted<IntVector3> blockPositionField = new Template.Field.Converted<IntVector3>();
-
+        public final Template.Method.Converted<Void> setBlockPositionField = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<IntVector3> getBlockPosition = new Template.Method.Converted<IntVector3>();
         public final Template.Method.Converted<BlockFace> getFacing = new Template.Method.Converted<BlockFace>();
 

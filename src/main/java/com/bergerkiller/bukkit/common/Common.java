@@ -64,7 +64,7 @@ public class Common {
      * <b>Use getVersion() instead if you want the actual, current version!
      * Constants get inlined when compiling!</b>
      */
-    public static final int VERSION = 12006;
+    public static final int VERSION = 12100;
     /**
      * Defines the Minecraft version that runs on the server.
      */

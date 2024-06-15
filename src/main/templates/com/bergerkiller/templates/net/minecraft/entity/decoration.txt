@@ -146,11 +146,18 @@ class EntityItemFrame extends EntityHanging {
 }
 
 class EntityHanging extends Entity {
-#if version >= 1.17
-    public (IntVector3) BlockPosition blockPositionField:pos;
+
+    //TODO: Is this actually useful for anything at all?
+    public void setBlockPositionField((IntVector3) BlockPosition blockPosition) {
+#if version >= 1.21
+        #require net.minecraft.world.entity.decoration.BlockAttachedEntity protected BlockPosition blockPositionField:pos;
+#elseif version >= 1.17
+        #require EntityHanging public BlockPosition blockPositionField:pos;
 #else
-    public (IntVector3) BlockPosition blockPositionField:blockPosition;
+        #require EntityHanging public BlockPosition blockPositionField:blockPosition;
 #endif
+        instance#blockPositionField = blockPosition;
+    }
 
 #if version >= 1.18
     public (IntVector3) BlockPosition getBlockPosition:getPos();

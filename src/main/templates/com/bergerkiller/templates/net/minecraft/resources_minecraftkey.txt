@@ -26,7 +26,11 @@ class MinecraftKey {
 #if version >= 1.13
     public static (MinecraftKeyHandle) MinecraftKey createNew(String keyToken) {
         try {
+  #if version >= 1.21
+            return MinecraftKey.parse(keyToken);
+  #else
             return new MinecraftKey(keyToken);
+  #endif
         } catch (ResourceKeyInvalidException ex) {
             return null;
         }
@@ -34,7 +38,11 @@ class MinecraftKey {
 
     public static optional (MinecraftKeyHandle) MinecraftKey createNew2(String namespace, String name) {
         try {
+  #if version >= 1.21
+            return MinecraftKey.fromNamespaceAndPath(namespace, name);
+  #else
             return new MinecraftKey(namespace, name);
+  #endif
         } catch (ResourceKeyInvalidException ex) {
             return null;
         }

@@ -207,7 +207,8 @@ class WorldServer extends World {
 
         // Custom world, dimension key is by world name lower-cased
         String name = instance.worldData.getName().toLowerCase(java.util.Locale.ENGLISH);
-        return ResourceKey.create(ResourceKey.CATEGORY_WORLD_DIMENSION, new net.minecraft.resources.MinecraftKey(name));
+        net.minecraft.resources.MinecraftKey key = #parseMinecraftKey(name);
+        return ResourceKey.create(ResourceKey.CATEGORY_WORLD_DIMENSION, key);
     }
 
     public static (org.bukkit.World) WorldServer getByDimensionKey((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> key) {

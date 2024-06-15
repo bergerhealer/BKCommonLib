@@ -120,8 +120,9 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract AxisAlignedBBHandle getOtherBoundingBox();
     public abstract AxisAlignedBBHandle getEntityBoundingBox(EntityHandle entity);
     public abstract void setPositionFromBoundingBox();
+    public abstract void handleFireBlockTick();
     public abstract boolean isBurning();
-    public abstract void setOnFire(int numSeconds);
+    public abstract void setOnFire(float numSeconds);
     public abstract void onTick();
     public abstract void loadFromNBT(CommonTagCompound compound);
     public abstract boolean onEntitySave(CommonTagCompound compound);
@@ -238,10 +239,10 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setNoclip(boolean value);
     public abstract RandomSourceHandle getRandom();
     public abstract void setRandom(RandomSourceHandle value);
-    public abstract int getTicksLived();
-    public abstract void setTicksLived(int value);
     public abstract int getFireTicks();
     public abstract void setFireTicks(int value);
+    public abstract int getTicksLived();
+    public abstract void setTicksLived(int value);
     public abstract DataWatcher getDatawatcherField();
     public abstract void setDatawatcherField(DataWatcher value);
     public abstract boolean isPositionChanged();
@@ -301,10 +302,10 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Float fallDistance = new Template.Field.Float();
         public final Template.Field.Boolean noclip = new Template.Field.Boolean();
         public final Template.Field.Converted<RandomSourceHandle> random = new Template.Field.Converted<RandomSourceHandle>();
+        public final Template.Field.Integer fireTicks = new Template.Field.Integer();
         public final Template.Field.Integer ticksLived = new Template.Field.Integer();
         @Template.Optional
         public final Template.Field.Integer field_maxFireTicks = new Template.Field.Integer();
-        public final Template.Field.Integer fireTicks = new Template.Field.Integer();
         public final Template.Field.Converted<DataWatcher> datawatcherField = new Template.Field.Converted<DataWatcher>();
         public final Template.Field.Boolean positionChanged = new Template.Field.Boolean();
         public final Template.Field.Integer portalCooldown = new Template.Field.Integer();
@@ -396,8 +397,9 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<AxisAlignedBBHandle> getOtherBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<AxisAlignedBBHandle> getEntityBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method<Void> setPositionFromBoundingBox = new Template.Method<Void>();
+        public final Template.Method<Void> handleFireBlockTick = new Template.Method<Void>();
         public final Template.Method<Boolean> isBurning = new Template.Method<Boolean>();
-        public final Template.Method<Void> setOnFire = new Template.Method<Void>();
+        public final Template.Method.Converted<Void> setOnFire = new Template.Method.Converted<Void>();
         @Template.Optional
         public final Template.Method<Integer> prop_getMaxFireTicks = new Template.Method<Integer>();
         @Template.Optional

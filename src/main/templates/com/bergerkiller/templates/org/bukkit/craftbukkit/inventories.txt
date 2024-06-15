@@ -34,7 +34,9 @@ class CraftInventoryPlayer {
 }
 
 class CraftInventoryCrafting {
-#if version >= 1.13
+#if version >= 1.21
+    public (org.bukkit.inventory.CraftingInventory) CraftInventoryCrafting((Object) net.minecraft.world.inventory.InventoryCrafting nmsInventoryCrafting, (Object) IInventory nmsResultIInventory);
+#elseif version >= 1.13
     public (org.bukkit.inventory.CraftingInventory) CraftInventoryCrafting((Object) IInventory nmsInventoryCrafting, (Object) IInventory nmsResultIInventory);
 #else
     public (org.bukkit.inventory.CraftingInventory) CraftInventoryCrafting((Object) net.minecraft.server.InventoryCrafting nmsInventoryCrafting, (Object) IInventory nmsResultIInventory);

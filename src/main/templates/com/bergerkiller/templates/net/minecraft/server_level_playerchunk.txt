@@ -296,10 +296,19 @@ class PlayerChunk {
     }
 #endif
 
-#if version >= 1.17
-    final (IntVector2) ChunkCoordIntPair location:pos;
+#if version >= 1.18
+    public (IntVector2) ChunkCoordIntPair getLocation:getPos();
+#elseif version >= 1.14.3
+    public (IntVector2) ChunkCoordIntPair getLocation:i();
+#elseif version >= 1.14
+    public (IntVector2) ChunkCoordIntPair getLocation:h();
+#elseif version >= 1.9
+    public (IntVector2) ChunkCoordIntPair getLocation:a();
 #else
-    private final (IntVector2) ChunkCoordIntPair location;
+    public (IntVector2) ChunkCoordIntPair getLocation() {
+        #require PlayerChunk private final net.minecraft.world.level.ChunkCoordIntPair location;
+        return instance#location;
+    }
 #endif
 
     /*
