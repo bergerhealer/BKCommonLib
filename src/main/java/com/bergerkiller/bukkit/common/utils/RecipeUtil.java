@@ -13,6 +13,7 @@ import com.bergerkiller.generated.net.minecraft.world.item.crafting.FurnaceRecip
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.IRecipeHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipesFurnaceHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityFurnaceHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingSet;
 
@@ -61,6 +62,9 @@ public class RecipeUtil {
     }
 
     public static int getFuelTime(Material material) {
+        if (!CraftMagicNumbersHandle.isItemMaterial(material)) {
+            return 0; // Invalid item
+        }
         return getFuelTime(new ItemStack(material, 1));
     }
 
@@ -89,6 +93,9 @@ public class RecipeUtil {
     }
 
     public static org.bukkit.inventory.ItemStack getFurnaceResult(org.bukkit.Material cookedType) {
+        if (!CraftMagicNumbersHandle.isItemMaterial(cookedType)) {
+            return null; // Causes errors otherwise
+        }
         return getFurnaceResult(new ItemStack(cookedType, 1));
     }
 
