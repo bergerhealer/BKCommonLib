@@ -7,7 +7,13 @@ optional class LightEngineThreaded {
 
     public void schedule(Runnable runnable) {
 #if exists net.minecraft.server.level.LightEngineThreaded
-  #if exists net.minecraft.server.level.WorldServer public final io.papermc.paper.chunk.system.scheduling.ChunkTaskScheduler chunkTaskScheduler;
+  #if exists net.minecraft.server.level.WorldServer public final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler moonrise$getChunkTaskScheduler();
+        // Paper new chunk system - mixin mode - now stored in WorldServer
+        #require LightEngineThreaded private final net.minecraft.server.level.PlayerChunkMap chunkMap;
+        net.minecraft.server.level.PlayerChunkMap pcm = instance#chunkMap;
+        net.minecraft.server.level.WorldServer world = pcm.level;
+        world.moonrise$getChunkTaskScheduler().parallelGenExecutor.queueRunnable(runnable);
+  #elseif exists net.minecraft.server.level.WorldServer public final io.papermc.paper.chunk.system.scheduling.ChunkTaskScheduler chunkTaskScheduler;
         // Paper new chunk system - now stored in WorldServer
         #require LightEngineThreaded private final net.minecraft.server.level.PlayerChunkMap chunkMap;
         net.minecraft.server.level.PlayerChunkMap pcm = instance#chunkMap;

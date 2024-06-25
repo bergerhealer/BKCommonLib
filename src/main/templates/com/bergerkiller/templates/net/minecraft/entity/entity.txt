@@ -806,7 +806,10 @@ class Entity {
         world = (WorldServer) instance.level;
     #endif
 
-    #if exists io.papermc.paper.chunk.system.entity.EntityLookup.EntityCallback
+    #if exists net.minecraft.world.entity.Entity public int moonrise$getSectionX();
+        // Paper new chunk system STILL does not care about all this
+        return world.getChunkIfLoaded(instance.moonrise$getSectionX(), instance.moonrise$getSectionZ());
+    #elseif exists io.papermc.paper.chunk.system.entity.EntityLookup.EntityCallback
         // Paper new chunk system does not care about all this
         return world.getChunkIfLoaded(instance.sectionX, instance.sectionZ);
     #else

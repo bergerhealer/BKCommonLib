@@ -17,8 +17,12 @@ class LightingHandlerDisabled implements LightingHandler {
     }
 
     public LightingHandlerDisabled(Throwable cause) {
+        this(cause, true);
+    }
+
+    public LightingHandlerDisabled(Throwable cause, boolean logCause) {
         this.cause = cause;
-        if (cause != null) {
+        if (logCause && cause != null) {
             Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize lighting handler", cause);
         }
     }

@@ -202,7 +202,33 @@ class Chunk {
     </code>
 
     public (List<org.bukkit.entity.Entity>) List<Entity> getEntities() {
-#if version >= 1.17 && exists io.papermc.paper.world.ChunkEntitySlices public org.bukkit.entity.Entity[] getChunkEntities();
+#if version >= 1.21 && exists ca.spottedleaf.moonrise.patches.chunk_system.level.entity.ChunkEntitySlices
+        // New 1.21 Paper chunk system patches system
+        WorldServer world = (WorldServer) instance#getChunkWorld();
+        ca.spottedleaf.moonrise.patches.chunk_system.level.entity.EntityLookup entityLookup;
+        entityLookup = world.moonrise$getEntityLookup();
+        ca.spottedleaf.moonrise.patches.chunk_system.level.entity.ChunkEntitySlices slices;
+        slices = entityLookup.getChunk(instance.getPos().x, instance.getPos().z);
+        if (slices == null) {
+            return java.util.Collections.emptyList();
+        }
+
+        #require ca.spottedleaf.moonrise.patches.chunk_system.level.entity.ChunkEntitySlices private final ca.spottedleaf.moonrise.common.list.EntityList entitySliceChunkEntities:entities;
+        ca.spottedleaf.moonrise.common.list.EntityList entities = slices#entitySliceChunkEntities;
+
+        // This replicates the code of getChunkEntities(), but sending it to a List of nms Entity instead of Bukkit entities
+        final Entity[] entitiesArray = entities.getRawData();
+        int size = Math.min(entitiesArray.length, entities.size());
+        java.util.ArrayList result = new java.util.ArrayList(size);
+        for (int i = 0; i < size; ++i) {
+            Entity entity = entitiesArray[i];
+            if (entity != null && entity.valid) {
+                result.add(entity);
+            }
+        }
+        return result;
+
+#elseif version >= 1.17 && exists io.papermc.paper.world.ChunkEntitySlices public org.bukkit.entity.Entity[] getChunkEntities();
         // Paper API for storing entities inside chunk slices can be used
         WorldServer world = (WorldServer) instance#getChunkWorld();
 

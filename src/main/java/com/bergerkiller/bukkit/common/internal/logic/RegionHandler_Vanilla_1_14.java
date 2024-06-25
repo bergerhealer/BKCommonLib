@@ -195,6 +195,11 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
          * #if assignable RegionFileCache PlayerChunkMap
          *     // On 1.14 and PaperMC this can more trivially be accessed
          *     return (RegionFileCache) pcm;
+         * #elseif exists net.minecraft.world.level.chunk.storage.IChunkLoader private final RegionFileCache storage;
+         *     // Paper 1.21 moved it back to a field
+         *     #require net.minecraft.world.level.chunk.storage.IChunkLoader private final RegionFileCache storage;
+         *     IChunkLoader icl = (IChunkLoader) pcm;
+         *     return icl#storage;
          * #elseif exists net.minecraft.world.level.chunk.storage.IChunkLoader protected final RegionFileCache regionFileCache;
          *     // Paperspigot compatible code
          *     #require net.minecraft.world.level.chunk.storage.IChunkLoader protected final RegionFileCache regionFileCache;
@@ -235,8 +240,11 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
          *     VillagePlace poi = cps.i();
          * #endif
          *     RegionFileSection rfs = (RegionFileSection) poi;
-         * 
-         * #if assignable RegionFileCache RegionFileSection
+         *
+         * #if exists net.minecraft.world.level.chunk.storage.RegionFileSection public net.minecraft.world.level.chunk.storage.RegionFileCache moonrise$getRegionStorage();
+         *     // New paper chunk system mixin getter method
+         *     return rfs.moonrise$getRegionStorage();
+         * #elseif assignable RegionFileCache RegionFileSection
          *     // On 1.14 and PaperMC this can more trivially be accessed
          *     return (RegionFileCache) rfs;
          * #else

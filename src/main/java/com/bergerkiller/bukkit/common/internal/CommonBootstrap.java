@@ -785,9 +785,10 @@ public class CommonBootstrap {
         // There have been various locations where starlight was installed
         // This was also part of tuinity at some point, but was then ported into paper
         {
-            String defaultNamespace = "ca.spottedleaf.starlight.common.light."; // Also used in templates
+            String defaultNamespace = "ca.spottedleaf.moonrise.patches.starlight.light."; // Also used in templates
             String[] starlightNamespaces = new String[] {
                     defaultNamespace,
+                    "ca.spottedleaf.starlight.common.light.",
                     "ca.spottedleaf.starlight.light.",
                     "com.tuinity.tuinity.chunk.light."
             };

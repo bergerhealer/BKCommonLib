@@ -27,6 +27,10 @@ public final class LightingHandlerSelector implements LightingHandler {
         // Vanilla fallback
         this.fallback = LibraryComponentSelector.forModule(LightingHandler.class)
                 .setDefaultComponent(LightingHandlerDisabled::new)
+                .addWhen("Only paper starlight is supported",
+                        e -> CommonBootstrap.evaluateMCVersion(">=", "1.21") &&
+                             CommonUtil.getClass("ca.spottedleaf.moonrise.patches.starlight.light.StarLightEngine") != null,
+                        e -> new LightingHandlerDisabled(new IllegalStateException("Only paper starlight is supported"), false))
                 .addVersionOption(null, "1.13.2", LightingHandler_1_8_to_1_13_2::new)
                 .addVersionOption("1.14", "1.19.4", LightingHandler_1_14::new)
                 .addVersionOption("1.20", null, LightingHandler_1_20::new)
@@ -64,7 +68,7 @@ public final class LightingHandlerSelector implements LightingHandler {
 
                     @Override
                     public boolean isSupported(Void environment) {
-                        return CommonUtil.getClass("ca.spottedleaf.starlight.common.light.StarLightEngine") != null;
+                        return CommonUtil.getClass("ca.spottedleaf.moonrise.patches.starlight.light.StarLightEngine") != null;
                     }
 
                     @Override
