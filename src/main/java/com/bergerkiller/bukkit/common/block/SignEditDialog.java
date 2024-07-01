@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -43,6 +44,7 @@ import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEnt
  */
 public abstract class SignEditDialog {
     private static Handler handler = null;
+    private Material signType = MaterialUtil.getFirst("OAK_WALL_SIGN", "LEGACY_WALL_SIGN");
 
     /**
      * Called when this edit dialog is opened using {@link #open(Player)}
@@ -78,6 +80,26 @@ public abstract class SignEditDialog {
      * @param player Player for which this dialog was aborted
      */
     public void onAborted(Player player) {}
+
+    /**
+     * Gets the Material type of sign for which an edit dialog is shown
+     *
+     * @return Sign Material Type
+     */
+    public final Material getSignType() {
+        return signType;
+    }
+
+    /**
+     * Sets a new Material type of sign for which an edit dialog will be shown
+     *
+     * @param signType Sign Material Type
+     * @return this dialog
+     */
+    public final SignEditDialog setSignType(Material signType) {
+        this.signType = signType;
+        return this;
+    }
 
     /**
      * Opens a new sign editing dialog for the player specified. Initial contents
@@ -170,8 +192,7 @@ public abstract class SignEditDialog {
         IntVector3 coordinates = IntVector3.coordinatesOf(metadata.signBlock);
 
         // Send a block change packet for a sign at the sign coordinates
-        metadata.sendBlock(BlockData.fromMaterial(MaterialUtil.getFirst("OAK_WALL_SIGN", "LEGACY_WALL_SIGN"))
-                .setState("facing", backDirection));
+        metadata.sendBlock(BlockData.fromMaterial(signType).setState("facing", backDirection));
 
         // Update the lines of text on this sign client-sided
         metadata.player.sendSignChange(metadata.signBlock.getLocation(), lines);
