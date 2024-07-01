@@ -84,8 +84,12 @@ class DataWatcher {
     #else
         #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<DataWatcher.Item<?>> itemsById:entries;
     #endif
-#elseif exists net.minecraft.network.syncher.DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<DataWatcher.Item<?>> dataValues;
+#elseif exists net.minecraft.network.syncher.DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<DataWatcher.Item<?>> dataValues;
     // Some server forks (1.8) do this
+    #set datawatcher_storage fastutil_map
+    #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<DataWatcher.Item<?>> itemsById:dataValues;
+#elseif exists net.minecraft.network.syncher.DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<DataWatcher.Item<?>> dataValues;
+    // Some server forks (1.8) might also do this
     #set datawatcher_storage fastutil_map
     #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<DataWatcher.Item<?>> itemsById:dataValues;
 #elseif exists net.minecraft.network.syncher.DataWatcher private final gnu.trove.map.TIntObjectMap dataValues;
