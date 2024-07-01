@@ -84,20 +84,21 @@ class DataWatcher {
     #else
         #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<DataWatcher.Item<?>> itemsById:entries;
     #endif
-#elseif exists net.minecraft.network.syncher.DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<DataWatcher.Item<?>> dataValues;
+#elseif exists net.minecraft.network.syncher.DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<DataWatcher.Item<?>> dataValues;
     // Some server forks (1.8) do this
     #set datawatcher_storage fastutil_map
     #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<DataWatcher.Item<?>> itemsById:dataValues;
-#elseif version >= 1.9
+#elseif exists net.minecraft.network.syncher.DataWatcher private final gnu.trove.map.TIntObjectMap dataValues;
+    // This is on 1.8 usually
+    #set datawatcher_storage trove_map
+    #require DataWatcher private final gnu.trove.map.TIntObjectMap itemsById:dataValues;
+#else
     #set datawatcher_storage java_map
     #if version >= 1.10.2
         #require DataWatcher private final java.util.Map<Integer, DataWatcher.Item<?>> itemsById:d;
     #else
         #require DataWatcher private final java.util.Map<Integer, DataWatcher.Item<?>> itemsById:c;
     #endif
-#else
-    #set datawatcher_storage trove_map
-    #require DataWatcher private final gnu.trove.map.TIntObjectMap itemsById:dataValues;
 #endif
 
     public (DataWatcherHandle) DataWatcher cloneWithOwner((EntityHandle) Entity owner) {
