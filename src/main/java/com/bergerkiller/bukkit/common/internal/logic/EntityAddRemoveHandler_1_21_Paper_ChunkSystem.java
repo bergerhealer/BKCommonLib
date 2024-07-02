@@ -283,6 +283,7 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
     @Template.Import("it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap")
     @Template.Import("net.minecraft.world.level.entity.EntityTickList")
     @Template.Import("ca.spottedleaf.moonrise.patches.chunk_system.level.entity.ChunkEntitySlices")
+    @Template.Import("ca.spottedleaf.concurrentutil.map.ConcurrentLong2ReferenceChainedHashTable")
     @Template.InstanceType("ca.spottedleaf.moonrise.patches.chunk_system.level.entity.EntityLookup")
     public static abstract class AddRemoveHandlerLogic extends Template.Class<Handle> {
 
@@ -303,8 +304,30 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *     #require net.minecraft.world.entity.Entity protected UUID entityUUID:uuid;
          *     int entityId = oldEntity#entityId;
          *     UUID entityUUID = oldEntity#entityUUID;
-         * 
+         *
          *     EntityLookup entityLookup = world.moonrise$getEntityLookup();
+         *
+         *     // Entities by ID lookup table
+         *     #require EntityLookup protected final ConcurrentLong2ReferenceChainedHashTable<Entity> entityById;
+         *     ConcurrentLong2ReferenceChainedHashTable byIdMap = entityLookup#entityById;
+         *     if (byIdMap.get((long) entityId) == oldEntity) {
+         *         if (newEntity == null) {
+         *             byIdMap.remove((long) entityId);
+         *         } else {
+         *             byIdMap.put((long) entityId, newEntity);
+         *         }
+         *     }
+         *
+         *     // Entities by UUID lookup table
+         *     #require EntityLookup protected final java.util.concurrent.ConcurrentHashMap<UUID, Entity> entityByUUID;
+         *     java.util.concurrent.ConcurrentHashMap byUUIDMap = entityLookup#entityByUUID;
+         *     if (byUUIDMap.get(entityUUID) == oldEntity) {
+         *         if (newEntity == null) {
+         *             byUUIDMap.remove(entityUUID);
+         *         } else {
+         *             byUUIDMap.put(entityUUID, newEntity);
+         *         }
+         *     }
          *
          *     #require net.minecraft.server.level.WorldServer final net.minecraft.world.level.entity.EntityTickList entityTickList;
          *     EntityTickList tickList = world#entityTickList;
