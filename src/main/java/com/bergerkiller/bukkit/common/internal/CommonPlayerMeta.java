@@ -160,7 +160,7 @@ public class CommonPlayerMeta {
             Player viewer = CommonPlayerMeta.this.getPlayer();
             List<EntityTrackerEntryHook_1_8_to_1_13_2.ViewableLogic> pendingUpdates = CommonPlayerMeta.this.pendingViewerUpdates;
             CommonPlayerMeta.this.pendingViewerUpdates = Collections.emptyList();
-            if (viewer != null && viewer.isOnline()) {
+            if (viewer != null && viewer.isValid()) {
                 pendingUpdates.forEach(viewable -> viewable.handleRespawnBlindness(viewer));
             }
         }

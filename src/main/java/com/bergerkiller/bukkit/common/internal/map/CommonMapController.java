@@ -971,7 +971,7 @@ public final class CommonMapController implements PacketListener, Listener {
             final int slot = event.getSlot();
             final int rawSlot = event.getRawSlot();
             CommonUtil.nextTick(() -> {
-                if (!player.isOnline()) {
+                if (!player.isValid()) {
                     return;
                 }
 
@@ -992,7 +992,7 @@ public final class CommonMapController implements PacketListener, Listener {
         ) {
             final Player player = (Player) event.getWhoClicked();
             CommonUtil.nextTick(() -> {
-                if (!player.isOnline()) {
+                if (!player.isValid()) {
                     return;
                 }
 

@@ -25,7 +25,7 @@ class MapDisplayInputUpdater extends Task {
         Iterator<Map.Entry<Player, MapPlayerInput>> iter = controller.playerInputs.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<Player, MapPlayerInput> entry = iter.next();
-            if (entry.getKey().isOnline()) {
+            if (entry.getKey().isValid()) {
                 entry.getValue().onTick();
             } else {
                 entry.getValue().onDisconnected();

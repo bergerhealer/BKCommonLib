@@ -129,7 +129,7 @@ public class CommonVehicleMountManager {
         Iterator<Map.Entry<Player, VehicleMountHandler_BaseImpl>> iter = this._players.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<Player, VehicleMountHandler_BaseImpl> entry = iter.next();
-            if (!entry.getKey().isOnline()) {
+            if (!entry.getKey().isValid()) {
                 VehicleMountHandler_BaseImpl handler = entry.getValue();
                 iter.remove();
                 handler.handleRemoved();

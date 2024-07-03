@@ -162,13 +162,13 @@ public class CommonTeam implements Serializable {
                 PacketUtil.sendPacket(p, this.getPacket(PacketPlayOutScoreboardTeamHandle.METHOD_JOIN));
             }
         } else {
-            if (player != null && player.isOnline()) {
+            if (player instanceof Player && ((Player) player).isValid()) {
                 PacketUtil.sendPacket((Player) player, this.getPacket(PacketPlayOutScoreboardTeamHandle.METHOD_ADD));
             }
 
             for (String user : players) {
                 Player p = Bukkit.getPlayer(user);
-                if (p != null && p.isOnline()) {
+                if (p != null && p.isValid()) {
                     PacketUtil.sendPacket(p, this.getPacket(PacketPlayOutScoreboardTeamHandle.METHOD_JOIN));
                 }
             }
@@ -188,13 +188,13 @@ public class CommonTeam implements Serializable {
                 PacketUtil.sendPacket(p, this.getPacket(PacketPlayOutScoreboardTeamHandle.METHOD_LEAVE));
             }
         } else {
-            if (player != null && player.isOnline()) {
+            if (player instanceof Player && ((Player) player).isValid()) {
                 PacketUtil.sendPacket((Player) player, this.getPacket(PacketPlayOutScoreboardTeamHandle.METHOD_REMOVE));
             }
 
             for (String user : players) {
                 Player p = Bukkit.getPlayer(user);
-                if (p != null && p.isOnline()) {
+                if (p != null && p.isValid()) {
                     PacketUtil.sendPacket(p, this.getPacket(PacketPlayOutScoreboardTeamHandle.METHOD_LEAVE));
                 }
             }
@@ -212,7 +212,7 @@ public class CommonTeam implements Serializable {
         } else {
             for (String user : players) {
                 Player p = Bukkit.getPlayer(user);
-                if (p != null && p.isOnline()) {
+                if (p != null && p.isValid()) {
                     PacketUtil.sendPacket(p, this.getPacket(0));
                 }
             }
@@ -230,7 +230,7 @@ public class CommonTeam implements Serializable {
         } else {
             for (String user : players) {
                 Player p = Bukkit.getPlayer(user);
-                if (p != null && p.isOnline()) {
+                if (p != null && p.isValid()) {
                     PacketUtil.sendPacket(p, this.getPacket(PacketPlayOutScoreboardTeamHandle.METHOD_REMOVE));
                 }
             }
@@ -248,7 +248,7 @@ public class CommonTeam implements Serializable {
         } else {
             for (String user : players) {
                 Player p = Bukkit.getPlayer(user);
-                if (p != null && p.isOnline()) {
+                if (p != null && p.isValid()) {
                     PacketUtil.sendPacket(p, this.getPacket(2));
                 }
             }

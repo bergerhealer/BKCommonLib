@@ -248,7 +248,7 @@ public class CommonSyncPacketDispatcher extends AsyncTask implements PacketListe
         }
 
         public boolean isValid() {
-            if (!this.player.isOnline()) {
+            if (!this.player.isValid()) {
                 return false;
             }
             if ((System.currentTimeMillis() - this.lastSendPacketTime) > 60000) {

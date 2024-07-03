@@ -55,7 +55,7 @@ public class MapSession {
                 owner.input.handleDisplayUpdate(this.display, owner.interceptInput);
 
                 // Check if online. Remove offline players if not set FOREVER
-                if (!owner.player.isOnline()) {
+                if (!owner.player.isValid()) {
                     if (this.mode != MapSessionMode.FOREVER) {
                         this.owners.remove(owner.player.getUniqueId());
                     }
