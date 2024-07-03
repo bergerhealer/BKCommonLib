@@ -52,6 +52,20 @@ public interface QuotedArgumentParser<C, T> extends SuggestionProviderHolder<C> 
     }
 
     /**
+     * Whether suggestions must be escaped strictly. If true, then all characters that
+     * aren't alpha-numeric will cause the entire suggestion to be quote-escaped.
+     * If false, then only if spaces or quotes are encountered will it escape it.<br>
+     * <br>
+     * For @Quoted command arguments, strict must be true. For flags, this can be false.
+     * Default is false.
+     *
+     * @return Whether strict quote escaping is enabled
+     */
+    default boolean isStrictQuoteEscaping() {
+        return false;
+    }
+
+    /**
      * Attempts to parse the quoted {@code input} string into an object of type {@link T}.
      *
      * <p>This method may be called when a command chain is being parsed for execution
@@ -80,5 +94,59 @@ public interface QuotedArgumentParser<C, T> extends SuggestionProviderHolder<C> 
     @SuppressWarnings("unchecked")
     default @NonNull SuggestionProvider<C> suggestionProvider() {
         return this instanceof SuggestionProvider ? (SuggestionProvider<C>) this : SuggestionProvider.noSuggestions();
+    }
+
+    /**
+     * Wraps a suggestion provider, quote-escaping suggestions that don't adhere to permissive
+     * quoting.
+     *
+     * @param base Base suggestion provider
+     * @return Permissively-quote escaped suggestion provider
+     * @param <C> Command Sender type
+     */
+    static <C> SuggestionProvider<C> permissiveQuotedSuggestions(SuggestionProvider<C> base) {
+        return new QuotedArgumentParser<C, String>() {
+            @Override
+            public boolean isStrictQuoteEscaping() {
+                return false;
+            }
+
+            @Override
+            public ArgumentParseResult<String> parseQuotedString(CommandContext<C> commandContext, String inputString) {
+                return ArgumentParseResult.success(inputString);
+            }
+
+            @Override
+            public SuggestionProvider<C> suggestionProvider() {
+                return base;
+            }
+        }.createParser().suggestionProvider();
+    }
+
+    /**
+     * Wraps a suggestion provider, quote-escaping suggestions that don't adhere to strict
+     * quoting.
+     *
+     * @param base Base suggestion provider
+     * @return Strictly-quote escaped suggestion provider
+     * @param <C> Command Sender type
+     */
+    static <C> SuggestionProvider<C> strictQuotedSuggestions(SuggestionProvider<C> base) {
+        return new QuotedArgumentParser<C, String>() {
+            @Override
+            public boolean isStrictQuoteEscaping() {
+                return true;
+            }
+
+            @Override
+            public ArgumentParseResult<String> parseQuotedString(CommandContext<C> commandContext, String inputString) {
+                return ArgumentParseResult.success(inputString);
+            }
+
+            @Override
+            public SuggestionProvider<C> suggestionProvider() {
+                return base;
+            }
+        }.createParser().suggestionProvider();
     }
 }

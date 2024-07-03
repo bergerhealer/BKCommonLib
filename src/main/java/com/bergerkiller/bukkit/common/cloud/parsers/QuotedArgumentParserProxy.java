@@ -34,6 +34,10 @@ final class QuotedArgumentParserProxy<C, T> implements ArgumentParser<C, T>, Sug
         this.parser = parser;
     }
 
+    public UnquotedCharacterFilter getCharFilter() {
+        return parser.isStrictQuoteEscaping() ? UnquotedCharacterFilter.STRICT : UnquotedCharacterFilter.PERMISSIVE;
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public @NonNull ArgumentParseResult<@NonNull T> parse(@NonNull CommandContext<@NonNull C> commandContext, @NonNull CommandInput commandInput) {
@@ -60,26 +64,28 @@ final class QuotedArgumentParserProxy<C, T> implements ArgumentParser<C, T>, Sug
         String input = commandInput.lastRemainingToken();
         if (input.startsWith("\"")) {
             // Rewrite the input as if it was typed without quotes
-            final CommandInput unescapedInput = CommandInput.of(unescapeString(input));
+            final CommandInput unescapedInput = CommandInput.of(UnquotedCharacterFilter.unescapeString(input));
 
             // Rewrite all underlying suggestions as "-escaped
             return createSuggestions(context, unescapedInput, (suggestions, newSuggestions) -> {
                 for (Suggestion suggestion : suggestions) {
-                    newSuggestions.add(suggestion.withSuggestion(escapeString(suggestion.suggestion())));
+                    newSuggestions.add(suggestion.withSuggestion(UnquotedCharacterFilter.escapeString(suggestion.suggestion())));
                 }
             });
         } else if (input.isEmpty()) {
             // Simply show all suggestions, quote-escape those suggestions that require it
+            final UnquotedCharacterFilter filter = getCharFilter();
             return createSuggestions(context, commandInput, (suggestions, newSuggestions) -> {
                 for (Suggestion suggestion : suggestions) {
-                    newSuggestions.add(suggestion.withSuggestion(escapeStringIfNeeded(suggestion.suggestion())));
+                    newSuggestions.add(suggestion.withSuggestion(filter.escapeStringIfNeeded(suggestion.suggestion())));
                 }
             });
         } else {
             // Show all suggestions that do not require quote-escaping
+            final UnquotedCharacterFilter filter = getCharFilter();
             return createSuggestions(context, commandInput, (suggestions, newSuggestions) -> {
                 for (Suggestion suggestion : suggestions) {
-                    if (isAllowedUnquoted(suggestion.suggestion())) {
+                    if (filter.isStringAllowed(suggestion.suggestion())) {
                         newSuggestions.add(suggestion);
                     }
                 }
@@ -105,92 +111,13 @@ final class QuotedArgumentParserProxy<C, T> implements ArgumentParser<C, T>, Sug
                 });
     }
 
-    /*
-     * These functions were taken over from brigadier and is how quoted string rules work there
-     */
-
-    public static boolean isAllowedInUnquotedString(final char c) {
-        //TODO: Flags seem to allow all characters
-        //      So for the moment, we just only disallow spaces
-
-        return c != ' ' && c != '"';
-
-        /*
-        return c >= '0' && c <= '9'
-                || c >= 'A' && c <= 'Z'
-                || c >= 'a' && c <= 'z'
-                || c == '_' || c == '-'
-                || c == '.' || c == '+';
-         */
-    }
-
-    public static boolean isAllowedUnquoted(String str) {
-        int len = str.length();
-        for (int i = 0; i < len; i++) {
-            if (!isAllowedInUnquotedString(str.charAt(i))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static String unescapeString(String str) {
-        // First character must be a " or its not escaped at all. Probably an error.
-        int len = str.length();
-        if (len == 0 || str.charAt(0) != '"') {
-            return str;
-        }
-
-        StringBuilder newStr = new StringBuilder(len - 1);
-        boolean escaped = false;
-        for (int i = 1; i < len; i++) {
-            char c = str.charAt(i);
-            if (escaped) {
-                escaped = false;
-                newStr.append(c);
-            } else if (c == '\\') {
-                escaped = true;
-            } else if (c == '"') {
-                break;
-            } else {
-                newStr.append(c);
-            }
-        }
-        return newStr.toString();
-    }
-
-    public static String escapeStringIfNeeded(String str) {
-        int len = str.length();
-        for (int i = 0; i < len; i++ ) {
-            char c = str.charAt(i);
-            if (!isAllowedInUnquotedString(c)) {
-                StringBuilder newStr = new StringBuilder(len + 10);
-                newStr.append('"');
-                newStr.append(str, 0, i);
-                appendEscapedCharToBuilder(newStr, c);
-                appendEscapedStringToBuilder(newStr, str, i + 1, len);
-                newStr.append('"');
-                return newStr.toString();
-            }
-        }
-        return str;
-    }
-
-    public static String escapeString(String str) {
-        StringBuilder newStr = new StringBuilder(str.length() + 10);
-        newStr.append('"');
-        appendEscapedStringToBuilder(newStr, str, 0, str.length());
-        newStr.append('"');
-        return newStr.toString();
-    }
-
-    private static void appendEscapedStringToBuilder(StringBuilder builder, String str, int startIndex, int endIndex) {
+    public static void appendEscapedStringToBuilder(StringBuilder builder, String str, int startIndex, int endIndex) {
         for (int i = startIndex; i < endIndex; i++) {
             appendEscapedCharToBuilder(builder, str.charAt(i));
         }
     }
 
-    private static void appendEscapedCharToBuilder(StringBuilder builder, char c) {
+    public static void appendEscapedCharToBuilder(StringBuilder builder, char c) {
         if (c == '\\' || c == '"') {
             builder.append('\\');
         }
