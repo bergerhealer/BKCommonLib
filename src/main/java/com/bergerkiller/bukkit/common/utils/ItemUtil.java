@@ -21,9 +21,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import com.bergerkiller.generated.org.bukkit.inventory.InventoryHandle;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -42,6 +45,17 @@ public class ItemUtil {
      */
     public static Inventory getClickedInventory(InventoryClickEvent event) {
         return getClickedInventoryFunc.apply(event);
+    }
+
+    /**
+     * Gets the Player of an inventory view. Fixes an issue with compatibility between versions
+     * 1.20.6 and 1.21 where Bukkit changed it from an interface to a class.
+     *
+     * @param view View
+     * @return InventoryView getPlayer()
+     */
+    public static Player getViewPlayer(InventoryView view) {
+        return InventoryHandle.getViewPlayer(view);
     }
 
     private static Function<InventoryClickEvent, Inventory> findGetClickedInventoryFunc() {

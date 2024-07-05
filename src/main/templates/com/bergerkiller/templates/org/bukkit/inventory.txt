@@ -15,6 +15,11 @@ class Inventory {
 
     // Paperspigot only, it seems
     public transient optional java.util.HashMap<Integer, org.bukkit.inventory.ItemStack> removeItemAnySlot(org.bukkit.inventory.ItemStack[] items);
+
+    // Bukkit changed it from interface to class, so we cannot use it directly
+    public static org.bukkit.entity.Player getViewPlayer(org.bukkit.inventory.InventoryView view) {
+        return (org.bukkit.entity.Player) view.getPlayer();
+    }
 }
 
 optional class MainHand {

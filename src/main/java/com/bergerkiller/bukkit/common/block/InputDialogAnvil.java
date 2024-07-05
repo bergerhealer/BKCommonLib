@@ -368,7 +368,7 @@ public class InputDialogAnvil {
             set_output_packet.write(PacketType.OUT_WINDOW_SET_SLOT.windowId, windowId);
             set_output_packet.write(PacketType.OUT_WINDOW_SET_SLOT.slot, getIndex());
             set_output_packet.write(PacketType.OUT_WINDOW_SET_SLOT.item, createItem());
-            PacketUtil.sendPacket((Player) view.getPlayer(), set_output_packet);
+            PacketUtil.sendPacket(ItemUtil.getViewPlayer(view), set_output_packet);
         }
 
         @Override
