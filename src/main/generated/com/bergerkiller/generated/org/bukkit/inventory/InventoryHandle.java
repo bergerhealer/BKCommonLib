@@ -2,8 +2,6 @@ package com.bergerkiller.generated.org.bukkit.inventory;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 
@@ -24,17 +22,11 @@ public abstract class InventoryHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static Player getViewPlayer(InventoryView view) {
-        return T.getViewPlayer.invoker.invoke(null,view);
-    }
-
     /**
      * Stores class members for <b>org.bukkit.inventory.Inventory</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class InventoryClass extends Template.Class<InventoryHandle> {
-        public final Template.StaticMethod<Player> getViewPlayer = new Template.StaticMethod<Player>();
-
         @Template.Optional
         public final Template.Method<Location> getLocation = new Template.Method<Location>();
         @Template.Optional

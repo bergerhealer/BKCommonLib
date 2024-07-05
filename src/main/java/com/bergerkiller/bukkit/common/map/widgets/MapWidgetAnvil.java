@@ -166,7 +166,7 @@ public class MapWidgetAnvil extends MapWidget {
 
         // Close all old views first (to be sure), both when enabling and disabling
         for (InventoryView view : this._openInventories) {
-            view.close();
+            ItemUtil.closeView(view);
         }
         this._openInventories.clear();
 
@@ -419,7 +419,7 @@ public class MapWidgetAnvil extends MapWidget {
             event.setResult(Result.DENY);
 
             if (!ItemUtil.isEmpty(itemOnCursor)) {
-                view.getBottomInventory().addItem(itemOnCursor);
+                ItemUtil.getBottomInventory(view).addItem(itemOnCursor);
             }
 
             onClick(button);

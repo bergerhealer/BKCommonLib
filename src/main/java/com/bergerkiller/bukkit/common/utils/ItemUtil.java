@@ -21,7 +21,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import com.bergerkiller.generated.org.bukkit.inventory.InventoryHandle;
+import com.bergerkiller.generated.org.bukkit.inventory.InventoryViewHandle;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -48,14 +48,46 @@ public class ItemUtil {
     }
 
     /**
+     * Calls {@link InventoryView#close()} on a view. Fixes an issue with compatibility between versions
+     * 1.20.6 and 1.21 where Bukkit changed it from an interface to a class.
+     *
+     * @param view InventoryView
+     */
+    public static void closeView(InventoryView view) {
+        InventoryViewHandle.createHandle(view).close();
+    }
+
+    /**
      * Gets the Player of an inventory view. Fixes an issue with compatibility between versions
      * 1.20.6 and 1.21 where Bukkit changed it from an interface to a class.
      *
-     * @param view View
+     * @param view InventoryView
      * @return InventoryView getPlayer()
      */
     public static Player getViewPlayer(InventoryView view) {
-        return InventoryHandle.getViewPlayer(view);
+        return (Player) InventoryViewHandle.createHandle(view).getPlayer();
+    }
+
+    /**
+     * Gets the top inventory of a view. Fixes an issue with compatibility between versions
+     * 1.20.6 and 1.21 where Bukkit changed it from an interface to a class.
+     *
+     * @param view InventoryView
+     * @return Top Inventory
+     */
+    public static Inventory getTopInventory(InventoryView view) {
+        return InventoryViewHandle.createHandle(view).getTopInventory();
+    }
+
+    /**
+     * Gets the bottom inventory of a view. Fixes an issue with compatibility between versions
+     * 1.20.6 and 1.21 where Bukkit changed it from an interface to a class.
+     *
+     * @param view InventoryView
+     * @return Bottom Inventory
+     */
+    public static Inventory getBottomInventory(InventoryView view) {
+        return InventoryViewHandle.createHandle(view).getBottomInventory();
     }
 
     private static Function<InventoryClickEvent, Inventory> findGetClickedInventoryFunc() {
@@ -66,10 +98,11 @@ public class ItemUtil {
 
         // Fallback for mc 1.8 - 1.13.1/2
         return event -> {
-            if (event.getRawSlot() < event.getView().getTopInventory().getSize()) {
-                return event.getView().getTopInventory();
+            Inventory topInventory = ItemUtil.getTopInventory(event.getView());
+            if (event.getRawSlot() < topInventory.getSize()) {
+                return topInventory;
             } else {
-                return event.getView().getBottomInventory();
+                return ItemUtil.getBottomInventory(event.getView());
             }
         };
     }
