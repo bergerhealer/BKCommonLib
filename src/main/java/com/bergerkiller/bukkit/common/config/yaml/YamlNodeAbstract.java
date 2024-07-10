@@ -377,6 +377,17 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     }
 
     /**
+     * Gets all the relative YAML path keys of the values sorted in the order they exist in the YAML file.
+     * Returned keys can be used with the YAMLPath-accepting getter methods.
+     * This deep search will include the child entries of other nodes, recursively.
+     *
+     * @return deep key set
+     */
+    public Set<YamlPath> getDeepYamlKeys() {
+        return YamlNodeDeepKeySetProxy.yamlPathKeysOf(this);
+    }
+
+    /**
      * Gets all the values mapped to the keys that are a descendant
      * of this node.
      *

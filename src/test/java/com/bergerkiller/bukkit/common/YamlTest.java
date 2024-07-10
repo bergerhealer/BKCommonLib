@@ -11,6 +11,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.bergerkiller.bukkit.common.config.yaml.YamlListNode;
 import org.bukkit.GameMode;
@@ -42,8 +44,15 @@ public class YamlTest {
         assertEquals(22, (int) parent.getOrDefault(YamlPath.create("sub.two"), 33));
         assertEquals(22, (int) root.getOrDefault(YamlPath.create("parent.sub.two"), 33));
 
+        // Shallow
         assertEquals(Arrays.asList(YamlPath.create("parent")), new ArrayList<>(root.getYamlKeys()));
         assertEquals(Arrays.asList(YamlPath.create("child"), YamlPath.create("sub")), new ArrayList<>(parent.getYamlKeys()));
+
+        // Deep
+        assertEquals(Stream.of("parent", "parent.child", "parent.sub", "parent.sub.two").map(YamlPath::create).collect(Collectors.toList()),
+                new ArrayList<>(root.getDeepYamlKeys()));
+        assertEquals(Stream.of("child", "sub", "sub.two").map(YamlPath::create).collect(Collectors.toList()),
+                new ArrayList<>(parent.getDeepYamlKeys()));
     }
 
     @Test
