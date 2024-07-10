@@ -39,7 +39,7 @@ public class YamlNodeValueCollectionProxy implements Collection<Object>, YamlNod
 
     @Override
     public Iterator<Object> iterator() {
-        return new ValueIterator(_node);
+        return YamlNodeMappedIterator.shallow(_node, YamlEntry::getValue);
     }
 
     @Override
@@ -91,55 +91,5 @@ public class YamlNodeValueCollectionProxy implements Collection<Object>, YamlNod
     @Override
     public void assignTo(YamlEntry entry) {
         entry.setValue(_node);
-    }
-
-    public static class ValueIterator implements Iterator<Object> {
-        private final YamlNodeAbstract<?> _node;
-        private int _index = 0;
-        private boolean _nextCalled = false;
-
-        public ValueIterator(YamlNodeAbstract<?> node) {
-            _node = node;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return _index < _node._children.size();
-        }
-
-        @Override
-        public Object next() {
-            if (hasNext()) {
-                _nextCalled = true;
-                return _node._children.get(_index++).getValue();
-            } else {
-                throw new NoSuchElementException("No next element available");
-            }
-        }
-
-        @Override
-        public void remove() {
-            if (_nextCalled) {
-                _nextCalled = false;
-                _node.removeChildEntryAt(--_index);
-            } else {
-                throw new NoSuchElementException("Next must be called before remove()");
-            }
-        }
-
-        /**
-         * Changes the value of the entry last returned the value of using {@link #next()}
-         * 
-         * @param value
-         * @return previous value
-         */
-        public Object set(Object value) {
-            if (_nextCalled) {
-                _nextCalled = false;
-                return _node._children.get(_index - 1).setValue(value);
-            } else {
-                throw new NoSuchElementException("Next must be called before set(value)");
-            }
-        }
     }
 }

@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.config.yaml;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import com.bergerkiller.bukkit.common.collections.CollectionBasics;
@@ -52,35 +51,7 @@ class YamlNodeKeySetProxy<T> implements Set<T> {
 
     @Override
     public Iterator<T> iterator() {
-        return new Iterator<T>() {
-            private int _index = 0;
-            private boolean _canRemove = false;
-
-            @Override
-            public boolean hasNext() {
-                return _index < _node._children.size();
-            }
-
-            @Override
-            public T next() {
-                if (hasNext()) {
-                    _canRemove = true;
-                    return _keyConv.toKey(_node, _node._children.get(_index++).getYamlPath());
-                } else {
-                    throw new NoSuchElementException("No next element available");
-                }
-            }
-
-            @Override
-            public void remove() {
-                if (_canRemove) {
-                    _canRemove = false;
-                    _node.removeChildEntryAt(--_index);
-                } else {
-                    throw new NoSuchElementException("Next must be called before remove()");
-                }
-            }
-        };
+        return YamlNodeMappedIterator.shallow(_node, e -> _keyConv.toKey(_node, e.getYamlPath()));
     }
 
     @Override

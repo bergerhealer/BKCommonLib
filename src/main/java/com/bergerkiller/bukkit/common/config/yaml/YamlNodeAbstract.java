@@ -411,7 +411,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     @SuppressWarnings("unchecked")
     public <T> Map<String, T> getValues(Class<T> valueType) {
         Map<String, Object> values = this.getValues();
-        YamlNodeValueCollectionProxy.ValueIterator iter = new YamlNodeValueCollectionProxy.ValueIterator(this);
+        YamlNodeMappedIterator<Object> iter = YamlNodeMappedIterator.shallow(this, YamlEntry::getValue);
         while (iter.hasNext()) {
             Object oldValue = iter.next();
             if (oldValue != null) {
@@ -419,7 +419,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
                 if (convertedValue == null) {
                     iter.remove();
                 } else if (convertedValue != oldValue) {
-                    iter.set(convertedValue);
+                    iter.setValue(convertedValue);
                 }
             }
         }
