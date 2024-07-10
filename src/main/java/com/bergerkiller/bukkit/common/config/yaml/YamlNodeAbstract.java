@@ -348,12 +348,32 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     }
 
     /**
+     * Checks if a value is contained at the path specified
+     *
+     * @param relativePath Relative YAML path to check at
+     * @return True if a value is contained, False if not
+     */
+    public boolean contains(YamlPath relativePath) {
+        return this.getEntryIfExists(relativePath) != null;
+    }
+
+    /**
      * Gets all the keys of the values sorted in the order they exist in the YAML file
      *
      * @return key set
      */
     public Set<String> getKeys() {
-        return new YamlNodeKeySetProxy(this);
+        return YamlNodeKeySetProxy.stringKeysOf(this);
+    }
+
+    /**
+     * Gets all the relative YAML path keys of the values sorted in the order they exist in the YAML file.
+     * Returned keys can be used with the YAMLPath-accepting getter methods.
+     *
+     * @return key set
+     */
+    public Set<YamlPath> getYamlKeys() {
+        return YamlNodeKeySetProxy.yamlPathKeysOf(this);
     }
 
     /**
@@ -691,7 +711,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * Gets the raw value at the path specified.
      * Returns null if nothing is stored at the path.
      *
-     * @param path The path to the value to get
+     * @param path The path of the value to get
      * @return the raw value
      */
     public Object get(String path) {
@@ -700,9 +720,22 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     }
 
     /**
+     * Gets the raw value at the path specified.
+     * Returns null if nothing is stored at the path.
+     * YamlPath allows key components containing special characters.
+     *
+     * @param relativePath The relative YAML path of the value to get
+     * @return the raw value
+     */
+    public Object get(YamlPath relativePath) {
+        YamlEntry entry = this.getEntryIfExists(relativePath);
+        return (entry == null) ? null : entry.getValue();
+    }
+
+    /**
      * Gets the raw value at the path as the type specified
      *
-     * @param path The path to the value to get
+     * @param path The path of the value to get
      * @param type of value to get
      * @return the converted value, or null if not found or of the wrong type
      * @param <T> Value type
@@ -712,13 +745,26 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     }
 
     /**
+     * Gets the raw value at the path as the type specified.
+     * YamlPath allows key components containing special characters.
+     *
+     * @param relativePath The relative YAML path of the value to get
+     * @param type of value to get
+     * @return the converted value, or null if not found or of the wrong type
+     * @param <T> Value type
+     */
+    public <T> T get(YamlPath relativePath, Class<T> type) {
+        return this.get(relativePath, type, null);
+    }
+
+    /**
      * Gets the value stored at the path as the type specified.
      * If the value is not stored or could not be converted to the type,
      * then the default value is set and returned instead.<br>
      * <br>
      * <b>The def value is used to get the type, it can not be null!</b>
      *
-     * @param path   The path to the value to get
+     * @param path   The path of the value to get
      * @param def    The value to return and store on failure, defines the type of value to return
      * @return The converted value, or the default value if not found or of the wrong type
      * @param <T> Value type
@@ -729,11 +775,29 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     }
 
     /**
+     * Gets the value stored at the path as the type specified.
+     * If the value is not stored or could not be converted to the type,
+     * then the default value is set and returned instead.
+     * YamlPath allows key components containing special characters.<br>
+     * <br>
+     * <b>The def value is used to get the type, it can not be null!</b>
+     *
+     * @param relativePath The relative YAML path of the value to get
+     * @param def    The value to return and store on failure, defines the type of value to return
+     * @return The converted value, or the default value if not found or of the wrong type
+     * @param <T> Value type
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T get(YamlPath relativePath, T def) {
+        return this.get(relativePath, (Class<T>) def.getClass(), def);
+    }
+
+    /**
      * Gets the raw value at the path as the type specified.
      * If the value is not stored or could not be converted to the type,
      * then the default value is set and returned instead.
      *
-     * @param path    The path to the value to get
+     * @param path    The path of the value to get
      * @param type    The type of value to convert the stored value to
      * @param def     The value to return and store on failure
      * @return The converted value, or the default value if not found or of the wrong type
@@ -756,6 +820,34 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     }
 
     /**
+     * Gets the raw value at the path as the type specified.
+     * If the value is not stored or could not be converted to the type,
+     * then the default value is set and returned instead.
+     * YamlPath allows key components containing special characters.
+     *
+     * @param relativePath The relative YAML path of the value to get
+     * @param type    The type of value to convert the stored value to
+     * @param def     The value to return and store on failure
+     * @return The converted value, or the default value if not found or of the wrong type
+     * @param <T> Value type
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T get(YamlPath relativePath, Class<T> type, T def) {
+        Object value = this.get(relativePath);
+        if (type == String.class && value instanceof String[]) {
+            // Special conversion to line-by-line String
+            // This is needed, as it saves line-split Strings as such
+            return (T) StringUtil.join("\n", (String[]) value);
+        }
+        T rval = ParseUtil.convert(value, type, null);
+        if (rval == null) {
+            rval = def;
+            this.set(relativePath, rval);
+        }
+        return rval;
+    }
+
+    /**
      * Gets the raw value at the path as the type specified. Does
      * <b>not</b> set the default value if it is missing, instead
      * only returning the default value. This is unlike
@@ -764,7 +856,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * <br>
      * <b>The def value is used to get the type, it can not be null!</b>
      *
-     * @param path   The path to the value to get
+     * @param path   The path of the value to get
      * @param def    The value to return and store on failure, defines the type of value to return
      * @return The converted value, or the default value if not found or of the wrong type
      * @param <T> Value type
@@ -778,10 +870,30 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * Gets the raw value at the path as the type specified. Does
      * <b>not</b> set the default value if it is missing, instead
      * only returning the default value. This is unlike
+     * {@link #get(YamlPath, Object)} which sets the default
+     * value in the configuration.
+     * YamlPath allows key components containing special characters.<br>
+     * <br>
+     * <b>The def value is used to get the type, it can not be null!</b>
+     *
+     * @param relativePath The relative YAML path of the value to get
+     * @param def    The value to return and store on failure, defines the type of value to return
+     * @return The converted value, or the default value if not found or of the wrong type
+     * @param <T> Value type
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getOrDefault(YamlPath relativePath, T def) {
+        return this.getOrDefault(relativePath, (Class<T>) def.getClass(), def);
+    }
+
+    /**
+     * Gets the raw value at the path as the type specified. Does
+     * <b>not</b> set the default value if it is missing, instead
+     * only returning the default value. This is unlike
      * {@link #get(String, Class, Object)} which sets the default
      * value in the configuration.
      *
-     * @param path    The path to the value to get
+     * @param path    The path of the value to get
      * @param type    The type of value to convert the stored value to
      * @param def     The value to return and store on failure
      * @return The converted value, or the default value if not found or of the wrong type
@@ -800,17 +912,58 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     }
 
     /**
+     * Gets the raw value at the path as the type specified. Does
+     * <b>not</b> set the default value if it is missing, instead
+     * only returning the default value. This is unlike
+     * {@link #get(YamlPath, Class, Object)} which sets the default
+     * value in the configuration.
+     * YamlPath allows key components containing special characters.
+     *
+     * @param relativePath The relative YAML path of the value to get
+     * @param type    The type of value to convert the stored value to
+     * @param def     The value to return and store on failure
+     * @return The converted value, or the default value if not found or of the wrong type
+     * @param <T> Value type
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getOrDefault(YamlPath relativePath, Class<T> type, T def) {
+        Object value = this.get(relativePath);
+        if (type == String.class && value instanceof String[]) {
+            // Special conversion to line-by-line String
+            // This is needed, as it saves line-split Strings as such
+            return (T) StringUtil.join("\n", (String[]) value);
+        }
+        T rval = ParseUtil.convert(value, type, null);
+        return (rval != null) ? rval : def;
+    }
+
+    /**
      * Sets a value at a certain path<br>
      * <br>
      * If the value is a node, it will be parented to this node's tree. Changes to the node
      * then impact this tree. If the node is already parented, it is cloned and later
      * changes to the node will not impact this tree.
      *
-     * @param path to set
+     * @param path to set at
      * @param value to set to
      */
     public void set(String path, Object value) {
         this.getEntry(path).setValue(value);
+    }
+
+    /**
+     * Sets a value at a certain path<br>
+     * <br>
+     * If the value is a node, it will be parented to this node's tree. Changes to the node
+     * then impact this tree. If the node is already parented, it is cloned and later
+     * changes to the node will not impact this tree.
+     * YamlPath allows key components containing special characters.
+     *
+     * @param relativePath Relative YAML path to set at
+     * @param value to set to
+     */
+    public void set(YamlPath relativePath, Object value) {
+        this.getEntry(relativePath).setValue(value);
     }
 
     /**
@@ -820,12 +973,34 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * then impact this tree. If the node is already parented, it is cloned and later
      * changes to the node will not impact this tree.
      * 
-     * @param path to set
+     * @param path to set at
      * @param value to set to
      * @return True if the value was stored, False if a previous value existed
      */
     public boolean setIfAbsent(String path, Object value) {
         YamlEntry entry = this.createEntryIfAbsent(path);
+        if (entry != null) {
+            entry.setValue(value);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Sets a value at a certain path, provided no previous value exists<br>
+     * <br>
+     * If the value is a node, it will be parented to this node's tree. Changes to the node
+     * then impact this tree. If the node is already parented, it is cloned and later
+     * changes to the node will not impact this tree.
+     * YamlPath allows key components containing special characters.
+     *
+     * @param relativePath Relative YAML path to set at
+     * @param value to set to
+     * @return True if the value was stored, False if a previous value existed
+     */
+    public boolean setIfAbsent(YamlPath relativePath, Object value) {
+        YamlEntry entry = this.createEntryIfAbsent(relativePath);
         if (entry != null) {
             entry.setValue(value);
             return true;
@@ -841,6 +1016,19 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      */
     public void remove(String path) {
         YamlEntry entry = this.getEntryIfExists(path);
+        if (entry != null && entry.getParentNode() != null) {
+            entry.getParentNode().removeChildEntry(entry);
+        }
+    }
+
+    /**
+     * Removes the value at the path specified.
+     * YamlPath allows key components containing special characters.
+     *
+     * @param relativePath Relative YAML path to remove at
+     */
+    public void remove(YamlPath relativePath) {
+        YamlEntry entry = this.getEntryIfExists(relativePath);
         if (entry != null && entry.getParentNode() != null) {
             entry.getParentNode().removeChildEntry(entry);
         }
@@ -1384,14 +1572,21 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
         return entry;
     }
 
-    protected int indexOfKey(Object key) {
-        if (key != null && !this._children.isEmpty()) {
-            String keyStr = key.toString();
+    protected int indexOfYamlPath(YamlPath path) {
+        if (path != null && !this._children.isEmpty()) {
             for (int i = 0; i < this._children.size(); i++) {
-                if (this._children.get(i).getKey().equals(keyStr)) {
+                if (this._children.get(i).getYamlPath().equals(path)) {
                     return i;
                 }
             }
+        }
+        return -1;
+    }
+
+    protected int indexOfKey(Object key) {
+        if (key != null) {
+            YamlPath path = this.getYamlPath().child(key.toString());
+            return indexOfYamlPath(path);
         }
         return -1;
     }
@@ -1432,6 +1627,10 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
 
     protected YamlEntry createEntryIfAbsent(String path) {
         return this._root.createEntryIfAbsent(this._entry.getYamlPath(), path);
+    }
+
+    protected YamlEntry createEntryIfAbsent(YamlPath relativePath) {
+        return this._root.createEntryIfAbsent(this._entry.getYamlPath(), relativePath);
     }
 
     protected YamlEntry getEntryIfExists(String path) {

@@ -10,12 +10,24 @@ import com.bergerkiller.bukkit.common.collections.CollectionBasics;
 /**
  * Accesses a YamlNode's key names using a Set interface.
  * Used by {@link YamlNodeAbstract<?>#getKeys()}.
+ *
+ * @param <T> - Value Type of the keys
  */
-public class YamlNodeKeySetProxy implements Set<String> {
+class YamlNodeKeySetProxy<T> implements Set<T> {
     private final YamlNodeAbstract<?> _node;
+    private final KeyConverter<T> _keyConv;
 
-    public YamlNodeKeySetProxy(YamlNodeAbstract<?> node) {
+    public static YamlNodeKeySetProxy<String> stringKeysOf(YamlNodeAbstract<?> node) {
+        return new YamlNodeKeySetProxy<>(node, KeyConverter.STRING_KEYS);
+    }
+
+    public static YamlNodeKeySetProxy<YamlPath> yamlPathKeysOf(YamlNodeAbstract<?> node) {
+        return new YamlNodeKeySetProxy<>(node, KeyConverter.PATH_KEYS);
+    }
+
+    private YamlNodeKeySetProxy(YamlNodeAbstract<?> node, KeyConverter<T> keyConv) {
         _node = node;
+        _keyConv = keyConv;
     }
 
     @Override
@@ -39,8 +51,8 @@ public class YamlNodeKeySetProxy implements Set<String> {
     }
 
     @Override
-    public Iterator<String> iterator() {
-        return new Iterator<String>() {
+    public Iterator<T> iterator() {
+        return new Iterator<T>() {
             private int _index = 0;
             private boolean _canRemove = false;
 
@@ -50,10 +62,10 @@ public class YamlNodeKeySetProxy implements Set<String> {
             }
 
             @Override
-            public String next() {
+            public T next() {
                 if (hasNext()) {
                     _canRemove = true;
-                    return _node._children.get(_index++).getKey();
+                    return _keyConv.toKey(_node, _node._children.get(_index++).getYamlPath());
                 } else {
                     throw new NoSuchElementException("No next element available");
                 }
@@ -73,7 +85,12 @@ public class YamlNodeKeySetProxy implements Set<String> {
 
     @Override
     public boolean remove(Object o) {
-        int index = _node.indexOfKey(o);
+        YamlPath path = _keyConv.toPath(_node, o);
+        if (path == null) {
+            return false;
+        }
+
+        int index = _node.indexOfYamlPath(path);
         if (index == -1) {
             return false;
         } else {
@@ -103,17 +120,57 @@ public class YamlNodeKeySetProxy implements Set<String> {
     }
 
     @Override
-    public <T> T[] toArray(T[] a) {
+    public <E> E[] toArray(E[] a) {
         return CollectionBasics.toArray(this, a);
     }
 
     @Override
-    public boolean add(String e) {
+    public boolean add(T e) {
         throw new UnsupportedOperationException("Node keys cannot be added");
     }
-    
+
     @Override
-    public boolean addAll(Collection<? extends String> c) {
+    public boolean addAll(Collection<? extends T> c) {
         throw new UnsupportedOperationException("Node keys cannot be added");
+    }
+
+    public interface KeyConverter<T> {
+        KeyConverter<String> STRING_KEYS = new KeyConverter<String>() {
+            @Override
+            public YamlPath toPath(YamlNodeAbstract<?> node, Object key) {
+                if (key instanceof String) {
+                    return node.getYamlPath().childWithName((String) key);
+                } else {
+                    return null;
+                }
+            }
+
+            @Override
+            public String toKey(YamlNodeAbstract<?> node, YamlPath absolutePath) {
+                // Only contains children 1 level deep. So we can just return the name.
+                return absolutePath.name();
+            }
+        };
+        KeyConverter<YamlPath> PATH_KEYS = new KeyConverter<YamlPath>() {
+            @Override
+            public YamlPath toPath(YamlNodeAbstract<?> node, Object key) {
+                if (key instanceof YamlPath) {
+                    YamlPath path = (YamlPath) key;
+                    if (path.parent().equals(node.getYamlPath())) {
+                        return path;
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            public YamlPath toKey(YamlNodeAbstract<?> node, YamlPath absolutePath) {
+                // Make the absolute path relative to the node path
+                return absolutePath.makeRelative(node.getYamlPath());
+            }
+        };
+
+        YamlPath toPath(YamlNodeAbstract<?> node, Object key);
+        T toKey(YamlNodeAbstract<?> node, YamlPath absolutePath);
     }
 }

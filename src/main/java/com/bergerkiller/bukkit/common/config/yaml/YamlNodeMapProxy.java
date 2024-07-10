@@ -80,7 +80,7 @@ public class YamlNodeMapProxy implements Map<String, Object> {
 
     @Override
     public Set<String> keySet() {
-        return new YamlNodeKeySetProxy(_node);
+        return YamlNodeKeySetProxy.stringKeysOf(_node);
     }
 
     @Override

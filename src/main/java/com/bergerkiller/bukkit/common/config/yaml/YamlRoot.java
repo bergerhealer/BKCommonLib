@@ -74,6 +74,10 @@ public class YamlRoot {
         return createEntryIfAbsent(parent.child(path));
     }
 
+    public YamlEntry createEntryIfAbsent(YamlPath parent, YamlPath relativePath) {
+        return createEntryIfAbsent(parent.child(relativePath));
+    }
+
     public YamlEntry createEntryIfAbsent(YamlPath path) {
         return this._entries.containsKey(path) ? null : createEntry(path, false);
     }

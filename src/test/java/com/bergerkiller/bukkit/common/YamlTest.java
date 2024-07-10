@@ -30,6 +30,23 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
 public class YamlTest {
 
     @Test
+    public void testYamlKeyAPIs() {
+        YamlNode root = new YamlNode();
+        root.set(YamlPath.create("parent.child"), 12);
+        assertEquals(12, root.get(YamlPath.create("parent.child")));
+
+        YamlNode parent = root.getNode(YamlPath.create("parent"));
+        assertEquals(12, parent.get(YamlPath.create("child")));
+
+        parent.set(YamlPath.create("sub.two"), 22);
+        assertEquals(22, (int) parent.getOrDefault(YamlPath.create("sub.two"), 33));
+        assertEquals(22, (int) root.getOrDefault(YamlPath.create("parent.sub.two"), 33));
+
+        assertEquals(Arrays.asList(YamlPath.create("parent")), new ArrayList<>(root.getYamlKeys()));
+        assertEquals(Arrays.asList(YamlPath.create("child"), YamlPath.create("sub")), new ArrayList<>(parent.getYamlKeys()));
+    }
+
+    @Test
     public void testYamlCopyIntoArrayToNode() {
         YamlNode rootOne = new YamlNode();
         YamlNode childOne = rootOne.getNode("child");
