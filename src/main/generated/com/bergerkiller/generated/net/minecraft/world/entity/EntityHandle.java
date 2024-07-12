@@ -44,6 +44,7 @@ public abstract class EntityHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract void setTrackerEntry(EntityTrackerEntryHandle tracker);
     public abstract List<EntityHandle> getPassengers();
     public abstract boolean isVehicle();
     public abstract boolean isPassenger();
@@ -278,8 +279,6 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.StaticField.Converted<Key<Boolean>> DATA_NO_GRAVITY = new Template.StaticField.Converted<Key<Boolean>>();
 
         public final Template.Field.Converted<Entity> bukkitEntityField = new Template.Field.Converted<Entity>();
-        @Template.Optional
-        public final Template.Field.Converted<EntityTrackerEntryHandle> tracker = new Template.Field.Converted<EntityTrackerEntryHandle>();
         public final Template.Field.Integer idField = new Template.Field.Integer();
         public final Template.Field.Boolean preventBlockPlace = new Template.Field.Boolean();
         public final Template.Field.Converted<EntityHandle> vehicle = new Template.Field.Converted<EntityHandle>();
@@ -315,6 +314,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Long move_SomeState = new Template.Field.Long();
         public final Template.Field.Boolean valid = new Template.Field.Boolean();
 
+        public final Template.Method.Converted<Void> setTrackerEntry = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<List<EntityHandle>> getPassengers = new Template.Method.Converted<List<EntityHandle>>();
         public final Template.Method<Boolean> isVehicle = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isPassenger = new Template.Method<Boolean>();

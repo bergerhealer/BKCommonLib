@@ -106,9 +106,7 @@ public class EntityTracker extends BasicWrapper<EntityTrackerHandle> {
      */
     public EntityTrackerEntryHandle setEntry(Entity entity, EntityTrackerEntryHandle entityTrackerEntry) {
         // On Paper, the entry is also stored in the entity itself
-        if (EntityHandle.T.tracker.isAvailable()) {
-            EntityHandle.T.tracker.set(HandleConversion.toEntityHandle(entity), entityTrackerEntry);
-        }
+        EntityHandle.T.setTrackerEntry.invoke(HandleConversion.toEntityHandle(entity), entityTrackerEntry);
 
         return handle.putEntry(entity.getEntityId(), entityTrackerEntry);
     }

@@ -44,7 +44,17 @@ class Entity {
     protected (org.bukkit.entity.Entity) CraftEntity bukkitEntityField:bukkitEntity;
 #endif
 
-    optional (EntityTrackerEntryHandle) net.minecraft.server.level.EntityTrackerEntry tracker;
+    public void setTrackerEntry((EntityTrackerEntryHandle) net.minecraft.server.level.EntityTrackerEntry tracker) {
+        System.out.println("Set tracker entry");
+#if exists net.minecraft.world.entity.Entity net.minecraft.server.level.EntityTrackerEntry tracker;
+        #require Entity net.minecraft.server.level.EntityTrackerEntry tracker;
+        instance#tracker = tracker;
+#endif
+
+#if exists net.minecraft.world.entity.Entity public final void moonrise$setTrackedEntity(net.minecraft.server.level.EntityTrackerEntry trackedEntity);
+        instance.moonrise$setTrackedEntity(tracker);
+#endif
+    }
 
 #if version >= 1.17
     private static optional java.util.concurrent.atomic.AtomicInteger opt_atomic_entityCount:ENTITY_COUNTER;
