@@ -45,7 +45,6 @@ class Entity {
 #endif
 
     public void setTrackerEntry((EntityTrackerEntryHandle) net.minecraft.server.level.EntityTrackerEntry tracker) {
-        System.out.println("Set tracker entry");
 #if exists net.minecraft.world.entity.Entity net.minecraft.server.level.EntityTrackerEntry tracker;
         #require Entity net.minecraft.server.level.EntityTrackerEntry tracker;
         instance#tracker = tracker;
