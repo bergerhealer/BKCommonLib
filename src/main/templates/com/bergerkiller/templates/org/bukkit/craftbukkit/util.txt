@@ -139,7 +139,7 @@ class CraftMagicNumbers {
     </code>
 
     public static boolean isItemMaterial(org.bukkit.Material material) {
-#if version >= 1.12.2
+#if version >= 1.13
         return material.isItem();
 #else
         //TODO: How do we fix this?
