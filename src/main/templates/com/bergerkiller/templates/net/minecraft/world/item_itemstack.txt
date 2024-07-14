@@ -218,6 +218,101 @@ class ItemStack {
 
 
 #if version >= 1.20.5
+    public void hideTooltip() {
+        instance.set(DataComponents.HIDE_TOOLTIP, net.minecraft.util.Unit.INSTANCE);
+    }
+
+    public void hideAllAttributes() {
+        // Hide additional tooltip
+        {
+            instance.set(DataComponents.HIDE_ADDITIONAL_TOOLTIP, net.minecraft.util.Unit.INSTANCE);
+        }
+
+        // Hide unbreakable
+        {
+            net.minecraft.world.item.component.Unbreakable unbreakable = (net.minecraft.world.item.component.Unbreakable) instance.get(DataComponents.UNBREAKABLE);
+            if (unbreakable != null) {
+                instance.set(DataComponents.UNBREAKABLE, unbreakable.withTooltip(false));
+            }
+        }
+
+        // Hide enchantments
+        {
+            net.minecraft.world.item.enchantment.ItemEnchantments enchants = (net.minecraft.world.item.enchantment.ItemEnchantments) instance.get(DataComponents.ENCHANTMENTS);
+            if (enchants == null) {
+                enchants = net.minecraft.world.item.enchantment.ItemEnchantments.EMPTY;
+            }
+            instance.set(DataComponents.ENCHANTMENTS, enchants.withTooltip(false));
+        }
+
+        // Hide dyed color
+        {
+            net.minecraft.world.item.component.DyedItemColor dye = (net.minecraft.world.item.component.DyedItemColor) instance.get(DataComponents.DYED_COLOR);
+            if (dye != null) {
+                instance.set(DataComponents.DYED_COLOR, dye.withTooltip(false));
+            }
+        }
+
+        // Hide armor trim
+        {
+            net.minecraft.world.item.armortrim.ArmorTrim trim = (net.minecraft.world.item.armortrim.ArmorTrim) instance.get(DataComponents.TRIM);
+            if (trim != null) {
+                instance.set(DataComponents.TRIM, trim.withTooltip(false));
+            }
+        }
+
+        // Hide item attributes in tooltip
+        {
+            net.minecraft.world.item.component.ItemAttributeModifiers modifiers = (net.minecraft.world.item.component.ItemAttributeModifiers) instance.get(DataComponents.ATTRIBUTE_MODIFIERS);
+            if (modifiers == null) {
+                modifiers = net.minecraft.world.item.component.ItemAttributeModifiers.EMPTY;
+            }
+            instance.set(DataComponents.ATTRIBUTE_MODIFIERS, modifiers.withTooltip(false));
+        }
+    }
+#else
+    #require ItemStack public void hideAllAttributesImpl() {
+        // Use Bukkit ItemFlag API to hide all attributes in an easy way
+        // This still works here
+        org.bukkit.inventory.ItemStack itemStack = org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(instance);
+        org.bukkit.inventory.meta.ItemMeta meta = itemStack.getItemMeta();
+        if (meta == null) {
+            return; // Fail silently I guess?
+        }
+        meta.addItemFlags(org.bukkit.inventory.ItemFlag.values());
+        itemStack.setItemMeta(meta);
+    }
+
+    public void hideAllAttributes() {
+        instance#hideAllAttributesImpl();
+    }
+
+    public void hideTooltip() {
+        // On this version we must hide all attributes
+        instance#hideAllAttributesImpl();
+
+        // Set custom name empty as well
+        // Seems to be no way to truly hide it
+  #if version >= 1.19
+        instance.setHoverName(IChatBaseComponent.literal(""));
+  #elseif version >= 1.18
+        instance.setHoverName(new net.minecraft.network.chat.ChatComponentText(""));
+  #elseif version >= 1.13
+        instance.a(new net.minecraft.network.chat.ChatComponentText(""));
+  #elseif version >= 1.11
+        StringBuilder str = new StringBuilder(org.bukkit.ChatColor.RESET.toString());
+        str.append((char) 0);
+        instance.g(str.toString());
+  #else
+        StringBuilder str = new StringBuilder(org.bukkit.ChatColor.RESET.toString());
+        str.append((char) 0);
+        instance.c(str.toString());
+  #endif
+    }
+#endif
+
+
+#if version >= 1.20.5
     public (List<ChatText>) List<IChatBaseComponent> getLores() {
         net.minecraft.world.item.component.ItemLore lore;
         lore = (net.minecraft.world.item.component.ItemLore) instance.get(DataComponents.LORE);

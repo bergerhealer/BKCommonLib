@@ -626,22 +626,6 @@ public final class CommonItemStack implements Cloneable {
     }
 
     /**
-     * Sets an empty custom name on this item, so that the original name of the item is not
-     * displayed. An empty String might not as reliably work, so use this method instead
-     * of hiding the original name is important.
-     *
-     * @return this CommonItemStack
-     * @throws IllegalStateException If this item is {@link #isEmpty() empty}.
-     */
-    public CommonItemStack setEmptyCustomName() {
-        if (CommonCapabilities.EMPTY_ITEM_NAME) {
-            return setCustomNameMessage(ChatColor.RESET.toString());
-        } else {
-            return setCustomNameMessage(ChatColor.RESET + "\0");
-        }
-    }
-
-    /**
      * Gets a list of Lore lines that are added to this item. Returns an empty list if no lores
      * have been assigned.
      *
@@ -883,12 +867,40 @@ public final class CommonItemStack implements Cloneable {
     /**
      * Hides all attributes of this item, such as 'unbreakable' and potion effects,
      * from the tooltip of this item. Equivalent to calling {@link #addItemFlags(ItemFlag...)}
-     * with all the HIDE_ flags.
+     * with all the HIDE_ flags. Still shows the tooltip.
      *
      * @return this CommonItemStack
      */
     public CommonItemStack hideAllAttributes() {
-        return addItemFlags(ItemFlag.values());
+        this.getHandle(false)
+                .ifPresent(ItemStackHandle::hideAllAttributes);
+        return this;
+    }
+
+    /**
+     * Completely hides the tooltip of the item. When hovering over the item,
+     * no tooltip will show.
+     *
+     * @return this CommonItemStack
+     */
+    public CommonItemStack hideTooltip() {
+        this.getHandle(false)
+                .ifPresent(ItemStackHandle::hideTooltip);
+        return this;
+    }
+
+    /**
+     * No longer does as written, as hiding the item name is no longer possible.
+     * Only the entire tooltip can be hidden.
+     * Use {@link #hideTooltip()} instead.
+     *
+     * @return this CommonItemStack
+     * @throws IllegalStateException If this item is {@link #isEmpty() empty}.
+     * @deprecated Use {@link #hideTooltip()} to hide the tooltip instead
+     */
+    @Deprecated
+    public CommonItemStack setEmptyCustomName() {
+        return hideTooltip();
     }
 
     /**
