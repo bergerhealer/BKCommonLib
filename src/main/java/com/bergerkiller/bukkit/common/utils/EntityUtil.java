@@ -76,7 +76,7 @@ public class EntityUtil extends EntityPropertyUtil {
      */
     public static void setSpeed(LivingEntity entity, double speed) {
         EntityLivingHandle nmsEntity = CommonNMS.getHandle(entity);
-        nmsEntity.getAttribute(GenericAttributesHandle.MOVEMENT_SPEED).setValue(speed);
+        nmsEntity.getAttribute(GenericAttributesHandle.MOVEMENT_SPEED).setBaseValue(speed);
     }
 
     /**
@@ -87,7 +87,7 @@ public class EntityUtil extends EntityPropertyUtil {
      */
     public static double getSpeed(LivingEntity entity) {
         EntityLivingHandle nmsEntity = CommonNMS.getHandle(entity);
-        return nmsEntity.getAttribute(GenericAttributesHandle.MOVEMENT_SPEED).getValue();
+        return nmsEntity.getAttribute(GenericAttributesHandle.MOVEMENT_SPEED).getBaseValue();
     }
 
     /**

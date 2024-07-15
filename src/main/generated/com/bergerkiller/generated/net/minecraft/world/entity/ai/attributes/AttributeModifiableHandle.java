@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.Holder;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.world.entity.ai.attributes.AttributeModifiable</b>.
@@ -19,15 +20,21 @@ public abstract class AttributeModifiableHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public abstract void setValue(double value);
+    public abstract Holder<AttributeBaseHandle> getAttribute();
+    public abstract void setBaseValue(double value);
+    public abstract double getBaseValue();
     public abstract double getValue();
+    public abstract void removeAllModifiers();
     /**
      * Stores class members for <b>net.minecraft.world.entity.ai.attributes.AttributeModifiable</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class AttributeModifiableClass extends Template.Class<AttributeModifiableHandle> {
-        public final Template.Method<Void> setValue = new Template.Method<Void>();
+        public final Template.Method.Converted<Holder<AttributeBaseHandle>> getAttribute = new Template.Method.Converted<Holder<AttributeBaseHandle>>();
+        public final Template.Method<Void> setBaseValue = new Template.Method<Void>();
+        public final Template.Method<Double> getBaseValue = new Template.Method<Double>();
         public final Template.Method<Double> getValue = new Template.Method<Double>();
+        public final Template.Method<Void> removeAllModifiers = new Template.Method<Void>();
 
     }
 

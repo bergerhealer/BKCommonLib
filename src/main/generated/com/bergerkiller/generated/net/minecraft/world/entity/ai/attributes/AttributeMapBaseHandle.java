@@ -22,7 +22,8 @@ public abstract class AttributeMapBaseHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public abstract Set<AttributeModifiableHandle> getAttributes();
+    public abstract Collection<AttributeModifiableHandle> getAllAttributes();
+    public abstract Set<AttributeModifiableHandle> getChangedSynchronizedAttributes();
     public abstract Collection<AttributeModifiableHandle> getSynchronizedAttributes();
     public abstract void loadFromNBT(CommonTagList nbttaglist);
     public abstract CommonTagList saveToNBT();
@@ -31,7 +32,8 @@ public abstract class AttributeMapBaseHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class AttributeMapBaseClass extends Template.Class<AttributeMapBaseHandle> {
-        public final Template.Method.Converted<Set<AttributeModifiableHandle>> getAttributes = new Template.Method.Converted<Set<AttributeModifiableHandle>>();
+        public final Template.Method.Converted<Collection<AttributeModifiableHandle>> getAllAttributes = new Template.Method.Converted<Collection<AttributeModifiableHandle>>();
+        public final Template.Method.Converted<Set<AttributeModifiableHandle>> getChangedSynchronizedAttributes = new Template.Method.Converted<Set<AttributeModifiableHandle>>();
         public final Template.Method.Converted<Collection<AttributeModifiableHandle>> getSynchronizedAttributes = new Template.Method.Converted<Collection<AttributeModifiableHandle>>();
         public final Template.Method.Converted<Void> loadFromNBT = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<CommonTagList> saveToNBT = new Template.Method.Converted<CommonTagList>();

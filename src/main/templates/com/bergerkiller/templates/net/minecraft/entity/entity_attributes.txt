@@ -10,30 +10,79 @@ import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.Attri
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
 
 class AttributeModifiable {
+#if version >= 1.20.5
+    public (Holder<AttributeBaseHandle>) net.minecraft.core.Holder<AttributeBase> getAttribute();
+#elseif version >= 1.16
+    public (Holder<AttributeBaseHandle>) AttributeBase getAttribute();
+#else
+    public (Holder<AttributeBaseHandle>) IAttribute getAttribute();
+#endif
+
 #if forge_nms_obfuscated
-    public abstract void setValue:a(double value);
+    public abstract void setBaseValue:a(double value);
+    public abstract double getBaseValue:b();
     public abstract double getValue:e();
 #elseif version >= 1.18
-    public abstract void setValue:setBaseValue(double value);
-    public abstract double getValue:getBaseValue();
-#else
-    public abstract void setValue(double value);
+    public abstract void setBaseValue(double value);
+    public abstract double getBaseValue();
     public abstract double getValue();
+#else
+    public abstract void setBaseValue:setValue(double value);
+    public abstract double getBaseValue();
+    public abstract double getValue();
+#endif
+
+#if version >= 1.18
+    public void removeAllModifiers:removeModifiers();
+#elseif version >= 1.17
+    public void removeAllModifiers:e();
+#elseif version >= 1.14.4
+    public void removeAllModifiers() {
+        java.util.Iterator allModifiers = instance.getModifiers().iterator();
+        while (allModifiers.hasNext()) {
+            instance.removeModifier((AttributeModifier) allModifiers.next());
+        }
+    }
+#else
+    public void removeAllModifiers() {
+        java.util.Iterator allModifiers = instance.c().iterator();
+        while (allModifiers.hasNext()) {
+            instance.c((AttributeModifier) allModifiers.next());
+        }
+    }
 #endif
 }
 
 class AttributeMapBase {
+#if version >= 1.16
+    public (Collection<AttributeModifiableHandle>) Collection<AttributeModifiable> getAllAttributes() {
+  #if version >= 1.20.5
+        #require AttributeMapBase private final java.util.Map<net.minecraft.core.Holder<AttributeBase>, AttributeModifiable> attributesMap:attributes;
+  #elseif version >= 1.17
+        #require AttributeMapBase private final java.util.Map<AttributeBase, AttributeModifiable> attributesMap:attributes;
+  #else
+        #require AttributeMapBase private final java.util.Map<AttributeBase, AttributeModifiable> attributesMap:b;
+  #endif
+        java.util.Map attributes = instance#attributesMap;
+        return attributes.values();
+    }
+#else
+    public (Collection<AttributeModifiableHandle>) Collection<AttributeModifiable> getAllAttributes() {
+        return instance.a();
+    }
+#endif
+
 #if version >= 1.21
-    public (Set<AttributeModifiableHandle>) Set<AttributeModifiable> getAttributes:getAttributesToSync();
+    public (Set<AttributeModifiableHandle>) Set<AttributeModifiable> getChangedSynchronizedAttributes:getAttributesToSync();
     public (Collection<AttributeModifiableHandle>) Collection<AttributeModifiable> getSynchronizedAttributes:getSyncableAttributes();
 #elseif version >= 1.18
-    public (Set<AttributeModifiableHandle>) Set<AttributeModifiable> getAttributes:getDirtyAttributes();
+    public (Set<AttributeModifiableHandle>) Set<AttributeModifiable> getChangedSynchronizedAttributes:getDirtyAttributes();
     public (Collection<AttributeModifiableHandle>) Collection<AttributeModifiable> getSynchronizedAttributes:getSyncableAttributes();
 #elseif version >= 1.16
-    public (Set<AttributeModifiableHandle>) Set<AttributeModifiable> getAttributes();
+    public (Set<AttributeModifiableHandle>) Set<AttributeModifiable> getChangedSynchronizedAttributes:getAttributes();
     public (Collection<AttributeModifiableHandle>) Collection<AttributeModifiable> getSynchronizedAttributes:b();
 #else
-    public (Set<AttributeModifiableHandle>) Set<AttributeModifiable> getAttributes() {
+    public (Set<AttributeModifiableHandle>) Set<AttributeModifiable> getChangedSynchronizedAttributes:getAttributes() {
         return ((AttributeMapServer) instance).getAttributes();
     }
 

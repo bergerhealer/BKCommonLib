@@ -55,7 +55,9 @@ public class Common {
             "Common:ConnectionResetAwaitTeleport",
             "Common:EntityController:PositionPassenger",
             "Common:CommonItemStack",
-            "Common:EquipmentSlot:IsSupportedCheck"
+            "Common:EquipmentSlot:IsSupportedCheck",
+            "Common:Attributes:RemoveAllModifiers",
+            "Common:Attributes:GetAllAttributes"
     ).collect(Collectors.toSet());
 
     /**
