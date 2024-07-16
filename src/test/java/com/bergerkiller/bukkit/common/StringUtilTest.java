@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.bergerkiller.bukkit.common.cloud.parsers.QuotedLinesParser;
 import org.bukkit.ChatColor;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -16,6 +17,27 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
  * Tests some functions in the StringUtil class
  */
 public class StringUtilTest {
+
+    @Test
+    public void testQuotedLinesParser() {
+        assertParsedQuotedLines("word", "word");
+        assertParsedQuotedLines("one two three", "one", "two", "three");
+        assertParsedQuotedLines("one  two  three", "one", "two", "three");
+        assertParsedQuotedLines("\"broken quote", "\"broken", "quote");
+        assertParsedQuotedLines("left \"escaped part\" right", "left", "escaped part", "right");
+        assertParsedQuotedLines("\"one two\" \"three four\"", "one two", "three four");
+        assertParsedQuotedLines("\"one  two\"  \"three  four\"", "one  two", "three  four");
+        assertParsedQuotedLines("\"\"", "");
+        assertParsedQuotedLines("");
+        assertParsedQuotedLines(" ");
+        assertParsedQuotedLines("\"", "\"");
+    }
+
+    private void assertParsedQuotedLines(String input, String... lines) {
+        QuotedLinesParser parser = new QuotedLinesParser();
+        parser.parse(input);
+        assertArrayEquals(lines, parser.getLinesArray());
+    }
 
     @Test
     public void testStringReplace() {
