@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.world.entity.player;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityLivingHandle;
@@ -25,6 +26,7 @@ public abstract class EntityHumanHandle extends EntityLivingHandle {
     /* ============================================================================== */
 
     public abstract void attack(Entity entity);
+    public static final Key<Byte> DATA_PLAYER_MODE_CUSTOMISATION = Key.Type.BYTE.createKey(T.DATA_PLAYER_MODE_CUSTOMISATION, -1);
     public abstract Object getInventoryRaw();
     public abstract void setInventoryRaw(Object value);
     public abstract Object getEnderChestRaw();
@@ -50,6 +52,9 @@ public abstract class EntityHumanHandle extends EntityLivingHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityHumanClass extends Template.Class<EntityHumanHandle> {
+        @Template.Optional
+        public final Template.StaticField.Converted<Key<Byte>> DATA_PLAYER_MODE_CUSTOMISATION = new Template.StaticField.Converted<Key<Byte>>();
+
         public final Template.Field.Converted<Object> inventoryRaw = new Template.Field.Converted<Object>();
         public final Template.Field.Converted<Object> enderChestRaw = new Template.Field.Converted<Object>();
         public final Template.Field.Converted<ContainerHandle> activeContainer = new Template.Field.Converted<ContainerHandle>();
