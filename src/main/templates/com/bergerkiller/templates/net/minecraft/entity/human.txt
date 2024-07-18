@@ -7,7 +7,9 @@ import net.minecraft.world.inventory.Container;
 import net.minecraft.world.inventory.InventoryEnderChest;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-
+import net.minecraft.network.syncher.DataWatcherObject;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle;
 
@@ -136,6 +138,55 @@ class EntityHuman extends net.minecraft.world.entity.EntityLiving {
     private unknown int i;
     private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bF;
 #endif
+
+#if version >= 1.17
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION;
+
+#elseif version >= 1.16.2
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bi;
+
+#elseif version >= 1.16
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bp;
+
+#elseif version >= 1.15
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bq;
+
+#elseif version >= 1.14
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bt;
+
+#elseif version >= 1.13
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bx;
+
+#elseif version >= 1.12
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:br;
+
+#elseif version >= 1.11
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bq;
+
+#elseif version >= 1.10
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:br;
+
+#elseif version >= 1.9.4
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bq;
+
+#elseif version >= 1.9
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bp;
+#else
+    /* === MC 1.8.9: These constants do not exist == */
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:###;
+
+#endif
+    <code>
+    public static final Key<Byte> DATA_PLAYER_MODE_CUSTOMISATION = Key.Type.BYTE.createKey(T.DATA_PLAYER_MODE_CUSTOMISATION, -1);
+    public static final int DATA_CUSTOMISATION_FLAG_CAPE = (1 << 0);
+    public static final int DATA_CUSTOMISATION_FLAG_JACKET = (1 << 1);
+    public static final int DATA_CUSTOMISATION_FLAG_LEFT_SLEEVE = (1 << 2);
+    public static final int DATA_CUSTOMISATION_FLAG_RIGHT_SLEEVE = (1 << 3);
+    public static final int DATA_CUSTOMISATION_FLAG_LEFT_PANTS_LEG = (1 << 4);
+    public static final int DATA_CUSTOMISATION_FLAG_RIGHT_PANTS_LEG = (1 << 5);
+    public static final int DATA_CUSTOMISATION_FLAG_HAT = (1 << 6);
+    public static final byte DATA_CUSTOMISATION_FLAG_ALL = 0x7f;
+    </code>
 
     public void attack((org.bukkit.entity.Entity) Entity entity);
 }

@@ -57,7 +57,8 @@ public class Common {
             "Common:CommonItemStack",
             "Common:EquipmentSlot:IsSupportedCheck",
             "Common:Attributes:RemoveAllModifiers",
-            "Common:Attributes:GetAllAttributes"
+            "Common:Attributes:GetAllAttributes",
+            "Common:Player:SetSkinMetadata"
     ).collect(Collectors.toSet());
 
     /**
