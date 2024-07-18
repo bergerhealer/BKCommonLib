@@ -27,6 +27,14 @@ public abstract class EntityHumanHandle extends EntityLivingHandle {
 
     public abstract void attack(Entity entity);
     public static final Key<Byte> DATA_PLAYER_MODE_CUSTOMISATION = Key.Type.BYTE.createKey(T.DATA_PLAYER_MODE_CUSTOMISATION, -1);
+    public static final int DATA_CUSTOMISATION_FLAG_CAPE = (1 << 0);
+    public static final int DATA_CUSTOMISATION_FLAG_JACKET = (1 << 1);
+    public static final int DATA_CUSTOMISATION_FLAG_LEFT_SLEEVE = (1 << 2);
+    public static final int DATA_CUSTOMISATION_FLAG_RIGHT_SLEEVE = (1 << 3);
+    public static final int DATA_CUSTOMISATION_FLAG_LEFT_PANTS_LEG = (1 << 4);
+    public static final int DATA_CUSTOMISATION_FLAG_RIGHT_PANTS_LEG = (1 << 5);
+    public static final int DATA_CUSTOMISATION_FLAG_HAT = (1 << 6);
+    public static final byte DATA_CUSTOMISATION_FLAG_ALL = 0x7f;
     public abstract Object getInventoryRaw();
     public abstract void setInventoryRaw(Object value);
     public abstract Object getEnderChestRaw();
