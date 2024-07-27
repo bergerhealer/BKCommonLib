@@ -194,7 +194,7 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *
          *         // Look the same entity type object up again by this same key
          *         // If this returns a different object, try with that instead
-         *         EntityTypes entityTypesAlter = BuiltInRegistries.ENTITY_TYPE.get(name);
+         *         EntityTypes entityTypesAlter = (EntityTypes) BuiltInRegistries.ENTITY_TYPE.get(name);
          *         if (entityTypes == entityTypesAlter || entityTypesAlter == null) {
          *             throw new IllegalStateException("Failed to construct entity of type " + name, t);
          *         }
