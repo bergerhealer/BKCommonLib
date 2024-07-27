@@ -1,12 +1,10 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.IdentityHashMap;
 import java.util.logging.Level;
 
-import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import org.bukkit.entity.Entity;
 
@@ -171,16 +169,49 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
     @Template.Import("net.minecraft.world.level.storage.WorldDataServer")
     @Template.Import("net.minecraft.world.entity.Entity")
     @Template.Import("net.minecraft.world.level.World")
+    @Template.Import("net.minecraft.core.registries.BuiltInRegistries")
+    @Template.Import("net.minecraft.resources.MinecraftKey")
     public static abstract class Handler extends Template.Class<Template.Handle> {
 
         /*
          * <CLASS_FROM_ENTITYTYPES>
          * public static Class<?> findClassFromEntityTypes((Object) EntityTypes entityTypes, (Object) World world) {
+         *     Object entity;
+         *     try {
          * #if version >= 1.18
-         *     Object entity = entityTypes.create(world);
+         *         entity = entityTypes.create(world);
          * #else
-         *     Object entity = entityTypes.a(world);
+         *         entity = entityTypes.a(world);
          * #endif
+         *     } catch (Throwable t) {
+         *         // Try to find some descriptive name for this entity type
+         *         // This could fail if the type is not registered
+         *         MinecraftKey name = (MinecraftKey) BuiltInRegistries.ENTITY_TYPE.getKey(entityTypes);
+         *         if (name == null) {
+         *             throw new IllegalStateException("Failed to find entity class of unregistered entity type (" +
+         *                     entityTypes.getClass().getName() + ")", t);
+         *         }
+         *
+         *         // Look the same entity type object up again by this same key
+         *         // If this returns a different object, try with that instead
+         *         EntityTypes entityTypesAlter = BuiltInRegistries.ENTITY_TYPE.get(name);
+         *         if (entityTypes == entityTypesAlter || entityTypesAlter == null) {
+         *             throw new IllegalStateException("Failed to construct entity of type " + name, t);
+         *         }
+         *
+         *         // Try again, but this time with the one from the registry
+         *         try {
+         * #if version >= 1.18
+         *             entity = entityTypesAlter.create(world);
+         * #else
+         *             entity = entityTypesAlter.a(world);
+         * #endif
+         *         } catch (Throwable t2) {
+         *             // Throw the original error
+         *             throw new IllegalStateException("Failed to construct entity of (adjusted) type " + name, t);
+         *         }
+         *     }
+         *
          *     if (entity == null) {
          *         return null;
          *     } else {
