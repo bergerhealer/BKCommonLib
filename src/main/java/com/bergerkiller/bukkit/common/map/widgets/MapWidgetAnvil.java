@@ -436,7 +436,8 @@ public class MapWidgetAnvil extends MapWidget {
         public void onPrepareAnvil(PrepareAnvilEvent event) {
             if (!mustHandle(event)) return;
 
-            handleTextChange(event.getView());
+            // Note: must cast, since 1.21 the return type changed :(
+            handleTextChange(((InventoryEvent) event).getView());
         }
     }
 }
