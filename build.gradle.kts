@@ -211,8 +211,9 @@ tasks {
         dependencies {
             exclude(dependency("org.apiguardian:apiguardian-api"))
             exclude(dependency("org.checkerframework:checker-qual"))
-            exclude("META-INF/services/*.*")
         }
+
+        mergeServiceFiles()
 
         destinationDirectory.set(layout.buildDirectory)
         archiveFileName.set("${project.name}-${project.version}-$buildNumber.jar")
