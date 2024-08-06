@@ -1958,7 +1958,8 @@ class Entity {
     public int getPortalWaitTime() {
         PortalProcessor processor = instance.portalProcess;
         if (processor == null) {
-            return 0;
+            // Return 1 so that the cooldown of 0 doesn't trigger any teleportations
+            return 1;
         }
 
         #require PortalProcessor private net.minecraft.world.level.block.Portal portalProcessorPortal:portal;
