@@ -211,6 +211,7 @@ tasks {
         dependencies {
             exclude(dependency("org.apiguardian:apiguardian-api"))
             exclude(dependency("org.checkerframework:checker-qual"))
+            exclude("META-INF/services/*.*")
         }
 
         destinationDirectory.set(layout.buildDirectory)
