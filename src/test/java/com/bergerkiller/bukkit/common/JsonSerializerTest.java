@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common;
 
-import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.config.JsonSerializer;
 import com.bergerkiller.bukkit.common.inventory.CommonItemMaterials;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
@@ -35,26 +34,6 @@ public class JsonSerializerTest {
         Map<String, Object> jsonMap = serializer.jsonToMap(json);
         assertEquals(dataVersion, ((Number) jsonMap.get("v")).intValue());
         assertEquals("STICK", jsonMap.get("type"));
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testItemStackToJsonPlayerHeadYa() throws JsonSerializer.JsonSyntaxException {
-        JsonSerializer serializer = new JsonSerializer();
-
-        GameProfileHandle profile = GameProfileHandle.createNew(
-                UUID.fromString("04049c90-d3e9-4621-9caf-0000aaa58540"),
-                "HeadDatabase");
-        profile.putProperty("textures", PropertyHandle.createNew("textures",
-                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjllNzVlMDQxNTFlN2NkZThlN2YxNDlkYWU5MmYwYzE0ZWY1ZjNmZjQ1Y2QzMjM5NTc4NzZiMGFkZDJjNDk0OSJ9fX0="));
-
-        ConfigurationNode node = new ConfigurationNode();
-        node.set("item", CommonItemStack.createPlayerSkull(profile)
-                        .toBukkit());
-
-        ConfigurationNode two = new ConfigurationNode();
-        two.loadFromString(node.toString());
-        System.out.println(two);
     }
 
     @Test
