@@ -1,8 +1,10 @@
 package com.bergerkiller.bukkit.common.config;
 
+import java.util.Collections;
 import java.util.Map;
 
 import com.bergerkiller.bukkit.common.config.yaml.YamlDeserializer;
+import com.bergerkiller.bukkit.common.map.gson.EmptyMapSerializer;
 import com.google.gson.GsonBuilder;
 import org.bukkit.inventory.ItemStack;
 
@@ -14,7 +16,9 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
  * Can serialize and deserialize various objects from/to a JSON String.
  */
 public class JsonSerializer {
-    private final com.google.gson.Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+    private final com.google.gson.Gson gson = new GsonBuilder().disableHtmlEscaping()
+            .registerTypeAdapter(Collections.emptyMap().getClass(), new EmptyMapSerializer())
+            .create();
 
     public ItemStack fromJsonToItemStack(String json) throws JsonSyntaxException {
         Map<String, Object> mapping = jsonToMap(json);

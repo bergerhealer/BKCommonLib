@@ -9,6 +9,8 @@ import com.bergerkiller.generated.com.mojang.authlib.properties.PropertyHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import org.junit.Test;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -16,6 +18,15 @@ import static org.junit.Assert.*;
 
 public class JsonSerializerTest {
     final int dataVersion = CraftMagicNumbersHandle.getDataVersion();
+
+    @Test
+    public void testEmptyMapToJson() {
+        JsonSerializer serializer = new JsonSerializer();
+        Map<String, Object> jsonMap = new LinkedHashMap<>();
+        jsonMap.put("key", Collections.emptyMap());
+        String json = serializer.toJson(jsonMap);
+        assertEquals("{\"key\":{}}", json);
+    }
 
     @Test
     public void testItemStackToJsonStick() throws JsonSerializer.JsonSyntaxException {

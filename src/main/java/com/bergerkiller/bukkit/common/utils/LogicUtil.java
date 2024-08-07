@@ -1183,17 +1183,22 @@ public class LogicUtil {
             }
         }
 
+        boolean cloned = false;
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             Object value = entry.getValue();
             if (value instanceof ConfigurationSerializable) {
                 Map<String, Object> serialized = serializeDeep((ConfigurationSerializable) value);
-                try {
-                    entry.setValue(serialized);
-                } catch (UnsupportedOperationException ex) {
-                    // This shouldn't ever be hit, but kept it for safety
+                if (!cloned) {
+                    try {
+                        entry.setValue(serialized);
+                        continue;
+                    } catch (UnsupportedOperationException ex) { /* Shouldn't happen but just in case */ }
+
                     values = new LinkedHashMap<>(values);
-                    values.put(entry.getKey(), serialized);
+                    cloned = true;
                 }
+
+                values.put(entry.getKey(), serialized);
             }
         }
         return values;
