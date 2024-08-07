@@ -42,6 +42,7 @@ import com.bergerkiller.mountiplex.reflection.SafeMethod;
 public class YamlDeserializer {
     private final Yaml yaml;
     private final PreParser preParser;
+    private final MappingConstructorFactory mappingFactory;
 
     /**
      * A singleton instance of the YamlDeserializer. Is thread-safe.
@@ -53,7 +54,8 @@ public class YamlDeserializer {
      */
     public YamlDeserializer() {
         // This is used to de-serialize custom types
-        YamlConstructorFactory ctorFactory = new YamlConstructorFactory();
+        mappingFactory = new MappingConstructorFactory();
+        YamlConstructorFactory ctorFactory = new YamlConstructorFactory(mappingFactory);
 
         // Check whether the SnakeYAML library currently in use imposes DOS protection
         // We want to turn this off so that de-serialization cannot break horrible with large files
@@ -92,6 +94,43 @@ public class YamlDeserializer {
 
         this.yaml = yaml;
         this.preParser = new PreParser();
+    }
+
+    /**
+     * Deserializes the Map into a known registered ConfigurationSerializable object. If possible.
+     *
+     * @param mapping Mapping
+     * @return Deserialized object, or the input Mapping
+     */
+    public Object deserializeMapping(Map<?, ?> mapping) {
+        Map<Object, Object> mappingUnsafe = LogicUtil.unsafeCast(mapping);
+
+        // Recursively deserialize all entries that are mapping themselves, first
+        boolean operatingOnCopy = false;
+        for (Map.Entry<Object, Object> entry : mappingUnsafe.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Map) {
+                Object newValue = deserializeMapping((Map<?, ?>) value);
+                if (value != newValue) {
+                    if (!operatingOnCopy) {
+                        if (!(mapping instanceof com.google.common.collect.ImmutableMap)) {
+                            // try to use entry.set
+                            try {
+                                entry.setValue(newValue);
+                                continue; // Skip alt
+                            } catch (UnsupportedOperationException ex) { /* Immutable */ }
+                        }
+
+                        mappingUnsafe = LogicUtil.unsafeCast((mapping = new LinkedHashMap<>(mapping)));
+                        operatingOnCopy = true;
+                    }
+
+                    mappingUnsafe.put(entry.getKey(), newValue);
+                }
+            }
+        }
+
+        return mappingFactory.construct(mapping);
     }
 
     /**
@@ -334,12 +373,11 @@ public class YamlDeserializer {
         }
     }
 
-    // Custom version of org.bukkit.configuration.file.YamlConstructor
-    // This allows us to add our own handlers for certain object types
-    private static class YamlConstructorFactory {
+    // Decodes a Map type into custom (registered) types
+    private static class MappingConstructorFactory {
         private final Map<String, Function<Map<String, Object>, ? extends Object>> custom_builders;
 
-        public YamlConstructorFactory() {
+        public MappingConstructorFactory() {
             this.custom_builders = new HashMap<>();
 
             this.register("org.bukkit.inventory.ItemStack", ItemStackDeserializer.INSTANCE);
@@ -355,6 +393,55 @@ public class YamlDeserializer {
 
         private void register(String typeName, Function<Map<String, Object>, ? extends Object> builder) {
             custom_builders.put(typeName, builder);
+        }
+
+        /**
+         * Constructs a ConfigurationSerializable Object from a specified mapping
+         *
+         * @param mapping Mapping
+         * @return Serialized object, or the input Mapping if not known
+         */
+        public Object construct(Map<?, ?> mapping) {
+            String serialized_type = LogicUtil.applyIfNotNull(mapping.get(ConfigurationSerialization.SERIALIZED_TYPE_KEY), Object::toString, null);
+            if (serialized_type != null) {
+                Map<String, Object> typed = CommonUtil.unsafeCast(mapping);
+
+                // If any entries in the mapping uses non-String keys, convert those to a String
+                // Almost all the time this operation is unneeded, so we do a detection step first
+                // If no conversion is needed, we use the input map casted as if it stores String keys.
+                for (Object key : mapping.keySet()) {
+                    if (!(key instanceof String)) {
+                        typed = new LinkedHashMap<String, Object>(mapping.size());
+                        for (Map.Entry<?, ?> entry : mapping.entrySet()) {
+                            typed.put(entry.getKey().toString(), entry.getValue());
+                        }
+                        break;
+                    }
+                }
+
+                try {
+                    Function<Map<String, Object>, ? extends Object> builder = custom_builders.get(serialized_type);
+                    if (builder != null) {
+                        return builder.apply(typed);
+                    } else {
+                        return ConfigurationSerialization.deserializeObject(typed);
+                    }
+                } catch (IllegalArgumentException ex) {
+                    throw new YAMLException("Could not deserialize object", ex);
+                }
+            }
+
+            return mapping;
+        }
+    }
+
+    // Custom version of org.bukkit.configuration.file.YamlConstructor
+    // This allows us to add our own handlers for certain object types
+    private static class YamlConstructorFactory {
+        private final MappingConstructorFactory mappingFactory;
+
+        public YamlConstructorFactory(MappingConstructorFactory mappingFactory) {
+            this.mappingFactory = mappingFactory;
         }
 
         public SafeConstructor create(LoaderOptions loaderOptions) {
@@ -405,38 +492,7 @@ public class YamlDeserializer {
                     throw new YAMLException("Unexpected referential mapping structure. Node: " + node);
                 }
 
-                Map<?, ?> raw = (Map<?, ?>) this.mapConstructor.construct(node);
-
-                String serialized_type = LogicUtil.applyIfNotNull(raw.get(ConfigurationSerialization.SERIALIZED_TYPE_KEY), Object::toString, null);
-                if (serialized_type != null) {
-                    Map<String, Object> typed = CommonUtil.unsafeCast(raw);
-
-                    // If any entries in the mapping uses non-String keys, convert those to a String
-                    // Almost all the time this operation is unneeded, so we do a detection step first
-                    // If no conversion is needed, we use the input map casted as if it stores String keys.
-                    for (Object key : raw.keySet()) {
-                        if (!(key instanceof String)) {
-                            typed = new LinkedHashMap<String, Object>(raw.size());
-                            for (Map.Entry<?, ?> entry : raw.entrySet()) {
-                                typed.put(entry.getKey().toString(), entry.getValue());
-                            }
-                            break;
-                        }
-                    }
-
-                    try {
-                        Function<Map<String, Object>, ? extends Object> builder = custom_builders.get(serialized_type);
-                        if (builder != null) {
-                            return builder.apply(typed);
-                        } else {
-                            return ConfigurationSerialization.deserializeObject(typed);
-                        }
-                    } catch (IllegalArgumentException ex) {
-                        throw new YAMLException("Could not deserialize object", ex);
-                    }
-                }
-
-                return raw;
+                return mappingFactory.construct((Map<?, ?>) this.mapConstructor.construct(node));
             }
 
             @Override

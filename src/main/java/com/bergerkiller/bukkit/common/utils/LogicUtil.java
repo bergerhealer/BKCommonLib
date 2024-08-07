@@ -33,6 +33,8 @@ import com.bergerkiller.bukkit.common.collections.ImmutableArrayList;
 import com.bergerkiller.mountiplex.reflection.util.BoxedType;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import com.google.common.collect.BiMap;
+import org.bukkit.configuration.serialization.DelegateDeserialization;
+import org.bukkit.configuration.serialization.SerializableAs;
 
 /**
  * Logic operations, such as contains checks and collection-type transformations
@@ -44,6 +46,7 @@ public class LogicUtil {
     private static final Predicate<Object> _alwaysFalsePredicate = obj -> false;
     private static final Supplier<Object> _nullSupplier = () -> null;
     private static final WeakReference<Object> _nullWeakReference = new WeakReference<Object>(null);
+    private static Map<Class<?>, String> configurationSerializableNames = Collections.emptyMap();
 
     @SuppressWarnings("unchecked")
     private static final ItemSynchronizer _identityItemSynchronizer = new ItemSynchronizer<Object, Object>() {
@@ -1164,31 +1167,61 @@ public class LogicUtil {
             return Collections.emptyMap();
         }
         Map<String, Object> values = serializable.serialize();
-        boolean cloned = false;
+
+        // Make produced map modifiable so we can store the == key
+        String key = getSerializableKey(serializable.getClass());
+        if (values instanceof com.google.common.collect.ImmutableMap) {
+            // Optimization: avoid UnsupportedOps if we know this is the case
+            values = new LinkedHashMap<>(values);
+            values.put("==", key);
+        } else {
+            try {
+                values.put("==", key);
+            } catch (UnsupportedOperationException ex) {
+                values = new LinkedHashMap<>(values);
+                values.put("==", key);
+            }
+        }
+
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             Object value = entry.getValue();
             if (value instanceof ConfigurationSerializable) {
                 Map<String, Object> serialized = serializeDeep((ConfigurationSerializable) value);
-                if (!cloned) {
-                    if (values instanceof com.google.common.collect.ImmutableMap) {
-                        // Optimization: avoid UnsupportedOps if we know this is the case
-                        values = new LinkedHashMap<>(values);
-                        cloned = true;
-                    } else {
-                        try {
-                            entry.setValue(serialized);
-                        } catch (UnsupportedOperationException ex) {
-                            values = new LinkedHashMap<>(values);
-                            cloned = true;
-                        }
-                    }
-                }
-                if (cloned) {
+                try {
+                    entry.setValue(serialized);
+                } catch (UnsupportedOperationException ex) {
+                    // This shouldn't ever be hit, but kept it for safety
+                    values = new LinkedHashMap<>(values);
                     values.put(entry.getKey(), serialized);
                 }
             }
         }
         return values;
+    }
+
+    // Gets the ==: key of a ConfigurationSerializable type by inspecting the annotations
+    private static String getSerializableKey(Class<? extends ConfigurationSerializable> type) {
+        return synchronizeCopyOnWrite(LogicUtil.class, () -> configurationSerializableNames, type, Map::get, (s, t) -> {
+            String key = computeSerializableKey(t);
+            HashMap<Class<?>, String> names = new HashMap<>(s);
+            names.put(t, key);
+            configurationSerializableNames = names;
+            return key;
+        });
+    }
+
+    private static String computeSerializableKey(Class<? extends ConfigurationSerializable> type) {
+        DelegateDeserialization delegate = type.getAnnotation(DelegateDeserialization.class);
+        if (delegate != null) {
+            return computeSerializableKey(delegate.value());
+        }
+
+        SerializableAs nameAnnot = type.getAnnotation(SerializableAs.class);
+        if (nameAnnot != null) {
+            return nameAnnot.value();
+        }
+
+        return type.getName();
     }
 
     /**

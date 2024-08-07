@@ -2,6 +2,8 @@ package com.bergerkiller.bukkit.common.config;
 
 import java.util.Map;
 
+import com.bergerkiller.bukkit.common.config.yaml.YamlDeserializer;
+import com.google.gson.GsonBuilder;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializer;
@@ -12,10 +14,18 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
  * Can serialize and deserialize various objects from/to a JSON String.
  */
 public class JsonSerializer {
-    private final com.google.gson.Gson gson = new com.google.gson.Gson();
+    private final com.google.gson.Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
     public ItemStack fromJsonToItemStack(String json) throws JsonSyntaxException {
-        return ItemStackDeserializer.INSTANCE.apply(jsonToMap(json));
+        Map<String, Object> mapping = jsonToMap(json);
+        Object result = YamlDeserializer.INSTANCE.deserializeMapping(mapping);
+        if (result instanceof Map) {
+            return ItemStackDeserializer.INSTANCE.apply((Map<String, Object>) result);
+        } else if (result instanceof ItemStack) {
+            return (ItemStack) result;
+        } else {
+            throw new JsonSyntaxException("Deserialized type is not an ItemStack or mapping: " + result);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -32,7 +42,9 @@ public class JsonSerializer {
     }
 
     public String itemStackToJson(ItemStack item) {
-        return mapToJson(LogicUtil.serializeDeep(item));
+        Map<String, Object> map = LogicUtil.serializeDeep(item);
+        map.remove("==");
+        return mapToJson(map);
     }
 
     public String mapToJson(Map<String, Object> map) {
