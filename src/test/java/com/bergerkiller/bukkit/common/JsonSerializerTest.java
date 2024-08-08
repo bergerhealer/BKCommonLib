@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common;
 import com.bergerkiller.bukkit.common.config.JsonSerializer;
 import com.bergerkiller.bukkit.common.inventory.CommonItemMaterials;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.com.mojang.authlib.properties.PropertyHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
@@ -91,5 +92,29 @@ public class JsonSerializerTest {
             assertEquals("textures", prop.getName());
             assertTrue(prop.getValue().length() > 10);
         }
+    }
+
+    @Test
+    public void testItemStackFromJsonDamagedItem() throws JsonSerializer.JsonSyntaxException {
+        JsonSerializer serializer = new JsonSerializer();
+
+        String json = "{\"v\":3700,\"amount\":2,\"type\":\"DIAMOND_SWORD\",\"meta\":{\"meta-type\":\"UNSPECIFIC\",\"ItemFlags\":[\"HIDE_ENCHANTS\",\"HIDE_ATTRIBUTES\",\"HIDE_UNBREAKABLE\",\"HIDE_DESTROYS\",\"HIDE_PLACED_ON\",\"HIDE_POTION_EFFECTS\",\"HIDE_DYE\",\"HIDE_ARMOR_TRIM\"],\"Unbreakable\":true,\"Damage\":126,\"\u003d\u003d\":\"ItemMeta\"}}";
+        CommonItemStack itemStack = CommonItemStack.of(serializer.fromJsonToItemStack(json));
+
+        assertEquals(MaterialUtil.getFirst("DIAMOND_SWORD", "LEGACY_DIAMOND_SWORD"), itemStack.getType());
+        assertEquals(2, itemStack.getAmount());
+        assertEquals(126, itemStack.getDamage());
+    }
+
+    @Test
+    public void testItemStackFromJsonDamagedItemWithoutTypeHeader() throws JsonSerializer.JsonSyntaxException {
+        JsonSerializer serializer = new JsonSerializer();
+
+        String json = "{\"v\":3700,\"amount\":2,\"type\":\"DIAMOND_SWORD\",\"meta\":{\"meta-type\":\"UNSPECIFIC\",\"ItemFlags\":[\"HIDE_ENCHANTS\",\"HIDE_ATTRIBUTES\",\"HIDE_UNBREAKABLE\",\"HIDE_DESTROYS\",\"HIDE_PLACED_ON\",\"HIDE_POTION_EFFECTS\",\"HIDE_DYE\",\"HIDE_ARMOR_TRIM\"],\"Unbreakable\":true,\"Damage\":126}}";
+        CommonItemStack itemStack = CommonItemStack.of(serializer.fromJsonToItemStack(json));
+
+        assertEquals(MaterialUtil.getFirst("DIAMOND_SWORD", "LEGACY_DIAMOND_SWORD"), itemStack.getType());
+        assertEquals(2, itemStack.getAmount());
+        assertEquals(126, itemStack.getDamage());
     }
 }

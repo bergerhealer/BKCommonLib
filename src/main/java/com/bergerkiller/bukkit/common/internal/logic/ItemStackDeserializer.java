@@ -37,6 +37,7 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
     private static final ConverterFunction NO_CONVERSION = map -> { return true; };
     private static final Material FALLBACK_MATERIAL = MaterialUtil.getFirst("OAK_WOOD", "LEGACY_WOOD");
     public static final ItemStackDeserializer INSTANCE = new ItemStackDeserializer();
+    private final ItemMetaDeserializer metaDeserializer = new ItemMetaDeserializer();
     private final List<ItemStackConverter> converters;
     private final int curr_version;
     private final int max_version;
@@ -56,7 +57,7 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
             // that reason.
             Object meta = map.get("meta");
             if (meta != null) {
-                Map<String, Object> metaMap = LegacyItemMeta.cachedMeta.get(meta);
+                Map<String, Object> metaMap = metaDeserializer.legacyCachedMeta.get(meta);
                 if (metaMap != null) {
                     map.putAll(metaMap);
                 }
@@ -275,9 +276,18 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         this.converters.add(0, new ItemStackConverter(data_version, converter));
     }
 
+    public ItemMetaDeserializer getItemMetaDeserializer() {
+        return metaDeserializer;
+    }
+
     @Override
     public ItemStack apply(Map<String, Object> args) {
-        deserializeMaps(args);
+        // Migrate double -> integer
+        // Also takes care of older gson where metadata was stored without a == qualifier
+        convertNumberToIntegerInMap(args, "amount");
+        convertNumberToIntegerInMap(args, "damage");
+        convertNumberToIntegerInMapValues(args, "enchantments");
+        replaceMapInMap(args, "meta", metaDeserializer);
 
         Object version_raw = args.get("v");
         if (version_raw instanceof Number) {
@@ -341,48 +351,6 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         return this.max_version;
     }
 
-    /**
-     * Deserializes ItemStack properties that are stored as just maps into the correct
-     * metadata type, and converts Double to Integer where needed.
-     * This is primarily important for JSON deserialization logic.
-     * 
-     * @param values
-     */
-    private void deserializeMaps(Map<String, Object> values) {
-        convertNumberToIntegerInMap(values, "amount");
-        convertNumberToIntegerInMap(values, "damage");
-        convertNumberToIntegerInMapValues(values, "enchantments");
-
-        replaceMapInMap(values, "meta", meta -> {
-            convertNumberToIntegerInMap(meta, "custom-model-data");
-            convertNumberToIntegerInMap(meta, "repair-cost");
-            convertNumberToIntegerInMap(meta, "Damage");
-            convertNumberToIntegerInMap(meta, "generation");
-            convertNumberToIntegerInMap(meta, "power");
-            convertNumberToIntegerInMap(meta, "map-id");
-            convertNumberToIntegerInMap(meta, "fish-variant");
-            convertNumberToIntegerInMapValues(meta, "enchants");
-            replaceMapInMap(meta, "color", ItemStackDeserializer::deserializeColor);
-            replaceMapInMap(meta, "display-map-color", ItemStackDeserializer::deserializeColor);
-            replaceMapInMap(meta, "custom-color", ItemStackDeserializer::deserializeColor);
-            replaceMapInMap(meta, "firework-effect", ItemStackDeserializer::deserializeFireworkEffect);
-            replaceListOfMapsInMap(meta, "firework-effects", ItemStackDeserializer::deserializeFireworkEffect);
-            replaceListOfMapsInMap(meta, "patterns", org.bukkit.block.banner.Pattern::new);
-            replaceListOfMapsInMap(meta, "charged-projectiles", ItemStackDeserializer.this);
-            replaceListOfMapsInMap(meta, "custom-effects", potionEffect -> {
-                convertNumberToIntegerInMap(potionEffect, "amplifier");
-                convertNumberToIntegerInMap(potionEffect, "duration");
-                return new org.bukkit.potion.PotionEffect(potionEffect);
-            });
-
-            if (CommonCapabilities.NEEDS_LEGACY_ITEMMETA_MIGRATION) {
-                return LegacyItemMeta.DESERIALIZER.apply(meta);
-            } else {
-                return CraftItemStackHandle.deserializeItemMeta(meta);
-            }
-        });
-    }
-
     private static ConfigurationSerializable deserializeFireworkEffect(java.util.Map<String, Object> values) {
         replaceListOfMapsInMap(values, "colors", ItemStackDeserializer::deserializeColor);
         replaceListOfMapsInMap(values, "fade-colors", ItemStackDeserializer::deserializeColor);
@@ -398,21 +366,33 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
     private static void replaceListOfMapsInMap(java.util.Map<String, Object> map, String key, Function<java.util.Map<String, Object>, ?> mapper) {
         Object value = map.get(key);
         if (value instanceof java.util.List) {
-            java.util.List<Object> list = (java.util.List<Object>) value;
-            for (int i = 0; i < list.size(); i++) {
-                Object list_item = list.get(i);
-                if (list_item instanceof java.util.Map) {
-                    list.set(i, mapper.apply((java.util.Map<String, Object>) list_item));
+            LogicUtil.mapListItems((java.util.List<Object>) value, o -> {
+                if (o instanceof java.util.Map) {
+                    return mapper.apply((java.util.Map<String, Object>) o);
+                } else {
+                    return o;
                 }
-            }
+            });
         }
     }
 
     @SuppressWarnings("unchecked")
     private static void replaceMapInMap(java.util.Map<String, Object> map, String key, Function<java.util.Map<String, Object>, ?> mapper) {
-        Object value = map.get(key);
-        if (value instanceof java.util.Map) {
-            map.put(key, mapper.apply((Map<String, Object>) value));
+        map.computeIfPresent(key, (k, value) -> {
+            if (value instanceof java.util.Map) {
+                return mapper.apply((Map<String, Object>) value);
+            } else {
+                return value;
+            }
+        });
+    }
+
+    @SuppressWarnings("UnnecessaryBoxing")
+    private static Object convertNumberToInteger(Object key, Object value) {
+        if (value instanceof Number && !(value instanceof Integer)) {
+            return Integer.valueOf(((Number) value).intValue());
+        } else {
+            return value;
         }
     }
 
@@ -423,22 +403,14 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked"})
     private static void convertNumberToIntegerInMap(Map<?, ?> map, Object key) {
-        Object old = map.get(key);
-        if (old instanceof Number && !(old instanceof Integer)) {
-            ((Map<Object, Object>) map).put(key, Integer.valueOf(((Number) old).intValue()));
-        }
+        ((Map<Object, Object>) map).computeIfPresent(key, ItemStackDeserializer::convertNumberToInteger);
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({"unchecked"})
     private static void convertNumberToIntegerInMapValues(Map<?, ?> map) {
-        for (Map.Entry entry : map.entrySet()) {
-            Object old = entry.getValue();
-            if (old instanceof Number && !(old instanceof Integer)) {
-                entry.setValue(Integer.valueOf(((Number) old).intValue()));
-            }
-        }
+        LogicUtil.mapMapValues((Map<Object, Object>) map, ItemStackDeserializer::convertNumberToInteger);
     }
 
     /**
@@ -461,25 +433,57 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         boolean convert(Map<String, Object> values);
     }
 
-    public static class LegacyItemMeta {
-        private static final Map<Object, Map<String, Object>> cachedMeta = new MapMaker().weakKeys().concurrencyLevel(4).makeMap();
+    public class ItemMetaDeserializer implements Function<Map<String, Object>, ItemMeta> {
+        private final Map<Object, Map<String, Object>> legacyCachedMeta = new MapMaker().weakKeys().concurrencyLevel(4).makeMap();
 
         /**
-         * Legacy ItemMeta de-serializer that stores some original Map contents that created an
+         * ItemMeta de-serializer that migrates double to integer where required for GSON decoding.<br>
+         * <br>
+         * On versions before 1.13 it also stores some original Map contents that created an
          * ItemMeta so that it can be restored when deserializing the ItemStack later. This migrates
          * the "Damage" value to the ItemStack's "damage" field.
+         *
+         * @param mapping Mapping
          */
-        public static final Function<Map<String, Object>, ItemMeta> DESERIALIZER = map -> {
-            ItemMeta meta = CraftItemStackHandle.deserializeItemMeta(map);
+        @Override
+        public ItemMeta apply(Map<String, Object> mapping) {
+            // Migrate double -> integer, this is required for loading items from GSON
+            convertNumberToIntegerInMap(mapping, "custom-model-data");
+            convertNumberToIntegerInMap(mapping, "repair-cost");
+            convertNumberToIntegerInMap(mapping, "Damage");
+            convertNumberToIntegerInMap(mapping, "max-damage");
+            convertNumberToIntegerInMap(mapping, "max-stack-size");
+            convertNumberToIntegerInMap(mapping, "generation");
+            convertNumberToIntegerInMap(mapping, "power");
+            convertNumberToIntegerInMap(mapping, "map-id");
+            convertNumberToIntegerInMap(mapping, "fish-variant");
+            convertNumberToIntegerInMapValues(mapping, "enchants");
+            replaceMapInMap(mapping, "color", ItemStackDeserializer::deserializeColor);
+            replaceMapInMap(mapping, "display-map-color", ItemStackDeserializer::deserializeColor);
+            replaceMapInMap(mapping, "custom-color", ItemStackDeserializer::deserializeColor);
+            replaceMapInMap(mapping, "firework-effect", ItemStackDeserializer::deserializeFireworkEffect);
+            replaceListOfMapsInMap(mapping, "firework-effects", ItemStackDeserializer::deserializeFireworkEffect);
+            replaceListOfMapsInMap(mapping, "patterns", org.bukkit.block.banner.Pattern::new);
+            replaceListOfMapsInMap(mapping, "charged-projectiles", ItemStackDeserializer.this);
+            replaceListOfMapsInMap(mapping, "custom-effects", potionEffect -> {
+                convertNumberToIntegerInMap(potionEffect, "amplifier");
+                convertNumberToIntegerInMap(potionEffect, "duration");
+                return new org.bukkit.potion.PotionEffect(potionEffect);
+            });
 
-            Object damage = map.get("Damage");
-            if (damage != null) {
-                Map<String, Object> itemStackMeta = new HashMap<>();
-                itemStackMeta.put("damage", damage);
-                cachedMeta.put(meta, itemStackMeta);
+            ItemMeta meta = CraftItemStackHandle.deserializeItemMeta(mapping);
+
+            if (CommonCapabilities.NEEDS_LEGACY_ITEMMETA_MIGRATION) {
+                Object damage = mapping.get("Damage");
+                if (damage != null) {
+                    Map<String, Object> itemStackMeta = new HashMap<>();
+                    itemStackMeta.put("damage", damage);
+                    legacyCachedMeta.put(meta, itemStackMeta);
+                }
             }
+
             return meta;
-        };
+        }
     }
 
     private static class Helper {

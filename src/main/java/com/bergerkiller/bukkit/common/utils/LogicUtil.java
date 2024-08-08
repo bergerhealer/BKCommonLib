@@ -14,6 +14,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.RandomAccess;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BiFunction;
@@ -367,6 +368,56 @@ public class LogicUtil {
             outputArray[i] = mapper.apply(inputArray[i]);
         }
         return outputArray;
+    }
+
+    /**
+     * Iterates all the values in a Map and calls the mapper function on it to compute a new value for each.
+     *
+     * @param map Map
+     * @param mapper Mapper function
+     * @param <K> Map key type
+     * @param <V> Map value type
+     */
+    public static <K, V> void mapMapValues(Map<K, V> map, BiFunction<? super K, ? super V, ? extends V> mapper) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            V oldValue = entry.getValue();
+            V newValue = mapper.apply(entry.getKey(), oldValue);
+            if (oldValue != newValue) {
+                entry.setValue(newValue);
+            }
+        }
+    }
+
+    /**
+     * Modifies a modifiable List mapping all of the List elements using a mapper function.
+     * The items are swapped out in-place.
+     *
+     * @param list List
+     * @param mapper Mapper function
+     * @param <E> List element type
+     */
+    public static <E> void mapListItems(List<E> list, UnaryOperator<E> mapper) {
+        if (list instanceof RandomAccess) {
+            // Iterate by index to avoid having to create a list iterator
+            int size = list.size();
+            for (int i = 0; i < size; i++) {
+                E oldValue = list.get(i);
+                E newValue = mapper.apply(oldValue);
+                if (oldValue != newValue) {
+                    list.set(i, newValue);
+                }
+            }
+        } else {
+            // Use ListIterator (in case this is a LinkedList...)
+            ListIterator<E> iter = list.listIterator();
+            while (iter.hasNext()) {
+                E oldValue = iter.next();
+                E newValue = mapper.apply(oldValue);
+                if (oldValue != newValue) {
+                    iter.set(newValue);
+                }
+            }
+        }
     }
 
     /**

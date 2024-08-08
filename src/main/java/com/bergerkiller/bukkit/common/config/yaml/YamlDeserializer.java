@@ -380,15 +380,10 @@ public class YamlDeserializer {
         public MappingConstructorFactory() {
             this.custom_builders = new HashMap<>();
 
-            this.register("org.bukkit.inventory.ItemStack", ItemStackDeserializer.INSTANCE);
-
-            // On versions 1.12.2 and before we must keep a backup of the original Map that created the
-            // ItemMeta as this is important for restoring some properties like Damage that get lost
-            // due to CraftItemMeta not storing these.
-            if (CommonCapabilities.NEEDS_LEGACY_ITEMMETA_MIGRATION) {
-                this.register("org.bukkit.inventory.ItemMeta", ItemStackDeserializer.LegacyItemMeta.DESERIALIZER);
-                this.register("ItemMeta", ItemStackDeserializer.LegacyItemMeta.DESERIALIZER);
-            }
+            ItemStackDeserializer itemStackDeserializer = ItemStackDeserializer.INSTANCE;
+            this.register("org.bukkit.inventory.ItemStack", itemStackDeserializer);
+            this.register("org.bukkit.inventory.ItemMeta", itemStackDeserializer.getItemMetaDeserializer());
+            this.register("ItemMeta", itemStackDeserializer.getItemMetaDeserializer());
         }
 
         private void register(String typeName, Function<Map<String, Object>, ? extends Object> builder) {
