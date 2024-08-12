@@ -263,8 +263,11 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
             return !Helper.ADDED_MC_1_21.contains(type);
         });
 
+        // From MC 1.21.1 to 1.21
+        this.register(3953, NO_CONVERSION);
+
         // Maximum supported data version
-        this.max_version = 3953; // MC 1.21
+        this.max_version = 3955; // MC 1.21.1
     }
 
     // Registers a converter if it can convert from a future data version only
