@@ -60,7 +60,7 @@ public class ImplicitlySharedList<E> extends ImplicitlySharedHolder<List<E>> imp
      * @param sharedList to access for reading contents
      */
     public ImplicitlySharedList(ImplicitlySharedList<E> sharedList) {
-        super(sharedList.ref);
+        super(sharedList.ref.get());
     }
 
     @Override
@@ -411,7 +411,7 @@ public class ImplicitlySharedList<E> extends ImplicitlySharedHolder<List<E>> imp
         private boolean hasLastElement;
 
         public ReferencedListIterator() {
-            this.ref = ImplicitlySharedList.this.ref;
+            this.ref = ImplicitlySharedList.this.ref.get();
             this.baseIter = this.ref.val.iterator();
             this.index = -1;
             this.hasLastElement = false;

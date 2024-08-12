@@ -58,7 +58,7 @@ public class ImplicitlySharedSet<E> extends ImplicitlySharedHolder<Set<E>> imple
      * @param sharedSet to access for reading contents
      */
     public ImplicitlySharedSet(ImplicitlySharedSet<E> sharedSet) {
-        super(sharedSet.ref);
+        super(sharedSet.ref.get());
     }
 
     @Override
@@ -247,7 +247,7 @@ public class ImplicitlySharedSet<E> extends ImplicitlySharedHolder<Set<E>> imple
         private E lastElement;
 
         public ReferencedSetIterator() {
-            this.ref = ImplicitlySharedSet.this.ref;
+            this.ref = ImplicitlySharedSet.this.ref.get();
             this.baseIter = this.ref.val.iterator();
             this.hasLastElement = false;
             this.lastElement = null;

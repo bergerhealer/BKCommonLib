@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.collections;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
 
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
@@ -11,7 +12,7 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
  * more than one instance is holding ownership over the data.
  */
 public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
-    protected volatile Reference<T> ref;
+    protected final AtomicReference<Reference<T>> ref;
 
     /**
      * Initializes a new ImplicitlySharedHolder for the initial value specified. Looks up
@@ -35,12 +36,12 @@ public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
      */
     @SuppressWarnings("unchecked")
     public <V extends T> ImplicitlySharedHolder(V value, UnaryOperator<V> cloneFunction) {
-        this.ref = (Reference<T>) new Reference<V>(value, cloneFunction, 1);
+        this.ref = new AtomicReference<>((Reference<T>) new Reference<V>(value, cloneFunction, 1));
     }
 
     protected ImplicitlySharedHolder(Reference<T> reference) {
         reference.openRead();
-        this.ref = reference;
+        this.ref = new AtomicReference<>(reference);
     }
 
     /**
@@ -52,10 +53,9 @@ public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
      */
     public final void assign(ImplicitlySharedHolder<T> sharedHolder) {
         // Note assign to self will work fine, the openRead() and close() make parity
-        Reference<T> old_ref = this.ref;
-        Reference<T> new_ref = sharedHolder.ref;
+        Reference<T> new_ref = sharedHolder.ref.get();
         new_ref.openRead();
-        this.ref = new_ref;
+        Reference<T> old_ref = this.ref.getAndSet(new_ref);
         if (old_ref != null) {
             old_ref.close();
         }
@@ -69,7 +69,7 @@ public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
      * @return True if referencing the same value
      */
     public final boolean refEquals(ImplicitlySharedHolder<?> sharedHolder) {
-        return sharedHolder != null && sharedHolder.ref == this.ref;
+        return sharedHolder != null && sharedHolder.ref.get() == this.ref.get();
     }
 
     /**
@@ -79,10 +79,7 @@ public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
      */
     @Override
     public final void close() {
-        //TODO: Not truly atomic, multiple assign/close calls from different threads
-        //      may cause this to become incorrect.
-        Reference<T> old_ref = this.ref;
-        this.ref = null;
+        Reference<T> old_ref = this.ref.getAndSet(null);
         if (old_ref != null) {
             old_ref.close();
         }
@@ -98,7 +95,7 @@ public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
      * @return reference to the data that should be modified next
      */
     protected final Reference<T> write() {
-        Reference<T> old_ref = this.ref;
+        Reference<T> old_ref = this.ref.get();
 
         try {
             // Fast: if readers is 1, set to WRITER_TOKEN to indicate exclusive write access
@@ -123,7 +120,7 @@ public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
             // Having gained read access, create a copy of the data and swap the reference in use
             UnaryOperator<T> cloneFunc = old_ref.cloneFunction;
             Reference<T> new_ref = new Reference<T>(cloneFunc.apply(old_ref.val), cloneFunc, Reference.WRITE_TOKEN);
-            this.ref = new_ref;
+            this.ref.set(new_ref);
             return new_ref;
         } finally {
             // Close read access to the original reference
@@ -138,7 +135,7 @@ public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
      * @return reference to the data that should be read from.
      */
     protected final Reference<T> read() {
-        Reference<T> ref = this.ref;
+        Reference<T> ref = this.ref.get();
         try {
             // Increment counter one more time, making it at least 2.
             // This will wait until read access is available (nobody is writing).
