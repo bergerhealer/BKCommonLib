@@ -26,9 +26,13 @@ class AttributeModifiable {
     public abstract void setBaseValue(double value);
     public abstract double getBaseValue();
     public abstract double getValue();
-#else
+#elseif version >= 1.14.4
     public abstract void setBaseValue:setValue(double value);
     public abstract double getBaseValue();
+    public abstract double getValue();
+#else
+    public abstract void setBaseValue:setValue(double value);
+    public abstract double getBaseValue:b();
     public abstract double getValue();
 #endif
 
