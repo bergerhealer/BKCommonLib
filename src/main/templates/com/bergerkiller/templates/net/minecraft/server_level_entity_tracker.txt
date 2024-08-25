@@ -415,6 +415,12 @@ class EntityTrackerEntry {
     public void hideForAll:a();
 #endif
 
+#if version >= 1.9
+    public void broadcastRawPacket:broadcast((Object) Packet packet);
+#else
+    public void broadcastRawPacket:broadcast((Object) Packet<?> packet);
+#endif
+
     // These got moved to the State class, but proxy them here to keep depending plugins compatible
     <code>
     @Deprecated

@@ -63,14 +63,19 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
 
     @Override
     public <T> T hook(T object) {
-        object = super.hook(object);
+        final T hookedTracker = super.hook(object);
 
         // Also hook the stored State value
-        Object state = EntityTrackerEntryHandle.T.getState.raw.invoke(object);
+        Object state = EntityTrackerEntryHandle.T.getState.raw.invoke(hookedTracker);
         state = this.stateHook.hook(state);
-        EntityTrackerEntryHandle.T.setState.raw.invoke(object, state);
+        EntityTrackerEntryHandle.T.setState.raw.invoke(hookedTracker, state);
 
-        return object;
+        // Swap out the broadcast consumer field with one that refers to this tracker instead
+        EntityTrackerEntryStateHandle.T.broadcastMethod.set(state, packet -> {
+            EntityTrackerEntryHandle.T.broadcastRawPacket.raw.invoke(hookedTracker, packet);
+        });
+
+        return hookedTracker;
     }
 
     @ClassHook.HookImport("net.minecraft.server.level.EntityPlayer")

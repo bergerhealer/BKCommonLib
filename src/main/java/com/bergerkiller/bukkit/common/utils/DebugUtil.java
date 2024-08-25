@@ -633,10 +633,10 @@ public class DebugUtil {
                         Object value = entry.getValue();
 
                         if (key != null && isInterestingType(key.getClass())) {
-                            pending.add(current.next(key, "M{v=" + value + "}.key"));
+                            pending.add(current.next(key, "M{v=" + value + "}.key " + key.getClass().getName()));
                         }
                         if (value != null && isInterestingType(value.getClass())) {
-                            pending.add(current.next(value, "M{k=" + key + "}.value"));
+                            pending.add(current.next(value, "M{k=" + key + "}.value " + value.getClass().getName()));
                         }
                     }
                 }

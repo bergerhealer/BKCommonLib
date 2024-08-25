@@ -265,6 +265,9 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         } else {
             newEntry.updateViewers();
         }
+
+        // Check for places we've missed when replacing the previously stored entry
+        // com.bergerkiller.bukkit.common.utils.DebugUtil.logInstances(storedEntry.getRaw());
     }
 
     private static void copyEntityTrackerEntry(EntityTrackerEntryHandle from, EntityTrackerEntryHandle to) {

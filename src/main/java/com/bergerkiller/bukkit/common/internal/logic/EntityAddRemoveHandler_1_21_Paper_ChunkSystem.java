@@ -329,6 +329,23 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *         }
          *     }
          *
+         *     // ReferenceList of tracked entities in moonrise mapping
+         *     if (entityLookup instanceof ca.spottedleaf.moonrise.patches.chunk_system.level.entity.server.ServerEntityLookup) {
+         *         ca.spottedleaf.moonrise.patches.chunk_system.level.entity.server.ServerEntityLookup serverEntityLookup;
+         *         serverEntityLookup = (ca.spottedleaf.moonrise.patches.chunk_system.level.entity.server.ServerEntityLookup) entityLookup;
+         *
+         *         if (serverEntityLookup.trackerEntities.remove(oldEntity)) {
+         *             if (newEntity != null) {
+         *                 serverEntityLookup.trackerEntities.add(newEntity);
+         *             }
+         *         }
+         *         if (serverEntityLookup.trackerUnloadedEntities.remove(oldEntity)) {
+         *             if (newEntity != null) {
+         *                 serverEntityLookup.trackerUnloadedEntities.add(newEntity);
+         *             }
+         *         }
+         *     }
+         *
          *     #require net.minecraft.server.level.WorldServer final net.minecraft.world.level.entity.EntityTickList entityTickList;
          *     EntityTickList tickList = world#entityTickList;
          *
