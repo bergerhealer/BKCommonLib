@@ -572,7 +572,8 @@ public class CommonBootstrap {
                         "longs.LongSortedSet",
                         "longs.LongBidirectionalIterator",
                         "objects.Object2IntMap",
-                        "objects.ObjectCollection"
+                        "objects.ObjectCollection",
+                        "objects.ObjectIterator"
                 }) {
                     remappings.put("it.unimi.dsi.fastutil." + fastutilClass, unimi_fastutil_path + fastutilClass);
                 }
