@@ -88,7 +88,7 @@ class Block {
 
 #if version >= 1.18
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
-        return instance.getLightBlock(iblockdata, world, new BlockPosition(x, y, z));
+        return iblockdata.getLightBlock((IBlockAccess) world, new BlockPosition(x, y, z));
     }
 
     public int getEmission:a((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
