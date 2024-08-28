@@ -290,8 +290,12 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
         /*
          * <IS_CHUNK_ENTITIES_LOADED>
          * public static boolean isChunkEntitiesLoaded(WorldServer world, int cx, int cz) {
+         *     // This no longer works: entity data can load without the chunk being a 'full' chunk yet
+         *     // It causes incompatibility with Bukkit isChunkLoaded
+         *     //return world.areEntitiesLoaded(ChunkCoordIntPair.asLong(cx, cz));
+         *
          *     // Just checks that the chunk is loaded, really
-         *     return world.areEntitiesLoaded(ChunkCoordIntPair.asLong(cx, cz));
+         *     return world.getChunkSource().isChunkLoaded(cx, cz);
          * }
          */
         @Template.Generated("%IS_CHUNK_ENTITIES_LOADED%")
