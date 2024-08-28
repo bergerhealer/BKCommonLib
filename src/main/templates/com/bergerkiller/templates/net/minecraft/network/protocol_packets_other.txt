@@ -432,6 +432,21 @@ class PacketPlayInBlockPlace extends Packet {
     // Spigot only
     public optional long timestamp;
 
+#if version >= 1.21
+    #require PacketPlayInBlockPlace private final float yRot;
+    #require PacketPlayInBlockPlace private final float xRot;
+
+    public float getYaw() { return instance#yRot; }
+    public float getPitch() { return instance#xRot; }
+    public void setYaw(float yaw) { instance#yRot = yaw; }
+    public void setPitch(float pitch) { instance#xRot = pitch; }
+#else
+    public float getYaw() { return 0.0f; }
+    public float getPitch() { return 0.0f; }
+    public void setYaw(float yaw) {}
+    public void setPitch(float pitch) { }
+#endif
+
     <code>
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {

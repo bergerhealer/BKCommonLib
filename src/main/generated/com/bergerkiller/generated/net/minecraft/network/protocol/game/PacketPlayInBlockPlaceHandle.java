@@ -20,6 +20,10 @@ public abstract class PacketPlayInBlockPlaceHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public abstract float getYaw();
+    public abstract float getPitch();
+    public abstract void setYaw(float yaw);
+    public abstract void setPitch(float pitch);
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
         return com.bergerkiller.bukkit.common.protocol.PacketType.IN_BLOCK_PLACE;
@@ -47,6 +51,11 @@ public abstract class PacketPlayInBlockPlaceHandle extends PacketHandle {
         public final Template.Field.Converted<Object> enumHand = new Template.Field.Converted<Object>();
         @Template.Optional
         public final Template.Field.Long timestamp = new Template.Field.Long();
+
+        public final Template.Method<Float> getYaw = new Template.Method<Float>();
+        public final Template.Method<Float> getPitch = new Template.Method<Float>();
+        public final Template.Method<Void> setYaw = new Template.Method<Void>();
+        public final Template.Method<Void> setPitch = new Template.Method<Void>();
 
     }
 

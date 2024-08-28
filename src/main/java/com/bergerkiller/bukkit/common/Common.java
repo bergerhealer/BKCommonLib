@@ -58,7 +58,8 @@ public class Common {
             "Common:EquipmentSlot:IsSupportedCheck",
             "Common:Attributes:RemoveAllModifiers",
             "Common:Attributes:GetAllAttributes",
-            "Common:Player:SetSkinMetadata"
+            "Common:Player:SetSkinMetadata",
+            "Common:PacketPlayInBlockPlace:RotationApi"
     ).collect(Collectors.toSet());
 
     /**
