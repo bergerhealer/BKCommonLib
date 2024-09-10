@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
-import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import org.bukkit.World;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -40,6 +39,7 @@ public abstract class PlayerFileDataHandler implements LazyInitializedObject, Li
 
     public static interface Hook {
         CommonTagCompound base_load(HumanEntity human);
+        CommonTagCompound base_load_offline(String playerName, String playerUUID);
         void base_save(HumanEntity human);
     }
 
@@ -47,7 +47,24 @@ public abstract class PlayerFileDataHandler implements LazyInitializedObject, Li
     @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
     protected static class PlayerFileDataHook extends ClassHook<PlayerFileDataHook> implements PlayerFileDataHandler.Hook {
         private static final boolean LOAD_RETURNS_OPTIONAL = CommonBootstrap.evaluateMCVersion(">=", "1.20.5");
+        private static final boolean HAS_OFFLINE_LOAD = CommonBootstrap.evaluateMCVersion(">=", "1.20.5");
         public PlayerDataController controller = null;
+
+        @HookMethodCondition("version >= 1.20.5")
+        @HookMethod("public java.util.Optional<net.minecraft.nbt.NBTTagCompound> load(String name, String uuid)")
+        public java.util.Optional<Object> loadOfflineOpt(String name, String uuid) {
+            if (this.controller != null) {
+                CommonTagCompound compound = null;
+                try {
+                    compound = this.controller.onLoadOffline(name, uuid);
+                } catch (Throwable t) {
+                    Logging.LOGGER.log(Level.SEVERE, "Failed to handle onLoad() on " + this.controller, t);
+                }
+                return (compound == null) ? java.util.Optional.empty()
+                                          : java.util.Optional.of(compound.getRawHandle());
+            }
+            return base.loadOfflineOpt(name, uuid);
+        }
 
         @HookMethodCondition("version >= 1.20.5")
         @HookMethod("public abstract java.util.Optional<net.minecraft.nbt.NBTTagCompound> load(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
@@ -94,6 +111,16 @@ public abstract class PlayerFileDataHandler implements LazyInitializedObject, Li
         public CommonTagCompound base_load(HumanEntity human) {
             return base_load_raw(HandleConversion.toEntityHandle(human))
                     .map(CommonTagCompound::create).orElse(null);
+        }
+
+        @Override
+        public CommonTagCompound base_load_offline(String playerName, String playerUUID) {
+            if (HAS_OFFLINE_LOAD) {
+                return base.loadOfflineOpt(playerName, playerUUID)
+                        .map(CommonTagCompound::create).orElse(null);
+            } else {
+                throw new UnsupportedOperationException("Not supported on this version of Minecraft");
+            }
         }
 
         private java.util.Optional<Object> base_load_raw(Object entityHuman) {

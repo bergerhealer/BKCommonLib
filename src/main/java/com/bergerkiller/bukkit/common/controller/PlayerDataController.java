@@ -17,10 +17,24 @@ public class PlayerDataController {
      * default, this method redirects to the underlying implementation.
      *
      * @param player to load
-     * @return the loaded data
+     * @return the loaded data, or <i>null</i> if no data is available
      */
     public CommonTagCompound onLoad(Player player) {
         return hook.base_load(player);
+    }
+
+    /**
+     * Called when the entity data for a player has to be loaded, for a player
+     * that is not currently online. This is called on Minecraft 1.20.5 and later,
+     * and if {@link #onLoad(Player)} isn't overrided, is called also for online
+     * players.
+     *
+     * @param playerName Name of the player
+     * @param playerUUID UUID String of the player. Could be an invalid UUID!
+     * @return the loaded data, or <i>null</i> if no data is available
+     */
+    public CommonTagCompound onLoadOffline(String playerName, String playerUUID) {
+        return hook.base_load_offline(playerName, playerUUID);
     }
 
     /**
