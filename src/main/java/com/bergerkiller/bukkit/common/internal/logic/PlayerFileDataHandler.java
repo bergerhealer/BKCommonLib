@@ -58,7 +58,7 @@ public abstract class PlayerFileDataHandler implements LazyInitializedObject, Li
                 try {
                     compound = this.controller.onLoadOffline(name, uuid);
                 } catch (Throwable t) {
-                    Logging.LOGGER.log(Level.SEVERE, "Failed to handle onLoad() on " + this.controller, t);
+                    Logging.LOGGER.log(Level.SEVERE, "Failed to handle onLoadOffline() on " + this.controller, t);
                 }
                 return (compound == null) ? java.util.Optional.empty()
                                           : java.util.Optional.of(compound.getRawHandle());
