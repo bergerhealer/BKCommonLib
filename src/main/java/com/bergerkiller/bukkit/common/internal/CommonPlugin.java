@@ -28,6 +28,7 @@ import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.hooks.LookupEntityClassMap;
 import com.bergerkiller.bukkit.common.internal.logic.BlockDataWrapperHook;
 import com.bergerkiller.bukkit.common.internal.logic.BlockPhysicsEventDataAccessor;
+import com.bergerkiller.bukkit.common.internal.logic.ChunkHandleTracker;
 import com.bergerkiller.bukkit.common.internal.logic.CreaturePreSpawnHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.internal.logic.PlayerGameInfoSupplier_ViaVersion;
@@ -702,6 +703,9 @@ public class CommonPlugin extends PluginBase {
         this.components.enableForVersions("Dimension resource key tracker", "1.19", null,
                 DimensionResourceKeyConversion.Tracker::new);
 
+        // Start tracking chunk - handle conversion
+        ChunkHandleTracker.INSTANCE.startTracking(this);
+
         // Enable BlockData hook stuff, we want the initialization error early
         BlockDataWrapperHook.init();
 
@@ -840,6 +844,9 @@ public class CommonPlugin extends PluginBase {
 
         // Shut down all components
         this.components.disable();
+
+        // Stop tracking chunsk when they unload
+        ChunkHandleTracker.INSTANCE.stopTracking();
 
         // Shut down any ongoing tasks for the portal handler
         PortalHandler.INSTANCE.disable(this);

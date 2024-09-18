@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.conversion.type;
 import java.util.Arrays;
 import java.util.List;
 
+import com.bergerkiller.bukkit.common.internal.logic.ChunkHandleTracker;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.block.Block;
@@ -60,10 +61,8 @@ import com.bergerkiller.generated.net.minecraft.world.level.ChunkCoordIntPairHan
 import com.bergerkiller.generated.net.minecraft.world.level.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.data.CraftBlockDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
@@ -123,15 +122,7 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.world.level.chunk.Chunk")
     public static Object toChunkHandle(org.bukkit.Chunk chunk) {
-        try {
-            return CraftChunkHandle.T.getHandle.invoker.invoke(chunk);
-        } catch (RuntimeException ex) {
-            if (CraftChunkHandle.T.isAssignableFrom(chunk)) {
-                throw ex;
-            } else {
-                return null;
-            }
-        }
+        return ChunkHandleTracker.INSTANCE.getChunkHandle(chunk);
     }
 
     @ConverterMethod(output="net.minecraft.world.item.ItemStack", acceptsNull = true)
