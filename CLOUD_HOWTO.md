@@ -24,7 +24,7 @@ Begin by adding the repository where BKCommonLib is hosted:
 Next, add BKCommonLib-bom under **dependencyManagement** (!). This automatically loads the information about what cloud version and its dependencies are used for a particular version of BKCommonLib. Next just add all the dependencies without specifying the version. The version is taken from the bom.
 ```xml
     <properties>
-        <project.bkcommonlib.version>1.20.6-v1-SNAPSHOT</project.bkcommonlib.version>
+        <project.bkcommonlib.version>1.21.1-v1</project.bkcommonlib.version>
     </properties>
 
     <dependencyManagement>
@@ -122,7 +122,7 @@ repositories {
 Next add the BKCommonLib dependency and the cloud dependencies. For cloud, no version has to be specified, which will be provided by BKCommonLib. It is recommended to make use of [version catalogs](https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format) to make this look cleaner, but this is optional.
 ```kotlin
 dependencies {
-    compileOnlyApi("com.bergerkiller.bukkit:BKCommonLib:1.20.6-v1-SNAPSHOT")
+    compileOnlyApi("com.bergerkiller.bukkit:BKCommonLib:1.21.1-v1")
 
     // Cloud integrated in BKCommonLib
     compileOnly("org.incendo:cloud-paper")
