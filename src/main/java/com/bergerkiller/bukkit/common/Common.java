@@ -59,7 +59,8 @@ public class Common {
             "Common:Attributes:RemoveAllModifiers",
             "Common:Attributes:GetAllAttributes",
             "Common:Player:SetSkinMetadata",
-            "Common:PacketPlayInBlockPlace:RotationApi"
+            "Common:PacketPlayInBlockPlace:RotationApi",
+            "Common:PlayerInstancePhase"
     ).collect(Collectors.toSet());
 
     /**

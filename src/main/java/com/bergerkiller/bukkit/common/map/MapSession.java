@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import com.bergerkiller.bukkit.common.entity.PlayerInstancePhase;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
@@ -55,7 +56,8 @@ public class MapSession {
                 owner.input.handleDisplayUpdate(this.display, owner.interceptInput);
 
                 // Check if online. Remove offline players if not set FOREVER
-                if (!owner.player.isValid()) {
+                PlayerInstancePhase playerPhase = PlayerInstancePhase.of(owner.player);
+                if (!playerPhase.isConnected()) {
                     if (this.mode != MapSessionMode.FOREVER) {
                         this.owners.remove(owner.player.getUniqueId());
                     }
@@ -64,17 +66,24 @@ public class MapSession {
                     continue;
                 }
 
-                // Check if holding the map
-                owner.controlling = info.isMap(HumanHand.getItemInMainHand(owner.player));
-                owner.holding = owner.controlling || info.isMap(HumanHand.getItemInOffHand(owner.player));
-                if (!owner.holding && this.mode == MapSessionMode.HOLDING) {
-                    this.owners.remove(owner.player.getUniqueId());
-                    onOwnerRemoved(owner);
-                    onlineIter.remove();
-                    continue;
+                // Check if dead (respawning). In this state the player cannot hold the map.
+                if (playerPhase.isAliveOnWorld()) {
+                    // Check if holding the map
+                    owner.controlling = info.isMap(HumanHand.getItemInMainHand(owner.player));
+                    owner.holding = owner.controlling || info.isMap(HumanHand.getItemInOffHand(owner.player));
+                    if (!owner.holding && this.mode == MapSessionMode.HOLDING) {
+                        this.owners.remove(owner.player.getUniqueId());
+                        onOwnerRemoved(owner);
+                        onlineIter.remove();
+                        continue;
+                    }
+                } else {
+                    owner.controlling = false;
+                    owner.holding = false;
                 }
 
                 // Check if viewing the map at all
+                // Dead players can still view the map on item frames
                 owner.wasViewing = owner.viewing;
                 owner.viewing = owner.holding || info.getViewers().contains(owner.player);
                 if (!owner.viewing && this.mode == MapSessionMode.VIEWING) {

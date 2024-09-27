@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.internal.map;
 
 import java.util.UUID;
 
+import com.bergerkiller.bukkit.common.entity.PlayerInstancePhase;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -9,7 +10,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.collections.SortedIdentityCache;
 import com.bergerkiller.bukkit.common.events.map.MapShowEvent;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 
@@ -27,7 +27,7 @@ class MapDisplayHeldMapUpdater extends Task {
 
     @Override
     public void run() {
-        entries.sync(CommonUtil.getOnlinePlayers());
+        entries.sync(PlayerInstancePhase.getAlivePlayers());
         entries.forEach(MapViewEntry::update);
     }
 

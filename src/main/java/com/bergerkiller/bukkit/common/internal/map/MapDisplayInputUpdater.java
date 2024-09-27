@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.internal.map;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.bergerkiller.bukkit.common.entity.PlayerInstancePhase;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,7 +26,7 @@ class MapDisplayInputUpdater extends Task {
         Iterator<Map.Entry<Player, MapPlayerInput>> iter = controller.playerInputs.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<Player, MapPlayerInput> entry = iter.next();
-            if (entry.getKey().isValid()) {
+            if (PlayerInstancePhase.of(entry.getKey()).isConnected()) {
                 entry.getValue().onTick();
             } else {
                 entry.getValue().onDisconnected();

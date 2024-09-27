@@ -44,6 +44,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.function.Predicate;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
@@ -247,11 +248,28 @@ public class CommonUtil {
     /**
      * Gets a list of online players on the server
      *
-     * @return online players
+     * @return unmodifiable collection of online players
      */
     public static Collection<Player> getOnlinePlayers() {
         return CommonUtil.unsafeCast(Bukkit.getOnlinePlayers());
         // return CommonNMS.getPlayerList().getPlayers();
+    }
+
+    /**
+     * Gets a list of online players on the server that match a certain predicate
+     *
+     * @param filter Filter predicate
+     * @return unmodifiable collection of online players that match the filter
+     */
+    public static Collection<Player> getOnlinePlayers(Predicate<Player> filter) {
+        Collection<? extends Player> allPlayers = Bukkit.getOnlinePlayers();
+        Collection<Player> players = new ArrayList<>(allPlayers.size());
+        for (Player player : allPlayers) {
+            if (filter.test(player)) {
+                players.add(player);
+            }
+        }
+        return Collections.unmodifiableCollection(players);
     }
 
     /**

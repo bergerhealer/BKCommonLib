@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import com.bergerkiller.bukkit.common.entity.PlayerInstancePhase;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.Task;
@@ -129,7 +130,7 @@ public class CommonVehicleMountManager {
         Iterator<Map.Entry<Player, VehicleMountHandler_BaseImpl>> iter = this._players.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<Player, VehicleMountHandler_BaseImpl> entry = iter.next();
-            if (!entry.getKey().isValid()) {
+            if (!PlayerInstancePhase.of(entry.getKey()).isConnected()) {
                 VehicleMountHandler_BaseImpl handler = entry.getValue();
                 iter.remove();
                 handler.handleRemoved();

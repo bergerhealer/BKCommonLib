@@ -18,6 +18,7 @@ import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.entity.PlayerInstancePhase;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSetCreativeSlotHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapHandle;
@@ -246,13 +247,7 @@ public final class CommonMapController implements PacketListener, Listener {
      * @return player input
      */
     public synchronized MapPlayerInput getPlayerInput(Player player) {
-        MapPlayerInput input;
-        input = playerInputs.get(player);
-        if (input == null) {
-            input = new MapPlayerInput(player);
-            playerInputs.put(player, input);
-        }
-        return input;
+        return playerInputs.computeIfAbsent(player, MapPlayerInput::new);
     }
 
     /**
@@ -366,7 +361,7 @@ public final class CommonMapController implements PacketListener, Listener {
         UUID oldMapUUID = oldItem.getHandle().map(ItemStackHandle::getMapDisplayUUID).orElse(null);
         if (oldMapUUID != null) {
             // Change in the inventories of all player owners
-            for (Player player : Bukkit.getOnlinePlayers()) {
+            for (Player player : PlayerInstancePhase.getAlivePlayers()) {
                 PlayerInventory inv = player.getInventory();
                 for (int i = 0; i < inv.getSize(); i++) {
                     UUID mapUUID = CommonMapUUIDStore.getMapUUID(inv.getItem(i));
@@ -971,6 +966,7 @@ public final class CommonMapController implements PacketListener, Listener {
             final int slot = event.getSlot();
             final int rawSlot = event.getRawSlot();
             CommonUtil.nextTick(() -> {
+                // If player is offline or dead, ignore, can't touch inventory in that state
                 if (!player.isValid()) {
                     return;
                 }
@@ -992,6 +988,7 @@ public final class CommonMapController implements PacketListener, Listener {
         ) {
             final Player player = (Player) event.getWhoClicked();
             CommonUtil.nextTick(() -> {
+                // If player is offline or dead, ignore, can't touch inventory in that state
                 if (!player.isValid()) {
                     return;
                 }

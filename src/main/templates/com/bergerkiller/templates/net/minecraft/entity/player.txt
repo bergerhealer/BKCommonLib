@@ -46,6 +46,21 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
     public (PlayerConnectionHandle) PlayerConnection playerConnection;
 #endif
 
+#if version >= 1.18
+    public boolean hasDisconnected();
+#elseif version >= 1.16
+    public boolean hasDisconnected:q();
+#elseif version >= 1.13
+    public boolean hasDisconnected:o();
+#elseif version >= 1.12
+    public boolean hasDisconnected:t();
+#else
+    public boolean hasDisconnected() {
+        PlayerConnection playerConnection = instance.playerConnection;
+        return playerConnection != null && playerConnection.isDisconnected();
+    }
+#endif
+
 #if version >= 1.16
     // World dimension on 1.16 and later
     public org.bukkit.World getSpawnWorld() {

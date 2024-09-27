@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.entity.PlayerInstancePhase;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook_1_8_to_1_13_2;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
@@ -160,7 +161,7 @@ public class CommonPlayerMeta {
             Player viewer = CommonPlayerMeta.this.getPlayer();
             List<EntityTrackerEntryHook_1_8_to_1_13_2.ViewableLogic> pendingUpdates = CommonPlayerMeta.this.pendingViewerUpdates;
             CommonPlayerMeta.this.pendingViewerUpdates = Collections.emptyList();
-            if (viewer != null && viewer.isValid()) {
+            if (viewer != null && PlayerInstancePhase.of(viewer).isConnected()) {
                 pendingUpdates.forEach(viewable -> viewable.handleRespawnBlindness(viewer));
             }
         }

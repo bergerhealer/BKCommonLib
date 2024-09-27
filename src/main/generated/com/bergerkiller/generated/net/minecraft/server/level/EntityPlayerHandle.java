@@ -26,6 +26,7 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
 
     /* ============================================================================== */
 
+    public abstract boolean hasDisconnected();
     public abstract World getSpawnWorld();
     public abstract void setSpawnWorld(World world);
     public abstract IntVector3 getSpawnCoord();
@@ -65,6 +66,7 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
         @Template.Readonly
         public final Template.Field.Boolean viewingCredits = new Template.Field.Boolean();
 
+        public final Template.Method<Boolean> hasDisconnected = new Template.Method<Boolean>();
         public final Template.Method<World> getSpawnWorld = new Template.Method<World>();
         public final Template.Method<Void> setSpawnWorld = new Template.Method<Void>();
         public final Template.Method.Converted<IntVector3> getSpawnCoord = new Template.Method.Converted<IntVector3>();
