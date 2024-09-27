@@ -4,7 +4,7 @@ import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.collections.FastTrackedUpdateSet;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
+import com.bergerkiller.mountiplex.MountiplexUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -18,17 +18,26 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 /**
- * Spigot 1.21 is busted. Getting the chunk handle in the ChunkUnloadEvent
+ * Spigot 1.21 & older 1.21.1 are busted. Getting the chunk handle in the ChunkUnloadEvent
  * doesn't work. This tracker keeps the handle cached in memory so that this
- * works properly.
+ * works properly.<br>
+ * <br>
+ * <a href="https://hub.spigotmc.org/jira/browse/SPIGOT-7780">This issue</a> was fixed at a later
+ * 1.21.1 version, so do check during chunk unload whether this issue still exists once.
  */
 class ChunkHandleTracker_Spigot_1_21 implements ChunkHandleTracker {
     private final ConcurrentHashMap<Chunk, CachedChunkHandle> cache = new ConcurrentHashMap<>();
     private final FastTrackedUpdateSet<CachedChunkHandle> pendingRemoval = new FastTrackedUpdateSet<>();
+    private boolean cacheEnabled = true;
+    private boolean bugDetectOccurred = false;
 
     private final Listener listener = new Listener() {
         @EventHandler(priority = EventPriority.LOWEST)
         public void onChunkLoad(ChunkLoadEvent event) {
+            if (!cacheEnabled) {
+                return;
+            }
+
             CachedChunkHandle previous = cache.put(event.getChunk(),
                     new CachedChunkHandle(event.getChunk(), pendingRemoval));
             if (previous != null) {
@@ -38,6 +47,25 @@ class ChunkHandleTracker_Spigot_1_21 implements ChunkHandleTracker {
 
         @EventHandler(priority = EventPriority.MONITOR)
         public void onChunkUnload(ChunkUnloadEvent event) {
+            if (!cacheEnabled) {
+                return;
+            }
+
+            if (!bugDetectOccurred) {
+                bugDetectOccurred = true;
+                try {
+                    ChunkHandleTracker_Default.getHandle(event.getChunk());
+
+                    // Nope, bug is fixed!
+                    cacheEnabled = false;
+                    stopTracking();
+                    return;
+                } catch (Throwable t) {
+                    // Yup!
+                    cacheEnabled = true;
+                }
+            }
+
             CachedChunkHandle cached = cache.get(event.getChunk());
             if (cached != null) {
                 cached.tracker.set(true);
@@ -56,6 +84,9 @@ class ChunkHandleTracker_Spigot_1_21 implements ChunkHandleTracker {
 
     @Override
     public void startTracking(CommonPlugin plugin) {
+        cacheEnabled = true;
+        bugDetectOccurred = false;
+
         plugin.register(this.listener);
 
         cleanupTask = new Task(plugin) {
@@ -79,6 +110,7 @@ class ChunkHandleTracker_Spigot_1_21 implements ChunkHandleTracker {
 
     @Override
     public void stopTracking() {
+        cacheEnabled = false;
         CommonUtil.unregisterListener(this.listener);
         Task.stop(cleanupTask);
         cleanupTask = null;
@@ -88,16 +120,19 @@ class ChunkHandleTracker_Spigot_1_21 implements ChunkHandleTracker {
 
     @Override
     public Object getChunkHandle(Chunk chunk) {
-        try {
-            return cache.computeIfAbsent(chunk, c -> {
-                if (cleanupTask == null) {
-                    throw new DisabledCacheException();
-                } else {
-                    return new CachedChunkHandle(c, pendingRemoval);
-                }
-            }).handle;
-        } catch (DisabledCacheException ex) {
-            return getHandle(chunk); // No cache
+        if (cacheEnabled) {
+            return cache.computeIfAbsent(chunk, c -> new CachedChunkHandle(c, pendingRemoval)).handle;
+        } else {
+            try {
+                return ChunkHandleTracker_Default.getHandle(chunk); // No cache
+            } catch (Throwable t) {
+                // Still bugged out for some reason. Re-enable the cache I guess to try and help the situation
+                bugDetectOccurred = true;
+                cacheEnabled = true;
+
+                // I guess we'll miss this one :(
+                throw MountiplexUtil.uncheckedRethrow(t);
+            }
         }
     }
 
@@ -108,32 +143,8 @@ class ChunkHandleTracker_Spigot_1_21 implements ChunkHandleTracker {
 
         public CachedChunkHandle(Chunk chunk, FastTrackedUpdateSet<CachedChunkHandle> set) {
             this.chunk = chunk;
-            this.handle = getHandle(chunk);
+            this.handle = ChunkHandleTracker_Default.getHandle(chunk);
             this.tracker = set.track(this);
-        }
-    }
-
-    private static Object getHandle(Chunk chunk) {
-        try {
-            return CraftChunkHandle.T.getHandle.invoker.invoke(chunk);
-        } catch (RuntimeException ex) {
-            if (CraftChunkHandle.T.isAssignableFrom(chunk)) {
-                throw ex;
-            } else {
-                return null;
-            }
-        }
-    }
-
-    private static class DisabledCacheException extends RuntimeException {
-        /**
-         * Static singleton instance of this exception, to avoid overhead of construction
-         */
-        public static final DisabledCacheException INSTANCE = new DisabledCacheException();
-
-        @Override
-        public Throwable fillInStackTrace() {
-            return this;
         }
     }
 }

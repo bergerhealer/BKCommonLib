@@ -16,7 +16,9 @@ public interface ChunkHandleTracker extends LibraryComponent {
     ChunkHandleTracker INSTANCE = LibraryComponentSelector.forModule(ChunkHandleTracker.class)
             .runFirst(CommonBootstrap::initServer)
             .addWhen("Spigot-1.21-broken",
-                    v -> !Common.IS_PAPERSPIGOT_SERVER && Common.evaluateMCVersion(">=", "1.21"),
+                    v -> !Common.IS_PAPERSPIGOT_SERVER &&
+                            Common.evaluateMCVersion(">=", "1.21") &&
+                            Common.evaluateMCVersion("<=", "1.21.1"),
                     ChunkHandleTracker_Spigot_1_21::new)
             .setDefaultComponent(ChunkHandleTracker_Default::new)
             .update();

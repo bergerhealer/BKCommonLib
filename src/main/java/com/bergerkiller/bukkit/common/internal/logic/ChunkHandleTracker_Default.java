@@ -27,6 +27,10 @@ class ChunkHandleTracker_Default implements ChunkHandleTracker {
 
     @Override
     public Object getChunkHandle(Chunk chunk) {
+        return getHandle(chunk);
+    }
+
+    protected static Object getHandle(Chunk chunk) {
         try {
             return CraftChunkHandle.T.getHandle.invoker.invoke(chunk);
         } catch (RuntimeException ex) {
