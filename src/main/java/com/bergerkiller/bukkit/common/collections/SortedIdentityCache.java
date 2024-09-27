@@ -120,7 +120,7 @@ public abstract class SortedIdentityCache<K, V> implements Iterable<V> {
      * @return True if values were added and/or removed.
      *         Change of element order is ignored.
      */
-    public final boolean sync(Stream<K> keyStream) {
+    public final boolean sync(Stream<? extends K> keyStream) {
         return sync(keyStream::forEachOrdered);
     }
 
@@ -134,7 +134,7 @@ public abstract class SortedIdentityCache<K, V> implements Iterable<V> {
      * @return True if values were added and/or removed.
      *         Change of element order is ignored.
      */
-    public final boolean sync(Iterable<K> keys) {
+    public final boolean sync(Iterable<? extends K> keys) {
         return sync(keys::forEach);
     }
 
@@ -148,7 +148,7 @@ public abstract class SortedIdentityCache<K, V> implements Iterable<V> {
      * @return True if values were added and/or removed.
      *         Change of element order is ignored.
      */
-    public final boolean sync(Iterator<K> keysIterator) {
+    public final boolean sync(Iterator<? extends K> keysIterator) {
         return sync(keysIterator::forEachRemaining);
     }
 
