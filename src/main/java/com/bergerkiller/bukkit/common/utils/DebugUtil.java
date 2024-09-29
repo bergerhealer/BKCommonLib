@@ -402,15 +402,25 @@ public class DebugUtil {
             @Override
             public void run() {
                 sleep(delay);
-                for (Thread thread : threadSelector.get()) {
-                    StackTraceElement[] stack = thread.getStackTrace();
-                    Logging.LOGGER_DEBUG.warning("Stack trace of thread " + thread.getName() + ":");
-                    for (StackTraceElement element : stack) {
-                        Logging.LOGGER_DEBUG.warning("  at " + element.toString());
-                    }
-                }
+                logStackTraces(threadSelector);
             }
         }.start();
+    }
+
+    /**
+     * Logs the stack traces of all threads supplied by the supplier.
+     * Can be used to debug application freezes.
+     *
+     * @param threadSelector selector to call to find the threads to dump
+     */
+    public static void logStackTraces(final Supplier<? extends Iterable<Thread>> threadSelector) {
+        for (Thread thread : threadSelector.get()) {
+            StackTraceElement[] stack = thread.getStackTrace();
+            Logging.LOGGER_DEBUG.warning("Stack trace of thread [" + thread.getName() + "]:");
+            for (StackTraceElement element : stack) {
+                Logging.LOGGER_DEBUG.warning("  at " + element.toString());
+            }
+        }
     }
 
     private static class StackElement {
