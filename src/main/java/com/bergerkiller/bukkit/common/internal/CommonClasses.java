@@ -1,21 +1,9 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.logic.BlockDataSerializer;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler;
@@ -25,7 +13,6 @@ import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.lighting.LightingHandler;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 class CommonClasses {
     /*
@@ -84,75 +71,6 @@ class CommonClasses {
             classNames[i] = Common.COMMON_ROOT + "." + classNames[i];
         }
         Common.loadClasses(classNames);
-    }
-
-    /**
-     * Forces all template classes to initialize. Inspects the BKCommonLib jar file to find all template classes
-     * to pull this off.
-     */
-    public static void initializeTemplateClasses() {
-        URLClassLoader loader = (URLClassLoader) CommonClasses.class.getClassLoader();
-        File jarFile = null;
-        for (URL url : loader.getURLs()) {
-            jarFile = new File(url.getFile());
-            if (!jarFile.exists()) {
-                jarFile = null;
-            }
-        }
-        if (jarFile == null) {
-            Logging.LOGGER.log(Level.WARNING, "Failed to figure out the jar file of BKCommonLib. No template classes pre-loaded.");
-            return;
-        }
-
-        List<String> classNames = new ArrayList<String>();
-        try {
-            try (ZipInputStream zip = new ZipInputStream(new FileInputStream(jarFile))) {
-                for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
-                    if (entry.isDirectory()) {
-                        continue;
-                    }
-                    String name = entry.getName();
-                    if (name.startsWith("/")) {
-                        name = name.substring(1);
-                    }
-                    if (!name.startsWith("com/bergerkiller/generated") || !name.endsWith(".class")) {
-                        continue;
-                    }
-                    if (name.equals("com/bergerkiller/generated/net/minecraft/network/protocol/game/PacketPlayOutCustomPayloadHandle.class")) {
-                        continue; // Deprecated temporary fallback
-                    }
-                    classNames.add(name.substring(0, name.length()-6).replace('/', '.'));
-                }
-            }
-        } catch (IOException ex) {
-            Logging.LOGGER.log(Level.WARNING, "Failed to pre-load template classes: listing failed", ex);
-            return;
-        }
-
-        classNames.parallelStream()
-            .map(className -> {
-                try {
-                    // The below code loads the class and calls the static initializer on it
-                    Class<?> templateClass = Class.forName(className, true, CommonClasses.class.getClassLoader());
-                    if (Template.Handle.class.isAssignableFrom(templateClass)) {
-                        Field templateClassInstanceField = templateClass.getDeclaredField("T");
-                        Template.Class<?> cls = (Template.Class<?>) templateClassInstanceField.get(null);
-                        return cls;
-                    }
-                } catch (Throwable t) {
-                    Logging.LOGGER.log(Level.SEVERE, "Failed to load class " + className, t);
-                    return null;
-                }
-                return null;
-            })
-            .filter(Objects::nonNull)
-            .forEach(cls -> {
-                try {
-                    cls.forceInitialization();
-                } catch (Throwable t) {
-                    Logging.LOGGER.log(Level.SEVERE, "Failed to initialize " + cls.getHandleType(), t);
-                }
-            });
     }
 
     public static void initializeLogicClasses(Logger logger) {

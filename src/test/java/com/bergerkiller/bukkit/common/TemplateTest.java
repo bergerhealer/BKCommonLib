@@ -10,9 +10,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
+import com.bergerkiller.bukkit.common.utils.DebugUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.junit.Ignore;
@@ -38,6 +44,7 @@ import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinec
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.junit.experimental.categories.Category;
 
 public class TemplateTest {
 
@@ -307,6 +314,48 @@ public class TemplateTest {
         } else {
             PacketPlayOutSpawnEntityHandle.T.opt_entityTypeId.forceInitialization();
         }
+    }
+
+    /**
+     * Performs the {@link CommonBootstrap#preloadTemplateClasses(Random)} and checks whether
+     * it deadlocks (fails to complete within 30 seconds). This test can be run
+     * on repeat to identify issues at random class initialization orders.
+     *
+     * @throws Throwable If anything goes wrong
+     */
+    @Test
+    @Ignore
+    public void testPreloadTemplatesDeadlock() throws Throwable {
+        // Force a particular seed, or generate a random seed to test with each time
+        long seed = new java.util.Random().nextLong();
+        // seed = 890821943411959027L;
+        Logging.LOGGER_DEBUG.info("Class Initialization Seed: " + seed);
+
+        // Timeout
+        final long preloadTimeoutMillis = 30000;
+
+        // This is not part of the test so run this right now
+        // It's also required to actually initialize the template classes
+        CommonBootstrap.initServer();
+
+        // Run initialization asynchronously
+        long startTime = System.currentTimeMillis();
+        final long seedFinal = seed;
+        CompletableFuture<Void> initFuture = CommonUtil.runCheckedAsync(() -> {
+            CommonBootstrap.preloadTemplateClasses(new java.util.Random(seedFinal));
+        });
+
+        try {
+            initFuture.get(preloadTimeoutMillis, TimeUnit.MILLISECONDS);
+        } catch (TimeoutException ex) {
+            DebugUtil.logStackTraces(() -> Thread.getAllStackTraces().keySet());
+            Thread.sleep(1000); // Give some time for logging to complete...
+            throw new RuntimeException("Initialization test hung!");
+        } catch (CompletionException ex) {
+            throw ex.getCause();
+        }
+
+        Logging.LOGGER_DEBUG.info("Finished initializing templates after " + (System.currentTimeMillis() - startTime) + " millis");
     }
 
     @Test

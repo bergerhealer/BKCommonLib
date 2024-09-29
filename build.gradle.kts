@@ -165,8 +165,23 @@ tasks {
             showStandardStreams = true
         }
 
+        // Used to preload classes under test
+        systemProperty("main.classes.dir", sourceSets["main"].output.classesDirs.asPath)
+
         // Uncomment to enable SIMD optimizations, to test performance of color conversion
         //jvmArgs("--add-modules", "jdk.incubator.vector");
+    }
+
+    // This keeps calling testPreloadTemplatesDeadlock in new instances until it fails
+    // We use this to identify class loading deadlocks
+    register("testPreloadTemplatesDeadlock") {
+        doLast {
+            while (true) {
+                exec {
+                    commandLine("./gradlew", "test", "--tests", "com.bergerkiller.bukkit.common.TemplateTest.testPreloadTemplatesDeadlock", "--rerun-tasks")
+                }
+            }
+        }
     }
 
     javadoc {

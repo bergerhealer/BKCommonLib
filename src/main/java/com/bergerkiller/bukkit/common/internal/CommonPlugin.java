@@ -642,7 +642,7 @@ public class CommonPlugin extends PluginBase {
         config.save();
 
         if (preloadTemplateClasses) {
-            CommonClasses.initializeTemplateClasses();
+            CommonBootstrap.preloadTemplateClasses(null);
             BlockPhysicsEventDataAccessor.init();
         }
 

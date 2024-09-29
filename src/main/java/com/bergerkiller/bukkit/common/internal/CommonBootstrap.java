@@ -1,12 +1,27 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.reflect.Field;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import com.bergerkiller.bukkit.common.conversion.type.JOMLConversion;
 import com.bergerkiller.bukkit.common.conversion.type.MapConversion;
@@ -15,6 +30,7 @@ import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.internal.logic.UnsetDataWatcherItemInit;
 import com.bergerkiller.bukkit.common.wrappers.Brightness;
 import com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.Bukkit;
 
 import com.bergerkiller.bukkit.common.Common;
@@ -947,6 +963,110 @@ public class CommonBootstrap {
         NBTBaseHandle.NBTTagStringHandle.T.forceInitialization();
         NBTTagCompoundHandle.T.forceInitialization();
         NBTTagListHandle.T.forceInitialization();
+    }
+
+    /**
+     * Forces all template classes to initialize. Inspects the BKCommonLib jar file to find all template classes
+     * to pull this off.
+     *
+     * @param classLoaderOrderRandom If non-null, randomizes the order of classes using this Random.
+     *                               This can be used to identify load orders that cause deadlocks or
+     *                               other issues by brute force.
+     */
+    public static void preloadTemplateClasses(Random classLoaderOrderRandom) {
+        List<String> classNames;
+        if (Common.IS_TEST_MODE) {
+            // List the .class files in the "classes" build folder of BKCommonLib
+            String bkclClassesDir = System.getProperty("main.classes.dir");
+            if (bkclClassesDir == null || bkclClassesDir.isEmpty()) {
+                throw new IllegalStateException("Run under test without main.classes.dir set (gradle error?)");
+            }
+
+            final Path bkclClassesPath = (new File(bkclClassesDir)).toPath();
+            try (Stream<Path> bkclClassFiles = Files.walk(bkclClassesPath)) {
+                classNames = bkclClassFiles
+                        .filter(Files::isRegularFile)
+                        .map(bkclClassesPath::relativize)
+                        .map(Path::toString)
+                        .collect(Collectors.toCollection(ArrayList::new));
+            } catch (IOException ex) {
+                Logging.LOGGER.log(Level.WARNING, "Failed to pre-load template classes: listing failed", ex);
+                return;
+            }
+        } else {
+            // List the .class files in the jar zip file of BKCommonLib
+            classNames = new ArrayList<String>();
+            URLClassLoader loader = (URLClassLoader) CommonClasses.class.getClassLoader();
+            File jarFile = null;
+            for (URL url : loader.getURLs()) {
+                jarFile = new File(url.getFile());
+                if (!jarFile.exists()) {
+                    jarFile = null;
+                }
+            }
+            if (jarFile == null) {
+                Logging.LOGGER.log(Level.WARNING, "Failed to figure out the jar file of BKCommonLib. No template classes pre-loaded.");
+                return;
+            }
+
+            try {
+                try (ZipInputStream zip = new ZipInputStream(new FileInputStream(jarFile))) {
+                    for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+                        if (!entry.isDirectory()) {
+                            classNames.add(entry.getName());
+                        }
+                    }
+                }
+            } catch (IOException ex) {
+                Logging.LOGGER.log(Level.WARNING, "Failed to pre-load template classes: listing failed", ex);
+                return;
+            }
+        }
+
+        // For debugging class loading deadlocks, randomize the order of the classes
+        // Some random shuffle seeds can more reliably reproduce such deadlocks
+        if (classLoaderOrderRandom != null) {
+            Collections.shuffle(classNames, classLoaderOrderRandom);
+        }
+
+        classNames.parallelStream()
+                // Omit / prefix for more reliable matching
+                .map(className -> {
+                    if (className.startsWith("/")) {
+                        className = className.substring(1);
+                    }
+                    return className;
+                })
+                // Only match Template files in the generated package, that are class files
+                .filter(name -> name.startsWith("com/bergerkiller/generated") && name.endsWith(".class"))
+                // Deprecated temporary fallback
+                .filter(name -> !name.equals("com/bergerkiller/generated/net/minecraft/network/protocol/game/PacketPlayOutCustomPayloadHandle.class"))
+                // Turn into a loadable class name
+                .map(name -> name.substring(0, name.length()-6).replace('/', '.'))
+                // Load all these classes
+                .map(className -> {
+                    try {
+                        // The below code loads the class and calls the static initializer on it
+                        Class<?> templateClass = Class.forName(className, true, CommonClasses.class.getClassLoader());
+                        if (Template.Handle.class.isAssignableFrom(templateClass)) {
+                            Field templateClassInstanceField = templateClass.getDeclaredField("T");
+                            Template.Class<?> cls = (Template.Class<?>) templateClassInstanceField.get(null);
+                            return cls;
+                        }
+                    } catch (Throwable t) {
+                        Logging.LOGGER.log(Level.SEVERE, "Failed to load class " + className, t);
+                        return null;
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .forEach(cls -> {
+                    try {
+                        cls.forceInitialization();
+                    } catch (Throwable t) {
+                        Logging.LOGGER.log(Level.SEVERE, "Failed to initialize " + cls.getHandleType(), t);
+                    }
+                });
     }
 
     /**
