@@ -42,10 +42,6 @@ public abstract class NBTTagListHandle extends NBTBaseHandle {
         return createHandle(raw_clone());
     }
 
-    static {
-        registerTypeInfo(java.util.Collection.class, T, T.create.raw::invoke, T.data.raw::get);
-    }
-
     public com.bergerkiller.bukkit.common.nbt.CommonTagList toCommonTag() {
         return new com.bergerkiller.bukkit.common.nbt.CommonTagList(this);
     }
