@@ -32,6 +32,36 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
 public class YamlTest {
 
     @Test
+    public void testYamlSpecialStringEscaping() {
+        YamlNode root = new YamlNode();
+        root.set("test1", " Word");
+        root.set("test2", "Word ");
+        root.set("test3", "Word:");
+        root.set("test4", "Word[]");
+        root.set("test5", "Word{}");
+        root.set("test6", "Word:[]");
+        root.set("test7", "Word:{}");
+        root.set("test8", "'Quoted'");
+        root.set("test9", "\"Quoted\"");
+        root.set("test10", "$Hello World");
+        root.set("test11", "&Hello World");
+        root.set("test12", "");
+        assertEquals("" +
+                "test1: ' Word'\n" +
+                "test2: 'Word '\n" +
+                "test3: 'Word:'\n" +
+                "test4: 'Word[]'\n" +
+                "test5: 'Word{}'\n" +
+                "test6: 'Word:[]'\n" +
+                "test7: 'Word:{}'\n" +
+                "test8: '''Quoted'''\n" +
+                "test9: '\"Quoted\"'\n" +
+                "test10: '$Hello World'\n" +
+                "test11: '&Hello World'\n" +
+                "test12: ''\n", root.toString());
+    }
+
+    @Test
     public void testYamlKeyAPIs() {
         YamlNode root = new YamlNode();
         root.set(YamlPath.create("parent.child"), 12);

@@ -20,6 +20,7 @@ import org.yaml.snakeyaml.events.StreamEndEvent;
 import org.yaml.snakeyaml.events.StreamStartEvent;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.representer.BaseRepresenter;
+import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.resolver.Resolver;
 import org.yaml.snakeyaml.serializer.Serializer;
 
@@ -54,6 +55,7 @@ public class YamlSerializer {
     /**
      * Creates a new YamlSerializer
      */
+    @SuppressWarnings("unchecked")
     public YamlSerializer() {
         headerPrefixes = new String[] { "#> ", "# " };
         dumperOptions = new DumperOptions();
@@ -61,11 +63,40 @@ public class YamlSerializer {
         dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         indentStr = StringUtil.getFilledString(" ", dumperOptions.getIndent());
         resolver = new Resolver();
-        representer = new YamlRepresenter();
-        representer.setDefaultFlowStyle(dumperOptions.getDefaultFlowStyle());
-        representer.setDefaultScalarStyle(dumperOptions.getDefaultScalarStyle());
-        representer.getPropertyUtils().setAllowReadOnlyProperties(dumperOptions.isAllowReadOnlyProperties());
-        representer.setTimeZone(dumperOptions.getTimeZone());
+        representer = createRepresenter(dumperOptions);
+
+        // Alter the registered String representer, making it quote strings that contain []{}&$
+        // See: stringMustBeQuoted(String)
+        try {
+            Field representersField = org.yaml.snakeyaml.representer.BaseRepresenter.class.getDeclaredField("representers");
+            representersField.setAccessible(true);
+
+            // Create a RepresentString instance that always quotes
+            final Represent quotedStringRepresent;
+            {
+                YamlRepresenter quotedRepresenter = createRepresenter(dumperOptions);
+                quotedRepresenter.setDefaultScalarStyle(DumperOptions.ScalarStyle.SINGLE_QUOTED);
+                Map<Class<?>, Represent> quotedRepresentersByType = (Map<Class<?>, Represent>) representersField.get(quotedRepresenter);
+                quotedStringRepresent = quotedRepresentersByType.get(String.class);
+                if (quotedStringRepresent == null) {
+                    throw new IllegalStateException("No String representer");
+                }
+            }
+
+            // Update the String representer, and switch dynamically between quoted and the default
+            // depending on the input data value
+            Map<Class<?>, Represent> representersByType = (Map<Class<?>, Represent>) representersField.get(representer);
+            representersByType.computeIfPresent(String.class, (clsKey, defaultStringRepresent) -> data -> {
+                if (stringMustBeQuoted((String) data)) {
+                    return quotedStringRepresent.representData(data);
+                } else {
+                    return defaultStringRepresent.representData(data);
+                }
+            });
+        } catch (Throwable t) {
+            Logging.LOGGER_CONFIG.log(Level.WARNING, "[Yaml] Failed to enable escaping of special characters", t);
+        }
+
         output = new StringBuilderWriter();
         resetMethod = new FastMethod<Void>();
         builder = output.getBuilder();
@@ -202,6 +233,15 @@ public class YamlSerializer {
         } catch (Throwable t) {
             Logging.LOGGER_CONFIG.log(Level.SEVERE, "Unhandled error disabling YAML anchors", t);
         }
+    }
+
+    private static YamlRepresenter createRepresenter(DumperOptions dumperOptions) {
+        YamlRepresenter representer = new YamlRepresenter();
+        representer.setDefaultFlowStyle(dumperOptions.getDefaultFlowStyle());
+        representer.setDefaultScalarStyle(dumperOptions.getDefaultScalarStyle());
+        representer.getPropertyUtils().setAllowReadOnlyProperties(dumperOptions.isAllowReadOnlyProperties());
+        representer.setTimeZone(dumperOptions.getTimeZone());
+        return representer;
     }
 
     private String build() {
@@ -485,6 +525,18 @@ public class YamlSerializer {
             "true", "True", "TRUE",
             "false", "False", "FALSE"
     ));
+
+    // Whether the String must always be quoted.
+    private static boolean stringMustBeQuoted(String str) {
+        int len = str.length();
+        for (int i = 0; i < len; i++) {
+            char c = str.charAt(i);
+            if (c == '[' || c == ']' || c == '{' || c == '}' || c == '&' || c == '$') {
+                return true;
+            }
+        }
+        return false;
+    }
 
     // Checks whether a String can be written as a String literal, without ' or "
     // This is a fast check for the most common case of only a-zA-Z key names
