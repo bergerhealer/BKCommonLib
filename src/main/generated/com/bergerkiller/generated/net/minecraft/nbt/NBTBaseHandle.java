@@ -69,69 +69,75 @@ public abstract class NBTBaseHandle extends Template.Handle {
         }
     }
 
-    private static final com.bergerkiller.bukkit.common.collections.ClassMap<TypeInfo> typeInfoLookup = new com.bergerkiller.bukkit.common.collections.ClassMap<TypeInfo>();
-    private static final TypeInfo toStringFallbackTypeInfo = new TypeInfo(
-        String.class, NBTTagStringHandle.T,
-        data -> NBTTagStringHandle.T.create.raw.invoke(com.bergerkiller.bukkit.common.conversion.Conversion.toString.convert(data, "")),
-        java.util.function.Function.identity()
-    );
-    private static boolean nbtTypesRegistered = false;
+    private static class TypeInfoLookup {
+        public final com.bergerkiller.bukkit.common.collections.ClassMap<TypeInfo> byType = new com.bergerkiller.bukkit.common.collections.ClassMap<TypeInfo>();
+        public final TypeInfo toStringFallback;
 
-    protected static void registerTypeInfo(
-            Class<?> dataType,
-            Template.Class<? extends NBTBaseHandle> handleClass,
-            java.util.function.Function<Object, Object> constructor,
-            java.util.function.Function<Object, Object> get_data)
-    {
-        TypeInfo data_typeInfo = new TypeInfo(dataType, handleClass, constructor, java.util.function.Function.identity());
-        typeInfoLookup.put(dataType, data_typeInfo);
-        Class<?> boxedDataType = com.bergerkiller.mountiplex.reflection.util.BoxedType.getBoxedType(dataType);
-        if (boxedDataType != null) {
-            typeInfoLookup.put(boxedDataType, data_typeInfo);
+        public TypeInfoLookup() {
+            toStringFallback = new TypeInfo(
+                    String.class, NBTTagStringHandle.T,
+                    data -> NBTTagStringHandle.T.create.raw.invoke(com.bergerkiller.bukkit.common.conversion.Conversion.toString.convert(data, "")),
+                    java.util.function.Function.identity()
+            );
+
+            registerTypeInfo(String.class, NBTTagStringHandle.T, NBTTagStringHandle.T.create.raw::invoke, NBTTagStringHandle.T.getData::invoke);
+            registerTypeInfo(byte.class, NBTTagByteHandle.T, NBTTagByteHandle.T.create.raw::invoke, NBTTagByteHandle.T.getByteData::invoke);
+            registerTypeInfo(short.class, NBTTagShortHandle.T, NBTTagShortHandle.T.create.raw::invoke, NBTTagShortHandle.T.getShortData::invoke);
+            registerTypeInfo(int.class, NBTTagIntHandle.T, NBTTagIntHandle.T.create.raw::invoke, NBTTagIntHandle.T.getIntegerData::invoke);
+            registerTypeInfo(long.class, NBTTagLongHandle.T, NBTTagLongHandle.T.create.raw::invoke, NBTTagLongHandle.T.getLongData::invoke);
+            registerTypeInfo(float.class, NBTTagFloatHandle.T, NBTTagFloatHandle.T.create.raw::invoke, NBTTagFloatHandle.T.getFloatData::invoke);
+            registerTypeInfo(double.class, NBTTagDoubleHandle.T, NBTTagDoubleHandle.T.create.raw::invoke, NBTTagDoubleHandle.T.getDoubleData::invoke);
+            registerTypeInfo(byte[].class, NBTTagByteArrayHandle.T, NBTTagByteArrayHandle.T.create.raw::invoke, NBTTagByteArrayHandle.T.getData::invoke);
+            registerTypeInfo(int[].class, NBTTagIntArrayHandle.T, NBTTagIntArrayHandle.T.create.raw::invoke, NBTTagIntArrayHandle.T.getData::invoke);
+
+            if (NBTTagLongArrayHandle.T.isAvailable()) {
+                registerTypeInfo(long[].class, NBTTagLongArrayHandle.T, NBTTagLongArrayHandle.T.create.raw::invoke, NBTTagLongArrayHandle.T.getData::invoke);
+            }
+
+            registerTypeInfo(java.util.Collection.class, NBTTagListHandle.T, NBTTagListHandle.T.create.raw::invoke, NBTTagListHandle.T.data.raw::get);
+            registerTypeInfo(java.util.Map.class, NBTTagCompoundHandle.T, NBTTagCompoundHandle.T.create.raw::invoke, NBTTagCompoundHandle.T.data.raw::get);
         }
 
-        typeInfoLookup.put(handleClass.getType(), new TypeInfo(dataType, handleClass,
-            java.util.function.Function.identity(), get_data));
+        private void registerTypeInfo(
+                Class<?> dataType,
+                Template.Class<? extends NBTBaseHandle> handleClass,
+                java.util.function.Function<Object, Object> constructor,
+                java.util.function.Function<Object, Object> get_data)
+        {
+            TypeInfo data_typeInfo = new TypeInfo(dataType, handleClass, constructor, java.util.function.Function.identity());
+            byType.put(dataType, data_typeInfo);
+            Class<?> boxedDataType = com.bergerkiller.mountiplex.reflection.util.BoxedType.getBoxedType(dataType);
+            if (boxedDataType != null) {
+                byType.put(boxedDataType, data_typeInfo);
+            }
 
-        typeInfoLookup.put(handleClass.getHandleType(), new TypeInfo(dataType, handleClass,
-            handle -> ((Template.Handle) handle).getRaw(),
-            handle -> get_data.apply(((Template.Handle) handle).getRaw())));
+            byType.put(handleClass.getType(), new TypeInfo(dataType, handleClass,
+                    java.util.function.Function.identity(), get_data));
 
-        handleClass.createHandle(null, true);
+            byType.put(handleClass.getHandleType(), new TypeInfo(dataType, handleClass,
+                    handle -> ((Template.Handle) handle).getRaw(),
+                    handle -> get_data.apply(((Template.Handle) handle).getRaw())));
+
+            handleClass.createHandle(null, true);
+        }
     }
 
-    private static void registerNBTTypes() {
-        if (nbtTypesRegistered) {
-            return;
+    private static TypeInfoLookup lookup = null;
+
+    private static TypeInfoLookup lookup() {
+        TypeInfoLookup lookup;
+        if ((lookup = NBTBaseHandle.lookup) != null) {
+            return lookup;
         }
 
         synchronized (NBTBaseHandle.class) {
-            if (nbtTypesRegistered) {
-                return;
+            if ((lookup = NBTBaseHandle.lookup) != null) {
+                return lookup;
             }
 
-            try {
-                registerTypeInfo(String.class, NBTTagStringHandle.T, NBTTagStringHandle.T.create.raw::invoke, NBTTagStringHandle.T.getData::invoke);
-                registerTypeInfo(byte.class, NBTTagByteHandle.T, NBTTagByteHandle.T.create.raw::invoke, NBTTagByteHandle.T.getByteData::invoke);
-                registerTypeInfo(short.class, NBTTagShortHandle.T, NBTTagShortHandle.T.create.raw::invoke, NBTTagShortHandle.T.getShortData::invoke);
-                registerTypeInfo(int.class, NBTTagIntHandle.T, NBTTagIntHandle.T.create.raw::invoke, NBTTagIntHandle.T.getIntegerData::invoke);
-                registerTypeInfo(long.class, NBTTagLongHandle.T, NBTTagLongHandle.T.create.raw::invoke, NBTTagLongHandle.T.getLongData::invoke);
-                registerTypeInfo(float.class, NBTTagFloatHandle.T, NBTTagFloatHandle.T.create.raw::invoke, NBTTagFloatHandle.T.getFloatData::invoke);
-                registerTypeInfo(double.class, NBTTagDoubleHandle.T, NBTTagDoubleHandle.T.create.raw::invoke, NBTTagDoubleHandle.T.getDoubleData::invoke);
-                registerTypeInfo(byte[].class, NBTTagByteArrayHandle.T, NBTTagByteArrayHandle.T.create.raw::invoke, NBTTagByteArrayHandle.T.getData::invoke);
-                registerTypeInfo(int[].class, NBTTagIntArrayHandle.T, NBTTagIntArrayHandle.T.create.raw::invoke, NBTTagIntArrayHandle.T.getData::invoke);
-
-                if (NBTTagLongArrayHandle.T.isAvailable()) {
-                    registerTypeInfo(long[].class, NBTTagLongArrayHandle.T, NBTTagLongArrayHandle.T.create.raw::invoke, NBTTagLongArrayHandle.T.getData::invoke);
-                }
-
-                registerTypeInfo(java.util.Collection.class, NBTTagListHandle.T, NBTTagListHandle.T.create.raw::invoke, NBTTagListHandle.T.data.raw::get);
-                registerTypeInfo(java.util.Map.class, NBTTagCompoundHandle.T, NBTTagCompoundHandle.T.create.raw::invoke, NBTTagCompoundHandle.T.data.raw::get);
-            } catch (Throwable t) {
-                com.bergerkiller.bukkit.common.Logging.LOGGER_NETWORK.log(java.util.logging.Level.SEVERE, "Failed to register all NBT types (corrupt jar?)", t);
-            }
-
-            nbtTypesRegistered = true; // Don't attempt again
+            lookup = new TypeInfoLookup();
+            NBTBaseHandle.lookup = lookup;
+            return lookup;
         }
     }
 
@@ -140,8 +146,8 @@ public abstract class NBTBaseHandle extends Template.Handle {
             throw new IllegalArgumentException("Can not find tag type information for null data");
         }
 
-        registerNBTTypes();
-        TypeInfo info = typeInfoLookup.get(data.getClass());
+        TypeInfoLookup lookup = lookup();
+        TypeInfo info = lookup.byType.get(data.getClass());
         if (info != null) {
             return info;
         }
@@ -153,12 +159,12 @@ public abstract class NBTBaseHandle extends Template.Handle {
                 tag -> handle_info.get_data.apply(((com.bergerkiller.bukkit.common.nbt.CommonTag) data).getRawHandle())
             );
         }
-        return toStringFallbackTypeInfo;
+        return lookup.toStringFallback;
     }
 
     public static boolean isDataSupportedNatively(Object data) {
-        registerNBTTypes();
-        return typeInfoLookup.get(data) != null || data instanceof com.bergerkiller.bukkit.common.nbt.CommonTag;
+        TypeInfoLookup lookup = lookup();
+        return lookup.byType.get(data) != null || data instanceof com.bergerkiller.bukkit.common.nbt.CommonTag;
     }
 
     public static Object getDataForHandle(Object handle) {
