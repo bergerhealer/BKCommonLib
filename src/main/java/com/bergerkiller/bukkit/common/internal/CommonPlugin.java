@@ -761,6 +761,11 @@ public class CommonPlugin extends PluginBase {
         // Register events and tasks, initialize
         register(listener = new CommonListener());
 
+        // Only used 1.20.2+
+        if (CommonCapabilities.HAS_SIGN_OPEN_EVENT) {
+            register(new CommonSignOpenListener());
+        }
+
         // NO LONGER USED!!!
         // register(new CommonPacketMonitor(), CommonPacketMonitor.TYPES);
 

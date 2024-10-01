@@ -287,4 +287,9 @@ public class CommonCapabilities {
      * Since Minecraft 1.20.2 the position/rotation interpolation tick duration can be set for display entities
      */
     public static final boolean HAS_DISPLAY_ENTITY_LOCATION_INTERPOLATION = CommonBootstrap.evaluateMCVersion(">=", "1.20.2");
+
+    /**
+     * Since Minecraft 1.20.2 the sign edit dialog open action has an event we can handle
+     */
+    public static final boolean HAS_SIGN_OPEN_EVENT = CommonBootstrap.evaluateMCVersion(">=", "1.20.2");
 }
