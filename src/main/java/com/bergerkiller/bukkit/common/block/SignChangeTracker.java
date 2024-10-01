@@ -33,7 +33,7 @@ import com.bergerkiller.mountiplex.reflection.util.FastField;
  *
  * Detecting will actively load the chunk the sign is in.
  */
-public class SignChangeTracker implements Cloneable {
+public class SignChangeTracker implements Cloneable, SignLineAccessor {
     private final Block block;
     private Sign state;
     private BlockData blockData;
@@ -137,53 +137,27 @@ public class SignChangeTracker implements Cloneable {
         return this.block.getZ();
     }
 
-    /**
-     * Gets a line at one side of the sign
-     *
-     * @param index Line index
-     * @return Line at this index
-     */
+    @Override
     public String getLine(SignSide side, int index) {
         return side.getLine(this, index);
     }
 
-    /**
-     * Sets a line of one side of the sign, updating the sign in the world.
-     * After calling {@link #update()} this change will be detected.
-     *
-     * @param index Line index
-     * @param text New text to put at this index
-     */
+    @Override
     public void setLine(SignSide side, int index, String text) {
         side.setLine(this, index, text);
     }
 
-    /**
-     * Gets all the lines put at a side of the sign. 4 lines.
-     *
-     * @return Sign lines
-     */
+    @Override
     public String[] getLines(SignSide side) {
         return side.getLines(this);
     }
 
-    /**
-     * Gets a line of the front of the sign
-     *
-     * @param index Line index
-     * @return Line at this index at the front of the sign
-     */
+    @Override
     public String getFrontLine(int index) {
         return getFrontLines()[index];
     }
 
-    /**
-     * Sets a line of the front of the sign, updating the sign in the world.
-     * After calling {@link #update()} this change will be detected.
-     *
-     * @param index Line index
-     * @param text New text to put at this index at the front of the sign
-     */
+    @Override
     public void setFrontLine(int index, String text) {
         checkRemoved();
         if (lastMessageFrontLines != null) {
@@ -193,11 +167,7 @@ public class SignChangeTracker implements Cloneable {
         state.update(true);
     }
 
-    /**
-     * Gets all the lines put at the front of the sign. 4 lines.
-     *
-     * @return Sign front lines
-     */
+    @Override
     public String[] getFrontLines() {
         checkRemoved();
         String[] lines = lastMessageFrontLines;
@@ -207,24 +177,13 @@ public class SignChangeTracker implements Cloneable {
         return lines;
     }
 
-    /**
-     * Gets a line as a formatted component of the front of the sign.
-     *
-     * @param index Line index
-     * @return Line at this index at the front of the sign
-     */
+    @Override
     public ChatText getFormattedFrontLine(int index) {
         checkRemoved();
         return ChatText.fromComponent(tileEntity.getRawFrontLines()[index]);
     }
 
-    /**
-     * Sets a line as a formatted component of the front of the sign, updating the sign in the world.
-     * After calling {@link #update()} this change will be detected.
-     *
-     * @param index Line index
-     * @param text New text to put at this index at the front of the sign
-     */
+    @Override
     public void setFormattedFrontLine(int index, ChatText text) {
         checkRemoved();
         this.tileEntity.setFormattedFrontLine(index, text);
@@ -234,35 +193,18 @@ public class SignChangeTracker implements Cloneable {
         this.state = this.tileEntity.toBukkit();
     }
 
-    /**
-     * Gets all the lines put at the front of the sign as formatted components. 4 lines.
-     *
-     * @return Sign front lines
-     */
+    @Override
     public ChatText[] getFormattedFrontLines() {
         checkRemoved();
         return LogicUtil.mapArray(tileEntity.getRawFrontLines(), ChatText.class, ChatText::fromComponent);
     }
 
-    /**
-     * Gets a line of the back of the sign.
-     * Always returns an empty String on Minecraft versions below 1.20.
-     *
-     * @param index Line index
-     * @return Line at this index at the back of the sign
-     */
+    @Override
     public String getBackLine(int index) {
         return getBackLines()[index];
     }
 
-    /**
-     * Sets a line of the back of the sign, updating the sign in the world.
-     * After calling {@link #update()} this change will be detected.
-     * Does nothing on Minecraft versions below 1.20.
-     *
-     * @param index Line index
-     * @param text New text to put at this index at the back of the sign
-     */
+    @Override
     public void setBackLine(int index, String text) {
         checkRemoved();
         if (CommonCapabilities.HAS_SIGN_BACK_TEXT) {
@@ -274,12 +216,7 @@ public class SignChangeTracker implements Cloneable {
         }
     }
 
-    /**
-     * Gets all the lines put at the back of the sign. 4 lines.
-     * Always returns an array of empty Strings on Minecraft versions below 1.20.
-     *
-     * @return Sign front lines
-     */
+    @Override
     public String[] getBackLines() {
         checkRemoved();
         String[] lines = lastMessageBackLines;
@@ -289,26 +226,13 @@ public class SignChangeTracker implements Cloneable {
         return lines;
     }
 
-    /**
-     * Gets a line as a formatted component of the back of the sign.
-     * Always returns an empty String on Minecraft versions below 1.20.
-     *
-     * @param index Line index
-     * @return Line at this index at the back of the sign
-     */
+    @Override
     public ChatText getFormattedBackLine(int index) {
         checkRemoved();
         return ChatText.fromComponent(tileEntity.getRawBackLines()[index]);
     }
 
-    /**
-     * Sets a line as a formatted component of the back of the sign, updating the sign in the world.
-     * After calling {@link #update()} this change will be detected.
-     * Does nothing on Minecraft versions below 1.20.
-     *
-     * @param index Line index
-     * @param text New text to put at this index at the back of the sign
-     */
+    @Override
     public void setFormattedBackLine(int index, ChatText text) {
         checkRemoved();
         if (CommonCapabilities.HAS_SIGN_BACK_TEXT) {
@@ -320,15 +244,105 @@ public class SignChangeTracker implements Cloneable {
         }
     }
 
-    /**
-     * Gets all the lines put at the back of the sign as formatted components. 4 lines.
-     * Always returns an array of empty Strings on Minecraft versions below 1.20.
-     *
-     * @return Sign front lines
-     */
+    @Override
     public ChatText[] getFormattedBackLines() {
         checkRemoved();
         return LogicUtil.mapArray(tileEntity.getRawBackLines(), ChatText.class, ChatText::fromComponent);
+    }
+
+    /**
+     * Returns a sign line accessor that automatically calls {@link #update()} for all method
+     * calls that retrieve lines. This effectively shows a live view of the text on the sign.
+     *
+     * @return Live-updating sign lines accessor
+     */
+    public SignLineAccessor liveUpdatingAccessor() {
+        return new SignLineAccessor() {
+            @Override
+            public String getLine(SignSide side, int index) {
+                SignChangeTracker.this.update();
+                return SignChangeTracker.this.getLine(side, index);
+            }
+
+            @Override
+            public void setLine(SignSide side, int index, String text) {
+                SignChangeTracker.this.setLine(side, index, text);
+            }
+
+            @Override
+            public String[] getLines(SignSide side) {
+                SignChangeTracker.this.update();
+                return SignChangeTracker.this.getLines(side);
+            }
+
+            @Override
+            public String getFrontLine(int index) {
+                SignChangeTracker.this.update();
+                return SignChangeTracker.this.getFrontLine(index);
+            }
+
+            @Override
+            public void setFrontLine(int index, String text) {
+                SignChangeTracker.this.setFrontLine(index, text);
+            }
+
+            @Override
+            public String[] getFrontLines() {
+                SignChangeTracker.this.update();
+                return SignChangeTracker.this.getFrontLines();
+            }
+
+            @Override
+            public ChatText getFormattedFrontLine(int index) {
+                SignChangeTracker.this.update();
+                return SignChangeTracker.this.getFormattedFrontLine(index);
+            }
+
+            @Override
+            public void setFormattedFrontLine(int index, ChatText text) {
+                SignChangeTracker.this.setFormattedFrontLine(index, text);
+            }
+
+            @Override
+            public ChatText[] getFormattedFrontLines() {
+                SignChangeTracker.this.update();
+                return SignChangeTracker.this.getFormattedFrontLines();
+            }
+
+            @Override
+            public String getBackLine(int index) {
+                SignChangeTracker.this.update();
+                return SignChangeTracker.this.getBackLine(index);
+            }
+
+            @Override
+            public void setBackLine(int index, String text) {
+                SignChangeTracker.this.setBackLine(index, text);
+            }
+
+            @Override
+            public String[] getBackLines() {
+                SignChangeTracker.this.update();
+                return SignChangeTracker.this.getBackLines();
+            }
+
+            @Override
+            public ChatText getFormattedBackLine(int index) {
+                SignChangeTracker.this.update();
+                return SignChangeTracker.this.getFormattedBackLine(index);
+            }
+
+            @Override
+            public void setFormattedBackLine(int index, ChatText text) {
+                SignChangeTracker.this.setFormattedBackLine(index, text);
+            }
+
+            @Override
+            public ChatText[] getFormattedBackLines() {
+                SignChangeTracker.this.update();
+                return SignChangeTracker.this.getFormattedBackLines();
+            }
+        };
     }
 
     /**
