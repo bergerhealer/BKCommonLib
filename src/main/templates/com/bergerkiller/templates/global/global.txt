@@ -51,10 +51,25 @@ import net.minecraft.network.chat.contents.TranslatableContents;
             return "";
         }
     }
+
+    #require net.minecraft.network.chat.IChatBaseComponent public boolean isComponentContentEmpty() {
+        net.minecraft.network.chat.ComponentContents contents = instance.getContents();
+        if (contents instanceof net.minecraft.network.chat.contents.LiteralContents) {
+            return ((net.minecraft.network.chat.contents.LiteralContents) contents).text().isEmpty();
+        } else {
+            return contents == net.minecraft.network.chat.CommonComponents.EMPTY;
+        }
+    }
 #elseif version >= 1.18
     #require net.minecraft.network.chat.IChatBaseComponent public abstract String getComponentText:getContents();
+    #require net.minecraft.network.chat.IChatBaseComponent public boolean isComponentContentEmpty() {
+        return instance.getContents().isEmpty();
+    }
 #else
     #require net.minecraft.network.chat.IChatBaseComponent public abstract String getComponentText:getText();
+    #require net.minecraft.network.chat.IChatBaseComponent public boolean isComponentContentEmpty() {
+        return instance.getText().isEmpty();
+    }
 #endif
 
 // Formats a chat component, and its siblings/children, as a legacy-color-formatted message String

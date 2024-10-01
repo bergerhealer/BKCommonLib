@@ -83,6 +83,34 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
     }
 
     /**
+     * Gets whether this chat text is empty. This method has the benefit of not
+     * having to decode the text to figure this out. Do note that some specially formatted
+     * messages, like translation or styles, could cause this to return false
+     * despite {@link #getMessage()} returning an empty String.
+     *
+     * @return True if this message is empty
+     */
+    public final boolean isEmpty() {
+        return handle == null || handle.isEmpty();
+    }
+
+    /**
+     * Checks whether all the ChatText elements of an array are {@link #isEmpty() empty}.
+     * Null entries are considered empty.
+     *
+     * @param lines Lines
+     * @return True if all lines are empty
+     */
+    public static boolean isAllEmpty(ChatText[] lines) {
+        for (ChatText line : lines) {
+            if (line != null && !line.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Sets the chat text using a legacy format-encoded String
      * 
      * @param messageText to set to

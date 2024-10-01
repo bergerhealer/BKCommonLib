@@ -45,6 +45,13 @@ class IChatBaseComponent {
     public abstract String getText();
 #endif
 
+    public boolean isEmpty() {
+        // Macro defined in global.txt
+        boolean isContentEmpty = instance#isComponentContentEmpty();
+
+        return isContentEmpty && instance.getSiblings().isEmpty();
+    }
+
 #if version >= 1.18
     public (IChatBaseComponentHandle) IChatBaseComponent addSibling((IChatBaseComponentHandle) IChatBaseComponent sibling) {
         if (instance instanceof IChatMutableComponent) {

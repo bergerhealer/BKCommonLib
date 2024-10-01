@@ -22,6 +22,7 @@ public abstract class IChatBaseComponentHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract String getText();
+    public abstract boolean isEmpty();
     public abstract IChatBaseComponentHandle addSibling(IChatBaseComponentHandle sibling);
     public abstract boolean isMutable();
     public abstract IChatBaseComponentHandle createCopy();
@@ -36,6 +37,7 @@ public abstract class IChatBaseComponentHandle extends Template.Handle {
      */
     public static final class IChatBaseComponentClass extends Template.Class<IChatBaseComponentHandle> {
         public final Template.Method<String> getText = new Template.Method<String>();
+        public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
         public final Template.Method.Converted<IChatBaseComponentHandle> addSibling = new Template.Method.Converted<IChatBaseComponentHandle>();
         public final Template.Method<Boolean> isMutable = new Template.Method<Boolean>();
         public final Template.Method.Converted<IChatBaseComponentHandle> createCopy = new Template.Method.Converted<IChatBaseComponentHandle>();

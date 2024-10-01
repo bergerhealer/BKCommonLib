@@ -17,6 +17,13 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 public class ChatTextTest {
 
     @Test
+    public void testIsEmpty() {
+        assertTrue(ChatText.empty().isEmpty());
+        assertFalse(ChatText.fromMessage("hello").isEmpty());
+        assertFalse(ChatText.empty().append("hello").isEmpty());
+    }
+
+    @Test
     public void testUnformattedText() {
         ChatText text = ChatText.fromMessage("Hello, world!");
         assertEquals("Hello, world!", text.getMessage());
