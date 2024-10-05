@@ -144,7 +144,7 @@ class ItemStack {
         NBTBase nameTag;
         if (displayTag != null && (nameTag = displayTag.get("Name")) instanceof NBTTagString) {
             String jsonContent = ((NBTTagString) nameTag).getAsString();
-            return IChatBaseComponent.ChatSerializer.fromJson(jsonContent);
+            return net.minecraft.network.chat.IChatBaseComponent$ChatSerializer.fromJson(jsonContent);
         }
         return null;
     }
