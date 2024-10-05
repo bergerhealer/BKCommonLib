@@ -280,7 +280,10 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
         /*
          * <FIND_REGION_FILE_CACHE_STORAGE>
          * public static Long2ObjectLinkedOpenHashMap findRegionFileCache(RegionFileCache rfc) {
-         * #if version >= 1.17
+         * #if exists net.minecraft.world.level.chunk.storage.RegionFileCache public final Long2ObjectLinkedOpenHashMap<org.stupidcraft.linearpaper.region.IRegionFile> regionCache;
+         *     // Used on Leaf server (1.21)
+         *     #require net.minecraft.world.level.chunk.storage.RegionFileCache public final Long2ObjectLinkedOpenHashMap<org.stupidcraft.linearpaper.region.IRegionFile> regionCache;
+         * #elseif version >= 1.17
          *     #require net.minecraft.world.level.chunk.storage.RegionFileCache private Long2ObjectLinkedOpenHashMap<RegionFile> regionCache;
          * #else
          *     #require net.minecraft.world.level.chunk.storage.RegionFileCache private Long2ObjectLinkedOpenHashMap<RegionFile> regionCache:cache;
