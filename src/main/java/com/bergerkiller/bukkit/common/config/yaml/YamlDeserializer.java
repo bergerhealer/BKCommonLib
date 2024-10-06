@@ -11,9 +11,10 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.logging.Level;
 
-import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.SafeField;
+import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
@@ -131,6 +132,19 @@ public class YamlDeserializer {
         }
 
         return mappingFactory.construct(mapping);
+    }
+
+    private static Map<String, Object> safePutInMap(Map<String, Object> map, String key, Object value) {
+        if (!(map instanceof com.google.common.collect.ImmutableMap)) {
+            try {
+                map.put(key, value);
+                return map;
+            } catch (UnsupportedOperationException ex) { /* Immutable */ }
+        }
+
+        map = new LinkedHashMap<>(map);
+        map.put(key, value);
+        return map;
     }
 
     /**
@@ -384,10 +398,80 @@ public class YamlDeserializer {
             this.register("org.bukkit.inventory.ItemStack", itemStackDeserializer);
             this.register("org.bukkit.inventory.ItemMeta", itemStackDeserializer.getItemMetaDeserializer());
             this.register("ItemMeta", itemStackDeserializer.getItemMetaDeserializer());
+
+            // Fix deserializing profiles with invalid name causing errors to be logged
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.18.1")) {
+                try {
+                    Class<?> craftPlayerProfileType = CommonUtil.getClass("org.bukkit.craftbukkit.profile.CraftPlayerProfile");
+                    final FastMethod<Object> deserializeMethod = new FastMethod<>(
+                            craftPlayerProfileType.getMethod("deserialize", Map.class));
+                    deserializeMethod.forceInitialization();
+
+                    Function<Map<String, Object>, Object> deserializePlayerProfile = map -> {
+                        // Fix name
+                        Object name = map.get("name");
+                        if (name instanceof String) {
+                            String newName = fixProfileName((String) name);
+                            if (newName != name) {
+                                map = safePutInMap(map, "name", newName);
+                            }
+                        }
+
+                        return deserializeMethod.invoke(null, map);
+                    };
+
+                    this.register("org.bukkit.profile.PlayerProfile", deserializePlayerProfile);
+                    this.register("PlayerProfile", deserializePlayerProfile);
+                } catch (Throwable t) {
+                    Logging.LOGGER_CONFIG.log(Level.SEVERE, "Failed to register player profile deserializer", t);
+                }
+            }
         }
 
         private void register(String typeName, Function<Map<String, Object>, ? extends Object> builder) {
             custom_builders.put(typeName, builder);
+        }
+
+        private static String fixProfileName(String name) {
+            // See constructor of CraftPlayerProfile on Paper:
+            //   Preconditions.checkArgument((uniqueId != null) || !StringUtils.isBlank(name), "uniqueId is null or name is blank");
+            //   Preconditions.checkArgument(name == null || name.length() <= 16, "The name of the profile is longer than 16 characters"); // Paper - Validate
+            //   Preconditions.checkArgument(name == null || net.minecraft.util.StringUtil.isValidPlayerName(name), "The name of the profile contains invalid characters: %s", name); // Paper - Validate
+            //
+            // With isValidPlayerName:
+            //   public static boolean isValidPlayerName(String name) {
+            //       return name.length() <= 16 && name.chars().filter(c -> c <= 32 || c >= 127).findAny().isEmpty();
+            //   }
+
+            int len = name.length();
+            StringBuilder result = null;
+            for (int i = 0; i < len; i++) {
+                char c = name.charAt(i);
+                if (c <= 32 || c >= 127) {
+                    if (result == null) {
+                        result = new StringBuilder(len);
+                        result.append(name, 0, i);
+                    }
+                    result.append('_');
+                } else if (result != null) {
+                    result.append(c);
+                }
+            }
+            if (result == null) {
+                if (len > 16) {
+                    result = new StringBuilder(name);
+                } else {
+                    return name; // All good! Return the original name, as it is valid.
+                }
+            }
+
+            // If too long, strip characters off from the end
+            len = result.length();
+            if (len > 16) {
+                result.delete(16, len);
+            }
+
+            return result.toString();
         }
 
         /**

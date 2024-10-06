@@ -15,7 +15,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.bergerkiller.bukkit.common.config.yaml.YamlListNode;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import org.bukkit.GameMode;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.util.Vector;
 import org.junit.Ignore;
@@ -30,6 +33,40 @@ import com.bergerkiller.bukkit.common.io.AsyncTextWriter;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 
 public class YamlTest {
+
+    @Test
+    public void testInvalidProfileName() {
+        // Can't run this test on a version before player profiles existed
+        if (!CommonBootstrap.evaluateMCVersion(">=", "1.18.1")) {
+            return;
+        }
+
+        String yamlInputString = "" +
+                "item:\n" +
+                "  ==: org.bukkit.inventory.ItemStack\n" +
+                "  v: 3700\n" +
+                "  type: PLAYER_HEAD\n" +
+                "  meta:\n" +
+                "    ==: ItemMeta\n" +
+                "    meta-type: SKULL\n" +
+                "    display-name: '{\"text\":\"\",\"extra\":[{\"text\":\"Blue Screen Monitor\",\"obfuscated\":false,\"italic\":false,\"underlined\":false,\"strikethrough\":false,\"color\":\"blue\",\"bold\":false}]}'\n" +
+                "    skull-owner:\n" +
+                "      ==: PlayerProfile\n" +
+                "      uniqueId: 04049c90-d3e9-4621-9caf-0000aaa34169\n" +
+                "      name: Head Database\n" +
+                "      properties:\n" +
+                "      - name: textures\n" +
+                "        value: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzQ1M2FlNWI3OTFkZWRjZWY3NTYyZjhkYjcyN2U4NWRmOGM2OTQyMzgxZjgxMmU0ODA1NTlmZGNjMmQwMDZlNyJ9fX0=";
+
+        // On Paper server it actively checks that the profile name is valid according to Mojang's standards
+        // Verify that this is decoded with a corrected name, Head Database -> Head_Database
+        // On Spigot no validation is done so no errors can occur regardless, so we
+        // got to verify the decoded item has the updated profile.
+        YamlNode root = new YamlNode();
+        root.loadFromString(yamlInputString);
+        CommonItemStack item = CommonItemStack.of(root.get("item", ItemStack.class));
+        assertEquals("Head_Database", item.getSkullProfile().getName());
+    }
 
     @Test
     public void testYamlSpecialStringEscaping() {
