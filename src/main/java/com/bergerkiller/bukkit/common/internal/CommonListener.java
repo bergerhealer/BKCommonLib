@@ -91,7 +91,7 @@ public class CommonListener implements Listener {
 
     /**
      * Tracks what sign blocks a player opened a sign edit dialog for.
-     * See {@link CommonSignOpenListener}, is always empty if unused.
+     * See {@link CommonSignOpenListenerBukkit}, is always empty if unused.
      */
     protected static final Map<Player, Block> editedSignBlocks = new HashMap<>();
 

@@ -762,8 +762,14 @@ public class CommonPlugin extends PluginBase {
         register(listener = new CommonListener());
 
         // Only used 1.20.2+
-        if (CommonCapabilities.HAS_SIGN_OPEN_EVENT) {
-            register(new CommonSignOpenListener());
+        if (CommonCapabilities.HAS_SIGN_OPEN_EVENT_PAPER) {
+            try {
+                CommonSignOpenListenerPaper.register(this);
+            } catch (Throwable t) {
+                getLogger().log(Level.SEVERE, "Failed to listen for paper's open sign event", t);
+            }
+        } else if (CommonCapabilities.HAS_SIGN_OPEN_EVENT) {
+            register(new CommonSignOpenListenerBukkit());
         }
 
         // NO LONGER USED!!!

@@ -10,7 +10,7 @@ import org.bukkit.event.player.PlayerSignOpenEvent;
  * This event is used to track whether a player has opened an edit dialog
  * for a sign.
  */
-class CommonSignOpenListener implements Listener {
+class CommonSignOpenListenerBukkit implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onSignOpen(PlayerSignOpenEvent event) {
         if (event.getCause() != PlayerSignOpenEvent.Cause.PLACE) {

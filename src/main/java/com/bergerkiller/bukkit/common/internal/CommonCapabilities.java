@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+
 /**
  * A list of server capabilities relevant for BKCommonLib to know about.
  * Storing them in booleans instead of evaluating frequently helps performance a bit.
@@ -289,7 +291,14 @@ public class CommonCapabilities {
     public static final boolean HAS_DISPLAY_ENTITY_LOCATION_INTERPOLATION = CommonBootstrap.evaluateMCVersion(">=", "1.20.2");
 
     /**
-     * Since Minecraft 1.20.2 the sign edit dialog open action has an event we can handle
+     * Since Minecraft 1.20 Paper server has their own PlayerOpenSignEvent.
      */
-    public static final boolean HAS_SIGN_OPEN_EVENT = CommonBootstrap.evaluateMCVersion(">=", "1.20.2");
+    public static final boolean HAS_SIGN_OPEN_EVENT_PAPER = LogicUtil.tryCreate(
+            () -> Class.forName("io.papermc.paper.event.player.PlayerOpenSignEvent"), err -> null) != null;;
+
+    /**
+     * Since Minecraft 1.20.2 the sign edit dialog open action has an event we can handle.
+     * On Paper 1.20 this event exists too.
+     */
+    public static final boolean HAS_SIGN_OPEN_EVENT = HAS_SIGN_OPEN_EVENT_PAPER || CommonBootstrap.evaluateMCVersion(">=", "1.20.2");
 }
