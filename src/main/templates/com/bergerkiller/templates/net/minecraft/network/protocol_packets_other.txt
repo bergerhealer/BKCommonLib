@@ -3066,31 +3066,6 @@ class PacketPlayOutOpenSignEditor extends Packet {
 #endif
 }
 
-class PacketPlayOutExplosion extends Packet {
-#if version >= 1.17
-    private final double x;
-    private final double y;
-    private final double z;
-    private final float power;
-    private final (List<IntVector3>) List<BlockPosition> blocks:toBlow;
-    private final float knockbackX;
-    private final float knockbackY;
-    private final float knockbackZ;
-#else
-    private double x:a;
-    private double y:b;
-    private double z:c;
-    private float power:d;
-    private (List<IntVector3>) List<BlockPosition> blocks:e;
-    private float knockbackX:f;
-    private float knockbackY:g;
-    private float knockbackZ:h;
-#endif
-
-    // This API Is too annoying to maintain.
-    //public (PacketPlayOutExplosionHandle) PacketPlayOutExplosion(double x, double y, double z, float power, (List<IntVector3>) List<BlockPosition> blocks, (org.bukkit.util.Vector) Vec3D knockback);
-}
-
 class PacketPlayInAbilities extends Packet {
 #if version >= 1.17
     private final boolean isFlying;

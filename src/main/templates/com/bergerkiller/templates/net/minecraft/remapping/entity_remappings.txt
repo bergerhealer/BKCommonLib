@@ -1,3 +1,7 @@
+import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.core.BlockPosition;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.sounds.SoundEffect;
 
 #if version >= 1.17
     #remap net.minecraft.world.entity.Entity private int remainingFireTicks;
@@ -42,3 +46,37 @@
   #case else:   #remap net.minecraft.world.entity.Entity public int getPortalWaitTime:L();
   #endselect
 #endif
+
+#select version >=
+#case 1.18:  #remap net.minecraft.world.entity.Entity protected SoundEffect getSwimSound();
+#case 1.14:  #remap net.minecraft.world.entity.Entity protected SoundEffect getSwimSound:getSoundSwim();
+#case 1.13:  #remap net.minecraft.world.entity.Entity protected SoundEffect getSwimSound:ad();
+#case 1.12:  #remap net.minecraft.world.entity.Entity protected SoundEffect getSwimSound:ae();
+#case 1.9:   #remap net.minecraft.world.entity.Entity protected SoundEffect getSwimSound:aa();
+#case else:  #remap net.minecraft.world.entity.Entity protected String getSwimSound:P();
+#endselect
+
+#select version >=
+#case 1.16:    #remap net.minecraft.world.entity.Entity public void playSound(SoundEffect soundeffect, float volume, float pitch);
+#case 1.9:     #remap net.minecraft.world.entity.Entity public void playSound:a(SoundEffect soundeffect, float volume, float pitch);
+#case else:    #remap net.minecraft.world.entity.Entity public void playSound:makeSound(String soundeffect, float volume, float pitch);
+#endselect
+
+#select version >=
+#case 1.18:    #remap net.minecraft.world.entity.Entity protected void playStepSound(BlockPosition position, IBlockData blockData);
+#case 1.16.2:  #remap net.minecraft.world.entity.Entity protected void playStepSound:b(BlockPosition position, IBlockData blockData);
+#case 1.13:    #remap net.minecraft.world.entity.Entity protected void playStepSound:a(BlockPosition position, IBlockData blockData);
+#case else:    #remap net.minecraft.world.entity.Entity protected void playStepSound:a(BlockPosition position, Block block);
+#endselect
+
+#select version >=
+#case 1.19.4:  #remap net.minecraft.world.entity.Entity public net.minecraft.world.entity.EntityLiving getControllingPassenger();
+#case 1.18:    #remap net.minecraft.world.entity.Entity public Entity getControllingPassenger();
+#case 1.14:    #remap net.minecraft.world.entity.Entity public Entity getControllingPassenger:getRidingPassenger();
+#case 1.13:    #remap net.minecraft.world.entity.Entity public Entity getControllingPassenger:bO();
+#case 1.12:    #remap net.minecraft.world.entity.Entity public Entity getControllingPassenger:bE();
+#case 1.10.2:  #remap net.minecraft.world.entity.Entity public Entity getControllingPassenger:bw();
+#case 1.9.4:   #remap net.minecraft.world.entity.Entity public Entity getControllingPassenger:bu();
+#case 1.9:     #remap net.minecraft.world.entity.Entity public Entity getControllingPassenger:bt();
+// Does not exist before 1.9
+#endselect

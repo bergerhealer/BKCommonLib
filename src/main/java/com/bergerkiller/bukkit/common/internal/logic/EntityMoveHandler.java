@@ -7,7 +7,6 @@ import java.util.stream.Stream;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Vehicle;
-import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
 import org.bukkit.util.Vector;
 
@@ -191,7 +190,7 @@ public abstract class EntityMoveHandler {
             // We need to do that.regardless of whether or not we are moving thanks to portals
             try {
                 if (this.blockActivationEnabled) {
-                    that.checkBlockCollisions();
+                    that.applyEffectsFromBlocks();
                 }
             } catch (Throwable throwable) {
                 CrashReportHandle crashreport = CrashReportHandle.create(throwable, "Checking entity block collision");
@@ -540,25 +539,7 @@ public abstract class EntityMoveHandler {
                     iblockdata.stepOn(this.entity.getWorld(), blockposition, this.entity.getEntity());
                 }
 
-                that.setWalkedDistanceXZ((float) ((double) that.getWalkedDistanceXZ() + Math.sqrt(d22 * d22 + d11 * d11) * 0.6D));
-                that.setWalkedDistanceXYZ((float) ((double) that.getWalkedDistanceXYZ() + Math.sqrt(d22 * d22 + d23 * d23 + d11 * d11) * 0.6D));
-                if (that.getWalkedDistanceXYZ() > (float) that.getStepCounter() && !iblockdata.isType(org.bukkit.Material.AIR)) {
-                    that.setStepCounter((int) that.getWalkedDistanceXYZ() + 1);
-                    if (that.isInWater()) {
-                        EntityHandle entity = that.isVehicle() ? that.getDriverEntity() : null;
-
-                        float f = entity == this.entity.getEntity() ? 0.35F : 0.4F;
-                        float f1 = (float) Math.sqrt(entity.getMotX() * entity.getMotX() * 0.2 + entity.getMotY() * entity.getMotY() + entity.getMotZ() * entity.getMotZ() * 0.2) * f;
-
-                        if (f1 > 1.0F) {
-                            f1 = 1.0F;
-                        }
-
-                        that.makeSound(that.getSwimSound(), f1, 1.0F + (this_random.nextFloat() - this_random.nextFloat()) * 0.4F);
-                    } else {
-                        that.playStepSound(blockposition, iblockdata);
-                    }
-                }
+                that.handleMovementEmissionAndPlaySound(new Vector(d22, d23, d11), blockposition, iblockdata);
             }
 
             // CraftBukkit start - Move to the top of the method

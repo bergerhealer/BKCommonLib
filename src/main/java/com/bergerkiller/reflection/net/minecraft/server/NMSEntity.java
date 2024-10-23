@@ -95,17 +95,6 @@ public class NMSEntity {
     /* ================================================================================================================ */
 
     /*
-     # protected void ##METHODNAME##() {
-     *     AxisAlignedBB axisalignedbb = this.getBoundingBox();
-     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition = BlockPosition.PooledBlockPosition.d(axisalignedbb.a + 0.001D, axisalignedbb.b + 0.001D, axisalignedbb.c + 0.001D);
-     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition1 = BlockPosition.PooledBlockPosition.d(axisalignedbb.d - 0.001D, axisalignedbb.e - 0.001D, axisalignedbb.f - 0.001D);
-     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition2 = BlockPosition.PooledBlockPosition.s();
-     *     ...
-     * }
-     */
-    private static final MethodAccessor<Void> updateBlockCollision = EntityHandle.T.checkBlockCollisions.toMethodAccessor();
-
-    /*
      # protected void ##METHODNAME##(BlockPosition blockposition, Block block) {
      *     SoundEffectType soundeffecttype = block.getStepSound();
      *     if (this.world.getType(blockposition.up()).getBlock() == Blocks.SNOW_LAYER) {
@@ -222,17 +211,6 @@ public class NMSEntity {
     public static final MethodAccessor<Void> doFallUpdate = EntityHandle.T.updateFalling.raw.toMethodAccessor();
 
     /*
-     * protected void checkBlockCollisions() {
-     *     AxisAlignedBB axisalignedbb = getBoundingBox();
-     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition = BlockPosition.PooledBlockPosition.d(axisalignedbb.a + 0.001D, axisalignedbb.b + 0.001D, axisalignedbb.c + 0.001D);
-     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition1 = BlockPosition.PooledBlockPosition.d(axisalignedbb.d - 0.001D, axisalignedbb.e - 0.001D, axisalignedbb.f - 0.001D);
-     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition2 = BlockPosition.PooledBlockPosition.s();
-     *     ...
-     * }
-     */
-    public static final MethodAccessor<Void> checkBlockCollisions = EntityHandle.T.checkBlockCollisions.toMethodAccessor();
-
-    /*
      * public double ##METHODNAME##(double d0, double d1, double d2) {
      *     double d3 = this.locX - d0;
      *     double d4 = this.locY - d1;
@@ -248,10 +226,6 @@ public class NMSEntity {
 
     public static boolean isInWater(Object entityHandle, boolean update) {
         return update ? isInWaterUpdate.invoke(entityHandle) : isInWaterNoUpdate.invoke(entityHandle);
-    }
-
-    public static void updateBlockCollision(Object entityHandle) {
-        updateBlockCollision.invoke(entityHandle);
     }
 
     public static void playStepSound(Object entityHandle, int x, int y, int z, Object blockStepped) {

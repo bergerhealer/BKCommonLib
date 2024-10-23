@@ -400,7 +400,12 @@ class World extends IBlockAccess {
 #endif
     }
 
-#if version >= 1.17
+#if version >= 1.21.2
+    public int getMinBuildHeight:getMinY();
+    public int getMaxBuildHeight() {
+        return instance.getMaxY() + 1;
+    }
+#elseif version >= 1.17
     public int getMinBuildHeight();
     public int getMaxBuildHeight();
 #else

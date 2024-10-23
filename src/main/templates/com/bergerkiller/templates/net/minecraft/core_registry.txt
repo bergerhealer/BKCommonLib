@@ -16,7 +16,10 @@ class RegistryMaterials {
     protected optional final Map<V, K> opt_inverseLookupField:b;
 #endif
 
-#if version >= 1.13.1
+#if version >= 1.21.2
+    public V get:getValue((Object) MinecraftKey key);
+    public (Object) MinecraftKey getKey(V value);
+#elseif version >= 1.13.1
     public V get((Object) MinecraftKey key);
     public (Object) MinecraftKey getKey(V value);
 #elseif version >= 1.9

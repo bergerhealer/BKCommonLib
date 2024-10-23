@@ -992,36 +992,6 @@ class Entity {
     }
 #endif
 
-#select version >=
-#case 1.17
-    public float walkedDistanceXZ:walkDist;
-    public float walkedDistanceXYZ:moveDist;
-#case 1.16
-    public unknown float z;
-    public float walkedDistanceXZ:A;
-    public float walkedDistanceXYZ:B;
-#case 1.15
-    public unknown float A;
-    public float walkedDistanceXZ:B;
-    public float walkedDistanceXYZ:C;
-#case 1.14
-    public unknown float D;
-    public float walkedDistanceXZ:E;
-    public float walkedDistanceXYZ:F;
-#case 1.13
-    public unknown float J;
-    public float walkedDistanceXZ:K;
-    public float walkedDistanceXYZ:L;
-#case 1.9
-    public unknown float I;
-    public float walkedDistanceXZ:J;
-    public float walkedDistanceXYZ:K;
-#case else
-    public unknown float L;
-    public float walkedDistanceXZ:M;
-    public float walkedDistanceXYZ:N;
-#endselect
-
 #if version >= 1.17
     public float fallDistance:flyDist;
 #else
@@ -1257,14 +1227,10 @@ class Entity {
      *     }
      * }
      */
-#if version >= 1.18
+#if version >= 1.13
     protected void playStepSound((IntVector3) BlockPosition position, (BlockData) IBlockData blockData);
-#elseif version >= 1.16.2
-    protected void playStepSound:b((IntVector3) BlockPosition position, (BlockData) IBlockData blockData);
-#elseif version >= 1.13
-    protected void playStepSound:a((IntVector3) BlockPosition position, (BlockData) IBlockData blockData);
 #else
-    protected void playStepSound:a((IntVector3) BlockPosition position, (BlockData) Block blockData);
+    protected void playStepSound((IntVector3) BlockPosition position, (BlockData) Block blockData);
 #endif
 
     /*
@@ -1348,7 +1314,12 @@ class Entity {
     public (org.bukkit.entity.Item) EntityItem dropItem:a((org.bukkit.Material) Item material, int amount, float force);
 #endif
 
-#if version >= 1.18
+#if version >= 1.21.2
+    public (org.bukkit.entity.Item) EntityItem dropItemStack((org.bukkit.inventory.ItemStack) ItemStack itemstack, float force) {
+        WorldServer world = (WorldServer) instance.level();
+        return instance.spawnAtLocation(world, itemstack, force);
+    }
+#elseif version >= 1.18
     public (org.bukkit.entity.Item) EntityItem dropItemStack:spawnAtLocation((org.bukkit.inventory.ItemStack) ItemStack itemstack, float force);
 #else
     public (org.bukkit.entity.Item) EntityItem dropItemStack:a((org.bukkit.inventory.ItemStack) ItemStack itemstack, float force);
@@ -1360,19 +1331,130 @@ class Entity {
      #     this.a(this.##METHODNAME##(), f1, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
      * }
      */
-#if version >= 1.18
-    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound:getSwimSound();
-#elseif version >= 1.14
-    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound:getSoundSwim();
-#elseif version >= 1.13
-    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound:ad();
-#elseif version >= 1.12
-    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound:ae();
-#elseif version >= 1.9
-    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound:aa();
+#if version >= 1.9
+    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound();
 #else
-    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String getSwimSound:P();
+    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String getSwimSound();
 #endif
+
+    public void handleMovementEmissionAndPlaySound((org.bukkit.util.Vector) Vec3D movement, (IntVector3) BlockPosition blockPosition, (BlockData) IBlockData iblockdata) {
+#if version >= 1.21.2
+        // Get what this entity should emit
+        #require Entity protected Entity.MovementEmission getMovementEmission();
+        Entity$MovementEmission entity_movementemission = instance#getMovementEmission();
+        if (!entity_movementemission.emitsAnything() || instance.isPassenger()) {
+            return;
+        }
+
+
+        // Call the default logic method
+        #require Entity private void applyMovementEmissionAndPlaySound(Entity.MovementEmission emission, Vec3D vec3d, BlockPosition blockPosition, IBlockData iBlockData);
+        instance#applyMovementEmissionAndPlaySound(entity_movementemission, movement, blockPosition, blockData);
+
+#else
+        //TODO: This stuff is vastly outdated :(
+
+  #select version >=
+  #case 1.17
+        #require Entity public float walkedDistanceXZ:walkDist;
+        #require Entity public float walkedDistanceXYZ:moveDist;
+  #case 1.16
+        #require Entity public float walkedDistanceXZ:A;
+        #require Entity public float walkedDistanceXYZ:B;
+  #case 1.15
+        #require Entity public float walkedDistanceXZ:B;
+        #require Entity public float walkedDistanceXYZ:C;
+  #case 1.14
+        #require Entity public float walkedDistanceXZ:E;
+        #require Entity public float walkedDistanceXYZ:F;
+  #case 1.13
+        #require Entity public float walkedDistanceXZ:K;
+        #require Entity public float walkedDistanceXYZ:L;
+  #case 1.9
+        #require Entity public float walkedDistanceXZ:J;
+        #require Entity public float walkedDistanceXYZ:K;
+  #case else
+        #require Entity public float walkedDistanceXZ:M;
+        #require Entity public float walkedDistanceXYZ:N;
+  #endselect
+
+        double dx = movement.x();
+        double dy = movement.y();
+        double dz = movement.z();
+
+        float newWalkedDistanceXZ = (float) ((double) instance#walkedDistanceXZ + Math.sqrt(dx * dx + dz * dz) * 0.6D);
+        float newWalkedDistanceXYZ = (float) ((double) instance#walkedDistanceXYZ + Math.sqrt(dx * dx + dz * dz + dy * dy) * 0.6D);
+        instance#walkedDistanceXZ = newWalkedDistanceXZ;
+        instance#walkedDistanceXYZ = newWalkedDistanceXYZ;
+
+        // Play at an interval and if not in the air
+        if (instance#walkedDistanceXYZ <= (float) instance#stepCounter || iblockdata.getBlock() == Blocks.AIR) {
+            return;
+        }
+
+        int newStepCounter = (int) instance#walkedDistanceXYZ + 1;
+        instance#stepCounter = newStepCounter;
+
+        // isInWater()
+  #if version >= 1.9
+        boolean isInWater = instance.isInWater();
+  #else
+        boolean isInWater = instance.V();
+  #endif
+
+        if (isInWater) {
+            Entity driver = null;
+  #if version >= 1.9
+            driver = instance.isVehicle() ? instance.getControllingPassenger() : null;
+  #endif
+
+            float f = (driver == instance) ? 0.35F : 0.4F;
+
+  #if version >= 1.14
+    #if version >= 1.18
+            Vec3D mot = instance.getDeltaMovement();
+    #else
+            Vec3D mot = instance.getMot();
+    #endif
+            double motX = mot.x;
+            double motY = mot.y;
+            double motZ = mot.z;
+  #else
+            double motX = instance.motX;
+            double motY = instance.motY;
+            double motZ = instance.motZ;
+  #endif
+
+            float volume = (float) Math.sqrt(motX * motX * 0.2 +
+                                             motY * motY +
+                                             motZ * motZ * 0.2) * f;
+            if (volume > 1.0F) {
+                volume = 1.0F;
+            }
+
+            net.minecraft.util.RandomSource random = instance.random; // Mojang random 1.19+, java Random before
+            float pitch = 1.0F + (random.nextFloat() - random.nextFloat()) * 0.4F;
+
+  #if version >= 1.9
+            #require Entity protected SoundEffect getSwimSound();
+            SoundEffect swimSound = instance#getSwimSound();
+  #else
+            #require Entity protected String getSwimSound();
+            String swimSound = instance#getSwimSound();
+  #endif
+            instance.playSound(swimSound, volume, pitch);
+
+        } else {
+  #if version >= 1.13
+            #require Entity protected void playStepSound(BlockPosition position, IBlockData blockData);
+            instance#playStepSound(blockPosition, iblockdata);
+  #else
+            #require Entity protected void playStepSound(BlockPosition position, Block block);
+            instance#playStepSound(blockPosition, iblockdata.getBlock());
+  #endif
+        }
+#endif
+    }
 
     /*
      * void move(...) {
@@ -1386,12 +1468,10 @@ class Entity {
      *     }
      * }
      */
-#if version >= 1.16
+#if version >= 1.9
     public void makeSound:playSound((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect soundeffect, float volume, float pitch);
-#elseif version >= 1.9
-    public void makeSound:a((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect soundeffect, float volume, float pitch);
 #else
-    public void makeSound:makeSound((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String soundeffect, float volume, float pitch);
+    public void makeSound:playSound((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String soundeffect, float volume, float pitch);
 #endif
 
     // Note: counts rain too as being wet!
@@ -1541,10 +1621,12 @@ class Entity {
      *     ...
      * }
      */
-#if version >= 1.18
-    protected void checkBlockCollisions:checkInsideBlocks();
+#if version >= 1.21.2
+    public void applyEffectsFromBlocks();
+#elseif version >= 1.18
+    protected void applyEffectsFromBlocks:checkInsideBlocks();
 #else
-    protected void checkBlockCollisions();
+    protected void applyEffectsFromBlocks:checkBlockCollisions();
 #endif
 
     /*
@@ -1566,13 +1648,17 @@ class Entity {
     public double calculateDistanceSquared:e(double x, double y, double z);
 #endif
 
+#select version >=
+#case 1.21.2:  public boolean damageEntity:hurtOrSimulate((DamageSourceHandle) DamageSource damagesource, float damage);
+#case 1.18:    public boolean damageEntity:hurt((DamageSourceHandle) DamageSource damagesource, float damage);
+#case else:    public boolean damageEntity((DamageSourceHandle) DamageSource damagesource, float damage);
+#endselect
+
 #if version >= 1.18
     public String getStringUUID();
-    public boolean damageEntity:hurt((DamageSourceHandle) DamageSource damagesource, float damage);
     public void setPosition:setPos(double x, double y, double z);
 #else
     public String getStringUUID:getName();
-    public boolean damageEntity((DamageSourceHandle) DamageSource damagesource, float damage);
     public void setPosition(double x, double y, double z);
 #endif
 
@@ -1803,39 +1889,15 @@ class Entity {
     }
     </code>
 
-#if version >= 1.18
-    public optional (EntityHandle) Entity getDriverEntity:getControllingPassenger();
-#elseif version >= 1.14
-    public optional (EntityHandle) Entity getDriverEntity:getRidingPassenger();
-#elseif version >= 1.13
-    public optional (EntityHandle) Entity getDriverEntity:bO();
-#elseif version >= 1.12
-    #if pre
-        // This was on the pre-release version
-        public optional (EntityHandle) Entity getDriverEntity:bC();
-    #else
-        // Official 1.12
-        public optional (EntityHandle) Entity getDriverEntity:bE();
-    #endif
-#elseif version >= 1.10.2
-    public optional (EntityHandle) Entity getDriverEntity:bw();
-#elseif version >= 1.9.4
-    public optional (EntityHandle) Entity getDriverEntity:bu();
+#if version >= 1.21.2
+    public (EntityHandle) net.minecraft.world.entity.EntityLiving getDriverEntity:getControllingPassenger();
 #elseif version >= 1.9
-    public optional (EntityHandle) Entity getDriverEntity:bt();
+    public (EntityHandle) Entity getDriverEntity:getControllingPassenger();
 #else
-    public optional (EntityHandle) Entity getDriverEntity:###();
-#endif
-
-    <code>
-    public EntityHandle getDriverEntity() {
-        if (T.getDriverEntity.isAvailable()) {
-            return T.getDriverEntity.invoke(getRaw());
-        } else {
-            return null; // driver feature not a thing on this server
-        }
+    public (EntityHandle) Entity getDriverEntity() {
+        return null; // driver feature not a thing on this server
     }
-    </code>
+#endif
 
 #if version >= 1.13
     public void onTick:tick();

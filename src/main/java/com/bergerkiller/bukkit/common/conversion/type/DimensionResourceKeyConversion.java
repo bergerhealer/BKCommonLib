@@ -51,7 +51,10 @@ public class DimensionResourceKeyConversion {
             throw new IllegalStateException("ResourceKey type not found");
         }
 
-        if (CommonBootstrap.evaluateMCVersion(">=", "1.19")) {
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.21.2")) {
+            registryGetByKeyMethod.init(Resolver.resolveAndGetDeclaredMethod(registryType, "getValue", resourceKeyType));
+            registryGetByValueMethod.init(Resolver.resolveAndGetDeclaredMethod(registryType, "getResourceKey", Object.class));
+        } else if (CommonBootstrap.evaluateMCVersion(">=", "1.19")) {
             registryGetByKeyMethod.init(Resolver.resolveAndGetDeclaredMethod(registryType, "get", resourceKeyType));
             registryGetByValueMethod.init(Resolver.resolveAndGetDeclaredMethod(registryType, "getResourceKey", Object.class));
         } else {

@@ -1240,17 +1240,9 @@ public class NMSPacketClasses {
         }
     }
 
+    //TODO: Actually implement a method to create new explosion packets
+    //      Inspecting the fields of the packet is just not worth it anymore (is a record class now...)
     public static class NMSPacketPlayOutExplosion extends NMSPacket {
-
-        public final FieldAccessor<Double> x = PacketPlayOutExplosionHandle.T.x.toFieldAccessor();
-        public final FieldAccessor<Double> y = PacketPlayOutExplosionHandle.T.y.toFieldAccessor();
-        public final FieldAccessor<Double> z = PacketPlayOutExplosionHandle.T.z.toFieldAccessor();
-        public final FieldAccessor<Float> power = PacketPlayOutExplosionHandle.T.power.toFieldAccessor();
-        public final FieldAccessor<List<IntVector3>> blocks = PacketPlayOutExplosionHandle.T.blocks.toFieldAccessor();
-        public final FieldAccessor<Float> knockbackX = PacketPlayOutExplosionHandle.T.knockbackX.toFieldAccessor();
-        public final FieldAccessor<Float> knockbackY = PacketPlayOutExplosionHandle.T.knockbackY.toFieldAccessor();
-        public final FieldAccessor<Float> knockbackZ = PacketPlayOutExplosionHandle.T.knockbackZ.toFieldAccessor();
-
         // Pain in the ass API with loads of parameters. Needs builder API honestly.
         /*
         public CommonPacket newInstance(double x, double y, double z, float radius) {

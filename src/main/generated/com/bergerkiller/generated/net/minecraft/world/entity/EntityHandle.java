@@ -98,6 +98,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract Item dropItem(Material material, int amount, float force);
     public abstract Item dropItemStack(ItemStack itemstack, float force);
     public abstract ResourceKey<SoundEffect> getSwimSound();
+    public abstract void handleMovementEmissionAndPlaySound(Vector movement, IntVector3 blockPosition, BlockData iblockdata);
     public abstract void makeSound(ResourceKey<SoundEffect> soundeffect, float volume, float pitch);
     public abstract boolean isWet();
     public abstract boolean isInWaterUpdate();
@@ -106,10 +107,10 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void updateFalling(double d0, boolean flag, BlockData blockData, IntVector3 position);
     public abstract boolean isOutsideWorldBorder();
     public abstract void setOutsideWorldBorder(boolean outside);
-    public abstract void checkBlockCollisions();
+    public abstract void applyEffectsFromBlocks();
     public abstract double calculateDistanceSquared(double x, double y, double z);
-    public abstract String getStringUUID();
     public abstract boolean damageEntity(DamageSourceHandle damagesource, float damage);
+    public abstract String getStringUUID();
     public abstract void setPosition(double x, double y, double z);
     public abstract void setSize(float width, float height);
     public abstract AxisAlignedBBHandle getBoundingBox();
@@ -124,6 +125,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void handleFireBlockTick();
     public abstract boolean isBurning();
     public abstract void setOnFire(float numSeconds);
+    public abstract EntityHandle getDriverEntity();
     public abstract void onTick();
     public abstract void loadFromNBT(CommonTagCompound compound);
     public abstract boolean onEntitySave(CommonTagCompound compound);
@@ -191,14 +193,6 @@ public abstract class EntityHandle extends Template.Handle {
         }
     }
 
-    public EntityHandle getDriverEntity() {
-        if (T.getDriverEntity.isAvailable()) {
-            return T.getDriverEntity.invoke(getRaw());
-        } else {
-            return null; // driver feature not a thing on this server
-        }
-    }
-
     public static EntityHandle fromBukkit(org.bukkit.entity.Entity entity) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(entity));
     }
@@ -234,10 +228,6 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract boolean isVerticalMovementBlocked();
     public abstract boolean isVelocityChanged();
     public abstract void setVelocityChanged(boolean value);
-    public abstract float getWalkedDistanceXZ();
-    public abstract void setWalkedDistanceXZ(float value);
-    public abstract float getWalkedDistanceXYZ();
-    public abstract void setWalkedDistanceXYZ(float value);
     public abstract float getFallDistance();
     public abstract void setFallDistance(float value);
     public abstract boolean isNoclip();
@@ -296,8 +286,6 @@ public abstract class EntityHandle extends Template.Handle {
         @Template.Readonly
         public final Template.Field.Boolean verticalMovementBlocked = new Template.Field.Boolean();
         public final Template.Field.Boolean velocityChanged = new Template.Field.Boolean();
-        public final Template.Field.Float walkedDistanceXZ = new Template.Field.Float();
-        public final Template.Field.Float walkedDistanceXYZ = new Template.Field.Float();
         public final Template.Field.Float fallDistance = new Template.Field.Float();
         public final Template.Field.Boolean noclip = new Template.Field.Boolean();
         public final Template.Field.Converted<RandomSourceHandle> random = new Template.Field.Converted<RandomSourceHandle>();
@@ -370,6 +358,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Item> dropItem = new Template.Method.Converted<Item>();
         public final Template.Method.Converted<Item> dropItemStack = new Template.Method.Converted<Item>();
         public final Template.Method.Converted<ResourceKey<SoundEffect>> getSwimSound = new Template.Method.Converted<ResourceKey<SoundEffect>>();
+        public final Template.Method.Converted<Void> handleMovementEmissionAndPlaySound = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> makeSound = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> isWet = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isInWaterUpdate = new Template.Method<Boolean>();
@@ -380,10 +369,10 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Void> setLegacyTrackingEntity = new Template.Method<Void>();
         public final Template.Method<Boolean> isOutsideWorldBorder = new Template.Method<Boolean>();
         public final Template.Method<Void> setOutsideWorldBorder = new Template.Method<Void>();
-        public final Template.Method<Void> checkBlockCollisions = new Template.Method<Void>();
+        public final Template.Method<Void> applyEffectsFromBlocks = new Template.Method<Void>();
         public final Template.Method<Double> calculateDistanceSquared = new Template.Method<Double>();
-        public final Template.Method<String> getStringUUID = new Template.Method<String>();
         public final Template.Method.Converted<Boolean> damageEntity = new Template.Method.Converted<Boolean>();
+        public final Template.Method<String> getStringUUID = new Template.Method<String>();
         public final Template.Method<Void> setPosition = new Template.Method<Void>();
         public final Template.Method<Void> setSize = new Template.Method<Void>();
         public final Template.Method.Converted<AxisAlignedBBHandle> getBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
@@ -400,7 +389,6 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Void> setOnFire = new Template.Method.Converted<Void>();
         @Template.Optional
         public final Template.Method<Integer> prop_getMaxFireTicks = new Template.Method<Integer>();
-        @Template.Optional
         public final Template.Method.Converted<EntityHandle> getDriverEntity = new Template.Method.Converted<EntityHandle>();
         public final Template.Method<Void> onTick = new Template.Method<Void>();
         public final Template.Method.Converted<Void> loadFromNBT = new Template.Method.Converted<Void>();
