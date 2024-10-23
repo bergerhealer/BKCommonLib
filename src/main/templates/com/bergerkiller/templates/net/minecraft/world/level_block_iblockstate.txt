@@ -13,7 +13,11 @@ interface IBlockState {
     public abstract String getValueToken:a(Comparable value);
 #endif
 
-#if version >= 1.18
+#if version >= 1.21.2
+    public java.util.Collection getValues() {
+        return instance.getPossibleValues(); // List -> Collection
+    }
+#elseif version >= 1.18
     public abstract java.util.Collection getValues:getPossibleValues();
 #elseif version >= 1.14.4
     public abstract java.util.Collection getValues();

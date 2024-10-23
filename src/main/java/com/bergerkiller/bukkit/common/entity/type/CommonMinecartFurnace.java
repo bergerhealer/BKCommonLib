@@ -7,6 +7,7 @@ import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinec
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 import java.util.List;
@@ -46,20 +47,48 @@ public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
         setFuelTicks(getFuelTicks() + amount);
     }
 
+    public Vector getPush() {
+        return EntityMinecartFurnaceHandle.T.getPushForce.invoke(getHandle());
+    }
+
+    public void setPush(double fx, double fy, double fz) {
+        EntityMinecartFurnaceHandle.createHandle(getHandle()).setPushForce(fx, fy, fz);
+    }
+
+    public void setPush(Vector push) {
+        setPush(push.getX(), push.getY(), push.getZ());
+    }
+
+    /**
+     * @deprecated Use {@link #getPush()}
+     */
+    @Deprecated
     public double getPushX() {
-        return EntityMinecartFurnaceHandle.T.pushForceX.getDouble(getHandle());
+        return EntityMinecartFurnaceHandle.createHandle(getHandle()).getPushForceX();
     }
 
+    /**
+     * @deprecated Use {@link #setPush(double, double, double)} or {@link #setPush(Vector)}
+     */
+    @Deprecated
     public void setPushX(double pushX) {
-        EntityMinecartFurnaceHandle.T.pushForceX.setDouble(getHandle(), pushX);
+        EntityMinecartFurnaceHandle.createHandle(getHandle()).setPushForceX(pushX);
     }
 
+    /**
+     * @deprecated Use {@link #getPush()}
+     */
+    @Deprecated
     public double getPushZ() {
-        return EntityMinecartFurnaceHandle.T.pushForceZ.getDouble(getHandle());
+        return EntityMinecartFurnaceHandle.createHandle(getHandle()).getPushForceZ();
     }
 
+    /**
+     * @deprecated Use {@link #setPush(double, double, double)} or {@link #setPush(Vector)}
+     */
+    @Deprecated
     public void setPushZ(double pushZ) {
-        EntityMinecartFurnaceHandle.T.pushForceZ.setDouble(getHandle(), pushZ);
+        EntityMinecartFurnaceHandle.createHandle(getHandle()).setPushForceX(pushZ);
     }
 
     public boolean isSmoking() {

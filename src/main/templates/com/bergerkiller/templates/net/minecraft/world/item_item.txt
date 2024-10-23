@@ -69,17 +69,25 @@ class Item {
     public boolean usesDurability();
 #endif
 
-#select version >=
-#case 1.18:   public String getInternalName:getDescriptionId((org.bukkit.inventory.ItemStack) ItemStack itemstack);
-#case 1.17:   public String getInternalName:j((org.bukkit.inventory.ItemStack) ItemStack itemstack);
-#case 1.14:   public String getInternalName:f((org.bukkit.inventory.ItemStack) ItemStack itemstack);
-#case 1.13:   public String getInternalName:h((org.bukkit.inventory.ItemStack) ItemStack itemstack);
-#case 1.11:   public String getInternalName:a((org.bukkit.inventory.ItemStack) ItemStack itemstack);
-#case 1.9:    public String getInternalName:f_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
-#case 1.8.6:  public String getInternalName:e_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
-#case 1.8.5:  public String getInternalName:f_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
-#case else:   public String getInternalName:e_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
-#endselect
+#if version >= 1.21.2
+    // Name can no longer be changed per item stack
+    public String getInternalName((org.bukkit.inventory.ItemStack) ItemStack itemstack) {
+        return instance.getDescriptionId();
+    }
+#else
+
+  #select version >=
+  #case 1.18:   public String getInternalName:getDescriptionId((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+  #case 1.17:   public String getInternalName:j((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+  #case 1.14:   public String getInternalName:f((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+  #case 1.13:   public String getInternalName:h((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+  #case 1.11:   public String getInternalName:a((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+  #case 1.9:    public String getInternalName:f_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+  #case 1.8.6:  public String getInternalName:e_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+  #case 1.8.5:  public String getInternalName:f_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+  #case else:   public String getInternalName:e_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+  #endselect
+#endif
 
     <code>
     public static ItemHandle fromMaterial(org.bukkit.Material material) {

@@ -135,16 +135,47 @@ class EntityMinecartFurnace extends EntityMinecartAbstract {
     private int fuel:c;
 #endif
 
-#if version >= 1.17
-    public double pushForceX:xPush;
-    public double pushForceZ:zPush;
+#if version >= 1.21.2
+    public (org.bukkit.util.Vector) Vec3D getPushForce() { return instance.push; }
+    public void setPushForce(double fx, double fy, double fz) { instance.push = new Vec3D(fx, fy, fz); }
+#elseif version >= 1.17
+    public (org.bukkit.util.Vector) Vec3D getPushForce() { return new Vec3D(instance.xPush, 0.0, instance.zPush); }
+    public void setPushForce(double fx, double fy, double fz) { instance.xPush = fx; instance.zPush = fz; }
 #elseif version >= 1.14
-    public double pushForceX:b;
-    public double pushForceZ:c;
+    public (org.bukkit.util.Vector) Vec3D getPushForce() { return new Vec3D(instance.b, 0.0, instance.c); }
+    public void setPushForce(double fx, double fy, double fz) { instance.b = fx; instance.c = fz; }
 #else
-    public double pushForceX:a;
-    public double pushForceZ:b;
+    public (org.bukkit.util.Vector) Vec3D getPushForce() { return new Vec3D(instance.a, 0.0, instance.b); }
+    public void setPushForce(double fx, double fy, double fz) { instance.a = fx; instance.b = fz; }
 #endif
+
+    <code>
+    public void setPushForce(org.bukkit.util.Vector force) {
+        setPushForce(force.getX(), force.getY(), force.getZ());
+    }
+
+    @Deprecated
+    public double getPushForceX() {
+        return getPushForce().getX();
+    }
+
+    @Deprecated
+    public double getPushForceZ() {
+        return getPushForce().getZ();
+    }
+
+    @Deprecated
+    public void setPushForceX(double x) {
+        Vector v = getPushForce();
+        setPushForce(x, v.getY(), v.getZ());
+    }
+
+    @Deprecated
+    public void setPushForceZ(double z) {
+        Vector v = getPushForce();
+        setPushForce(v.getX(), v.getY(), z);
+    }
+    </code>
 }
 
 class EntityMinecartHopper extends EntityMinecartAbstract {

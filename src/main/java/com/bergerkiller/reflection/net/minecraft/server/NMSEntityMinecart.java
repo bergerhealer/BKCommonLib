@@ -36,8 +36,6 @@ public class NMSEntityMinecart {
         public static DataWatcher.Key<Boolean> DATA_SMOKING = EntityMinecartFurnaceHandle.DATA_SMOKING;
 
         public static final FieldAccessor<Integer> fuel = EntityMinecartFurnaceHandle.T.fuel.toFieldAccessor();
-        public static final FieldAccessor<Double> pushForceX = EntityMinecartFurnaceHandle.T.pushForceX.toFieldAccessor();
-        public static final FieldAccessor<Double> pushForceZ = EntityMinecartFurnaceHandle.T.pushForceZ.toFieldAccessor();
     }
 
     public static class MobSpawner {

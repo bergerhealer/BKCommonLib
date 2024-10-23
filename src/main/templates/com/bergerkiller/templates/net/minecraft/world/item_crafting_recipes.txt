@@ -110,13 +110,9 @@ interface IRecipe {
 
 // >= MC 1.12
 optional class RecipeItemStack {
-#if version >= 1.17
-    #require net.minecraft.world.item.crafting.RecipeItemStack public ItemStack[] choicesRecipeItemStack:itemStacks;
-#elseif version >= 1.12
-    #require net.minecraft.world.item.crafting.RecipeItemStack public final ItemStack[] choicesRecipeItemStack:choices;
-#endif
-
-#if version >= 1.18
+#if version >= 1.21.2
+    public (List<org.bukkit.inventory.ItemStack>) List<ItemStack> getChoices:itemStacks();
+#elseif version >= 1.18
     public (List<org.bukkit.inventory.ItemStack>) ItemStack[] getChoices:getItems();
 #elseif version >= 1.17
     public (List<org.bukkit.inventory.ItemStack>) ItemStack[] getChoices:a();
@@ -125,12 +121,25 @@ optional class RecipeItemStack {
   #if version >= 1.13
         instance.buildChoices();
   #endif
-        return instance#choicesRecipeItemStack;
+        return instance.choices;
     }
 #endif
 
-    public void setChoices((List<org.bukkit.inventory.ItemStack>) ItemStack[] choices) {
+    public void setChoices((List<org.bukkit.inventory.ItemStack>) List<ItemStack> choices) {
+#if version >= 1.21.2
+        #require net.minecraft.world.item.crafting.RecipeItemStack private List<ItemStack> choicesRecipeItemStack:itemStacks;
+        choices = new ArrayList(choices); // Safe copy / avoid conversion stuff sticking around
         instance#choicesRecipeItemStack = choices;
+#else
+
+  #if version >= 1.17
+        #require net.minecraft.world.item.crafting.RecipeItemStack public ItemStack[] choicesRecipeItemStack:itemStacks;
+  #elseif version >= 1.12
+        #require net.minecraft.world.item.crafting.RecipeItemStack public final ItemStack[] choicesRecipeItemStack:choices;
+  #endif
+        ItemStack[] choicesArr = (ItemStack[]) choices.toArray(new ItemStack[0]);
+        instance#choicesRecipeItemStack = choicesArr;
+#endif
     }
 
     <code>
@@ -154,14 +163,19 @@ optional class RecipesFurnace {
 
 // >= MC 1.13
 optional class FurnaceRecipe extends IRecipe {
+
+#if version >= 1.21.2
+    public (CraftInputSlot) RecipeItemStack getIngredient:input();
+#else
     public (CraftInputSlot) RecipeItemStack getIngredient() {
-#if version >= 1.14
+  #if version >= 1.14
         #require net.minecraft.world.item.crafting.RecipeCooking protected final RecipeItemStack ingredient;
-#elseif version >= 1.13
+  #elseif version >= 1.13
         #require net.minecraft.world.item.crafting.FurnaceRecipe private final RecipeItemStack ingredient;
-#endif
+  #endif
         return instance#ingredient;
     }
+#endif
 
     public static (Iterable<FurnaceRecipeHandle>) Iterable<FurnaceRecipe> getRecipes() {
 #if version >= 1.18
