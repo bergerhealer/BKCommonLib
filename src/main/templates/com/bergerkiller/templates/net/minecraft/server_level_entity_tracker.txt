@@ -453,43 +453,24 @@ class EntityTrackerEntryState {
     private final int updateInterval;
     private final boolean isMobile:trackDelta;
     private optional final java.util.function.Consumer broadcastMethod:broadcast;
-    public int raw_xRot:lastSentYRot;
-    public int raw_yRot:lastSentXRot;
-    public int raw_headYaw:lastSentYHeadRot;
 #elseif version >= 1.17
     private final (EntityHandle) Entity entity;
     private final int updateInterval;
     private final boolean isMobile:trackDelta;
     private optional final java.util.function.Consumer broadcastMethod:broadcast;
-    public int raw_xRot:yRotp;
-    public int raw_yRot:xRotp;
-    public int raw_headYaw:yHeadRotp;
 #elseif version >= 1.14
     private final (EntityHandle) Entity entity:tracker;
     private final int updateInterval:d;
     private final boolean isMobile:e;
     private optional final java.util.function.Consumer broadcastMethod:f;
-    public int raw_xRot:yRot;
-    public int raw_yRot:xRot;
-    public int raw_headYaw:headYaw;
 #elseif version >= 1.9
     private final readonly (EntityHandle) Entity entity:tracker;
     private final int updateInterval:g;
     private optional final java.util.function.Consumer broadcastMethod:###;
-    public int raw_xRot:yRot;
-    public int raw_yRot:xRot;
-    public int raw_headYaw:headYaw;
 #else
     public final readonly (EntityHandle) Entity entity:tracker;
     public int updateInterval:c;
     private optional final java.util.function.Consumer broadcastMethod:###;
-    public int raw_xRot:yRot;
-    public int raw_yRot:xRot;
-  #if nachospigot
-    public int raw_headYaw:lastHeadYaw;
-  #else
-    public int raw_headYaw:i;
-  #endif
 #endif
 
 #if version >= 1.17
@@ -810,6 +791,46 @@ class EntityTrackerEntryState {
     private final boolean isMobile:u;
 #endif
 
+#if version >= 1.21.2
+    // byte <> int
+    public int getEncodedPitch() { return ((int) instance.lastSentYRot) & 0xFF; }
+    public void setEncodedPitch(int encoded) { instance.lastSendYRot = (byte) (encoded & 0xFF); }
+    public int getEncodedYaw() { return ((int) instance.lastSentXRot) & 0xFF; }
+    public void setEncodedYaw(int encoded) { instance.lastSentXRot = (byte) (encoded & 0xFF); }
+    public int getEncodedHeadYaw() { return ((int) instance.lastSentYHeadRot) & 0xFF; }
+    public void setEncodedHeadYaw(int encoded) { instance.lastSentYHeadRot = (byte) (encoded & 0xFF); }
+#elseif version >= 1.21
+    public int getEncodedPitch() { return instance.lastSentYRot; }
+    public void setEncodedPitch(int encoded) { instance.lastSendYRot = encoded; }
+    public int getEncodedYaw() { return instance.lastSentXRot; }
+    public void setEncodedYaw(int encoded) { instance.lastSentXRot = encoded; }
+    public int getEncodedHeadYaw() { return instance.lastSentYHeadRot; }
+    public void setEncodedHeadYaw(int encoded) { instance.lastSentYHeadRot = encoded; }
+#elseif version >= 1.17
+    public int getEncodedPitch() { return instance.yRotp; }
+    public void setEncodedPitch(int encoded) { instance.yRotp = encoded; }
+    public int getEncodedYaw() { return instance.xRotp; }
+    public void setEncodedYaw(int encoded) { instance.xRotp = encoded; }
+    public int getEncodedHeadYaw() { return instance.yHeadRotp; }
+    public void setEncodedHeadYaw(int encoded) { instance.yHeadRotp = encoded; }
+#else
+    public int getEncodedPitch() { return instance.yRotp; }
+    public void setEncodedPitch(int encoded) { instance.yRotp = encoded; }
+    public int getEncodedYaw() { return instance.xRotp; }
+    public void setEncodedYaw(int encoded) { instance.xRotp = encoded; }
+
+  #if version >= 1.9
+    public int getEncodedHeadYaw() { return instance.headYaw; }
+    public void setEncodedHeadYaw(int encoded) { instance.headYaw = encoded; }
+  #elseif nachospigot
+    public int getEncodedHeadYaw() { return instance.lastHeadYaw; }
+    public void setEncodedHeadYaw(int encoded) { instance.lastHeadYaw = encoded; }
+  #else
+    public int getEncodedHeadYaw() { return instance.i; }
+    public void setEncodedHeadYaw(int encoded) { instance.i = encoded; }
+  #endif
+#endif
+
     <code>
     // Minimal change of x/y/z position or rotation that is supported
     public static final double POSITION_STEP;
@@ -858,32 +879,32 @@ class EntityTrackerEntryState {
 
     // Performs protocol translation to set the synchronized yaw rotation
     public void setYaw(float yaw) {
-        T.raw_yRot.setInteger(getRaw(), getProtocolRotation(yaw));
+        setEncodedYaw(getProtocolRotation(yaw));
     }
 
     // Performs protocol translation to set the synchronized pitch rotation
     public void setPitch(float pitch) {
-        T.raw_xRot.setInteger(getRaw(), getProtocolRotation(pitch));
+        setEncodedPitch(getProtocolRotation(pitch));
     }
 
     // Performs protocol translation to set the synchronized head rotation
     public void setHeadYaw(float headYaw) {
-        T.raw_headYaw.setInteger(getRaw(), getProtocolRotation(headYaw));
+        setEncodedHeadYaw(getProtocolRotation(headYaw));
     }
 
     // Performs protocol translation to get the synchronized yaw rotation
     public float getYaw() {
-        return getRotationFromProtocol(T.raw_yRot.getInteger(getRaw()));
+        return getRotationFromProtocol(getEncodedYaw());
     }
 
     // Performs protocol translation to get the synchronized pitch rotation
     public float getPitch() {
-        return getRotationFromProtocol(T.raw_xRot.getInteger(getRaw()));
+        return getRotationFromProtocol(getEncodedPitch());
     }
 
     // Performs protocol translation to get the synchronized head rotation
     public float getHeadYaw() {
-        return getRotationFromProtocol(T.raw_headYaw.getInteger(getRaw()));
+        return getRotationFromProtocol(getEncodedHeadYaw());
     }
     </code>
 

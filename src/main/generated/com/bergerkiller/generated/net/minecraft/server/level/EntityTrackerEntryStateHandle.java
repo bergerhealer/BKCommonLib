@@ -42,6 +42,12 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
     public abstract Vector getVelocity();
     public abstract void setVelocity(double x, double y, double z);
     public abstract boolean checkTrackNeeded();
+    public abstract int getEncodedPitch();
+    public abstract void setEncodedPitch(int encoded);
+    public abstract int getEncodedYaw();
+    public abstract void setEncodedYaw(int encoded);
+    public abstract int getEncodedHeadYaw();
+    public abstract void setEncodedHeadYaw(int encoded);
     public abstract CommonPacket getSpawnPacket();
     public abstract void onTick();
     public void setVelocity(org.bukkit.util.Vector velocity) {
@@ -93,27 +99,27 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
     }
 
     public void setYaw(float yaw) {
-        T.raw_yRot.setInteger(getRaw(), getProtocolRotation(yaw));
+        setEncodedYaw(getProtocolRotation(yaw));
     }
 
     public void setPitch(float pitch) {
-        T.raw_xRot.setInteger(getRaw(), getProtocolRotation(pitch));
+        setEncodedPitch(getProtocolRotation(pitch));
     }
 
     public void setHeadYaw(float headYaw) {
-        T.raw_headYaw.setInteger(getRaw(), getProtocolRotation(headYaw));
+        setEncodedHeadYaw(getProtocolRotation(headYaw));
     }
 
     public float getYaw() {
-        return getRotationFromProtocol(T.raw_yRot.getInteger(getRaw()));
+        return getRotationFromProtocol(getEncodedYaw());
     }
 
     public float getPitch() {
-        return getRotationFromProtocol(T.raw_xRot.getInteger(getRaw()));
+        return getRotationFromProtocol(getEncodedPitch());
     }
 
     public float getHeadYaw() {
-        return getRotationFromProtocol(T.raw_headYaw.getInteger(getRaw()));
+        return getRotationFromProtocol(getEncodedHeadYaw());
     }
     public abstract EntityHandle getEntity();
     public abstract void setEntity(EntityHandle value);
@@ -121,12 +127,6 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
     public abstract void setUpdateInterval(int value);
     public abstract boolean isMobile();
     public abstract void setIsMobile(boolean value);
-    public abstract int getRaw_xRot();
-    public abstract void setRaw_xRot(int value);
-    public abstract int getRaw_yRot();
-    public abstract void setRaw_yRot(int value);
-    public abstract int getRaw_headYaw();
-    public abstract void setRaw_headYaw(int value);
     public abstract int getTickCounter();
     public abstract void setTickCounter(int value);
     public abstract int getTimeSinceLocationSync();
@@ -141,9 +141,6 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
         public final Template.Field.Boolean isMobile = new Template.Field.Boolean();
         @Template.Optional
         public final Template.Field<Consumer> broadcastMethod = new Template.Field<Consumer>();
-        public final Template.Field.Integer raw_xRot = new Template.Field.Integer();
-        public final Template.Field.Integer raw_yRot = new Template.Field.Integer();
-        public final Template.Field.Integer raw_headYaw = new Template.Field.Integer();
         public final Template.Field.Integer tickCounter = new Template.Field.Integer();
         public final Template.Field.Integer timeSinceLocationSync = new Template.Field.Integer();
         @Template.Optional
@@ -172,6 +169,12 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
         @Template.Optional
         public final Template.Method.Converted<Void> addPairing = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> checkTrackNeeded = new Template.Method<Boolean>();
+        public final Template.Method<Integer> getEncodedPitch = new Template.Method<Integer>();
+        public final Template.Method<Void> setEncodedPitch = new Template.Method<Void>();
+        public final Template.Method<Integer> getEncodedYaw = new Template.Method<Integer>();
+        public final Template.Method<Void> setEncodedYaw = new Template.Method<Void>();
+        public final Template.Method<Integer> getEncodedHeadYaw = new Template.Method<Integer>();
+        public final Template.Method<Void> setEncodedHeadYaw = new Template.Method<Void>();
         public final Template.Method.Converted<CommonPacket> getSpawnPacket = new Template.Method.Converted<CommonPacket>();
         public final Template.Method<Void> onTick = new Template.Method<Void>();
 
