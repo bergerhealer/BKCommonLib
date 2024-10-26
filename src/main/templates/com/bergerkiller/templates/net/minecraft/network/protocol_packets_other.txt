@@ -1870,7 +1870,7 @@ class PacketPlayInSteerVehicle extends Packet {
     public float getSideways() {
         net.minecraft.world.entity.player.Input input = instance.input();
         if (input.left() != input.right()) {
-            return input.right() ? 1.0f : -1.0f;
+            return input.left() ? 0.98f : -0.98f;
         } else {
             return 0.0f;
         }
@@ -1879,7 +1879,7 @@ class PacketPlayInSteerVehicle extends Packet {
     public float getForwards() {
         net.minecraft.world.entity.player.Input input = instance.input();
         if (input.forward() != input.backward()) {
-            return input.forward() ? 1.0f : -1.0f;
+            return input.forward() ? 0.98f : -0.98f;
         } else {
             return 0.0f;
         }
@@ -1901,8 +1901,8 @@ class PacketPlayInSteerVehicle extends Packet {
     #require PacketPlayInSteerVehicle private boolean unmount:d;
   #endif
 
-    public boolean isLeft() { return instance#sideways < 0.0f; }
-    public boolean isRight() { return instance#sideways > 0.0f; }
+    public boolean isLeft() { return instance#sideways > 0.0f; }
+    public boolean isRight() { return instance#sideways < 0.0f; }
     public boolean isForward() { return instance#forwards > 0.0f; }
     public boolean isBackward() { return instance#forwards < 0.0f; }
 
