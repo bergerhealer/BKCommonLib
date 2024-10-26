@@ -1,5 +1,6 @@
 package net.minecraft.world.entity.vehicle;
 
+import net.minecraft.world.phys.Vec3D;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.syncher.DataWatcherObject;

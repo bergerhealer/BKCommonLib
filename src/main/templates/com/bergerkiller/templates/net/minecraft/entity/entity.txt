@@ -17,6 +17,7 @@ import net.minecraft.world.EnumInteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.World;
 import net.minecraft.world.phys.AxisAlignedBB;
@@ -1393,7 +1394,7 @@ class Entity {
         }
 
         int newStepCounter = (int) instance#walkedDistanceXYZ + 1;
-        instance#stepCounter = newStepCounter;
+        instance#stepCounter = (float)newStepCounter;
 
         // isInWater()
   #if version >= 1.9
@@ -1889,7 +1890,7 @@ class Entity {
     }
     </code>
 
-#if version >= 1.21.2
+#if version >= 1.19.4
     public (EntityHandle) net.minecraft.world.entity.EntityLiving getDriverEntity:getControllingPassenger();
 #elseif version >= 1.9
     public (EntityHandle) Entity getDriverEntity:getControllingPassenger();

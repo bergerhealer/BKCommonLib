@@ -792,43 +792,44 @@ class EntityTrackerEntryState {
 #endif
 
 #if version >= 1.21.2
-    // byte <> int
-    public int getEncodedPitch() { return ((int) instance.lastSentYRot) & 0xFF; }
-    public void setEncodedPitch(int encoded) { instance.lastSendYRot = (byte) (encoded & 0xFF); }
-    public int getEncodedYaw() { return ((int) instance.lastSentXRot) & 0xFF; }
-    public void setEncodedYaw(int encoded) { instance.lastSentXRot = (byte) (encoded & 0xFF); }
-    public int getEncodedHeadYaw() { return ((int) instance.lastSentYHeadRot) & 0xFF; }
-    public void setEncodedHeadYaw(int encoded) { instance.lastSentYHeadRot = (byte) (encoded & 0xFF); }
+    #require EntityTrackerEntryState private byte lastSentYRot;
+    #require EntityTrackerEntryState private byte lastSentXRot;
+    #require EntityTrackerEntryState private byte lastSentYHeadRot;
 #elseif version >= 1.21
-    public int getEncodedPitch() { return instance.lastSentYRot; }
-    public void setEncodedPitch(int encoded) { instance.lastSendYRot = encoded; }
-    public int getEncodedYaw() { return instance.lastSentXRot; }
-    public void setEncodedYaw(int encoded) { instance.lastSentXRot = encoded; }
-    public int getEncodedHeadYaw() { return instance.lastSentYHeadRot; }
-    public void setEncodedHeadYaw(int encoded) { instance.lastSentYHeadRot = encoded; }
+    #require EntityTrackerEntryState private int lastSentYRot;
+    #require EntityTrackerEntryState private int lastSentXRot;
+    #require EntityTrackerEntryState private int lastSentYHeadRot;
 #elseif version >= 1.17
-    public int getEncodedPitch() { return instance.yRotp; }
-    public void setEncodedPitch(int encoded) { instance.yRotp = encoded; }
-    public int getEncodedYaw() { return instance.xRotp; }
-    public void setEncodedYaw(int encoded) { instance.xRotp = encoded; }
-    public int getEncodedHeadYaw() { return instance.yHeadRotp; }
-    public void setEncodedHeadYaw(int encoded) { instance.yHeadRotp = encoded; }
+    #require EntityTrackerEntryState private int lastSentYRot:yRotp;
+    #require EntityTrackerEntryState private int lastSentXRot:xRotp;
+    #require EntityTrackerEntryState private int lastSentYHeadRot:yHeadRotp;
 #else
-    public int getEncodedPitch() { return instance.yRotp; }
-    public void setEncodedPitch(int encoded) { instance.yRotp = encoded; }
-    public int getEncodedYaw() { return instance.xRotp; }
-    public void setEncodedYaw(int encoded) { instance.xRotp = encoded; }
-
+    #require EntityTrackerEntryState private int lastSentYRot:yRotp;
+    #require EntityTrackerEntryState private int lastSentXRot:xRotp;
   #if version >= 1.9
-    public int getEncodedHeadYaw() { return instance.headYaw; }
-    public void setEncodedHeadYaw(int encoded) { instance.headYaw = encoded; }
+    #require EntityTrackerEntryState private int lastSentYHeadRot:headYaw;
   #elseif nachospigot
-    public int getEncodedHeadYaw() { return instance.lastHeadYaw; }
-    public void setEncodedHeadYaw(int encoded) { instance.lastHeadYaw = encoded; }
+    #require EntityTrackerEntryState private int lastSentYHeadRot:lastHeadYaw;
   #else
-    public int getEncodedHeadYaw() { return instance.i; }
-    public void setEncodedHeadYaw(int encoded) { instance.i = encoded; }
+    #require EntityTrackerEntryState private int lastSentYHeadRot:i;
   #endif
+#endif
+
+#if version >= 1.21.2
+    // byte <> int
+    public int getEncodedPitch() { return ((int) instance#lastSentYRot) & 0xFF; }
+    public void setEncodedPitch(int encoded) { instance#lastSentYRot = (byte) (encoded & 0xFF); }
+    public int getEncodedYaw() { return ((int) instance#lastSentXRot) & 0xFF; }
+    public void setEncodedYaw(int encoded) { instance#lastSentXRot = (byte) (encoded & 0xFF); }
+    public int getEncodedHeadYaw() { return ((int) instance#lastSentYHeadRot) & 0xFF; }
+    public void setEncodedHeadYaw(int encoded) { instance#lastSentYHeadRot = (byte) (encoded & 0xFF); }
+#else
+    public int getEncodedPitch() { return instance#lastSentYRot; }
+    public void setEncodedPitch(int encoded) { instance#lastSentYRot = encoded; }
+    public int getEncodedYaw() { return instance#lastSentXRot; }
+    public void setEncodedYaw(int encoded) { instance#lastSentXRot = encoded; }
+    public int getEncodedHeadYaw() { return instance#lastSentYHeadRot; }
+    public void setEncodedHeadYaw(int encoded) { instance#lastSentYHeadRot = encoded; }
 #endif
 
     <code>
