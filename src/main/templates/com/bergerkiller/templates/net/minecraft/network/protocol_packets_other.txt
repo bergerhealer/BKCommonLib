@@ -1861,16 +1861,55 @@ class PacketPlayOutCustomSoundEffect extends Packet {
 }
 
 class PacketPlayInSteerVehicle extends Packet {
-#if version >= 1.17
-    private final float sideways:xxa;
-    private final float forwards:zza;
-    private final boolean jump:isJumping;
-    private final boolean unmount:isShiftKeyDown;
+#if version >= 1.21.2
+    public boolean isLeft() { return instance.input().left(); }
+    public boolean isRight() { return instance.input().right(); }
+    public boolean isForward() { return instance.input().forward(); }
+    public boolean isBackward() { return instance.input().backward(); }
+
+    public float getSideways() {
+        net.minecraft.world.entity.player.Input input = instance.input();
+        if (input.left() != input.right()) {
+            return input.right() ? 1.0f : -1.0f;
+        } else {
+            return 0.0f;
+        }
+    }
+
+    public float getForwards() {
+        net.minecraft.world.entity.player.Input input = instance.input();
+        if (input.forward() != input.backward()) {
+            return input.forward() ? 1.0f : -1.0f;
+        } else {
+            return 0.0f;
+        }
+    }
+
+    public boolean isJump() { return instance.input().jump(); }
+    public boolean isUnmount() { return instance.input().shift(); }
+
 #else
-    private float sideways:a;
-    private float forwards:b;
-    private boolean jump:c;
-    private boolean unmount:d;
+  #if version >= 1.17
+    #require PacketPlayInSteerVehicle private final float sideways:xxa;
+    #require PacketPlayInSteerVehicle private final float forwards:zza;
+    #require PacketPlayInSteerVehicle private final boolean jump:isJumping;
+    #require PacketPlayInSteerVehicle private final boolean unmount:isShiftKeyDown;
+  #else
+    #require PacketPlayInSteerVehicle private float sideways:a;
+    #require PacketPlayInSteerVehicle private float forwards:b;
+    #require PacketPlayInSteerVehicle private boolean jump:c;
+    #require PacketPlayInSteerVehicle private boolean unmount:d;
+  #endif
+
+    public boolean isLeft() { return instance#sideways < 0.0f; }
+    public boolean isRight() { return instance#sideways > 0.0f; }
+    public boolean isForward() { return instance#forwards > 0.0f; }
+    public boolean isBackward() { return instance#forwards < 0.0f; }
+
+    public float getSideways() { return instance#sideways; }
+    public float getForwards() { return instance#forwards; }
+    public boolean isJump() { return instance#jump; }
+    public boolean isUnmount() { return instance#unmount; }
 #endif
 }
 

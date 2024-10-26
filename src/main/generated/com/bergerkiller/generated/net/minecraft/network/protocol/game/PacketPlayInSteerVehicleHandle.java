@@ -20,23 +20,27 @@ public abstract class PacketPlayInSteerVehicleHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public abstract boolean isLeft();
+    public abstract boolean isRight();
+    public abstract boolean isForward();
+    public abstract boolean isBackward();
     public abstract float getSideways();
-    public abstract void setSideways(float value);
     public abstract float getForwards();
-    public abstract void setForwards(float value);
     public abstract boolean isJump();
-    public abstract void setJump(boolean value);
     public abstract boolean isUnmount();
-    public abstract void setUnmount(boolean value);
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.PacketPlayInSteerVehicle</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayInSteerVehicleClass extends Template.Class<PacketPlayInSteerVehicleHandle> {
-        public final Template.Field.Float sideways = new Template.Field.Float();
-        public final Template.Field.Float forwards = new Template.Field.Float();
-        public final Template.Field.Boolean jump = new Template.Field.Boolean();
-        public final Template.Field.Boolean unmount = new Template.Field.Boolean();
+        public final Template.Method<Boolean> isLeft = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> isRight = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> isForward = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> isBackward = new Template.Method<Boolean>();
+        public final Template.Method<Float> getSideways = new Template.Method<Float>();
+        public final Template.Method<Float> getForwards = new Template.Method<Float>();
+        public final Template.Method<Boolean> isJump = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> isUnmount = new Template.Method<Boolean>();
 
     }
 

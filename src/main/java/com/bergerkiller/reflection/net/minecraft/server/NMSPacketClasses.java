@@ -500,10 +500,50 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInSteerVehicle extends NMSPacket {
 
-        public final FieldAccessor<Float> sideways = PacketPlayInSteerVehicleHandle.T.sideways.toFieldAccessor();
-        public final FieldAccessor<Float> forwards = PacketPlayInSteerVehicleHandle.T.forwards.toFieldAccessor();
-        public final FieldAccessor<Boolean> jump = PacketPlayInSteerVehicleHandle.T.jump.toFieldAccessor();
-        public final FieldAccessor<Boolean> unmount = PacketPlayInSteerVehicleHandle.T.unmount.toFieldAccessor();
+        public final FieldAccessor<Float> sideways = new FieldAccessor<Float>() {
+            @Override
+            public Float get(Object instance) {
+                return PacketPlayInSteerVehicleHandle.T.getSideways.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Float value) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Float> forwards = new FieldAccessor<Float>() {
+            @Override
+            public Float get(Object instance) {
+                return PacketPlayInSteerVehicleHandle.T.getForwards.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Float value) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Boolean> jump = new FieldAccessor<Boolean>() {
+            @Override
+            public Boolean get(Object instance) {
+                return PacketPlayInSteerVehicleHandle.T.isJump.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Boolean value) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Boolean> unmount = new FieldAccessor<Boolean>() {
+            @Override
+            public Boolean get(Object instance) {
+                return PacketPlayInSteerVehicleHandle.T.isUnmount.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Boolean value) {
+                return false;
+            }
+        };
     }
 
     public static class NMSPacketPlayInTabComplete extends NMSPacket {
