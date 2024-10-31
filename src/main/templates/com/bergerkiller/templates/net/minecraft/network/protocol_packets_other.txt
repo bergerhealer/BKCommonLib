@@ -1991,10 +1991,10 @@ class PacketPlayOutPosition extends Packet {
     }
 #endif
 
-    public static (PacketPlayOutPositionHandle) PacketPlayOutPosition createNew(int teleportWaitTimer, double x, double y, double z, float yaw, float pitch, (RelativeFlags) Set<RelativeMovement> relativeFlags) {
+    public static (PacketPlayOutPositionHandle) PacketPlayOutPosition createNew(double x, double y, double z, float yaw, float pitch, double deltaX, double deltaY, double deltaZ, (RelativeFlags) Set<RelativeMovement> relativeFlags, int teleportWaitTimer) {
 #if version >= 1.21.2
         return PacketPlayOutPosition.of(teleportWaitTimer, new PositionMoveRotation(
-            new Vec3D(x, y, z), new Vec3D(0.0, 0.0, 0.0), yaw, pitch
+            new Vec3D(x, y, z), new Vec3D(deltaX, deltaY, deltaZ), yaw, pitch
         ), relativeFlags);
 #elseif version >= 1.19.4
         return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer);
@@ -2008,6 +2008,14 @@ class PacketPlayOutPosition extends Packet {
     }
 
     <code>
+    public static PacketPlayOutPositionHandle createNew(double x, double y, double z, float yaw, float pitch, double deltaX, double deltaY, double deltaZ, RelativeFlags relativeFlags) {
+        return createNew(x, y, z, yaw, pitch, deltaX, deltaY, deltaZ, relativeFlags, 0);
+    }
+
+    public static PacketPlayOutPositionHandle createNew(double x, double y, double z, float yaw, float pitch, RelativeFlags relativeFlags) {
+        return createNew(x, y, z, yaw, pitch, 0.0, 0.0, 0.0, relativeFlags, 0);
+    }
+
     public static PacketPlayOutPositionHandle createRelative(double dx, double dy, double dz, float dyaw, float dpitch) {
         return createNew(dx, dy, dz, dyaw, dpitch, RelativeFlags.RELATIVE_POSITION_ROTATION);
     }
@@ -2018,10 +2026,6 @@ class PacketPlayOutPosition extends Packet {
 
     public static PacketPlayOutPositionHandle createAbsolute(double x, double y, double z, float yaw, float pitch) {
         return createNew(x, y, z, yaw, pitch, RelativeFlags.ABSOLUTE_POSITION);
-    }
-
-    public static PacketPlayOutPositionHandle createNew(double x, double y, double z, float yaw, float pitch, RelativeFlags relativeFlags) {
-        return createNew(0, x, y, z, yaw, pitch, relativeFlags);
     }
     </code>
 }

@@ -21,8 +21,8 @@ public abstract class PacketPlayOutPositionHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public static PacketPlayOutPositionHandle createNew(int teleportWaitTimer, double x, double y, double z, float yaw, float pitch, RelativeFlags relativeFlags) {
-        return T.createNew.invokeVA(teleportWaitTimer, x, y, z, yaw, pitch, relativeFlags);
+    public static PacketPlayOutPositionHandle createNew(double x, double y, double z, float yaw, float pitch, double deltaX, double deltaY, double deltaZ, RelativeFlags relativeFlags, int teleportWaitTimer) {
+        return T.createNew.invokeVA(x, y, z, yaw, pitch, deltaX, deltaY, deltaZ, relativeFlags, teleportWaitTimer);
     }
 
     public abstract double getX();
@@ -32,6 +32,14 @@ public abstract class PacketPlayOutPositionHandle extends PacketHandle {
     public abstract float getPitch();
     public abstract RelativeFlags getRelativeFlags();
     public abstract int getTeleportWaitTimer();
+    public static PacketPlayOutPositionHandle createNew(double x, double y, double z, float yaw, float pitch, double deltaX, double deltaY, double deltaZ, RelativeFlags relativeFlags) {
+        return createNew(x, y, z, yaw, pitch, deltaX, deltaY, deltaZ, relativeFlags, 0);
+    }
+
+    public static PacketPlayOutPositionHandle createNew(double x, double y, double z, float yaw, float pitch, RelativeFlags relativeFlags) {
+        return createNew(x, y, z, yaw, pitch, 0.0, 0.0, 0.0, relativeFlags, 0);
+    }
+
     public static PacketPlayOutPositionHandle createRelative(double dx, double dy, double dz, float dyaw, float dpitch) {
         return createNew(dx, dy, dz, dyaw, dpitch, RelativeFlags.RELATIVE_POSITION_ROTATION);
     }
@@ -42,10 +50,6 @@ public abstract class PacketPlayOutPositionHandle extends PacketHandle {
 
     public static PacketPlayOutPositionHandle createAbsolute(double x, double y, double z, float yaw, float pitch) {
         return createNew(x, y, z, yaw, pitch, RelativeFlags.ABSOLUTE_POSITION);
-    }
-
-    public static PacketPlayOutPositionHandle createNew(double x, double y, double z, float yaw, float pitch, RelativeFlags relativeFlags) {
-        return createNew(0, x, y, z, yaw, pitch, relativeFlags);
     }
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.PacketPlayOutPosition</b>.
