@@ -24,8 +24,13 @@ optional class LightEngineThreaded {
         world.chunkTaskScheduler.lightExecutor.queueRunnable(runnable);
     #endif
 
+  #elseif version >= 1.21.2
+        // Spigot/Legacy Paper >= 1.21.2
+        #require net.minecraft.server.level.LightEngineThreaded private final net.minecraft.util.thread.ConsecutiveExecutor consecutiveExecutor;
+        net.minecraft.util.thread.ConsecutiveExecutor executor = instance#consecutiveExecutor;
+        executor.schedule(runnable);
   #else
-        // Spigot/Legacy Paper
+        // Spigot/Legacy Paper < 1.21.2
     #if exists net.minecraft.server.level.LightEngineThreaded private final net.minecraft.util.thread.ThreadedMailbox<Runnable> taskMailbox;
         #require net.minecraft.server.level.LightEngineThreaded private final net.minecraft.util.thread.ThreadedMailbox<Runnable> taskMailbox;
     #else
