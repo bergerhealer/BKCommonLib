@@ -119,7 +119,10 @@ class HeightMap {
                     }
                 }
 
-  #if version >= 1.17
+  #if version >= 1.21.2
+                // Adjust for world height offset
+                y -= ichunkaccess.getMinY();
+  #elseif version >= 1.17
                 // Adjust for world height offset
                 y -= ichunkaccess.getMinBuildHeight();
   #endif

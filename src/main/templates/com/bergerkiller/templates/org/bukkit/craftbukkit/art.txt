@@ -26,7 +26,11 @@ class CraftArt {
 
     public static (Object) Holder<PaintingVariant> NotchFromInternalId(int internalId) {
         IRegistry paintingRegistry = #getPaintingVariantRegistry();
+#if version >= 1.21.2
+        java.util.Optional opt = paintingRegistry.get(internalId);
+#else
         java.util.Optional opt = paintingRegistry.getHolder(internalId);
+#endif
         return (Holder) opt.orElse(null);
     }
 
@@ -44,7 +48,11 @@ class CraftArt {
             return null;
         }
         int internalId = paintingRegistry.getId(valueAtKey);
+#if version >= 1.21.2
+        java.util.Optional opt = paintingRegistry.get(internalId);
+#else
         java.util.Optional opt = paintingRegistry.getHolder(internalId);
+#endif
         return (Holder) opt.orElse(null);
     }
 

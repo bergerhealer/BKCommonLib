@@ -803,6 +803,7 @@ public class CommonBootstrap {
         // 1.21.2 mappings
         if (evaluateMCVersion(">=", "1.21.2")) {
             remappings.put("net.minecraft.world.entity.RelativeMovement", "net.minecraft.world.entity.Relative");
+            remappings.put("net.minecraft.world.level.saveddata.maps.WorldMap$PatchData", "net.minecraft.world.level.saveddata.maps.WorldMap$c");
         }
 
         // There have been various locations where starlight was installed

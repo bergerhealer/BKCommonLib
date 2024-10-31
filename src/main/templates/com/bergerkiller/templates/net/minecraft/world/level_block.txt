@@ -90,10 +90,15 @@ class Block {
 
 #if version >= 1.18
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
+  #if version >= 1.21.2
+        // Note: not really called, as the getCachedOpacity() always succeeds
+        return iblockdata.getLightBlock();
+  #else
         return iblockdata.getLightBlock((IBlockAccess) world, new BlockPosition(x, y, z));
+  #endif
     }
 
-    public int getEmission:a((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
+    public int getEmission((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
         // Forge
   #if exists net.minecraft.world.level.block.Block public int getLightValue(IBlockData data, IBlockAccess world, BlockPosition pos);
         if (world != null) {

@@ -3,7 +3,9 @@ package net.minecraft.server.network;
 import net.minecraft.network.protocol.Packet;
 
 import net.minecraft.network.protocol.game.PacketPlayOutPosition;
+import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.entity.RelativeMovement;
+import net.minecraft.world.phys.Vec3D;
 
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 
@@ -128,7 +130,11 @@ class PlayerConnection {
         java.util.Set flags = new java.util.HashSet();
         flags.add(RelativeMovement.X_ROT);
         flags.add(RelativeMovement.Y_ROT);
-  #if version >= 1.19.4
+  #if version >= 1.21.2
+        instance.send((Packet) new PacketPlayOutPosition(0, new PositionMoveRotation(
+            new Vec3D(x, y, z), new Vec3D(0.0, 0.0, 0.0), 0.0f, 0.0f
+        ), flags));
+  #elseif version >= 1.19.4
         instance.send((Packet) new PacketPlayOutPosition(x, y, z, 0.0f, 0.0f, flags, 0));
   #elseif version >= 1.18
         instance.send((Packet) new PacketPlayOutPosition(x, y, z, 0.0f, 0.0f, flags, 0, false));

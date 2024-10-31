@@ -165,7 +165,9 @@ interface IBlockData {
         // When this happens, it would make transparent blocks block all light
         // We obviously don't want that!
         if (mask == com.bergerkiller.bukkit.common.collections.BlockFaceSet.ALL.mask()) {
-  #if version >= 1.18
+  #if version >= 1.21.2
+            int opacity = instance.getLightBlock();
+  #elseif version >= 1.18
             int opacity = instance.getLightBlock(emptyBlockAccess, BlockPosition.ZERO);
   #else
             int opacity = instance.b(emptyBlockAccess, BlockPosition.ZERO);
@@ -187,7 +189,13 @@ interface IBlockData {
     }
 
     // Returns -1 if world access is required to figure it out
-#if version >= 1.14
+#if version >= 1.21.2
+    public int getCachedOpacity() {
+        // World access is never required - it is always cached
+        // There isn't even a method to get the light level that makes use of a block position / world access
+        return instance.getLightBlock();
+    }
+#elseif version >= 1.14
     public int getCachedOpacity() {
         // Check world access isn't required (see: Block)
         Block block = instance.getBlock();

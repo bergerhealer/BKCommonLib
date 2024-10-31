@@ -1347,10 +1347,9 @@ class Entity {
             return;
         }
 
-
         // Call the default logic method
         #require Entity private void applyMovementEmissionAndPlaySound(Entity.MovementEmission emission, Vec3D vec3d, BlockPosition blockPosition, IBlockData iBlockData);
-        instance#applyMovementEmissionAndPlaySound(entity_movementemission, movement, blockPosition, blockData);
+        instance#applyMovementEmissionAndPlaySound(entity_movementemission, movement, blockPosition, iblockdata);
 
 #else
         //TODO: This stuff is vastly outdated :(

@@ -451,7 +451,9 @@ class Chunk {
     public boolean checkCanSave:a(boolean isNotAutosave);
 #endif
 
-#if version >= 1.18
+#if version >= 1.21.2
+    public void markDirty:markUnsaved();
+#elseif version >= 1.18
     public void markDirty() {
         instance.setUnsaved(true);
     }
@@ -467,6 +469,7 @@ class Chunk {
     // is the field still required at all?
     public void markEntitiesDirty() {
 #select version >=
+#case 1.21.2: instance.markUnsaved(); // Not entirely correct, do we need this?
 #case 1.18:   instance.setUnsaved(true); // Not entirely correct, do we need this?
 #case 1.17:   instance.markDirty(); // Not entirely correct, do we need this?
 #case 1.14:   instance.d(true);

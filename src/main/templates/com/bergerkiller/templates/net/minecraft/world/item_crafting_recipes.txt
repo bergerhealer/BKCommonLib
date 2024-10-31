@@ -219,7 +219,9 @@ class CraftingManager {
             // Since Minecraft 1.17 the fireworks recipe exists twice
             // One is shapeless, the other is complex
             // Correct for this and only keep the complex one!
-  #if version >= 1.19.4
+  #if version >= 1.21.2
+            // I guess do nothing (?)
+  #elseif version >= 1.19.4
             IRegistryCustom$Dimension registry = MinecraftServer.getServer().registryAccess();
             if (!(recipe instanceof RecipeFireworks) && ((IRecipe) recipe).getResultItem(registry).getItem() == Items.FIREWORK_ROCKET) {
                 continue;

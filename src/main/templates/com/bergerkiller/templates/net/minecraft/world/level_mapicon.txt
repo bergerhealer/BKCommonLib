@@ -233,7 +233,13 @@ class MapDecorationType {
     public byte getId:a();
 #endif
 
-#if version >= 1.20.5
+#if version >= 1.21.2
+    public static (List<Holder<MapDecorationTypeHandle>>) List<net.minecraft.core.Holder<MapDecorationType>> getValues() {
+        return net.minecraft.core.registries.BuiltInRegistries.MAP_DECORATION_TYPE
+                .listElements()
+                .collect(java.util.stream.Collectors.toList());
+    }
+#elseif version >= 1.20.5
     public static (List<Holder<MapDecorationTypeHandle>>) List<net.minecraft.core.Holder<MapDecorationType>> getValues() {
         return net.minecraft.core.registries.BuiltInRegistries.MAP_DECORATION_TYPE
                 .holders()
