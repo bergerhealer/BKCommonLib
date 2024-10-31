@@ -19,103 +19,90 @@ public abstract class PacketPlayOutEntityTeleportHandle extends PacketHandle {
         return T.createHandle(handleInstance);
     }
 
-    public static final PacketPlayOutEntityTeleportHandle createNew(Entity entity) {
-        return T.constr_entity.newInstance(entity);
-    }
-
     /* ============================================================================== */
 
-    public static PacketPlayOutEntityTeleportHandle createNew() {
-        return T.createNew.invoke();
+    public static PacketPlayOutEntityTeleportHandle createNewForEntity(Entity entity) {
+        return T.createNewForEntity.invoke(entity);
     }
 
+    public static PacketPlayOutEntityTeleportHandle createNew(int entityId, double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
+        return T.createNew.invokeVA(entityId, posX, posY, posZ, yaw, pitch, onGround);
+    }
+
+    public abstract int getEntityId();
+    public abstract double getPosX();
+    public abstract double getPosY();
+    public abstract double getPosZ();
+    public abstract float getYaw();
+    public abstract float getPitch();
+    public abstract boolean isOnGround();
+    public abstract int getEncodedPosX();
+    public abstract int getEncodedPosY();
+    public abstract int getEncodedPosZ();
+    public abstract int getEncodedYaw();
+    public abstract int getEncodedPitch();
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
         return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_TELEPORT;
     }
 
-    public static PacketPlayOutEntityTeleportHandle createNew(int entityId, double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
-        PacketPlayOutEntityTeleportHandle handle = createNew();
-        handle.setEntityId(entityId);
-        handle.setPosX(posX);
-        handle.setPosY(posY);
-        handle.setPosZ(posZ);
-        handle.setYaw(yaw);
-        handle.setPitch(pitch);
-        handle.setOnGround(onGround);
-        return handle;
+
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public double getPosX() {
-        return getProtocolPosition(T.posX_1_8_8, T.posX_1_10_2);
-    }
+    public static class Builder {
+        private int entityId;
+        private double posX, posY, posZ;
+        private float yaw, pitch;
+        private boolean onGround;
 
-    public double getPosY() {
-        return getProtocolPosition(T.posY_1_8_8, T.posY_1_10_2);
-    }
+        public Builder entityId(int entityId) { this.entityId = entityId; return this; }
+        public Builder posX(double posX) { this.posX = posX; return this; }
+        public Builder posY(double posY) { this.posY = posY; return this; }
+        public Builder posZ(double posZ) { this.posZ = posZ; return this; }
+        public Builder position(org.bukkit.util.Vector position) {
+            return position(position.getX(), position.getY(), position.getZ());
+        }
+        public Builder position(double x, double y, double z) {
+            this.posX = x;
+            this.posY = y;
+            this.posZ = z;
+            return this;
+        }
+        public Builder yaw(float yaw) { this.yaw = yaw; return this; }
+        public Builder pitch(float pitch) { this.pitch = pitch; return this; }
+        public Builder rotation(float yaw, float pitch) {
+            this.yaw = yaw;
+            this.pitch = pitch;
+            return this;
+        }
+        public Builder onGround(boolean onGround) { this.onGround = onGround; return this; }
 
-    public double getPosZ() {
-        return getProtocolPosition(T.posZ_1_8_8, T.posZ_1_10_2);
+        public PacketPlayOutEntityTeleportHandle create() {
+            return PacketPlayOutEntityTeleportHandle.createNew(entityId, posX, posY, posZ, yaw, pitch, onGround);
+        }
     }
-
-    public void setPosX(double posX) {
-        setProtocolPosition(T.posX_1_8_8, T.posX_1_10_2, posX);
-    }
-
-    public void setPosY(double posY) {
-        setProtocolPosition(T.posY_1_8_8, T.posY_1_10_2, posY);
-    }
-
-    public void setPosZ(double posZ) {
-        setProtocolPosition(T.posZ_1_8_8, T.posZ_1_10_2, posZ);
-    }
-
-    public float getYaw() {
-        return getProtocolRotation(T.yaw_raw);
-    }
-
-    public float getPitch() {
-        return getProtocolRotation(T.pitch_raw);
-    }
-
-    public void setYaw(float yaw) {
-        setProtocolRotation(T.yaw_raw, yaw);
-    }
-
-    public void setPitch(float pitch) {
-        setProtocolRotation(T.pitch_raw, pitch);
-    }
-    public abstract int getEntityId();
-    public abstract void setEntityId(int value);
-    public abstract boolean isOnGround();
-    public abstract void setOnGround(boolean value);
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutEntityTeleportClass extends Template.Class<PacketPlayOutEntityTeleportHandle> {
-        public final Template.Constructor.Converted<PacketPlayOutEntityTeleportHandle> constr_entity = new Template.Constructor.Converted<PacketPlayOutEntityTeleportHandle>();
-
-        public final Template.Field.Integer entityId = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Integer posX_1_8_8 = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Integer posY_1_8_8 = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Integer posZ_1_8_8 = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Double posX_1_10_2 = new Template.Field.Double();
-        @Template.Optional
-        public final Template.Field.Double posY_1_10_2 = new Template.Field.Double();
-        @Template.Optional
-        public final Template.Field.Double posZ_1_10_2 = new Template.Field.Double();
-        @Template.Optional
-        public final Template.Field.Byte yaw_raw = new Template.Field.Byte();
-        @Template.Optional
-        public final Template.Field.Byte pitch_raw = new Template.Field.Byte();
-        public final Template.Field.Boolean onGround = new Template.Field.Boolean();
-
+        public final Template.StaticMethod.Converted<PacketPlayOutEntityTeleportHandle> createNewForEntity = new Template.StaticMethod.Converted<PacketPlayOutEntityTeleportHandle>();
         public final Template.StaticMethod.Converted<PacketPlayOutEntityTeleportHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutEntityTeleportHandle>();
+
+        public final Template.Method<Integer> getEntityId = new Template.Method<Integer>();
+        public final Template.Method<Double> getPosX = new Template.Method<Double>();
+        public final Template.Method<Double> getPosY = new Template.Method<Double>();
+        public final Template.Method<Double> getPosZ = new Template.Method<Double>();
+        public final Template.Method<Float> getYaw = new Template.Method<Float>();
+        public final Template.Method<Float> getPitch = new Template.Method<Float>();
+        public final Template.Method<Boolean> isOnGround = new Template.Method<Boolean>();
+        public final Template.Method<Integer> getEncodedPosX = new Template.Method<Integer>();
+        public final Template.Method<Integer> getEncodedPosY = new Template.Method<Integer>();
+        public final Template.Method<Integer> getEncodedPosZ = new Template.Method<Integer>();
+        public final Template.Method<Integer> getEncodedYaw = new Template.Method<Integer>();
+        public final Template.Method<Integer> getEncodedPitch = new Template.Method<Integer>();
 
     }
 

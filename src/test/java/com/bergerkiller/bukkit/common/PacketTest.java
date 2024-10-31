@@ -14,7 +14,6 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.resources.BlockStateType;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityTeleportHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTileEntityDataHandle;
 
 public class PacketTest {
@@ -61,12 +60,6 @@ public class PacketTest {
         assertTrue(PacketType.OUT_ENTITY_MOVE.isOutGoing());
         assertTrue(PacketType.OUT_MAP.isOutGoing());
         assertTrue(PacketType.OUT_MAP_CHUNK.isOutGoing());
-    }
-
-    @Test
-    public void testPacketTeleportCreateNew() {
-        assertNotNull(PacketPlayOutEntityTeleportHandle.createNew());
-        assertNotNull(PacketType.OUT_ENTITY_TELEPORT.newInstance());
     }
 
     @Test

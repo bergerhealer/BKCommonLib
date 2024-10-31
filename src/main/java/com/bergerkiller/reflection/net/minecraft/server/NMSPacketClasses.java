@@ -1174,7 +1174,17 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutEntityTeleport extends NMSPacket {
 
-        public final FieldAccessor<Integer> entityId = PacketPlayOutEntityTeleportHandle.T.entityId.toFieldAccessor();
+        public final FieldAccessor<Integer> entityId = new FieldAccessor<Integer>() {
+            @Override
+            public Integer get(Object instance) {
+                return PacketPlayOutEntityTeleportHandle.createHandle(instance).getEntityId();
+            }
+
+            @Override
+            public boolean set(Object instance, Integer value) {
+                return false;
+            }
+        };
         public final FieldAccessor<Double> x = new SafeDirectField<Double>() {
             @Override
             public Double get(Object instance) {
@@ -1183,8 +1193,7 @@ public class NMSPacketClasses {
 
             @Override
             public boolean set(Object instance, Double value) {
-                PacketPlayOutEntityTeleportHandle.createHandle(instance).setPosX(value.doubleValue());
-                return true;
+                return false;
             }
         };
         public final FieldAccessor<Double> y = new SafeDirectField<Double>() {
@@ -1195,8 +1204,7 @@ public class NMSPacketClasses {
 
             @Override
             public boolean set(Object instance, Double value) {
-                PacketPlayOutEntityTeleportHandle.createHandle(instance).setPosY(value.doubleValue());
-                return true;
+                return false;
             }
         };
         public final FieldAccessor<Double> z = new SafeDirectField<Double>() {
@@ -1207,8 +1215,7 @@ public class NMSPacketClasses {
 
             @Override
             public boolean set(Object instance, Double value) {
-                PacketPlayOutEntityTeleportHandle.createHandle(instance).setPosZ(value.doubleValue());
-                return true;
+                return false;
             }
         };
         public final FieldAccessor<Float> yaw = new SafeDirectField<Float>() {
@@ -1219,8 +1226,7 @@ public class NMSPacketClasses {
 
             @Override
             public boolean set(Object instance, Float value) {
-                PacketPlayOutEntityTeleportHandle.createHandle(instance).setYaw(value.floatValue());
-                return true;
+                return false;
             }
         };
         public final FieldAccessor<Float> pitch = new SafeDirectField<Float>() {
@@ -1231,14 +1237,33 @@ public class NMSPacketClasses {
 
             @Override
             public boolean set(Object instance, Float value) {
-                PacketPlayOutEntityTeleportHandle.createHandle(instance).setPitch(value.floatValue());
-                return true;
+                return false;
             }
         };
-        public final FieldAccessor<Boolean> onGround = PacketPlayOutEntityTeleportHandle.T.onGround.toFieldAccessor();
+        public final FieldAccessor<Boolean> onGround = new SafeDirectField<Boolean>() {
+            @Override
+            public Boolean get(Object instance) {
+                return PacketPlayOutEntityTeleportHandle.createHandle(instance).isOnGround();
+            }
+
+            @Override
+            public boolean set(Object instance, Boolean value) {
+                return false;
+            }
+        };
+
+        /**
+         * @deprecated It is no longer possible to construct this packet with initial values, as the
+         * class is now a record class. Use the other constructors instead.
+         */
+        @Override
+        @Deprecated
+        public CommonPacket newInstance() {
+            throw new UnsupportedOperationException("Not supported anymore");
+        }
 
         public CommonPacket newInstance(org.bukkit.entity.Entity entity) {
-            return PacketPlayOutEntityTeleportHandle.createNew(entity).toCommonPacket();
+            return PacketPlayOutEntityTeleportHandle.createNewForEntity(entity).toCommonPacket();
         }
 
         public CommonPacket newInstance(int entityId, double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {

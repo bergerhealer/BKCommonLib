@@ -53,57 +53,203 @@ class PacketPlayOutEntityTeleport extends Packet {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 #endif
 
-#if version >= 1.17
-    private int entityId:id;
-#else
-    private int entityId:a;
-#endif
-
-#if version >= 1.17
-    private optional int posX_1_8_8:###;
-    private optional int posY_1_8_8:###;
-    private optional int posZ_1_8_8:###;
-    private optional double posX_1_10_2:x;
-    private optional double posY_1_10_2:y;
-    private optional double posZ_1_10_2:z;
-#elseif version >= 1.9
-    private optional int posX_1_8_8:###;
-    private optional int posY_1_8_8:###;
-    private optional int posZ_1_8_8:###;
-    private optional double posX_1_10_2:b;
-    private optional double posY_1_10_2:c;
-    private optional double posZ_1_10_2:d;
-#else
-    private optional int posX_1_8_8:b;
-    private optional int posY_1_8_8:c;
-    private optional int posZ_1_8_8:d;
-    private optional double posX_1_10_2:###;
-    private optional double posY_1_10_2:###;
-    private optional double posZ_1_10_2:###;
-#endif
-
-#if version >= 1.17
-    private optional byte yaw_raw:yRot;
-    private optional byte pitch_raw:xRot;
-    private boolean onGround;
-#else
-    private optional byte yaw_raw:e;
-    private optional byte pitch_raw:f;
-    private boolean onGround:g;
-#endif
-
-    public static (PacketPlayOutEntityTeleportHandle) PacketPlayOutEntityTeleport createNew() {
-#if version >= 1.20.5
-        #require net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport private PacketPlayOutEntityTeleport createTeleportPacket:<init>(net.minecraft.network.PacketDataSerializer serializer);
-        return #createTeleportPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+    // Reflection needed on some versions of Minecraft, and also for creating a new packet
+#if version >= 1.21.2
+    // Record class, no fields need to be set using reflection
 #elseif version >= 1.17
-        return new PacketPlayOutEntityTeleport(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+    #require PacketPlayOutEntityTeleport private final int entityId:id;
+    #require PacketPlayOutEntityTeleport private final double posX:x;
+    #require PacketPlayOutEntityTeleport private final double posY:y;
+    #require PacketPlayOutEntityTeleport private final double posZ:z;
+    #require PacketPlayOutEntityTeleport private final byte encodedYaw:yRot;
+    #require PacketPlayOutEntityTeleport private final byte encodedPitch:xRot;
+    #require PacketPlayOutEntityTeleport private final boolean onGround;
 #else
-        return new PacketPlayOutEntityTeleport();
+    #require PacketPlayOutEntityTeleport private int entityId:a;
+  #if version >= 1.9
+    #require PacketPlayOutEntityTeleport private double posX:b;
+    #require PacketPlayOutEntityTeleport private double posY:c;
+    #require PacketPlayOutEntityTeleport private double posZ:d;
+  #else
+    #require PacketPlayOutEntityTeleport private int encodedPosX:b;
+    #require PacketPlayOutEntityTeleport private int encodedPosY:c;
+    #require PacketPlayOutEntityTeleport private int encodedPosZ:d;
+  #endif
+    #require PacketPlayOutEntityTeleport private byte encodedYaw:e;
+    #require PacketPlayOutEntityTeleport private byte encodedPitch:f;
+    #require PacketPlayOutEntityTeleport private boolean onGround:g;
+#endif
+
+#if version >= 1.21.2
+    public int getEntityId:id();
+    public double getPosX() { return instance.change().position().x; }
+    public double getPosY() { return instance.change().position().y; }
+    public double getPosZ() { return instance.change().position().z; }
+    public float getYaw() { return instance.change().yRot(); }
+    public float getPitch() { return instance.change().xRot(); }
+    public boolean isOnGround:onGround();
+
+    // Not really used anymore, but here for completion sake
+    public int getEncodedPosX() {
+        return ProtocolMath.serializePosition_1_8_8(instance.change().position().x);
+    }
+    public int getEncodedPosY() {
+        return ProtocolMath.serializePosition_1_8_8(instance.change().position().y);
+    }
+    public int getEncodedPosZ() {
+        return ProtocolMath.serializePosition_1_8_8(instance.change().position().z);
+    }
+    public int getEncodedYaw() {
+        return ProtocolMath.serializeRotation(instance.change().yRot());
+    }
+    public int getEncodedPitch() {
+        return ProtocolMath.serializeRotation(instance.change().xRot());
+    }
+#elseif version >= 1.18
+    public int getEntityId:getId();
+    public double getPosX:getX();
+    public double getPosY:getY();
+    public double getPosZ:getZ();
+    public float getYaw() {
+        return ProtocolMath.deserializeRotation(instance.getyRot());
+    }
+    public float getPitch() {
+        return ProtocolMath.deserializeRotation(instance.getxRot());
+    }
+    public boolean isOnGround();
+
+    // Not really used anymore, but here for completion sake
+    public int getEncodedX() {
+        return ProtocolMath.serializePosition_1_8_8(instance.getX());
+    }
+    public int getEncodedY() {
+        return ProtocolMath.serializePosition_1_8_8(instance.getY());
+    }
+    public int getEncodedZ() {
+        return ProtocolMath.serializePosition_1_8_8(instance.getZ());
+    }
+
+    public int getEncodedYaw() { return (int) instance.getyRot() & 0xFF; }
+    public int getEncodedPitch() { return (int) instance.getxRot() & 0xFF; }
+#elseif version >= 1.17
+    public int getEntityId:b();
+    public double getPosX:c();
+    public double getPosY:d();
+    public double getPosZ:e();
+    public float getYaw() {
+        return ProtocolMath.deserializeRotation(instance.f());
+    }
+    public float getPitch() {
+        return ProtocolMath.deserializeRotation(instance.g());
+    }
+    public boolean isOnGround:h();
+
+    // Not really used anymore, but here for completion sake
+    public int getEncodedPosX() {
+        return ProtocolMath.serializePosition_1_8_8(instance.c());
+    }
+    public int getEncodedPosY() {
+        return ProtocolMath.serializePosition_1_8_8(instance.d());
+    }
+    public int getEncodedPosZ() {
+        return ProtocolMath.serializePosition_1_8_8(instance.e());
+    }
+
+    public int getEncodedYaw() { return (int) instance.f() & 0xFF; }
+    public int getEncodedPitch() { return (int) instance.g() & 0xFF; }
+#else
+    // Relies on reflection to access the private fields
+    public int getEntityId() { return instance#entityId; }
+
+  #if version >= 1.9
+    public double getPosX() { return instance#posX; }
+    public double getPosY() { return instance#posY; }
+    public double getPosZ() { return instance#posZ; }
+  #else
+    public double getPosX() { return ProtocolMath.deserializePosition_1_8_8( instance#encodedPosX ); }
+    public double getPosY() { return ProtocolMath.deserializePosition_1_8_8( instance#encodedPosY ); }
+    public double getPosZ() { return ProtocolMath.deserializePosition_1_8_8( instance#encodedPosZ ); }
+  #endif
+
+    public float getYaw() {
+        return ProtocolMath.deserializeRotation( instance#encodedYaw );
+    }
+    public float getPitch() {
+        return ProtocolMath.deserializeRotation( instance#encodedPitch );
+    }
+
+    public boolean isOnGround() { return instance#onGround; }
+
+  #if version >= 1.9
+    public int getEncodedPosX() { return instance#encodedPosX; }
+    public int getEncodedPosY() { return instance#encodedPosY; }
+    public int getEncodedPosZ() { return instance#encodedPosZ; }
+  #else
+    // Not really used anymore, but here for completion sake
+    public int getEncodedPosX() {
+        return ProtocolMath.serializePosition_1_8_8( instance#posX );
+    }
+    public int getEncodedPosY() {
+        return ProtocolMath.serializePosition_1_8_8( instance#posY );
+    }
+    public int getEncodedPosZ() {
+        return ProtocolMath.serializePosition_1_8_8( instance#posZ );
+    }
+  #endif
+
+    public int getEncodedYaw() { return (int) instance#encodedYaw & 0xFF; }
+    public int getEncodedPitch() { return (int) instance#encodedPitch & 0xFF; }
+#endif
+
+    public static (PacketPlayOutEntityTeleportHandle) PacketPlayOutEntityTeleport createNewForEntity((org.bukkit.entity.Entity) Entity entity) {
+#if version >= 1.21.2
+        PositionMoveRotation change = PositionMoveRotation.of(entity);
+        java.util.Set relatives = java.util.Collections.emptySet();
+        return new PacketPlayOutEntityTeleport(entity.getId(), change, relatives, entity.onGround());
+#else
+        return new PacketPlayOutEntityTeleport(entity);
 #endif
     }
 
-    public (PacketPlayOutEntityTeleportHandle) PacketPlayOutEntityTeleport((org.bukkit.entity.Entity) Entity entity);
+    public static (PacketPlayOutEntityTeleportHandle) PacketPlayOutEntityTeleport createNew(int entityId, double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
+#if version >= 1.21.2
+        PositionMoveRotation change = new PositionMoveRotation(new Vec3D(posX, posY, posZ), new Vec3D(0.0, 0.0, 0.0), yaw, pitch);
+        java.util.Set relatives = RelativeFlags.toRawRelativeFlags(RelativeFlags.ABSOLUTE_POSITION);
+        return new PacketPlayOutEntityTeleport(entityId, change, relatives, onGround);
+
+#elseif version >= 1.9
+        // Create a new packet and use reflection to set the fields
+        // Unfortunately, no nice constructor :(
+  #if version >= 1.20.5
+        #require net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport private PacketPlayOutEntityTeleport createTeleportPacket:<init>(net.minecraft.network.PacketDataSerializer serializer);
+        PacketPlayOutEntityTeleport packet = #createTeleportPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+  #elseif version >= 1.17
+        PacketPlayOutEntityTeleport packet = new PacketPlayOutEntityTeleport(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+  #else
+        PacketPlayOutEntityTeleport packet = new PacketPlayOutEntityTeleport();
+  #endif
+
+        byte encodedYaw = (byte) ProtocolMath.serializeRotation(yaw);
+        byte encodedPitch = (byte) ProtocolMath.serializeRotation(pitch);
+
+        packet#entityId = entityId;
+        packet#posX = posX;
+        packet#posY = posY;
+        packet#posZ = posZ;
+        packet#encodedYaw = encodedYaw;
+        packet#encodedPitch = encodedPitch;
+        packet#onGround = onGround;
+        return packet;
+#else
+        // Constructor is available
+        int encodedPosX = ProtocolMath.serializePosition_1_8_8(posX);
+        int encodedPosY = ProtocolMath.serializePosition_1_8_8(posY);
+        int encodedPosZ = ProtocolMath.serializePosition_1_8_8(posZ);
+        byte encodedYaw = (byte) ProtocolMath.serializeRotation(yaw);
+        byte encodedPitch = (byte) ProtocolMath.serializeRotation(pitch);
+        return new PacketPlayOutEntityTeleport(entityId, encodedPosX, encodedPosY, encodedPosZ, encodedYaw, encodedPitch, onGround);
+#endif
+    }
 
     <code>
     @Override
@@ -111,56 +257,42 @@ class PacketPlayOutEntityTeleport extends Packet {
         return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_TELEPORT;
     }
 
-    public static PacketPlayOutEntityTeleportHandle createNew(int entityId, double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
-        PacketPlayOutEntityTeleportHandle handle = createNew();
-        handle.setEntityId(entityId);
-        handle.setPosX(posX);
-        handle.setPosY(posY);
-        handle.setPosZ(posZ);
-        handle.setYaw(yaw);
-        handle.setPitch(pitch);
-        handle.setOnGround(onGround);
-        return handle;
+
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public double getPosX() {
-        return getProtocolPosition(T.posX_1_8_8, T.posX_1_10_2);
-    }
+    public static class Builder {
+        private int entityId;
+        private double posX, posY, posZ;
+        private float yaw, pitch;
+        private boolean onGround;
 
-    public double getPosY() {
-        return getProtocolPosition(T.posY_1_8_8, T.posY_1_10_2);
-    }
+        public Builder entityId(int entityId) { this.entityId = entityId; return this; }
+        public Builder posX(double posX) { this.posX = posX; return this; }
+        public Builder posY(double posY) { this.posY = posY; return this; }
+        public Builder posZ(double posZ) { this.posZ = posZ; return this; }
+        public Builder position(org.bukkit.util.Vector position) {
+            return position(position.getX(), position.getY(), position.getZ());
+        }
+        public Builder position(double x, double y, double z) {
+            this.posX = x;
+            this.posY = y;
+            this.posZ = z;
+            return this;
+        }
+        public Builder yaw(float yaw) { this.yaw = yaw; return this; }
+        public Builder pitch(float pitch) { this.pitch = pitch; return this; }
+        public Builder rotation(float yaw, float pitch) {
+            this.yaw = yaw;
+            this.pitch = pitch;
+            return this;
+        }
+        public Builder onGround(boolean onGround) { this.onGround = onGround; return this; }
 
-    public double getPosZ() {
-        return getProtocolPosition(T.posZ_1_8_8, T.posZ_1_10_2);
-    }
-
-    public void setPosX(double posX) {
-        setProtocolPosition(T.posX_1_8_8, T.posX_1_10_2, posX);
-    }
-
-    public void setPosY(double posY) {
-        setProtocolPosition(T.posY_1_8_8, T.posY_1_10_2, posY);
-    }
-
-    public void setPosZ(double posZ) {
-        setProtocolPosition(T.posZ_1_8_8, T.posZ_1_10_2, posZ);
-    }
-
-    public float getYaw() {
-        return getProtocolRotation(T.yaw_raw);
-    }
-
-    public float getPitch() {
-        return getProtocolRotation(T.pitch_raw);
-    }
-
-    public void setYaw(float yaw) {
-        setProtocolRotation(T.yaw_raw, yaw);
-    }
-
-    public void setPitch(float pitch) {
-        setProtocolRotation(T.pitch_raw, pitch);
+        public PacketPlayOutEntityTeleportHandle create() {
+            return PacketPlayOutEntityTeleportHandle.createNew(entityId, posX, posY, posZ, yaw, pitch, onGround);
+        }
     }
     </code>
 }
