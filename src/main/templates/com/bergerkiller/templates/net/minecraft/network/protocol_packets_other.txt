@@ -2340,10 +2340,10 @@ class PacketPlayOutCombatEvent extends Packet {
 // Only >= MC 1.9
 optional class PacketPlayOutSetCooldown extends Packet {
 #if version >= 1.17
-    private (org.bukkit.Material) Item material:item;
+    //private (org.bukkit.Material) Item material:item;
     private int cooldown:duration;
 #else
-    private (org.bukkit.Material) Item material:a;
+    //private (org.bukkit.Material) Item material:a;
     private int cooldown:b;
 #endif
 }

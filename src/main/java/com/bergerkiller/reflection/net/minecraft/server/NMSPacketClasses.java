@@ -1824,7 +1824,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutSetCooldown extends NMSPacket {
 
-        public final FieldAccessor<Material> material = PacketPlayOutSetCooldownHandle.T.material.toFieldAccessor();
+        //public final FieldAccessor<Material> material = PacketPlayOutSetCooldownHandle.T.material.toFieldAccessor();
         public final FieldAccessor<Integer> cooldown = PacketPlayOutSetCooldownHandle.T.cooldown.toFieldAccessor();
     }
 
