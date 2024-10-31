@@ -1303,7 +1303,11 @@ class Entity {
     protected void burn(float dmg);
 #endif
 
-#if version >= 1.18
+#if version >= 1.21.2
+    public (org.bukkit.entity.Item) EntityItem dropItem((org.bukkit.Material) Item material, int amount, float force) {
+        return instance.spawnAtLocation((WorldServer) instance.level(), new ItemStack(material, amount), force);
+    }
+#elseif version >= 1.18
     public (org.bukkit.entity.Item) EntityItem dropItem((org.bukkit.Material) Item material, int amount, float force) {
         return instance.spawnAtLocation(new ItemStack(material, amount), force);
     }

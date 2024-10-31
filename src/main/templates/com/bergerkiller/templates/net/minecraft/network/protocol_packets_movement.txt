@@ -2,6 +2,8 @@ package net.minecraft.network.protocol.game;
 
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.PositionMoveRotation;
+import net.minecraft.world.phys.Vec3D;
 
 import com.bergerkiller.bukkit.common.internal.logic.ProtocolMath;
 
@@ -12,6 +14,8 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotationHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityVelocityHandle
+
+import com.bergerkiller.bukkit.common.wrappers.RelativeFlags;
 
 // Only >= MC 1.9
 optional class PacketPlayInVehicleMove extends Packet {

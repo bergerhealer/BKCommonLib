@@ -2707,7 +2707,10 @@ class PacketPlayOutWorldParticles extends Packet {
   #if version >= 1.17
         } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$DustColorTransitionOptions) {
             com.bergerkiller.bukkit.common.resources.ParticleType$DustColorTransitionOptions ts = (com.bergerkiller.bukkit.common.resources.ParticleType$DustColorTransitionOptions) options;
-    #if version >= 1.19.3
+    #if version >= 1.21.2
+            int color = ts.color.asRGB();
+            int to_color = ts.endColor.asRGB();
+    #elseif version >= 1.19.3
             org.joml.Vector3f color = new org.joml.Vector3f((float) ts.color.getRed() / 255.0f,
                                                             (float) ts.color.getGreen() / 255.0f,
                                                             (float) ts.color.getBlue() / 255.0f);
@@ -2770,15 +2773,20 @@ class PacketPlayOutWorldParticles extends Packet {
 
         } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions) {
             com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions dust = (com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions) options;
+
+  #if version >= 1.21.2
+            param = new net.minecraft.core.particles.ParticleParamRedstone(dust.color.asRGB(), dust.scale);
+  #else
             float r = (float) dust.color.getRed() / 255.0f;
             float g = (float) dust.color.getGreen() / 255.0f;
             float b = (float) dust.color.getBlue() / 255.0f;
-  #if version >= 1.19.3
+    #if version >= 1.19.3
             param = new net.minecraft.core.particles.ParticleParamRedstone(new org.joml.Vector3f(r,g,b), dust.scale);
-  #elseif version >= 1.17
+    #elseif version >= 1.17
             param = new net.minecraft.core.particles.ParticleParamRedstone(new com.mojang.math.Vector3fa(r,g,b), dust.scale);
-  #else
+    #else
             param = new net.minecraft.core.particles.ParticleParamRedstone(r, g, b, dust.scale);
+    #endif
   #endif
 
         } else {

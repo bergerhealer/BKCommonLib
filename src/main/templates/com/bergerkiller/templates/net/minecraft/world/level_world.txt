@@ -395,7 +395,9 @@ class World extends IBlockAccess {
 #endif
 
     public void applyBlockPhysics((IntVector3) BlockPosition position, (BlockData) Block causeType) {
-#if version >= 1.18
+#if version >= 1.21.2
+        instance.neighborChanged(position, causeType, (net.minecraft.world.level.redstone.Orientation) null);
+#elseif version >= 1.18
         instance.neighborChanged(position, causeType, position);
 #elseif version >= 1.11
         instance.a(position, causeType, position);

@@ -254,12 +254,21 @@ class ItemStack {
         }
 
         // Hide armor trim
+  #if version >= 1.21.2
+        {
+            net.minecraft.world.item.equipment.trim.ArmorTrim trim = (net.minecraft.world.item.equipment.trim.ArmorTrim) instance.get(DataComponents.TRIM);
+            if (trim != null) {
+                instance.set(DataComponents.TRIM, trim.withTooltip(false));
+            }
+        }
+  #else
         {
             net.minecraft.world.item.armortrim.ArmorTrim trim = (net.minecraft.world.item.armortrim.ArmorTrim) instance.get(DataComponents.TRIM);
             if (trim != null) {
                 instance.set(DataComponents.TRIM, trim.withTooltip(false));
             }
         }
+  #endif
 
         // Hide item attributes in tooltip
         {
