@@ -23,6 +23,7 @@ import net.minecraft.world.EnumHand;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectList;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -48,6 +49,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
+import com.bergerkiller.bukkit.common.wrappers.RelativeFlags;
 import com.bergerkiller.bukkit.common.resources.BlockStateType;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.wrappers.WindowType;
@@ -86,7 +88,6 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.RelativeMovementHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
 
 class PacketPlayOutEntityDestroy extends Packet {
@@ -1941,99 +1942,88 @@ class PacketPlayOutStopSound extends Packet {
 }
 
 class PacketPlayOutPosition extends Packet {
-#if version >= 1.17
-    private double x:x;
-    private double y:y;
-    private double z:z;
-    private float yaw:yRot;
-    private float pitch:xRot;
-    private (Set<RelativeMovementHandle>) Set<RelativeMovement> teleportFlags:relativeArguments;
-
-    // >= MC 1.9
-    private optional int teleportWaitTimer:id;
-#else
-    private double x:a;
-    private double y:b;
-    private double z:c;
-    private float yaw:d;
-    private float pitch:e;
-    private (Set<RelativeMovementHandle>) Set<RelativeMovement> teleportFlags:f;
-
-    // >= MC 1.9
-    private optional int teleportWaitTimer:g;
-#endif
-
-    <code>
-    public int getTeleportWaitTimer() {
-        if (T.teleportWaitTimer.isAvailable()) {
-            return T.teleportWaitTimer.getInteger(getRaw());
-        } else {
-            return 0;
-        }
-    }
-
-    public void setTeleportWaitTimer(int ticks) {
-        if (T.teleportWaitTimer.isAvailable()) {
-            T.teleportWaitTimer.setInteger(getRaw(), ticks);
-        }
-    }
-
-    public void setRotationRelative(boolean relative) {
-        Set<RelativeMovementHandle> flags = getTeleportFlags();
-        if (relative) {
-            flags.add(RelativeMovementHandle.Y_ROT);
-            flags.add(RelativeMovementHandle.X_ROT);
-        } else {
-            flags.remove(RelativeMovementHandle.Y_ROT);
-            flags.remove(RelativeMovementHandle.X_ROT);
-        }
-    }
-
-    public void setPositionRelative(boolean relative) {
-        Set<RelativeMovementHandle> flags = getTeleportFlags();
-        if (relative) {
-            flags.add(RelativeMovementHandle.X);
-            flags.add(RelativeMovementHandle.Y);
-            flags.add(RelativeMovementHandle.Z);
-        } else {
-            flags.remove(RelativeMovementHandle.X);
-            flags.remove(RelativeMovementHandle.Y);
-            flags.remove(RelativeMovementHandle.Z);
-        }
-    }
-    </code>
-
-    public static (PacketPlayOutPositionHandle) PacketPlayOutPosition createRelative(double dx, double dy, double dz, float dyaw, float dpitch) {
-        java.util.Set flags = com.bergerkiller.generated.net.minecraft.world.entity.RelativeMovementHandle.allRelative();
-#if version >= 1.19.4
-        return new PacketPlayOutPosition(dx, dy, dz, dyaw, dpitch, flags, 0);
+#if version >= 1.21.2
+    public double getX() { return instance.change().position().x; }
+    public double getY() { return instance.change().position().y; }
+    public double getZ() { return instance.change().position().z; }
+    public float getYaw() { return instance.change().yRot(); }
+    public float getPitch() { return instance.change().xRot(); }
+    public (RelativeFlags) Set<RelativeMovement> getRelativeFlags:relatives();
+    public int getTeleportWaitTimer:id();
+#elseif version >= 1.18
+    public double getX();
+    public double getY();
+    public double getZ();
+    public float getYaw:getYRot();
+    public float getPitch:getXRot();
+    public (RelativeFlags) Set<RelativeMovement> getRelativeFlags:getRelativeArguments();
+    public int getTeleportWaitTimer:getId();
 #elseif version >= 1.17
-        return new PacketPlayOutPosition(dx, dy, dz, dyaw, dpitch, flags, 0, false);
-#elseif version >= 1.9
-        return new PacketPlayOutPosition(dx, dy, dz, dyaw, dpitch, flags, 0);
+    public double getX:b();
+    public double getY:c();
+    public double getZ:d();
+    public float getYaw:e();
+    public float getPitch:f();
+    public (RelativeFlags) Set<RelativeMovement> getRelativeFlags:i();
+    public int getTeleportWaitTimer:g();
 #else
-        return new PacketPlayOutPosition(dx, dy, dz, dyaw, dpitch, flags);
+    #require PacketPlayOutPosition private double x:a;
+    #require PacketPlayOutPosition private double y:b;
+    #require PacketPlayOutPosition private double z:c;
+    #require PacketPlayOutPosition private float yaw:d;
+    #require PacketPlayOutPosition private float pitch:e;
+    #require PacketPlayOutPosition private Set<RelativeMovement> relativeArguments:f;
+
+    public double getX() { return instance#x; }
+    public double getY() { return instance#y; }
+    public double getZ() { return instance#z; }
+    public float getYaw() { return instance#yaw; }
+    public float getPitch() { return instance#pitch; }
+    public (RelativeFlags) Set<RelativeMovement> getRelativeFlags() { return instance#relativeArguments; }
+
+    public int getTeleportWaitTimer() {
+  #if version >= 1.9
+        #require PacketPlayOutPosition private int teleportWaitTimer:g;
+        return instance#teleportWaitTimer; }
+  #else
+        return 0;
+  #endif
+    }
+#endif
+
+    public static (PacketPlayOutPositionHandle) PacketPlayOutPosition createNew(int teleportWaitTimer, double x, double y, double z, float yaw, float pitch, (RelativeFlags) Set<RelativeMovement> relativeFlags) {
+#if version >= 1.21.2
+        return PacketPlayOutPosition.of(teleportWaitTimer, new PositionMoveRotation(
+            new Vec3D(x, y, z), new Vec3D(0.0, 0.0, 0.0), yaw, pitch
+        ), relativeFlags);
+#elseif version >= 1.19.4
+        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer);
+#elseif version >= 1.17
+        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer, false);
+#elseif version >= 1.9
+        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer);
+#else
+        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags);
 #endif
     }
 
     <code>
+    public static PacketPlayOutPositionHandle createRelative(double dx, double dy, double dz, float dyaw, float dpitch) {
+        return createNew(dx, dy, dz, dyaw, dpitch, RelativeFlags.RELATIVE_POSITION_ROTATION);
+    }
+
     public static PacketPlayOutPositionHandle createAbsolute(org.bukkit.Location location) {
         return createAbsolute(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
     }
-    </code>
 
-    public static (PacketPlayOutPositionHandle) PacketPlayOutPosition createAbsolute(double x, double y, double z, float yaw, float pitch) {
-        java.util.Set flags = com.bergerkiller.generated.net.minecraft.world.entity.RelativeMovementHandle.allAbsolute();
-#if version >= 1.19.4
-        return new PacketPlayOutPosition(x, y, z, yaw, pitch, flags, 0);
-#elseif version >= 1.17
-        return new PacketPlayOutPosition(x, y, z, yaw, pitch, flags, 0, false);
-#elseif version >= 1.9
-        return new PacketPlayOutPosition(x, y, z, yaw, pitch, flags, 0);
-#else
-        return new PacketPlayOutPosition(x, y, z, yaw, pitch, flags);
-#endif
+    public static PacketPlayOutPositionHandle createAbsolute(double x, double y, double z, float yaw, float pitch) {
+        return createNew(x, y, z, yaw, pitch, RelativeFlags.ABSOLUTE_POSITION);
     }
+
+    public static PacketPlayOutPositionHandle createNew(double x, double y, double z, float yaw, float pitch, RelativeFlags relativeFlags) {
+        return createNew(0, x, y, z, yaw, pitch, relativeFlags);
+    }
+    </code>
 }
 
 // Available >= MC 1.9

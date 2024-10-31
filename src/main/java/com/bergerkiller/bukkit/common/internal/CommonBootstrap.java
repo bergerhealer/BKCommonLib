@@ -30,6 +30,7 @@ import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.internal.logic.UnsetDataWatcherItemInit;
 import com.bergerkiller.bukkit.common.wrappers.Brightness;
 import com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode;
+import com.bergerkiller.bukkit.common.wrappers.RelativeFlags;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.Bukkit;
 
@@ -799,6 +800,11 @@ public class CommonBootstrap {
             remappings.put("org.bukkit.craftbukkit.inventory.SerializableMeta", "org.bukkit.craftbukkit.inventory.CraftMetaItem$SerializableMeta");
         }
 
+        // 1.21.2 mappings
+        if (evaluateMCVersion(">=", "1.21.2")) {
+            remappings.put("net.minecraft.world.entity.RelativeMovement", "net.minecraft.world.entity.Relative");
+        }
+
         // There have been various locations where starlight was installed
         // This was also part of tuinity at some point, but was then ported into paper
         {
@@ -883,6 +889,7 @@ public class CommonBootstrap {
         Conversion.registerConverters(Brightness.class);
         Conversion.registerConverters(CommonEntityType.class);
         Conversion.registerConverters(MapConversion.class);
+        Conversion.registerConverters(RelativeFlags.class);
 
         // EquipmentSlot <> EnumItemSlot, only for later version of 1.8 builds
         {

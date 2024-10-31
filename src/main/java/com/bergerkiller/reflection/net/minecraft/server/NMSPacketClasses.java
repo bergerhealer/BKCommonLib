@@ -1593,12 +1593,61 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutPosition extends NMSPacket {
 
-        public final FieldAccessor<Double> x = PacketPlayOutPositionHandle.T.x.toFieldAccessor();
-        public final FieldAccessor<Double> y = PacketPlayOutPositionHandle.T.y.toFieldAccessor();
-        public final FieldAccessor<Double> z = PacketPlayOutPositionHandle.T.z.toFieldAccessor();
-        public final FieldAccessor<Float> yaw = PacketPlayOutPositionHandle.T.yaw.toFieldAccessor();
-        public final FieldAccessor<Float> pitch = PacketPlayOutPositionHandle.T.pitch.toFieldAccessor();
-        public final FieldAccessor<Set<?>> teleportFlags = CommonUtil.unsafeCast(PacketPlayOutPositionHandle.T.teleportFlags.raw.toFieldAccessor());
+        public final FieldAccessor<Double> x = new FieldAccessor<Double>() {
+            @Override
+            public Double get(Object instance) {
+                return PacketPlayOutPositionHandle.T.getX.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Double value) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Double> y = new FieldAccessor<Double>() {
+            @Override
+            public Double get(Object instance) {
+                return PacketPlayOutPositionHandle.T.getY.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Double value) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Double> z = new FieldAccessor<Double>() {
+            @Override
+            public Double get(Object instance) {
+                return PacketPlayOutPositionHandle.T.getZ.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Double value) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Float> yaw = new FieldAccessor<Float>() {
+            @Override
+            public Float get(Object instance) {
+                return PacketPlayOutPositionHandle.T.getYaw.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Float value) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Float> pitch = new FieldAccessor<Float>() {
+            @Override
+            public Float get(Object instance) {
+                return PacketPlayOutPositionHandle.T.getPitch.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Float value) {
+                return false;
+            }
+        };
         public final FieldAccessor<Integer> teleportWaitTimer = new SafeDirectField<Integer>() {
             @Override
             public Integer get(Object instance) {
@@ -1607,12 +1656,9 @@ public class NMSPacketClasses {
 
             @Override
             public boolean set(Object instance, Integer value) {
-                PacketPlayOutPositionHandle.createHandle(instance).setTeleportWaitTimer(value.intValue());
-                return true;
+                return false;
             }
         };
-        @Deprecated
-        public final FieldAccessor<Integer> unknown1 = teleportWaitTimer;
     }
 
     public static class NMSPacketPlayOutRemoveEntityEffect extends NMSPacket {
