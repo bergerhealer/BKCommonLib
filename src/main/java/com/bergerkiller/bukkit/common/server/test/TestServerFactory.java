@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.server.test;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -29,7 +30,9 @@ public abstract class TestServerFactory {
         }
 
         TestServerFactory factory;
-        if (CommonBootstrap.evaluateMCVersion(">=", "1.20.2")) {
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.21.2")) {
+            factory = new TestServerFactory_1_21_2();
+        } else if (CommonBootstrap.evaluateMCVersion(">=", "1.20.2")) {
             factory = new TestServerFactory_1_20_2();
         } else if (CommonBootstrap.evaluateMCVersion(">=", "1.19.3")) {
             factory = new TestServerFactory_1_19_3();
@@ -246,5 +249,6 @@ public abstract class TestServerFactory {
         public Object mc_server = null;
         public Object resourcePackRepository = null;
         public Object resourceManager = null;
+        public List<?> tagDataPackRegistries = null; // Only used 1.21.2+
     }
 }

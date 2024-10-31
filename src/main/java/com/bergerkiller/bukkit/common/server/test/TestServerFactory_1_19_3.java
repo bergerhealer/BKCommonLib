@@ -197,12 +197,24 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         // In WorldLoader.java:
         //                 LayeredRegistryAccess<RegistryLayer> layeredregistryaccess1 = loadAndReplaceLayer(ireloadableresourcemanager, layeredregistryaccess, RegistryLayer.WORLDGEN, RegistryDataLoader.WORLDGEN_REGISTRIES);
         {
-            registries = createFromCode(minecraftServerType,
-                    "return net.minecraft.server.WorldLoader.loadAndReplaceLayer(\n" +
-                    "    arg0, arg1,\n" +
-                    "    net.minecraft.server.RegistryLayer.WORLDGEN,\n" +
-                    "    net.minecraft.resources.RegistryDataLoader.WORLDGEN_REGISTRIES\n" +
-                    ");",
+            registries = createFromCode(minecraftServerType, "" +
+                            "return net.minecraft.server.WorldLoader.loadAndReplaceLayer(\n" +
+                            "    arg0, arg1,\n" +
+                            "    net.minecraft.server.RegistryLayer.WORLDGEN,\n" +
+                            "    net.minecraft.resources.RegistryDataLoader.WORLDGEN_REGISTRIES\n" +
+                            ");",
+                    env.resourceManager, registries);
+        }
+
+        // Initialize the DIMENSION_REGISTRIES (used for dimension type api)
+        // In WorldLoader.java:
+        //            IRegistryCustom.Dimension iregistrycustom_dimension = layeredregistryaccess1.getAccessForLoading(RegistryLayer.DIMENSIONS);
+        //            IRegistryCustom.Dimension iregistrycustom_dimension1 = RegistryDataLoader.load((IResourceManager) ireloadableresourcemanager, iregistrycustom_dimension, RegistryDataLoader.DIMENSION_REGISTRIES);
+        {
+            createFromCode(minecraftServerType, "" +
+                            "return net.minecraft.resources.RegistryDataLoader.load(arg0,\n" +
+                            "            arg1.getAccessForLoading(net.minecraft.server.RegistryLayer.DIMENSIONS),\n" +
+                            "            net.minecraft.resources.RegistryDataLoader.DIMENSION_REGISTRIES);",
                     env.resourceManager, registries);
         }
 
@@ -211,17 +223,6 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
 
     @SuppressWarnings("unchecked")
     protected void initDataPack(ServerEnvironment env, Class<?> minecraftServerType, Object mc_server, Object registries) throws Throwable {
-        /*
-         * Initialize the DIMENSION_REGISTRIES (used for dimension type api)
-         */
-        {
-            createFromCode(minecraftServerType,
-                    "return net.minecraft.resources.RegistryDataLoader.load(arg0,\n" +
-                    "            arg1.getAccessForLoading(net.minecraft.server.RegistryLayer.DIMENSIONS),\n" +
-                    "            net.minecraft.resources.RegistryDataLoader.DIMENSION_REGISTRIES);",
-                    env.resourceManager, registries);
-        }
-
         /*
          * Retrieve reloadable ICustomRegistry.Dimension instance from the loaded resource pack
          */
@@ -267,7 +268,36 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
             Executor executor2 = newThreadExecutor();
             Class<?> dataPackResourcesType = Class.forName("net.minecraft.server.DataPackResources");
 
-            if (CommonBootstrap.evaluateMCVersion(">=", "1.20.5")) {
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.21.2")) {
+                /*
+                 * public static CompletableFuture<DataPackResources> loadResources(
+                 *         IResourceManager iresourcemanager,
+                 *         LayeredRegistryAccess<RegistryLayer> layeredregistryaccess,
+                 *         List<IRegistry.a<?>> list,
+                 *         FeatureFlagSet featureflagset,
+                 *         CommandDispatcher.ServerType commanddispatcher_servertype,
+                 *         int i,
+                 *         Executor executor,
+                 *         Executor executor1) {
+                 */
+
+                // Pass the registries object instead of the customdimension object
+                // It calls the same getAccessForLoading internally
+                Method startLoadingMethod = Resolver.resolveAndGetDeclaredMethod(dataPackResourcesType, "loadResources",
+                        Class.forName("net.minecraft.server.packs.resources.IResourceManager"),
+                        Class.forName("net.minecraft.core.LayeredRegistryAccess"),
+                        java.util.List.class, // tagDataPackRegistries List
+                        Class.forName("net.minecraft.world.flag.FeatureFlagSet"),
+                        serverTypeType,
+                        int.class,
+                        Executor.class,
+                        Executor.class);
+                futureDPLoaded = (CompletableFuture<Object>) startLoadingMethod.invoke(null,
+                        env.resourceManager, registries, env.tagDataPackRegistries, featureFlagSet, serverType, functionPermissionLevel, executor1, executor2);
+
+                // Retrieve it, using get(). May throw if problems occur.
+                datapackresources = futureDPLoaded.get();
+            } else if (CommonBootstrap.evaluateMCVersion(">=", "1.20.5")) {
                 // Pass the registries object instead of the customdimension object
                 // It calls the same getAccessForLoading internally
                 Method startLoadingMethod = Resolver.resolveAndGetDeclaredMethod(dataPackResourcesType, "loadResources",

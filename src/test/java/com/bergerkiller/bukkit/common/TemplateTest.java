@@ -44,7 +44,6 @@ import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinec
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import org.junit.experimental.categories.Category;
 
 public class TemplateTest {
 
