@@ -355,7 +355,13 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          * public static void storeNetherPortal(org.bukkit.block.Block startBlock) {
          *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
          *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
-         * #if version >= 1.19
+         * #if version >= 1.21.2
+         *     VillagePlace villageplace = world.getPoiManager();
+         *     java.util.Optional typeHolderOpt = BuiltInRegistries.POINT_OF_INTEREST_TYPE.get(PoiTypes.NETHER_PORTAL);
+         *     if (typeHolderOpt.isPresent()) {
+         *         villageplace.add(blockposition, (net.minecraft.core.Holder) typeHolderOpt.get());
+         *     }
+         * #elseif version >= 1.19
          *     VillagePlace villageplace = world.getPoiManager();
          *     java.util.Optional typeHolderOpt = BuiltInRegistries.POINT_OF_INTEREST_TYPE.getHolder(PoiTypes.NETHER_PORTAL);
          *     if (typeHolderOpt.isPresent()) {

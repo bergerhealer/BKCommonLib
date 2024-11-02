@@ -32,7 +32,6 @@ class ItemVariantListHandler_1_19_3 extends ItemVariantListHandler {
     public void enable() throws Throwable {
         handler.forceInitialization();
         registerHandler("InstrumentItem", handler::getInstrumentItemVariants);
-        registerHandler("ItemEnchantedBook", handler::getEnchantedBookVariants);
         registerHandler("ItemPotion", handler::getPotionVariants);
         registerHandler("ItemTippedArrow", handler::getTippedArrowVariants);
 
@@ -99,6 +98,7 @@ class ItemVariantListHandler_1_19_3 extends ItemVariantListHandler {
     @Template.Import("net.minecraft.world.item.alchemy.PotionContents")
     @Template.Import("net.minecraft.core.Holder")
     @Template.Import("net.minecraft.tags.TagKey")
+    @Template.Import("net.minecraft.core.IRegistry")
     @Template.Import("net.minecraft.core.registries.BuiltInRegistries")
     @Template.Import("org.bukkit.craftbukkit.CraftRegistry")
     @Template.InstanceType("net.minecraft.world.item.Item")
@@ -122,9 +122,14 @@ class ItemVariantListHandler_1_19_3 extends ItemVariantListHandler {
          * 
          *     #require InstrumentItem private final TagKey<Instrument> instruments;
          *     TagKey instruments = item#instruments;
-         *     java.util.Iterator iterator = BuiltInRegistries.INSTRUMENT.getTagOrEmpty(instruments).iterator();
-         *     while (iterator.hasNext()) {
-         *         Holder holder = (Holder) iterator.next();
+         *
+         * #if version >= 1.21.2
+         *     IRegistry registry = CraftRegistry.getMinecraftRegistry(net.minecraft.core.registries.Registries.INSTRUMENT);
+         * #else
+         *     IRegistry registry = BuiltInRegistries.INSTRUMENT;
+         * #endif
+         *     for (java.util.Iterator iter = registry.getTagOrEmpty(instruments).iterator(); iter.hasNext();) {
+         *         Holder holder = (Holder) iter.next();
          *         result.add(InstrumentItem.create(Items.GOAT_HORN, holder));
          *     }
          *     return result;
@@ -165,8 +170,11 @@ class ItemVariantListHandler_1_19_3 extends ItemVariantListHandler {
          *     return result;
          * }
          */
-        @Template.Generated("%GET_ENCHANTED_BOOK_VARIANTS%")
-        public abstract List<?> getEnchantedBookVariants(Object nmsItem);
+        // This is disabled. It seems kind of useless for the creative-like menu we use this for
+        // As of 1.21.2 the logic for this was moved to EnchantmentManager::createBook, and
+        // ItemEnchantedBook no longer exists as a type.
+        //@Template.Generated("%GET_ENCHANTED_BOOK_VARIANTS%")
+        //public abstract List<?> getEnchantedBookVariants(Object nmsItem);
 
         /*
          * <GET_POTION_VARIANTS>

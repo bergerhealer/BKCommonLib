@@ -40,7 +40,9 @@ class DimensionManager {
   #endif
 
         // Find the specific registry for dimension types
-  #if version >= 1.19.3
+  #if version >= 1.21.2
+        return registry.lookupOrThrow(net.minecraft.core.registries.Registries.DIMENSION_TYPE);
+  #elseif version >= 1.19.3
         return registry.registryOrThrow(net.minecraft.core.registries.Registries.DIMENSION_TYPE);
   #elseif version >= 1.18
         return registry.ownedRegistryOrThrow(net.minecraft.core.IRegistry.DIMENSION_TYPE_REGISTRY);
