@@ -32,8 +32,10 @@ class BlockDataSerializer_1_19 extends BlockDataSerializer {
                 "public static IBlockData deserialize(String text) {\n" +
                 "    ArgumentBlock$a block;\n" +
                 "    try {\n" +
-                "#if version >= 1.19.3\n" +
+                "#if version >= 1.21.2n\n" +
                 "        block = ArgumentBlock.parseForBlock(BuiltInRegistries.BLOCK.asLookup(), text, true);\n" +
+                "#elseif version >= 1.19.3\n" +
+                "        block = ArgumentBlock.parseForBlock(BuiltInRegistries.BLOCK, text, true);\n" +
                 "#else\n" +
                 "        block = ArgumentBlock.parseForBlock((IRegistry) BuiltInRegistries.BLOCK, text, true);\n" +
                 "#endif\n" +
