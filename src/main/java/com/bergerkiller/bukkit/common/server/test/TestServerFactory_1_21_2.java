@@ -1,20 +1,35 @@
 package com.bergerkiller.bukkit.common.server.test;
 
 class TestServerFactory_1_21_2 extends TestServerFactory_1_20_2 {
+
     @Override
-    protected Object initRegistries(ServerEnvironment env, Class<?> minecraftServerType) throws Throwable {
-        Object registries = createFromCode(minecraftServerType, "return net.minecraft.server.RegistryLayer.createRegistryAccess();");
+    protected void init(ServerEnvironment env) throws Throwable {
+        super.init(env);
+
+        // FuelValues used for RecipeUtil (furnace recipe burn times)
+        // In MinecraftServer.java:
+        //            this.fuelValues = FuelValues.vanillaBurnTimes(this.registries.compositeAccess(), this.worldData.enabledFeatures());
+        setField(env.mc_server, "fuelValues", createFromCode(env.mc_server_type, "" +
+                "return net.minecraft.world.level.block.entity.FuelValues.vanillaBurnTimes(\n" +
+                "    arg0.compositeAccess(),\n" +
+                "    arg1\n" +
+                ");", env.registries, env.featureFlagSet));
+    }
+
+    @Override
+    protected Object initRegistries(ServerEnvironment env) throws Throwable {
+        Object registryAccess = createFromCode(env.mc_server_type, "return net.minecraft.server.RegistryLayer.createRegistryAccess();");
 
         // Initialize tag data pack stuff
         // In WorldLoader.java:
         //            List<IRegistry.a<?>> list = TagDataPack.loadTagsForExistingRegistries(ireloadableresourcemanager, layeredregistryaccess.getLayer(RegistryLayer.STATIC));
         {
-            env.tagDataPackRegistries = (java.util.List<?>) createFromCode(minecraftServerType, "" +
+            env.tagDataPackRegistries = (java.util.List<?>) createFromCode(env.mc_server_type, "" +
                     "net.minecraft.server.packs.resources.IReloadableResourceManager ireloadableresourcemanager = arg0;\n" +
                     "net.minecraft.core.LayeredRegistryAccess layeredregistryaccess = arg1;\n" +
                     "return net.minecraft.tags.TagDataPack.loadTagsForExistingRegistries(ireloadableresourcemanager, layeredregistryaccess.getLayer(net.minecraft.server.RegistryLayer.STATIC));",
 
-                    env.resourceManager, registries);
+                    env.resourceManager, registryAccess);
         }
 
         // Initialize WORLDGEN_REGISTRIES <AND> DIMENSION_REGISTRIES (used for dimension type api)
@@ -26,7 +41,7 @@ class TestServerFactory_1_21_2 extends TestServerFactory_1_20_2 {
         //            List<HolderLookup.b<?>> list2 = Stream.concat(list1.stream(), iregistrycustom_dimension1.listRegistries()).toList();
         //            IRegistryCustom.Dimension iregistrycustom_dimension2 = RegistryDataLoader.load((IResourceManager) ireloadableresourcemanager, list2, RegistryDataLoader.DIMENSION_REGISTRIES);
         {
-            registries = createFromCode(minecraftServerType, "" +
+            env.registries = createFromCode(env.mc_server_type, "" +
                     "net.minecraft.server.packs.resources.IReloadableResourceManager ireloadableresourcemanager = arg0;\n" +
                     "net.minecraft.core.LayeredRegistryAccess layeredregistryaccess = arg1;\n" +
                     "java.util.List list = arg2;\n" +
@@ -38,9 +53,9 @@ class TestServerFactory_1_21_2 extends TestServerFactory_1_20_2 {
                     "\n" +
                     "return layeredregistryaccess.replaceFrom(RegistryLayer.WORLDGEN, java.util.Collections.singletonList(iregistrycustom_dimension1));",
 
-                    env.resourceManager, registries, env.tagDataPackRegistries);
+                    env.resourceManager, registryAccess, env.tagDataPackRegistries);
         }
 
-        return registries;
+        return env.registries;
     }
 }

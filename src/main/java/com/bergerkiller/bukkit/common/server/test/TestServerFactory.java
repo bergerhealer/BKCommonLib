@@ -247,6 +247,9 @@ public abstract class TestServerFactory {
         public String CB_ROOT = "FAIL";
         public String NMS_ROOT = "FAIL";
         public Object mc_server = null;
+        public Class<?> mc_server_type = null;
+        public Object registries = null;
+        public Object featureFlagSet = null;
         public Object resourcePackRepository = null;
         public Object resourceManager = null;
         public List<?> tagDataPackRegistries = null; // Only used 1.21.2+

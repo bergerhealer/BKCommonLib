@@ -29,9 +29,25 @@ class IRecipe {
         } else {
   #if version >= 1.21.2
             //TODO: Technically could support world-specific recipes!
-            //TODO: Recipes could change depending on inputs
-            CraftingInput input = CraftingInput.EMPTY;
             IRegistryCustom$Dimension registry = MinecraftServer.getServer().registryAccess();
+
+            //TODO: Recipes could change depending on inputs
+            RecipeInput input;
+            if (instance instanceof RecipeTippedArrow || instance instanceof DecoratedPotRecipe) {
+                // These recipes cannot operate with an empty input
+                return ItemStack.EMPTY;
+            } else if (instance instanceof RecipeCrafting) {
+                input = CraftingInput.EMPTY;
+            } else if (instance instanceof RecipeSingleItem) {
+                input = new SingleRecipeInput(ItemStack.EMPTY);
+            } else if (instance instanceof SmithingRecipe) {
+                // record SmithingRecipeInput(ItemStack template, ItemStack base, ItemStack addition);
+                input = new SmithingRecipeInput(ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY);
+            } else {
+                // Unknown recipe type. Fail.
+                throw new IllegalStateException("Unknown recipe type: " + instance.getClass().getName());
+            }
+
             return instance.assemble((RecipeInput) input, registry);
   #elseif version >= 1.19.4
             //TODO: Technically could support world-specific recipes!
@@ -124,7 +140,21 @@ interface IRecipe {
 // >= MC 1.12
 optional class RecipeItemStack {
 #if version >= 1.21.2
-    public (List<org.bukkit.inventory.ItemStack>) List<ItemStack> getChoices:itemStacks();
+    public (List<org.bukkit.inventory.ItemStack>) List<ItemStack> getChoices() {
+        if (instance.isExact()) {
+            return instance.itemStacks();
+        }
+
+        // Only stores the Item material to match. Create itemstacks out of them (count 1)
+        java.util.List items = instance.items();
+        java.util.List itemStacks = new java.util.ArrayList(items.size());
+        for (java.util.Iterator iter = items.iterator(); iter.hasNext();) {
+            net.minecraft.core.Holder itemHolder = (net.minecraft.core.Holder) iter.next();
+            ItemStack item = new ItemStack(itemHolder);
+            itemStacks.add(item);
+        }
+        return itemStacks;
+    }
 #elseif version >= 1.18
     public (List<org.bukkit.inventory.ItemStack>) ItemStack[] getChoices:getItems();
 #elseif version >= 1.17
@@ -219,23 +249,41 @@ class CraftingManager {
         java.util.Iterator allRecipes = MinecraftServer.getServer().getCraftingManager().b().iterator();
   #endif
         java.util.List filteredResult = new java.util.ArrayList();
+
+  #if version >= 1.19.4
+        IRegistryCustom$Dimension registry = MinecraftServer.getServer().registryAccess();
+  #endif
+  #if version >= 1.21.2
+        RecipeInput emptyCraftingInput = CraftingInput.EMPTY;
+  #endif
+
         while (allRecipes.hasNext()) {
             Object recipe = allRecipes.next();
   #if version >= 1.20.2
             recipe = ((net.minecraft.world.item.crafting.RecipeHolder) recipe).value();
   #endif
 
-            if (recipe instanceof FurnaceRecipe) {
+            // Recipe must be a crafting recipe. This can be shaped, shapeless or complex
+            // This removes furnace recipes, stone cutting, etc. Which is not intended to be 'seen' here.
+            // TODO: In future, we probably do want to have an api accessible for such recipes?
+  #if version >= 1.14
+            if (!(recipe instanceof RecipeCrafting)) {
                 continue;
             }
+  #else
+            if (!(recipe instanceof ShapedRecipes || recipe instanceof ShapelessRecipes || recipe instanceof IRecipeComplex)) {
+                continue;
+            }
+  #endif
 
             // Since Minecraft 1.17 the fireworks recipe exists twice
             // One is shapeless, the other is complex
             // Correct for this and only keep the complex one!
   #if version >= 1.21.2
-            // I guess do nothing (?)
+            if (recipe instanceof ShapelessRecipes && ((IRecipe) recipe).assemble(emptyCraftingInput, registry).getItem() == Items.FIREWORK_ROCKET) {
+                continue;
+            }
   #elseif version >= 1.19.4
-            IRegistryCustom$Dimension registry = MinecraftServer.getServer().registryAccess();
             if (!(recipe instanceof RecipeFireworks) && ((IRecipe) recipe).getResultItem(registry).getItem() == Items.FIREWORK_ROCKET) {
                 continue;
             }

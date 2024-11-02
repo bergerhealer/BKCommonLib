@@ -43,7 +43,7 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         // This prevents loads of extra server logic executing during test
         ClassTemplate<?> server_t = ClassTemplate.create(CommonServerBase.SERVER_CLASS);
         Object server = server_t.newInstanceNull();
-        Class<?> minecraftServerType = Class.forName("net.minecraft.server.MinecraftServer");
+        env.mc_server_type = Class.forName("net.minecraft.server.MinecraftServer");
         Class<?> dedicatedType = Class.forName("net.minecraft.server.dedicated.DedicatedServer");
         ClassTemplate<?> mc_server_t = ClassTemplate.create(dedicatedType);
         Object mc_server = mc_server_t.newInstanceNull();
@@ -52,7 +52,7 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         // Since we null-construct, some members of the parent class "IAsyncTaskHandler" are not initialized. Do that here.
         Class<?> iAsyncTaskHandlerClass = Class.forName("net.minecraft.util.thread.IAsyncTaskHandler");
         setField(mc_server, iAsyncTaskHandlerClass, "name", "Server");
-        setField(mc_server, iAsyncTaskHandlerClass, "pendingRunnables", createFromCode(minecraftServerType, 
+        setField(mc_server, iAsyncTaskHandlerClass, "pendingRunnables", createFromCode(env.mc_server_type,
                 "return com.google.common.collect.Queues.newConcurrentLinkedQueue();"));
 
         // Assign logger, nms Server instance and primary thread (current thread) to avoid NPE's during test
@@ -66,10 +66,14 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         } catch (RuntimeException ex) {}
 
         // Resource Manager with only the vanilla data pack loaded in
-        initVanillaResourceManager(env, minecraftServerType);
+        initVanillaResourceManager(env);
+
+        // Feature flag set for loading the data pack
+        env.featureFlagSet = createFromCode(Class.forName("net.minecraft.world.level.WorldDataConfiguration"),
+                "return WorldDataConfiguration.DEFAULT.enabledFeatures();");
 
         // Use the resource manager to initialize the registries, assign field
-        Object registries = initRegistries(env, minecraftServerType);
+        Object registries = initRegistries(env);
         setField(mc_server, "registries", registries);
 
         /*
@@ -101,12 +105,12 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
 
         // this.executorService = SystemUtils.e();
         {
-            setField(mc_server, "executor", createFromCode(minecraftServerType,
+            setField(mc_server, "executor", createFromCode(env.mc_server_type,
                     "return net.minecraft.SystemUtils.backgroundExecutor();"));
         }
 
         // ResourcePack initialization (makes recipes available)
-        initDataPack(env, minecraftServerType, mc_server, registries);
+        initDataPack(env, env.mc_server_type, mc_server, registries);
 
         // Set server worldData field, required by the Entity constructors under test (EntityType)
         // WorldData enabledFeatures() should return non-null to avoid trouble
@@ -143,7 +147,7 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         return construct(resourcePackRepositoryType, new Object[] {resourcePackSources});
     }
 
-    protected void initVanillaResourceManager(ServerEnvironment env, Class<?> minecraftServerType) throws Throwable {
+    protected void initVanillaResourceManager(ServerEnvironment env) throws Throwable {
         final String repopath = "net.minecraft.server.packs.repository.";
         final Class<?> resourcePackRepositoryType = Class.forName(repopath + "ResourcePackRepository");
 
@@ -190,20 +194,20 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         env.resourceManager = resourcemanager;
     }
 
-    protected Object initRegistries(ServerEnvironment env, Class<?> minecraftServerType) throws Throwable {
-        Object registries = createFromCode(minecraftServerType, "return net.minecraft.server.RegistryLayer.createRegistryAccess();");
+    protected Object initRegistries(ServerEnvironment env) throws Throwable {
+        Object registryAccess = createFromCode(env.mc_server_type, "return net.minecraft.server.RegistryLayer.createRegistryAccess();");
 
         // Initialize WORLDGEN_REGISTRIES
         // In WorldLoader.java:
         //                 LayeredRegistryAccess<RegistryLayer> layeredregistryaccess1 = loadAndReplaceLayer(ireloadableresourcemanager, layeredregistryaccess, RegistryLayer.WORLDGEN, RegistryDataLoader.WORLDGEN_REGISTRIES);
         {
-            registries = createFromCode(minecraftServerType, "" +
+            env.registries = createFromCode(env.mc_server_type, "" +
                             "return net.minecraft.server.WorldLoader.loadAndReplaceLayer(\n" +
                             "    arg0, arg1,\n" +
                             "    net.minecraft.server.RegistryLayer.WORLDGEN,\n" +
                             "    net.minecraft.resources.RegistryDataLoader.WORLDGEN_REGISTRIES\n" +
                             ");",
-                    env.resourceManager, registries);
+                    env.resourceManager, registryAccess);
         }
 
         // Initialize the DIMENSION_REGISTRIES (used for dimension type api)
@@ -211,14 +215,14 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         //            IRegistryCustom.Dimension iregistrycustom_dimension = layeredregistryaccess1.getAccessForLoading(RegistryLayer.DIMENSIONS);
         //            IRegistryCustom.Dimension iregistrycustom_dimension1 = RegistryDataLoader.load((IResourceManager) ireloadableresourcemanager, iregistrycustom_dimension, RegistryDataLoader.DIMENSION_REGISTRIES);
         {
-            createFromCode(minecraftServerType, "" +
+            createFromCode(env.mc_server_type, "" +
                             "return net.minecraft.resources.RegistryDataLoader.load(arg0,\n" +
                             "            arg1.getAccessForLoading(net.minecraft.server.RegistryLayer.DIMENSIONS),\n" +
                             "            net.minecraft.resources.RegistryDataLoader.DIMENSION_REGISTRIES);",
-                    env.resourceManager, registries);
+                    env.resourceManager, env.registries);
         }
 
-        return registries;
+        return env.registries;
     }
 
     @SuppressWarnings("unchecked")
@@ -254,8 +258,6 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         {
             Class<?> serverTypeType = Class.forName("net.minecraft.commands.CommandDispatcher$ServerType");
             Object serverType = getStaticField(serverTypeType, "DEDICATED");
-            Object featureFlagSet = createFromCode(Class.forName("net.minecraft.world.level.WorldDataConfiguration"),
-                                                   "return WorldDataConfiguration.DEFAULT.enabledFeatures();");
             int functionPermissionLevel = 2;
             Executor executor1;
             if (CommonBootstrap.evaluateMCVersion(">=", "1.19.4")) {
@@ -293,10 +295,17 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
                         Executor.class,
                         Executor.class);
                 futureDPLoaded = (CompletableFuture<Object>) startLoadingMethod.invoke(null,
-                        env.resourceManager, registries, env.tagDataPackRegistries, featureFlagSet, serverType, functionPermissionLevel, executor1, executor2);
+                        env.resourceManager, registries, env.tagDataPackRegistries, env.featureFlagSet, serverType, functionPermissionLevel, executor1, executor2);
 
                 // Retrieve it, using get(). May throw if problems occur.
                 datapackresources = futureDPLoaded.get();
+
+                // Call updateStaticRegistryTags() on the result - which calls bind() on the tags
+                {
+                    Class<?> datapackresourceType = Class.forName("net.minecraft.server.DataPackResources");
+                    Resolver.resolveAndGetDeclaredMethod(datapackresourceType, "updateStaticRegistryTags")
+                            .invoke(datapackresources);
+                }
             } else if (CommonBootstrap.evaluateMCVersion(">=", "1.20.5")) {
                 // Pass the registries object instead of the customdimension object
                 // It calls the same getAccessForLoading internally
@@ -309,7 +318,7 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
                         Executor.class,
                         Executor.class);
                 futureDPLoaded = (CompletableFuture<Object>) startLoadingMethod.invoke(null,
-                        env.resourceManager, registries, featureFlagSet, serverType, functionPermissionLevel, executor1, executor2);
+                        env.resourceManager, registries, env.featureFlagSet, serverType, functionPermissionLevel, executor1, executor2);
 
                 // Retrieve it, using get(). May throw if problems occur.
                 datapackresources = futureDPLoaded.get();
@@ -331,7 +340,7 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
                         Executor.class,
                         Executor.class);
                 futureDPLoaded = (CompletableFuture<Object>) startLoadingMethod.invoke(null,
-                        env.resourceManager, customRegistryDimension, featureFlagSet, serverType, functionPermissionLevel, executor1, executor2);
+                        env.resourceManager, customRegistryDimension, env.featureFlagSet, serverType, functionPermissionLevel, executor1, executor2);
 
                 // Retrieve it, using get(). May throw if problems occur.
                 datapackresources = futureDPLoaded.get();
