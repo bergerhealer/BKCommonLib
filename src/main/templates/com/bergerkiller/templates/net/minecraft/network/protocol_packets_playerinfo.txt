@@ -124,7 +124,12 @@ class ClientboundPlayerInfoUpdatePacket extends Packet {
         </code>
 
         public static (PlayerInfoDataHandle) ClientboundPlayerInfoUpdatePacket.PlayerInfoData createNew((ClientboundPlayerInfoUpdatePacketHandle) ClientboundPlayerInfoUpdatePacket packet, (GameProfileHandle) GameProfile profile, int ping, (org.bukkit.GameMode) EnumGamemode gameMode, (ChatText) IChatBaseComponent listName, boolean listed) {
-#if version >= 1.19.3
+#if version >= 1.21.2
+            java.util.UUID uuid = profile.getId();
+            net.minecraft.network.chat.RemoteChatSession$a chatSession = null; //TODO: What to do with this?
+            int listOrder = 0; //TODO: Important?
+            return new ClientboundPlayerInfoUpdatePacket$PlayerInfoData(uuid, profile, listed, ping, gameMode, listName, listOrder, chatSession);
+#elseif version >= 1.19.3
             java.util.UUID uuid = profile.getId();
             net.minecraft.network.chat.RemoteChatSession$a chatSession = null; //TODO: What to do with this?
             return new ClientboundPlayerInfoUpdatePacket$PlayerInfoData(uuid, profile, listed, ping, gameMode, listName, chatSession);

@@ -203,7 +203,13 @@ class TileEntity {
 }
 
 class TileEntityFurnace extends TileEntity {
-#if version >= 1.14
+    #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
+
+#if version >= 1.21.2
+    public static int fuelTime((ItemStackHandle) ItemStack itemstack) {
+        return net.minecraft.server.MinecraftServer.getServer().fuelValues().burnDuration(itemstack);
+    }
+#elseif version >= 1.14
     public static int fuelTime((ItemStackHandle) ItemStack itemstack) {
         if (itemstack.isEmpty()) {
             return 0;

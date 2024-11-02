@@ -27,7 +27,13 @@ class IRecipe {
             ItemStackHandle.T.setFireworksFlightDuration.invoke(itemstack, Integer.valueOf(3));
             return itemstack;
         } else {
-  #if version >= 1.19.4
+  #if version >= 1.21.2
+            //TODO: Technically could support world-specific recipes!
+            //TODO: Recipes could change depending on inputs
+            CraftingInput input = CraftingInput.EMPTY;
+            IRegistryCustom$Dimension registry = MinecraftServer.getServer().registryAccess();
+            return instance.assemble((RecipeInput) input, registry);
+  #elseif version >= 1.19.4
             //TODO: Technically could support world-specific recipes!
             IRegistryCustom$Dimension registry = MinecraftServer.getServer().registryAccess();
             return instance.getResultItem(registry);
@@ -46,10 +52,19 @@ class IRecipe {
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:b();
 #endif
 
-    public abstract (List<CraftInputSlot>) NonNullList<RecipeItemStack> getIngredients() {
+    public abstract (List<CraftInputSlot>) List<RecipeItemStack> getIngredients() {
         if (instance instanceof ShapedRecipes) {
             ShapedRecipes s = (ShapedRecipes) instance;
 #select version >=
+#case 1.21.2:   java.util.List optionalIngredients = s.getIngredients();
+                java.util.List ingredients = new java.util.ArrayList(optionalIngredients.size());
+                for (java.util.Iterator iter = optionalIngredients.iterator(); iter.hasNext();) {
+                    java.util.Optional opt = (java.util.Optional) iter.next();
+                    if (opt.isPresent()) {
+                        ingredients.add(opt.get());
+                    }
+                }
+                return ingredients;
 #case 1.18:     return s.getIngredients();
 #case 1.14:     return s.a();
 #case 1.13:     return s.e();
@@ -60,6 +75,8 @@ class IRecipe {
         } else if (instance instanceof ShapelessRecipes) {
             ShapelessRecipes s = (ShapelessRecipes) instance;
 #select version >=
+#case 1.21.2:   #require net.minecraft.world.item.crafting.ShapelessRecipes final java.util.List<RecipeItemStack> shapelessIngredients:ingredients;
+                return s#shapelessIngredients;
 #case 1.18:     return s.getIngredients();
 #case 1.14:     return s.a();
 #case 1.13:     return s.e();
@@ -74,24 +91,20 @@ class IRecipe {
             // To sort of work properly rather than not at all, default to
             // crafting a flight 3 firework:
             // Shapeless(1 paper + 3 gunpowder) -> Flight 3 firework
-            Object[] ingredients = new Object[4];
   #if version >= 1.18
-            ingredients[0] = RecipeItemStack.of(new net.minecraft.world.level.IMaterial[] { net.minecraft.world.item.Items.PAPER });
-            ingredients[1] = RecipeItemStack.of(new net.minecraft.world.level.IMaterial[] { net.minecraft.world.item.Items.GUNPOWDER });
-            ingredients[2] = ingredients[1];
-            ingredients[3] = ingredients[1];
-            return NonNullList.of((Object) RecipeItemStack.EMPTY, ingredients);
+            RecipeItemStack paper = RecipeItemStack.of(new net.minecraft.world.level.IMaterial[] { net.minecraft.world.item.Items.PAPER });
+            RecipeItemStack gunpowder = RecipeItemStack.of(new net.minecraft.world.level.IMaterial[] { net.minecraft.world.item.Items.GUNPOWDER });
   #else
-            ingredients[0] = RecipeItemStack.a(new net.minecraft.world.level.IMaterial[] { net.minecraft.world.item.Items.PAPER });
-            ingredients[1] = RecipeItemStack.a(new net.minecraft.world.level.IMaterial[] { net.minecraft.world.item.Items.GUNPOWDER });
-            ingredients[2] = ingredients[1];
-            ingredients[3] = ingredients[1];
-    #if version >= 1.17
-            return NonNullList.a((Object) RecipeItemStack.EMPTY, ingredients);
-    #else
-            return NonNullList.a((Object) RecipeItemStack.a, ingredients);
-    #endif
+            RecipeItemStack paper = RecipeItemStack.a(new net.minecraft.world.level.IMaterial[] { net.minecraft.world.item.Items.PAPER });
+            RecipeItemStack gunpowder = RecipeItemStack.a(new net.minecraft.world.level.IMaterial[] { net.minecraft.world.item.Items.GUNPOWDER });
   #endif
+
+            java.util.List ingredients = new java.util.ArrayList(4);
+            ingredients.add(paper);
+            ingredients.add(gunpowder);
+            ingredients.add(gunpowder);
+            ingredients.add(gunpowder);
+            return ingredients;
 #endif
         } else {
             return null;
