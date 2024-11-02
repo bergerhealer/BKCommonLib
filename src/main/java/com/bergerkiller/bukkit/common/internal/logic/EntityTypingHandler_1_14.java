@@ -178,7 +178,9 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          * public static Class<?> findClassFromEntityTypes((Object) EntityTypes entityTypes, (Object) World world) {
          *     Object entity;
          *     try {
-         * #if version >= 1.18
+         * #if version >= 1.21.2
+         *         entity = entityTypes.create(world, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+         * #elseif version >= 1.18
          *         entity = entityTypes.create(world);
          * #else
          *         entity = entityTypes.a(world);
@@ -201,7 +203,9 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *
          *         // Try again, but this time with the one from the registry
          *         try {
-         * #if version >= 1.18
+         * #if version >= 1.21.2
+         *             entity = entityTypesAlter.create(world, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+         * #elseif version >= 1.18
          *             entity = entityTypesAlter.create(world);
          * #else
          *             entity = entityTypesAlter.a(world);
