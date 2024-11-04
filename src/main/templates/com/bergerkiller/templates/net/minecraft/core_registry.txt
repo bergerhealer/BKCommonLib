@@ -37,7 +37,11 @@ optional class IRegistry {
     public static Object getWindowTypeByName(String name) {
         if (name == null) return null;
         MinecraftKey key = #parseMinecraftKey(name);
+  #if version >= 1.21.2
+        return BuiltInRegistries.MENU.getValue(key);
+  #else
         return BuiltInRegistries.MENU.get(key);
+  #endif
     }
     public static int getWindowTypeId(Object windowTypeRaw) {
         if (windowTypeRaw == null) return -1;

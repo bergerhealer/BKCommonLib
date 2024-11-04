@@ -87,7 +87,11 @@ class DimensionManager {
             throw new IllegalArgumentException("Invalid dimension id " + id);
         }
         IRegistry dimensionTypeRegistry = #getDimensionTypeRegistry();
+    #if version >= 1.21.2
+        return (DimensionManager) dimensionTypeRegistry.getValue(res_key);
+    #else
         return (DimensionManager) dimensionTypeRegistry.get(res_key);
+    #endif
     }
   #elseif version >= 1.17
     // deprecated fallback

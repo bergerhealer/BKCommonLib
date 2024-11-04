@@ -9,7 +9,26 @@ import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 class TileEntityTypes {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
-#if version >= 1.13.1
+#if version >= 1.21.2
+    public (MinecraftKeyHandle) MinecraftKey getKey() {
+        return (MinecraftKey) BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey((Object) instance);
+    }
+
+    public int getId() {
+        Object minecraftKey = BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey((Object) instance);
+        return com.bergerkiller.bukkit.common.internal.proxy.TileEntityTypesSerializedIds_1_8_to_1_17_1.getId(minecraftKey);
+    }
+
+    public static Object getRawByKey((MinecraftKeyHandle) MinecraftKey key) {
+        return BuiltInRegistries.BLOCK_ENTITY_TYPE.getValue(key);
+    }
+
+    public static Object getRawById(int id) {
+        MinecraftKey minecraftKey = (MinecraftKey) com.bergerkiller.bukkit.common.internal.proxy.TileEntityTypesSerializedIds_1_8_to_1_17_1.toMinecraftKey(id);
+        return (minecraftKey == null) ? null : BuiltInRegistries.BLOCK_ENTITY_TYPE.getValue(minecraftKey);
+    }
+
+#elseif version >= 1.13.1
     public (MinecraftKeyHandle) MinecraftKey getKey() {
         return (MinecraftKey) BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey((Object) instance);
     }
@@ -27,6 +46,7 @@ class TileEntityTypes {
         MinecraftKey minecraftKey = (MinecraftKey) com.bergerkiller.bukkit.common.internal.proxy.TileEntityTypesSerializedIds_1_8_to_1_17_1.toMinecraftKey(id);
         return (minecraftKey == null) ? null : BuiltInRegistries.BLOCK_ENTITY_TYPE.get(minecraftKey);
     }
+
 #elseif version >= 1.13
     public (MinecraftKeyHandle) MinecraftKey getKey() {
         return (MinecraftKey) TileEntityTypes.a.b((Object) instance);
@@ -45,6 +65,7 @@ class TileEntityTypes {
         Object minecraftKey = com.bergerkiller.bukkit.common.internal.proxy.TileEntityTypesSerializedIds_1_8_to_1_17_1.toMinecraftKey(id);
         return (minecraftKey == null) ? null : TileEntityTypes.a.get(minecraftKey);
     }
+
 #else
     public (MinecraftKeyHandle) MinecraftKey getKey() {
         return (MinecraftKey) instance.minecraftKey;

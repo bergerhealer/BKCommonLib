@@ -16,21 +16,21 @@ class CraftArt {
     public static (Object) Holder<PaintingVariant> BukkitToNotch(org.bukkit.Art art);
   #endif
 
-  #require BuiltInRegistries public static net.minecraft.core.IRegistry getPaintingVariantRegistry() {
-#if version >= 1.21
-      return org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry(net.minecraft.core.registries.Registries.PAINTING_VARIANT);
-#else
-      return BuiltInRegistries.PAINTING_VARIANT;
-#endif
-  }
+    #require BuiltInRegistries public static net.minecraft.core.IRegistry getPaintingVariantRegistry() {
+  #if version >= 1.21
+        return org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry(net.minecraft.core.registries.Registries.PAINTING_VARIANT);
+  #else
+        return BuiltInRegistries.PAINTING_VARIANT;
+  #endif
+    }
 
     public static (Object) Holder<PaintingVariant> NotchFromInternalId(int internalId) {
         IRegistry paintingRegistry = #getPaintingVariantRegistry();
-#if version >= 1.21.2
+  #if version >= 1.21.2
         java.util.Optional opt = paintingRegistry.get(internalId);
-#else
+  #else
         java.util.Optional opt = paintingRegistry.getHolder(internalId);
-#endif
+  #endif
         return (Holder) opt.orElse(null);
     }
 
@@ -43,16 +43,20 @@ class CraftArt {
         // Dear god...
         net.minecraft.resources.MinecraftKey key = #parseMinecraftKey(internalName);
         IRegistry paintingRegistry = #getPaintingVariantRegistry();
+  #if version >= 1.21.2
+        Object valueAtKey = paintingRegistry.getValue(key);
+  #else
         Object valueAtKey = paintingRegistry.get(key);
+  #endif
         if (valueAtKey == null) {
             return null;
         }
         int internalId = paintingRegistry.getId(valueAtKey);
-#if version >= 1.21.2
+  #if version >= 1.21.2
         java.util.Optional opt = paintingRegistry.get(internalId);
-#else
+  #else
         java.util.Optional opt = paintingRegistry.getHolder(internalId);
-#endif
+  #endif
         return (Holder) opt.orElse(null);
     }
 

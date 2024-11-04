@@ -34,7 +34,11 @@ public class Particle {
         } catch (net.minecraft.ResourceKeyInvalidException ex) {
             return null;
         }
+  #if version >= 1.21.2
+        return (Particle) BuiltInRegistries.PARTICLE_TYPE.getValue(key);
+  #else
         return (Particle) BuiltInRegistries.PARTICLE_TYPE.get(key);
+  #endif
     }
 
     public static java.util.List<?> values() {
