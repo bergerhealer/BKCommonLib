@@ -194,6 +194,8 @@ public class IBlockDataToMaterialData {
                        "BAMBOO_BUTTON")
              .addTypesIf(Common.evaluateMCVersion(">=", "1.19.4"),
                        "CHERRY_BUTTON")
+             .addTypesIf(Common.evaluateMCVersion(">=", "1.21.2"),
+                       "PALE_OAK_BUTTON")
              .setDataValues(0,1,2,3,4,5, 8,9,10,11,12,13)
              .build();
         }
@@ -263,6 +265,8 @@ public class IBlockDataToMaterialData {
                        "BAMBOO_PRESSURE_PLATE")
              .addTypesIf(Common.evaluateMCVersion(">=", "1.19.4"),
                        "CHERRY_PRESSURE_PLATE")
+             .addTypesIf(Common.evaluateMCVersion(">=", "1.21.2"),
+                       "PALE_OAK_PRESSURE_PLATE")
              .setDataValues(0, 1)
              .build();
         }
@@ -470,6 +474,8 @@ public class IBlockDataToMaterialData {
                            "BAMBOO_WALL_SIGN")
                  .addTypesIf(Common.evaluateMCVersion(">=", "1.19.4"),
                            "CHERRY_WALL_SIGN")
+                 .addTypesIf(Common.evaluateMCVersion(">=", "1.21.2"),
+                           "PALE_OAK_WALL_SIGN")
                  .setDataValues(2, 3, 4, 5)
                  .build();
             }
@@ -507,6 +513,8 @@ public class IBlockDataToMaterialData {
                            "BAMBOO_SIGN")
                  .addTypesIf(Common.evaluateMCVersion(">=", "1.19.4"),
                            "CHERRY_SIGN")
+                 .addTypesIf(Common.evaluateMCVersion(">=", "1.21.2"),
+                           "PALE_OAK_SIGN")
                  .setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
                  .build();
             }
@@ -645,6 +653,8 @@ public class IBlockDataToMaterialData {
                        "CRIMSON_HANGING_SIGN", "WARPED_HANGING_SIGN")
                     .addTypesIf(Common.evaluateMCVersion(">=", "1.19.4"),
                             "CHERRY_HANGING_SIGN")
+                    .addTypesIf(Common.evaluateMCVersion(">=", "1.21.2"),
+                            "PALE_OAK_HANGING_SIGN")
                     .setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
                     .build();
 
@@ -672,6 +682,8 @@ public class IBlockDataToMaterialData {
                        "CRIMSON_WALL_HANGING_SIGN", "WARPED_WALL_HANGING_SIGN")
                     .addTypesIf(Common.evaluateMCVersion(">=", "1.19.4"),
                             "CHERRY_WALL_HANGING_SIGN")
+                    .addTypesIf(Common.evaluateMCVersion(">=", "1.21.2"),
+                            "PALE_OAK_WALL_HANGING_SIGN")
                     .setDataValues(0,1,6,7,8,9,10,11,12,13,14,15,2,3,4,5)
                     .build();
         }
