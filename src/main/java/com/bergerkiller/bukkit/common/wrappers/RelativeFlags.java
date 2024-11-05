@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
 import java.util.Collections;
@@ -28,21 +29,25 @@ public final class RelativeFlags {
     private static final int FLAG_DELTA_ROTATION = (1 << 8);
     private static final RelativeFlags[] cache = new RelativeFlags[1 << 9];
 
+    static {
+        CommonBootstrap.initCommonServerAssertCompatibility();
+    }
+
     // Used for converting between these RelativeFlags and internally-used Set of movement relative flags
     public static final FastMethod<Set<?>> unpackMethod = new FastMethod<>(m -> {
         Class<?> relativeMovementType = CommonUtil.getClass("net.minecraft.world.entity.RelativeMovement");
         if (CommonBootstrap.evaluateMCVersion(">=", "1.18")) {
-            m.init(relativeMovementType.getDeclaredMethod("unpack", int.class));
+            m.init(Resolver.resolveAndGetDeclaredMethod(relativeMovementType, "unpack", int.class));
         } else {
-            m.init(relativeMovementType.getDeclaredMethod("a", int.class));
+            m.init(Resolver.resolveAndGetDeclaredMethod(relativeMovementType, "a", int.class));
         }
     });
     public static final FastMethod<Integer> packMethod = new FastMethod<>(m -> {
         Class<?> relativeMovementType = CommonUtil.getClass("net.minecraft.world.entity.RelativeMovement");
         if (CommonBootstrap.evaluateMCVersion(">=", "1.18")) {
-            m.init(relativeMovementType.getDeclaredMethod("pack", Set.class));
+            m.init(Resolver.resolveAndGetDeclaredMethod(relativeMovementType, "pack", Set.class));
         } else {
-            m.init(relativeMovementType.getDeclaredMethod("a", Set.class));
+            m.init(Resolver.resolveAndGetDeclaredMethod(relativeMovementType, "a", Set.class));
         }
     });
 
@@ -56,7 +61,7 @@ public final class RelativeFlags {
 
     private RelativeFlags(int flags) {
         this.flags = flags;
-        this.relativeFlags = Collections.unmodifiableSet(unpackMethod.invoke(flags));
+        this.relativeFlags = Collections.unmodifiableSet(unpackMethod.invoke(null, flags));
     }
 
     public boolean isRelativeX() {
@@ -214,7 +219,7 @@ public final class RelativeFlags {
      */
     @ConverterMethod(input="java.util.Set<net.minecraft.world.entity.RelativeMovement>")
     public static RelativeFlags fromRawRelativeFlags(Set<?> rawRelativeFlags) {
-        return fromFlags(packMethod.invoke(rawRelativeFlags));
+        return fromFlags(packMethod.invoke(null, rawRelativeFlags));
     }
 
     /**

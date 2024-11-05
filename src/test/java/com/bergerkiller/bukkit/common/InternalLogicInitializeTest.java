@@ -3,8 +3,10 @@ package com.bergerkiller.bukkit.common;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Modifier;
+import java.util.Set;
 
 import com.bergerkiller.bukkit.common.internal.hooks.AdvancementDataPlayerHook;
+import com.bergerkiller.bukkit.common.wrappers.RelativeFlags;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -120,5 +122,11 @@ public class InternalLogicInitializeTest {
     @Test
     public void testItemVariantsInit() {
         assertNotNull(ItemVariantListHandler.INSTANCE);
+    }
+
+    @Test
+    public void testRelativeFlags() {
+        Set<?> raw = RelativeFlags.toRawRelativeFlags(RelativeFlags.RELATIVE_ROTATION);
+        assertEquals(RelativeFlags.RELATIVE_ROTATION, RelativeFlags.fromRawRelativeFlags(raw));
     }
 }
