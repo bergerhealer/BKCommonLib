@@ -266,8 +266,14 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         // From MC 1.21.1 to 1.21
         this.register(3953, NO_CONVERSION);
 
+        // From MC 1.21.2 to 1.21.1
+        this.register(3955, map -> {
+            Object type = map.get("type");
+            return !Helper.ADDED_MC_1_21_2.contains(type);
+        });
+
         // Maximum supported data version
-        this.max_version = 3955; // MC 1.21.1
+        this.max_version = 4080; // MC 1.21.2
     }
 
     // Registers a converter if it can convert from a future data version only
@@ -511,8 +517,46 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
             }
         }
 
+        @SafeVarargs
+        private static <T> Set<T> makeSet(List<T>... lists) {
+            Set<T> result = new HashSet<T>();
+            for (List<T> list : lists) {
+                result.addAll(list);
+            }
+            return result;
+        }
+
+        private static List<String> makeWoodMaterials(String woodName) {
+            return Arrays.asList(
+                    woodName + "_PLANKS", woodName + "_SAPLING",
+                    woodName + "_LOG", woodName + "_WOOD",
+                    woodName + "_LEAVES", woodName + "_SLAB",
+                    woodName + "_FENCE", woodName + "_STAIRS",
+                    woodName + "_BUTTON", woodName + "_PRESSURE_PLATE",
+                    woodName + "_DOOR", woodName + "_TRAPDOOR",
+                    woodName + "_FENCE_GATE", woodName + "_BOAT",
+                    woodName + "_CHEST_BOAT", woodName + "_SIGN",
+                    woodName + "_HANGING_SIGN", woodName + "_WALL_SIGN",
+                    woodName + "_WALL_HANGING_SIGN",
+                    "POTTED_" + woodName + "_SAPLING",
+                    "STRIPPED_" + woodName + "_LOG",
+                    "STRIPPED_" + woodName + "_WOOD");
+        }
+
+        private static List<String> makeColoredMaterials(String materialName) {
+            return Arrays.asList(
+                    "WHITE_" + materialName, "ORANGE_" + materialName,
+                    "MAGENTA_" + materialName, "LIGHT_BLUE_" + materialName,
+                    "YELLOW_" + materialName, "LIME_" + materialName,
+                    "PINK_" + materialName, "GRAY_" + materialName,
+                    "LIGHT_GRAY_" + materialName, "CYAN_" + materialName,
+                    "PURPLE_" + materialName, "BLUE_" + materialName,
+                    "BROWN_" + materialName, "GREEN_" + materialName,
+                    "RED_" + materialName, "BLACK_" + materialName);
+        }
+
         // All material names (Material enum) added Minecraft 1.13.2 -> 1.14
-        public static final Set<String> ADDED_MC_1_14 = new HashSet<String>(Arrays.asList(
+        public static final Set<String> ADDED_MC_1_14 = makeSet(Arrays.asList(
                 "ACACIA_SIGN", "ACACIA_WALL_SIGN",
                 "ANDESITE_SLAB", "ANDESITE_STAIRS", "ANDESITE_WALL",
                 "BAMBOO", "BAMBOO_SAPLING", "BARREL", "BELL",
@@ -552,7 +596,7 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                 "WANDERING_TRADER_SPAWN_EGG", "WHITE_DYE", "WITHER_ROSE"));
 
         // All material names (Material enum) added Minecraft 1.14.4 -> 1.15
-        public static final Set<String> ADDED_MC_1_15 = new HashSet<String>(Arrays.asList(
+        public static final Set<String> ADDED_MC_1_15 = makeSet(Arrays.asList(
                 "BEEHIVE", "BEE_NEST", "BEE_SPAWN_EGG",
                 "HONEYCOMB", "HONEYCOMB_BLOCK",
                 "HONEY_BLOCK", "HONEY_BOTTLE"));
@@ -604,7 +648,10 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                 "ZOGLIN_SPAWN_EGG", "ZOMBIFIED_PIGLIN_SPAWN_EGG"));
 
         // All material names (Material enum) added Minecraft 1.16.5 -> 1.17
-        public static final Set<String> ADDED_MC_1_17 = new HashSet<String>(Arrays.asList(
+        public static final Set<String> ADDED_MC_1_17 = makeSet(
+                makeColoredMaterials("CANDLE"),
+                makeColoredMaterials("CANDLE_CAKE"),
+                Arrays.asList(
                 "DEEPSLATE", "COBBLED_DEEPSLATE", "POLISHED_DEEPSLATE",
                 "CALCITE",  "TUFF", "DRIPSTONE_BLOCK", "ROOTED_DIRT",
                 "DEEPSLATE_COAL_ORE", "DEEPSLATE_IRON_ORE", "COPPER_ORE",
@@ -647,25 +694,16 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                 "RAW_COPPER", "COPPER_INGOT", "AMETHYST_SHARD", "POWDER_SNOW_BUCKET",
                 "AXOLOTL_BUCKET", "BUNDLE", "SPYGLASS", "GLOW_INK_SAC",
                 "AXOLOTL_SPAWN_EGG", "GLOW_SQUID_SPAWN_EGG", "GOAT_SPAWN_EGG",
-                "GLOW_ITEM_FRAME", "GLOW_BERRIES", "CANDLE", "WHITE_CANDLE",
-                "ORANGE_CANDLE", "MAGENTA_CANDLE", "LIGHT_BLUE_CANDLE",
-                "YELLOW_CANDLE", "LIME_CANDLE", "PINK_CANDLE", "GRAY_CANDLE",
-                "LIGHT_GRAY_CANDLE", "CYAN_CANDLE", "PURPLE_CANDLE",
-                "BLUE_CANDLE", "BROWN_CANDLE", "GREEN_CANDLE", "RED_CANDLE",
-                "BLACK_CANDLE", "SMALL_AMETHYST_BUD", "MEDIUM_AMETHYST_BUD",
+                "GLOW_ITEM_FRAME", "GLOW_BERRIES", "CANDLE",
+                "SMALL_AMETHYST_BUD", "MEDIUM_AMETHYST_BUD",
                 "LARGE_AMETHYST_BUD", "AMETHYST_CLUSTER", "POINTED_DRIPSTONE",
                 "WATER_CAULDRON", "LAVA_CAULDRON", "POWDER_SNOW_CAULDRON",
-                "CANDLE_CAKE", "WHITE_CANDLE_CAKE", "ORANGE_CANDLE_CAKE",
-                "MAGENTA_CANDLE_CAKE", "LIGHT_BLUE_CANDLE_CAKE", "YELLOW_CANDLE_CAKE",
-                "LIME_CANDLE_CAKE", "PINK_CANDLE_CAKE", "GRAY_CANDLE_CAKE",
-                "LIGHT_GRAY_CANDLE_CAKE", "CYAN_CANDLE_CAKE",
-                "PURPLE_CANDLE_CAKE", "BLUE_CANDLE_CAKE", "BROWN_CANDLE_CAKE",
-                "GREEN_CANDLE_CAKE", "RED_CANDLE_CAKE", "BLACK_CANDLE_CAKE",
+                "CANDLE_CAKE",
                 "POWDER_SNOW", "CAVE_VINES", "CAVE_VINES_PLANT",
                 "BIG_DRIPLEAF_STEM",  "POTTED_AZALEA_BUSH", "POTTED_FLOWERING_AZALEA_BUSH"));
 
         // All material names (Material enum) added Minecraft 1.18.2 -> 1.19
-        public static final Set<String> ADDED_MC_1_19 = new HashSet<String>(Arrays.asList(
+        public static final Set<String> ADDED_MC_1_19 = makeSet(Arrays.asList(
                 "MUD", "MANGROVE_PLANKS", "MANGROVE_PROPAGULE",
                 "MANGROVE_LOG", "MANGROVE_ROOTS", "MUDDY_MANGROVE_ROOTS",
                 "STRIPPED_MANGROVE_LOG", "STRIPPED_MANGROVE_WOOD",
@@ -688,7 +726,7 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                 "POTTED_MANGROVE_PROPAGULE"));
 
         // All material names (Material enum) added Minecraft 1.19.2 -> 1.19.3
-        public static final Set<String> ADDED_MC_1_19_3 = new HashSet<String>(Arrays.asList(
+        public static final Set<String> ADDED_MC_1_19_3 = makeSet(Arrays.asList(
                 "BAMBOO_PLANKS", "BAMBOO_MOSAIC", "BAMBOO_BLOCK",
                 "STRIPPED_BAMBOO_BLOCK", "BAMBOO_SLAB", "BAMBOO_MOSAIC_SLAB",
                 "CHISELED_BOOKSHELF", "BAMBOO_FENCE", "SCULK_VEIN",
@@ -711,28 +749,26 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                 "WITHER_SPAWN_EGG", "PIGLIN_HEAD", "PIGLIN_WALL_HEAD"));
 
         // All material names (Material enum) added Minecraft 1.19.3 -> 1.19.4
-        public static final Set<String> ADDED_MC_1_19_4 = new HashSet<String>(Arrays.asList(
-                "CHERRY_PLANKS", "CHERRY_SAPLING", "SUSPICIOUS_SAND", "CHERRY_LOG",
-                "STRIPPED_CHERRY_LOG", "STRIPPED_CHERRY_WOOD", "CHERRY_WOOD",
-                "CHERRY_LEAVES", "TORCHFLOWER", "PINK_PETALS", "CHERRY_SLAB",
-                "DECORATED_POT", "CHERRY_FENCE", "CHERRY_STAIRS",
-                "CHERRY_BUTTON", "CHERRY_PRESSURE_PLATE", "CHERRY_DOOR",
-                "CHERRY_TRAPDOOR", "CHERRY_FENCE_GATE", "CHERRY_BOAT",
-                "CHERRY_CHEST_BOAT", "CHERRY_SIGN", "CHERRY_HANGING_SIGN",
-                "SNIFFER_SPAWN_EGG", "TORCHFLOWER_SEEDS", "BRUSH",
-                "NETHERITE_UPGRADE_SMITHING_TEMPLATE", "SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE",
-                "DUNE_ARMOR_TRIM_SMITHING_TEMPLATE", "COAST_ARMOR_TRIM_SMITHING_TEMPLATE",
-                "WILD_ARMOR_TRIM_SMITHING_TEMPLATE", "WARD_ARMOR_TRIM_SMITHING_TEMPLATE",
-                "EYE_ARMOR_TRIM_SMITHING_TEMPLATE", "VEX_ARMOR_TRIM_SMITHING_TEMPLATE",
-                "TIDE_ARMOR_TRIM_SMITHING_TEMPLATE", "SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE",
-                "RIB_ARMOR_TRIM_SMITHING_TEMPLATE", "SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE",
-                "POTTERY_SHARD_ARCHER", "POTTERY_SHARD_PRIZE", "POTTERY_SHARD_ARMS_UP",
-                "POTTERY_SHARD_SKULL", "CHERRY_WALL_SIGN", "CHERRY_WALL_HANGING_SIGN",
-                "POTTED_TORCHFLOWER", "POTTED_CHERRY_SAPLING", "TORCHFLOWER_CROP"
+        public static final Set<String> ADDED_MC_1_19_4 = makeSet(
+                makeWoodMaterials("CHERRY"),
+                Arrays.asList(
+                        "SUSPICIOUS_SAND",
+                        "TORCHFLOWER", "PINK_PETALS",
+                        "DECORATED_POT",
+                        "SNIFFER_SPAWN_EGG", "TORCHFLOWER_SEEDS", "BRUSH",
+                        "NETHERITE_UPGRADE_SMITHING_TEMPLATE", "SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE",
+                        "DUNE_ARMOR_TRIM_SMITHING_TEMPLATE", "COAST_ARMOR_TRIM_SMITHING_TEMPLATE",
+                        "WILD_ARMOR_TRIM_SMITHING_TEMPLATE", "WARD_ARMOR_TRIM_SMITHING_TEMPLATE",
+                        "EYE_ARMOR_TRIM_SMITHING_TEMPLATE", "VEX_ARMOR_TRIM_SMITHING_TEMPLATE",
+                        "TIDE_ARMOR_TRIM_SMITHING_TEMPLATE", "SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE",
+                        "RIB_ARMOR_TRIM_SMITHING_TEMPLATE", "SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE",
+                        "POTTERY_SHARD_ARCHER", "POTTERY_SHARD_PRIZE", "POTTERY_SHARD_ARMS_UP",
+                        "POTTERY_SHARD_SKULL",
+                        "POTTED_TORCHFLOWER", "TORCHFLOWER_CROP"
         ));
 
         // All material names (Material enum) added Minecraft 1.19.4 -> 1.20
-        public static final Set<String> ADDED_MC_1_20 = new HashSet<String>(Arrays.asList(
+        public static final Set<String> ADDED_MC_1_20 = makeSet(Arrays.asList(
                 "SUSPICIOUS_GRAVEL", "PITCHER_PLANT", "SNIFFER_EGG", "PITCHER_CROP",
                 "CALIBRATED_SCULK_SENSOR", "PITCHER_POD", "MUSIC_DISC_RELIC",
                 "WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE", "SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE",
@@ -748,7 +784,7 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         ));
 
         // All material names (Material enum) added Minecraft 1.20.2 -> 1.20.3
-        public static final Set<String> ADDED_MC_1_20_3 = new HashSet<>(Arrays.asList(
+        public static final Set<String> ADDED_MC_1_20_3 = makeSet(Arrays.asList(
                 "TUFF_SLAB", "TUFF_STAIRS", "TUFF_WALL", "CHISELED_TUFF", "POLISHED_TUFF",
                 "POLISHED_TUFF_SLAB", "POLISHED_TUFF_STAIRS", "POLISHED_TUFF_WALL",
                 "TUFF_BRICKS", "TUFF_BRICK_SLAB", "TUFF_BRICK_STAIRS", "TUFF_BRICK_WALL",
@@ -772,7 +808,7 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         ));
 
         // All material names (Material enum) added Minecraft 1.20.4 -> 1.20.5
-        public static final Set<String> ADDED_MC_1_20_5 = new HashSet<>(Arrays.asList(
+        public static final Set<String> ADDED_MC_1_20_5 = makeSet(Arrays.asList(
                 "HEAVY_CORE", "TURTLE_SCUTE", "ARMADILLO_SCUTE", "WOLF_ARMOR",
                 "ARMADILLO_SPAWN_EGG", "BOGGED_SPAWN_EGG", "WIND_CHARGE",
                 "MACE", "FLOW_BANNER_PATTERN", "GUSTER_BANNER_PATTERN",
@@ -782,8 +818,19 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         ));
 
         // All material names (Material enum) added Minecraft 1.20.6 -> 1.21
-        public static final Set<String> ADDED_MC_1_21 = new HashSet<>(Arrays.asList(
+        public static final Set<String> ADDED_MC_1_21 = makeSet(Arrays.asList(
                 "MUSIC_DISC_CREATOR", "MUSIC_DISC_CREATOR_MUSIC_BOX", "MUSIC_DISC_PRECIPICE"
+        ));
+
+        // All material names (Material enum) added Minecraft 1.21.1 -> 1.21.2
+        public static final Set<String> ADDED_MC_1_21_2 = makeSet(
+                makeWoodMaterials("PALE_OAK"),
+                makeColoredMaterials("BUNDLE"),
+                Arrays.asList(
+                        "PALE_MOSS_CARPET", "PALE_HANGING_MOSS", "PALE_MOSS_BLOCK",
+                        "CREAKING_HEART", "CREAKING_SPAWN_EGG",
+                        "FIELD_MASONED_BANNER_PATTERN", "BORDURE_INDENTED_BANNER_PATTERN"
+
         ));
     }
 }
