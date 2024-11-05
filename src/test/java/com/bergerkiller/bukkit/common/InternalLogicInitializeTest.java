@@ -6,6 +6,7 @@ import java.lang.reflect.Modifier;
 import java.util.Set;
 
 import com.bergerkiller.bukkit.common.internal.hooks.AdvancementDataPlayerHook;
+import com.bergerkiller.bukkit.common.wrappers.InteractionResult;
 import com.bergerkiller.bukkit.common.wrappers.RelativeFlags;
 import org.junit.Assert;
 import org.junit.Test;
@@ -125,8 +126,13 @@ public class InternalLogicInitializeTest {
     }
 
     @Test
-    public void testRelativeFlags() {
+    public void testRelativeFlagsInit() {
         Set<?> raw = RelativeFlags.toRawRelativeFlags(RelativeFlags.RELATIVE_ROTATION);
         assertEquals(RelativeFlags.RELATIVE_ROTATION, RelativeFlags.fromRawRelativeFlags(raw));
+    }
+
+    @Test
+    public void testInteractionResultInit() {
+        assertTrue(InteractionResult.SUCCESS.isTruthy());
     }
 }

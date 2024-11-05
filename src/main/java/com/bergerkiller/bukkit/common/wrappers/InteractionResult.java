@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 
 /**
  * Wrapper class for EnumInteractionResult introduced in Minecraft 1.9.
@@ -33,7 +34,18 @@ public enum InteractionResult {
 
     private InteractionResult(boolean truthy) {
         this._truthy = truthy;
-        if (CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.21.2")) {
+            // Interface with constants
+            String name = this.name();
+            try {
+                this._handle = Resolver.resolveAndGetDeclaredField(
+                        CommonUtil.getClass("net.minecraft.world.EnumInteractionResult"),
+                        name).get(null);
+            } catch (Throwable t) {
+                throw new IllegalStateException("EnumInteractionResult missing constant: " + name, t);
+            }
+        } else if (CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
+            // Enum
             String name = this.name();
             if (name.equals("CONSUME") && !CommonBootstrap.evaluateMCVersion(">=", "1.15")) {
                 name = "SUCCESS";
@@ -46,6 +58,7 @@ public enum InteractionResult {
             }
             throw new IllegalStateException("EnumInteractionResult missing constant: " + name);
         } else {
+            // True/False
             this._handle = null;
         }
     }
