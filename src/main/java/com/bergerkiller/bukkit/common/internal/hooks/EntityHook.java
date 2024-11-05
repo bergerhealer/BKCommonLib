@@ -162,17 +162,44 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
+    @HookMethodCondition("version < 1.21.2")
     @HookMethod("public boolean damageEntity:???(net.minecraft.world.damagesource.DamageSource damagesource, float f)")
-    public boolean onDamageEntity(Object damageSource, float damage) {
+    public boolean onDamageEntityLegacy(Object damageSource, float damage) {
         try {
             if (checkController()) {
                 return controller.onDamage(com.bergerkiller.bukkit.common.wrappers.DamageSource.getForHandle(damageSource), damage);
             } else {
-                return base.onDamageEntity(damageSource, damage);
+                return base.onDamageEntityLegacy(damageSource, damage);
             }
         } catch (Throwable t) {
             Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity damageEntity callback", t);
             return false;
+        }
+    }
+
+    @HookMethodCondition("version >= 1.21.2")
+    @HookMethod("public boolean damageEntityWithWorld:hurtServer(net.minecraft.server.level.WorldServer world, net.minecraft.world.damagesource.DamageSource damagesource, float f)")
+    public boolean onDamageEntity(Object world, Object damageSource, float damage) {
+        try {
+            if (checkController()) {
+                return controller.onDamage(com.bergerkiller.bukkit.common.wrappers.DamageSource.getForHandle(damageSource), damage);
+            } else {
+                return base.onDamageEntity(world, damageSource, damage);
+            }
+        } catch (Throwable t) {
+            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity damageEntity callback", t);
+            return false;
+        }
+    }
+
+    private static final boolean DAMAGE_ENTITY_HAS_WORLD_ARG = CommonBootstrap.evaluateMCVersion(">=", "1.21.2");
+
+    public boolean baseDamageEntity(Object damageSource, float damage) {
+        if (DAMAGE_ENTITY_HAS_WORLD_ARG) {
+            Object worldServer = EntityHandle.T.getWorld.raw.invoker.invoke(instance());
+            return base.onDamageEntity(worldServer, damage, damage);
+        } else {
+            return base.onDamageEntityLegacy(damageSource, damage);
         }
     }
 
