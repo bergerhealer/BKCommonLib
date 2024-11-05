@@ -531,7 +531,7 @@ public class YamlSerializer {
         int len = str.length();
         for (int i = 0; i < len; i++) {
             char c = str.charAt(i);
-            if (c == '[' || c == ']' || c == '{' || c == '}' || c == '&' || c == '$') {
+            if (c == '[' || c == ']' || c == '{' || c == '}' || c == '&' || c == '$' || c == '\'' || c == StringUtil.CHAT_STYLE_CHAR) {
                 return true;
             }
         }
