@@ -12,7 +12,11 @@ optional class LightEngineThreaded {
         #require LightEngineThreaded private final net.minecraft.server.level.PlayerChunkMap chunkMap;
         net.minecraft.server.level.PlayerChunkMap pcm = instance#chunkMap;
         net.minecraft.server.level.WorldServer world = pcm.level;
+    #if version >= 1.21.2
+        world.moonrise$getChunkTaskScheduler().parallelGenExecutor.queueTask(runnable);
+    #else
         world.moonrise$getChunkTaskScheduler().parallelGenExecutor.queueRunnable(runnable);
+    #endif
   #elseif exists net.minecraft.server.level.WorldServer public final io.papermc.paper.chunk.system.scheduling.ChunkTaskScheduler chunkTaskScheduler;
         // Paper new chunk system - now stored in WorldServer
         #require LightEngineThreaded private final net.minecraft.server.level.PlayerChunkMap chunkMap;
