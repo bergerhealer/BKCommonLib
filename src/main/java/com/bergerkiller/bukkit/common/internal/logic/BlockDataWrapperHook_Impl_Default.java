@@ -23,7 +23,12 @@ import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import com.bergerkiller.mountiplex.reflection.util.NullInstantiator;
 import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 
-class BlockDataWrapperHook_Impl extends BlockDataWrapperHook {
+/**
+ * Hooks the map storing the properties of the block data to store our own BlockData instance.
+ * Used on Spigot, and on Paper versions 1.8 - 1.21.1. Does not support Paper 1.21.2+
+ * due to changes in their block state property handling.
+ */
+class BlockDataWrapperHook_Impl_Default extends BlockDataWrapperHook {
     private final FastMethod<Object> getValues = new FastMethod<>();
     private final FastField<Object> values = new FastField<>();
     private NullInstantiator<Object> hookBuilder = null;
@@ -92,7 +97,7 @@ class BlockDataWrapperHook_Impl extends BlockDataWrapperHook {
         final ExtendedClassWriter<Object> cw = ExtendedClassWriter.builder(immutableMapType)
                 .addInterface(Accessor.class)
                 .setFlags(ClassWriter.COMPUTE_MAXS)
-                .setClassLoader(BlockDataWrapperHook_Impl.class.getClassLoader())
+                .setClassLoader(BlockDataWrapperHook_Impl_Default.class.getClassLoader())
                 .build();
         final String blockDataDesc = MPLType.getDescriptor(BlockData.class);
         final String immutableMapDesc = MPLType.getDescriptor(immutableMapType);
