@@ -305,6 +305,31 @@ class Entity {
             dw#dw_owner = instance;
         }
 
+        // MinecartBehavior instance
+#if version >= 1.21.2
+        if (instance instanceof net.minecraft.world.entity.vehicle.EntityMinecartAbstract) {
+            net.minecraft.world.entity.vehicle.MinecartBehavior behavior;
+            behavior = ((net.minecraft.world.entity.vehicle.EntityMinecartAbstract) instance).getBehavior();
+            #require net.minecraft.world.entity.vehicle.MinecartBehavior protected final net.minecraft.world.entity.vehicle.EntityMinecartAbstract minecart;
+            behavior#minecart = (net.minecraft.world.entity.vehicle.EntityMinecartAbstract)instance;
+        }
+#endif
+
+        // CraftBukkit added a 'CommandSource' field to, I guess, avoid instance creation?
+#if version >= 1.21.2 && exists net.minecraft.world.entity.Entity private final net.minecraft.commands.ICommandListener commandSource || version > 1.21.3
+        #require Entity private final net.minecraft.commands.ICommandListener commandSource;
+        net.minecraft.commands.ICommandListener commandSource = instance#commandSource;
+        // Can't use #require here because we don't know the name of this anonymous class
+        // Identify the instance by inspecting the current value...which could fail
+        try {
+            java.lang.reflect.Field f = commandSource.getClass().getDeclaredField("this$0");
+            f.setAccessible(true);
+            f.set((Object) commandSource, (Object) instance);
+        } catch (Throwable t) {
+            com.bergerkiller.bukkit.common.Logging.LOGGER_REFLECTION.log(java.util.logging.Level.SEVERE, "Failed to assign part of entity reference during swap", t);
+        }
+#endif
+
         // -- Paper LootableInventory field --
 #if exists net.minecraft.world.entity.Entity public com.destroystokyo.paper.loottable.PaperLootableInventoryData lootableData;
         if (instance.lootableData != null) {

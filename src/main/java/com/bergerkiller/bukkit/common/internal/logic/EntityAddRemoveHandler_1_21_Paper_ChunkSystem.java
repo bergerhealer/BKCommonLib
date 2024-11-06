@@ -284,6 +284,7 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
     @Template.Import("net.minecraft.world.level.entity.EntityTickList")
     @Template.Import("ca.spottedleaf.moonrise.patches.chunk_system.level.entity.ChunkEntitySlices")
     @Template.Import("ca.spottedleaf.concurrentutil.map.ConcurrentLong2ReferenceChainedHashTable")
+    @Template.Import("ca.spottedleaf.moonrise.common.util.WorldUtil")
     @Template.InstanceType("ca.spottedleaf.moonrise.patches.chunk_system.level.entity.EntityLookup")
     public static abstract class AddRemoveHandlerLogic extends Template.Class<Handle> {
 
@@ -343,11 +344,14 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *                 serverEntityLookup.trackerEntities.add(newEntity);
          *             }
          *         }
+         *
+         * #if version < 1.21.2
          *         if (serverEntityLookup.trackerUnloadedEntities.remove(oldEntity)) {
          *             if (newEntity != null) {
          *                 serverEntityLookup.trackerUnloadedEntities.add(newEntity);
          *             }
          *         }
+         * #endif
          *     }
          *
          *     #require net.minecraft.server.level.WorldServer final net.minecraft.world.level.entity.EntityTickList entityTickList;
@@ -360,12 +364,17 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *             set.add(newEntity);
          *         }
          *     }
-         * 
+         *
+         * #if version >= 1.21.2
+         *     final int minSection = WorldUtil.getMinSection(world);
+         *     final int maxSection = WorldUtil.getMaxSection(world);
+         * #else
          *     #require EntityLookup private final int minSection;
          *     #require EntityLookup private final int maxSection;
          *     final int minSection = entityLookup#minSection;
          *     final int maxSection = entityLookup#maxSection;
-         * 
+         * #endif
+         *
          *     // First check whether the new entity is already stored. If so, no ticking mode changes
          *     boolean isNewEntityStored = false;
          *     if (newEntity != null) {
