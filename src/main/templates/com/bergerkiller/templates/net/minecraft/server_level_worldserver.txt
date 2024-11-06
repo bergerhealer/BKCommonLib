@@ -19,7 +19,7 @@ import net.minecraft.server.MinecraftServer;
 import java.util.function.Function;
 import java.util.function.LongPredicate;
 
-import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPoint;
+import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPointNearBlock;
 
 import com.bergerkiller.generated.net.minecraft.server.level.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
@@ -534,12 +534,8 @@ class WorldServer extends World {
     public void saveLevel();
 #endif
 
-    public org.bukkit.Location findSafeSpawn(PlayerRespawnPoint respawnPoint, boolean alsoWhenDestroyed, boolean isDeathRespawn) {
-        if (respawnPoint.isNone()) {
-            return null;
-        }
-
-        BlockPosition blockposition = new BlockPosition(respawnPoint.getX(), respawnPoint.getY(), respawnPoint.getZ());
+    public org.bukkit.Location findSafeSpawn(PlayerRespawnPointNearBlock respawnPoint, boolean alsoWhenDestroyed, boolean isDeathRespawn) {
+        BlockPosition blockposition = new BlockPosition(respawnPoint.getBlockX(), respawnPoint.getBlockY(), respawnPoint.getBlockZ());
 
         // If isDeathRespawn is true, removes one use tick from a bed respawn anchor, if used
         boolean ignoreRespawnAnchorUses = !isDeathRespawn;

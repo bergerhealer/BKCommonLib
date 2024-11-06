@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPoint;
 
+import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPointNearBlock;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -146,7 +147,12 @@ public class CommonPlayer extends CommonLivingEntity<Player> {
      */
     @Deprecated
     public Block getSpawnPoint() {
-        return PlayerRespawnPoint.forPlayer(this.getEntity()).getBlock();
+        PlayerRespawnPoint p = PlayerRespawnPoint.forPlayer(this.getEntity());
+        if (p instanceof PlayerRespawnPointNearBlock) {
+            return ((PlayerRespawnPointNearBlock) p).getBlock();
+        } else {
+            return null;
+        }
     }
 
     /**
