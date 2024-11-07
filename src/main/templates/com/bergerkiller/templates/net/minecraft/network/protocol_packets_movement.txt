@@ -123,13 +123,13 @@ class PacketPlayOutEntityTeleport extends Packet {
     public boolean isOnGround();
 
     // Not really used anymore, but here for completion sake
-    public int getEncodedX() {
+    public int getEncodedPosX() {
         return ProtocolMath.serializePosition_1_8_8(instance.getX());
     }
-    public int getEncodedY() {
+    public int getEncodedPosY() {
         return ProtocolMath.serializePosition_1_8_8(instance.getY());
     }
-    public int getEncodedZ() {
+    public int getEncodedPosZ() {
         return ProtocolMath.serializePosition_1_8_8(instance.getZ());
     }
 
@@ -185,10 +185,6 @@ class PacketPlayOutEntityTeleport extends Packet {
     public boolean isOnGround() { return instance#onGround; }
 
   #if version >= 1.9
-    public int getEncodedPosX() { return instance#encodedPosX; }
-    public int getEncodedPosY() { return instance#encodedPosY; }
-    public int getEncodedPosZ() { return instance#encodedPosZ; }
-  #else
     // Not really used anymore, but here for completion sake
     public int getEncodedPosX() {
         return ProtocolMath.serializePosition_1_8_8( instance#posX );
@@ -199,6 +195,10 @@ class PacketPlayOutEntityTeleport extends Packet {
     public int getEncodedPosZ() {
         return ProtocolMath.serializePosition_1_8_8( instance#posZ );
     }
+  #else
+    public int getEncodedPosX() { return instance#encodedPosX; }
+    public int getEncodedPosY() { return instance#encodedPosY; }
+    public int getEncodedPosZ() { return instance#encodedPosZ; }
   #endif
 
     public int getEncodedYaw() { return (int) instance#encodedYaw & 0xFF; }

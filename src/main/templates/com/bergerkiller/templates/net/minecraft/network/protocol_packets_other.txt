@@ -1984,7 +1984,7 @@ class PacketPlayOutPosition extends Packet {
     public int getTeleportWaitTimer() {
   #if version >= 1.9
         #require PacketPlayOutPosition private int teleportWaitTimer:g;
-        return instance#teleportWaitTimer; }
+        return instance#teleportWaitTimer;
   #else
         return 0;
   #endif

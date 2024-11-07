@@ -804,8 +804,8 @@ class EntityTrackerEntryState {
     #require EntityTrackerEntryState private int lastSentXRot:xRotp;
     #require EntityTrackerEntryState private int lastSentYHeadRot:yHeadRotp;
 #else
-    #require EntityTrackerEntryState private int lastSentYRot:yRotp;
-    #require EntityTrackerEntryState private int lastSentXRot:xRotp;
+    #require EntityTrackerEntryState private int lastSentYRot:yRot;
+    #require EntityTrackerEntryState private int lastSentXRot:xRot;
   #if version >= 1.9
     #require EntityTrackerEntryState private int lastSentYHeadRot:headYaw;
   #elseif nachospigot
