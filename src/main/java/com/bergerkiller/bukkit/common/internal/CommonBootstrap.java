@@ -804,6 +804,9 @@ public class CommonBootstrap {
         if (evaluateMCVersion(">=", "1.21.2")) {
             remappings.put("net.minecraft.world.entity.RelativeMovement", "net.minecraft.world.entity.Relative");
             remappings.put("net.minecraft.world.level.saveddata.maps.WorldMap$PatchData", "net.minecraft.world.level.saveddata.maps.WorldMap$c");
+
+            // Spigot uses the wrong one. We need the sync packet for behavior similar to 1.21.1 and before
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport", "net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket");
         }
 
         // There have been various locations where starlight was installed

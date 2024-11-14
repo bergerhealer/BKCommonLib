@@ -86,28 +86,28 @@ class PacketPlayOutEntityTeleport extends Packet {
 
 #if version >= 1.21.2
     public int getEntityId:id();
-    public double getPosX() { return instance.change().position().x; }
-    public double getPosY() { return instance.change().position().y; }
-    public double getPosZ() { return instance.change().position().z; }
-    public float getYaw() { return instance.change().yRot(); }
-    public float getPitch() { return instance.change().xRot(); }
+    public double getPosX() { return instance.values().position().x; }
+    public double getPosY() { return instance.values().position().y; }
+    public double getPosZ() { return instance.values().position().z; }
+    public float getYaw() { return instance.values().yRot(); }
+    public float getPitch() { return instance.values().xRot(); }
     public boolean isOnGround:onGround();
 
     // Not really used anymore, but here for completion sake
     public int getEncodedPosX() {
-        return ProtocolMath.serializePosition_1_8_8(instance.change().position().x);
+        return ProtocolMath.serializePosition_1_8_8(instance.values().position().x);
     }
     public int getEncodedPosY() {
-        return ProtocolMath.serializePosition_1_8_8(instance.change().position().y);
+        return ProtocolMath.serializePosition_1_8_8(instance.values().position().y);
     }
     public int getEncodedPosZ() {
-        return ProtocolMath.serializePosition_1_8_8(instance.change().position().z);
+        return ProtocolMath.serializePosition_1_8_8(instance.values().position().z);
     }
     public int getEncodedYaw() {
-        return ProtocolMath.serializeRotation(instance.change().yRot());
+        return ProtocolMath.serializeRotation(instance.values().yRot());
     }
     public int getEncodedPitch() {
-        return ProtocolMath.serializeRotation(instance.change().xRot());
+        return ProtocolMath.serializeRotation(instance.values().xRot());
     }
 #elseif version >= 1.18
     public int getEntityId:getId();
@@ -207,9 +207,8 @@ class PacketPlayOutEntityTeleport extends Packet {
 
     public static (PacketPlayOutEntityTeleportHandle) PacketPlayOutEntityTeleport createNewForEntity((org.bukkit.entity.Entity) Entity entity) {
 #if version >= 1.21.2
-        PositionMoveRotation change = PositionMoveRotation.of(entity);
-        java.util.Set relatives = java.util.Collections.emptySet();
-        return new PacketPlayOutEntityTeleport(entity.getId(), change, relatives, entity.onGround());
+        PositionMoveRotation values = PositionMoveRotation.of(entity);
+        return new PacketPlayOutEntityTeleport(entity.getId(), values, entity.onGround());
 #else
         return new PacketPlayOutEntityTeleport(entity);
 #endif
@@ -217,9 +216,8 @@ class PacketPlayOutEntityTeleport extends Packet {
 
     public static (PacketPlayOutEntityTeleportHandle) PacketPlayOutEntityTeleport createNew(int entityId, double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
 #if version >= 1.21.2
-        PositionMoveRotation change = new PositionMoveRotation(new Vec3D(posX, posY, posZ), new Vec3D(0.0, 0.0, 0.0), yaw, pitch);
-        java.util.Set relatives = RelativeFlags.toRawRelativeFlags(RelativeFlags.ABSOLUTE_POSITION);
-        return new PacketPlayOutEntityTeleport(entityId, change, relatives, onGround);
+        PositionMoveRotation values = new PositionMoveRotation(new Vec3D(posX, posY, posZ), new Vec3D(0.0, 0.0, 0.0), yaw, pitch);
+        return new PacketPlayOutEntityTeleport(entityId, values, onGround);
 
 #elseif version >= 1.9
         // Create a new packet and use reflection to set the fields
