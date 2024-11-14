@@ -20,6 +20,10 @@ public abstract class PacketPlayInSteerVehicleHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public static PacketPlayInSteerVehicleHandle createNew(boolean isLeft, boolean isRight, boolean isForward, boolean isBackward, boolean isJump, boolean isUnmount, boolean isSprint) {
+        return T.createNew.invokeVA(isLeft, isRight, isForward, isBackward, isJump, isUnmount, isSprint);
+    }
+
     public abstract boolean isLeft();
     public abstract boolean isRight();
     public abstract boolean isForward();
@@ -28,11 +32,14 @@ public abstract class PacketPlayInSteerVehicleHandle extends PacketHandle {
     public abstract float getForwards();
     public abstract boolean isJump();
     public abstract boolean isUnmount();
+    public abstract boolean isSprint();
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.PacketPlayInSteerVehicle</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayInSteerVehicleClass extends Template.Class<PacketPlayInSteerVehicleHandle> {
+        public final Template.StaticMethod.Converted<PacketPlayInSteerVehicleHandle> createNew = new Template.StaticMethod.Converted<PacketPlayInSteerVehicleHandle>();
+
         public final Template.Method<Boolean> isLeft = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isRight = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isForward = new Template.Method<Boolean>();
@@ -41,6 +48,7 @@ public abstract class PacketPlayInSteerVehicleHandle extends PacketHandle {
         public final Template.Method<Float> getForwards = new Template.Method<Float>();
         public final Template.Method<Boolean> isJump = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isUnmount = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> isSprint = new Template.Method<Boolean>();
 
     }
 

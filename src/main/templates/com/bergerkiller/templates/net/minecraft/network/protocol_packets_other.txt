@@ -70,6 +70,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockDigHandle.EnumPlayerDigTypeHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutOpenWindowHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPositionHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSteerVehicleHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSetCreativeSlotHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutUpdateAttributesHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTitleHandle;
@@ -1863,6 +1864,11 @@ class PacketPlayOutCustomSoundEffect extends Packet {
 
 class PacketPlayInSteerVehicle extends Packet {
 #if version >= 1.21.2
+    public static (PacketPlayInSteerVehicleHandle) PacketPlayInSteerVehicle createNew(boolean isLeft, boolean isRight, boolean isForward, boolean isBackward, boolean isJump, boolean isUnmount, boolean isSprint) {
+        return new PacketPlayInSteerVehicle(new net.minecraft.world.entity.player.Input(
+            isForward, isBackward, isLeft, isRight, isJump, isUnmount, isSprint));
+    }
+
     public boolean isLeft() { return instance.input().left(); }
     public boolean isRight() { return instance.input().right(); }
     public boolean isForward() { return instance.input().forward(); }
@@ -1888,6 +1894,7 @@ class PacketPlayInSteerVehicle extends Packet {
 
     public boolean isJump() { return instance.input().jump(); }
     public boolean isUnmount() { return instance.input().shift(); }
+    public boolean isSprint() { return instance.input().sprint(); }
 
 #else
   #if version >= 1.17
@@ -1902,6 +1909,21 @@ class PacketPlayInSteerVehicle extends Packet {
     #require PacketPlayInSteerVehicle private boolean unmount:d;
   #endif
 
+    public static (PacketPlayInSteerVehicleHandle) PacketPlayInSteerVehicle createNew(boolean isLeft, boolean isRight, boolean isForward, boolean isBackward, boolean isJump, boolean isUnmount, boolean isSprint) {
+       float sideways = (isLeft == isRight) ? 0.0f : (isLeft ? 0.98f : -0.98f);
+       float forwards = (isForward == isBackward) ? 0.0f : (isForward ? 0.98f : -0.98f);
+  #if version >= 1.17
+       return new PacketPlayInSteerVehicle(sideways, forwards, isJump, isUnmount);
+  #else
+       PacketPlayInSteerVehicle packet = new PacketPlayInSteerVehicle();
+       packet#sideways = sideways;
+       packet#forwards = forwards;
+       packet#jump = isJump;
+       packet#unmount = isUnmount;
+       return packet;
+  #endif
+    }
+
     public boolean isLeft() { return instance#sideways > 0.0f; }
     public boolean isRight() { return instance#sideways < 0.0f; }
     public boolean isForward() { return instance#forwards > 0.0f; }
@@ -1911,6 +1933,7 @@ class PacketPlayInSteerVehicle extends Packet {
     public float getForwards() { return instance#forwards; }
     public boolean isJump() { return instance#jump; }
     public boolean isUnmount() { return instance#unmount; }
+    public boolean isSprint() { return false; }
 #endif
 }
 
