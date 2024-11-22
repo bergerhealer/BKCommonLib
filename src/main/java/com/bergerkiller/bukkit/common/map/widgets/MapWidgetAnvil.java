@@ -143,7 +143,7 @@ public class MapWidgetAnvil extends MapWidget {
         if (!CommonCapabilities.EMPTY_ITEM_NAME) {
             new_text = new_text.replace("\0", "");
         }
-        LEFT_BUTTON._title = ChatColor.BLACK + " " + new_text;
+        LEFT_BUTTON._title = ChatColor.BLACK + new_text;
         if (!_text.equals(new_text)) {
             _text = new_text;
             onTextChanged();

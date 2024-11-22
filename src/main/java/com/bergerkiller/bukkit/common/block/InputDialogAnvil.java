@@ -148,14 +148,14 @@ public class InputDialogAnvil {
             // User inputed something new without the space in front. Insert our space!
             // Then remove the text again. MC doesn't consider it a rename if text is empty.
             forceResendAll = true;
+            LEFT_BUTTON._title = ChatColor.BLACK + " " + new_text;
         } else {
             // Omit whitespace in front
             while (new_text.startsWith(" ")) {
                 new_text = new_text.substring(1);
             }
+            LEFT_BUTTON._title = ChatColor.BLACK + new_text;
         }
-
-        LEFT_BUTTON._title = ChatColor.BLACK + " " + new_text;
 
         if (!_text.equals(new_text)) {
             _text = new_text;
