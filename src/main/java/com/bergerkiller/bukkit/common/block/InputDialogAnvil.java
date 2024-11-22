@@ -143,10 +143,11 @@ public class InputDialogAnvil {
         // String new_text = view.getInventory().getRenameText(); // Not backwards-compatible
         String new_text = ContainerAnvilHandle.fromBukkit(view).getRenameText();
         new_text = LogicUtil.fixNull(new_text, "").replace("\0", "");
+        boolean forceResendAll = false;
         if (!new_text.startsWith(" ") && !new_text.isEmpty()) {
             // User inputed something new without the space in front. Insert our space!
             // Then remove the text again. MC doesn't consider it a rename if text is empty.
-            LEFT_BUTTON._title = ChatColor.BLACK + " " + new_text;
+            forceResendAll = true;
         } else {
             // Omit whitespace in front
             while (new_text.startsWith(" ")) {
@@ -154,13 +155,19 @@ public class InputDialogAnvil {
             }
         }
 
+        LEFT_BUTTON._title = ChatColor.BLACK + " " + new_text;
+
         if (!_text.equals(new_text)) {
             _text = new_text;
             onTextChanged();
         }
 
         // force resend the output item as it gets reset by this
-        RIGHT_BUTTON.refresh(view);
+        if (forceResendAll || new_text.equals(_initialText)) {
+            refreshButtons(view);
+        } else {
+            RIGHT_BUTTON.refresh(view);
+        }
     }
 
     private void refreshButtons(InventoryView view) {
@@ -439,6 +446,7 @@ public class InputDialogAnvil {
             } else if (event.getRawSlot() == 2) {
                 button = RIGHT_BUTTON;
             } else {
+                CommonUtil.nextTick(() -> refreshButtons(view));
                 return;
             }
 

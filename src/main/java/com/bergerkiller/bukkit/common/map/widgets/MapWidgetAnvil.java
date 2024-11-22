@@ -143,13 +143,19 @@ public class MapWidgetAnvil extends MapWidget {
         if (!CommonCapabilities.EMPTY_ITEM_NAME) {
             new_text = new_text.replace("\0", "");
         }
+        LEFT_BUTTON._title = ChatColor.BLACK + " " + new_text;
         if (!_text.equals(new_text)) {
             _text = new_text;
             onTextChanged();
         }
 
         // force resend the output item as it gets reset by this
-        RIGHT_BUTTON.refresh(view);
+        if (new_text.isEmpty()) {
+            // Opening the dialog can trigger all items to reset
+            refreshButtons(view);
+        } else {
+            RIGHT_BUTTON.refresh(view);
+        }
     }
 
     private void refreshButtons(InventoryView view) {
@@ -411,6 +417,7 @@ public class MapWidgetAnvil extends MapWidget {
             } else if (event.getRawSlot() == 2) {
                 button = RIGHT_BUTTON;
             } else {
+                CommonUtil.nextTick(() -> refreshButtons(view));
                 return;
             }
 
