@@ -148,8 +148,8 @@ public class MapWidgetAnvil extends MapWidget {
             onTextChanged();
         }
 
-        // force resend the buttons
-        refreshButtons(view);
+        // force resend the output item as it gets reset by this
+        RIGHT_BUTTON.refresh(view);
     }
 
     private void refreshButtons(InventoryView view) {
@@ -403,7 +403,7 @@ public class MapWidgetAnvil extends MapWidget {
             final InventoryView view = event.getView();
 
             // Use raw slot
-            Button button;
+            final Button button;
             if (event.getRawSlot() == 0) {
                 button = LEFT_BUTTON;
             } else if (event.getRawSlot() == 1) {

@@ -159,8 +159,8 @@ public class InputDialogAnvil {
             onTextChanged();
         }
 
-        // force resend the buttons
-        refreshButtons(view);
+        // force resend the output item as it gets reset by this
+        RIGHT_BUTTON.refresh(view);
     }
 
     private void refreshButtons(InventoryView view) {
