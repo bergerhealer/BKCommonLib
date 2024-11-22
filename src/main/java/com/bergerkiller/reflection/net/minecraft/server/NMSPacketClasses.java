@@ -2439,4 +2439,8 @@ public class NMSPacketClasses {
             return true; // Bug because this packet isn't registered in the normal places
         }
     }
+
+    // Since 1.21.2. Can be used to identify when network issues occur.
+    public static class NMSServerboundClientTickEndPacket extends NMSPacket {
+    }
 }

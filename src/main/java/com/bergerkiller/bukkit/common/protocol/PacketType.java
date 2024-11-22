@@ -166,6 +166,7 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayInUseEntity IN_USE_ENTITY = new NMSPacketPlayInUseEntity();
     public static final NMSPacketPlayInUseItem IN_USE_ITEM = new NMSPacketPlayInUseItem();
     public static final NMSPacketPlayInVehicleMove IN_VEHICLE_MOVE = new NMSPacketPlayInVehicleMove();
+    public static final NMSServerboundClientTickEndPacket IN_CLIENT_TICK_END = new NMSServerboundClientTickEndPacket();
 
     /* Window-related packets */
     public static final NMSPacketPlayInCloseWindow IN_WINDOW_CLOSE = new NMSPacketPlayInCloseWindow();

@@ -63,6 +63,12 @@ public class MapPlayerInput implements Tickable {
             curr_dx = recv_dx;
             curr_dy = recv_dy;
             curr_dz = recv_dz;
+
+            if (curr_dx != 0 || curr_dy != 0 || curr_dz != 0) {
+                key_repeat_timer++;
+            } else {
+                key_repeat_timer = 0;
+            }
         });
         reset();
     }
@@ -456,12 +462,11 @@ public class MapPlayerInput implements Tickable {
         recv_dy = dy;
         recv_dz = dz;
         has_input = true;
-        ticks_without_input = 0;
-        if (dx != 0 || dy != 0 || dz != 0) {
-            key_repeat_timer++;
-        } else {
+        if (dx == 0 && dy == 0 && dz == 0) {
             key_repeat_timer = 0;
         }
+
+        keepAliveInput();
 
         // Must send the mount packet again, with a slight delay, when shift is pressed post-1.16
         // After 4 ticks we may no longer be sending our input, and nothing happens
@@ -474,6 +479,10 @@ public class MapPlayerInput implements Tickable {
         }
 
         return this._isIntercepting;
+    }
+
+    public void keepAliveInput() {
+        ticks_without_input = 0;
     }
 
     private void updateInterception(boolean intercept) {

@@ -170,7 +170,8 @@ public final class CommonMapController implements PacketListener, Listener {
     public static final PacketType[] PACKET_TYPES = {
             PacketType.OUT_MAP, PacketType.IN_STEER_VEHICLE, 
             PacketType.OUT_WINDOW_ITEMS, PacketType.OUT_WINDOW_SET_SLOT,
-            PacketType.OUT_ENTITY_METADATA, PacketType.IN_SET_CREATIVE_SLOT
+            PacketType.OUT_ENTITY_METADATA, PacketType.IN_SET_CREATIVE_SLOT,
+            PacketType.IN_CLIENT_TICK_END
     };
 
     /**
@@ -885,6 +886,16 @@ public final class CommonMapController implements PacketListener, Listener {
 
                 // Receive input. If it will be handled, it will cancel further handling of this packet
                 event.setCancelled(input.receiveInput(dx, dy, dz));
+            }
+        }
+
+        // Since 1.21.2 the client sends this packet every tick
+        // This can be used to 'keep-alive' the input received, or time it out
+        if (event.getType() == PacketType.IN_CLIENT_TICK_END) {
+            Player p = event.getPlayer();
+            MapPlayerInput input = playerInputs.get(p);
+            if (input != null) {
+                input.keepAliveInput();
             }
         }
 
