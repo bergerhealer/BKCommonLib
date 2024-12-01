@@ -19,6 +19,7 @@ import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -143,18 +144,11 @@ public class InputDialogAnvil {
         // String new_text = view.getInventory().getRenameText(); // Not backwards-compatible
         String new_text = ContainerAnvilHandle.fromBukkit(view).getRenameText();
         new_text = LogicUtil.fixNull(new_text, "").replace("\0", "");
-        boolean forceResendAll = false;
-        if (!new_text.startsWith(" ") && !new_text.isEmpty()) {
-            // User inputed something new without the space in front. Insert our space!
-            // Then remove the text again. MC doesn't consider it a rename if text is empty.
-            forceResendAll = true;
-            LEFT_BUTTON._title = ChatColor.BLACK + " " + new_text;
-        } else {
-            // Omit whitespace in front
-            while (new_text.startsWith(" ")) {
-                new_text = new_text.substring(1);
-            }
-            LEFT_BUTTON._title = ChatColor.BLACK + new_text;
+        LEFT_BUTTON._title = ChatColor.BLACK + new_text;
+
+        // Omit whitespace in front
+        while (new_text.startsWith(" ")) {
+            new_text = new_text.substring(1);
         }
 
         if (!_text.equals(new_text)) {
@@ -163,11 +157,7 @@ public class InputDialogAnvil {
         }
 
         // force resend the output item as it gets reset by this
-        if (forceResendAll || new_text.equals(_initialText)) {
-            refreshButtons(view);
-        } else {
-            RIGHT_BUTTON.refresh(view);
-        }
+        RIGHT_BUTTON.refresh(view);
     }
 
     private void refreshButtons(InventoryView view) {
@@ -184,6 +174,9 @@ public class InputDialogAnvil {
 
         // Close all old views first (to be sure), both when enabling and disabling
         for (InventoryView view : this._openInventories) {
+            view.setItem(LEFT_BUTTON.getIndex(), null);
+            view.setItem(MIDDLE_BUTTON.getIndex(), null);
+            view.setItem(RIGHT_BUTTON.getIndex(), null);
             ItemUtil.closeView(view);
         }
         this._openInventories.clear();
@@ -197,7 +190,7 @@ public class InputDialogAnvil {
 
             // Reset text
             _text = _initialText;
-            LEFT_BUTTON._title = ChatColor.BLACK + " " + _initialText;
+            LEFT_BUTTON._title = ChatColor.BLACK + _initialText;
 
             // Open windows for all viewing players
             final InventoryView view = EntityPlayerHandle.fromBukkit(player).openAnvilWindow(getTitle());
@@ -370,6 +363,12 @@ public class InputDialogAnvil {
             if (!this._owner._isWindowOpen) {
                 return;
             }
+
+            ItemStack item = createItem();
+            if (!LogicUtil.bothNullOrEqual(item, view.getItem(getIndex()))) {
+                view.setItem(getIndex(), item);
+            }
+
             int windowId = ContainerHandle.fromBukkit(view).getWindowId();
             CommonPacket set_output_packet = PacketType.OUT_WINDOW_SET_SLOT.newInstance();
             set_output_packet.write(PacketType.OUT_WINDOW_SET_SLOT.windowId, windowId);
@@ -407,6 +406,13 @@ public class InputDialogAnvil {
             }
 
             return true; // yay!
+        }
+
+        @EventHandler(priority = EventPriority.LOWEST)
+        public void onPluginDisable(PluginDisableEvent event) {
+            if (event.getPlugin() == plugin) {
+                setWindowOpen(false, false);
+            }
         }
 
         @EventHandler(priority = EventPriority.MONITOR)
@@ -474,6 +480,7 @@ public class InputDialogAnvil {
 
             // Note: must cast, since 1.21 the return type changed :(
             handleTextChange(((InventoryEvent) event).getView());
+            event.setResult(RIGHT_BUTTON.createItem());
         }
     }
 }
