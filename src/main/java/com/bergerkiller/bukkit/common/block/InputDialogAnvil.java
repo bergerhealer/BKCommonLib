@@ -69,6 +69,24 @@ public class InputDialogAnvil {
     }
 
     /**
+     * Gets the plugin managing this dialog
+     *
+     * @return plugin owner
+     */
+    public final Plugin getPlugin() {
+        return plugin;
+    }
+
+    /**
+     * Gets the Player for which this dialog is displayed
+     *
+     * @return Player owner
+     */
+    public final Player getPlayer() {
+        return player;
+    }
+
+    /**
      * Gets the current text input by the user
      * 
      * @return text
@@ -104,7 +122,7 @@ public class InputDialogAnvil {
      * @return this
      */
     public InputDialogAnvil setMiddleButtonTitle(String title) {
-        MIDDLE_BUTTON.setTitleAndRefresh(title);
+        MIDDLE_BUTTON.setTitle(title);
         return this;
     }
 
@@ -262,17 +280,17 @@ public class InputDialogAnvil {
          * 
          * @return title
          */
-        private String getTitle() {
+        public String getTitle() {
             return this._title;
         }
 
         /**
          * Sets the title displayed when hovering over the button.
          * For the left-most slot, this also sets the initial text field value.
-         * 
-         * @param title to set
+         *
+         * @param title New title to set
          */
-        private void setTitleAndRefresh(String title) {
+        public void setTitle(String title) {
             if (!LogicUtil.bothNullOrEqual(this._title, title)) {
                 this._title = title;
                 this.refresh();

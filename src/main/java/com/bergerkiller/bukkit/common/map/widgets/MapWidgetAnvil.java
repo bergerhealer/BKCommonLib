@@ -1,43 +1,21 @@
 package com.bergerkiller.bukkit.common.map.widgets;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
-import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import com.bergerkiller.bukkit.common.block.InputDialogAnvil;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Result;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryEvent;
-import org.bukkit.event.inventory.PrepareAnvilEvent;
-import org.bukkit.inventory.AnvilInventory;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
-import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
-import com.bergerkiller.bukkit.common.internal.hooks.LegacyContainerAnvilHook;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.ItemUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.utils.PacketUtil;
-import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerAnvilHandle;
-import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle;
-import com.bergerkiller.mountiplex.reflection.ClassHook;
 
 /**
  * Add this widget to open an interactive anvil window, where the player
@@ -53,24 +31,17 @@ import com.bergerkiller.mountiplex.reflection.ClassHook;
  * When the window is closed, focus is returned to the underlying map widget.
  */
 public class MapWidgetAnvil extends MapWidget {
-    public final Button LEFT_BUTTON = new Button(this, 0);
-    public final Button MIDDLE_BUTTON = new Button(this, 1);
-    public final Button RIGHT_BUTTON = new Button(this, 2);
-    private final Set<InventoryView> _openInventories;
+    public final Button LEFT_BUTTON = new Button(this, 0, i -> i.LEFT_BUTTON);
+    public final Button MIDDLE_BUTTON = new Button(this, 1, i -> i.MIDDLE_BUTTON);
+    public final Button RIGHT_BUTTON = new Button(this, 2, i -> i.RIGHT_BUTTON);
     private final Set<Player> _openFor = new HashSet<>();
-    private final Listener _listener;
-    private boolean _isWindowOpen = false;
+    private final Map<Player, InputDialogAnvil> _openDialogs = new HashMap<>();
+    private boolean _isOpen = false; // Avoids multiple onClose() being fired
     private String _text = "";
 
     public MapWidgetAnvil() {
-        this._openInventories = Collections.newSetFromMap(new WeakHashMap<InventoryView, Boolean>());
         this.setBounds(0, 0, 0, 0);
         this.setFocusable(true);
-        if (CommonCapabilities.HAS_PREPARE_ANVIL_EVENT) {
-            this._listener = new EventListenerFull();
-        } else {
-            this._listener = new EventListenerBase();
-        }
     }
 
     /**
@@ -127,96 +98,69 @@ public class MapWidgetAnvil extends MapWidget {
     @Override
     public void onActivate() {
         super.onActivate();
-        this.setWindowOpen(true);
+
+        // Reset any previous open dialogs
+        closeAllDialogs();
+
+        // Reset text
+        this._text = "";
+
+        // Show to everyone viewing this display
+        openDialogForAll();
     }
 
     @Override
     public void onDeactivate() {
         super.onDeactivate();
-        this.setWindowOpen(false);
+        closeAllDialogs();
     }
 
-    private void handleTextChange(InventoryView view) {
-        // String new_text = view.getInventory().getRenameText(); // Not backwards-compatible
-        String new_text = ContainerAnvilHandle.fromBukkit(view).getRenameText();
-        new_text = LogicUtil.fixNull(new_text, "");
-        if (!CommonCapabilities.EMPTY_ITEM_NAME) {
-            new_text = new_text.replace("\0", "");
-        }
-        LEFT_BUTTON._title = ChatColor.BLACK + new_text;
-        if (!_text.equals(new_text)) {
-            _text = new_text;
-            onTextChanged();
+    private void openDialogForAll() {
+        // Open windows for all viewing players
+        for (Player player : (_openFor.isEmpty() ? this.display.getViewers() : _openFor)) {
+            if (_openFor.isEmpty() && !this.display.isControlling(player)) {
+                continue;
+            }
+
+            WidgetInputDialogAnvil dialog = new WidgetInputDialogAnvil(player);
+            LEFT_BUTTON.applyAll(dialog);
+            MIDDLE_BUTTON.applyAll(dialog);
+            RIGHT_BUTTON.applyAll(dialog);
+            this._openDialogs.put(player, dialog);
+            dialog.open();
         }
 
-        // force resend the output item as it gets reset by this
-        if (new_text.isEmpty()) {
-            // Opening the dialog can trigger all items to reset
-            refreshButtons(view);
-        } else {
-            RIGHT_BUTTON.refresh(view);
-        }
-    }
-
-    private void refreshButtons(InventoryView view) {
-        LEFT_BUTTON.refresh(view);
-        MIDDLE_BUTTON.refresh(view);
-        RIGHT_BUTTON.refresh(view);
-    }
-
-    private void setWindowOpen(boolean enabled) {
-        if (this._isWindowOpen == enabled) {
+        // If it couldn't be opened for anyone, close itself
+        if (this._openDialogs.isEmpty()) {
+            closeAllDialogs();
+            this.deactivate();
             return;
         }
-        this._isWindowOpen = enabled;
 
-        // Close all old views first (to be sure), both when enabling and disabling
-        for (InventoryView view : this._openInventories) {
-            ItemUtil.closeView(view);
-        }
-        this._openInventories.clear();
+        _isOpen = true;
+    }
 
-        if (enabled) {
-            // Start listening
-            JavaPlugin plugin = this.getDisplay().getPlugin();
-            Bukkit.getPluginManager().registerEvents(this._listener, plugin);
+    private void closeAllDialogs() {
+        List<InputDialogAnvil> dialogs = new ArrayList<>(_openDialogs.values());
+        dialogs.forEach(InputDialogAnvil::close);
+        _openDialogs.clear(); // For good measure
 
-            // Reset text
-            this._text = "";
-
-            // Open windows for all viewing players
-            for (Player player : (_openFor.isEmpty() ? this.display.getViewers() : _openFor)) {
-                if (_openFor.isEmpty() && !this.display.isControlling(player)) {
-                    continue;
-                }
-
-                final InventoryView view = EntityPlayerHandle.fromBukkit(player).openAnvilWindow(getTitle());
-
-                // Required for handling text changes < MC 1.9
-                if (!CommonCapabilities.HAS_PREPARE_ANVIL_EVENT) {
-                    ContainerAnvilHandle container = ContainerAnvilHandle.fromBukkit(view);
-                    LegacyContainerAnvilHook hook = ClassHook.get(container.getRaw(), LegacyContainerAnvilHook.class);
-                    hook.textChangeCallback = () -> handleTextChange(view);
-                }
-
-                this._openInventories.add(view);
-                this.refreshButtons(view);
-            }
-
-            // If it couldn't be opened for anyone, close itself
-            if (this._openInventories.isEmpty()) {
-                setWindowOpen(false);
-            }
-
-        } else {
-            // Unregister event listener
-            CommonUtil.unregisterListener(this._listener);
-
-            // Deactivate the widget (to be sure)
-            deactivate();
-
-            // Event
+        // Event
+        if (_isOpen) {
+            _isOpen = false;
             onClose();
+        }
+    }
+
+    private Button buttonFromAnvilDialog(InputDialogAnvil dialog, InputDialogAnvil.Button button) {
+        if (LEFT_BUTTON._buttonAccessor.apply(dialog) == button) {
+            return LEFT_BUTTON;
+        } else if (MIDDLE_BUTTON._buttonAccessor.apply(dialog) == button) {
+            return MIDDLE_BUTTON;
+        } else if (RIGHT_BUTTON._buttonAccessor.apply(dialog) == button) {
+            return RIGHT_BUTTON;
+        } else {
+            return null; // Error?
         }
     }
 
@@ -227,16 +171,18 @@ public class MapWidgetAnvil extends MapWidget {
     public static class Button {
         private final MapWidgetAnvil _owner;
         private final int _index;
-        private String _title;
-        private String _description;
-        private Material _material;
+        private final Function<InputDialogAnvil, InputDialogAnvil.Button> _buttonAccessor;
 
-        public Button(MapWidgetAnvil owner, int index) {
+        // These are only stored 'offline' if no input dialogs are open yet
+        // The values are applied when the dialog is first activated
+        private Material _material = Material.AIR;
+        private String _title = "";
+        private String _description = "";
+
+        public Button(MapWidgetAnvil owner, int index, Function<InputDialogAnvil, InputDialogAnvil.Button> buttonAccessor) {
             this._owner = owner;
             this._index = index;
-            this._title = "";
-            this._description = "";
-            this._material = Material.AIR;
+            this._buttonAccessor = buttonAccessor;
         }
 
         /**
@@ -265,10 +211,8 @@ public class MapWidgetAnvil extends MapWidget {
          * @param title to set
          */
         public void setTitle(String title) {
-            if (!LogicUtil.bothNullOrEqual(this._title, title)) {
-                this._title = title;
-                this.refresh();
-            }
+            this._title = title;
+            forAllDialogs(b -> b.setTitle(title));
         }
 
         /**
@@ -286,10 +230,8 @@ public class MapWidgetAnvil extends MapWidget {
          * @param description to set
          */
         public void setDescription(String description) {
-            if (!LogicUtil.bothNullOrEqual(this._description, description)) {
-                this._description = description;
-                this.refresh();
-            }
+            this._description = description;
+            forAllDialogs(b -> b.setDescription(description));
         }
 
         /**
@@ -307,10 +249,8 @@ public class MapWidgetAnvil extends MapWidget {
          * @param material to set
          */
         public void setMaterial(Material material) {
-            if (this._material != material) {
-                this._material = material;
-                this.refresh();
-            }
+            this._material = material;
+            forAllDialogs(b -> b.setMaterial(material));
         }
 
         /**
@@ -323,44 +263,17 @@ public class MapWidgetAnvil extends MapWidget {
             setMaterial(material == null ? null : material.getType());
         }
 
-        protected ItemStack createItem() {
-            if (getMaterial() == null || BlockData.AIR.isType(getMaterial())) {
-                return null;
-            } else {
-                CommonItemStack item = CommonItemStack.create(getMaterial(), 1);
-                if (this.getTitle() != null && !this.getTitle().isEmpty()) {
-                    item.setCustomNameMessage(this.getTitle());
-                } else if (CommonCapabilities.EMPTY_ITEM_NAME) {
-                    item.setCustomNameMessage("");
-                } else {
-                    item.setCustomNameMessage("\0");
-                }
-                item.setRepairCost(0); // Ensure no cost shown in menu
-                if (this.getDescription() != null && !this.getDescription().isEmpty()) {
-                    for (String line : this.getDescription().split("\n")) {
-                        item.addLoreMessage(ChatColor.RESET.toString() + line);
-                    }
-                }
-                return item.toBukkit();
+        private void forAllDialogs(Consumer<InputDialogAnvil.Button> action) {
+            for (InputDialogAnvil dialog : _owner._openDialogs.values()) {
+                action.accept(_buttonAccessor.apply(dialog));
             }
         }
 
-        protected void refresh() {
-            for (InventoryView view : this._owner._openInventories) {
-                this.refresh(view);
-            }
-        }
-
-        protected void refresh(InventoryView view) {
-            if (!this._owner._isWindowOpen) {
-                return;
-            }
-            int windowId = ContainerHandle.fromBukkit(view).getWindowId();
-            CommonPacket set_output_packet = PacketType.OUT_WINDOW_SET_SLOT.newInstance();
-            set_output_packet.write(PacketType.OUT_WINDOW_SET_SLOT.windowId, windowId);
-            set_output_packet.write(PacketType.OUT_WINDOW_SET_SLOT.slot, getIndex());
-            set_output_packet.write(PacketType.OUT_WINDOW_SET_SLOT.item, createItem());
-            PacketUtil.sendPacket(ItemUtil.getViewPlayer(view), set_output_packet);
+        private void applyAll(InputDialogAnvil dialog) {
+            InputDialogAnvil.Button dialogButton = _buttonAccessor.apply(dialog);
+            dialogButton.setTitle(getTitle());
+            dialogButton.setDescription(getDescription());
+            dialogButton.setMaterial(getMaterial());
         }
 
         @Override
@@ -373,78 +286,39 @@ public class MapWidgetAnvil extends MapWidget {
         }
     }
 
-    // Listens to Bukkit events for refreshing and handling the map widget anvil
-    private class EventListenerBase implements Listener {
+    private class WidgetInputDialogAnvil extends InputDialogAnvil {
 
-        protected boolean mustHandle(InventoryEvent event) {
-            // Check whether we even have windows open
-            // If not, deactivate the widget again
-            if (_openInventories.isEmpty()) {
-                setWindowOpen(false);
-                return false;
-            }
-
-            // If not interesting to us, ignore event
-            if (!(event.getInventory() instanceof AnvilInventory) ||
-                !_openInventories.contains(event.getView()))
-            {
-                return false;
-            }
-
-            return true; // yay!
+        public WidgetInputDialogAnvil(Player player) {
+            super(MapWidgetAnvil.this.getDisplay().getPlugin(), player);
         }
 
-        @EventHandler(priority = EventPriority.MONITOR)
-        public void onInventoryClose(InventoryCloseEvent event) {
-            if (!mustHandle(event)) return;
-
-            setWindowOpen(false);
+        @Override
+        public ChatText getTitle() {
+            return MapWidgetAnvil.this.getTitle();
         }
 
-        @SuppressWarnings("deprecation")
-        @EventHandler(priority = EventPriority.LOWEST)
-        public void onInventoryClick(InventoryClickEvent event) {
-            if (!mustHandle(event)) return;
+        @Override
+        public void onTextChanged() {
+            MapWidgetAnvil.this._text = this.getText();
+            MapWidgetAnvil.this.LEFT_BUTTON._title = this.getText();
+            MapWidgetAnvil.this.onTextChanged();
+        }
 
-            final InventoryView view = event.getView();
-
-            // Use raw slot
-            final Button button;
-            if (event.getRawSlot() == 0) {
-                button = LEFT_BUTTON;
-            } else if (event.getRawSlot() == 1) {
-                button = MIDDLE_BUTTON;
-            } else if (event.getRawSlot() == 2) {
-                button = RIGHT_BUTTON;
-            } else {
-                CommonUtil.nextTick(() -> refreshButtons(view));
-                return;
-            }
-
-            ItemStack itemOnCursor = event.getCursor();
-            event.setCursor(null);
-            event.setResult(Result.DENY);
-
-            if (!ItemUtil.isEmpty(itemOnCursor)) {
-                ItemUtil.getBottomInventory(view).addItem(itemOnCursor);
-            }
-
-            onClick(button);
-
-            if (_isWindowOpen) {
-                CommonUtil.nextTick(() -> refreshButtons(view));
+        @Override
+        public void onClick(InputDialogAnvil.Button button) {
+            // Which widget button is this?
+            MapWidgetAnvil.Button widgetButton = buttonFromAnvilDialog(this, button);
+            if (widgetButton != null) {
+                MapWidgetAnvil.this.onClick(widgetButton);
             }
         }
-    }
 
-    // usable since MC 1.9
-    private class EventListenerFull extends EventListenerBase {
-        @EventHandler(priority = EventPriority.LOWEST)
-        public void onPrepareAnvil(PrepareAnvilEvent event) {
-            if (!mustHandle(event)) return;
+        @Override
+        public void onClose() {
+            MapWidgetAnvil.this._openDialogs.remove(this.getPlayer());
 
-            // Note: must cast, since 1.21 the return type changed :(
-            handleTextChange(((InventoryEvent) event).getView());
+            // Also close the dialog for everyone else, fires onClose
+            MapWidgetAnvil.this.closeAllDialogs();
         }
     }
 }
