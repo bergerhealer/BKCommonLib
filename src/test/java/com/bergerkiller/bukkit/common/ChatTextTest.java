@@ -51,6 +51,10 @@ public class ChatTextTest {
         } else {
             allowed.add("{\"extra\":[\"Hello, \",{\"color\":\"red\",\"text\":\"World!\"}],\"text\":\"\"}");
         }
+        if (Common.evaluateMCVersion(">=", "1.21.4")) {
+            // Blegh! Mojang, quit changing this shit all the time what the hell
+            allowed.add("{\"text\":\"\",\"extra\":[\"Hello, \",{\"text\":\"World!\",\"strikethrough\":false,\"obfuscated\":false,\"bold\":false,\"italic\":false,\"underlined\":false,\"color\":\"red\"}]}");
+        }
         String result = text.getJson();
         if (!allowed.contains(result)) {
             System.out.println("Incorrect JSON: " + result);
@@ -91,6 +95,10 @@ public class ChatTextTest {
             allowed.add("{\"extra\":[{\"color\":\"red\",\"text\":\"\"},{\"color\":\"red\",\"text\":\"\"}],\"text\":\"\"}");
             // It's even more messed up now :(
             allowed.add("{\"extra\":[{\"bold\":false,\"italic\":false,\"underlined\":false,\"strikethrough\":false,\"obfuscated\":false,\"color\":\"red\",\"text\":\"\"},{\"color\":\"red\",\"text\":\"\"}],\"text\":\"\"}");
+        }
+        if (Common.evaluateMCVersion(">=", "1.21.4")) {
+            // Argh!
+            allowed.add("{\"text\":\"\",\"extra\":[{\"text\":\"\",\"strikethrough\":false,\"obfuscated\":false,\"bold\":false,\"italic\":false,\"underlined\":false,\"color\":\"red\"},{\"text\":\"\",\"color\":\"red\"}]}");
         }
         String json = text.getJson();
         if (!allowed.contains(json)) {

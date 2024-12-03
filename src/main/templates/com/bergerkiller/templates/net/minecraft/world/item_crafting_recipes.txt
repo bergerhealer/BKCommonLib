@@ -146,7 +146,12 @@ optional class RecipeItemStack {
         }
 
         // Only stores the Item material to match. Create itemstacks out of them (count 1)
+  #if version >= 1.21.4
+        #require RecipeItemStack private final net.minecraft.core.HolderSet<net.minecraft.world.item.Item> values;
+        net.minecraft.core.HolderSet items = instance#values;
+  #else
         java.util.List items = instance.items();
+  #endif
         java.util.List itemStacks = new java.util.ArrayList(items.size());
         for (java.util.Iterator iter = items.iterator(); iter.hasNext();) {
             net.minecraft.core.Holder itemHolder = (net.minecraft.core.Holder) iter.next();

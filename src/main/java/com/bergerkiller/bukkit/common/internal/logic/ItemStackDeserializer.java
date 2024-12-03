@@ -275,8 +275,19 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         // From MC 1.21.3 to 1.21.2
         this.register(4080, NO_CONVERSION);
 
+        // From MC 1.21.4 to 1.21.3
+        this.register(4082, map -> {
+            Object type = map.get("type");
+            if (Helper.ADDED_MC_1_21_4.contains(type)) {
+                return false;
+            }
+
+            //TODO: Migrate custom model data?
+            return true;
+        });
+
         // Maximum supported data version
-        this.max_version = 4082; // MC 1.21.3
+        this.max_version = 4189; // MC 1.21.4
     }
 
     // Registers a converter if it can convert from a future data version only
@@ -834,6 +845,16 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                         "CREAKING_HEART", "CREAKING_SPAWN_EGG",
                         "FIELD_MASONED_BANNER_PATTERN", "BORDURE_INDENTED_BANNER_PATTERN"
 
+        ));
+
+        // All material names (Material enum) added Minecraft 1.21.4 -> 1.21.4
+        public static final Set<String> ADDED_MC_1_21_4 = makeSet(Arrays.asList(
+                "OPEN_EYEBLOSSOM", "CLOSED_EYEBLOSSOM",
+                "RESIN_CLUMP", "RESIN_BLOCK", "RESIN_BRICKS",
+                "RESIN_BRICK_STAIRS", "RESIN_BRICK_SLAB",
+                "RESIN_BRICK_WALL", "CHISELED_RESIN_BRICKS",
+                "RESIN_BRICK",
+                "POTTED_OPEN_EYEBLOSSOM", "POTTED_CLOSED_EYEBLOSSOM"
         ));
     }
 }
