@@ -21,26 +21,29 @@ public abstract class PacketPlayInVehicleMoveHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public static PacketPlayInVehicleMoveHandle createNew(double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
+        return T.createNew.invokeVA(posX, posY, posZ, yaw, pitch, onGround);
+    }
+
     public abstract double getPosX();
-    public abstract void setPosX(double value);
     public abstract double getPosY();
-    public abstract void setPosY(double value);
     public abstract double getPosZ();
-    public abstract void setPosZ(double value);
     public abstract float getYaw();
-    public abstract void setYaw(float value);
     public abstract float getPitch();
-    public abstract void setPitch(float value);
+    public abstract boolean isOnGround();
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.PacketPlayInVehicleMove</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayInVehicleMoveClass extends Template.Class<PacketPlayInVehicleMoveHandle> {
-        public final Template.Field.Double posX = new Template.Field.Double();
-        public final Template.Field.Double posY = new Template.Field.Double();
-        public final Template.Field.Double posZ = new Template.Field.Double();
-        public final Template.Field.Float yaw = new Template.Field.Float();
-        public final Template.Field.Float pitch = new Template.Field.Float();
+        public final Template.StaticMethod.Converted<PacketPlayInVehicleMoveHandle> createNew = new Template.StaticMethod.Converted<PacketPlayInVehicleMoveHandle>();
+
+        public final Template.Method<Double> getPosX = new Template.Method<Double>();
+        public final Template.Method<Double> getPosY = new Template.Method<Double>();
+        public final Template.Method<Double> getPosZ = new Template.Method<Double>();
+        public final Template.Method<Float> getYaw = new Template.Method<Float>();
+        public final Template.Method<Float> getPitch = new Template.Method<Float>();
+        public final Template.Method<Boolean> isOnGround = new Template.Method<Boolean>();
 
     }
 

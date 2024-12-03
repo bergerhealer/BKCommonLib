@@ -21,26 +21,27 @@ public abstract class PacketPlayOutVehicleMoveHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public static PacketPlayOutVehicleMoveHandle createNew(double posX, double posY, double posZ, float yaw, float pitch) {
+        return T.createNew.invoke(posX, posY, posZ, yaw, pitch);
+    }
+
     public abstract double getPosX();
-    public abstract void setPosX(double value);
     public abstract double getPosY();
-    public abstract void setPosY(double value);
     public abstract double getPosZ();
-    public abstract void setPosZ(double value);
     public abstract float getYaw();
-    public abstract void setYaw(float value);
     public abstract float getPitch();
-    public abstract void setPitch(float value);
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.PacketPlayOutVehicleMove</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutVehicleMoveClass extends Template.Class<PacketPlayOutVehicleMoveHandle> {
-        public final Template.Field.Double posX = new Template.Field.Double();
-        public final Template.Field.Double posY = new Template.Field.Double();
-        public final Template.Field.Double posZ = new Template.Field.Double();
-        public final Template.Field.Float yaw = new Template.Field.Float();
-        public final Template.Field.Float pitch = new Template.Field.Float();
+        public final Template.StaticMethod.Converted<PacketPlayOutVehicleMoveHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutVehicleMoveHandle>();
+
+        public final Template.Method<Double> getPosX = new Template.Method<Double>();
+        public final Template.Method<Double> getPosY = new Template.Method<Double>();
+        public final Template.Method<Double> getPosZ = new Template.Method<Double>();
+        public final Template.Method<Float> getYaw = new Template.Method<Float>();
+        public final Template.Method<Float> getPitch = new Template.Method<Float>();
 
     }
 

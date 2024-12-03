@@ -14,41 +14,111 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotationHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityVelocityHandle
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutVehicleMoveHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInVehicleMoveHandle;
 
 import com.bergerkiller.bukkit.common.wrappers.RelativeFlags;
 
 // Only >= MC 1.9
 optional class PacketPlayInVehicleMove extends Packet {
-#if version >= 1.17
-    private double posX:x;
-    private double posY:y;
-    private double posZ:z;
-    private float yaw:yRot;
-    private float pitch:xRot;
+#if version >= 1.21.4
+    public double getPosX() { return instance.position().x; }
+    public double getPosY() { return instance.position().y; }
+    public double getPosZ() { return instance.position().z; }
+    public float getYaw:yRot();
+    public float getPitch:xRot();
+    public boolean isOnGround:onGround();
+
+    public static (PacketPlayInVehicleMoveHandle) PacketPlayInVehicleMove createNew(double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
+        return new PacketPlayInVehicleMove(new Vec3D(posX, posY, posZ), yaw, pitch, onGround);
+    }
 #else
-    private double posX:a;
-    private double posY:b;
-    private double posZ:c;
-    private float yaw:d;
-    private float pitch:e;
+  #if version >= 1.17
+    #require PacketPlayInVehicleMove private double posX:x;
+    #require PacketPlayInVehicleMove private double posY:y;
+    #require PacketPlayInVehicleMove private double posZ:z;
+    #require PacketPlayInVehicleMove private float yaw:yRot;
+    #require PacketPlayInVehicleMove private float pitch:xRot;
+  #elseif version >= 1.9
+    #require PacketPlayInVehicleMove private double posX:a;
+    #require PacketPlayInVehicleMove private double posY:b;
+    #require PacketPlayInVehicleMove private double posZ:c;
+    #require PacketPlayInVehicleMove private float yaw:d;
+    #require PacketPlayInVehicleMove private float pitch:e;
+  #endif
+
+    public double getPosX() { return instance#posX; }
+    public double getPosY() { return instance#posY; }
+    public double getPosZ() { return instance#posZ; }
+    public float getYaw() { return instance#yaw; }
+    public float getPitch() { return instance#pitch; }
+    public boolean isOnGround() { return false; /* not supported */ }
+
+    public static (PacketPlayInVehicleMoveHandle) PacketPlayInVehicleMove createNew(double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
+  #if version >= 1.17
+        #require PacketPlayInVehicleMove private PacketPlayInVehicleMove createVehicleMovePacket:<init>(net.minecraft.network.PacketDataSerializer packetdataserializer);
+        PacketPlayInVehicleMove packet = #createVehicleMovePacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+  #else
+        PacketPlayInVehicleMove packet = new PacketPlayInVehicleMove();
+  #endif
+        packet#posX = posX;
+        packet#posY = posY;
+        packet#posZ = posZ;
+        packet#yaw = yaw;
+        packet#pitch = pitch;
+        //onGround is ignored (doesn't exist)
+        return packet;
+    }
 #endif
-    
 }
 
 // Only >= MC 1.9
 optional class PacketPlayOutVehicleMove extends Packet {
-#if version >= 1.17
-    private double posX:x;
-    private double posY:y;
-    private double posZ:z;
-    private float yaw:yRot;
-    private float pitch:xRot;
+#if version >= 1.21.4
+    public double getPosX() { return instance.position().x; }
+    public double getPosY() { return instance.position().y; }
+    public double getPosZ() { return instance.position().z; }
+    public float getYaw:yRot();
+    public float getPitch:xRot();
+
+    public static (PacketPlayOutVehicleMoveHandle) PacketPlayOutVehicleMove createNew(double posX, double posY, double posZ, float yaw, float pitch) {
+        return new PacketPlayOutVehicleMove(new Vec3D(posX, posY, posZ), yaw, pitch);
+    }
 #else
-    private double posX:a;
-    private double posY:b;
-    private double posZ:c;
-    private float yaw:d;
-    private float pitch:e;
+  #if version >= 1.17
+    #require PacketPlayOutVehicleMove private double posX:x;
+    #require PacketPlayOutVehicleMove private double posY:y;
+    #require PacketPlayOutVehicleMove private double posZ:z;
+    #require PacketPlayOutVehicleMove private float yaw:yRot;
+    #require PacketPlayOutVehicleMove private float pitch:xRot;
+  #elseif version >= 1.9
+    #require PacketPlayOutVehicleMove private double posX:a;
+    #require PacketPlayOutVehicleMove private double posY:b;
+    #require PacketPlayOutVehicleMove private double posZ:c;
+    #require PacketPlayOutVehicleMove private float yaw:d;
+    #require PacketPlayOutVehicleMove private float pitch:e;
+  #endif
+
+    public double getPosX() { return instance#posX; }
+    public double getPosY() { return instance#posY; }
+    public double getPosZ() { return instance#posZ; }
+    public float getYaw() { return instance#yaw; }
+    public float getPitch() { return instance#pitch; }
+
+    public static (PacketPlayOutVehicleMoveHandle) PacketPlayOutVehicleMove createNew(double posX, double posY, double posZ, float yaw, float pitch) {
+  #if version >= 1.17
+        #require PacketPlayOutVehicleMove private PacketPlayOutVehicleMove createVehicleMovePacket:<init>(net.minecraft.network.PacketDataSerializer packetdataserializer);
+        PacketPlayOutVehicleMove packet = #createVehicleMovePacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+  #else
+        PacketPlayOutVehicleMove packet = new PacketPlayOutVehicleMove();
+  #endif
+        packet#posX = posX;
+        packet#posY = posY;
+        packet#posZ = posZ;
+        packet#yaw = yaw;
+        packet#pitch = pitch;
+        return packet;
+    }
 #endif
 }
 

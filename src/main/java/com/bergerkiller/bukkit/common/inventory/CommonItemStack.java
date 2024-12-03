@@ -716,7 +716,7 @@ public final class CommonItemStack implements Cloneable {
      */
     public boolean hasCustomModelData() {
         return getHandle(true)
-                .map(ItemStackHandle::hasCustomModelData)
+                .map(ItemStackHandle::hasCustomModelDataValue)
                 .orElse(Boolean.FALSE);
     }
 
@@ -729,7 +729,7 @@ public final class CommonItemStack implements Cloneable {
      */
     public int getCustomModelData() {
         return getHandle(true)
-                .map(ItemStackHandle::getCustomModelData)
+                .map(ItemStackHandle::getCustomModelDataValue)
                 .orElse(-1);
     }
 
@@ -743,7 +743,7 @@ public final class CommonItemStack implements Cloneable {
     public CommonItemStack setCustomModelData(int value) {
         getHandle()
                 .orElseThrow(() -> new IllegalStateException("Can not set custom model data on an empty item"))
-                .setCustomModelData(value);
+                .setCustomModelDataValue(value);
         return this;
     }
 

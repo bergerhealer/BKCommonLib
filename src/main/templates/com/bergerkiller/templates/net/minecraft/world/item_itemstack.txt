@@ -730,19 +730,43 @@ class ItemStack {
 #endif
     }
 
+#if version >= 1.21.4
+    public boolean hasCustomModelDataValue() {
+        net.minecraft.world.item.component.CustomModelData cmd;
+        cmd = (net.minecraft.world.item.component.CustomModelData) instance.get(DataComponents.CUSTOM_MODEL_DATA);
+        return cmd != null && !cmd.floats().isEmpty();
+    }
 
-#if version >= 1.20.5
-    public boolean hasCustomModelData() {
+    public int getCustomModelDataValue() {
+        net.minecraft.world.item.component.CustomModelData cmd;
+        cmd = (net.minecraft.world.item.component.CustomModelData) instance.get(DataComponents.CUSTOM_MODEL_DATA);
+        return (cmd == null || cmd.floats().isEmpty()) ? -1 : ((Float) cmd.floats().get(0)).intValue();
+    }
+
+    public void setCustomModelDataValue(int value) {
+        instance.set(DataComponents.CUSTOM_MODEL_DATA, new net.minecraft.world.item.component.CustomModelData(
+            java.util.Collections.singletonList(Float.valueOf((float) value)), /* floats */
+            java.util.Collections.emptyList(), /* flags */
+            java.util.Collections.emptyList(), /* strings */
+            java.util.Collections.emptyList() /* colors */
+        ));
+    }
+
+    public void clearCustomModelData() {
+        instance.remove(DataComponents.CUSTOM_MODEL_DATA);
+    }
+#elseif version >= 1.20.5
+    public boolean hasCustomModelDataValue() {
         return instance.has(DataComponents.CUSTOM_MODEL_DATA);
     }
 
-    public int getCustomModelData() {
+    public int getCustomModelDataValue() {
         net.minecraft.world.item.component.CustomModelData cmd;
         cmd = (net.minecraft.world.item.component.CustomModelData) instance.get(DataComponents.CUSTOM_MODEL_DATA);
         return (cmd == null) ? -1 : cmd.value();
     }
 
-    public void setCustomModelData(int value) {
+    public void setCustomModelDataValue(int value) {
         instance.set(DataComponents.CUSTOM_MODEL_DATA, new net.minecraft.world.item.component.CustomModelData(value));
     }
 
@@ -750,12 +774,12 @@ class ItemStack {
         instance.remove(DataComponents.CUSTOM_MODEL_DATA);
     }
 #else
-    public boolean hasCustomModelData() {
+    public boolean hasCustomModelDataValue() {
         NBTTagCompound tag = instance.getTag();
         return tag != null && tag.get("CustomModelData") instanceof NBTTagInt;
     }
 
-    public int getCustomModelData() {
+    public int getCustomModelDataValue() {
         NBTTagCompound tag = instance.getTag();
         if (tag != null) {
             NBTBase cmd = tag.get("CustomModelData");
@@ -766,7 +790,7 @@ class ItemStack {
         return -1;
     }
 
-    public void setCustomModelData(int value) {
+    public void setCustomModelDataValue(int value) {
         NBTTagCompound tag = instance#getOrCreateTag();
         tag.putInt("CustomModelData", value);
     }

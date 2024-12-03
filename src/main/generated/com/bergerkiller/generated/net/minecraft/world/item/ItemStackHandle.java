@@ -61,9 +61,9 @@ public abstract class ItemStackHandle extends Template.Handle {
     public abstract void setFireworksFlightDuration(int duration);
     public abstract GameProfileHandle getSkullProfile();
     public abstract void setSkullProfile(GameProfileHandle profile);
-    public abstract boolean hasCustomModelData();
-    public abstract int getCustomModelData();
-    public abstract void setCustomModelData(int value);
+    public abstract boolean hasCustomModelDataValue();
+    public abstract int getCustomModelDataValue();
+    public abstract void setCustomModelDataValue(int value);
     public abstract void clearCustomModelData();
     public abstract boolean hasCustomData();
     public abstract CommonTagCompound getCustomDataCopy();
@@ -136,9 +136,9 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.Method<Void> setFireworksFlightDuration = new Template.Method<Void>();
         public final Template.Method.Converted<GameProfileHandle> getSkullProfile = new Template.Method.Converted<GameProfileHandle>();
         public final Template.Method.Converted<Void> setSkullProfile = new Template.Method.Converted<Void>();
-        public final Template.Method<Boolean> hasCustomModelData = new Template.Method<Boolean>();
-        public final Template.Method<Integer> getCustomModelData = new Template.Method<Integer>();
-        public final Template.Method<Void> setCustomModelData = new Template.Method<Void>();
+        public final Template.Method<Boolean> hasCustomModelDataValue = new Template.Method<Boolean>();
+        public final Template.Method<Integer> getCustomModelDataValue = new Template.Method<Integer>();
+        public final Template.Method<Void> setCustomModelDataValue = new Template.Method<Void>();
         public final Template.Method<Void> clearCustomModelData = new Template.Method<Void>();
         public final Template.Method<Boolean> hasCustomData = new Template.Method<Boolean>();
         public final Template.Method.Converted<CommonTagCompound> getCustomDataCopy = new Template.Method.Converted<CommonTagCompound>();

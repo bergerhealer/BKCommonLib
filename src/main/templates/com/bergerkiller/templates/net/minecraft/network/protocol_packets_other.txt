@@ -2674,7 +2674,9 @@ class PacketPlayOutWorldParticles extends Packet {
 #endif
 
     public static (PacketPlayOutWorldParticlesHandle) PacketPlayOutWorldParticles createNew() {
-#if version >= 1.15
+#if version >= 1.21.4
+        return new PacketPlayOutWorldParticles((ParticleParam) null, false, false, 0.0, 0.0, 0.0, 0.0f, 0.0f, 0.0f, 0.0f, 1);
+#elseif version >= 1.15
         return new PacketPlayOutWorldParticles((ParticleParam) null, false, 0.0, 0.0, 0.0, 0.0f, 0.0f, 0.0f, 0.0f, 1);
 #elseif version >= 1.13
         return new PacketPlayOutWorldParticles((ParticleParam) null, false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1);

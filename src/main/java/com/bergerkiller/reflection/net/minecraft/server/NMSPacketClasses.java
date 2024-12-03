@@ -620,11 +620,76 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInVehicleMove extends NMSPacket {
 
-        public final FieldAccessor<Double> posX = PacketPlayInVehicleMoveHandle.T.posX.toFieldAccessor();
-        public final FieldAccessor<Double> posY = PacketPlayInVehicleMoveHandle.T.posY.toFieldAccessor();
-        public final FieldAccessor<Double> posZ = PacketPlayInVehicleMoveHandle.T.posZ.toFieldAccessor();
-        public final FieldAccessor<Float> yaw = PacketPlayInVehicleMoveHandle.T.yaw.toFieldAccessor();
-        public final FieldAccessor<Float> pitch = PacketPlayInVehicleMoveHandle.T.pitch.toFieldAccessor();
+        public final FieldAccessor<Double> posX = new SafeDirectField<Double>() {
+            @Override
+            public Double get(Object o) {
+                return PacketPlayInVehicleMoveHandle.T.getPosX.invoke(o);
+            }
+
+            @Override
+            public boolean set(Object o, Double aDouble) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Double> posY = new SafeDirectField<Double>() {
+            @Override
+            public Double get(Object o) {
+                return PacketPlayInVehicleMoveHandle.T.getPosY.invoke(o);
+            }
+
+            @Override
+            public boolean set(Object o, Double aDouble) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Double> posZ = new SafeDirectField<Double>() {
+            @Override
+            public Double get(Object o) {
+                return PacketPlayInVehicleMoveHandle.T.getPosZ.invoke(o);
+            }
+
+            @Override
+            public boolean set(Object o, Double aDouble) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Float> yaw = new SafeDirectField<Float>() {
+            @Override
+            public Float get(Object o) {
+                return PacketPlayInVehicleMoveHandle.T.getYaw.invoke(o);
+            }
+
+            @Override
+            public boolean set(Object o, Float aFloat) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Float> pitch = new SafeDirectField<Float>() {
+            @Override
+            public Float get(Object o) {
+                return PacketPlayInVehicleMoveHandle.T.getPitch.invoke(o);
+            }
+
+            @Override
+            public boolean set(Object o, Float aFloat) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Boolean> onGround = new SafeDirectField<Boolean>() {
+            @Override
+            public Boolean get(Object o) {
+                return PacketPlayInVehicleMoveHandle.T.isOnGround.invoke(o);
+            }
+
+            @Override
+            public boolean set(Object o, Boolean aBool) {
+                return false;
+            }
+        };
+
+        public CommonPacket newInstance(double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
+            return PacketPlayInVehicleMoveHandle.createNew(posX, posY, posZ, yaw, pitch, onGround).toCommonPacket();
+        }
     }
 
     public static class NMSPacketPlayInWindowClick extends NMSPacket {
@@ -2321,11 +2386,65 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutVehicleMove extends NMSPacket {
 
-        public final FieldAccessor<Double> posX = PacketPlayOutVehicleMoveHandle.T.posX.toFieldAccessor();
-        public final FieldAccessor<Double> posY = PacketPlayOutVehicleMoveHandle.T.posY.toFieldAccessor();
-        public final FieldAccessor<Double> posZ = PacketPlayOutVehicleMoveHandle.T.posZ.toFieldAccessor();
-        public final FieldAccessor<Float> yaw = PacketPlayOutVehicleMoveHandle.T.yaw.toFieldAccessor();
-        public final FieldAccessor<Float> pitch = PacketPlayOutVehicleMoveHandle.T.pitch.toFieldAccessor();
+        public final FieldAccessor<Double> posX = new SafeDirectField<Double>() {
+            @Override
+            public Double get(Object o) {
+                return PacketPlayOutVehicleMoveHandle.T.getPosX.invoke(o);
+            }
+
+            @Override
+            public boolean set(Object o, Double aDouble) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Double> posY = new SafeDirectField<Double>() {
+            @Override
+            public Double get(Object o) {
+                return PacketPlayOutVehicleMoveHandle.T.getPosY.invoke(o);
+            }
+
+            @Override
+            public boolean set(Object o, Double aDouble) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Double> posZ = new SafeDirectField<Double>() {
+            @Override
+            public Double get(Object o) {
+                return PacketPlayOutVehicleMoveHandle.T.getPosZ.invoke(o);
+            }
+
+            @Override
+            public boolean set(Object o, Double aDouble) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Float> yaw = new SafeDirectField<Float>() {
+            @Override
+            public Float get(Object o) {
+                return PacketPlayOutVehicleMoveHandle.T.getYaw.invoke(o);
+            }
+
+            @Override
+            public boolean set(Object o, Float aFloat) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Float> pitch = new SafeDirectField<Float>() {
+            @Override
+            public Float get(Object o) {
+                return PacketPlayOutVehicleMoveHandle.T.getPitch.invoke(o);
+            }
+
+            @Override
+            public boolean set(Object o, Float aFloat) {
+                return false;
+            }
+        };
+
+        public CommonPacket newInstance(double posX, double posY, double posZ, float yaw, float pitch) {
+            return PacketPlayOutVehicleMoveHandle.createNew(posX, posY, posZ, yaw, pitch).toCommonPacket();
+        }
     }
 
     public static class NMSPacketPlayOutWindowData extends NMSPacket {
