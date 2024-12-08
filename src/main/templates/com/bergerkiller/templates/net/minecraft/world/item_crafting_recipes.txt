@@ -175,9 +175,16 @@ optional class RecipeItemStack {
 
     public void setChoices((List<org.bukkit.inventory.ItemStack>) List<ItemStack> choices) {
 #if version >= 1.21.2
+  #if exists net.minecraft.world.item.crafting.RecipeItemStack private java.util.Set<net.minecraft.world.item.ItemStack> itemStacks;
+        // Paper
+        #require net.minecraft.world.item.crafting.RecipeItemStack private Set<ItemStack> choicesRecipeItemStack:itemStacks;
+        choices = new HashSet(choices); // Safe copy / avoid conversion stuff sticking around
+        instance#choicesRecipeItemStack = choices;
+  #else
         #require net.minecraft.world.item.crafting.RecipeItemStack private List<ItemStack> choicesRecipeItemStack:itemStacks;
         choices = new ArrayList(choices); // Safe copy / avoid conversion stuff sticking around
         instance#choicesRecipeItemStack = choices;
+  #endif
 #else
 
   #if version >= 1.17
