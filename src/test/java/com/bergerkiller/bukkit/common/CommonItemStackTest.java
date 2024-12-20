@@ -1,18 +1,44 @@
 package com.bergerkiller.bukkit.common;
 
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import org.bukkit.Material;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.junit.Test;
 
 import static com.bergerkiller.bukkit.common.utils.MaterialUtil.getFirst;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class CommonItemStackTest {
+
+    @Test
+    public void testTransferToExistingItem() {
+        final Material coal = MaterialUtil.getFirst("COAL", "LEGACY_COAL");
+        CommonItemStack emptyItem = CommonItemStack.create(coal, 3);
+        Inventory from = new InventoryBaseImpl(5);
+        from.setItem(0, CommonItemStack.create(coal, 5).toBukkit());
+        int amount = CommonItemStack.transfer(from, emptyItem, item -> item.getType() == coal, 10000);
+        assertEquals(5, amount);
+        assertEquals(coal, emptyItem.getType());
+        assertEquals(8, emptyItem.getAmount());
+        assertTrue(CommonItemStack.of(from.getItem(0)).isEmpty());
+    }
+
+    @Test
+    public void testTransferToEmptyItem() {
+        final Material coal = MaterialUtil.getFirst("COAL", "LEGACY_COAL");
+        CommonItemStack emptyItem = CommonItemStack.empty();
+        Inventory from = new InventoryBaseImpl(5);
+        from.setItem(0, CommonItemStack.create(coal, 5).toBukkit());
+        int amount = CommonItemStack.transfer(from, emptyItem, item -> item.getType() == coal, 10000);
+        assertEquals(5, amount);
+        assertEquals(coal, emptyItem.getType());
+        assertEquals(5, emptyItem.getAmount());
+        assertTrue(CommonItemStack.of(from.getItem(0)).isEmpty());
+    }
 
     @Test
     public void testDisplayName() {

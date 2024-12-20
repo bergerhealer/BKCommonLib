@@ -1478,7 +1478,7 @@ public final class CommonItemStack implements Cloneable {
                 }
 
                 // Compute remaining amount based on the max stack size and maxAmount parameters
-                remainingAmount = result.getMaxStackSize();
+                remainingAmount = item.getMaxStackSize();
                 if (maxAmount >= 0 && maxAmount < remainingAmount) {
                     remainingAmount = maxAmount;
                 }
