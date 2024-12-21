@@ -192,9 +192,9 @@ public class InputDialogAnvil {
 
         // Close all old views first (to be sure), both when enabling and disabling
         for (InventoryView view : this._openInventories) {
-            view.setItem(LEFT_BUTTON.getIndex(), null);
-            view.setItem(MIDDLE_BUTTON.getIndex(), null);
-            view.setItem(RIGHT_BUTTON.getIndex(), null);
+            ItemUtil.setViewItem(view, LEFT_BUTTON.getIndex(), null);
+            ItemUtil.setViewItem(view, MIDDLE_BUTTON.getIndex(), null);
+            ItemUtil.setViewItem(view, RIGHT_BUTTON.getIndex(), null);
             ItemUtil.closeView(view);
         }
         this._openInventories.clear();
