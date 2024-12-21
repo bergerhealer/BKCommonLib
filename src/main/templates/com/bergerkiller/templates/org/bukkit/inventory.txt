@@ -24,6 +24,8 @@ class InventoryView {
     public abstract org.bukkit.entity.HumanEntity getPlayer();
     public abstract org.bukkit.inventory.Inventory getTopInventory();
     public abstract org.bukkit.inventory.Inventory getBottomInventory();
+    public abstract org.bukkit.inventory.ItemStack getItem(int index);
+    public abstract void setItem(int index, org.bukkit.inventory.ItemStack item);
 }
 
 optional class MainHand {

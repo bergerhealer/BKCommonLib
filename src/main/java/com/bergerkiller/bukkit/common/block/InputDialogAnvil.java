@@ -383,8 +383,8 @@ public class InputDialogAnvil {
             }
 
             ItemStack item = createItem();
-            if (!LogicUtil.bothNullOrEqual(item, view.getItem(getIndex()))) {
-                view.setItem(getIndex(), item);
+            if (!LogicUtil.bothNullOrEqual(item, ItemUtil.getViewItem(view, getIndex()))) {
+                ItemUtil.setViewItem(view, getIndex(), item);
             }
 
             int windowId = ContainerHandle.fromBukkit(view).getWindowId();

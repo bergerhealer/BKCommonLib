@@ -69,6 +69,30 @@ public class ItemUtil {
     }
 
     /**
+     * Gets the item in an inventory view at an index. Fixes an issue with compatibility between versions
+     * 1.20.6 and 1.21 where Bukkit changed it from an interface to a class.
+     *
+     * @param view InventoryView
+     * @param index Item slot index
+     * @return ItemStack in this slot, null for air
+     */
+    public static ItemStack getViewItem(InventoryView view, int index) {
+        return InventoryViewHandle.createHandle(view).getItem(index);
+    }
+
+    /**
+     * Sets the item in an inventory view at an index. Fixes an issue with compatibility between versions
+     * 1.20.6 and 1.21 where Bukkit changed it from an interface to a class.
+     *
+     * @param view InventoryView
+     * @param index Item slot index
+     * @param item ItemStack to put into this slot
+     */
+    public static void setViewItem(InventoryView view, int index, ItemStack item) {
+        InventoryViewHandle.createHandle(view).setItem(index, item);
+    }
+
+    /**
      * Gets the top inventory of a view. Fixes an issue with compatibility between versions
      * 1.20.6 and 1.21 where Bukkit changed it from an interface to a class.
      *
