@@ -93,7 +93,13 @@ class WorldServer extends World {
     public boolean isLoaded() {
 #if version >= 1.18
         #require net.minecraft.world.level.storage.Convertable.ConversionSession final net.minecraft.util.SessionLock conv_lock:lock;
+  #if version > 1.21.4 && paper
+        net.minecraft.util.SessionLock lock = instance.levelStorageAccess#conv_lock;
+  #elseif version == 1.21.4 && paper && exists net.minecraft.server.level.WorldServer public final net.minecraft.world.level.storage.Convertable.ConversionSession levelStorageAccess;
+        net.minecraft.util.SessionLock lock = instance.levelStorageAccess#conv_lock;
+  #else
         net.minecraft.util.SessionLock lock = instance.convertable#conv_lock;
+  #endif
         return lock.isValid();
 #elseif version >= 1.17
         #require net.minecraft.world.level.storage.Convertable.ConversionSession final net.minecraft.util.SessionLock conv_lock:lock;

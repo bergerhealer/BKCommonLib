@@ -32,11 +32,18 @@ class PlayerFileDataHandler_1_16 extends PlayerFileDataHandler {
         ClassResolver resolver = new ClassResolver();
         resolver.setDeclaredClassName("net.minecraft.server.level.WorldServer");
         resolver.setVariable("version", Common.MC_VERSION);
+        if (Common.IS_PAPERSPIGOT_SERVER) {
+            resolver.setVariable("paper", "true");
+        }
 
         {
-            MethodDeclaration getPlayerFolderOfWorldMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
+            MethodDeclaration getPlayerFolderOfWorldMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess("" +
                     "public java.io.File getPlayerDir() {\n" +
-                    "#if version >= 1.18\n" +
+                    "#if version > 1.21.4 && paper\n" +
+                    "    return new java.io.File(instance.levelStorageAccess.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
+                    "#elseif version == 1.21.4 && paper && exists net.minecraft.server.level.WorldServer public final net.minecraft.world.level.storage.Convertable.ConversionSession levelStorageAccess;\n" +
+                    "    return new java.io.File(instance.levelStorageAccess.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
+                    "#elseif version >= 1.18\n" +
                     "    return new java.io.File(instance.convertable.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
                     "#else\n" +
                     "    return new java.io.File(instance.convertable.a(instance.getDimensionKey()), \"playerdata\");\n" +
