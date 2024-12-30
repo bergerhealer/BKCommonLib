@@ -311,7 +311,7 @@ public void doWorkInChunk(Chunk chunk) {
 
 #####
 By extending server Entity classes at runtime, this API makes it possible to completely alter the behavior of entities on the server. This is core to how [TrainCarts](https://github.com/bergerhealer/TrainCarts) operates.
-  - The entity _onTick()_ can be overwritten to run your own routines
+  - The entity _onTick()_ can be overridden to run your own routines
   - Run entity _onMove()_ or omit it, handle block and entity collisions
   - Hotswap existing entities at runtime with custom behavior while keeping data consistent
   - Override entity network synchronization (packets)
