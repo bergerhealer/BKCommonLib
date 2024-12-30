@@ -4,7 +4,7 @@
 〚 [⤓ Modrinth](https://modrinth.com/plugin/bkcommonlib) / [⤓ Spigot](https://www.spigotmc.org/resources/bkcommonlib.39590/) / [⤓ Jenkins  Dev Builds](https://ci.mg-dev.eu/job/BKCommonLib/) / [Source on GitHub](https://github.com/bergerhealer/BKCommonLib) / [Javadocs](https://ci.mg-dev.eu/javadocs/BKCommonLib/) / [Discord](https://discord.gg/wvU2rFgSnw) 〛
 
 ## About BKCommonLib
-**BKCommonLib** is a Paper/Spigot/Bukkit server plugin and library which houses a large selection of utilities, API's, frameworks and performance-critical code. It was made to eliminate all use of Minecraft Server Code (aka NMS) from plugins themselves, improving their stability.
+**BKCommonLib** is a Paper/Spigot/Bukkit server plugin and library which houses a large selection of utilities, APIs, frameworks and performance-critical code. It was made to eliminate all use of Minecraft Server Code (aka NMS) from plugins themselves, improving their stability.
 
 It made it so that when Minecraft updates, only this library has to be updated. Plugins using it generally don't require updates anymore, except to stay compatible with BKCommonLib itself.
 
@@ -311,7 +311,7 @@ public void doWorkInChunk(Chunk chunk) {
 
 #####
 By extending server Entity classes at runtime, this API makes it possible to completely alter the behavior of entities on the server. This is core to how [TrainCarts](https://github.com/bergerhealer/TrainCarts) operates.
-  - The entity _onTick()_ can be overrided to run your own routines
+  - The entity _onTick()_ can be overwritten to run your own routines
   - Run entity _onMove()_ or omit it, handle block and entity collisions
   - Hotswap existing entities at runtime with custom behavior while keeping data consistent
   - Override entity network synchronization (packets)
