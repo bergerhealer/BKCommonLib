@@ -61,7 +61,8 @@ public class Common {
             "Common:Player:SetSkinMetadata",
             "Common:PacketPlayInBlockPlace:RotationApi",
             "Common:PlayerInstancePhase",
-            "Common:SignEditTextEvent"
+            "Common:SignEditTextEvent",
+            "Common:PacketListener:SetPacket"
     ).collect(Collectors.toSet());
 
     /**
