@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.events;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 
+import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 
@@ -55,5 +56,31 @@ public abstract class PacketEvent implements Cancellable {
      */
     public CommonPacket getPacket() {
         return packet;
+    }
+
+    /**
+     * Switches out the current packet with a new one. Can be used when immutable packets
+     * need to be changed before being sent to the player / received by the server.
+     *
+     * @param packet New packet to swap it out with. Not null.
+     */
+    public void setPacket(CommonPacket packet) {
+        if (packet == null) {
+            throw new IllegalArgumentException("Cannot set null packet");
+        }
+        this.packet = packet;
+    }
+
+    /**
+     * Switches out the current packet with a new one. Can be used when immutable packets
+     * need to be changed before being sent to the player / received by the server.
+     *
+     * @param packet New packet to swap it out with. Not null.
+     */
+    public void setPacket(PacketHandle packet) {
+        if (packet == null) {
+            throw new IllegalArgumentException("Cannot set null packet");
+        }
+        this.packet = packet.toCommonPacket();
     }
 }

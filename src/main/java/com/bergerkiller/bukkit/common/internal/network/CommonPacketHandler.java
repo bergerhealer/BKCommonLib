@@ -128,15 +128,17 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            if (handler.handlePacketSend(player, msg, false)) {
-                super.write(ctx, msg, promise);
+            PacketHandlerRegistration.HandlerResult result = handler.handlePacketSend(player, msg, false);
+            if (!result.isCancelled) {
+                super.write(ctx, result.packet, promise);
             }
         }
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            if (handler.handlePacketReceive(player, msg, false)) {
-                super.channelRead(ctx, msg);
+            PacketHandlerRegistration.HandlerResult result = handler.handlePacketReceive(player, msg, false);
+            if (!result.isCancelled) {
+                super.channelRead(ctx, result.packet);
             }
         }
     }

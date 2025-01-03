@@ -176,7 +176,17 @@ class PacketHandlerRegistration {
         }
     }
 
-    public boolean handlePacketSend(Player player, PacketType packetType, Object packet, boolean is_silent, boolean wasCancelled) {
+    /**
+     * Handles when a packet is sent to a player
+     *
+     * @param player Player
+     * @param packetType Packet Type
+     * @param packet The packet
+     * @param is_silent Whether listeners should be skipped for this packet
+     * @param wasCancelled Whether it was originally cancelled
+     * @return Result of handling this packet
+     */
+    public HandlerResult handlePacketSend(Player player, PacketType packetType, Object packet, boolean is_silent, boolean wasCancelled) {
         if (packetType == PacketType.OUT_BUNDLE) {
             ClientboundBundlePacketHandle bundle = ClientboundBundlePacketHandle.createHandle(packet);
             if (is_silent) {
@@ -184,25 +194,48 @@ class PacketHandlerRegistration {
                 for (Object subPacket : bundle.subPackets()) {
                     handlePacketSendMonitor(player, packetType, subPacket);
                 }
-                return true;
+                return new HandlerResult(packet, packetType, false);
             } else {
                 // Filter the packets contained within the bundle packet. If all packets end up filtered,
                 // cancel the entire Bundle packet. We skip the monitors as every packet already passes
                 // by the monitor.
-                return bundle.filterSubPackets(p -> handlePacketSend(player, PacketType.getType(p), p, false, wasCancelled));
+                // TODO: Actually swap out the packets if changed by listener callbacks...
+                if (bundle.filterSubPackets(p -> handlePacketSend(player, PacketType.getType(p), p, false, wasCancelled) != null)) {
+                    return new HandlerResult(packet, packetType, false);
+                } else {
+                    return new HandlerResult(packet, packetType, true);
+                }
             }
         }
 
-        if (!is_silent && !handlePacketSendListener(player, packetType, packet, wasCancelled)) {
-            return false;
+        HandlerResult result;
+        if (is_silent) {
+            result = new HandlerResult(packet, packetType, false);
+        } else {
+            result = handlePacketSendListener(player, packetType, packet, wasCancelled);
+            if (result.isCancelled) {
+                return result;
+            } else {
+                packet = result.packet;
+                packetType = result.packetType;
+            }
         }
 
         // Handle monitors
         handlePacketSendMonitor(player, packetType, packet);
-        return true;
+        return result;
     }
 
-    public boolean handlePacketSendListener(Player player, PacketType packetType, Object packet, boolean wasCancelled) {
+    /**
+     * Handles when a packet is sent to a player
+     *
+     * @param player Player
+     * @param packetType Packet Type
+     * @param packet The packet
+     * @param wasCancelled Whether it was originally cancelled
+     * @return Result of handling this packet
+     */
+    public HandlerResult handlePacketSendListener(Player player, PacketType packetType, Object packet, boolean wasCancelled) {
         List<PacketListener> listenerList = listeners.get(packetType);
         if (listenerList != null) {
             CommonPacket cp = new CommonPacket(packet, packetType);
@@ -211,15 +244,28 @@ class PacketHandlerRegistration {
             for (PacketListener listener : listenerList) {
                 try {
                     listener.onPacketSend(ev);
+
+                    if (ev.getPacket() != cp) {
+                        cp = ev.getPacket();
+                        packet = cp.getHandle();
+
+                        // If packet type is changed, abort any further listener callbacks
+                        // Not sure how to proceed with this honestly...
+                        PacketType newType = ev.getType();
+                        if (newType != packetType) {
+                            packetType = newType;
+                            break;
+                        }
+                    }
                 } catch (Throwable t) {
                     Logging.LOGGER_NETWORK.log(Level.SEVERE, "Error occurred in onPacketSend handling " + packetType + ":", t);
                 }
             }
             if (ev.isCancelled()) {
-                return false;
+                return new HandlerResult(packet, packetType, true); // Cancelled
             }
         }
-        return true;
+        return new HandlerResult(packet, packetType, false);
     }
 
     public void handlePacketSendMonitor(Player player, PacketType packetType, Object packet) {
@@ -243,12 +289,13 @@ class PacketHandlerRegistration {
      * @param packet that is handled
      * @param wasCancelled - True if the packet is allowed to be received, False
      * if not
-     * @return True if the packet is allowed to be received, False if not
+     * @return Result of handling this packet
      */
-    public boolean handlePacketReceive(Player player, Object packet, boolean wasCancelled) {
+    public HandlerResult handlePacketReceive(Player player, Object packet, boolean wasCancelled) {
         if (player == null || !PacketHandle.T.isAssignableFrom(packet)) {
-            return true;
+            return new HandlerResult(packet, null, wasCancelled); // not handled
         }
+
         // Handle listeners
         PacketType type = PacketType.getType(packet);
         List<PacketListener> listenerList = listeners.get(type);
@@ -256,15 +303,30 @@ class PacketHandlerRegistration {
             CommonPacket cp = new CommonPacket(packet, type);
             PacketReceiveEvent ev = new PacketReceiveEvent(player, cp);
             ev.setCancelled(wasCancelled);
+
             for (PacketListener listener : listenerList) {
                 try {
                     listener.onPacketReceive(ev);
+
+                    if (ev.getPacket() != cp) {
+                        cp = ev.getPacket();
+                        packet = cp.getHandle();
+
+                        // If packet type is changed, abort any further listener callbacks
+                        // Not sure how to proceed with this honestly...
+                        PacketType newType = ev.getType();
+                        if (newType != type) {
+                            type = newType;
+                            break;
+                        }
+                    }
                 } catch (Throwable t) {
                     Logging.LOGGER_NETWORK.log(Level.SEVERE, "Error occurred in onPacketReceive handling " + type + ":", t);
                 }
             }
+
             if (ev.isCancelled()) {
-                return false;
+                return new HandlerResult(packet, type, true); // Cancelled
             }
         }
         // Handle monitors
@@ -279,6 +341,18 @@ class PacketHandlerRegistration {
                 }
             }
         }
-        return true;
+        return new HandlerResult(packet, type, false); // Not cancelled, but packet instance may have changed
+    }
+
+    public static class HandlerResult {
+        public final Object packet;
+        public final PacketType packetType;
+        public final boolean isCancelled;
+
+        public HandlerResult(Object packet, PacketType packetType, boolean isCancelled) {
+            this.packet = packet;
+            this.packetType = packetType;
+            this.isCancelled = isCancelled;
+        }
     }
 }

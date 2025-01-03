@@ -88,16 +88,32 @@ public abstract class PacketHandlerHooked implements PacketHandler {
         type.preprocess(packet);
         SafeMethod<?> method = this.receiverMethods.get(packet);
         if (method == null) {
-        	Logging.LOGGER_NETWORK.log(Level.WARNING, "Could not find suitable packet handler for " + packet.getClass().getSimpleName());
-        } else {
-            PlayerConnectionHandle connection = PlayerConnectionHandle.forPlayer(player);
-            if (connection != null) {
-                // We are bypassing the hook - make sure to handle receive packet listener
-                if (this.handlePacketReceive(player, packet, false)) {
-                    method.invoke(connection.getRaw(), packet);
-                }
+            Logging.LOGGER_NETWORK.log(Level.WARNING, "Could not find suitable packet handler for " + packet.getClass().getSimpleName());
+            return;
+        }
+
+        PlayerConnectionHandle connection = PlayerConnectionHandle.forPlayer(player);
+        if (connection == null) {
+            return;
+        }
+
+        // We are bypassing the hook - make sure to handle receive packet listener
+        PacketHandlerRegistration.HandlerResult result = this.handlePacketReceive(player, packet, false);
+        if (result.isCancelled) {
+            return;
+        }
+
+        // Listeners could have changed the type of packet being received, then we
+        // need to find different receiver methods for it
+        if (result.packetType != type) {
+            method = this.receiverMethods.get(result.packet);
+            if (method == null) {
+                Logging.LOGGER_NETWORK.log(Level.WARNING, "Could not find suitable packet handler for listener-changed " + result.packet.getClass().getSimpleName());
+                return;
             }
         }
+
+        method.invoke(connection.getRaw(), result.packet);
     }
 
     @Override
@@ -167,11 +183,11 @@ public abstract class PacketHandlerHooked implements PacketHandler {
      * @param player for which the packet was meant
      * @param packet that is handled
      * @param wasCancelled - True if it was originally cancelled, False if not
-     * @return True if the packet is allowed to be sent, False if not
+     * @return Result of handling the packet
      */
-    public boolean handlePacketSend(Player player, Object packet, boolean wasCancelled) {
+    public PacketHandlerRegistration.HandlerResult handlePacketSend(Player player, Object packet, boolean wasCancelled) {
         if (player == null || !PacketHandle.T.isAssignableFrom(packet)) {
-            return true;
+            return new PacketHandlerRegistration.HandlerResult(packet, null, wasCancelled);
         }
 
         // Check if silent
@@ -190,9 +206,9 @@ public abstract class PacketHandlerHooked implements PacketHandler {
      * @param packet that is handled
      * @param wasCancelled - True if the packet is allowed to be received, False
      * if not
-     * @return True if the packet is allowed to be received, False if not
+     * @return Result of handling the packet
      */
-    public boolean handlePacketReceive(Player player, Object packet, boolean wasCancelled) {
+    public PacketHandlerRegistration.HandlerResult handlePacketReceive(Player player, Object packet, boolean wasCancelled) {
         return handlers.handlePacketReceive(player, packet, wasCancelled);
     }
 }

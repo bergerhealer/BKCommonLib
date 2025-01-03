@@ -176,6 +176,10 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         return plugins;
     }
 
+    private PacketContainer toContainer(Object rawPacket) {
+        return new PacketContainer(getPacketType(rawPacket.getClass()), rawPacket);
+    }
+
     @Override
     public void receivePacket(Player player, PacketType type, Object packet) {
         if (PlayerConnectionHandle.forPlayer(player) == null) {
@@ -183,7 +187,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         }
 
         type.preprocess(packet);
-        PacketContainer toReceive = new PacketContainer(getPacketType(packet.getClass()), packet);
+        PacketContainer toReceive = toContainer(packet);
         try {
             this.receivePacketMethod.invoke(getProtocolManager(), player, toReceive);
         } catch (RuntimeException ex) {
@@ -225,7 +229,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         } else {
             // Silent - do not send it through listeners, only through monitors
             try {
-                final PacketContainer toSend = new PacketContainer(getPacketType(packet.getClass()), packet);
+                final PacketContainer toSend = toContainer(packet);
                 getProtocolManager().sendServerPacket(player, toSend, null, false);
             } catch (RuntimeException ex) {
                 if (this.loggedOutPlayerExceptionType.isInstance(ex)) {
@@ -517,6 +521,17 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             this.listener = listener;
         }
 
+        private void swapPacket(PacketEvent event, CommonPacket commonpacket) {
+            PacketContainer container = toContainer(commonpacket.getHandle());
+
+            // TODO: Cancel the packet and schedule a new one instead to avoid warning
+            // Im not sure this actually works for receiving packets...
+            //if (event.getPacketType() != container.getType()) {
+            //    event.setCancelled(true);
+            //}
+            event.setPacket(container);
+        }
+
         @Override
         public void onPacketReceiving(PacketEvent event) {
             // Check not temporary
@@ -529,6 +544,9 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             receiveEvent.setCancelled(event.isCancelled());
             listener.onPacketReceive(receiveEvent);
             event.setCancelled(receiveEvent.isCancelled());
+            if (receiveEvent.getPacket() != packet) {
+                swapPacket(event, receiveEvent.getPacket());
+            }
         }
 
         @Override
@@ -555,6 +573,9 @@ public class ProtocolLibPacketHandler implements PacketHandler {
                 listener.onPacketSend(sendEvent);
                 return sendEvent.isCancelled();
             }));
+            if (sendEvent.getPacket() != packet) {
+                swapPacket(event, sendEvent.getPacket());
+            }
         }
     }
 
