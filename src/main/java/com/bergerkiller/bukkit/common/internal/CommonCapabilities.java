@@ -301,4 +301,10 @@ public class CommonCapabilities {
      * On Paper 1.20 this event exists too.
      */
     public static final boolean HAS_SIGN_OPEN_EVENT = HAS_SIGN_OPEN_EVENT_PAPER || CommonBootstrap.evaluateMCVersion(">=", "1.20.2");
+
+    /**
+     * Since Minecraft 1.21.4 there is a separate "items" assets folder that is used for GUI item models.
+     * Before that it used the standard "models/item" folder.
+     */
+    public static final boolean HAS_RESOURCEPACK_ITEMS_FOLDER = CommonBootstrap.evaluateMCVersion(">=", "1.21.4");
 }

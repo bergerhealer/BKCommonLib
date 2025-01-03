@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import com.bergerkiller.bukkit.common.map.util.ItemModelState;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -389,7 +390,28 @@ public class MapResourcePack {
     public Model getItemModel(CommonItemStack item) {
         ItemRenderOptions options = ModelInfoLookup.lookupItemRenderOptions(item);
         String itemModelName = options.lookupModelName();
-        Model m = this.loadModel("item/" + itemModelName, options);
+        Model m = null;
+        if (CommonCapabilities.HAS_RESOURCEPACK_ITEMS_FOLDER) {
+            // Since Minecraft 1.21.4 we need to first look up a metadata file for the item name
+            // This points to the model name for this item, which could be item/ or block/ or
+            // something else entirely.
+            ItemModelState itemModelState = openGsonObject(ItemModelState.class, ResourceType.ITEMS, itemModelName);
+            if ((
+                    itemModelState == null ||
+                    itemModelState.model == null ||
+                    itemModelState.model.model == null ||
+                    itemModelState.model.type == null)
+            ) {
+                Logging.LOGGER_MAPDISPLAY.once(Level.WARNING, "Failed to load item gui model " + itemModelName);
+            } else if (!"minecraft:model".equals(itemModelState.model.type)) {
+                Logging.LOGGER_MAPDISPLAY.once(Level.WARNING, "Failed to load item gui model " + itemModelName +
+                        ": unknown type \"" + itemModelState.model.type + "\"");
+            } else {
+                m = this.loadModel(itemModelState.model.model, options);
+            }
+        } else {
+            m = this.loadModel("item/" + itemModelName, options);
+        }
         if (m != null) {
             m.buildBlock(options);
             m.buildQuads();
@@ -806,7 +828,7 @@ public class MapResourcePack {
 
     /**
      * Loads a model, always fetching it from the resource pack instead of the cache
-     * 
+     *
      * @param path to find the model at
      * @param options to apply when building the model
      * @return the model, or <i>null</i> if not found
@@ -1038,6 +1060,8 @@ public class MapResourcePack {
     public static enum ResourceType {
         /** Models found in <b>assets/minecraft/models/</b> */
         MODELS("/models/", ".json"),
+        /** Item (gui) models found in <b>assets/minecraft/items</b>, used since 1.21.4 */
+        ITEMS("/items/", ".json"),
         /** Block States found in <b>assets/minecraft/blockstates/</b> */
         BLOCKSTATES("/blockstates/", ".json"),
         /** Textures found in <b>assets/minecraft/textures/</b> */
