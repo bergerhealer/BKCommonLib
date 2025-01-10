@@ -571,7 +571,8 @@ class NBTTagCompound extends NBTBase {
     // Results in getData() being added, which overrides the one in NBTBase
 #if version >= 1.17
     private final readonly (Map<String, NBTBaseHandle>) Map<String, NBTBase> data:tags;
-#elseif nachospigot
+#elseif exists net.minecraft.nbt.NBTTagCompound private final it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<String, NBTBase> map;
+    // Nachospigot / Azurite
     private final readonly (Map<String, NBTBaseHandle>) it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<String, NBTBase> data:map;
 #else
     private final readonly (Map<String, NBTBaseHandle>) Map<String, NBTBase> data:map;

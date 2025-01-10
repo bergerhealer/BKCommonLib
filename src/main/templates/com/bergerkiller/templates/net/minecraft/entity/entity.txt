@@ -1855,6 +1855,9 @@ class Entity {
     }
 #elseif version >= 1.9
     public void setPositionFromBoundingBox:recalcPosition();
+#elseif exists net.minecraft.world.entity.Entity protected void recalcPosition();
+    // Azurite server
+    protected void setPositionFromBoundingBox:recalcPosition();
 #else
     private void setPositionFromBoundingBox:recalcPosition();
 #endif

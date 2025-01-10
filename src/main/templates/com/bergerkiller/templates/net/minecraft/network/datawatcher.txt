@@ -98,7 +98,10 @@ class DataWatcher {
     #require DataWatcher private final gnu.trove.map.TIntObjectMap itemsById:dataValues;
 #else
     #set datawatcher_storage java_map
-    #if version >= 1.10.2
+    #if exists net.minecraft.network.syncher.DataWatcher private final java.util.Map<Integer, net.minecraft.network.syncher.DataWatcher.WatchableObject> itemsById:d;
+        // Azurite server
+        #require DataWatcher private final java.util.Map<Integer, DataWatcher.Item<?>> itemsById:d;
+    #elseif version >= 1.10.2
         #require DataWatcher private final java.util.Map<Integer, DataWatcher.Item<?>> itemsById:d;
     #else
         #require DataWatcher private final java.util.Map<Integer, DataWatcher.Item<?>> itemsById:c;

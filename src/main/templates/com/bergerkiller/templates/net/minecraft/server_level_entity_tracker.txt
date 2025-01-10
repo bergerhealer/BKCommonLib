@@ -80,6 +80,9 @@ class EntityTracker {
   #elseif exists net.minecraft.server.level.EntityTracker public me.rastrian.dev.utils.IndexedLinkedHashSet<net.minecraft.server.level.EntityTrackerEntry> c;
     // Also seems to be used on (older?) WindSpigot/NachoSpigot 1.8.8 crap
     #require net.minecraft.server.level.EntityTracker public me.rastrian.dev.utils.IndexedLinkedHashSet<net.minecraft.server.level.EntityTrackerEntry> trackedEntitiesSet:c;
+  #elseif exists net.minecraft.server.level.EntityTracker private final dev.azurite.spigot.optimizations.ObjectMapList<net.minecraft.server.level.EntityTrackerEntry> trackedEntitiesSet:c;
+    // Azurite
+    #require net.minecraft.server.level.EntityTracker private final dev.azurite.spigot.optimizations.ObjectMapList<net.minecraft.server.level.EntityTrackerEntry> trackedEntitiesSet:c;
   #else
     #require net.minecraft.server.level.EntityTracker private final Set<EntityTrackerEntry> trackedEntitiesSet:c;
   #endif
@@ -404,7 +407,12 @@ class EntityTrackerEntry {
   #endif
     }
 
+  #if exists net.minecraft.server.level.EntityTrackerEntry public void clear(net.minecraft.server.EntityPlayer a); && !exists net.minecraft.server.level.EntityTrackerEntry public void a(net.minecraft.server.EntityPlayer a);
+    // This is used on Azurite / 1.8.x forks. Both methods behave pretty much the same.
+    public void removeViewer:clear((org.bukkit.entity.Player) EntityPlayer player);
+  #else
     public void removeViewer:a((org.bukkit.entity.Player) EntityPlayer player);
+  #endif
 #endif
 
     public void updatePlayer((org.bukkit.entity.Player) EntityPlayer player);
@@ -951,7 +959,8 @@ class EntityTrackerEntryState {
     }
 #elseif version >= 1.9
     private (CommonPacket) Packet<?> getSpawnPacket:e();
-#elseif nachospigot
+#elseif exists net.minecraft.server.level.EntityTrackerEntryState protected Packet getSpawnPacket:c();
+    // Nachospigot / Azurite
     protected (CommonPacket) Packet getSpawnPacket:c();
 #else
     private (CommonPacket) Packet getSpawnPacket:c();
