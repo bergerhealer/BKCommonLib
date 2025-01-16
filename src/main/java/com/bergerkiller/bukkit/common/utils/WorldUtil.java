@@ -67,6 +67,22 @@ public class WorldUtil extends ChunkUtil {
     public static final int CHUNKS_PER_REGION_AXIS = 32;
 
     /**
+     * Checks whether a certain World has a feature enabled or not. Since Minecraft 1.20 features
+     * can be enabled on some worlds and not others through datapacks. This API can be used to
+     * detect these features.<br>
+     * <br>
+     * <b>This API is quite slow, if a feature is being checked very frequently consider caching it!</b>
+     *
+     * @param world World
+     * @param featureFlagName Name of the feature flag to check, e.g. "minecraft:bundle"
+     * @return True if the feature is enabled on this World, or False if the feature does not exist or
+     *         is not enabled.
+     */
+    public static boolean hasFeatureFlag(World world, String featureFlagName) {
+        return com.bergerkiller.generated.org.bukkit.WorldHandle.T.hasFeatureFlag.invoker.invoke(world, featureFlagName);
+    }
+
+    /**
      * Gets whether a Bukkit World instance has been unloaded from the server.
      * Use this to check whether loading new chunks for a World is acceptable, and
      * to purge world-tied volatile data.<br>

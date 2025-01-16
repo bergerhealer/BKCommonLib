@@ -21,6 +21,7 @@ public abstract class WorldHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract boolean hasFeatureFlag(String featureFlagName);
     public abstract void playSound(Location loc, MinecraftKeyHandle sound, float volume, float pitch);
     public abstract int getMinHeight();
     public abstract void setClearWeatherDuration(int duration);
@@ -29,6 +30,7 @@ public abstract class WorldHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class WorldClass extends Template.Class<WorldHandle> {
+        public final Template.Method<Boolean> hasFeatureFlag = new Template.Method<Boolean>();
         public final Template.Method<Void> playSound = new Template.Method<Void>();
         public final Template.Method<Integer> getMinHeight = new Template.Method<Integer>();
         public final Template.Method<Void> setClearWeatherDuration = new Template.Method<Void>();

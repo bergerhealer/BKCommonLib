@@ -62,7 +62,9 @@ public class Common {
             "Common:PacketPlayInBlockPlace:RotationApi",
             "Common:PlayerInstancePhase",
             "Common:SignEditTextEvent",
-            "Common:PacketListener:SetPacket"
+            "Common:PacketListener:SetPacket",
+            "Common:Packet:MinecartMovementPacket",
+            "Common:WorldUtil:HasFeatureFlag"
     ).collect(Collectors.toSet());
 
     /**

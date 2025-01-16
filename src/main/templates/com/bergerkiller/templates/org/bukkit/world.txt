@@ -1,8 +1,38 @@
 package org.bukkit;
 
+import org.bukkit.FeatureFlag;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 
 class World {
+
+    public boolean hasFeatureFlag(String featureFlagName) {
+#if exists org.bukkit.FeatureFlag public static final net.kyori.adventure.util.Index<net.kyori.adventure.key.Key, FeatureFlag> ALL_FLAGS;
+        // Paper API using the Adventure-keyed lookup table
+        net.kyori.adventure.key.Key key;
+        try {
+            key = net.kyori.adventure.key.Key.key(featureFlagName);
+        } catch (net.kyori.adventure.key.InvalidKeyException ex) {
+            return false;
+        }
+        FeatureFlag flag = (FeatureFlag) FeatureFlag.ALL_FLAGS.valueOr(key, null);
+        if (flag != null) {
+            return instance.getFeatureFlags().contains(flag);
+        }
+#elseif version >= 1.20
+        // Look up the feature flag from the registry (Spigot)
+        org.bukkit.NamespacedKey key = org.bukkit.NamespacedKey.fromString(featureFlagName);
+        if (key != null) {
+            for (java.util.Iterator iter = instance.getFeatureFlags().iterator(); iter.hasNext();) {
+                org.bukkit.NamespacedKey existingKey = ((FeatureFlag) iter.next()).getKey();
+                if (key.equals(existingKey)) {
+                    return true;
+                }
+            }
+        }
+#endif
+
+        return false;
+    }
 
     public void playSound(Location loc, MinecraftKeyHandle sound, float volume, float pitch) {
 #if version >= 1.13
