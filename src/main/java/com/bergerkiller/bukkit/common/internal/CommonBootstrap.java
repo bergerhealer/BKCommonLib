@@ -807,6 +807,9 @@ public class CommonBootstrap {
 
             // Spigot uses the wrong one. We need the sync packet for behavior similar to 1.21.1 and before
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport", "net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket");
+
+            // Borked.
+            remappings.put("net.minecraft.world.entity.vehicle.NewMinecartBehavior$LerpStep", "net.minecraft.world.entity.vehicle.NewMinecartBehavior$a");
         }
 
         // There have been various locations where starlight was installed

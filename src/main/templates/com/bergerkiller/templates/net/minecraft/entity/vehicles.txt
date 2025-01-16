@@ -5,6 +5,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.syncher.DataWatcherObject;
 
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.NewMinecartBehaviorHandle.LerpStepHandle;
+
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
@@ -278,4 +280,19 @@ class EntityMinecartMobSpawner extends EntityMinecartAbstract {
 #else
     private final (com.bergerkiller.bukkit.common.wrappers.MobSpawner) net.minecraft.world.level.MobSpawnerAbstract mobSpawner:a;
 #endif
+}
+
+// Since Minecraft 1.21.2
+optional class NewMinecartBehavior {
+    optional class NewMinecartBehavior.LerpStep {
+        public (org.bukkit.util.Vector) Vec3D getPosition:position();
+        public (org.bukkit.util.Vector) Vec3D getMovement:movement();
+        public float getYaw:yRot();
+        public float getPitch:xRot();
+        public float getWeight:weight();
+
+        public static (NewMinecartBehaviorHandle.LerpStepHandle) NewMinecartBehavior.LerpStep createNew((org.bukkit.util.Vector) Vec3D position, (org.bukkit.util.Vector) Vec3D movement, float yaw, float pitch, float weight) {
+            return new NewMinecartBehavior$LerpStep(position, movement, yaw, pitch, weight);
+        }
+    }
 }

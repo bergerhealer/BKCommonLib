@@ -4,6 +4,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.phys.Vec3D;
+import net.minecraft.world.entity.vehicle.NewMinecartBehavior.LerpStep;
 
 import com.bergerkiller.bukkit.common.internal.logic.ProtocolMath;
 
@@ -16,6 +17,9 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityVelocityHandle
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutVehicleMoveHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInVehicleMoveHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMoveMinecartPacketHandle;
+
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.NewMinecartBehaviorHandle.LerpStepHandle;
 
 import com.bergerkiller.bukkit.common.wrappers.RelativeFlags;
 
@@ -756,4 +760,14 @@ class PacketPlayInFlying extends Packet {
     protected boolean hasPos;
     protected boolean hasLook;
 #endif
+}
+
+// Since Minecraft 1.21.2, and only used with the new minecart movement behavior feature
+optional class ClientboundMoveMinecartPacket extends Packet {
+    public int getEntityId:entityId();
+    public (List<NewMinecartBehaviorHandle.LerpStepHandle>) List<NewMinecartBehavior.LerpStep> getLerpSteps:lerpSteps();
+
+    public static (ClientboundMoveMinecartPacketHandle) ClientboundMoveMinecartPacket createNew(int entityId, (List<NewMinecartBehaviorHandle.LerpStepHandle>) List<NewMinecartBehavior.LerpStep> lerpSteps) {
+        return new ClientboundMoveMinecartPacket(entityId, lerpSteps);
+    }
 }
