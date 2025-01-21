@@ -150,7 +150,9 @@ class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
      * <GET_HEIGHT_OFFSET>
      * public static int getHeightOffset(Chunk chunk) {
      *     // Note: StarLight uses offset for below-bedrock light buffers, hence + 1
-     * #if version >= 1.17
+     * #if exists ca.spottedleaf.moonrise.common.util.WorldUtil public static int getMinLightSection(net.minecraft.world.level.LevelHeightAccessor world);
+     *     return -ca.spottedleaf.moonrise.common.util.WorldUtil.getMinLightSection(chunk.getLevel());
+     * #elseif version >= 1.17
      *     return 1 - chunk.getMinSection();
      * #else
      *     return 1;
