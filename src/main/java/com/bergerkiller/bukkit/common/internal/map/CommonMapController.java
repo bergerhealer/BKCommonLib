@@ -939,8 +939,7 @@ public final class CommonMapController implements PacketListener, Listener {
                 // Cancel original packet, we send a replacement (immutable) if changed
                 // Equals check avoids infinite loop
                 if (!item.equals(newItem)) {
-                    event.setCancelled(true);
-                    PacketUtil.receivePacket(event.getPlayer(), PacketPlayInSetCreativeSlotHandle.createNew(
+                    event.setPacket(PacketPlayInSetCreativeSlotHandle.createNew(
                             packet.getSlotIndex(), newItem.toBukkit()));
                 }
             }
