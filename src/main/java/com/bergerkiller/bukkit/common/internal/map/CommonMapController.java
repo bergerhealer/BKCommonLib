@@ -931,6 +931,7 @@ public final class CommonMapController implements PacketListener, Listener {
                     // Original item was found. Restore all properties of that item.
                     // Keep metadata the player can control, replace everything else
                     newItem.setCustomData(originalMapItem.getCustomData());
+                    newItem.setFilledMapId(originalMapItem.getFilledMapId()); // Not part of custom data anymore
                 } else {
                     // Dynamic Id. Force a map id value of 0 to prevent creation of new World Map instances
                     newItem.setFilledMapId(0);
