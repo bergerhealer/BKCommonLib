@@ -62,6 +62,8 @@ public class MapResourcePackTest {
 
         // Verify it can detect the golden_pickaxe override and doesn't list anything else
         assertEquals(Collections.singleton("golden_pickaxe"), pack.listOverriddenItemModelNames());
+
+        pack.getItemModelInfo("golden_pickaxe");
     }
 
     @Ignore

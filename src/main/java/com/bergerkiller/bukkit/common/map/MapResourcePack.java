@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.map.gson.MapResourcePackDeserializer;
+import com.bergerkiller.bukkit.common.map.util.ItemModel;
 import com.bergerkiller.bukkit.common.map.util.ItemModelState;
 import com.bergerkiller.bukkit.common.map.util.VanillaResourcePackFormat;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
@@ -378,7 +379,16 @@ public class MapResourcePack {
      * @return the model information
      */
     public ModelInfo getItemModelInfo(String itemName) {
-        return getModelInfo("item/" + itemName); //TODO: Fix!
+        if (getMetadata().hasItemOverrides()) {
+            ItemModel.Root root = this.openGsonObject(ItemModel.Root.class, ResourceType.ITEMS, itemName);
+            System.out.println(root);
+
+
+            return getModelInfo("item/" + itemName); //TODO: Fix!
+        } else {
+            // Legacy stores all the information we want in the model itself
+            return getModelInfo("item/" + itemName);
+        }
     }
 
     /**

@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.map.gson;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.map.util.BlockModelState;
+import com.bergerkiller.bukkit.common.map.util.ItemModel;
 import com.bergerkiller.bukkit.common.math.Vector3;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.google.gson.Gson;
@@ -36,7 +37,7 @@ public final class MapResourcePackDeserializer {
         gsonBuilder.registerTypeAdapter(BlockModelState.VariantList.class, new VariantListDeserializer());
         gsonBuilder.registerTypeAdapter(BlockModelState.Condition.class, new ConditionalDeserializer());
         gsonBuilder.registerTypeAdapter(List.class, new NonNullListDeserializer());
-        //ItemModel.registerDeserializers(gsonBuilder);
+        ItemModel.registerDeserializers(gsonBuilder);
         this.gson = gsonBuilder.create();
     }
 
