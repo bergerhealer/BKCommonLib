@@ -366,6 +366,22 @@ public class MapResourcePack {
     }
 
     /**
+     * Loads a JSON-syntax item model from this resource pack and decodes only the
+     * metadata of the model. No information is loaded that is needed for rendering,
+     * such as textures and boxes. This can be used to display information about
+     * models stored in this resource pack.<br>
+     * <br>
+     * If the model could not be found or failed to be decoded, a placeholder
+     * is returned which can be checked with {@link ModelInfo#isPlaceholder()}
+     *
+     * @param itemName Name of the item, e.g. "golden_pickaxe"
+     * @return the model information
+     */
+    public ModelInfo getItemModelInfo(String itemName) {
+        return getModelInfo("item/" + itemName); //TODO: Fix!
+    }
+
+    /**
      * Lists all the {@link ResourceType#ITEMS item models} stored in this resource pack
      * that have been overridden compared to the {@link MapResourcePack#VANILLA vanilla} resource
      * pack. If this is the vanilla resource pack, returns an empty set.<br>
@@ -400,22 +416,6 @@ public class MapResourcePack {
             allOverridenModels = Collections.unmodifiableSet(allOverridenModels);
         }
         return allOverridenModels;
-    }
-
-    /**
-     * Loads a JSON-syntax item model from this resource pack and decodes only the
-     * metadata of the model. No information is loaded that is needed for rendering,
-     * such as textures and boxes. This can be used to display information about
-     * models stored in this resource pack.<br>
-     * <br>
-     * If the model could not be found or failed to be decoded, a placeholder
-     * is returned which can be checked with {@link ModelInfo#isPlaceholder()}
-     *
-     * @param itemName Name of the item, e.g. "golden_pickaxe"
-     * @return the model information
-     */
-    public ModelInfo getItemModelInfo(String itemName) {
-        return getModel("item/" + itemName); //TODO: Fix!
     }
 
     /**
