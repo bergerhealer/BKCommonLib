@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Formatter;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,13 +39,17 @@ import com.google.gson.GsonBuilder;
 public class MapResourcePackDownloadedArchive implements MapResourcePackArchive {
     private final File resourcepacksFolder;
     private final URL resourcePackURL;
-    private final String resourcePackHash;
+    private final Optional<String> resourcePackHash;
     private final Logger log;
     private MapResourcePackArchive archive = null;
 
     public MapResourcePackDownloadedArchive(URL resourcePackURL, String resourcePackHash) {
+        if (resourcePackURL == null) {
+            throw new IllegalArgumentException("Resource pack URL cannot be null");
+        }
         this.resourcePackURL = resourcePackURL;
-        this.resourcePackHash = resourcePackHash;
+        this.resourcePackHash = (resourcePackHash == null || resourcePackHash.isEmpty())
+                ? Optional.empty() : Optional.of(resourcePackHash);
         this.log = Logging.LOGGER_MAPDISPLAY;
 
         File pluginFolder;
@@ -54,6 +59,11 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
             pluginFolder = CommonPlugin.getInstance().getDataFolder();
         }
         this.resourcepacksFolder = new File(pluginFolder, "resourcepacks");
+    }
+
+    @Override
+    public String name() {
+        return "URL: " + resourcePackURL;
     }
 
     @Override
@@ -102,7 +112,7 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
         }
 
         // If the entry was not found, or a hash was set and the hash differs, re-download the file
-        if (foundEntry == null || !foundEntry.checkHash(this.resourcePackHash)) {
+        if (foundEntry == null || !resourcePackHash.map(foundEntry::checkHash).orElse(true)) {
             // Download the resource pack and save it as a temporary file
             if (lazy) {
                 log.severe("A resource pack is being downloaded while the server is running. This will result in lag.");
@@ -150,9 +160,9 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
                 indexChanged = true;
 
                 // Log a warning when the calculated hash does not match the expected
-                if (!foundEntry.checkHash(this.resourcePackHash)) {
+                if (!resourcePackHash.map(foundEntry::checkHash).orElse(true)) {
                     log.warning("The downloaded resource pack SHA-1 hash does not match with what was expected");
-                    log.warning("Expected " + this.resourcePackHash + ", but was " + download.hash);
+                    log.warning("Expected " + this.resourcePackHash.get() + ", but was " + download.hash);
                     log.warning("The resource pack will be re-downloaded every time it is loaded unless this is fixed!");
                 }
             }
@@ -320,9 +330,6 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
             public String hash = "";
 
             public boolean checkHash(String sha1Hash) {
-                if (sha1Hash == null || sha1Hash.isEmpty()) {
-                    return true;
-                }
                 if (this.hash == null || this.hash.isEmpty()) {
                     return true;
                 }

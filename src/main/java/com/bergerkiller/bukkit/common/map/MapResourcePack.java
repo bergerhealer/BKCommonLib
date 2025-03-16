@@ -5,21 +5,25 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import com.bergerkiller.bukkit.common.map.gson.MapResourcePackDeserializer;
 import com.bergerkiller.bukkit.common.map.util.ItemModelState;
+import com.bergerkiller.bukkit.common.map.util.VanillaResourcePackFormat;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 import org.yaml.snakeyaml.error.YAMLException;
 
@@ -34,11 +38,6 @@ import com.bergerkiller.bukkit.common.internal.resources.builtin.GeneratedModel;
 import com.bergerkiller.bukkit.common.map.archive.MapResourcePackArchive;
 import com.bergerkiller.bukkit.common.map.archive.MapResourcePackAutoArchive;
 import com.bergerkiller.bukkit.common.map.archive.MapResourcePackClientArchive;
-import com.bergerkiller.bukkit.common.map.gson.BlockFaceDeserializer;
-import com.bergerkiller.bukkit.common.map.gson.ConditionalDeserializer;
-import com.bergerkiller.bukkit.common.map.gson.NonNullListDeserializer;
-import com.bergerkiller.bukkit.common.map.gson.VariantListDeserializer;
-import com.bergerkiller.bukkit.common.map.gson.Vector3Deserializer;
 import com.bergerkiller.bukkit.common.map.util.ModelInfoLookup;
 import com.bergerkiller.bukkit.common.map.util.BlockModelState;
 import com.bergerkiller.bukkit.common.map.util.Model;
@@ -54,7 +53,6 @@ import com.bergerkiller.bukkit.common.wrappers.ItemRenderOptions;
 import com.bergerkiller.bukkit.common.wrappers.RenderOptions;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 /**
@@ -100,12 +98,13 @@ public class MapResourcePack {
 
     private final MapResourcePack baseResourcePack;
     protected MapResourcePackArchive archive;
+    protected Metadata metadata = null; // loaded in load()
     private final Map<String, MapTexture> textureCache = new HashMap<String, MapTexture>();
     private final Map<String, ConfigurationNode> yamlCache = new HashMap<String, ConfigurationNode>();
     private final Map<String, Model> modelCache = new HashMap<String, Model>();
     private final Map<BlockRenderOptions, Model> blockModelCache = new HashMap<BlockRenderOptions, Model>();
     private BlockRenderProvider currProvider = null;
-    private Gson gson = null;
+    private MapResourcePackDeserializer deserializer = null;
     private boolean loaded = false;
 
     /**
@@ -187,6 +186,17 @@ public class MapResourcePack {
     }
 
     /**
+     * Gets the contents of this resource pack's pack.mcmeta file. If this file did not exist or
+     * fails to load, returns a fallback.
+     *
+     * @return Pack metadata
+     */
+    public Metadata getMetadata() {
+        this.handleLoad(true, false);
+        return this.metadata;
+    }
+
+    /**
      * Gets the base (parent) resource pack that this resource pack extends. If this resource pack
      * is the lowest level, such as {@link #VANILLA}, then null is returned.
      *
@@ -211,6 +221,7 @@ public class MapResourcePack {
             return;
         }
         this.loaded = true;
+        this.metadata = Metadata.fallback("Failed to load resource pack");
         if (lazy && !recurse) {
             Logging.LOGGER_MAPDISPLAY.warning("[Developer] You must call MapResourcePack.load() when enabling your plugin!");
             Logging.LOGGER_MAPDISPLAY.warning("[Developer] This avoids stalling the server while downloading large resource packs/Minecraft client.");
@@ -218,7 +229,14 @@ public class MapResourcePack {
         }
         if (this.archive != null) {
             this.archive.load(lazy);
+
+            if (this.deserializer == null) {
+                this.deserializer = MapResourcePackDeserializer.create();
+            }
+            this.metadata = this.archive.tryLoadMetadata(this.deserializer);
         }
+
+        // Recursively load the parent packs too
         if (this.baseResourcePack != null) {
             this.baseResourcePack.handleLoad(lazy, true);
         }
@@ -345,6 +363,59 @@ public class MapResourcePack {
         } else {
             return ModelInfo.createPlaceholder(path);
         }
+    }
+
+    /**
+     * Lists all the {@link ResourceType#ITEMS item models} stored in this resource pack
+     * that have been overridden compared to the {@link MapResourcePack#VANILLA vanilla} resource
+     * pack. If this is the vanilla resource pack, returns an empty set.<br>
+     * <br>
+     * For resource packs for version 1.21.4, it reads these files in the items assets folder.
+     * On versions before that, it decodes the predicates stored in the models/item assets folder.
+     *
+     * @return Set of names of items without extension that are overridden by this resource pack.
+     *         These names can be directly used with {@link #getItemModelInfo(String)}
+     *         to read what overrides have been configured. This set is unmodifiable.
+     */
+    public Set<String> listOverriddenItemModelNames() {
+        boolean unmodifiable = true;
+        Set<String> allOverridenModels = Collections.emptySet();
+        for (MapResourcePack p = this; p != null && p != MapResourcePack.VANILLA; p = p.getBase()) {
+            Set<String> packModels = p.listResources(ResourceType.ITEMS, "/", false);
+            if (packModels.isEmpty()) {
+                continue;
+            }
+
+            if (allOverridenModels.isEmpty()) {
+                allOverridenModels = packModels;
+            } else {
+                if (unmodifiable) {
+                    unmodifiable = false;
+                    allOverridenModels = new LinkedHashSet<>(allOverridenModels);
+                    allOverridenModels.addAll(packModels);
+                }
+            }
+        }
+        if (!unmodifiable) {
+            allOverridenModels = Collections.unmodifiableSet(allOverridenModels);
+        }
+        return allOverridenModels;
+    }
+
+    /**
+     * Loads a JSON-syntax item model from this resource pack and decodes only the
+     * metadata of the model. No information is loaded that is needed for rendering,
+     * such as textures and boxes. This can be used to display information about
+     * models stored in this resource pack.<br>
+     * <br>
+     * If the model could not be found or failed to be decoded, a placeholder
+     * is returned which can be checked with {@link ModelInfo#isPlaceholder()}
+     *
+     * @param itemName Name of the item, e.g. "golden_pickaxe"
+     * @return the model information
+     */
+    public ModelInfo getItemModelInfo(String itemName) {
+        return getModel("item/" + itemName); //TODO: Fix!
     }
 
     /**
@@ -538,6 +609,29 @@ public class MapResourcePack {
         // Must end with / to be a valid zip directory 'file'
         if (!folder.endsWith("/")) {
             folder += "/";
+        }
+
+        // If type is ITEMS and this is not supported by this pack, list models/item instead
+        if (type == ResourceType.ITEMS && !getMetadata().hasItemOverrides()) {
+            System.out.println("FALLBACK!");
+            //TODO: Utility?
+            if (folder.equals("/")) {
+                folder = "item";
+            } else if (folder.startsWith("/")) {
+                folder = "item" + folder;
+            } else {
+                folder = "item/" + folder;
+            }
+            Set<String> paths = listResources(ResourceType.MODELS, namespace, folder, recurse);
+
+            // Omit item/ prefix
+            if (paths.isEmpty()) {
+                return Collections.emptySet();
+            } else {
+                return paths.stream()
+                        .map(s -> s.substring(5))
+                        .collect(Collectors.toCollection(LinkedHashSet::new));
+            }
         }
 
         String zipFolderPath;
@@ -893,17 +987,18 @@ public class MapResourcePack {
         // =null: failed to load resource pack file
         this.handleLoad(true, false);
         if (this.archive != null) {
+            String prefix = (folder.equals("/") ? "": folder);
             try {
                 if (directories) {
                     for (String file : this.archive.listFiles(rootRelFolder)) {
                         if (file.endsWith("/")) {
-                            result.add(folder + file.substring(0, file.length() - 1));
+                            result.add(prefix + file.substring(0, file.length() - 1));
                         }
                     }
                 } else {
                     for (String file : this.archive.listFiles(rootRelFolder)) {
                         if (type.isExtension(file)) {
-                            result.add(folder + file.substring(0, file.length() - type.getExtension().length()));
+                            result.add(prefix + file.substring(0, file.length() - type.getExtension().length()));
                         }
                     }
                 }
@@ -1012,46 +1107,11 @@ public class MapResourcePack {
         return readGsonObject(objectType, inputStream, null);
     }
 
-    private final <T> T readGsonObject(Class<T> objectType, InputStream inputStream, String optPath) {
-        if (inputStream == null) {
-            return null;
+    private <T> T readGsonObject(Class<T> objectType, InputStream inputStream, String optPath) {
+        if (deserializer == null) {
+            deserializer = MapResourcePackDeserializer.create();
         }
-        try {
-            try {
-                Reader reader = new InputStreamReader(inputStream, "UTF-8");
-                if (this.gson == null) {
-                    this.gson = createGson();
-                }
-                T result = this.gson.fromJson(reader, objectType);
-                if (result == null) {
-                    String s = (optPath == null) ? "" : (" at " + optPath);
-                    throw new IOException("Failed to parse JSON for " + objectType.getSimpleName() + s);
-                }
-                return result;
-            } finally {
-                inputStream.close();
-            }
-        } catch (JsonSyntaxException ex) {
-            String s = (optPath == null) ? "" : (" at " + optPath);
-            String msg = ex.getMessage();
-            msg = StringUtil.trimStart(msg, "com.bergerkiller.bukkit.common.dep.gson.stream.MalformedJsonException: ");
-            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Failed to parse GSON for " + objectType.getSimpleName() +
-                    s + ": " + msg);
-        } catch (IOException ex) {
-            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Unhandled IO Exception", ex);
-        }
-        return null;
-    }
-
-    @SuppressWarnings("rawtypes")
-    private Gson createGson() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(Vector3.class, new Vector3Deserializer());
-        gsonBuilder.registerTypeAdapter(BlockFace.class, new BlockFaceDeserializer());
-        gsonBuilder.registerTypeAdapter(BlockModelState.VariantList.class, new VariantListDeserializer());
-        gsonBuilder.registerTypeAdapter(BlockModelState.Condition.class, new ConditionalDeserializer());
-        gsonBuilder.registerTypeAdapter(List.class, new NonNullListDeserializer());
-        return gsonBuilder.create();
+        return deserializer.readGsonObject(objectType, inputStream, optPath);
     }
 
     /**
@@ -1060,7 +1120,10 @@ public class MapResourcePack {
     public static enum ResourceType {
         /** Models found in <b>assets/minecraft/models/</b> */
         MODELS("/models/", ".json"),
-        /** Item (gui) models found in <b>assets/minecraft/items</b>, used since 1.21.4 */
+        /**
+         * Item (gui) models found in <b>assets/minecraft/items</b>, used since 1.21.4.
+         * On versions before 1.21.4 gets and lists items in <b>assets/minecraft/models/item</b> instead.
+         * */
         ITEMS("/items/", ".json"),
         /** Block States found in <b>assets/minecraft/blockstates/</b> */
         BLOCKSTATES("/blockstates/", ".json"),
@@ -1115,4 +1178,73 @@ public class MapResourcePack {
         }
     }
 
+    /**
+     * Contents of <b>pack.mcmeta</b>
+     */
+    public static class Metadata {
+        private int pack_format;
+        private String description;
+
+        /**
+         * Gets the pack_format value
+         *
+         * @return Pack format
+         */
+        public int getPackFormat() {
+            return pack_format;
+        }
+
+        /**
+         * Gets the description of this resource pack
+         *
+         * @return Description
+         */
+        public String getDescription() {
+            return hasDescription() ? description : "No Description";
+        }
+
+        public boolean hasDescription() {
+            return description != null && !description.isEmpty();
+        }
+
+        /**
+         * Gets whether this resource pack version makes use of {@link ResourceType#ITEMS item model} overrides.
+         *
+         * @return True if this resource pack makes use of item model overrides. False if it uses the old
+         *         item predicate system.
+         */
+        public boolean hasItemOverrides() {
+            return pack_format >= 46;
+        }
+
+        /**
+         * Creates fallback metadata
+         *
+         * @param errorReason Reason metadata could not be loaded
+         * @return Metadata
+         */
+        public static Metadata fallback(String errorReason) {
+            Metadata metadata = new Metadata();
+            metadata.pack_format = VanillaResourcePackFormat.getLatestPackFormat();
+            metadata.description = "Unknown Resource pack - " + errorReason;
+            return metadata;
+        }
+
+        /**
+         * Creates metadata for the Vanilla Minecraft client jar assets
+         *
+         * @param mcVersion Minecraft version of the client jar
+         * @return Metadata
+         */
+        public static Metadata vanilla(String mcVersion) {
+            Metadata metadata = new Metadata();
+            metadata.pack_format = VanillaResourcePackFormat.getPackFormat(mcVersion);
+            metadata.description = "Vanilla Minecraft " + mcVersion;
+            return metadata;
+        }
+
+        public static class PackWrapper {
+            public Metadata pack; // JSON file has a 'pack' field
+        }
+    }
 }

@@ -26,7 +26,15 @@ public class MapResourcePackZipArchive implements MapResourcePackArchive {
     private final File zipFile;
 
     public MapResourcePackZipArchive(File zipFile) {
+        if (zipFile == null) {
+            throw new IllegalArgumentException("Zip file cannot be null");
+        }
         this.zipFile = zipFile;
+    }
+
+    @Override
+    public String name() {
+        return "ZIP: " + zipFile;
     }
 
     @Override

@@ -1,13 +1,55 @@
 package com.bergerkiller.bukkit.common.map.archive;
 
+import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.map.MapResourcePack;
+import com.bergerkiller.bukkit.common.map.gson.MapResourcePackDeserializer;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Abstract interface for accessing the file contents of a resource pack.
  */
 public interface MapResourcePackArchive {
+
+    /**
+     * Gets the name of this archive. Is used in error reporting.
+     *
+     * @return Archive name
+     */
+    String name();
+
+    /**
+     * Attempts to load the pack.mcmeta of this resource pack archive. If loading fails,
+     * a default fallback is returned instead.
+     *
+     * @param deserializer Deserializer to use for loading the json file
+     * @return Loaded metadata
+     */
+    default MapResourcePack.Metadata tryLoadMetadata(MapResourcePackDeserializer deserializer) {
+        // Load pack.mcmeta contents
+        // If this fails, the fallback will take over
+        try (InputStream mcMetaInputStream = this.openFileStream("pack.mcmeta")) {
+            if (mcMetaInputStream == null) {
+                Logging.LOGGER_MAPDISPLAY.warning("Resource pack " + name() + " has no pack.mcmeta");
+                return MapResourcePack.Metadata.fallback("missing pack.mcmeta");
+            }
+
+            MapResourcePack.Metadata.PackWrapper wrap = deserializer.readGsonObject(
+                    MapResourcePack.Metadata.PackWrapper.class, mcMetaInputStream, "pack.mcmeta");
+            if (wrap == null || wrap.pack == null) {
+                Logging.LOGGER_MAPDISPLAY.warning("Resource pack " + name() + " pack.mcmeta could not be loaded (format error)");
+                return MapResourcePack.Metadata.fallback("corrupt pack.mcmeta");
+            }
+
+            return wrap.pack;
+        } catch (Throwable t) {
+            Logging.LOGGER_MAPDISPLAY.log(Level.WARNING, "Resource pack " + name() + " pack.mcmeta could not be loaded", t);
+            return MapResourcePack.Metadata.fallback("error reading pack.mcmeta");
+        }
+    }
 
     /**
      * Loads the resource pack archive, making it available for use

@@ -19,6 +19,11 @@ public class MapResourcePackDirectoryArchive implements MapResourcePackArchive {
     }
 
     @Override
+    public String name() {
+        return "Directory: " + directory.getName();
+    }
+
+    @Override
     public void load(boolean lazy) {
     }
 

@@ -3,10 +3,13 @@ package com.bergerkiller.bukkit.common;
 import static org.junit.Assert.*;
 
 import java.awt.Dimension;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Random;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import com.bergerkiller.bukkit.common.map.util.VanillaResourcePackFormat;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.junit.Ignore;
@@ -25,6 +28,41 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
  * These test the various texture/model loading routines of the Map Resource Pack
  */
 public class MapResourcePackTest {
+
+    @Test
+    public void testPackFormat() {
+        assertEquals(8, VanillaResourcePackFormat.getPackFormat("1.18.1"));
+        assertEquals(VanillaResourcePackFormat.getLatestPackFormat(),
+                VanillaResourcePackFormat.getPackFormat(CommonBootstrap.initCommonServer().getMinecraftVersion()));
+    }
+
+    @Test
+    public void testPackItemModelsLegacy() {
+        MapResourcePack pack = new MapResourcePack("./misc/resource_packs/TrainCarts_Demo_TP_v4_1_19_3.zip");
+        pack.load();
+
+        // Sanity check
+        assertEquals(12, pack.getMetadata().getPackFormat());
+        assertFalse(pack.getMetadata().hasItemOverrides());
+
+        System.out.println(pack.listResources(MapResourcePack.ResourceType.MODELS, "item"));
+
+        // Verify it can detect the golden_pickaxe override and doesn't list anything else
+        assertEquals(Collections.singleton("golden_pickaxe"), pack.listOverriddenItemModelNames());
+    }
+
+    @Test
+    public void testPackItemModelsModern() {
+        MapResourcePack pack = new MapResourcePack("./misc/resource_packs/TrainCarts_Demo_TP_v4_1_21_4.zip");
+        pack.load();
+
+        // Sanity check
+        assertEquals(46, pack.getMetadata().getPackFormat());
+        assertTrue(pack.getMetadata().hasItemOverrides());
+
+        // Verify it can detect the golden_pickaxe override and doesn't list anything else
+        assertEquals(Collections.singleton("golden_pickaxe"), pack.listOverriddenItemModelNames());
+    }
 
     @Ignore
     @Test

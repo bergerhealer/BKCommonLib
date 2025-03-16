@@ -15,9 +15,11 @@ import com.bergerkiller.bukkit.common.Logging;
  * This handles URL and Filesystem paths
  */
 public class MapResourcePackAutoArchive implements MapResourcePackArchive {
+    private final String resourcePackPath;
     private MapResourcePackArchive archive;
 
     public MapResourcePackAutoArchive(String resourcePackPath, String resourcePackHash) {
+        this.resourcePackPath = resourcePackPath;
         File file = new File(resourcePackPath);
         if (file.isFile()) {
             this.archive = new MapResourcePackZipArchive(file);
@@ -36,6 +38,11 @@ public class MapResourcePackAutoArchive implements MapResourcePackArchive {
                 Logging.LOGGER_MAPDISPLAY.warning("Resource pack '" + resourcePackPath + "' could not be found or understood");
             }
         }
+    }
+
+    @Override
+    public String name() {
+        return resourcePackPath;
     }
 
     @Override
