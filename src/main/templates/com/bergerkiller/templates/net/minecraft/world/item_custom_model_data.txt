@@ -1,0 +1,68 @@
+package net.minecraft.world.item.component;
+
+import com.bergerkiller.generated.net.minecraft.world.item.component.CustomModelDataHandle;
+
+// 1.8 - 1.20.4: Custom proxy class
+// 1.20.5 - 1.21.3: Only has an int field
+// 1.21.4+: Has three properties
+class CustomModelData {
+#if version >= 1.21.4
+    public static (CustomModelDataHandle) CustomModelData empty() {
+        return CustomModelData.EMPTY;
+    }
+
+    public static (CustomModelDataHandle) CustomModelData createNew(List<Float> floats, List<Boolean> flags, List<String> strings, List<Integer> colors) {
+        return new CustomModelData(floats, flags, strings, colors);
+    }
+
+    public static (CustomModelDataHandle) CustomModelData createNewLegacy(int value) {
+        if (value == 0) {
+            return CustomModelData.EMPTY;
+        } else {
+            return new CustomModelData(java.util.Collections.singletonList(Float.valueOf((float) value)),
+                                       java.util.Collections.emptyList(),
+                                       java.util.Collections.emptyList(),
+                                       java.util.Collections.emptyList());
+        }
+    }
+
+    public List<Float> floats();
+    public List<Boolean> flags();
+    public List<String> strings();
+    public List<Integer> colors();
+#else
+    public static (CustomModelDataHandle) CustomModelData empty() {
+        return CustomModelData.DEFAULT;
+    }
+
+    public static (CustomModelDataHandle) CustomModelData createNew(List<Float> floats, List<Boolean> flags, List<String> strings, List<Integer> colors) {
+        if (floats.isEmpty()) {
+            return new CustomModelData(0);
+        } else {
+            return new CustomModelData(((Float) floats.get(0)).intValue());
+        }
+    }
+
+    public static (CustomModelDataHandle) CustomModelData createNewLegacy(int value) {
+        return new CustomModelData(value);
+    }
+
+    public List<Float> floats() {
+        int value = instance.value();
+        if (value == 0) {
+            return java.util.Collections.emptyList();
+        } else {
+            return java.util.Collections.singletonList(Float.valueOf((float) value));
+        }
+    }
+    public List<Boolean> flags() {
+        return java.util.Collections.emptyList();
+    }
+    public List<String> strings() {
+        return java.util.Collections.emptyList();
+    }
+    public List<Integer> colors() {
+        return java.util.Collections.emptyList();
+    }
+#endif
+}

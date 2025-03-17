@@ -4,15 +4,96 @@ import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import com.bergerkiller.bukkit.common.wrappers.CustomModelData;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import static com.bergerkiller.bukkit.common.utils.MaterialUtil.getFirst;
 import static org.junit.Assert.*;
 
 public class CommonItemStackTest {
+
+    @Test
+    public void testCustomModelDataLegacy() {
+        CommonItemStack item = CommonItemStack.create(MaterialUtil.getFirst("DIAMOND_SWORD", "LEGACY_DIAMOND_SWORD"), 1);
+        assertFalse(item.hasCustomModelData());
+
+        // Test legacy API
+        item.setCustomModelData(5);
+        assertTrue(item.hasCustomModelData());
+        assertEquals(5, item.getCustomModelData());
+        assertEquals(Collections.singletonList((float) 5), item.getCustomModelDataComponents().floats());
+
+        // Modify using components API, should be seen by legacy API
+        item.setCustomModelDataComponents(new CustomModelData().withFloats(Collections.singletonList(20.0f)));
+        assertEquals(20, item.getCustomModelData());
+        assertEquals(Collections.singletonList((float) 20), item.getCustomModelDataComponents().floats());
+
+        // Verify clearing works
+        item.clearCustomModelData();
+        assertFalse(item.hasCustomModelData());
+        assertEquals(-1, item.getCustomModelData());
+    }
+
+    @Test
+    public void testCustomModelDataComponents() {
+        if (!Common.evaluateMCVersion(">=", "1.21.4")) {
+            return; // Not supported, other component fields do nothing
+        }
+
+        CommonItemStack item = CommonItemStack.create(MaterialUtil.getFirst("DIAMOND_SWORD", "LEGACY_DIAMOND_SWORD"), 1);
+        assertFalse(item.hasCustomModelData());
+
+        // Test modern components API
+        CustomModelData cmd = new CustomModelData();
+
+        { /* Floats */
+            cmd = cmd.withFloats(Arrays.asList(2.0f, 5.0f, 7.0f));
+            item.setCustomModelDataComponents(cmd);
+            assertTrue(item.hasCustomModelData());
+            assertEquals(Arrays.asList(2.0f, 5.0f, 7.0f), item.getCustomModelDataComponents().floats());
+        }
+
+        { /* Flags */
+            cmd = cmd.withFlags(Arrays.asList(true, true, false));
+            item.setCustomModelDataComponents(cmd);
+            assertTrue(item.hasCustomModelData());
+            assertEquals(Arrays.asList(true, true, false), item.getCustomModelDataComponents().flags());
+        }
+
+        { /* Strings */
+            cmd = cmd.withStrings(Arrays.asList("hello", "world"));
+            item.setCustomModelDataComponents(cmd);
+            assertTrue(item.hasCustomModelData());
+            assertEquals(Arrays.asList("hello", "world"), item.getCustomModelDataComponents().strings());
+        }
+
+        { /* Colors */
+            cmd = cmd.withColors(Arrays.asList(Color.RED.asRGB(), Color.GREEN.asRGB()));
+            item.setCustomModelDataComponents(cmd);
+            assertTrue(item.hasCustomModelData());
+            assertEquals(Arrays.asList(Color.RED.asRGB(), Color.GREEN.asRGB()), item.getCustomModelDataComponents().colors());
+        }
+
+        // Sanity check that setting one has not erased the other fields
+        {
+            assertEquals(Arrays.asList(2.0f, 5.0f, 7.0f), item.getCustomModelDataComponents().floats());
+            assertEquals(Arrays.asList(true, true, false), item.getCustomModelDataComponents().flags());
+            assertEquals(Arrays.asList("hello", "world"), item.getCustomModelDataComponents().strings());
+            assertEquals(Arrays.asList(Color.RED.asRGB(), Color.GREEN.asRGB()), item.getCustomModelDataComponents().colors());
+        }
+
+        // Verify clearing works
+        item.clearCustomModelData();
+        assertFalse(item.hasCustomModelData());
+        assertEquals(new CustomModelData(), item.getCustomModelDataComponents());
+    }
 
     @Test
     public void testTransferToExistingItem() {

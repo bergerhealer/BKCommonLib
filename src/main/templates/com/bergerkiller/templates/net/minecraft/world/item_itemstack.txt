@@ -731,16 +731,30 @@ class ItemStack {
     }
 
 #if version >= 1.21.4
+    public boolean hasCustomModelData() {
+        return instance.has(DataComponents.CUSTOM_MODEL_DATA);
+    }
+
     public boolean hasCustomModelDataValue() {
         net.minecraft.world.item.component.CustomModelData cmd;
         cmd = (net.minecraft.world.item.component.CustomModelData) instance.get(DataComponents.CUSTOM_MODEL_DATA);
         return cmd != null && !cmd.floats().isEmpty();
     }
 
+    public (com.bergerkiller.bukkit.common.wrappers.CustomModelData) net.minecraft.world.item.component.CustomModelData getCustomModelData() {
+        net.minecraft.world.item.component.CustomModelData cmd;
+        cmd = (net.minecraft.world.item.component.CustomModelData) instance.get(DataComponents.CUSTOM_MODEL_DATA);
+        return (cmd != null) ? cmd : net.minecraft.world.item.component.CustomModelData.EMPTY;
+    }
+
     public int getCustomModelDataValue() {
         net.minecraft.world.item.component.CustomModelData cmd;
         cmd = (net.minecraft.world.item.component.CustomModelData) instance.get(DataComponents.CUSTOM_MODEL_DATA);
         return (cmd == null || cmd.floats().isEmpty()) ? -1 : ((Float) cmd.floats().get(0)).intValue();
+    }
+
+    public void setCustomModelData((com.bergerkiller.bukkit.common.wrappers.CustomModelData) net.minecraft.world.item.component.CustomModelData cmd) {
+        instance.set(DataComponents.CUSTOM_MODEL_DATA, cmd);
     }
 
     public void setCustomModelDataValue(int value) {
@@ -756,14 +770,28 @@ class ItemStack {
         instance.remove(DataComponents.CUSTOM_MODEL_DATA);
     }
 #elseif version >= 1.20.5
+    public boolean hasCustomModelData() {
+        return instance.has(DataComponents.CUSTOM_MODEL_DATA);
+    }
+
     public boolean hasCustomModelDataValue() {
         return instance.has(DataComponents.CUSTOM_MODEL_DATA);
+    }
+
+    public (com.bergerkiller.bukkit.common.wrappers.CustomModelData) net.minecraft.world.item.component.CustomModelData getCustomModelData() {
+        net.minecraft.world.item.component.CustomModelData cmd;
+        cmd = (net.minecraft.world.item.component.CustomModelData) instance.get(DataComponents.CUSTOM_MODEL_DATA);
+        return (cmd != null) ? cmd : net.minecraft.world.item.component.CustomModelData.DEFAULT;
     }
 
     public int getCustomModelDataValue() {
         net.minecraft.world.item.component.CustomModelData cmd;
         cmd = (net.minecraft.world.item.component.CustomModelData) instance.get(DataComponents.CUSTOM_MODEL_DATA);
         return (cmd == null) ? -1 : cmd.value();
+    }
+
+    public void setCustomModelData((com.bergerkiller.bukkit.common.wrappers.CustomModelData) net.minecraft.world.item.component.CustomModelData cmd) {
+        instance.set(DataComponents.CUSTOM_MODEL_DATA, cmd);
     }
 
     public void setCustomModelDataValue(int value) {
@@ -774,9 +802,26 @@ class ItemStack {
         instance.remove(DataComponents.CUSTOM_MODEL_DATA);
     }
 #else
+    public boolean hasCustomModelData() {
+        NBTTagCompound tag = instance.getTag();
+        return tag != null && tag.get("CustomModelData") instanceof NBTTagInt;
+    }
+
     public boolean hasCustomModelDataValue() {
         NBTTagCompound tag = instance.getTag();
         return tag != null && tag.get("CustomModelData") instanceof NBTTagInt;
+    }
+
+    public (com.bergerkiller.bukkit.common.wrappers.CustomModelData) net.minecraft.world.item.component.CustomModelData getCustomModelData() {
+        NBTTagCompound tag = instance.getTag();
+        if (tag != null) {
+            NBTBase cmd = tag.get("CustomModelData");
+            if (cmd instanceof NBTTagInt) {
+                int value = ((NBTTagInt) cmd).getAsInt();
+                return new net.minecraft.world.item.component.CustomModelData(value);
+            }
+        }
+        return net.minecraft.world.item.component.CustomModelData.DEFAULT;
     }
 
     public int getCustomModelDataValue() {
@@ -788,6 +833,11 @@ class ItemStack {
             }
         }
         return -1;
+    }
+
+    public void setCustomModelData((com.bergerkiller.bukkit.common.wrappers.CustomModelData) net.minecraft.world.item.component.CustomModelData cmd) {
+        NBTTagCompound tag = instance#getOrCreateTag();
+        tag.putInt("CustomModelData", cmd.value());
     }
 
     public void setCustomModelDataValue(int value) {

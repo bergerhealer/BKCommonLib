@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.bukkit.common.wrappers.CustomModelData;
 import com.bergerkiller.bukkit.common.wrappers.ItemRenderOptions;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
@@ -734,6 +735,20 @@ public final class CommonItemStack implements Cloneable {
     }
 
     /**
+     * Gets the full custom model data information, if
+     * {@link #hasCustomModelData() this item includes custom model data}.
+     * Otherwise, returns default custom model data with all component
+     * lists empty.
+     *
+     * @return Custom Model Data components
+     */
+    public CustomModelData getCustomModelDataComponents() {
+        return getHandle(true)
+                .map(ItemStackHandle::getCustomModelData)
+                .orElseGet(CustomModelData::new);
+    }
+
+    /**
      * Sets a new custom model data integer value. Note that -1 does not
      * clear it, use {@link #clearCustomModelData()} instead for that.
      *
@@ -744,6 +759,20 @@ public final class CommonItemStack implements Cloneable {
         getHandle()
                 .orElseThrow(() -> new IllegalStateException("Can not set custom model data on an empty item"))
                 .setCustomModelDataValue(value);
+        return this;
+    }
+
+    /**
+     * Sets a new custom model data. Note that empty() not
+     * clear it, use {@link #clearCustomModelData()} instead for that.
+     *
+     * @param value New custom model data components to set
+     * @return this CommonItemStack
+     */
+    public CommonItemStack setCustomModelDataComponents(CustomModelData value) {
+        getHandle()
+                .orElseThrow(() -> new IllegalStateException("Can not set custom model data on an empty item"))
+                .setCustomModelData(value);
         return this;
     }
 

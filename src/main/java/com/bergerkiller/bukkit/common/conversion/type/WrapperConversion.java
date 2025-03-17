@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import com.bergerkiller.bukkit.common.wrappers.CustomModelData;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeBaseHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.component.CustomModelDataHandle;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
@@ -84,6 +86,16 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersH
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
 public class WrapperConversion {
+
+    @ConverterMethod(input="net.minecraft.world.item.component.CustomModelData")
+    public static CustomModelData handleToCustomModelData(Object handle) {
+        return new CustomModelData(CustomModelDataHandle.createHandle(handle));
+    }
+
+    @ConverterMethod(output="net.minecraft.world.item.component.CustomModelData")
+    public static Object customModelDataToHandle(CustomModelData cmd) {
+        return cmd.getRawHandle();
+    }
 
     @ConverterMethod(output="java.util.function.Consumer<net.minecraft.nbt.NBTTagCompound>")
     public static Consumer<Object> createNBTTagCompoundConsumer(Consumer<CommonTagCompound> consumer) {

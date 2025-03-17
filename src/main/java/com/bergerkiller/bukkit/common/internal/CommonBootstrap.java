@@ -798,6 +798,8 @@ public class CommonBootstrap {
                                  "net.minecraft.world.level.saveddata.maps.MapIcon$Type"));
             // Before 1.20.5, SerializableMeta was a subclass of CraftMetaItem
             remappings.put("org.bukkit.craftbukkit.inventory.SerializableMeta", "org.bukkit.craftbukkit.inventory.CraftMetaItem$SerializableMeta");
+            // Before 1.20.5, CustomModelData did not exist so proxy it
+            remappings.put("net.minecraft.world.item.component.CustomModelData", "com.bergerkiller.bukkit.common.internal.proxy.CustomModelData_pre_1_20_5");
         }
 
         // 1.21.2 mappings
