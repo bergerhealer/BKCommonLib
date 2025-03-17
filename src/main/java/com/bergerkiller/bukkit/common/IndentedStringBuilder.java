@@ -1,5 +1,8 @@
 package com.bergerkiller.bukkit.common;
 
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
 /**
  * Helper class for creating a multi-line string with indents. Useful for document trees
  * in debug toString() methods.
@@ -9,9 +12,25 @@ public class IndentedStringBuilder {
     public final StringBuilder builder;
 
     private final int indent;
+    private final int indentStep;
 
+    /**
+     * Creates a new IndentedStringBuilder with a default indent step of 2 spaces
+     *
+     * @return IndentedStringBuilder
+     */
     public static IndentedStringBuilder create() {
-        return new IndentedStringBuilder();
+        return create(2);
+    }
+
+    /**
+     * Creates a new IndentedStringBuilder
+     *
+     * @param indentStep How many spaces are added for each indent
+     * @return IndentedStringBuilder
+     */
+    public static IndentedStringBuilder create(int indentStep) {
+        return new IndentedStringBuilder(indentStep);
     }
 
     /**
@@ -22,29 +41,96 @@ public class IndentedStringBuilder {
      * @return String
      */
     public static String toString(AppendableToString appendable) {
-        IndentedStringBuilder str = new IndentedStringBuilder();
+        IndentedStringBuilder str = create();
         str.append(appendable);
         return str.toString();
     }
 
-    private IndentedStringBuilder() {
-        this(new StringBuilder(), 0);
+    private IndentedStringBuilder(int indentStep) {
+        this(new StringBuilder(), indentStep, 0);
     }
 
-    private IndentedStringBuilder(StringBuilder builder, int indent) {
+    private IndentedStringBuilder(StringBuilder builder, int indentStep, int indent) {
         this.builder = builder;
         this.indent = indent;
+        this.indentStep = indentStep;
+    }
+
+    /**
+     * Returns a new IndentedStringBuilder that writes to the same underlying
+     * StringBuilder buffer, but with a +1 indentation level.
+     *
+     * @return IndentedStringBuilder
+     */
+    public IndentedStringBuilder indent() {
+        return indent(1);
     }
 
     /**
      * Returns a new IndentedStringBuilder that writes to the same underlying
      * StringBuilder buffer, but with a new indentation level.
      *
-     * @param indentIncrease Amount of spaces to add to the indent
+     * @param indentIncrease Amount of indent-step spaces to add to the indent
      * @return IndentedStringBuilder
      */
     public IndentedStringBuilder indent(int indentIncrease) {
-        return new IndentedStringBuilder(builder, indent + indentIncrease);
+        return new IndentedStringBuilder(builder, indentStep, indent + indentStep * indentIncrease);
+    }
+
+    /**
+     * Calls the callback to append additional contents to this builder at a +1 indent level.
+     * Returns this same builder so appending can continue on the current indentation level.
+     *
+     * @param callback Callback that performs indenting on the next indent level
+     * @return this
+     */
+    public IndentedStringBuilder appendWithIndent(Consumer<IndentedStringBuilder> callback) {
+        callback.accept(indent());
+        return this;
+    }
+
+    /**
+     * Calls the callback to append additional contents to this builder at a new indent level.
+     * Returns this same builder so appending can continue on the current indentation level.
+     *
+     * @param callback Callback that performs indenting on the next indent level
+     * @param indentIncrease Amount of indent-step spaces to add to the indent
+     * @return this
+     */
+    public IndentedStringBuilder appendWithIndent(Consumer<IndentedStringBuilder> callback, int indentIncrease) {
+        callback.accept(indent(indentIncrease));
+        return this;
+    }
+
+    /**
+     * Iterates all the appendable items specified and adds it on a new line. A newline is inserted before every
+     * single item.
+     *
+     * @param lineItems Item values of type AppendableToString
+     * @return this
+     * @param <T> Value type of the items
+     */
+    public <T extends AppendableToString> IndentedStringBuilder appendLines(Iterable<T> lineItems) {
+        for (T item : lineItems) {
+            item.toString(append("\n"));
+        }
+        return this;
+    }
+
+    /**
+     * Iterates all the items specified and adds it on a new line. A newline is inserted before every
+     * single item.
+     *
+     * @param lineItems Item values
+     * @param toString Function to write the value to this IndentedStringBuilder
+     * @return this
+     * @param <T> Value type of the items
+     */
+    public <T> IndentedStringBuilder appendLines(Iterable<T> lineItems, BiConsumer<IndentedStringBuilder, T> toString) {
+        for (T item : lineItems) {
+            toString.accept(append("\n"), item);
+        }
+        return this;
     }
 
     /**
@@ -55,7 +141,11 @@ public class IndentedStringBuilder {
      * @return this
      */
     public IndentedStringBuilder append(AppendableToString appendable) {
-        appendable.toString(this);
+        if (appendable != null) {
+            appendable.toString(this);
+        } else {
+            builder.append("<null>");
+        }
         return this;
     }
 
@@ -99,12 +189,14 @@ public class IndentedStringBuilder {
             ((AppendableToString) obj).toString(this);
             return this;
         } else {
-            return append(obj == null ? "null" : obj.toString());
+            return append(obj == null ? "<null>" : obj.toString());
         }
     }
 
     public IndentedStringBuilder append(String str) {
-        if (indent > 0) {
+        if (str == null) {
+            builder.append("<null>");
+        } else if (indent > 0) {
             int startChar = 0;
             int newlineChar = -1;
             while ((newlineChar = str.indexOf('\n', startChar)) != -1) {

@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.map.util;
 
 import com.bergerkiller.bukkit.common.IndentedStringBuilder;
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
@@ -8,6 +9,7 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -15,10 +17,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Used on Minecraft 1.21.4 and later to represent the "item model" graph. This sets up
- * the conditions for showing particular models for items.<br>
+ * the conditions for showing particular models for items. For resource packs using the
+ * older predicate system, it makes use of {@link Overrides}<br>
  * <br>
  * The ItemModel represents a single node of this graph.
  */
@@ -146,6 +150,39 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
 
             return select;
         });
+
+        /*
+         * Deserializer for a single override in the overrides list
+         * {
+         *   "_cmd_": "give @p minecraft:golden_pickaxe 1 10 {Unbreakable:1}",
+         *   "predicate": {"damaged": 0, "damage": 0.30303030303030304},
+         *   "model": "traincarts:nubx/traincarts_locomotive_full"
+         * }
+         */
+        gsonBuilder.registerTypeAdapter(Overrides.OverriddenModel.class, (JsonDeserializer<Overrides.OverriddenModel>) (jsonElement, type, jsonDeserializationContext) -> {
+            JsonObject obj = jsonElement.getAsJsonObject();
+            Overrides.OverriddenModel result = new Overrides.OverriddenModel();
+
+            if (obj.has("predicate")) {
+                JsonObject predicateListObj = obj.get("predicate").getAsJsonObject();
+                List<Overrides.PredicateCondition<?>> conditions = new ArrayList<>(predicateListObj.size());
+                for (Map.Entry<String, JsonElement> predicateObj : predicateListObj.entrySet()) {
+                    ItemModelProperty.PredicateProperty<?> property = ItemModelProperty.get(predicateObj.getKey()).asPredicateProperty();
+                    conditions.add(property.asPredicateCondition(predicateObj.getValue()));
+                }
+                result.predicate = Collections.unmodifiableList(conditions);
+            } else {
+                result.predicate = Collections.emptyList();
+            }
+
+            if (obj.has("model")) {
+                result.model = MinecraftModel.of(obj.get("model").getAsString());
+            } else {
+                result.model = MinecraftModel.NOT_SET;
+            }
+
+            return result;
+        });
     }
 
     // Unknown or unsupported
@@ -165,13 +202,15 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
     /**
      * The root document of the item model json file
      */
-    public static class Root {
+    public static class Root extends ItemModel {
         public ItemModel model;
         public boolean hand_animation_on_swap = true;
 
         @Override
-        public String toString() {
-            return model.toString();
+        public void toString(IndentedStringBuilder str) {
+            str.append("{");
+            str.indent().append("\nmodel: ").append(model);
+            str.append("\n}");
         }
     }
 
@@ -179,7 +218,13 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
         /** Placeholder model value when a ModelInfo field is not set, such as with range_dispatch fallback */
         public static final MinecraftModel NOT_SET = new MinecraftModel();
         static {
-            NOT_SET.model = "generic:missing";
+            NOT_SET.model = "minecraft:builtin/missing";
+        }
+
+        public static MinecraftModel of(String name) {
+            MinecraftModel model = new MinecraftModel();
+            model.model = name;
+            return model;
         }
 
         public String model;
@@ -187,6 +232,76 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
         @Override
         public void toString(IndentedStringBuilder str) {
             str.append("Model { name: " + model + " }");
+        }
+    }
+
+    /**
+     * Used for the older predicates system, stored in the models/item/*.json files directly.
+     * See: <a href="https://minecraft.wiki/w/Tutorial:Models#Item_predicates">Wiki page about predicates</a>
+     */
+    public static class Overrides extends ItemModel {
+        /** List of model overrides based on the predicates system */
+        public List<OverriddenModel> overrides;
+        /** Model to use if none of the overrides match. Refers to the original item model */
+        public MinecraftModel fallback = MinecraftModel.NOT_SET;
+
+        @Override
+        public void toString(IndentedStringBuilder str) {
+            str.append("Predicate Overrides {");
+            str.indent()
+                    .append("\noverrides: [")
+                    .appendWithIndent(ov_str -> ov_str.appendLines(overrides))
+                    .append("\n]")
+                    .append("\nfallback: ").append(fallback);
+            str.append("\n}");
+        }
+
+        public static class OverriddenModel implements IndentedStringBuilder.AppendableToString {
+            public List<PredicateCondition<?>> predicate;
+            public MinecraftModel model;
+
+            @Override
+            public String toString() {
+                return IndentedStringBuilder.toString(this);
+            }
+
+            @Override
+            public void toString(IndentedStringBuilder str) {
+                str.append("Override {");
+                str.indent()
+                        .append("\npredicate: [")
+                        .appendWithIndent(predicatesStr -> predicatesStr.appendLines(predicate))
+                        .append("\n]")
+                        .append("\nmodel: ").append(model);
+                str.append("\n}");
+            }
+        }
+
+        public static class PredicateCondition<T> implements IndentedStringBuilder.AppendableToString {
+            public ItemModelProperty.PredicateProperty<T> property;
+            public @Nullable T value;
+
+            public boolean isMatching(CommonItemStack item) {
+                return value != null && property.isMatchingPredicate(item, value);
+            }
+
+            public Optional<CommonItemStack> tryApply(CommonItemStack item) {
+                return (value == null) ? Optional.empty() : property.tryApplyPredicate(item, value);
+            }
+
+            @Override
+            public String toString() {
+                return IndentedStringBuilder.toString(this);
+            }
+
+            @Override
+            public void toString(IndentedStringBuilder str) {
+                str.append("Predicate {");
+                str.indent()
+                        .append("\npredicate: ").append(property)
+                        .append("\nvalue: ").append(value == null ? "<failed to parse>" : value);
+                str.append("\n}");
+            }
         }
     }
 
@@ -198,7 +313,7 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
         @Override
         public void toString(IndentedStringBuilder str) {
             str.append("Condition {");
-            str.indent(2)
+            str.indent()
                     .append("\nproperty: ").append(property)
                     .append("\non_true: ").append(on_true)
                     .append("\non_false: ").append(on_false);
@@ -219,14 +334,14 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
         @Override
         public void toString(IndentedStringBuilder str) {
             str.append("Range Dispatch {");
-            IndentedStringBuilder ind = str.indent(2);
+            IndentedStringBuilder ind = str.indent();
             ind.append("\nproperty: ").append(property);
             ind.append("\nentries: [");
             {
-                IndentedStringBuilder entryStr = ind.indent(2);
+                IndentedStringBuilder entryStr = ind.indent();
                 for (Entry e : entries) {
                     entryStr.append("\n{");
-                    entryStr.indent(2)
+                    entryStr.indent()
                             .append("\nthreshold: ").append(e.threshold)
                             .append("\nmodel: ").append(e.model);
                     entryStr.append("\n}");
@@ -260,14 +375,14 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
         @Override
         public void toString(IndentedStringBuilder str) {
             str.append("Select {");
-            IndentedStringBuilder ind = str.indent(2);
+            IndentedStringBuilder ind = str.indent();
             ind.append("\nproperty: ").append(property);
             ind.append("\ncases: [");
             {
-                IndentedStringBuilder entryStr = ind.indent(2);
+                IndentedStringBuilder entryStr = ind.indent();
                 for (Case c : cases) {
                     entryStr.append("\n{");
-                    entryStr.indent(2)
+                    entryStr.indent()
                             .append("\nwhen: ").append(c.when)
                             .append("\nmodel: ").append(c.model);
                     entryStr.append("\n}");

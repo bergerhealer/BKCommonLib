@@ -46,10 +46,10 @@ public class MapResourcePackTest {
         assertEquals(12, pack.getMetadata().getPackFormat());
         assertFalse(pack.getMetadata().hasItemOverrides());
 
-        System.out.println(pack.listResources(MapResourcePack.ResourceType.MODELS, "item"));
-
         // Verify it can detect the golden_pickaxe override and doesn't list anything else
         assertEquals(Collections.singleton("golden_pickaxe"), pack.listOverriddenItemModelNames());
+
+        //System.out.println(pack.getItemModel("golden_pickaxe"));
     }
 
     @Test
@@ -68,7 +68,7 @@ public class MapResourcePackTest {
         assertEquals(new HashSet<>(Arrays.asList("golden_pickaxe", "golden_axe", "golden_sword")),
                 pack.listOverriddenItemModelNames());
 
-        pack.getItemModelInfo("golden_sword");
+        //System.out.println(pack.getItemModel("golden_sword"));
     }
 
     @Ignore

@@ -6,7 +6,10 @@ import com.bergerkiller.bukkit.common.map.util.ItemModel;
 import com.bergerkiller.bukkit.common.math.Vector3;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import org.bukkit.block.BlockFace;
 
@@ -16,6 +19,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 
 /**
@@ -67,5 +71,82 @@ public final class MapResourcePackDeserializer {
             Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Unhandled IO Exception", ex);
         }
         return null;
+    }
+
+    /**
+     * Attempts to parse a JSON value into an integer. Can parse numbers and string versions
+     * of these.
+     *
+     * @param jsonElement JSON Element
+     * @return Parsed integer value if successful, or an empty optional otherwise
+     */
+    public static Optional<Integer> tryParseAsInt(JsonElement jsonElement) {
+        try {
+            return Optional.of(jsonElement.getAsInt());
+        } catch (UnsupportedOperationException | NumberFormatException | IllegalStateException ex) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Attempts to parse a JSON value into a double. Can parse numbers and string versions
+     * of these.
+     *
+     * @param jsonElement JSON Element
+     * @return Parsed double value if successful, or an empty optional otherwise
+     */
+    public static Optional<Double> tryParseAsDouble(JsonElement jsonElement) {
+        try {
+            return Optional.of(jsonElement.getAsDouble());
+        } catch (UnsupportedOperationException | NumberFormatException | IllegalStateException ex) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Attempts to parse a JSON value into a boolean. Can parse numbers (0 and 1), booleans
+     * (true and false), string versions of these and single-element arrays.
+     *
+     * @param jsonElement JSON Element
+     * @return Parsed boolean value if successful, or an empty optional otherwise
+     */
+    public static Optional<Boolean> tryParseAsBoolean(JsonElement jsonElement) {
+        if (jsonElement == null || jsonElement.isJsonNull()) {
+            return Optional.empty();
+        }
+
+        // Unwrap single-element arrays
+        if (jsonElement.isJsonArray()) {
+            JsonArray array = jsonElement.getAsJsonArray();
+            if (array.size() == 1) {
+                jsonElement = array.get(0);
+            } else {
+                return Optional.empty();
+            }
+        }
+
+        // Parse strings, booleans or numbers into a boolean
+        if (jsonElement.isJsonPrimitive()) {
+            JsonPrimitive primitive = jsonElement.getAsJsonPrimitive();
+            if (primitive.isBoolean()) {
+                return Optional.of(jsonElement.getAsBoolean());
+            } else if (primitive.isNumber()) {
+                return Optional.of(jsonElement.getAsInt() != 0);
+            } else if (primitive.isString()) {
+                String value = jsonElement.getAsString().toLowerCase();
+                switch (value) {
+                    case "1":
+                    case "true":
+                        return Optional.of(Boolean.TRUE);
+                    case "0":
+                    case "false":
+                        return Optional.of(Boolean.FALSE);
+                    default:
+                        return Optional.empty();
+                }
+            }
+        }
+
+        return Optional.empty();
     }
 }

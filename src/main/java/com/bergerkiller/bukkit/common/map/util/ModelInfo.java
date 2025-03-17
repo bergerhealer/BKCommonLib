@@ -17,7 +17,7 @@ public class ModelInfo {
     private transient String name = "unknown";
     protected transient boolean placeholder = false;
     protected String parent = null;
-    protected List<ModelOverride> overrides = new ArrayList<ModelOverride>();
+    protected List<ItemModel.Overrides.OverriddenModel> overrides = new ArrayList<>();
 
     /*
      * Some metadata fields that aren't important for functional purposes
@@ -81,14 +81,40 @@ public class ModelInfo {
     }
 
     /**
+     * Retrieves the ItemModel information from this model, assuming that this model information
+     * is for a legacy (pre-1.21.4) resource pack format.
+     *
+     * @return Item Model
+     */
+    public ItemModel asItemModel() {
+        if (this.overrides == null || this.overrides.isEmpty()) {
+            return ItemModel.MinecraftModel.of(this.name);
+        } else {
+            ItemModel.Overrides overrides = new ItemModel.Overrides();
+            overrides.overrides = this.overrides;
+            overrides.fallback = ItemModel.MinecraftModel.of(this.name);
+            return overrides;
+        }
+    }
+
+    /**
      * Gets a List of Model Overrides. These are predicates that, if fulfilled, display
      * a different model than this one.
      *
      * @return Overrides
+     * @deprecated Please use the new {@link ItemModel} API instead
      */
+    @Deprecated
     public final List<ModelOverride> getOverrides() {
-        List<ModelOverride> overrides = this.overrides;
-        return (overrides == null || overrides.isEmpty()) ? Collections.emptyList() : overrides;
+        if (this.overrides == null || this.overrides.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<ModelOverride> asOverrides = new ArrayList<>(this.overrides.size());
+        for (ItemModel.Overrides.OverriddenModel overriddenModel : this.overrides) {
+            asOverrides.add(new ModelOverride(overriddenModel));
+        }
+        return asOverrides;
     }
 
     /**

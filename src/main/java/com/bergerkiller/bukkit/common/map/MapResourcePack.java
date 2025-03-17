@@ -2,8 +2,6 @@ package com.bergerkiller.bukkit.common.map;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,7 +19,6 @@ import com.bergerkiller.bukkit.common.map.gson.MapResourcePackDeserializer;
 import com.bergerkiller.bukkit.common.map.util.ItemModel;
 import com.bergerkiller.bukkit.common.map.util.ItemModelState;
 import com.bergerkiller.bukkit.common.map.util.VanillaResourcePackFormat;
-import com.bergerkiller.bukkit.common.utils.StringUtil;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -53,8 +50,6 @@ import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 import com.bergerkiller.bukkit.common.wrappers.ItemRenderOptions;
 import com.bergerkiller.bukkit.common.wrappers.RenderOptions;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 
 /**
  * Resource Management class that loads models and textures from the Vanilla Minecraft jar or zip resource pack archives.<br>
@@ -378,16 +373,12 @@ public class MapResourcePack {
      * @param itemName Name of the item, e.g. "golden_pickaxe"
      * @return the model information
      */
-    public ModelInfo getItemModelInfo(String itemName) {
+    public ItemModel getItemModel(String itemName) {
         if (getMetadata().hasItemOverrides()) {
-            ItemModel.Root root = this.openGsonObject(ItemModel.Root.class, ResourceType.ITEMS, itemName);
-            System.out.println(root);
-
-
-            return getModelInfo("item/" + itemName); //TODO: Fix!
+            return this.openGsonObject(ItemModel.Root.class, ResourceType.ITEMS, itemName);
         } else {
             // Legacy stores all the information we want in the model itself
-            return getModelInfo("item/" + itemName);
+            return this.getModelInfo("item/" + itemName).asItemModel();
         }
     }
 
@@ -400,7 +391,7 @@ public class MapResourcePack {
      * On versions before that, it decodes the predicates stored in the models/item assets folder.
      *
      * @return Set of names of items without extension that are overridden by this resource pack.
-     *         These names can be directly used with {@link #getItemModelInfo(String)}
+     *         These names can be directly used with {@link #getItemModel(String)}
      *         to read what overrides have been configured. This set is unmodifiable.
      */
     public Set<String> listOverriddenItemModelNames() {
@@ -623,7 +614,6 @@ public class MapResourcePack {
 
         // If type is ITEMS and this is not supported by this pack, list models/item instead
         if (type == ResourceType.ITEMS && !getMetadata().hasItemOverrides()) {
-            System.out.println("FALLBACK!");
             //TODO: Utility?
             if (folder.equals("/")) {
                 folder = "item";
@@ -950,6 +940,7 @@ public class MapResourcePack {
         }
 
         // Handle overrides first
+        //TODO: Fixme!
         for (Model.ModelOverride override : model.getOverrides()) {
             if (override.matches(options) && !override.model.equals(path)) {
                 //System.out.println("MATCH " + override.model + "  " + options);

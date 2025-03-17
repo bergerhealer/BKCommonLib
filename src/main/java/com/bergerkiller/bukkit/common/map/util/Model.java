@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import com.bergerkiller.bukkit.common.wrappers.ItemRenderOptions;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 
@@ -20,7 +21,6 @@ import com.bergerkiller.bukkit.common.map.util.Model.Element.Face;
 import com.bergerkiller.bukkit.common.math.Matrix4x4;
 import com.bergerkiller.bukkit.common.math.Vector3;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
-import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.wrappers.RenderOptions;
 import com.google.gson.annotations.SerializedName;
 
@@ -212,9 +212,7 @@ public class Model extends ModelInfo {
             clone.elements.add(element.clone());
         }
         if (this.overrides != null && !this.overrides.isEmpty()) {
-            for (ModelOverride override : this.overrides) {
-                clone.overrides.add(override);
-            }
+            clone.overrides.addAll(this.overrides);
         }
         return clone;
     }
@@ -524,22 +522,29 @@ public class Model extends ModelInfo {
     /**
      * Model override based on a predicate.
      * When the predicate matches, the linked model is loaded instead of this one.
+     *
+     * @deprecated Please use the new {@link ItemModel} API instead
      */
+    @Deprecated
     public static class ModelOverride {
-        public Map<String, String> predicate;
+        private final ItemModel.Overrides.OverriddenModel overriddenModel;
         public String model;
+
+        public ModelOverride(ItemModel.Overrides.OverriddenModel overriddenModel) {
+            this.overriddenModel = overriddenModel;
+            this.model = overriddenModel.model.model;
+        }
 
         @Override
         public ModelOverride clone() {
-            ModelOverride clone = new ModelOverride();
+            ModelOverride clone = new ModelOverride(overriddenModel);
             clone.model = this.model;
-            clone.predicate = (this.predicate == null) ? null : new HashMap<String, String>(this.predicate);
             return clone;
         }
 
         @Override
         public String toString() {
-            return this.model + "[" + this.predicate + "]";
+            return this.model + "[" + this.overriddenModel.toString() + "]";
         }
 
         /**
@@ -549,15 +554,17 @@ public class Model extends ModelInfo {
          * @return True if it matches the predicate
          */
         public boolean matches(RenderOptions options) {
-            if (this.predicate != null && !this.predicate.isEmpty()) {
-                for (Map.Entry<String, String> pred : this.predicate.entrySet()) {
-                    String opt = options.get(pred.getKey());
-                    if (opt == null) {
-                        return false;
-                    }
-                    if (!PredicateType.get(pred.getKey()).matches(opt, pred.getValue())) {
-                        return false;
-                    }
+            if (overriddenModel.predicate.isEmpty()) {
+                return true;
+            }
+            if (!(options instanceof ItemRenderOptions)) {
+                return false;
+            }
+
+            CommonItemStack item = CommonItemStack.of(((ItemRenderOptions) options).getItem());
+            for (ItemModel.Overrides.PredicateCondition<?> condition : overriddenModel.predicate) {
+                if (!condition.isMatching(item)) {
+                    return false;
                 }
             }
             return true;
@@ -573,128 +580,17 @@ public class Model extends ModelInfo {
          */
         public ItemStack applyToItem(ItemStack item) {
             CommonItemStack copy = CommonItemStack.copyOf(item);
-            if (this.predicate != null) {
-                for (Map.Entry<String, String> predicate : this.predicate.entrySet()) {
-                    PredicateType.get(predicate.getKey()).applyToItem(copy, predicate.getValue());
-                }
+            for (ItemModel.Overrides.PredicateCondition<?> condition : overriddenModel.predicate) {
+                copy = condition.tryApply(copy).orElse(copy);
             }
             return copy.toBukkit();
-        }
-
-        /**
-         * Type of predicate supported by Minecraft
-         */
-        private static enum PredicateType {
-            CUSTOM_MODEL_DATA("custom_model_data") {
-                @Override
-                public void applyToItem(CommonItemStack item, String value) {
-                    int cmd;
-                    try {
-                        cmd = Integer.parseInt(value);
-                    } catch (NumberFormatException ex) {
-                        return;
-                    }
-                    item.setCustomModelData(cmd);
-                }
-
-                @Override
-                public boolean matches(String a, String b) {
-                    return a.equals(b); // Integer comparison works with str equals. No decimals.
-                }
-            },
-            UNBREAKABLE("damaged") {
-                @Override
-                public void applyToItem(CommonItemStack item, String value) {
-                    item.setUnbreakable(value.equals("0"));
-                }
-
-                @Override
-                public boolean matches(String a, String b) {
-                    return a.equals(b); // integer comparison works with str equals. No decimals.
-                }
-            },
-            DAMAGE("damage") {
-                @Override
-                public void applyToItem(CommonItemStack item, String value) {
-                    int maxDamage = item.getMaxDamage();
-                    if (maxDamage <= 0) {
-                        return;
-                    }
-
-                    double damageDbl;
-                    try {
-                        damageDbl = Double.parseDouble(value);
-                        damageDbl = MathUtil.clamp(damageDbl, 0.0, 1.0);
-                    } catch (NumberFormatException ex) {
-                        return;
-                    }
-
-                    item.setDamage((int) (damageDbl * maxDamage) + 1);
-                }
-
-                @Override
-                public boolean matches(String a, String b) {
-                    // Floating point damage values must equal
-                    return compareNumberStr(a, b);
-                }
-            },
-            DEFAULT(null) {
-                @Override
-                public void applyToItem(CommonItemStack item, String value) {
-                    // No-Op
-                }
-
-                @Override
-                public boolean matches(String a, String b) {
-                    // Assume its a floating point number and compare
-                    return compareNumberStr(a, b);
-                }
-            };
-
-            private static final Map<String, PredicateType> byKey = new HashMap<>();
-            private final String key;
-
-            static {
-                for (PredicateType type : PredicateType.values()) {
-                    byKey.put(type.getKey(), type);
-                }
-            }
-
-            private PredicateType(String key) {
-                this.key = key;
-            }
-
-            public String getKey() {
-                return key;
-            }
-
-            public abstract void applyToItem(CommonItemStack item, String value);
-            public abstract boolean matches(String a, String b);
-
-            public static PredicateType get(String key) {
-                return byKey.getOrDefault(key, DEFAULT);
-            }
-
-            private static boolean compareNumberStr(String a, String b) {
-                if (a.equals(b)) {
-                    return true;
-                }
-
-                try {
-                    final double RANGE = 0.0000001;
-                    double diff = Double.parseDouble(a) - Double.parseDouble(b);
-                    return diff >= -RANGE && diff <= RANGE;
-                } catch (NumberFormatException ex) {}
-
-                return false;
-            }
         }
     }
 
     /**
      * The builtin internal type that manages the further loading of this model
      */
-    public static enum BuiltinType {
+    public enum BuiltinType {
         DEFAULT, GENERATED
     }
 }
