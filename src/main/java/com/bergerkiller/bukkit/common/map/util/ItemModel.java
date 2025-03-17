@@ -36,6 +36,7 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
             registerDeserializerToType("model", MinecraftModel.class);
             registerDeserializerToType("condition", Condition.class);
             registerDeserializerToType("range_dispatch", RangeDispatch.class);
+            registerDeserializerToType("select", Select.class);
         }
 
         private void registerDeserializerToType(String name, final Class<? extends ItemModel> itemModelType) {
@@ -88,11 +89,62 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
                 for (int i = 0; i < size; i++) {
                     dispatch.entries.add(jsonDeserializationContext.deserialize(arr.get(i), RangeDispatch.Entry.class));
                 }
+                dispatch.entries = Collections.unmodifiableList(dispatch.entries);
             } else {
                 dispatch.entries = Collections.emptyList();
             }
 
             return dispatch;
+        });
+
+        gsonBuilder.registerTypeAdapter(Select.Case.class, (JsonDeserializer<Select.Case>) (jsonElement, type, jsonDeserializationContext) -> {
+            JsonObject obj = jsonElement.getAsJsonObject();
+            Select.Case c = new Select.Case();
+            if (obj.has("when")) {
+                JsonElement whenElement = obj.get("when");
+                if (whenElement.isJsonArray()) {
+                    JsonArray whenArray = whenElement.getAsJsonArray();
+                    int whenCount = whenArray.size();
+                    ArrayList<String> whenArrayValues = new ArrayList<>(whenCount);
+                    for (int i = 0; i < whenCount; i++) {
+                        whenArrayValues.add(whenArray.get(i).getAsString());
+                    }
+                    c.when = Collections.unmodifiableList(whenArrayValues);
+                } else {
+                    c.when = Collections.singletonList(whenElement.getAsString());
+                }
+            } else {
+                c.when = Collections.emptyList();
+            }
+
+            c.model = jsonDeserializationContext.deserialize(obj.get("model"), ItemModel.class);
+
+            return c;
+        });
+
+        gsonBuilder.registerTypeAdapter(Select.class, (JsonDeserializer<Select>) (jsonElement, type, jsonDeserializationContext) -> {
+            JsonObject obj = jsonElement.getAsJsonObject();
+            Select select = new Select();
+
+            select.property = ItemModelProperty.get(obj.get("property").getAsString(), obj);
+
+            select.fallback = obj.has("fallback")
+                    ? jsonDeserializationContext.deserialize(obj.get("fallback"), ItemModel.class)
+                    : MinecraftModel.NOT_SET;
+
+            if (obj.has("cases")) {
+                JsonArray arr = obj.get("cases").getAsJsonArray();
+                int size = arr.size();
+                select.cases = new ArrayList<>(size);
+                for (int i = 0; i < size; i++) {
+                    select.cases.add(jsonDeserializationContext.deserialize(arr.get(i), Select.Case.class));
+                }
+                select.cases = Collections.unmodifiableList(select.cases);
+            } else {
+                select.cases = Collections.emptyList();
+            }
+
+            return select;
         });
     }
 
@@ -182,6 +234,7 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
             }
             ind.append("\n]");
             ind.append("\nfallback: ").append(fallback);
+            str.append("\n}");
         }
     }
 
@@ -195,25 +248,34 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
     }
 
     public static class Select extends ItemModel {
-        public String property;
+        public ItemModelProperty property;
         public List<Case> cases;
         public ItemModel fallback;
 
         public static class Case {
+            public List<String> when; // singleton list for one value
             public ItemModel model;
-        }
-
-        public static class SingleCase extends Case {
-            public String when;
-        }
-
-        public static class MultiCase extends Case {
-            public List<String> when;
         }
 
         @Override
         public void toString(IndentedStringBuilder str) {
-            str.append("Select {}");
+            str.append("Select {");
+            IndentedStringBuilder ind = str.indent(2);
+            ind.append("\nproperty: ").append(property);
+            ind.append("\ncases: [");
+            {
+                IndentedStringBuilder entryStr = ind.indent(2);
+                for (Case c : cases) {
+                    entryStr.append("\n{");
+                    entryStr.indent(2)
+                            .append("\nwhen: ").append(c.when)
+                            .append("\nmodel: ").append(c.model);
+                    entryStr.append("\n}");
+                }
+            }
+            ind.append("\n]");
+            ind.append("\nfallback: ").append(fallback);
+            str.append("\n}");
         }
     }
 }

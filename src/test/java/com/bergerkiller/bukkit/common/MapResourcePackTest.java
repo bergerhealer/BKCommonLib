@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common;
 import static org.junit.Assert.*;
 
 import java.awt.Dimension;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Random;
@@ -38,7 +39,7 @@ public class MapResourcePackTest {
 
     @Test
     public void testPackItemModelsLegacy() {
-        MapResourcePack pack = new MapResourcePack("./misc/resource_packs/TrainCarts_Demo_TP_v4_1_19_3.zip");
+        MapResourcePack pack = new MapResourcePack("./misc/resource_packs/TestPack_TrainCarts_Demo_TP_v4_1_19_3.zip");
         pack.load();
 
         // Sanity check
@@ -53,17 +54,21 @@ public class MapResourcePackTest {
 
     @Test
     public void testPackItemModelsModern() {
-        MapResourcePack pack = new MapResourcePack("./misc/resource_packs/TrainCarts_Demo_TP_v4_1_21_4.zip");
+        MapResourcePack pack = new MapResourcePack("./misc/resource_packs/TestPack_TrainCarts_Demo_TP_v4_1_21_4.zip");
         pack.load();
 
         // Sanity check
         assertEquals(46, pack.getMetadata().getPackFormat());
         assertTrue(pack.getMetadata().hasItemOverrides());
 
-        // Verify it can detect the golden_pickaxe override and doesn't list anything else
-        assertEquals(Collections.singleton("golden_pickaxe"), pack.listOverriddenItemModelNames());
+        // Verify it can detect the golden tool overrides and doesn't list anything else
+        // golden_pickaxe: Uses unbreakable + damage values (condition + range_dispatch)
+        // golden_axe: Uses custom model data flags / int (range_dispatch)
+        // golden_sword: Uses custom model data flags + strings (condition + select)
+        assertEquals(new HashSet<>(Arrays.asList("golden_pickaxe", "golden_axe", "golden_sword")),
+                pack.listOverriddenItemModelNames());
 
-        pack.getItemModelInfo("golden_pickaxe");
+        pack.getItemModelInfo("golden_sword");
     }
 
     @Ignore
