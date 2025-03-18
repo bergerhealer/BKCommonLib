@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.utils;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -1530,5 +1531,27 @@ public class LogicUtil {
     public static <V> V getOrSupplyDefault(Map<?, V> map, Object key, Supplier<? extends V> supplier) {
         V value = map.get(key);
         return (value != null) ? value : supplier.get();
+    }
+
+    /**
+     * Combines two unmodifiable Lists, producing a new unmodifiable List with both list's items.
+     * If either list is empty, returns the other list.
+     *
+     * @param a List one
+     * @param b List two
+     * @return List with contents of both, first of a, then of b
+     * @param <E> Element type
+     */
+    public static <E> List<E> combineUnmodifiableLists(List<E> a, List<E> b) {
+        if (b.isEmpty()) {
+            return a;
+        } else if (a.isEmpty()) {
+            return b;
+        } else {
+            List<E> result = new ArrayList<>(a.size() + b.size());
+            result.addAll(a);
+            result.addAll(b);
+            return Collections.unmodifiableList(result);
+        }
     }
 }

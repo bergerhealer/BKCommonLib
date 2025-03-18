@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.bergerkiller.bukkit.common.map.util.Model.ModelOverride;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * The base {@link Model} information, such as the model name, parent, author, comments
@@ -102,7 +103,8 @@ public class ModelInfo {
      * a different model than this one.
      *
      * @return Overrides
-     * @deprecated Please use the new {@link ItemModel} API instead
+     * @deprecated Please use the new {@link ItemModel} API instead with
+     *             {@link com.bergerkiller.bukkit.common.map.MapResourcePack#getItemModel(String) getItemModel()}
      */
     @Deprecated
     public final List<ModelOverride> getOverrides() {

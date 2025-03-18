@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 
 import java.util.Map;
 
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.map.util.ModelInfoLookup;
@@ -11,14 +12,22 @@ import com.bergerkiller.bukkit.common.utils.ItemUtil;
  * Render options for item models
  */
 public class ItemRenderOptions extends RenderOptions {
-    private ItemStack item;
+    private CommonItemStack item;
 
     public ItemRenderOptions(ItemStack item, String optionsToken) {
+        this(CommonItemStack.of(item), optionsToken);
+    }
+
+    public ItemRenderOptions(ItemStack item, Map<String, String> optionsMap) {
+        this(CommonItemStack.of(item), optionsMap);
+    }
+
+    public ItemRenderOptions(CommonItemStack item, String optionsToken) {
         super(optionsToken);
         this.item = item;
     }
 
-    public ItemRenderOptions(ItemStack item, Map<String, String> optionsMap) {
+    public ItemRenderOptions(CommonItemStack item, Map<String, String> optionsMap) {
         super(optionsMap);
         this.item = item;
     }
@@ -29,6 +38,15 @@ public class ItemRenderOptions extends RenderOptions {
      * @return item stack
      */
     public final ItemStack getItem() {
+        return this.item.toBukkit();
+    }
+
+    /**
+     * Gets the CommonItemStack of the item this model is for
+     *
+     * @return item stack
+     */
+    public final CommonItemStack getCommonItem() {
         return this.item;
     }
 
@@ -40,9 +58,9 @@ public class ItemRenderOptions extends RenderOptions {
     @Override
     public ItemRenderOptions clone() {
         if (this.optionsMap != null) {
-            return new ItemRenderOptions(ItemUtil.cloneItem(this.item), this.optionsMap);
+            return new ItemRenderOptions(this.item.clone(), this.optionsMap);
         } else {
-            return new ItemRenderOptions(ItemUtil.cloneItem(this.item), this.optionsToken);
+            return new ItemRenderOptions(this.item.clone(), this.optionsToken);
         }
     }
 }

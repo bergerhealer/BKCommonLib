@@ -532,7 +532,11 @@ public class Model extends ModelInfo {
 
         public ModelOverride(ItemModel.Overrides.OverriddenModel overriddenModel) {
             this.overriddenModel = overriddenModel;
-            this.model = overriddenModel.model.model;
+
+            ItemModel.MinecraftModel setModel = (overriddenModel.models.isEmpty()
+                    ? ItemModel.MinecraftModel.NOT_SET
+                    : overriddenModel.models.get(0));
+            this.model = setModel.model;
         }
 
         @Override
@@ -554,20 +558,8 @@ public class Model extends ModelInfo {
          * @return True if it matches the predicate
          */
         public boolean matches(RenderOptions options) {
-            if (overriddenModel.predicate.isEmpty()) {
-                return true;
-            }
-            if (!(options instanceof ItemRenderOptions)) {
-                return false;
-            }
-
-            CommonItemStack item = CommonItemStack.of(((ItemRenderOptions) options).getItem());
-            for (ItemModel.Overrides.PredicateCondition<?> condition : overriddenModel.predicate) {
-                if (!condition.isMatching(item)) {
-                    return false;
-                }
-            }
-            return true;
+            return options instanceof ItemRenderOptions &&
+                    overriddenModel.isMatching(((ItemRenderOptions) options).getCommonItem());
         }
 
         /**
@@ -581,7 +573,7 @@ public class Model extends ModelInfo {
         public ItemStack applyToItem(ItemStack item) {
             CommonItemStack copy = CommonItemStack.copyOf(item);
             for (ItemModel.Overrides.PredicateCondition<?> condition : overriddenModel.predicate) {
-                copy = condition.tryApply(copy).orElse(copy);
+                copy = condition.tryMakeMatching(copy).orElse(copy);
             }
             return copy.toBukkit();
         }

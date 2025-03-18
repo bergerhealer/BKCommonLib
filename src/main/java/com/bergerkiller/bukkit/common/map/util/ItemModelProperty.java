@@ -20,6 +20,14 @@ import java.util.Optional;
  * inferred server-side.
  */
 public abstract class ItemModelProperty implements IndentedStringBuilder.AppendableToString {
+    /** Placeholder value for when no property is set in the configuration */
+    public static final ItemModelProperty NONE = new ItemModelProperty("") {
+        @Override
+        public void toString(IndentedStringBuilder str) {
+            str.append("No Property Set");
+        }
+    };
+
     private static final Map<String, PropertyCreator> BY_NAME = new HashMap<>();
     private static final JsonObject NO_OBJ = new JsonObject();
     private final String name;
@@ -112,7 +120,7 @@ public abstract class ItemModelProperty implements IndentedStringBuilder.Appenda
      *
      * @param name Name of the property
      * @param contextObj Additional context options for the property. For example,
-     *                   the numeric properties include normalize and scale properties.
+     *                   the numeric properties include normalize and scale options.
      * @return ItemModelProperty
      */
     public static ItemModelProperty get(String name, JsonObject contextObj) {
@@ -290,6 +298,27 @@ public abstract class ItemModelProperty implements IndentedStringBuilder.Appenda
          *         in this way or is unknown.
          */
         Optional<CommonItemStack> applyCondition(CommonItemStack item, boolean isTrue);
+
+        /**
+         * Creates an ItemModelPredicate using this property to make it match either
+         * true or false.
+         *
+         * @param isTrue Whether the property is true
+         * @return ItemModelPredicate
+         */
+        default ItemModelPredicate asPredicate(boolean isTrue) {
+            return new ItemModelPredicate() {
+                @Override
+                public boolean isMatching(CommonItemStack item) {
+                    return isTrue == testCondition(item);
+                }
+
+                @Override
+                public Optional<CommonItemStack> tryMakeMatching(CommonItemStack item) {
+                    return applyCondition(item, isTrue);
+                }
+            };
+        }
     }
 
     public interface NumericProperty {

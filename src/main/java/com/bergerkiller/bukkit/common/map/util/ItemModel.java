@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.map.util;
 
 import com.bergerkiller.bukkit.common.IndentedStringBuilder;
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -9,6 +10,7 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
@@ -18,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 /**
  * Used on Minecraft 1.21.4 and later to represent the "item model" graph. This sets up
@@ -33,6 +37,41 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
         return IndentedStringBuilder.toString(this);
     }
 
+    /**
+     * Resolves the models that should be displayed for rendering the item. Can return
+     * more than one in case a {@link Composite} item model node is used.
+     *
+     * @param item Item whose models to resolve
+     * @return List of MinecraftModel model names
+     */
+    public abstract List<MinecraftModel> resolveModels(CommonItemStack item);
+
+    /**
+     * Creates a flattened List of all item model overrides that exist for this
+     * item model configuration. This might not be perfectly accurate if identical
+     * predicates exist in several places of the item model tree, but it works
+     * well enough for most usual cases.
+     *
+     * @return Flattened List of ItemModelOverrides
+     */
+    public final List<ItemModelOverride> listAllOverrides() {
+        ItemModelPredicate.ModelChain root = ItemModelPredicate.ModelChain.newRoot();
+        this.populateModelChain(root);
+
+        return root.getAllLeafs().stream()
+                .filter(ItemModelPredicate.ModelChain::hasModels)
+                .map(ItemModelPredicate.ModelChain::collectAsOverride)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Fills a {@link ItemModelPredicate.ModelChain} with predicates and model definitions.
+     * Produces a List of leaf nodes, which can then be turned into unique overrides.
+     *
+     * @param chain Predicate chain navigated so far
+     */
+    protected abstract void populateModelChain(ItemModelPredicate.ModelChain chain);
+
     public static class ItemModelDeserializer implements JsonDeserializer<ItemModel> {
         private final Map<String, JsonDeserializer<? extends ItemModel>> byName = new HashMap<>();
 
@@ -41,6 +80,7 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
             registerDeserializerToType("condition", Condition.class);
             registerDeserializerToType("range_dispatch", RangeDispatch.class);
             registerDeserializerToType("select", Select.class);
+            registerDeserializerToType("composite", Composite.class);
         }
 
         private void registerDeserializerToType(String name, final Class<? extends ItemModel> itemModelType) {
@@ -70,9 +110,14 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
         gsonBuilder.registerTypeAdapter(Condition.class, (JsonDeserializer<Condition>) (jsonElement, type, jsonDeserializationContext) -> {
             JsonObject obj = jsonElement.getAsJsonObject();
             Condition condition = new Condition();
-            condition.property = ItemModelProperty.get(obj.get("property").getAsString(), obj);
-            condition.on_true = jsonDeserializationContext.deserialize(obj.get("on_true"), ItemModel.class);
-            condition.on_false = jsonDeserializationContext.deserialize(obj.get("on_false"), ItemModel.class);
+            if (obj.has("property")) {
+
+            } else {
+
+            }
+            condition.property = tryParseProperty(jsonDeserializationContext, obj, "property");
+            condition.on_true = tryParseItemModel(jsonDeserializationContext, obj, "on_true");
+            condition.on_false = tryParseItemModel(jsonDeserializationContext, obj, "on_false");
             return condition;
         });
 
@@ -80,19 +125,29 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
             JsonObject obj = jsonElement.getAsJsonObject();
             RangeDispatch dispatch = new RangeDispatch();
 
-            dispatch.property = ItemModelProperty.get(obj.get("property").getAsString(), obj);
-
-            dispatch.fallback = obj.has("fallback")
-                    ? jsonDeserializationContext.deserialize(obj.get("fallback"), ItemModel.class)
-                    : MinecraftModel.NOT_SET;
+            dispatch.property = tryParseProperty(jsonDeserializationContext, obj, "property");
+            dispatch.fallback = tryParseItemModel(jsonDeserializationContext, obj, "fallback");
 
             if (obj.has("entries")) {
                 JsonArray arr = obj.get("entries").getAsJsonArray();
                 int size = arr.size();
                 dispatch.entries = new ArrayList<>(size);
                 for (int i = 0; i < size; i++) {
-                    dispatch.entries.add(jsonDeserializationContext.deserialize(arr.get(i), RangeDispatch.Entry.class));
+                    RangeDispatch.Entry e = jsonDeserializationContext.deserialize(arr.get(i), RangeDispatch.Entry.class);
+                    e.property = dispatch.property;
+                    dispatch.entries.add(e);
                 }
+
+                // Populate the adjacent entry maximum threshold information
+                // According to wiki: "Will select last entry with threshold less or equal to property value."
+                // This behavior is odd but hopefully this is correct...
+                double maxThreshold = Double.MAX_VALUE;
+                for (int i = size - 1; i >= 0; --i) {
+                    RangeDispatch.Entry e = dispatch.entries.get(i);
+                    e.maxThreshold = maxThreshold;
+                    maxThreshold = Math.min(e.minThreshold, maxThreshold);
+                }
+
                 dispatch.entries = Collections.unmodifiableList(dispatch.entries);
             } else {
                 dispatch.entries = Collections.emptyList();
@@ -121,7 +176,7 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
                 c.when = Collections.emptyList();
             }
 
-            c.model = jsonDeserializationContext.deserialize(obj.get("model"), ItemModel.class);
+            c.model = tryParseItemModel(jsonDeserializationContext, obj, "model");
 
             return c;
         });
@@ -130,18 +185,17 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
             JsonObject obj = jsonElement.getAsJsonObject();
             Select select = new Select();
 
-            select.property = ItemModelProperty.get(obj.get("property").getAsString(), obj);
-
-            select.fallback = obj.has("fallback")
-                    ? jsonDeserializationContext.deserialize(obj.get("fallback"), ItemModel.class)
-                    : MinecraftModel.NOT_SET;
+            select.property = tryParseProperty(jsonDeserializationContext, obj, "property");
+            select.fallback = tryParseItemModel(jsonDeserializationContext, obj, "fallback");
 
             if (obj.has("cases")) {
                 JsonArray arr = obj.get("cases").getAsJsonArray();
                 int size = arr.size();
                 select.cases = new ArrayList<>(size);
                 for (int i = 0; i < size; i++) {
-                    select.cases.add(jsonDeserializationContext.deserialize(arr.get(i), Select.Case.class));
+                    Select.Case c = jsonDeserializationContext.deserialize(arr.get(i), Select.Case.class);
+                    c.property = select.property;
+                    select.cases.add(c);
                 }
                 select.cases = Collections.unmodifiableList(select.cases);
             } else {
@@ -171,18 +225,42 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
                     conditions.add(property.asPredicateCondition(predicateObj.getValue()));
                 }
                 result.predicate = Collections.unmodifiableList(conditions);
-            } else {
-                result.predicate = Collections.emptyList();
             }
 
             if (obj.has("model")) {
-                result.model = MinecraftModel.of(obj.get("model").getAsString());
-            } else {
-                result.model = MinecraftModel.NOT_SET;
+                result.models = Collections.singletonList(MinecraftModel.of(obj.get("model").getAsString()));
             }
 
             return result;
         });
+    }
+
+    private static ItemModelProperty tryParseProperty(JsonDeserializationContext jsonDeserializationContext, JsonObject obj, String key) {
+        if (!obj.has(key)) {
+            return ItemModelProperty.NONE;
+        }
+
+        String name = "<unknown>";
+        try {
+            name = obj.get(key).getAsString();
+            return ItemModelProperty.get(name, obj);
+        } catch (Throwable t) {
+            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Failed to deserialize an item model property '" + name + "'", t);
+            return ItemModelProperty.NONE;
+        }
+    }
+
+    private static ItemModel tryParseItemModel(JsonDeserializationContext jsonDeserializationContext, JsonObject obj, String key) {
+        if (!obj.has(key)) {
+            return MinecraftModel.NOT_SET;
+        }
+
+        try {
+            return jsonDeserializationContext.deserialize(obj.get(key), ItemModel.class);
+        } catch (Throwable t) {
+            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Failed to deserialize an item model", t);
+            return MinecraftModel.NOT_SET;
+        }
     }
 
     // Unknown or unsupported
@@ -197,14 +275,38 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
         public void toString(IndentedStringBuilder str) {
             str.append("Unknown { type: ").append(type).append(" }");
         }
+
+        @Override
+        public List<MinecraftModel> resolveModels(CommonItemStack item) {
+            return Collections.emptyList();
+        }
+
+        @Override
+        protected void populateModelChain(ItemModelPredicate.ModelChain chain) {
+        }
     }
 
     /**
      * The root document of the item model json file
      */
     public static class Root extends ItemModel {
-        public ItemModel model;
+        protected ItemModel model;
         public boolean hand_animation_on_swap = true;
+
+        public ItemModel getModel() {
+            ItemModel model = this.model;
+            return (model != null) ? model : MinecraftModel.NOT_SET;
+        }
+
+        @Override
+        public List<MinecraftModel> resolveModels(CommonItemStack item) {
+            return getModel().resolveModels(item);
+        }
+
+        @Override
+        protected void populateModelChain(ItemModelPredicate.ModelChain chain) {
+            getModel().populateModelChain(chain);
+        }
 
         @Override
         public void toString(IndentedStringBuilder str) {
@@ -217,6 +319,7 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
     public static class MinecraftModel extends ItemModel {
         /** Placeholder model value when a ModelInfo field is not set, such as with range_dispatch fallback */
         public static final MinecraftModel NOT_SET = new MinecraftModel();
+        public static final List<MinecraftModel> NOT_SET_LIST = Collections.singletonList(NOT_SET);
         static {
             NOT_SET.model = "minecraft:builtin/missing";
         }
@@ -228,6 +331,16 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
         }
 
         public String model;
+
+        @Override
+        public List<MinecraftModel> resolveModels(CommonItemStack item) {
+            return Collections.singletonList(this);
+        }
+
+        @Override
+        protected void populateModelChain(ItemModelPredicate.ModelChain chain) {
+            chain.addModel(this);
+        }
 
         @Override
         public void toString(IndentedStringBuilder str) {
@@ -246,6 +359,24 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
         public MinecraftModel fallback = MinecraftModel.NOT_SET;
 
         @Override
+        public List<MinecraftModel> resolveModels(CommonItemStack item) {
+            for (OverriddenModel override : overrides) {
+                if (override.isMatching(item)) {
+                    return override.getOverrideModels();
+                }
+            }
+            return Collections.singletonList(fallback);
+        }
+
+        @Override
+        protected void populateModelChain(ItemModelPredicate.ModelChain chain) {
+            for (OverriddenModel override : overrides) {
+                chain.next(override).addModels(override.models);
+            }
+            chain.next(PredicateCondition.ALWAYS_TRUE_PREDICATE).addModel(fallback);
+        }
+
+        @Override
         public void toString(IndentedStringBuilder str) {
             str.append("Predicate Overrides {");
             str.indent()
@@ -256,9 +387,41 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
             str.append("\n}");
         }
 
-        public static class OverriddenModel implements IndentedStringBuilder.AppendableToString {
-            public List<PredicateCondition<?>> predicate;
-            public MinecraftModel model;
+        public static class OverriddenModel implements IndentedStringBuilder.AppendableToString, ItemModelOverride {
+            public List<PredicateCondition<?>> predicate = Collections.emptyList();
+            public List<MinecraftModel> models = MinecraftModel.NOT_SET_LIST;
+
+            @Override
+            public boolean isMatching(CommonItemStack item) {
+                for (PredicateCondition<?> condition : predicate) {
+                    if (!condition.isMatching(item)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            @Override
+            public boolean isMatchingAlways() {
+                return predicate.isEmpty();
+            }
+
+            @Override
+            public Optional<CommonItemStack> tryMakeMatching(CommonItemStack item) {
+                Optional<CommonItemStack> result = Optional.of(item);
+                for (PredicateCondition<?> condition : predicate) {
+                    result = condition.tryMakeMatching(result.get());
+                    if (!result.isPresent()) {
+                        break;
+                    }
+                }
+                return result;
+            }
+
+            @Override
+            public List<MinecraftModel> getOverrideModels() {
+                return models;
+            }
 
             @Override
             public String toString() {
@@ -272,20 +435,22 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
                         .append("\npredicate: [")
                         .appendWithIndent(predicatesStr -> predicatesStr.appendLines(predicate))
                         .append("\n]")
-                        .append("\nmodel: ").append(model);
+                        .append("\nmodel: ").append(models.get(0)); // Always stores exactly one model
                 str.append("\n}");
             }
         }
 
-        public static class PredicateCondition<T> implements IndentedStringBuilder.AppendableToString {
+        public static class PredicateCondition<T> implements IndentedStringBuilder.AppendableToString, ItemModelPredicate {
             public ItemModelProperty.PredicateProperty<T> property;
             public @Nullable T value;
 
+            @Override
             public boolean isMatching(CommonItemStack item) {
                 return value != null && property.isMatchingPredicate(item, value);
             }
 
-            public Optional<CommonItemStack> tryApply(CommonItemStack item) {
+            @Override
+            public Optional<CommonItemStack> tryMakeMatching(CommonItemStack item) {
                 return (value == null) ? Optional.empty() : property.tryApplyPredicate(item, value);
             }
 
@@ -311,6 +476,24 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
         public ItemModel on_false;
 
         @Override
+        public List<MinecraftModel> resolveModels(CommonItemStack item) {
+            boolean isTrue = (property instanceof ItemModelProperty.BooleanProperty) &&
+                    ((ItemModelProperty.BooleanProperty) property).testCondition(item);
+            return (isTrue ? on_true : on_false).resolveModels(item);
+        }
+
+        @Override
+        protected void populateModelChain(ItemModelPredicate.ModelChain chain) {
+            if (property instanceof ItemModelProperty.BooleanProperty) {
+                ItemModelProperty.BooleanProperty bProp = (ItemModelProperty.BooleanProperty) property;
+                on_true.populateModelChain(chain.next(bProp.asPredicate(true)));
+                on_false.populateModelChain(chain.next(bProp.asPredicate(false)));
+            } else {
+                on_false.populateModelChain(chain);
+            }
+        }
+
+        @Override
         public void toString(IndentedStringBuilder str) {
             str.append("Condition {");
             str.indent()
@@ -326,9 +509,27 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
         public List<Entry> entries;
         public ItemModel fallback;
 
-        public static class Entry {
-            public double threshold;
-            public ItemModel model;
+        @Override
+        public List<MinecraftModel> resolveModels(CommonItemStack item) {
+            if (property instanceof ItemModelProperty.NumericProperty) {
+                double propertyValue = ((ItemModelProperty.NumericProperty) property).getNumericValue(item);
+                List<Entry> entries = this.entries;
+                for (int i = entries.size() - 1; i >= 0; --i) {
+                    Entry e = entries.get(i);
+                    if (propertyValue >= e.minThreshold) {
+                        return e.model.resolveModels(item);
+                    }
+                }
+            }
+            return fallback.resolveModels(item);
+        }
+
+        @Override
+        protected void populateModelChain(ItemModelPredicate.ModelChain chain) {
+            for (Entry e : entries) {
+                e.model.populateModelChain(chain.next(e));
+            }
+            fallback.populateModelChain(chain.next(ItemModelPredicate.ALWAYS_TRUE_PREDICATE));
         }
 
         @Override
@@ -342,7 +543,7 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
                 for (Entry e : entries) {
                     entryStr.append("\n{");
                     entryStr.indent()
-                            .append("\nthreshold: ").append(e.threshold)
+                            .append("\nthreshold: ").append(e.minThreshold)
                             .append("\nmodel: ").append(e.model);
                     entryStr.append("\n}");
                 }
@@ -351,14 +552,57 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
             ind.append("\nfallback: ").append(fallback);
             str.append("\n}");
         }
+
+        public static class Entry implements ItemModelPredicate {
+            protected transient ItemModelProperty property = ItemModelProperty.NONE;
+            @SerializedName("threshold")
+            public double minThreshold = -Double.MAX_VALUE;
+            public transient double maxThreshold = Double.MAX_VALUE;
+            public ItemModel model = MinecraftModel.NOT_SET;
+
+            @Override
+            public boolean isMatching(CommonItemStack item) {
+                if (!(property instanceof ItemModelProperty.NumericProperty)) {
+                    return false;
+                }
+
+                double propertyValue = ((ItemModelProperty.NumericProperty) property).getNumericValue(item);
+                return propertyValue >= minThreshold && propertyValue < maxThreshold;
+            }
+
+            @Override
+            public Optional<CommonItemStack> tryMakeMatching(CommonItemStack item) {
+                if (!(property instanceof ItemModelProperty.NumericProperty)) {
+                    return Optional.empty();
+                }
+
+                return ((ItemModelProperty.NumericProperty) property).setNumericValue(item, minThreshold);
+            }
+        }
     }
 
     public static class Composite extends ItemModel {
-        public List<Model> models;
+        public List<ItemModel> models = Collections.emptyList();
+
+        @Override
+        public List<MinecraftModel> resolveModels(CommonItemStack item) {
+            return models.stream()
+                    .flatMap(m -> m.resolveModels(item).stream())
+                    .collect(Collectors.toList());
+        }
+
+        @Override
+        protected void populateModelChain(ItemModelPredicate.ModelChain chain) {
+            for (ItemModel model : models) {
+                model.populateModelChain(chain);
+            }
+        }
 
         @Override
         public void toString(IndentedStringBuilder str) {
-            str.append("Composite {}");
+            str.append("Composite [");
+            str.indent().appendLines(models);
+            str.append("\n]");
         }
     }
 
@@ -367,9 +611,25 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
         public List<Case> cases;
         public ItemModel fallback;
 
-        public static class Case {
-            public List<String> when; // singleton list for one value
-            public ItemModel model;
+        @Override
+        public List<MinecraftModel> resolveModels(CommonItemStack item) {
+            if (property instanceof ItemModelProperty.StringProperty) {
+                String propertyValue = ((ItemModelProperty.StringProperty) property).getStringValue(item);
+                for (Case c : cases) {
+                    if (c.when.contains(propertyValue)) {
+                        return c.model.resolveModels(item);
+                    }
+                }
+            }
+            return fallback.resolveModels(item);
+        }
+
+        @Override
+        protected void populateModelChain(ItemModelPredicate.ModelChain chain) {
+            for (Case c : cases) {
+                c.model.populateModelChain(chain.next(c));
+            }
+            fallback.populateModelChain(chain.next(ItemModelPredicate.ALWAYS_TRUE_PREDICATE));
         }
 
         @Override
@@ -391,6 +651,34 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
             ind.append("\n]");
             ind.append("\nfallback: ").append(fallback);
             str.append("\n}");
+        }
+
+        public static class Case implements ItemModelPredicate {
+            protected transient ItemModelProperty property = ItemModelProperty.NONE;
+            public List<String> when = Collections.emptyList(); // match-any
+            public ItemModel model = MinecraftModel.NOT_SET;
+
+            @Override
+            public boolean isMatching(CommonItemStack item) {
+                if (!(property instanceof ItemModelProperty.StringProperty)) {
+                    return false;
+                }
+
+                String propertyValue = ((ItemModelProperty.StringProperty) property).getStringValue(item);
+                return when.contains(propertyValue);
+            }
+
+            @Override
+            public Optional<CommonItemStack> tryMakeMatching(CommonItemStack item) {
+                if (!(property instanceof ItemModelProperty.StringProperty)) {
+                    return Optional.empty();
+                }
+                if (when.isEmpty()) {
+                    return Optional.of(item); // Always matches I guess?
+                }
+
+                return ((ItemModelProperty.StringProperty) property).applyStringValue(item, when.get(0));
+            }
         }
     }
 }

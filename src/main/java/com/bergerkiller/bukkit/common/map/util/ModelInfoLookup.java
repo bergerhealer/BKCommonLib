@@ -32,14 +32,13 @@ public class ModelInfoLookup {
         Material type = item.getType();
         if (MaterialUtil.isBlock(type)) {
             BlockRenderOptions blockOpt = BlockData.fromItemStack(item).getDefaultRenderOptions();
-            return new ItemRenderOptions(item.toBukkit(), blockOpt);
+            return new ItemRenderOptions(item, blockOpt);
         }
 
-        ItemStack bukkitItem = item.toBukkit();
         ItemStackHandle handle = item.getHandle().orElseThrow(() -> new IllegalStateException("Item should not be empty"));
 
         // Some items, like leather boots, require additional render options passed
-        ItemRenderOptions options = new ItemRenderOptions(bukkitItem, "");
+        ItemRenderOptions options = new ItemRenderOptions(item, "");
         if (MaterialUtil.ISLEATHERARMOR.get(type)) {
             options.put("layer0tint", String.format("#%06x", handle.getLeatherArmorColor()));
         }

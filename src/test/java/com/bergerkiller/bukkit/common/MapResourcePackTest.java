@@ -3,14 +3,20 @@ package com.bergerkiller.bukkit.common;
 import static org.junit.Assert.*;
 
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import com.bergerkiller.bukkit.common.map.util.ItemModel;
+import com.bergerkiller.bukkit.common.map.util.ItemModelOverride;
 import com.bergerkiller.bukkit.common.map.util.VanillaResourcePackFormat;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.junit.Ignore;
@@ -49,6 +55,38 @@ public class MapResourcePackTest {
         // Verify it can detect the golden_pickaxe override and doesn't list anything else
         assertEquals(Collections.singleton("golden_pickaxe"), pack.listOverriddenItemModelNames());
 
+        // Verify all the overrides we expect are listed in the same order as the overrides listing
+        // TODO: Merge these into one method
+        List<ItemModelOverride> overrides = pack.getItemModel("golden_pickaxe").listAllOverrides();
+        CommonItemStack item = CommonItemStack.create(MaterialUtil.getFirst("GOLDEN_PICKAXE", "LEGACY_GOLDEN_PICKAXE"), 1);
+
+        // Verify the overrides match what we expect
+        List<OverrideResult> results = validateOverrides(item, overrides);
+
+        //System.out.println(results);
+
+        assertEquals(16, results.size());
+
+        results.get(0).assertUnbreakableWithDamage("traincarts:nubx/traincarts_locomotive_full", 10);
+        results.get(1).assertUnbreakableWithDamage("traincarts:nubx/traincarts_locomotive_base", 11);
+        results.get(2).assertUnbreakableWithDamage("traincarts:nubx/traincarts_locomotive_wheels", 12);
+        results.get(3).assertUnbreakableWithDamage("traincarts:nubx/traincarts_locomotive_piston", 13);
+
+        results.get(4).assertUnbreakableWithDamage("traincarts:maxi/coaster_cart_red", 17);
+        results.get(5).assertUnbreakableWithDamage("traincarts:maxi/coaster_cart_green", 18);
+        results.get(6).assertUnbreakableWithDamage("traincarts:maxi/coaster_cart_blue", 19);
+
+        results.get(7).assertUnbreakableWithDamage("traincarts:nubx/traincarts_carriage_red_full", 20);
+        results.get(8).assertUnbreakableWithDamage("traincarts:nubx/traincarts_carriage_green_full", 21);
+        results.get(9).assertUnbreakableWithDamage("traincarts:nubx/traincarts_carriage_blue_full", 22);
+        results.get(10).assertUnbreakableWithDamage("traincarts:nubx/traincarts_carriage_red_base", 23);
+        results.get(11).assertUnbreakableWithDamage("traincarts:nubx/traincarts_carriage_green_base", 24);
+        results.get(12).assertUnbreakableWithDamage("traincarts:nubx/traincarts_carriage_blue_base", 25);
+        results.get(13).assertUnbreakableWithDamage("traincarts:nubx/traincarts_carriage_wheels", 26);
+
+        results.get(14).assertDefaultItem("minecraft:item/golden_pickaxe");
+        results.get(15).assertDefaultItem("item/golden_pickaxe");
+
         //System.out.println(pack.getItemModel("golden_pickaxe"));
     }
 
@@ -67,6 +105,19 @@ public class MapResourcePackTest {
         // golden_sword: Uses custom model data flags + strings (condition + select)
         assertEquals(new HashSet<>(Arrays.asList("golden_pickaxe", "golden_axe", "golden_sword")),
                 pack.listOverriddenItemModelNames());
+
+        ItemModel itemModel = pack.getItemModel("golden_sword");
+
+        /*
+        CommonItemStack item = CommonItemStack.create(Material.GOLDEN_SWORD, 1);
+        for (ItemModelOverride override : itemModel.listAllOverrides()) {
+            Optional<CommonItemStack> overrideItem = override.tryMakeMatching(item);
+            if (overrideItem.isPresent()) {
+                System.out.println("- Item: " + overrideItem);
+                System.out.println("  Model: " + override.getOverrideModels());
+            }
+        }
+         */
 
         //System.out.println(pack.getItemModel("golden_sword"));
     }
@@ -253,6 +304,68 @@ public class MapResourcePackTest {
         }
         if (hasLoadErrors) {
             fail("Some block models could not be loaded!");
+        }
+    }
+
+    private static List<OverrideResult> validateOverrides(CommonItemStack baseItem, List<ItemModelOverride> overrides) {
+        List<OverrideResult> results = new ArrayList<>();
+        for (ItemModelOverride override : overrides) {
+            Optional<CommonItemStack> item = override.tryMakeMatching(baseItem);
+            if (override.getOverrideModels().isEmpty()) {
+                if (item.isPresent()) {
+                    fail("Override with item " + item.get() + " has no models set");
+                } else {
+                    fail("An override exists with no item and no models set");
+                }
+            } else if (!item.isPresent()) {
+                fail("Failed to make item for override " + override.getOverrideModels().get(0).model);
+            } else if (override.getOverrideModels().size() > 1) {
+                System.out.println("List of models:");
+                for (ItemModel.MinecraftModel model : override.getOverrideModels()) {
+                    System.out.println("  Model: " + model);
+                }
+                fail("Override with item " + item.get() + " has too many models (" + override.getOverrideModels().size() + ")");
+            } else {
+                // Also check the item it produced actually matches true with the predicate
+                if (!override.isMatching(item.get())) {
+                    fail("Override with item " + item.get() + " does not actually match the predicate for " + override.getOverrideModels().get(0).model);
+                } else {
+                    results.add(new OverrideResult(item.get(), override.getOverrideModels().get(0).model));
+                }
+            }
+        }
+        return results;
+    }
+
+    private static class OverrideResult {
+        public final CommonItemStack item;
+        public final String model;
+
+        public OverrideResult(CommonItemStack item, String model) {
+            this.item = item;
+            this.model = model;
+        }
+
+        public void assertDefaultItem(String expectedModelName) {
+            assertFalse("item with model " + model + " is unbreakable", item.isUnbreakable());
+            assertEquals("item with model " + model + " has a damage value", 0, item.getDamage());
+            assertEquals("item with model " + model + " has a custom model data value", -1, item.getCustomModelData());
+            assertEquals("item " + this.item + " has the wrong model", expectedModelName, this.model);
+        }
+
+        public void assertUnbreakableWithDamage(String expectedModelName, int expectedDamage) {
+            assertTrue("item with model " + model + " is not unbreakable", item.isUnbreakable());
+            assertEquals("item with model " + model + " has incorrect damage", expectedDamage, item.getDamage());
+            assertEquals("item with model " + model + " has a custom model data value", -1, item.getCustomModelData());
+            assertEquals("item " + this.item + " has the wrong model", expectedModelName, this.model);
+        }
+
+        @Override
+        public String toString() {
+            return "{\n" +
+                    "  item: " + item + "\n" +
+                    "  model: " + model + "\n" +
+                    "}";
         }
     }
 }
