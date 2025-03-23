@@ -70,6 +70,7 @@ public interface ItemModelPredicate {
     final class ModelChain implements ItemModelPredicate {
         private final List<ModelChain> allChainLeafs;
         private final @Nullable ModelChain parent;
+        private final @Nullable CommonItemStack itemStack;
         private final ItemModelPredicate predicate;
         private @Nullable List<ItemModel.MinecraftModel> allModels = null; // cached
         private List<ItemModel.MinecraftModel> models = Collections.emptyList();
@@ -79,10 +80,11 @@ public interface ItemModelPredicate {
          * This empty chain acts as the root terminator element. Will always match true and
          * won't do anything to make an item match.
          *
+         * @param itemStack The ItemStack that is the base vanilla item, or null if not available
          * @return Empty ModelChain root
          */
-        public static ModelChain newRoot() {
-            return new ModelChain(null, new ArrayList<>(), ALWAYS_TRUE_PREDICATE /* not really used */);
+        public static ModelChain newRoot(@Nullable CommonItemStack itemStack) {
+            return new ModelChain(null, new ArrayList<>(), itemStack, ALWAYS_TRUE_PREDICATE /* not really used */);
         }
 
         /**
@@ -93,13 +95,14 @@ public interface ItemModelPredicate {
          * @return New Chain
          */
         public ModelChain next(ItemModelPredicate predicate) {
-            return new ModelChain(this, allChainLeafs, predicate);
+            CommonItemStack nextItem = (itemStack == null) ? null : predicate.tryMakeMatching(itemStack).orElse(null);
+            return new ModelChain(this, allChainLeafs, nextItem, predicate);
         }
 
         /**
          * Gets all model chain leaf nodes that have been produced so far. Every time
          * {@link #next(ItemModelPredicate)} is called, a new leaf node is created.
-         * This includes the {@link #newRoot() root} chain node.
+         * This includes the {@link #newRoot(CommonItemStack) root} chain node.
          *
          * @return All model chain leafs produced
          */
@@ -107,9 +110,10 @@ public interface ItemModelPredicate {
             return allChainLeafs;
         }
 
-        private ModelChain(@Nullable ModelChain parent, List<ModelChain> allChainLeafs, ItemModelPredicate predicate) {
+        private ModelChain(@Nullable ModelChain parent, List<ModelChain> allChainLeafs, @Nullable CommonItemStack itemStack, ItemModelPredicate predicate) {
             this.allChainLeafs = allChainLeafs;
             this.parent = parent;
+            this.itemStack = itemStack;
             this.predicate = predicate;
             allChainLeafs.add(this);
         }
@@ -161,10 +165,10 @@ public interface ItemModelPredicate {
                         return asOverride;
                     }
                 }
-                return ItemModelOverride.of(predicate, allModels);
+                return ItemModelOverride.of(itemStack, predicate, allModels);
             } else {
                 // Makes use of the chain predicate logic, which checks parents too
-                return ItemModelOverride.of(this, allModels);
+                return ItemModelOverride.of(itemStack, this, allModels);
             }
         }
 

@@ -50,12 +50,29 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
      * Creates a flattened List of all item model overrides that exist for this
      * item model configuration. This might not be perfectly accurate if identical
      * predicates exist in several places of the item model tree, but it works
-     * well enough for most usual cases.
+     * well enough for most usual cases.<br>
+     * <br>
+     * For the root entry, this automatically sets the base ItemStack. So the
+     * override {@link ItemModelOverride#getItemStack()} can be used. This will
+     * not happen for nested entries.
      *
      * @return Flattened List of ItemModelOverrides
      */
-    public final List<ItemModelOverride> listAllOverrides() {
-        ItemModelPredicate.ModelChain root = ItemModelPredicate.ModelChain.newRoot();
+    public List<ItemModelOverride> listAllOverrides() {
+        return listAllOverrides(null);
+    }
+
+    /**
+     * Creates a flattened List of all item model overrides that exist for this
+     * item model configuration. This might not be perfectly accurate if identical
+     * predicates exist in several places of the item model tree, but it works
+     * well enough for most usual cases.
+     *
+     * @param baseItemStack The base ItemStack that displays this vanilla item, or null if not available
+     * @return Flattened List of ItemModelOverrides
+     */
+    public final List<ItemModelOverride> listAllOverrides(@Nullable CommonItemStack baseItemStack) {
+        ItemModelPredicate.ModelChain root = ItemModelPredicate.ModelChain.newRoot(baseItemStack);
         this.populateModelChain(root);
 
         return root.getAllLeafs().stream()
@@ -290,12 +307,19 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
      * The root document of the item model json file
      */
     public static class Root extends ItemModel {
-        protected ItemModel model;
+        /** Set to the vanilla ItemStack that displays the model, if available */
+        public transient @Nullable CommonItemStack baseItemStack = null;
+        public ItemModel model;
         public boolean hand_animation_on_swap = true;
 
         public ItemModel getModel() {
             ItemModel model = this.model;
             return (model != null) ? model : MinecraftModel.NOT_SET;
+        }
+
+        @Override
+        public List<ItemModelOverride> listAllOverrides() {
+            return listAllOverrides(baseItemStack);
         }
 
         @Override
@@ -354,9 +378,9 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
      */
     public static class Overrides extends ItemModel {
         /** List of model overrides based on the predicates system */
-        public List<OverriddenModel> overrides;
+        public List<OverriddenModel> overrides = Collections.emptyList();
         /** Model to use if none of the overrides match. Refers to the original item model */
-        public MinecraftModel fallback = MinecraftModel.NOT_SET;
+        public transient MinecraftModel fallback = MinecraftModel.NOT_SET;
 
         @Override
         public List<MinecraftModel> resolveModels(CommonItemStack item) {
@@ -391,6 +415,9 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
             public List<PredicateCondition<?>> predicate = Collections.emptyList();
             public List<MinecraftModel> models = MinecraftModel.NOT_SET_LIST;
 
+            /** Set to the ItemStack that will display this overridden model. Set externally. */
+            public @Nullable CommonItemStack itemStack = null;
+
             @Override
             public boolean isMatching(CommonItemStack item) {
                 for (PredicateCondition<?> condition : predicate) {
@@ -421,6 +448,11 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
             @Override
             public List<MinecraftModel> getOverrideModels() {
                 return models;
+            }
+
+            @Override
+            public Optional<CommonItemStack> getItemStack() {
+                return Optional.ofNullable(itemStack);
             }
 
             @Override

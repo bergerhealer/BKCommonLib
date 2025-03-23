@@ -106,20 +106,18 @@ public class MapResourcePackTest {
         assertEquals(new HashSet<>(Arrays.asList("golden_pickaxe", "golden_axe", "golden_sword")),
                 pack.listOverriddenItemModelNames());
 
+        /*
         ItemModel itemModel = pack.getItemModel("golden_sword");
 
-        /*
         CommonItemStack item = CommonItemStack.create(Material.GOLDEN_SWORD, 1);
         for (ItemModelOverride override : itemModel.listAllOverrides()) {
-            Optional<CommonItemStack> overrideItem = override.tryMakeMatching(item);
+            Optional<CommonItemStack> overrideItem = override.getItemStack();
             if (overrideItem.isPresent()) {
                 System.out.println("- Item: " + overrideItem);
                 System.out.println("  Model: " + override.getOverrideModels());
             }
         }
-         */
-
-        //System.out.println(pack.getItemModel("golden_sword"));
+        */
     }
 
     @Ignore
@@ -310,7 +308,7 @@ public class MapResourcePackTest {
     private static List<OverrideResult> validateOverrides(CommonItemStack baseItem, List<ItemModelOverride> overrides) {
         List<OverrideResult> results = new ArrayList<>();
         for (ItemModelOverride override : overrides) {
-            Optional<CommonItemStack> item = override.tryMakeMatching(baseItem);
+            Optional<CommonItemStack> item = override.getItemStack();
             if (override.getOverrideModels().isEmpty()) {
                 if (item.isPresent()) {
                     fail("Override with item " + item.get() + " has no models set");
@@ -318,7 +316,7 @@ public class MapResourcePackTest {
                     fail("An override exists with no item and no models set");
                 }
             } else if (!item.isPresent()) {
-                fail("Failed to make item for override " + override.getOverrideModels().get(0).model);
+                fail("Failed to get item for override " + override.getOverrideModels().get(0).model);
             } else if (override.getOverrideModels().size() > 1) {
                 System.out.println("List of models:");
                 for (ItemModel.MinecraftModel model : override.getOverrideModels()) {
@@ -330,7 +328,17 @@ public class MapResourcePackTest {
                 if (!override.isMatching(item.get())) {
                     fail("Override with item " + item.get() + " does not actually match the predicate for " + override.getOverrideModels().get(0).model);
                 } else {
-                    results.add(new OverrideResult(item.get(), override.getOverrideModels().get(0).model));
+                    // Also verify getItemStack() == tryMakeMatching()
+                    Optional<CommonItemStack> madeMatching = override.tryMakeMatching(baseItem);
+                    if (!madeMatching.isPresent()) {
+                        fail("Failed to make item with tryMakeMatching() for override " + override.getOverrideModels().get(0).model);
+                    } else if (!item.get().equals(madeMatching.get())) {
+                        System.out.println("Expected: " + item.get());
+                        System.out.println("But made: " + madeMatching.get());
+                        fail("The resulting item from tryMakeMatching() for override " + override.getOverrideModels().get(0).model + " does not match");
+                    } else {
+                        results.add(new OverrideResult(item.get(), override.getOverrideModels().get(0).model));
+                    }
                 }
             }
         }

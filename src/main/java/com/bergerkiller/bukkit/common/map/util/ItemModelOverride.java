@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.map.util;
 
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,13 +23,24 @@ public interface ItemModelOverride extends ItemModelPredicate {
     List<ItemModel.MinecraftModel> getOverrideModels();
 
     /**
+     * Gets the ItemStack that will display this model override. This is the base
+     * vanilla item with all override predicates applied, if possible. If some of
+     * these predicates could not be applied, or the item name is invalid, then this will
+     * return empty.
+     *
+     * @return ItemStack that displays this model override, or empty if not available
+     */
+    Optional<CommonItemStack> getItemStack();
+
+    /**
      * Creates a new override for a case that is true by default, always returning a
      * specific List of models.
      *
+     * @param itemStack The ItemStack that will display this override, use null if not available
      * @param models List of models
      * @return ItemModelOverride
      */
-    static ItemModelOverride of(final List<ItemModel.MinecraftModel> models) {
+    static ItemModelOverride of(@Nullable final CommonItemStack itemStack, final List<ItemModel.MinecraftModel> models) {
         return new ItemModelOverride() {
             @Override
             public boolean isMatching(CommonItemStack item) {
@@ -49,17 +61,23 @@ public interface ItemModelOverride extends ItemModelPredicate {
             public List<ItemModel.MinecraftModel> getOverrideModels() {
                 return models;
             }
+
+            @Override
+            public Optional<CommonItemStack> getItemStack() {
+                return Optional.ofNullable(itemStack);
+            }
         };
     }
 
     /**
      * Creates a new override by combining a predicate and a List of models
      *
+     * @param itemStack The ItemStack that will display this override, use null if not available
      * @param predicate ItemModelPredicate
      * @param models List of models
      * @return ItemModelOverride
      */
-    static ItemModelOverride of(final ItemModelPredicate predicate, final List<ItemModel.MinecraftModel> models) {
+    static ItemModelOverride of(@Nullable final CommonItemStack itemStack, final ItemModelPredicate predicate, final List<ItemModel.MinecraftModel> models) {
         return new ItemModelOverride() {
             @Override
             public boolean isMatching(CommonItemStack item) {
@@ -79,6 +97,11 @@ public interface ItemModelOverride extends ItemModelPredicate {
             @Override
             public List<ItemModel.MinecraftModel> getOverrideModels() {
                 return models;
+            }
+
+            @Override
+            public Optional<CommonItemStack> getItemStack() {
+                return Optional.ofNullable(itemStack);
             }
         };
     }

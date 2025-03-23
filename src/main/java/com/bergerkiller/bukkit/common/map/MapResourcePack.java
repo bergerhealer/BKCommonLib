@@ -374,12 +374,40 @@ public class MapResourcePack {
      * @return the model information
      */
     public ItemModel getItemModel(String itemName) {
+        // Look up the vanilla item that will display this item model name
+        CommonItemStack baseItemStack = ModelInfoLookup.findItemStackByModelName(itemName).orElse(null);
+
+        // Attempt to load the item model details. This could fail if files are corrupted or invalid.
+        ItemModel.Root root;
         if (getMetadata().hasItemOverrides()) {
-            return this.openGsonObject(ItemModel.Root.class, ResourceType.ITEMS, itemName);
+            root = this.openGsonObject(ItemModel.Root.class, ResourceType.ITEMS, itemName);
         } else {
-            // Legacy stores all the information we want in the model itself
-            return this.getModelInfo("item/" + itemName).asItemModel();
+            ItemModel.MinecraftModel vanillaModel = ItemModel.MinecraftModel.of("item/" + itemName);
+            ItemModel.Overrides overrides = openGsonObject(ItemModel.Overrides.class, ResourceType.MODELS, vanillaModel.model);
+            if (overrides != null) {
+                overrides.fallback = vanillaModel;
+                if (baseItemStack != null) {
+                    for (ItemModel.Overrides.OverriddenModel override : overrides.overrides) {
+                        override.itemStack = override.tryMakeMatching(baseItemStack).orElse(null);
+                    }
+                }
+                root = new ItemModel.Root();
+                root.model = overrides;
+            } else {
+                root = null;
+            }
         }
+
+        // If parsing failed, produce a fallback model
+        if (root == null) {
+            root = new ItemModel.Root();
+            root.model = ItemModel.MinecraftModel.NOT_SET;
+        }
+
+        // Provide a base item, which is used by the override listing
+        root.baseItemStack = baseItemStack;
+
+        return root;
     }
 
     /**
