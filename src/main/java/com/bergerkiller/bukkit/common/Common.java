@@ -64,7 +64,8 @@ public class Common {
             "Common:SignEditTextEvent",
             "Common:PacketListener:SetPacket",
             "Common:Packet:MinecartMovementPacket",
-            "Common:WorldUtil:HasFeatureFlag"
+            "Common:WorldUtil:HasFeatureFlag",
+            "Common:ResourcePack:ItemModel"
     ).collect(Collectors.toSet());
 
     /**
