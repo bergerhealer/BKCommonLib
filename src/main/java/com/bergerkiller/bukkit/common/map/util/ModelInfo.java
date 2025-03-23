@@ -104,7 +104,7 @@ public class ModelInfo {
      *
      * @return Overrides
      * @deprecated Please use the new {@link ItemModel} API instead with
-     *             {@link com.bergerkiller.bukkit.common.map.MapResourcePack#getItemModel(String) getItemModel()}
+     *             {@link com.bergerkiller.bukkit.common.map.MapResourcePack#getItemModelConfig(String) getItemModelConfig()}
      */
     @Deprecated
     public final List<ModelOverride> getOverrides() {

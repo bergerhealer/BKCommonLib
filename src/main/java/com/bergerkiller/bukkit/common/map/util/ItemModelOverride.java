@@ -23,6 +23,21 @@ public interface ItemModelOverride extends ItemModelPredicate {
     List<ItemModel.MinecraftModel> getOverrideModels();
 
     /**
+     * Gets whether any valid models exist for override. If false, then {@link #getOverrideModels()}
+     * will only ever return {@link ItemModel.MinecraftModel#NOT_SET} or an empty list.
+     *
+     * @return True if item models exist
+     */
+    default boolean hasValidOverrideModels() {
+        for (ItemModel.MinecraftModel model : getOverrideModels()) {
+            if (model.hasValidModels()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Gets the ItemStack that will display this model override. This is the base
      * vanilla item with all override predicates applied, if possible. If some of
      * these predicates could not be applied, or the item name is invalid, then this will

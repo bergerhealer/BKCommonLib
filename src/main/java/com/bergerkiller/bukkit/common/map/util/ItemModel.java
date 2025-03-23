@@ -47,6 +47,14 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
     public abstract List<MinecraftModel> resolveModels(CommonItemStack item);
 
     /**
+     * Gets whether any valid models exist. If false, then {@link #resolveModels(CommonItemStack)}
+     * will only ever return {@link MinecraftModel#NOT_SET}.
+     *
+     * @return True if item models exist
+     */
+    public abstract boolean hasValidModels();
+
+    /**
      * Creates a flattened List of all item model overrides that exist for this
      * item model configuration. This might not be perfectly accurate if identical
      * predicates exist in several places of the item model tree, but it works
@@ -299,6 +307,11 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
         }
 
         @Override
+        public boolean hasValidModels() {
+            return false;
+        }
+
+        @Override
         protected void populateModelChain(ItemModelPredicate.ModelChain chain) {
         }
     }
@@ -328,6 +341,11 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
         }
 
         @Override
+        public boolean hasValidModels() {
+            return getModel().hasValidModels();
+        }
+
+        @Override
         protected void populateModelChain(ItemModelPredicate.ModelChain chain) {
             getModel().populateModelChain(chain);
         }
@@ -341,7 +359,7 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
     }
 
     public static class MinecraftModel extends ItemModel {
-        /** Placeholder model value when a ModelInfo field is not set, such as with range_dispatch fallback */
+        /** Placeholder model value when an ItemModel model field is not set, such as with range_dispatch fallback */
         public static final MinecraftModel NOT_SET = new MinecraftModel();
         public static final List<MinecraftModel> NOT_SET_LIST = Collections.singletonList(NOT_SET);
         static {
@@ -364,6 +382,11 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
         @Override
         protected void populateModelChain(ItemModelPredicate.ModelChain chain) {
             chain.addModel(this);
+        }
+
+        @Override
+        public boolean hasValidModels() {
+            return this != NOT_SET;
         }
 
         @Override
@@ -390,6 +413,21 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
                 }
             }
             return Collections.singletonList(fallback);
+        }
+
+        @Override
+        public boolean hasValidModels() {
+            if (fallback.hasValidModels()) {
+                return true;
+            }
+
+            for (OverriddenModel override : overrides) {
+                if (override.hasValidOverrideModels()) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         @Override
@@ -515,6 +553,11 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
         }
 
         @Override
+        public boolean hasValidModels() {
+            return on_true.hasValidModels() || on_false.hasValidModels();
+        }
+
+        @Override
         protected void populateModelChain(ItemModelPredicate.ModelChain chain) {
             if (property instanceof ItemModelProperty.BooleanProperty) {
                 ItemModelProperty.BooleanProperty bProp = (ItemModelProperty.BooleanProperty) property;
@@ -554,6 +597,21 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
                 }
             }
             return fallback.resolveModels(item);
+        }
+
+        @Override
+        public boolean hasValidModels() {
+            if (fallback.hasValidModels()) {
+                return true;
+            }
+
+            for (Entry e : entries) {
+                if (e.model.hasValidModels()) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         @Override
@@ -624,6 +682,16 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
         }
 
         @Override
+        public boolean hasValidModels() {
+            for (ItemModel model : models) {
+                if (model.hasValidModels()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
         protected void populateModelChain(ItemModelPredicate.ModelChain chain) {
             for (ItemModel model : models) {
                 model.populateModelChain(chain);
@@ -654,6 +722,21 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
                 }
             }
             return fallback.resolveModels(item);
+        }
+
+        @Override
+        public boolean hasValidModels() {
+            if (fallback.hasValidModels()) {
+                return true;
+            }
+
+            for (Case c : cases) {
+                if (c.model.hasValidModels()) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         @Override

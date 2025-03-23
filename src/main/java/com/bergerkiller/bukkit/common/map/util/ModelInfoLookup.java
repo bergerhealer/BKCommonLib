@@ -193,12 +193,15 @@ public class ModelInfoLookup {
     }
 
     public static String lookupItem(ItemRenderOptions options) {
-        CommonItemStack item = options.getCommonItem();
-        List<ModelNameEntry> entries = byMaterial.get(item.getType());
+        return lookupItem(options.getCommonItem());
+    }
+
+    public static String lookupItem(CommonItemStack itemStack) {
+        List<ModelNameEntry> entries = byMaterial.get(itemStack.getType());
         if (entries.size() > 1) {
             // Got to match it to the item
             for (ModelNameEntry entry : entries) {
-                if (entry.matchDynamicItem(item)) {
+                if (entry.matchDynamicItem(itemStack)) {
                     return entry.getItemName().orElse("unknown");
                 }
             }

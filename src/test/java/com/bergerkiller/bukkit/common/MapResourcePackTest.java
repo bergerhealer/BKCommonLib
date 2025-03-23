@@ -57,7 +57,7 @@ public class MapResourcePackTest {
 
         // Verify all the overrides we expect are listed in the same order as the overrides listing
         // TODO: Merge these into one method
-        List<ItemModelOverride> overrides = pack.getItemModel("golden_pickaxe").listAllOverrides();
+        List<ItemModelOverride> overrides = pack.getItemModelConfig("golden_pickaxe").listAllOverrides();
         CommonItemStack item = CommonItemStack.create(MaterialUtil.getFirst("GOLDEN_PICKAXE", "LEGACY_GOLDEN_PICKAXE"), 1);
 
         // Verify the overrides match what we expect
@@ -107,7 +107,7 @@ public class MapResourcePackTest {
                 pack.listOverriddenItemModelNames());
 
         /*
-        ItemModel itemModel = pack.getItemModel("golden_sword");
+        ItemModel itemModel = pack.getItemModelConfig("golden_sword");
 
         CommonItemStack item = CommonItemStack.create(Material.GOLDEN_SWORD, 1);
         for (ItemModelOverride override : itemModel.listAllOverrides()) {

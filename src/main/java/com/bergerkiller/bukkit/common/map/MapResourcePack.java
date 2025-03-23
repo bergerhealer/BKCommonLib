@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.map.gson.MapResourcePackDeserializer;
 import com.bergerkiller.bukkit.common.map.util.ItemModel;
-import com.bergerkiller.bukkit.common.map.util.ItemModelState;
 import com.bergerkiller.bukkit.common.map.util.VanillaResourcePackFormat;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -97,6 +96,7 @@ public class MapResourcePack {
     protected Metadata metadata = null; // loaded in load()
     private final Map<String, MapTexture> textureCache = new HashMap<String, MapTexture>();
     private final Map<String, ConfigurationNode> yamlCache = new HashMap<String, ConfigurationNode>();
+    private final Map<String, ItemModel> itemModelCache = new HashMap<>();
     private final Map<String, Model> modelCache = new HashMap<String, Model>();
     private final Map<BlockRenderOptions, Model> blockModelCache = new HashMap<BlockRenderOptions, Model>();
     private BlockRenderProvider currProvider = null;
@@ -362,18 +362,59 @@ public class MapResourcePack {
     }
 
     /**
-     * Loads a JSON-syntax item model from this resource pack and decodes only the
-     * metadata of the model. No information is loaded that is needed for rendering,
-     * such as textures and boxes. This can be used to display information about
-     * models stored in this resource pack.<br>
+     * Loads a JSON-syntax item model from this resource pack, which contains
+     * details about the override predicates configured. This information can
+     * then be used to find unique items that are tied to certain model names.<br>
      * <br>
-     * If the model could not be found or failed to be decoded, a placeholder
-     * is returned which can be checked with {@link ModelInfo#isPlaceholder()}
+     * If the item model does not exist, returns a dummy one that only returns
+     * {@link ItemModel.MinecraftModel#NOT_SET}. This can be checked using
+     * {@link ItemModel#hasValidModels()}, which will return false in that case.
+     *
+     * @param itemStack ItemStack whose unique item model configuration to retrieve.
+     *                  Ignores properties of the item other than its name.
+     * @return the item model configuration
+     */
+    public ItemModel getItemModelConfig(ItemStack itemStack) {
+        return getItemModelConfig(CommonItemStack.of(itemStack));
+    }
+
+    /**
+     * Loads a JSON-syntax item model from this resource pack, which contains
+     * details about the override predicates configured. This information can
+     * then be used to find unique items that are tied to certain model names.<br>
+     * <br>
+     * If the item model does not exist, returns a dummy one that only returns
+     * {@link ItemModel.MinecraftModel#NOT_SET}. This can be checked using
+     * {@link ItemModel#hasValidModels()}, which will return false in that case.
+     *
+     * @param itemStack ItemStack whose unique item model configuration to retrieve.
+     *                  Ignores properties of the item other than its name.
+     * @return the item model configuration
+     */
+    public ItemModel getItemModelConfig(CommonItemStack itemStack) {
+        return getItemModelConfig(ModelInfoLookup.lookupItem(itemStack));
+    }
+
+    /**
+     * Loads a JSON-syntax item model from this resource pack, which contains
+     * details about the override predicates configured. This information can
+     * then be used to find unique items that are tied to certain model names.<br>
+     * <br>
+     * If the item model does not exist, returns a dummy one that only returns
+     * {@link ItemModel.MinecraftModel#NOT_SET}. This can be checked using
+     * {@link ItemModel#hasValidModels()}, which will return false in that case.
      *
      * @param itemName Name of the item, e.g. "golden_pickaxe"
-     * @return the model information
+     * @return the item model configuration
      */
-    public ItemModel getItemModel(String itemName) {
+    public ItemModel getItemModelConfig(String itemName) {
+        {
+            ItemModel cached = itemModelCache.get(itemName);
+            if (cached != null) {
+                return cached;
+            }
+        }
+
         // Look up the vanilla item that will display this item model name
         CommonItemStack baseItemStack = ModelInfoLookup.findItemStackByModelName(itemName).orElse(null);
 
@@ -407,6 +448,9 @@ public class MapResourcePack {
         // Provide a base item, which is used by the override listing
         root.baseItemStack = baseItemStack;
 
+        // Cache for next time
+        itemModelCache.put(itemName, root);
+
         return root;
     }
 
@@ -419,7 +463,7 @@ public class MapResourcePack {
      * On versions before that, it decodes the predicates stored in the models/item assets folder.
      *
      * @return Set of names of items without extension that are overridden by this resource pack.
-     *         These names can be directly used with {@link #getItemModel(String)}
+     *         These names can be directly used with {@link #getItemModelConfig(String)}
      *         to read what overrides have been configured. This set is unmodifiable.
      */
     public Set<String> listOverriddenItemModelNames() {
@@ -488,30 +532,17 @@ public class MapResourcePack {
      * @return item model for the item
      */
     public Model getItemModel(CommonItemStack item) {
-        ItemRenderOptions options = ModelInfoLookup.lookupItemRenderOptions(item);
-        String itemModelName = options.lookupModelName();
-        Model m = null;
-        if (CommonCapabilities.HAS_RESOURCEPACK_ITEMS_FOLDER) {
-            // Since Minecraft 1.21.4 we need to first look up a metadata file for the item name
-            // This points to the model name for this item, which could be item/ or block/ or
-            // something else entirely.
-            ItemModelState itemModelState = openGsonObject(ItemModelState.class, ResourceType.ITEMS, itemModelName);
-            if ((
-                    itemModelState == null ||
-                    itemModelState.model == null ||
-                    itemModelState.model.model == null ||
-                    itemModelState.model.type == null)
-            ) {
-                Logging.LOGGER_MAPDISPLAY.once(Level.WARNING, "Failed to load item gui model " + itemModelName);
-            } else if (!"minecraft:model".equals(itemModelState.model.type)) {
-                Logging.LOGGER_MAPDISPLAY.once(Level.WARNING, "Failed to load item gui model " + itemModelName +
-                        ": unknown type \"" + itemModelState.model.type + "\"");
-            } else {
-                m = this.loadModel(itemModelState.model.model, options);
-            }
-        } else {
-            m = this.loadModel("item/" + itemModelName, options);
+        ItemModel itemModel = getItemModelConfig(item);
+        List<ItemModel.MinecraftModel> models = itemModel.resolveModels(item);
+        if (models.isEmpty()) {
+            models = ItemModel.MinecraftModel.NOT_SET_LIST;
         }
+
+        //TODO: Add support for multiple models composited together
+        //      For now we just show the first model only
+
+        ItemRenderOptions options = ModelInfoLookup.lookupItemRenderOptions(item);
+        Model m = this.loadModel(models.get(0).model, options);
         if (m != null) {
             m.buildBlock(options);
             m.buildQuads();
@@ -959,6 +990,11 @@ public class MapResourcePack {
         // Builtin models
         if (path.equals("builtin/generated")) {
             return new GeneratedModel();
+        }
+
+        // Builtin error model
+        if (path.equals(ItemModel.MinecraftModel.NOT_SET.model)) {
+            return Model.createPlaceholderModel(options);
         }
 
         Model model = openGsonObject(Model.class, ResourceType.MODELS, path);
