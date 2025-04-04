@@ -142,7 +142,16 @@ optional class RecipeItemStack {
 #if version >= 1.21.2
     public (List<org.bukkit.inventory.ItemStack>) List<ItemStack> getChoices() {
         if (instance.isExact()) {
-            return instance.itemStacks();
+  #if exists net.minecraft.world.item.crafting.RecipeItemStack public java.util.Set<net.minecraft.world.item.ItemStack> itemStacks();
+            java.util.Set itemStacks = instance.itemStacks();
+            if (itemStacks.isEmpty()) {
+                return java.util.Collections.emptyList();
+            } else {
+                return new java.util.ArrayList(itemStacks);
+            }
+  #else
+            return (List) instance.itemStacks();
+  #endif
         }
 
         // Only stores the Item material to match. Create itemstacks out of them (count 1)
