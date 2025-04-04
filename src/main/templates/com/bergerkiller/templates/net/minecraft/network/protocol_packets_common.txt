@@ -241,7 +241,11 @@ class ClientboundCustomPayloadPacket extends Packet {
         key = (net.minecraft.resources.MinecraftKey) MinecraftKeyHandle.createNew(channel).getRaw();
 
   #if version >= 1.20.5
+    #if exists net.minecraft.network.protocol.common.custom.DiscardedPayload public DiscardedPayload(net.minecraft.resources.MinecraftKey id, byte[] data);
+        CustomPacketPayload payload = new DiscardedPayload(key, message);
+    #else
         CustomPacketPayload payload = new DiscardedPayload(key, Unpooled.wrappedBuffer(message));
+    #endif
   #elseif exists net.minecraft.network.protocol.common.custom.BukkitCustomPayload BukkitCustomPayload(org.bukkit.craftbukkit.entity.CraftPlayer p, byte[] message, net.minecraft.resources.MinecraftKey channel);
         // Warning: this type is fake and is remapped in CommonBootstrap to an anonymous class in CraftPlayer!
         // If the server was built with a newer JDK the CraftPlayer argument may have been dropped as well - future-proof it!
