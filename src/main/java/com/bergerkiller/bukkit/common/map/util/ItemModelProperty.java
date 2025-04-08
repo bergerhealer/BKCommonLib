@@ -496,7 +496,22 @@ public abstract class ItemModelProperty implements IndentedStringBuilder.Appenda
 
         @Override
         public Optional<CommonItemStack> setExactValue(CommonItemStack item, double value) {
-            return Optional.empty();
+            if (index < 0) {
+                return Optional.empty();
+            }
+
+            CustomModelData cmd = item.getCustomModelDataComponents();
+            List<Float> floats = new ArrayList<>(cmd.floats());
+
+            // Need to add padding values if index is beyond the range
+            while (index >= floats.size()) {
+                floats.add(0.0F);
+            }
+
+            // Modify at this index
+            floats.set(index, (float) value);
+
+            return Optional.of(item.clone().setCustomModelDataComponents(cmd.withFloats(floats)));
         }
 
         @Override
