@@ -358,6 +358,17 @@ public class BlockDataTest {
         assertEquals("furnace", blockData.getBlockName());
     }
 
+    @Test
+    public void testValidBlockDataFromString() {
+        assertEquals(MaterialUtil.getFirst("DIAMOND_BLOCK", "LEGACY_DIAMOND_BLOCK"),
+                BlockData.fromString("minecraft:diamond_block").getType());
+    }
+
+    @Test
+    public void testInvalidBlockDataFromString() {
+        assertNull(BlockData.fromString("invalid_block_data"));
+    }
+
     private void testSignMaterial(Material material, boolean isWallSign) {
         assertNotNull(material);
         BlockData signData = BlockData.fromMaterial(material);

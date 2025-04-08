@@ -44,10 +44,15 @@ public class BlockDataRegistry {
      * Obtains immutable BlockData information wrapping particular IBlockData
      * 
      * @param iBlockData input data
-     * @return Immutable BlockData
+     * @return Immutable BlockData. Null if the input block data is null also.
      */
     public static BlockData fromBlockData(Object iBlockData) {
         final BlockDataWrapperHook hook = BlockDataWrapperHook.INSTANCE;
+
+        // Protect against null
+        if (iBlockData == null) {
+            return null;
+        }
 
         // Try to access an already hooked IBlockData first
         Object accessor;
