@@ -89,6 +89,14 @@ public class ModelInfoLookup {
                 entry.getBlockName().ifPresent(name -> byBlockName.put(name, entry));
             }
         }
+
+        // Weirdness with potions...
+        {
+            ModelNameEntry e = byItemName.get("bottle_drinkable");
+            if (e != null) {
+                byItemName.put("potion", e);
+            }
+        }
     }
 
     public static ItemRenderOptions lookupItemRenderOptions(ItemStack item) {
