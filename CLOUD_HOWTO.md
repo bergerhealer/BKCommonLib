@@ -122,7 +122,7 @@ repositories {
 Next add the BKCommonLib dependency and the cloud dependencies. For cloud, no version has to be specified, which will be provided by BKCommonLib. It is recommended to make use of [version catalogs](https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format) to make this look cleaner, but this is optional.
 ```kotlin
 dependencies {
-    compileOnlyApi("com.bergerkiller.bukkit:BKCommonLib:1.21.1-v1")
+    compileOnly("com.bergerkiller.bukkit:BKCommonLib:1.21.1-v1")
 
     // Cloud integrated in BKCommonLib
     compileOnly("org.incendo:cloud-paper")
@@ -138,11 +138,11 @@ plugins {
 
 tasks {
     shadowJar {
-        val commonPrefix = "com.bergerkiller.bukkit.common.dep"
-        relocate("org.incendo.cloud", "$commonPrefix.cloud")
-        relocate("io.leangen.geantyref", "$commonPrefix.typetoken")
-        relocate("me.lucko.commodore", "$commonPrefix.me.lucko.commodore")
-        relocate("net.kyori", "$commonPrefix.net.kyori")
+        def commonPrefix = "com.bergerkiller.bukkit.common.dep"
+        relocate("org.incendo.cloud", "${commonPrefix}.cloud")
+        relocate("io.leangen.geantyref", "${commonPrefix}.typetoken")
+        relocate("me.lucko.commodore", "${commonPrefix}.me.lucko.commodore")
+        relocate("net.kyori", "${commonPrefix}.net.kyori")
     }
 }
 ```
