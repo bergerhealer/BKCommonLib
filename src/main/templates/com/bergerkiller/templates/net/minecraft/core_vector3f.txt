@@ -3,9 +3,15 @@ package net.minecraft.core;
 import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
 
 class Vector3f {
+#if version >= 1.21.5
+    public float getX:x();
+    public float getY:y();
+    public float getZ:z();
+#else
     public float getX();
     public float getY();
     public float getZ();
+#endif
 
     public org.bukkit.util.Vector toBukkit() {
         return new org.bukkit.util.Vector(instance.getX(), instance.getY(), instance.getZ());

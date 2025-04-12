@@ -231,15 +231,8 @@ class NBTBase {
 #else
         public static (NBTBaseHandle.NBTTagShortHandle) NBTTagShort create(short data) { return new NBTTagShort(data); }
 #endif
-#if version >= 1.18
+
         public short getShortData:getAsShort();
-#elseif version >= 1.13.2
-        public short getShortData:asShort();
-#elseif version >= 1.10.2
-        public short getShortData:f();
-#else
-        public short getShortData:e();
-#endif
 
         <code>
         public static Object createRaw(Object data) { return T.create.raw.invoke(data); }
@@ -272,15 +265,8 @@ class NBTBase {
 #else
         public static (NBTBaseHandle.NBTTagLongHandle) NBTTagLong create(long data) { return new NBTTagLong(data); }
 #endif
-#if version >= 1.18
+
         public long getLongData:getAsLong();
-#elseif version >= 1.13.2
-        public long getLongData:asLong();
-#elseif version >= 1.10.2
-        public long getLongData:d();
-#else
-        public long getLongData:c();
-#endif
 
         <code>
         public NBTBaseHandle.NBTTagLongHandle clone() {
@@ -296,15 +282,8 @@ class NBTBase {
 #else
         public static (NBTBaseHandle.NBTTagFloatHandle) NBTTagFloat create(float data) { return new NBTTagFloat(data); }
 #endif
-#if version >= 1.18
+
         public float getFloatData:getAsFloat();
-#elseif version >= 1.13.2
-        public float getFloatData:asFloat();
-#elseif version >= 1.10.2
-        public float getFloatData:i();
-#else
-        public float getFloatData:h();
-#endif
 
         <code>
         public NBTBaseHandle.NBTTagFloatHandle clone() {
@@ -321,17 +300,7 @@ class NBTBase {
         public static (NBTBaseHandle.NBTTagDoubleHandle) NBTTagDouble create(double data) { return new NBTTagDouble(data); }
 #endif
 
-#if version >= 1.18
         public double getDoubleData:getAsDouble();
-#elseif forge_nms_obfuscated
-        public double getDoubleData:h();
-#elseif version >= 1.11
-        public double getDoubleData:asDouble();
-#elseif version >= 1.10.2
-        public double getDoubleData:h();
-#else
-        public double getDoubleData:g();
-#endif
 
         <code>
         public NBTBaseHandle.NBTTagDoubleHandle clone() {
@@ -427,7 +396,9 @@ class NBTTagList extends NBTBase {
     public int size();
     public boolean isEmpty();
 
-#if version >= 1.18
+#if version >= 1.21.5
+    public (byte) byte getElementTypeId:identifyRawElementType();
+#elseif version >= 1.18
     public (byte) byte getElementTypeId:getElementType();
 #elseif version >= 1.17
     public (byte) byte getElementTypeId:e();
@@ -619,7 +590,9 @@ class NBTTagCompound extends NBTBase {
     }
 #endif
 
-#if version >= 1.18
+#if version >= 1.21.5
+    public Set<String> getKeys:keySet();
+#elseif version >= 1.18
     public Set<String> getKeys:getAllKeys();
 #elseif version >= 1.13
     public Set<String> getKeys();
