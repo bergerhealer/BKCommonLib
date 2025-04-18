@@ -147,3 +147,54 @@ tasks {
 }
 ```
 
+While using `build.gradle`, you will have a small difference in syntax.
+
+Add the following plugins (`java` should be there already when creating your project):
+```kotlin
+plugins {
+    id "java"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id "java-library"
+}
+```
+
+Then you will add the maven repository for BKCommonlib:
+```kotlin
+repositories {
+    mavenCentral()
+    maven {
+        url = "https://ci.mg-dev.eu/plugin/repository/everything"
+    }
+}
+```
+
+Then add it to the dependencies:
+```kotlin
+dependencies {
+    // BKCommonLib
+    compileOnlyApi("com.bergerkiller.bukkit:BKCommonLib:1.21.1-v1")
+
+    // Cloud integrated in BKCommonLib
+    compileOnly("org.incendo:cloud-paper")
+    compileOnly("org.incendo:cloud-annotations")
+    compileOnly("org.incendo:cloud-minecraft-extras")
+
+    // Adventure MiniMessage
+    implementation("net.kyori:adventure-api:4.14.0")
+    implementation("net.kyori:adventure-text-minimessage:4.14.0")
+}
+```
+
+Finally, you can shadow the imported plugins:
+```kotlin
+tasks {
+    shadowJar {
+        def commonPrefix = "com.bergerkiller.bukkit.common.dep"
+        relocate("org.incendo.cloud", "${commonPrefix}.cloud")
+        relocate("io.leangen.geantyref", "${commonPrefix}.typetoken")
+        relocate("me.lucko.commodore", "${commonPrefix}.me.lucko.commodore")
+        relocate("net.kyori", "${commonPrefix}.net.kyori")
+    }
+}
+
+
