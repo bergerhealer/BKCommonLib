@@ -113,6 +113,7 @@ Depending on BKCommonLib will automatically tell Gradle what versions of Cloud a
 
 This does not work well with older versions of Gradle. Make sure to use **gradle 8.5** at least.
 
+
 Begin by adding the repository where BKCommonLib is hosted:
 ```kotlin
 repositories {
@@ -131,9 +132,11 @@ dependencies {
 }
 ```
 Finally, make sure the cloud dependency is shaded correctly when compiling your plugin:
+Also, don't forget to add the Java library.
 ```kotlin
 plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("java-library")
 }
 
 tasks {
