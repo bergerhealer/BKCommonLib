@@ -108,7 +108,7 @@ However, the library and its dependencies are shaded in at a different package t
     </build>
 ```
 
-### Gradle
+### Gradle (Kotlin)
 Depending on BKCommonLib will automatically tell Gradle what versions of Cloud and its dependencies to use. The below configuration assumes kotlin gradle syntax, and are for your project's `build.gradle.kts` file.
 
 This does not work well with older versions of Gradle. Make sure to use **gradle 8.5** at least.
@@ -147,6 +147,7 @@ tasks {
 }
 ```
 
+### Gradle (Groovy)
 While using `build.gradle`, you will have a small difference in syntax.
 
 Add the following plugins (`java` should be there already when creating your project):
