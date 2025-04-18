@@ -108,10 +108,11 @@ However, the library and its dependencies are shaded in at a different package t
     </build>
 ```
 
-### Gradle
+### Gradle (Kotlin)
 Depending on BKCommonLib will automatically tell Gradle what versions of Cloud and its dependencies to use. The below configuration assumes kotlin gradle syntax, and are for your project's `build.gradle.kts` file.
 
 This does not work well with older versions of Gradle. Make sure to use **gradle 8.5** at least.
+
 
 Begin by adding the repository where BKCommonLib is hosted:
 ```kotlin
@@ -131,9 +132,11 @@ dependencies {
 }
 ```
 Finally, make sure the cloud dependency is shaded correctly when compiling your plugin:
+Also, don't forget to add the Java library.
 ```kotlin
 plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("java-library")
 }
 
 tasks {
@@ -146,4 +149,56 @@ tasks {
     }
 }
 ```
+
+### Gradle (Groovy)
+While using `build.gradle`, you will have a small difference in syntax.
+
+Add the following plugins (`java` should be there already when creating your project):
+```kotlin
+plugins {
+    id "java"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id "java-library"
+}
+```
+
+Then you will add the maven repository for BKCommonlib:
+```kotlin
+repositories {
+    mavenCentral()
+    maven {
+        url = "https://ci.mg-dev.eu/plugin/repository/everything"
+    }
+}
+```
+
+Then add it to the dependencies:
+```kotlin
+dependencies {
+    // BKCommonLib
+    compileOnlyApi("com.bergerkiller.bukkit:BKCommonLib:1.21.1-v1")
+
+    // Cloud integrated in BKCommonLib
+    compileOnly("org.incendo:cloud-paper")
+    compileOnly("org.incendo:cloud-annotations")
+    compileOnly("org.incendo:cloud-minecraft-extras")
+
+    // Adventure MiniMessage
+    implementation("net.kyori:adventure-api:4.14.0")
+    implementation("net.kyori:adventure-text-minimessage:4.14.0")
+}
+```
+
+Finally, you can shadow the imported plugins:
+```kotlin
+tasks {
+    shadowJar {
+        def commonPrefix = "com.bergerkiller.bukkit.common.dep"
+        relocate("org.incendo.cloud", "${commonPrefix}.cloud")
+        relocate("io.leangen.geantyref", "${commonPrefix}.typetoken")
+        relocate("me.lucko.commodore", "${commonPrefix}.me.lucko.commodore")
+        relocate("net.kyori", "${commonPrefix}.net.kyori")
+    }
+}
+
 
