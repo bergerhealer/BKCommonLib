@@ -120,8 +120,10 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
             return tryResolveElse(path, "net.minecraft.world.server.ServerChunkProvider$ChunkExecutor");
         }
 
-        if (path.equals("net.minecraft.world.level.biome.BiomeSettingsMobs$SpawnRate") &&
-                this.evaluateMCVersion(">=", "1.16.5")) {
+        if ((path.equals("net.minecraft.world.level.biome.BiomeBase$BiomeMeta") ||
+             path.equals("net.minecraft.world.level.biome.BiomeSettingsMobs$c")) &&
+                this.evaluateMCVersion(">=", "1.16.5"))
+        {
             return tryResolveElse(path, "net.minecraft.world.biome.MobSpawnInfo$Spawners");
         }
 

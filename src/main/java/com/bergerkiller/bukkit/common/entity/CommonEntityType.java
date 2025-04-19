@@ -376,6 +376,7 @@ public class CommonEntityType {
     /*
      * Getters
      */
+    @ConverterMethod
     public static CommonEntityType byEntityType(EntityType type) {
         return LogicUtil.fixNull(byEntityType.get(type), UNKNOWN);
     }
@@ -384,6 +385,7 @@ public class CommonEntityType {
         return byNMSEntity(HandleConversion.toEntityHandle(entity));
     }
 
+    @ConverterMethod
     public static CommonEntityType byNMSEntityClass(Class<?> entityClass) {
         return LogicUtil.fixNull(byNMS.get(entityClass), UNKNOWN);
     }
@@ -400,6 +402,7 @@ public class CommonEntityType {
         return LogicUtil.fixNull(byEntityTypeId.get(entityTypeId), UNKNOWN);
     }
 
+    @ConverterMethod(input="net.minecraft.world.entity.EntityTypes")
     public static CommonEntityType byNMSEntityTypeRaw(Object entityTypesHandleRaw) {
         if (entityTypesHandleRaw != null) {
             CommonEntityType type = byNMSEntityType.get(entityTypesHandleRaw);
@@ -414,6 +417,11 @@ public class CommonEntityType {
             }
         }
         return UNKNOWN;
+    }
+
+    @ConverterMethod(output="net.minecraft.world.entity.EntityTypes")
+    public static Object toNMSEntityTypeRaw(CommonEntityType entityType) {
+        return entityType.nmsEntityType == null ? null : entityType.nmsEntityType.getRaw();
     }
 
     /**

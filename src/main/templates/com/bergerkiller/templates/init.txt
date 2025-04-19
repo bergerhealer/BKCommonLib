@@ -101,7 +101,6 @@
 #include /net/minecraft/world/item_item.txt
 #include /net/minecraft/world/item_itemstack.txt
 #include /net/minecraft/world/item_custom_model_data.txt
-#include /net/minecraft/world/level_biome.txt
 #include /net/minecraft/world/level_block.txt
 #include /net/minecraft/world/level_block_soundeffecttype.txt
 #include /net/minecraft/world/level_block_tileentity.txt

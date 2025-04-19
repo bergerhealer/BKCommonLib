@@ -430,9 +430,9 @@ public class CommonBootstrap {
         remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet", "com.bergerkiller.bukkit.common.internal.proxy.LongHashSet_pre_1_13_2");
         remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet$LongIterator", "com.bergerkiller.bukkit.common.internal.proxy.LongHashSet_pre_1_13_2$LongIterator");
 
-        // Since Minecraft 1.16.2 it has an entirely new Class, this makes the API look clean
-        remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs$SpawnRate", "net.minecraft.world.level.biome.BiomeBase$BiomeMeta");
-        remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs", "net.minecraft.world.level.biome.BiomeBase");
+        // Name was all over the place, internally we refer to this as "BiomeSpawnCluster"
+        // This is a record/struct of a mob entity type, min spawn count and max spawn count
+        remappings.put("net.minecraft.world.level.biome.BiomeSpawnCluster", "net.minecraft.world.level.biome.BiomeBase$BiomeMeta");
 
         // Obfuscated class name
         remappings.put("net.minecraft.server.level.ChunkProviderServer$MainThreadExecutor", "net.minecraft.server.level.ChunkProviderServer$a");
@@ -507,7 +507,7 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.entity.player.EnumChatVisibility", "net.minecraft.world.entity.player.EnumChatVisibility");
             remappings.put("net.minecraft.server.level.PlayerChunk", "net.minecraft.server.level.PlayerChunk");
             remappings.put("net.minecraft.util.WeightedRandom$WeightedRandomChoice", "net.minecraft.util.WeightedRandomChoice");
-            remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs$SpawnRate", "net.minecraft.world.level.biome.BiomeMeta");
+            remappings.put("net.minecraft.world.level.biome.BiomeSpawnCluster", "net.minecraft.world.level.biome.BiomeMeta");
             remappings.put("net.minecraft.util.IntHashMap$IntHashMapEntry", "net.minecraft.util.IntHashMapEntry");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutEntity$PacketPlayOutEntityLook", "net.minecraft.network.protocol.game.PacketPlayOutEntityLook");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutEntity$PacketPlayOutRelEntityMove", "net.minecraft.network.protocol.game.PacketPlayOutRelEntityMove");
@@ -640,8 +640,7 @@ public class CommonBootstrap {
         // BiomeBase.BiomeMeta was removed and replaced with BiomeSettingsMobs.c
         // Assume a more human-readable name and remap the name prior to the right place
         if (evaluateMCVersion(">=", "1.16.2")) {
-            remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs$SpawnRate", "net.minecraft.world.level.biome.BiomeSettingsMobs$c");
-            remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs", "net.minecraft.world.level.biome.BiomeSettingsMobs");
+            remappings.put("net.minecraft.world.level.biome.BiomeSpawnCluster", "net.minecraft.world.level.biome.BiomeSettingsMobs$c");
         }
 
         // 1.17 mappings
