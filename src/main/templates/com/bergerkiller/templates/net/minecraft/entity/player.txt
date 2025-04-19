@@ -469,7 +469,11 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 
         public static void codecToNBT((EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig respawnConfig, (CommonTagCompound) NBTTagCompound nbt) {
 #if version >= 1.21.5
-            nbt.storeNullable("respawn", EntityPlayer$RespawnConfig.CODEC, respawnConfig);
+            if (respawnConfig != null) {
+                nbt.store("respawn", EntityPlayer$RespawnConfig.CODEC, respawnConfig);
+            } else {
+                nbt.remove("respawn");
+            }
 #endif
         }
 
