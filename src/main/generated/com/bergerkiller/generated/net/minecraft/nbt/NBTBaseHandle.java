@@ -47,7 +47,35 @@ public abstract class NBTBaseHandle extends Template.Handle {
             } else {
                 str.append(data.getClass().getSimpleName());
             }
-            str.append(": ").append(data);
+            str.append(": ");
+
+            if (data instanceof byte[]) {
+                byte[] values = (byte[]) data;
+                str.append("[");
+                for (int i = 0; i < values.length; i++) {
+                    if (i > 0) str.append(", ");
+                    str.append(values[i]);
+                }
+                str.append("]");
+            } else if (data instanceof int[]) {
+                int[] values = (int[]) data;
+                str.append("[");
+                for (int i = 0; i < values.length; i++) {
+                    if (i > 0) str.append(", ");
+                    str.append(values[i]);
+                }
+                str.append("]");
+            } else if (data instanceof long[]) {
+                long[] values = (long[]) data;
+                str.append("[");
+                for (int i = 0; i < values.length; i++) {
+                    if (i > 0) str.append(", ");
+                    str.append(values[i]);
+                }
+                str.append("]");
+            } else {
+                str.append(data);
+            }
         }
     }
 
