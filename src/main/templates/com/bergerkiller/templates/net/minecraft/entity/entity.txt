@@ -1514,37 +1514,49 @@ class Entity {
 #endif
 
     // Note: counts rain too as being wet!
-#select version >=
-#case 1.18:   public boolean isWet:isInWaterRainOrBubble();
-#case 1.17:   public boolean isWet:aN();
-#case 1.16.4: public boolean isWet:aG();
-#case 1.16.2: public boolean isWet:aF();
-#case 1.16:   public boolean isWet:aC();
-#case 1.15:   public boolean isWet:ay();
-#case 1.14.3: public boolean isWet:au();
-#case 1.14:   public boolean isWet:at();
-#case 1.13:   public boolean isWet:ap();
-#case 1.12:   public boolean isWet:an();
-#case 1.10.2: public boolean isWet:ai();
-#case 1.9.4:  public boolean isWet:ah();
-#case 1.9:    public boolean isWet:ah();
-#case else:   public boolean isWet:U();
-#endselect
+#if version >= 1.21.5
+    public boolean isWet() {
+        return instance.isInWater() || instance.isInRain() || instance.getInBlockState().is(Blocks.BUBBLE_COLUMN);
+    }
+#else
+  #select version >=
+  #case 1.18:   public boolean isWet:isInWaterRainOrBubble();
+  #case 1.17:   public boolean isWet:aN();
+  #case 1.16.4: public boolean isWet:aG();
+  #case 1.16.2: public boolean isWet:aF();
+  #case 1.16:   public boolean isWet:aC();
+  #case 1.15:   public boolean isWet:ay();
+  #case 1.14.3: public boolean isWet:au();
+  #case 1.14:   public boolean isWet:at();
+  #case 1.13:   public boolean isWet:ap();
+  #case 1.12:   public boolean isWet:an();
+  #case 1.10.2: public boolean isWet:ai();
+  #case 1.9.4:  public boolean isWet:ah();
+  #case 1.9:    public boolean isWet:ah();
+  #case else:   public boolean isWet:U();
+  #endselect
+#endif
 
     // Note: checks just standing in water! Rain does not count.
-#select version >=
-#case 1.18:   public boolean isInWaterUpdate:isInWaterOrBubble();
-#case 1.17:   public boolean isInWaterUpdate:aO();
-#case 1.16.4: public boolean isInWaterUpdate:aH();
-#case 1.16.2: public boolean isInWaterUpdate:aG();
-#case 1.16:   public boolean isInWaterUpdate:aD();
-#case 1.15:   public boolean isInWaterUpdate:az();
-#case 1.14:   public boolean isInWaterUpdate:au();
-#case 1.12:   public boolean isInWaterUpdate:aq();
-#case 1.10.2: public boolean isInWaterUpdate:ak();
-#case 1.9:    public boolean isInWaterUpdate:aj();
-#case else:   public boolean isInWaterUpdate:W();
-#endselect
+#if version >= 1.21.5
+    public boolean isInWaterUpdate() {
+        return instance.isInWater() || instance.getInBlockState().is(Blocks.BUBBLE_COLUMN);
+    }
+#else
+  #select version >=
+  #case 1.18:   public boolean isInWaterUpdate:isInWaterOrBubble();
+  #case 1.17:   public boolean isInWaterUpdate:aO();
+  #case 1.16.4: public boolean isInWaterUpdate:aH();
+  #case 1.16.2: public boolean isInWaterUpdate:aG();
+  #case 1.16:   public boolean isInWaterUpdate:aD();
+  #case 1.15:   public boolean isInWaterUpdate:az();
+  #case 1.14:   public boolean isInWaterUpdate:au();
+  #case 1.12:   public boolean isInWaterUpdate:aq();
+  #case 1.10.2: public boolean isInWaterUpdate:ak();
+  #case 1.9:    public boolean isInWaterUpdate:aj();
+  #case else:   public boolean isInWaterUpdate:W();
+  #endselect
+#endif
 
     /*
      # public boolean ###METHODNAME###() {

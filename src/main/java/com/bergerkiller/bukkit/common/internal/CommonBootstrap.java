@@ -815,7 +815,8 @@ public class CommonBootstrap {
 
         // 1.21.5 mappings
         if (evaluateMCVersion(">=", "1.21.5")) {
-
+            // Obfuscated class name changed
+            remappings.put("net.minecraft.server.level.ChunkProviderServer$MainThreadExecutor", "net.minecraft.server.level.ChunkProviderServer$a");
         } else {
             // RespawnConfig record class was added in 1.21.5, use a proxy on versions prior to hold this data
             remappings.put("net.minecraft.server.level.EntityPlayer$RespawnConfig", "com.bergerkiller.bukkit.common.internal.proxy.PlayerRespawnConfig_pre_1_21_5");

@@ -12,6 +12,8 @@ import net.minecraft.network.syncher.DataWatcher.PackedItem;
 import net.minecraft.network.syncher.DataWatcher.WatchableObject;
 import net.minecraft.network.PacketDataSerializer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagLongArray;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.sounds.SoundCategory;
@@ -30,6 +32,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.block.entity.TileEntityTypes;
 import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.world.level.levelgen.HeightMap;
+import net.minecraft.world.level.levelgen.HeightMap.Type;
 import net.minecraft.world.level.EnumGamemode;
 import net.minecraft.world.level.dimension.DimensionManager;
 import net.minecraft.world.level.World;
@@ -1507,7 +1511,22 @@ class PacketPlayOutMapChunk extends Packet {
 
     // Heightmap data, not available on MC 1.13.2 and before
     public (CommonTagCompound) NBTTagCompound getHeightmaps() {
-#if version >= 1.18
+#if version >= 1.21.5
+        // Convert Map<HeightMap.Type, long[]> into NBT
+        NBTTagCompound heightmapsNBT = new NBTTagCompound();
+
+        java.util.Map heightmaps = instance.getChunkData().getHeightmaps();
+        java.util.Iterator iter = heightmaps.entrySet().iterator();
+        while (iter.hasNext()) {
+            java.util.Map$Entry entry = (java.util.Map$Entry) iter.next();
+            HeightMap$Type heightmapType = (HeightMap$Type) entry.getKey();
+            long[] heightmapData = (long[]) entry.getValue();
+            heightmapsNBT.putLongArray(heightmapType.getSerializedName(), heightmapData);
+        }
+
+        return heightmapsNBT;
+
+#elseif version >= 1.18
         return instance.getChunkData().getHeightmaps();
 #elseif version >= 1.17
         return instance.f();
@@ -1520,7 +1539,46 @@ class PacketPlayOutMapChunk extends Packet {
     }
 
     public void setHeightmaps((CommonTagCompound) NBTTagCompound heightmapsData) {
-#if version >= 1.18
+#if version >= 1.21.5
+        // Convert NBT into Map<HeightMap.Type, long[]>
+        java.util.Map heightmaps = new java.util.HashMap(heightmapsData.size());
+
+        HeightMap$Type[] heightmapTypes = HeightMap$Type.values();
+
+        //   public Set<Map.Entry<String, NBTBase>> entrySet() {
+        java.util.Iterator nbtEntryIter = heightmapsData.entrySet().iterator();
+        while (nbtEntryIter.hasNext()) {
+            java.util.Map$Entry entry = (java.util.Map$Entry) nbtEntryIter.next();
+
+            // Key -> HeightMap.Type
+            // TODO: Use the Codec to avoid a for loop here
+            String serializedName = (String) entry.getKey();
+            HeightMap$Type heightmapType = null;
+            for (int i = 0; i < heightmapTypes.length; i++) {
+                if (heightmapTypes[i].getSerializedName().equals(serializedName)) {
+                    heightmapType = heightmapTypes[i];
+                    break;
+                }
+            }
+            if (heightmapType == null) {
+                continue;
+            }
+
+            // NBTBase -> long[]
+            NBTBase heightNBT = (NBTBase) entry.getValue();
+            if (!(heightNBT instanceof NBTTagLongArray)) {
+                continue;
+            }
+
+            long[] heightmapData = ((NBTTagLongArray) heightNBT).getAsLongArray();
+
+            heightmaps.put(heightmapType, heightmapData);
+        }
+
+        #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData private final Map<HeightMap.Type, long[]> heightmaps;
+        instance#heightmaps = heightmaps;
+
+#elseif version >= 1.18
         #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData private final NBTTagCompound heightmaps;
         net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData data = instance.getChunkData();
         data#heightmaps = heightmapsData;
@@ -2584,15 +2642,20 @@ class PacketPlayInUpdateSign extends Packet {
 }
 
 class PacketPlayInWindowClick extends Packet {
-#if version >= 1.17
+#if version >= 1.21.5
     private int windowId:containerId;
-    private int slot:slotNum;
-    private int button:buttonNum;
+    private (short) short slot:slotNum;
+    private (byte) byte button:buttonNum;
+    private (org.bukkit.inventory.ItemStack) ItemStack item:carriedItem;
+#elseif version >= 1.17
+    private int windowId:containerId;
+    private (short) int slot:slotNum;
+    private (byte) int button:buttonNum;
     private (org.bukkit.inventory.ItemStack) ItemStack item:carriedItem;
 #else
     private int windowId:a;
-    private int slot;
-    private int button;
+    private (short) int slot;
+    private (byte) int button;
     private unknown short action:d; //TODO: Do something with this?
     private (org.bukkit.inventory.ItemStack) ItemStack item;
 #endif
