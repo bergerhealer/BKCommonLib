@@ -73,6 +73,14 @@ public abstract class NBTTagCompoundHandle extends NBTBaseHandle {
         }
         str.append('}');
     }
+
+    public static java.util.function.Consumer<String> createPartialErrorLogger(Object nbtBase) {
+        return (s) -> {
+            String nbtToStr = (nbtBase == null) ? "[null]" : nbtBase.toString();
+            com.bergerkiller.bukkit.common.Logging.LOGGER.severe(
+                    "Failed to read (" + nbtToStr + "): " + s);
+        };
+    }
     @Template.Readonly
     public abstract Map<String, NBTBaseHandle> getData();
     /**

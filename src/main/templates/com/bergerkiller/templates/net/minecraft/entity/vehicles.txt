@@ -231,7 +231,11 @@ class EntityMinecartTNT extends EntityMinecartAbstract {
     protected void explode:b(double damage);
 #endif
 
-#if version >= 1.18
+#if version >= 1.21.5
+    public void prime() {
+        instance.primeFuse((net.minecraft.world.damagesource.DamageSource) null);
+    }
+#elseif version >= 1.18
     public void prime:primeFuse();
 #elseif version >= 1.17
     public void prime:w();

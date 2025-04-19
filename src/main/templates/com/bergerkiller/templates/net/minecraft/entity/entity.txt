@@ -1660,7 +1660,9 @@ class Entity {
      *     ...
      * }
      */
-#if version >= 1.21.2
+#if version >= 1.21.5
+    protected void applyEffectsFromBlocks();
+#elseif version >= 1.21.2
     public void applyEffectsFromBlocks();
 #elseif version >= 1.18
     protected void applyEffectsFromBlocks:checkInsideBlocks();
@@ -1786,7 +1788,12 @@ class Entity {
 
     public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox();
 
-#if version >= 1.18
+#if version >= 1.21.5
+    public void setPositionRotation:snapTo(double x, double y, double z, float yaw, float pitch);
+    public void setLocation:absSnapTo(double x, double y, double z, float yaw, float pitch);
+    public void setBoundingBox((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
+    public float getHeadRotation:getYHeadRot();
+#elseif version >= 1.18
     public void setPositionRotation:moveTo(double x, double y, double z, float yaw, float pitch);
     public void setLocation:absMoveTo(double x, double y, double z, float yaw, float pitch);
     public void setBoundingBox((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);

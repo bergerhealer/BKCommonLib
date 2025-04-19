@@ -59,8 +59,13 @@ class MobSpawnerAbstract {
         instance.nextSpawnData.getEntityToSpawn().putString("id", nameKey.toString());
 
         // Note: spawnPotentials is private on some forge servers
+  #if version >= 1.21.5
+        #require MobSpawnerAbstract private net.minecraft.util.random.WeightedList<MobSpawnerData> spawnPotentials;
+        instance#spawnPotentials = net.minecraft.util.random.WeightedList.of();
+  #else
         #require MobSpawnerAbstract private net.minecraft.util.random.SimpleWeightedRandomList<MobSpawnerData> spawnPotentials;
         instance#spawnPotentials = net.minecraft.util.random.SimpleWeightedRandomList.empty();
+  #endif
     }
 #elseif version >= 1.17
     public (MinecraftKeyHandle) MinecraftKey getMobName() {

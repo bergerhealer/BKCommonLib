@@ -46,7 +46,16 @@ class MobEffect {
     //TODO: showIcon?
     //TODO: hiddenEffect?
 
-#if version >= 1.18
+#if version >= 1.21.5
+    public static (MobEffectHandle) MobEffect fromNBT((CommonTagCompound) NBTTagCompound compound) {
+        //TODO: Should this use this whole mess or not?
+        // RegistryOps<NBTBase> registryops = this.registryAccess().<NBTBase>createSerializationContext(DynamicOpsNBT.INSTANCE);
+        com.mojang.serialization.DynamicOps dynamicops = net.minecraft.nbt.DynamicOpsNBT.INSTANCE;
+        return (MobEffect) MobEffect.CODEC.parse(dynamicops, compound)
+            .resultOrPartial(CommonTagCompound.createPartialErrorLogger(compound))
+            .orElse(null);
+    }
+#elseif version >= 1.18
     public static (MobEffectHandle) MobEffect fromNBT:load((CommonTagCompound) NBTTagCompound compound);
 #else
     public static (MobEffectHandle) MobEffect fromNBT:b((CommonTagCompound) NBTTagCompound compound);
