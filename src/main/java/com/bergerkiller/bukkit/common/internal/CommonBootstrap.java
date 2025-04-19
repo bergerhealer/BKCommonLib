@@ -814,6 +814,14 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.entity.vehicle.NewMinecartBehavior$LerpStep", "net.minecraft.world.entity.vehicle.NewMinecartBehavior$a");
         }
 
+        // 1.21.5 mappings
+        if (evaluateMCVersion(">=", "1.21.5")) {
+
+        } else {
+            // RespawnConfig record class was added in 1.21.5, use a proxy on versions prior to hold this data
+            remappings.put("net.minecraft.server.level.EntityPlayer$RespawnConfig", "com.bergerkiller.bukkit.common.internal.proxy.PlayerRespawnConfig_pre_1_21_5");
+        }
+
         // There have been various locations where starlight was installed
         // This was also part of tuinity at some point, but was then ported into paper
         {

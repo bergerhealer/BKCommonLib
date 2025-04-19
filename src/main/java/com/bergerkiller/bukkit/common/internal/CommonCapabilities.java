@@ -307,4 +307,9 @@ public class CommonCapabilities {
      * Before that it used the standard "models/item" folder.
      */
     public static final boolean HAS_RESOURCEPACK_ITEMS_FOLDER = CommonBootstrap.evaluateMCVersion(">=", "1.21.4");
+
+    /**
+     * Since Minecraft 1.21.5 the respawn point is packed into a compount in the player's data NBT
+     */
+    public static final boolean IS_RESPAWN_POINT_PACKED = CommonBootstrap.evaluateMCVersion(">=", "1.21.5");
 }

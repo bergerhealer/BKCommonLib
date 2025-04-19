@@ -6,6 +6,9 @@ import java.util.function.Consumer;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.CustomModelData;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
+import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPoint;
+import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPointNearBlock;
+import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeBaseHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.component.CustomModelDataHandle;
 import org.bukkit.ChatColor;
@@ -86,6 +89,24 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersH
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
 public class WrapperConversion {
+
+    @ConverterMethod(input="net.minecraft.server.level.EntityPlayer.RespawnConfig", acceptsNull = true)
+    public static PlayerRespawnPoint toRespawnPoint(Object respawnConfig) {
+        if (respawnConfig == null) {
+            return PlayerRespawnPoint.NONE;
+        } else {
+            return new PlayerRespawnPointNearBlock(EntityPlayerHandle.RespawnConfigHandle.createHandle(respawnConfig));
+        }
+    }
+
+    @ConverterMethod(output="net.minecraft.server.level.EntityPlayer.RespawnConfig")
+    public static Object toRespawnConfigFromPoint(PlayerRespawnPoint respawnPoint) {
+        if (respawnPoint instanceof PlayerRespawnPointNearBlock) {
+            return ((PlayerRespawnPointNearBlock) respawnPoint).getHandle().getRaw();
+        } else {
+            return null;
+        }
+    }
 
     @ConverterMethod(input="net.minecraft.world.item.component.CustomModelData")
     public static CustomModelData handleToCustomModelData(Object handle) {

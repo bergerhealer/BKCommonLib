@@ -1,6 +1,7 @@
 package net.minecraft.server.level;
 
 import net.minecraft.core.BlockPosition;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.chat.ChatMessage;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.Packet;
@@ -26,10 +27,12 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 
 import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle.RespawnConfigHandle;
 import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityItemFrameHandle;
@@ -61,120 +64,149 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
     }
 #endif
 
-#if version >= 1.16
-    // World dimension on 1.16 and later
-    public org.bukkit.World getSpawnWorld() {
-  #if version >= 1.18
-        ResourceKey spawn = instance.getRespawnDimension();
-        World world = MinecraftServer.getServer().getLevel(spawn);
-  #else
-        ResourceKey spawn = instance.getSpawnDimension();
-        World world = MinecraftServer.getServer().getWorldServer(spawn);
-  #endif
-        return (world == null) ? null : world.getWorld();
+#if version >= 1.21.5
+    public (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig getRespawnConfig();
+
+    //TODO: Add an API that also fires the new spawn change event?
+    // The "cause" enum would have to be proxied as it doesn't exist pre-1.21.5
+    public void setRespawnConfigSilent((EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig respawnConfig) {
+        #require net.minecraft.server.level.EntityPlayer private EntityPlayer.RespawnConfig respawnConfig;
+        instance#respawnConfig = respawnConfig;
     }
-    public void setSpawnWorld(org.bukkit.World world) {
+#else
+  #if version >= 1.17
+      #require net.minecraft.server.level.EntityPlayer private net.minecraft.core.BlockPosition spawnCoord:respawnPosition;
+      #require net.minecraft.server.level.EntityPlayer private boolean spawnForced:respawnForced;
+  #elseif version >= 1.16
+      #require net.minecraft.server.level.EntityPlayer private net.minecraft.core.BlockPosition spawnCoord:spawn;
+      #require net.minecraft.server.level.EntityPlayer private boolean spawnForced;
+  #elseif version >= 1.15
+      #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:g;
+      #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:bR;
+  #elseif version >= 1.14.4
+      #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:g;
+      #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:bU;
+  #elseif version >= 1.14
+      #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:f;
+      #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:g;
+  #elseif version >= 1.13
+      #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:e;
+      #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:f;
+  #elseif version >= 1.12
+      #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:d;
+      #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:e;
+  #elseif version >= 1.9
+      #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:e;
+      #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:f;
+  #else
+      #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:c;
+      #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:d;
+  #endif
+
+  #if version >= 1.17
+      #require net.minecraft.server.level.EntityPlayer private float spawnAngle:respawnAngle;
+  #elseif version >= 1.16.2
+      #require net.minecraft.server.level.EntityPlayer private float spawnAngle;
+  #endif
+
+    public (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig getRespawnConfig() {
+        // World dimension on 1.16 and later
+        // Before
+        ResourceKey dimension;
+  #if version >= 1.18
+        dimension = instance.getRespawnDimension();
+  #elseif version >= 1.16
+        dimension = instance.getSpawnDimension();
+  #else
+        //TODO: Do this conversion without first looking up the World?
+        dimension = null;
+        if (instance.spawnWorld != null) {
+            org.bukkit.World bukkitSpawnWorld = org.bukkit.Bukkit.getWorld(instance.spawnWorld);
+            if (bukkitSpawnWorld != null) {
+                WorldServer spawnWorld = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) bukkitSpawnWorld).getHandle();
+                dimension = (ResourceKey) com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.getDimensionKey.raw.invoke(spawnWorld);
+            }
+        }
+  #endif
+
+        if (dimension == null) return null;
+
+        BlockPosition position = instance#spawnCoord;
+        if (position == null) return null;
+
+  #if version >= 1.16.2
+        float angle = instance#spawnAngle;
+  #else
+        float angle = 0.0f;
+  #endif
+
+        boolean forced = instance#spawnForced;
+
+        return new EntityPlayer$RespawnConfig(dimension, position, angle, forced);
+    }
+
+    public void setRespawnConfigSilent((EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig respawnConfig) {
   #if version >= 1.17
         #require net.minecraft.server.level.EntityPlayer private net.minecraft.resources.ResourceKey<net.minecraft.world.level.World> spawnDimension:respawnDimension;
-  #else
+  #elseif version >= 1.16
         #require net.minecraft.server.level.EntityPlayer private net.minecraft.resources.ResourceKey<net.minecraft.world.level.World> spawnDimension;
   #endif
-  #if version >= 1.18
-        ResourceKey key = (world == null) ? World.OVERWORLD : ((WorldServer) ((org.bukkit.craftbukkit.CraftWorld) world).getHandle()).dimension();
+
+        boolean hasSpawnConfig;
+  #if version >= 1.16
+        ResourceKey dimension = null;
+        if (respawnConfig != null) {
+            dimension = (ResourceKey) respawnConfig.dimension();
+        }
+
+        hasSpawnConfig = (dimension != null);
   #else
-        ResourceKey key = (world == null) ? World.OVERWORLD : ((WorldServer) ((org.bukkit.craftbukkit.CraftWorld) world).getHandle()).getDimensionKey();
+        // Convert to spawn world name
+        //TODO: Convert to world name without first looking up the World?
+        String spawnWorldName = null;
+        if (respawnConfig != null && respawnConfig.dimension() != null) {
+            WorldServer world = (WorldServer) com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.getByDimensionKey.raw.invoke(respawnConfig.dimension());
+            if (world != null) {
+                spawnWorldName = world.getHandle().getName();
+            }
+        }
+
+        hasSpawnConfig = (spawnWorldName != null);
   #endif
-        instance#spawnDimension = key;
-    }
-#else
-    // World name on 1.15.2 and earlier
-    public org.bukkit.World getSpawnWorld() {
-        return org.bukkit.Bukkit.getWorld(instance.spawnWorld);
-    }
-    public void setSpawnWorld(org.bukkit.World world) {
-        instance.spawnWorld = (world == null) ? "" : world.getName();
+
+        if (!hasSpawnConfig) {
+  #if version >= 1.16
+            instance#spawnDimension = null;
+  #else
+            instance.spawnWorld = null;
+  #endif
+            instance#spawnCoord = null;
+            instance#spawnForced = false;
+  #if version >= 1.16.2
+            instance#spawnAngle = 0.0f;
+  #endif
+            return;
+        }
+
+  #if version >= 1.16
+        instance#spawnDimension = dimension;
+  #else
+        instance.spawnWorld = spawnWorldName;
+  #endif
+
+        instance#spawnCoord = (BlockPosition)respawnConfig.pos();
+        instance#spawnForced = respawnConfig.forced();
+  #if version >= 1.16.2
+        instance#spawnAngle = respawnConfig.angle();
+  #endif
     }
 #endif
 
-#if version >= 1.17
-    #require net.minecraft.server.level.EntityPlayer private net.minecraft.core.BlockPosition spawnCoord:respawnPosition;
-    #require net.minecraft.server.level.EntityPlayer private boolean spawnForced:respawnForced;
-#elseif version >= 1.16
-    #require net.minecraft.server.level.EntityPlayer private net.minecraft.core.BlockPosition spawnCoord:spawn;
-    #require net.minecraft.server.level.EntityPlayer private boolean spawnForced;
-#elseif version >= 1.15
-    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:g;
-    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:bR;
-#elseif version >= 1.14.4
-    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:g;
-    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:bU;
-#elseif version >= 1.14
-    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:f;
-    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:g;
-#elseif version >= 1.13
-    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:e;
-    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:f;
-#elseif version >= 1.12
-    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:d;
-    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:e;
-#elseif version >= 1.11
-    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:e;
-    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:f;
-#elseif version >= 1.10.2
-    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:e;
-    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:f;
-#elseif version >= 1.9.4
-    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:e;
-    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:f; 
-#elseif version >= 1.9
-    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:e;
-    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:f;
-#elseif version >= 1.8.3
-    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:c;
-    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:d;
-#else
-    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:c;
-    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:d;
-#endif
-
-    public (IntVector3) BlockPosition getSpawnCoord() {
-        return instance#spawnCoord;
-    }
-
-    public void setSpawnCoord((IntVector3) BlockPosition coord) {
-        instance#spawnCoord = coord;
-    }
-
-    public boolean isSpawnForced() {
-        return instance#spawnForced;
-    }
-
+    <code>
+    @Deprecated
     public void setSpawnForced(boolean forced) {
-        instance#spawnForced = forced;
     }
-
-#if version >= 1.17
-    #require net.minecraft.server.level.EntityPlayer private float spawnAngle:respawnAngle;
-#elseif version >= 1.16.2
-    #require net.minecraft.server.level.EntityPlayer private float spawnAngle;
-#endif
-
-#if version >= 1.16.2
-    public float getSpawnAngle() {
-        return instance#spawnAngle;
-    }
-
-    public void setSpawnAngle(float angle) {
-        instance#spawnAngle = angle;
-    }
-#else
-    public float getSpawnAngle() {
-        return 0.0f;
-    }
-
-    public void setSpawnAngle(float angle) {
-    }
-#endif
+    </code>
 
     public int getPing() {
 #if version >= 1.20.2
@@ -404,4 +436,51 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player));
     }
     </code>
+
+    // Since 1.21.5, before it uses a proxy class
+    public class EntityPlayer.RespawnConfig {
+#if version >= 1.21.5
+        public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension();
+        public (IntVector3) BlockPosition position:pos();
+#else
+        public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension() {
+            return (ResourceKey) instance.dimension();
+        }
+
+        public (IntVector3) BlockPosition position() {
+            return (BlockPosition) instance.pos();
+        }
+#endif
+
+        public float angle();
+        public boolean forced();
+
+        public static (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig of((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension, (IntVector3) BlockPosition position, float angle, boolean forced) {
+            return new EntityPlayer$RespawnConfig(dimension, position, angle, forced);
+        }
+
+        public static (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig codecFromNBT((CommonTagCompound) NBTTagCompound nbt) {
+#if version >= 1.21.5
+            return (EntityPlayer$RespawnConfig) nbt.read("respawn", EntityPlayer$RespawnConfig.CODEC).orElse(null);
+#else
+            return null;
+#endif
+        }
+
+        public static void codecToNBT((EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig respawnConfig, (CommonTagCompound) NBTTagCompound nbt) {
+#if version >= 1.21.5
+            nbt.storeNullable("respawn", EntityPlayer$RespawnConfig.CODEC, respawnConfig);
+#endif
+        }
+
+        <code>
+        public org.bukkit.World world() {
+            return com.bergerkiller.bukkit.common.utils.WorldUtil.getWorldByDimensionKey(this.dimension());
+        }
+
+        public static EntityPlayerHandle.RespawnConfigHandle of(org.bukkit.World world, IntVector3 position, float angle, boolean forced) {
+            return of(com.bergerkiller.bukkit.common.utils.WorldUtil.getDimensionKey(world), position, angle, forced);
+        }
+        </code>
+    }
 }

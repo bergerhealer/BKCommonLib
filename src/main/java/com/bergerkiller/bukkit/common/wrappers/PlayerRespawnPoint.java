@@ -1,12 +1,12 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.resources.ResourceCategory;
@@ -19,27 +19,31 @@ import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
  * configured for a player.
  */
 public abstract class PlayerRespawnPoint {
-    private final World world;
-    private final float angle;
 
     /**
      * Default constant for unavailable respawn points. The world is null
      * and the x/y/z coordinates are 0. Can be applied to players or
      * saved to NBT, which will work as intended to clear the respawn point.
      */
-    public static final PlayerRespawnPoint NONE = new PlayerRespawnPoint(null, 0.0f) {
+    public static final PlayerRespawnPoint NONE = new PlayerRespawnPoint() {
         @Override
         public boolean isNone() {
             return true;
         }
 
         @Override
-        public Location findSafeSpawn(boolean alsoWhenDestroyed, boolean isDeathRespawn) {
+        public World getWorld() {
             return null;
         }
 
         @Override
+        public float getAngle() {
+            return 0;
+        }
+
+        @Override
         public void toNBT(CommonTagCompound nbt) {
+            nbt.removeValue("respawn");
             nbt.removeValue("SpawnWorld");
             nbt.removeValue("SpawnDimension");
             nbt.removeValue("SpawnForced");
@@ -51,14 +55,27 @@ public abstract class PlayerRespawnPoint {
 
         @Override
         public void applyToPlayer(Player player) {
-            EntityPlayerHandle handle = EntityPlayerHandle.fromBukkit(player);
-            handle.setSpawnWorld(null);
-            handle.setSpawnCoord(null);
+            EntityPlayerHandle.fromBukkit(player).setRespawnConfigSilent(null);
+        }
+
+        @Override
+        public Location findSafeSpawn() {
+            return null;
+        }
+
+        @Override
+        public Location findSafeSpawn(boolean alsoWhenDestroyed, boolean isDeathRespawn) {
+            return null;
         }
 
         @Override
         public String toString() {
             return "NONE";
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return this == o;
         }
     };
 
@@ -67,7 +84,7 @@ public abstract class PlayerRespawnPoint {
      * A default angle of 0.0 is used.
      * If block is null, {@link #NONE} is returned.
      * 
-     * @param block
+     * @param block Near Block
      * @return respawn point at this block
      */
     public static PlayerRespawnPoint create(Block block) {
@@ -78,8 +95,8 @@ public abstract class PlayerRespawnPoint {
      * Creates a new player respawn point near the block specified.
      * If block is null, {@link #NONE} is returned.
      * 
-     * @param block
-     * @param angle
+     * @param block Near Block
+     * @param angle Horizontal Angle
      * @return respawn point near this block
      */
     public static PlayerRespawnPoint create(Block block, float angle) {
@@ -90,8 +107,8 @@ public abstract class PlayerRespawnPoint {
      * Creates a new player respawn point near the block specified.
      * If block is null, {@link #NONE} is returned.
      *
-     * @param block
-     * @param angle
+     * @param block Near Block
+     * @param angle Horizontal Angle
      * @param forced Whether the respawn point near this block succeeds even if no bed or respawn anchor
      *               is nearby
      * @return respawn point near this block
@@ -109,11 +126,11 @@ public abstract class PlayerRespawnPoint {
      * specified.
      * A default angle of 0.0 is used.
      * If world is null, {@link #NONE} is returned.
-     * 
-     * @param world
-     * @param x
-     * @param y
-     * @param z
+     *
+     * @param world World
+     * @param x Near-Block X
+     * @param y Near-Block Y
+     * @param z Near-Block Z
      * @return respawn point near this block
      */
     public static PlayerRespawnPoint create(World world, int x, int y, int z) {
@@ -124,11 +141,11 @@ public abstract class PlayerRespawnPoint {
      * Creates a new player respawn point for near the block on the world and coordinates
      * specified.
      * If world is null, {@link #NONE} is returned.
-     * 
-     * @param world
-     * @param x
-     * @param y
-     * @param z
+     *
+     * @param world World
+     * @param x Near-Block X
+     * @param y Near-Block Y
+     * @param z Near-Block Z
      * @return respawn point near this block
      */
     public static PlayerRespawnPoint create(World world, int x, int y, int z, float angle) {
@@ -140,10 +157,10 @@ public abstract class PlayerRespawnPoint {
      * specified.
      * If world is null, {@link #NONE} is returned.
      *
-     * @param world
-     * @param x
-     * @param y
-     * @param z
+     * @param world World
+     * @param x Near-Block X
+     * @param y Near-Block Y
+     * @param z Near-Block Z
      * @param forced Whether the respawn point near this block succeeds even if no bed or respawn anchor
      *               is nearby
      * @return respawn point near this block
@@ -156,9 +173,25 @@ public abstract class PlayerRespawnPoint {
         }
     }
 
-    protected PlayerRespawnPoint(World world, float angle) {
-        this.world = world;
-        this.angle = Float.isNaN(angle) ? 0.0f : angle;
+    /**
+     * Creates a new player respawn point for near the block on the world and coordinates
+     * specified.
+     * If world is null, {@link #NONE} is returned.
+     *
+     * @param dimensionKey Resource key identity of the World (offline reference)
+     * @param x Near-Block X
+     * @param y Near-Block Y
+     * @param z Near-Block Z
+     * @param forced Whether the respawn point near this block succeeds even if no bed or respawn anchor
+     *               is nearby
+     * @return respawn point near this block
+     */
+    public static PlayerRespawnPoint create(ResourceKey<World> dimensionKey, int x, int y, int z, float angle, boolean forced) {
+        if (dimensionKey == null) {
+            return NONE;
+        } else {
+            return new PlayerRespawnPointNearBlock(dimensionKey, x, y, z, angle, forced);
+        }
     }
 
     /**
@@ -175,9 +208,7 @@ public abstract class PlayerRespawnPoint {
      * 
      * @return world
      */
-    public World getWorld() {
-        return this.world;
-    }
+    public abstract World getWorld();
 
     /**
      * Gets the horizontal rotation angle of the player.
@@ -185,16 +216,14 @@ public abstract class PlayerRespawnPoint {
      * 
      * @return rotation angle
      */
-    public float getAngle() {
-        return this.angle;
-    }
+    public abstract float getAngle();
 
     /**
      * Encodes this player respawn point and saves it to NBT, formatted in the
      * same way player data is stored. If this respawn point is {@link #NONE},
      * then all relevant fields are removed.
      * 
-     * @param nbt
+     * @param nbt NBT to write this respawn point configuration to
      */
     public abstract void toNBT(CommonTagCompound nbt);
 
@@ -242,6 +271,14 @@ public abstract class PlayerRespawnPoint {
     public static PlayerRespawnPoint fromNBT(CommonTagCompound nbt) {
         World world = null;
 
+        // Read the new packed format as of 1.21.5
+        if (CommonCapabilities.PLAYER_SPAWN_WORLD_IS_DIMENSION_KEY) {
+            EntityPlayerHandle.RespawnConfigHandle respawnConfig = EntityPlayerHandle.RespawnConfigHandle.codecFromNBT(nbt);
+            if (respawnConfig != null) {
+                return new PlayerRespawnPointNearBlock(respawnConfig);
+            }
+        }
+
         // Read the SpawnDimension in the new format
         if (CommonCapabilities.PLAYER_SPAWN_WORLD_IS_DIMENSION_KEY) {
             MinecraftKeyHandle spawnDimensionName = nbt.getMinecraftKey("SpawnDimension");
@@ -280,19 +317,11 @@ public abstract class PlayerRespawnPoint {
      */
     public static PlayerRespawnPoint forPlayer(Player player) {
         EntityPlayerHandle handle = EntityPlayerHandle.fromBukkit(player);
-        World world = handle.getSpawnWorld();
-        if (world == null) {
-            return NONE;
+        EntityPlayerHandle.RespawnConfigHandle respawnConfig = handle.getRespawnConfig();
+        if (respawnConfig != null) {
+            return new PlayerRespawnPointNearBlock(respawnConfig);
         }
-        IntVector3 coord = handle.getSpawnCoord();
-        if (coord == null) {
-            return NONE;
-        }
-        float angle = handle.getSpawnAngle();
-        boolean forced = handle.isSpawnForced();
-        return create(world, coord.x, coord.y, coord.z, angle, forced);
-    }
 
-    @Override
-    public abstract String toString();
+        return NONE;
+    }
 }
