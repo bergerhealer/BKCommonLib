@@ -124,7 +124,7 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
             org.bukkit.World bukkitSpawnWorld = org.bukkit.Bukkit.getWorld(instance.spawnWorld);
             if (bukkitSpawnWorld != null) {
                 WorldServer spawnWorld = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) bukkitSpawnWorld).getHandle();
-                dimension = (ResourceKey) com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.getDimensionKey.raw.invoke(spawnWorld);
+                dimension = (ResourceKey) com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.T.getDimensionKey.raw().invoke(spawnWorld);
             }
         }
   #endif
@@ -165,9 +165,9 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         //TODO: Convert to world name without first looking up the World?
         String spawnWorldName = null;
         if (respawnConfig != null && respawnConfig.dimension() != null) {
-            WorldServer world = (WorldServer) com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.getByDimensionKey.raw.invoke(respawnConfig.dimension());
+            WorldServer world = (WorldServer) com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.T.getByDimensionKey.raw().invoke(respawnConfig.dimension());
             if (world != null) {
-                spawnWorldName = world.getHandle().getName();
+                spawnWorldName = world.getWorld().getName();
             }
         }
 
