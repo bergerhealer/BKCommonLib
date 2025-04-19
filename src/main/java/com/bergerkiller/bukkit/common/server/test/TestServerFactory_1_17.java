@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.server.test;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -49,6 +50,9 @@ class TestServerFactory_1_17 extends TestServerFactory {
         setField(server, "logger",  MountiplexUtil.LOGGER);
         setField(server, "console", mc_server);
         setField(mc_server, "serverThread", Thread.currentThread());
+
+        // Assign an empty list of loaded worlds to the server instance
+        setField(mc_server, "levels", Collections.emptyMap());
 
         // Initialize the dimension root registry for the server
         // IRegistryCustom.Dimension iregistrycustom_dimension = IRegistryCustom.b(); (Main.java)

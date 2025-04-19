@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collections;
 
 import org.bukkit.Bukkit;
 
@@ -54,6 +55,9 @@ class TestServerFactory_1_14 extends TestServerFactory {
         setField(server, "logger",  MountiplexUtil.LOGGER);
         setField(server, "console", mc_server);
         setField(mc_server, "serverThread", Thread.currentThread());
+
+        // Assign an empty list of loaded worlds to the server instance
+        setField(mc_server, "worldServer", Collections.emptyMap());
 
         // Assign to the Bukkit server silently (don't want a duplicate server info log line with random null's)
         Field bkServerField = Bukkit.class.getDeclaredField("server");

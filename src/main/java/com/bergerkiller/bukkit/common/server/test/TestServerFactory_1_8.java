@@ -4,7 +4,10 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collections;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.bukkit.Bukkit;
 
 import com.bergerkiller.bukkit.common.server.CommonServerBase;
@@ -48,6 +51,15 @@ class TestServerFactory_1_8 extends TestServerFactory {
         setField(server, "console", mc_server);
         setField(mc_server, "primaryThread", Thread.currentThread());
         setField(mc_server, "serverThread", Thread.currentThread());
+
+        // Assign an empty list of loaded worlds to the server instance
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.13.1")) {
+            setField(mc_server, "worldServer", Collections.emptyMap());
+        } else {
+            Class<?> worldServerType = Class.forName(env.NMS_ROOT + "WorldServer", false, TestServerFactory.class.getClassLoader());
+            setField(mc_server, "worldServer", LogicUtil.createArray(worldServerType, 0));
+            setField(mc_server, "worlds", Collections.emptyList());
+        }
 
         // Assign to the Bukkit server silently (don't want a duplicate server info log line with random null's)
         Field bkServerField = Bukkit.class.getDeclaredField("server");

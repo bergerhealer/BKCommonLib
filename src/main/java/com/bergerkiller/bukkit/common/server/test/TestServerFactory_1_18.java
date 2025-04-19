@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.server.test;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -60,6 +61,9 @@ class TestServerFactory_1_18 extends TestServerFactory {
         setField(server, "logger",  MountiplexUtil.LOGGER);
         setField(server, "console", mc_server);
         setField(mc_server, "serverThread", Thread.currentThread());
+
+        // Assign an empty list of loaded worlds to the server instance
+        setField(mc_server, "levels", Collections.emptyMap());
 
         // Initialize the 'registries' cache field. Added in Bukkit 1.19.1
         if (CommonBootstrap.evaluateMCVersion(">=", "1.19.1")) {
