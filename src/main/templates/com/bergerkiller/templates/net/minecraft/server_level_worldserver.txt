@@ -15,6 +15,8 @@ import net.minecraft.world.phys.Vec3D;
 import net.minecraft.world.ticks.TickListServer;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.Ticket;
+import net.minecraft.server.level.TicketType;
 
 import java.util.function.Function;
 import java.util.function.LongPredicate;
@@ -304,7 +306,19 @@ class WorldServer extends World {
 #endif
     }
 
-#if exists net.minecraft.server.level.TicketType public static final TicketType<org.bukkit.plugin.Plugin> PLUGIN_TICKET;
+#if version >= 1.21.5
+    public void setForceLoadedAsync(int x, int z, org.bukkit.plugin.Plugin plugin, boolean loaded, int radius) {
+        ChunkProviderServer cps = instance#getChunkProviderServer();
+        net.minecraft.world.level.TicketStorage ticketStorage = cps.ticketStorage;
+        ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(x, z);
+        Ticket ticket = Ticket.of(TicketType.PLUGIN_TICKET, radius, (Object) plugin);
+        if (loaded) {
+            ticketStorage.addTicket(ticket, chunkCoord);
+        } else {
+            ticketStorage.removeTicket(ticket, chunkCoord);
+        }
+    }
+#elseif exists net.minecraft.server.level.TicketType public static final TicketType<org.bukkit.plugin.Plugin> PLUGIN_TICKET;
     public void setForceLoadedAsync(int x, int z, org.bukkit.plugin.Plugin plugin, boolean loaded, int radius) {
         PlayerChunkMap chunkMap = instance#getPlayerChunkMap();
         ChunkMapDistance chunkDistanceManager;
@@ -319,7 +333,16 @@ class WorldServer extends World {
   #endif
 
         ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(x, z);
-  #if version >= 1.18
+  #if version >= 1.21.5
+          #require
+
+
+          if (loaded) {
+              chunkDistanceManager.addRegionTicket(TicketType.PLUGIN_TICKET, chunkCoord, radius, plugin);
+          } else {
+              chunkDistanceManager.removeRegionTicket(TicketType.PLUGIN_TICKET, chunkCoord, radius, plugin);
+          }
+  #elseif version >= 1.18
         if (loaded) {
             chunkDistanceManager.addRegionTicket(TicketType.PLUGIN_TICKET, chunkCoord, radius, plugin);
         } else {
