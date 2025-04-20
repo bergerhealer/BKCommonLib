@@ -741,7 +741,10 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
     </code>
 }
 
-class PacketPlayOutSpawnEntityExperienceOrb extends Packet {
+// No longer used since 1.21.5, where it uses a normal PacketPlayOutSpawnEntity
+// The experience value (size of orb) is stored in the DataWatcher metadata instead
+// This logic is incompatible so this class is not kept around for 1.21.5+
+optional class PacketPlayOutSpawnEntityExperienceOrb extends Packet {
 #if version >= 1.17
     private int entityId:id;
 #else

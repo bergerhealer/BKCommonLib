@@ -8,6 +8,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.Optional
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityExperienceOrb")
 public abstract class PacketPlayOutSpawnEntityExperienceOrbHandle extends PacketHandle {
     /** @see PacketPlayOutSpawnEntityExperienceOrbClass */
