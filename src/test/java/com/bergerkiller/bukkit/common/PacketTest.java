@@ -81,4 +81,28 @@ public class PacketTest {
         packet.setDisplayName(ChatText.fromMessage("Dummy"));
         assertEquals(ChatText.fromMessage("Dummy"), packet.getDisplayName());
     }
+
+    @Test
+    public void testPacketScoreboardTeamVisibility() {
+        PacketPlayOutScoreboardTeamHandle packet = PacketPlayOutScoreboardTeamHandle.createNew();
+        assertNotNull(packet);
+
+        packet.setVisibility("never");
+        assertEquals("never", packet.getVisibility());
+
+        packet.setVisibility("always");
+        assertEquals("always", packet.getVisibility());
+    }
+
+    @Test
+    public void testPacketScoreboardTeamCollisionRule() {
+        PacketPlayOutScoreboardTeamHandle packet = PacketPlayOutScoreboardTeamHandle.createNew();
+        assertNotNull(packet);
+
+        packet.setCollisionRule("pushOtherTeams");
+        assertEquals("pushOtherTeams", packet.getCollisionRule());
+
+        packet.setCollisionRule("never");
+        assertEquals("never", packet.getCollisionRule());
+    }
 }

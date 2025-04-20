@@ -26,6 +26,7 @@ import java.util.zip.ZipInputStream;
 import com.bergerkiller.bukkit.common.conversion.type.JOMLConversion;
 import com.bergerkiller.bukkit.common.conversion.type.MapConversion;
 import com.bergerkiller.bukkit.common.conversion.type.ScoreboardDisplaySlotConversion;
+import com.bergerkiller.bukkit.common.conversion.type.SerializedEnumConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.internal.logic.UnsetDataWatcherItemInit;
 import com.bergerkiller.bukkit.common.wrappers.Brightness;
@@ -960,6 +961,9 @@ public class CommonBootstrap {
             Logging.LOGGER_REFLECTION.log(Level.SEVERE,
                     "Failed to register JOML converters", t);
         }
+
+        // Enum <> String type of conversions based on Mojangs Codec system
+        SerializedEnumConversion.registerMinecraftEnumConversion();
 
         // Initialize the 'Conversion' classes right after to catch errors happening here
         CommonUtil.getClass(Conversion.class.getName(), true);

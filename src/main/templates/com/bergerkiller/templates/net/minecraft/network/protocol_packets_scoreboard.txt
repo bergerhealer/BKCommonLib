@@ -74,8 +74,13 @@ class PacketPlayOutScoreboardTeam extends Packet {
     #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam.b private final IChatBaseComponent displayName;
     #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam.b private final IChatBaseComponent prefix:playerPrefix;
     #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam.b private final IChatBaseComponent suffix:playerSuffix;
+  #if version >= 1.21.5
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam.b private final (String) net.minecraft.world.scores.ScoreboardTeamBase.EnumNameTagVisibility visibility:nametagVisibility;
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam.b private final (String) net.minecraft.world.scores.ScoreboardTeamBase.EnumTeamPush collisionRule;
+  #else
     #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam.b private final String visibility:nametagVisibility;
     #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam.b private final String collisionRule;
+  #endif
     #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam.b private final EnumChatFormat color;
     #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam.b private final int teamOptionFlags:options;
 
