@@ -3,7 +3,6 @@ package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.PacketPlayInWindowClick</b>.
@@ -28,8 +27,6 @@ public abstract class PacketPlayInWindowClickHandle extends PacketHandle {
     public abstract void setSlot(short value);
     public abstract byte getButton();
     public abstract void setButton(byte value);
-    public abstract ItemStack getItem();
-    public abstract void setItem(ItemStack value);
     public abstract InventoryClickType getMode();
     public abstract void setMode(InventoryClickType value);
     /**
@@ -40,7 +37,6 @@ public abstract class PacketPlayInWindowClickHandle extends PacketHandle {
         public final Template.Field.Integer windowId = new Template.Field.Integer();
         public final Template.Field.Converted<Short> slot = new Template.Field.Converted<Short>();
         public final Template.Field.Converted<Byte> button = new Template.Field.Converted<Byte>();
-        public final Template.Field.Converted<ItemStack> item = new Template.Field.Converted<ItemStack>();
         public final Template.Field.Converted<InventoryClickType> mode = new Template.Field.Converted<InventoryClickType>();
 
     }

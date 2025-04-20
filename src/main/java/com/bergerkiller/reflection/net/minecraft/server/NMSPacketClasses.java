@@ -697,7 +697,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> windowId = PacketPlayInWindowClickHandle.T.windowId.toFieldAccessor();
         public final FieldAccessor<Short> slot = PacketPlayInWindowClickHandle.T.slot.toFieldAccessor();
         public final FieldAccessor<Byte> button = PacketPlayInWindowClickHandle.T.button.toFieldAccessor();
-        public final FieldAccessor<ItemStack> item = PacketPlayInWindowClickHandle.T.item.toFieldAccessor();
+        //public final FieldAccessor<ItemStack> item = PacketPlayInWindowClickHandle.T.item.toFieldAccessor();
         public final FieldAccessor<InventoryClickType> mode = PacketPlayInWindowClickHandle.T.mode.toFieldAccessor();
     }
 

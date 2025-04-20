@@ -2646,18 +2646,20 @@ class PacketPlayInWindowClick extends Packet {
     private int windowId:containerId;
     private (short) short slot:slotNum;
     private (byte) byte button:buttonNum;
-    private (org.bukkit.inventory.ItemStack) ItemStack item:carriedItem;
+
+    // Note: this is now a "HashedStack" which we will need an API for
+    //private (org.bukkit.inventory.ItemStack) ItemStack item:carriedItem;
 #elseif version >= 1.17
     private int windowId:containerId;
     private (short) int slot:slotNum;
     private (byte) int button:buttonNum;
-    private (org.bukkit.inventory.ItemStack) ItemStack item:carriedItem;
+    //private (org.bukkit.inventory.ItemStack) ItemStack item:carriedItem;
 #else
     private int windowId:a;
     private (short) int slot;
     private (byte) int button;
     private unknown short action:d; //TODO: Do something with this?
-    private (org.bukkit.inventory.ItemStack) ItemStack item;
+    //private (org.bukkit.inventory.ItemStack) ItemStack item;
 #endif
 
 #if version >= 1.17
