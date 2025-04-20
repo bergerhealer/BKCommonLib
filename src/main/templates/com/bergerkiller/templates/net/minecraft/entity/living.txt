@@ -142,12 +142,18 @@ class EntityLiving extends Entity {
         instance#craftAttributes = new_craftAttributes;
 
         // Item attributes need to be re-applied later, they are lost as part of this reset
+  #if version >= 1.21.5
+        #require net.minecraft.world.entity.EntityLiving private final Map<EnumItemSlot, ItemStack> lastEquipmentItems;
+        Map lastEquipmentItems = instance#lastEquipmentItems;
+        lastEquipmentItems.clear();
+  #else
         #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> lastHandItemStacks;
         #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> lastArmorItemStacks;
         NonNullList lastHandItemStacks = instance#lastHandItemStacks;
         NonNullList lastArmorItemStacks = instance#lastArmorItemStacks;
         lastHandItemStacks.clear();
         lastArmorItemStacks.clear();
+  #endif
 #elseif version >= 1.16
         // Is only set in constructor, so we'll have to force it
         // TODO: Is there no cleaner way to do this? Maybe modify AttributeMapBase directly?
