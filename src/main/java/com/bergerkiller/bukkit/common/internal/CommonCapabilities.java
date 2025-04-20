@@ -312,4 +312,9 @@ public class CommonCapabilities {
      * Since Minecraft 1.21.5 the respawn point is packed into a compount in the player's data NBT
      */
     public static final boolean IS_RESPAWN_POINT_PACKED = CommonBootstrap.evaluateMCVersion(">=", "1.21.5");
+
+    /**
+     * Since Minecraft 1.21.5 the Minecart displayed block and whether it is displayed is in a single (Optional) BlockData key instead.
+     */
+    public static final boolean IS_MINECART_BLOCK_COMBINED_KEY = CommonBootstrap.evaluateMCVersion(">=", "1.21.5");
 }

@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.entity.type;
 import java.util.Collections;
 import java.util.List;
 
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Minecart;
@@ -26,8 +27,6 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
     public final DataWatcher.EntityItem<Float>   metaShakingDamage    = getDataItem(EntityMinecartAbstractHandle.DATA_SHAKING_DAMAGE);
     public final DataWatcher.EntityItem<Integer> metaShakingFactor    = getDataItem(EntityMinecartAbstractHandle.DATA_SHAKING_FACTOR);
     public final DataWatcher.EntityItem<Integer> metaBlockOffset      = getDataItem(EntityMinecartAbstractHandle.DATA_BLOCK_OFFSET);
-    public final DataWatcher.EntityItem<Integer> metaBlockType        = getDataItem(EntityMinecartAbstractHandle.DATA_BLOCK_TYPE);
-    public final DataWatcher.EntityItem<Boolean> metaBlockVisible     = getDataItem(EntityMinecartAbstractHandle.DATA_BLOCK_VISIBLE);
 
     public CommonMinecart(T base) {
         super(base);
@@ -135,18 +134,6 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
     }
 
     /**
-     * Gets the block data for this Minecart<br>
-     * <br>
-     * <b>Deprecated: </b>use {@link #getBlock()} instead
-     *
-     * @return block data
-     */
-    @Deprecated
-    public int getBlockData() {
-        return metaBlockType.get() >> 16;
-    }
-
-    /**
      * Sets the Block displayed in this Minecart<br>
      * <br>
      * <b>Deprecated: </b>use {@link #setBlock(BlockData)} instead
@@ -166,7 +153,12 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
      */
     @SuppressWarnings("deprecation")
     public BlockData getBlock() {
-        return BlockData.fromCombinedId(metaBlockType.get());
+        if (CommonCapabilities.IS_MINECART_BLOCK_COMBINED_KEY) {
+            return getDataWatcher().get(EntityMinecartAbstractHandle.DATA_CUSTOM_DISPLAY_BLOCK);
+        } else {
+            Integer value = getDataWatcher().get(EntityMinecartAbstractHandle.DATA_BLOCK_TYPE);
+            return value == null ? BlockData.AIR : BlockData.fromCombinedId(value);
+        }
     }
 
     /**
@@ -185,13 +177,21 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
      */
     @SuppressWarnings("deprecation")
     public void setBlock(BlockData block) {
-        if (block.getType() == Material.AIR) {
-            metaBlockType.set(0);
-            metaBlockVisible.set(false);
-            return;
+        DataWatcher meta = getDataWatcher();
+        if (CommonCapabilities.IS_MINECART_BLOCK_COMBINED_KEY) {
+            if (block.getType() == Material.AIR) {
+                meta.set(EntityMinecartAbstractHandle.DATA_CUSTOM_DISPLAY_BLOCK, null);
+            } else {
+                meta.set(EntityMinecartAbstractHandle.DATA_CUSTOM_DISPLAY_BLOCK, block);
+            }
         } else {
-            metaBlockType.set(block.getCombinedId());
-            metaBlockVisible.set(true);
+            if (block.getType() == Material.AIR) {
+                meta.set(EntityMinecartAbstractHandle.DATA_BLOCK_TYPE, 0);
+                meta.set(EntityMinecartAbstractHandle.DATA_BLOCK_VISIBLE, false);
+            } else {
+                meta.set(EntityMinecartAbstractHandle.DATA_BLOCK_TYPE, block.getCombinedId());
+                meta.set(EntityMinecartAbstractHandle.DATA_BLOCK_VISIBLE, true);
+            }
         }
     }
 

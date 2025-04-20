@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.world.entity.vehicle;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 
@@ -28,6 +29,10 @@ public abstract class EntityMinecartAbstractHandle extends EntityHandle {
     public static final Key<Integer> DATA_SHAKING_FACTOR;
     public static final Key<Integer> DATA_SHAKING_DIRECTION;
     public static final Key<Float> DATA_SHAKING_DAMAGE;
+    public static final Key<BlockData> DATA_CUSTOM_DISPLAY_BLOCK;
+    public static final Key<Integer> DATA_BLOCK_TYPE;
+    public static final Key<Integer> DATA_BLOCK_OFFSET = Key.Type.INTEGER.createKey(T.DATA_BLOCK_OFFSET, 21);
+    public static final Key<Boolean> DATA_BLOCK_VISIBLE;
 
     static {
         if (VehicleEntityHandle.T.isAvailable()) {
@@ -39,11 +44,17 @@ public abstract class EntityMinecartAbstractHandle extends EntityHandle {
             DATA_SHAKING_DIRECTION = Key.Type.INTEGER.createKey(T.DATA_SHAKING_DIRECTION, 18);
             DATA_SHAKING_DAMAGE = Key.Type.FLOAT.createKey(T.DATA_SHAKING_DAMAGE, 19);
         }
-    }
 
-    public static final Key<Integer> DATA_BLOCK_TYPE = Key.Type.INTEGER.createKey(T.DATA_BLOCK_TYPE, 20);
-    public static final Key<Integer> DATA_BLOCK_OFFSET = Key.Type.INTEGER.createKey(T.DATA_BLOCK_OFFSET, 21);
-    public static final Key<Boolean> DATA_BLOCK_VISIBLE = Key.Type.BOOLEAN.createKey(T.DATA_BLOCK_VISIBLE, 22);
+        if (com.bergerkiller.bukkit.common.internal.CommonCapabilities.IS_MINECART_BLOCK_COMBINED_KEY) {
+            DATA_CUSTOM_DISPLAY_BLOCK = Key.Type.BLOCK_DATA.createKey(T.DATA_ID_CUSTOM_DISPLAY_BLOCK, -1);
+            DATA_BLOCK_TYPE = new Key.Disabled(Key.Type.INTEGER);
+            DATA_BLOCK_VISIBLE = new Key.Disabled(Key.Type.BOOLEAN);
+        } else {
+            DATA_CUSTOM_DISPLAY_BLOCK = new Key.Disabled(Key.Type.BLOCK_DATA);
+            DATA_BLOCK_TYPE = Key.Type.INTEGER.createKey(T.DATA_BLOCK_TYPE, 20);
+            DATA_BLOCK_VISIBLE = Key.Type.BOOLEAN.createKey(T.DATA_BLOCK_VISIBLE, 22);
+        }
+    }
     /**
      * Stores class members for <b>net.minecraft.world.entity.vehicle.EntityMinecartAbstract</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -55,6 +66,8 @@ public abstract class EntityMinecartAbstractHandle extends EntityHandle {
         public final Template.StaticField.Converted<Key<Integer>> DATA_SHAKING_DIRECTION = new Template.StaticField.Converted<Key<Integer>>();
         @Template.Optional
         public final Template.StaticField.Converted<Key<Float>> DATA_SHAKING_DAMAGE = new Template.StaticField.Converted<Key<Float>>();
+        @Template.Optional
+        public final Template.StaticField.Converted<Key<BlockData>> DATA_ID_CUSTOM_DISPLAY_BLOCK = new Template.StaticField.Converted<Key<BlockData>>();
         @Template.Optional
         public final Template.StaticField.Converted<Key<Integer>> DATA_BLOCK_TYPE = new Template.StaticField.Converted<Key<Integer>>();
         @Template.Optional

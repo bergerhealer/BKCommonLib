@@ -3,12 +3,14 @@ package com.bergerkiller.bukkit.common;
 import static org.junit.Assert.*;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.math.Quaternion;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode;
 import com.bergerkiller.generated.net.minecraft.world.entity.DisplayHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityItemFrameHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartAbstractHandle;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -393,6 +395,24 @@ public class DataWatcherTest {
 
             metadata.set(DisplayHandle.ItemDisplayHandle.DATA_ITEM_DISPLAY_MODE, mode);
             assertEquals(mode, metadata.get(DisplayHandle.ItemDisplayHandle.DATA_ITEM_DISPLAY_MODE));
+        }
+    }
+
+    @Test
+    public void testMinecartDisplayedBlock() {
+        DataWatcher metadata = new DataWatcher();
+
+        BlockData testData = BlockData.fromMaterial(MaterialUtil.getFirst("DIAMOND_BLOCK", "LEGACY_DIAMOND_BLOCK"));
+
+        if (CommonCapabilities.IS_MINECART_BLOCK_COMBINED_KEY) {
+            metadata.set(EntityMinecartAbstractHandle.DATA_CUSTOM_DISPLAY_BLOCK, testData);
+            assertEquals(testData, metadata.get(EntityMinecartAbstractHandle.DATA_CUSTOM_DISPLAY_BLOCK));
+        } else {
+            metadata.set(EntityMinecartAbstractHandle.DATA_BLOCK_VISIBLE, true);
+            assertEquals(true, metadata.get(EntityMinecartAbstractHandle.DATA_BLOCK_VISIBLE));
+
+            metadata.set(EntityMinecartAbstractHandle.DATA_BLOCK_TYPE, testData.getCombinedId());
+            assertEquals(testData, BlockData.fromCombinedId(metadata.get(EntityMinecartAbstractHandle.DATA_BLOCK_TYPE)));
         }
     }
 }

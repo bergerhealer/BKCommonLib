@@ -20,9 +20,7 @@ public class NMSEntityMinecart {
     public static DataWatcher.Key<Integer> DATA_SHAKING_FACTOR = EntityMinecartAbstractHandle.DATA_SHAKING_FACTOR;
     public static DataWatcher.Key<Integer> DATA_SHAKING_DIRECTION = EntityMinecartAbstractHandle.DATA_SHAKING_DIRECTION;
     public static DataWatcher.Key<Float> DATA_SHAKING_DAMAGE = EntityMinecartAbstractHandle.DATA_SHAKING_DAMAGE;
-    public static DataWatcher.Key<Integer> DATA_BLOCK_TYPE = EntityMinecartAbstractHandle.DATA_BLOCK_TYPE;
     public static DataWatcher.Key<Integer> DATA_BLOCK_OFFSET = EntityMinecartAbstractHandle.DATA_BLOCK_OFFSET;
-    public static DataWatcher.Key<Boolean> DATA_BLOCK_VISIBLE = EntityMinecartAbstractHandle.DATA_BLOCK_VISIBLE;
 
     public static final MethodAccessor<Void> activate = EntityMinecartAbstractHandle.T.activate.toMethodAccessor();
 

@@ -1,5 +1,6 @@
 package net.minecraft.world.entity.vehicle;
 
+import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.phys.Vec3D;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.network.chat.IChatBaseComponent;
@@ -7,6 +8,7 @@ import net.minecraft.network.syncher.DataWatcherObject;
 
 import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.NewMinecartBehaviorHandle.LerpStepHandle;
 
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
@@ -34,14 +36,22 @@ optional class VehicleEntity extends Entity {
 }
 
 class EntityMinecartAbstract extends Entity {
-#if version >= 1.20.3
+#if version >= 1.21.5
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:###;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:###;
+    private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:###;
+    private static optional final (DataWatcher.Key<BlockData>) DataWatcherObject<Optional<IBlockData>> DATA_ID_CUSTOM_DISPLAY_BLOCK;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_TYPE:###;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_OFFSET:DATA_ID_DISPLAY_OFFSET;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_BLOCK_VISIBLE:###;
+#elseif version >= 1.20.3
     // Note: hurt/hurtdir/damage have been moved to parent class "VehicleEntity"
     //       it's a bit of a mess with backwards compatibility unfortunately
     //       we cope...
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:###;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:###;
     private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:###;
-
+    private static optional final (DataWatcher.Key<BlockData>) DataWatcherObject<Optional<IBlockData>> DATA_ID_CUSTOM_DISPLAY_BLOCK:###;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_TYPE:DATA_ID_DISPLAY_BLOCK;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_OFFSET:DATA_ID_DISPLAY_OFFSET;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_BLOCK_VISIBLE:DATA_ID_CUSTOM_DISPLAY;
@@ -49,6 +59,7 @@ class EntityMinecartAbstract extends Entity {
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:DATA_ID_HURT;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:DATA_ID_HURTDIR;
     private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:DATA_ID_DAMAGE;
+    private static optional final (DataWatcher.Key<BlockData>) DataWatcherObject<Optional<IBlockData>> DATA_ID_CUSTOM_DISPLAY_BLOCK:###;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_TYPE:DATA_ID_DISPLAY_BLOCK;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_OFFSET:DATA_ID_DISPLAY_OFFSET;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_BLOCK_VISIBLE:DATA_ID_CUSTOM_DISPLAY;
@@ -56,6 +67,7 @@ class EntityMinecartAbstract extends Entity {
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:b;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:c;
     private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:d;
+    private static optional final (DataWatcher.Key<BlockData>) DataWatcherObject<Optional<IBlockData>> DATA_ID_CUSTOM_DISPLAY_BLOCK:###;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_TYPE:e;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_OFFSET:f;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_BLOCK_VISIBLE:g;
@@ -63,6 +75,7 @@ class EntityMinecartAbstract extends Entity {
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:a;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:b;
     private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:c;
+    private static optional final (DataWatcher.Key<BlockData>) DataWatcherObject<Optional<IBlockData>> DATA_ID_CUSTOM_DISPLAY_BLOCK:###;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_TYPE:d;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_OFFSET:e;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_BLOCK_VISIBLE:f;
@@ -70,6 +83,7 @@ class EntityMinecartAbstract extends Entity {
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:###;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:###;
     private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:###;
+    private static optional final (DataWatcher.Key<BlockData>) DataWatcherObject<Optional<IBlockData>> DATA_ID_CUSTOM_DISPLAY_BLOCK:###;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_TYPE:###;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_OFFSET:###;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_BLOCK_VISIBLE:###;
@@ -79,6 +93,10 @@ class EntityMinecartAbstract extends Entity {
     public static final Key<Integer> DATA_SHAKING_FACTOR;
     public static final Key<Integer> DATA_SHAKING_DIRECTION;
     public static final Key<Float> DATA_SHAKING_DAMAGE;
+    public static final Key<BlockData> DATA_CUSTOM_DISPLAY_BLOCK;
+    public static final Key<Integer> DATA_BLOCK_TYPE;
+    public static final Key<Integer> DATA_BLOCK_OFFSET = Key.Type.INTEGER.createKey(T.DATA_BLOCK_OFFSET, 21);
+    public static final Key<Boolean> DATA_BLOCK_VISIBLE;
 
     static {
         if (VehicleEntityHandle.T.isAvailable()) {
@@ -90,11 +108,17 @@ class EntityMinecartAbstract extends Entity {
             DATA_SHAKING_DIRECTION = Key.Type.INTEGER.createKey(T.DATA_SHAKING_DIRECTION, 18);
             DATA_SHAKING_DAMAGE = Key.Type.FLOAT.createKey(T.DATA_SHAKING_DAMAGE, 19);
         }
-    }
 
-    public static final Key<Integer> DATA_BLOCK_TYPE = Key.Type.INTEGER.createKey(T.DATA_BLOCK_TYPE, 20);
-    public static final Key<Integer> DATA_BLOCK_OFFSET = Key.Type.INTEGER.createKey(T.DATA_BLOCK_OFFSET, 21);
-    public static final Key<Boolean> DATA_BLOCK_VISIBLE = Key.Type.BOOLEAN.createKey(T.DATA_BLOCK_VISIBLE, 22);
+        if (com.bergerkiller.bukkit.common.internal.CommonCapabilities.IS_MINECART_BLOCK_COMBINED_KEY) {
+            DATA_CUSTOM_DISPLAY_BLOCK = Key.Type.BLOCK_DATA.createKey(T.DATA_ID_CUSTOM_DISPLAY_BLOCK, -1);
+            DATA_BLOCK_TYPE = new Key.Disabled(Key.Type.INTEGER);
+            DATA_BLOCK_VISIBLE = new Key.Disabled(Key.Type.BOOLEAN);
+        } else {
+            DATA_CUSTOM_DISPLAY_BLOCK = new Key.Disabled(Key.Type.BLOCK_DATA);
+            DATA_BLOCK_TYPE = Key.Type.INTEGER.createKey(T.DATA_BLOCK_TYPE, 20);
+            DATA_BLOCK_VISIBLE = Key.Type.BOOLEAN.createKey(T.DATA_BLOCK_VISIBLE, 22);
+        }
+    }
     </code>
 
     public float getDamage();
