@@ -119,6 +119,17 @@ public class PlayerRespawnPointNearBlock extends PlayerRespawnPoint {
         return handle.forced();
     }
 
+    /**
+     * Updates this respawn point so that the {@link #isForced()} reflects the updated state
+     *
+     * @param forced True if forced
+     * @return New PlayerRespawnPointNearBlock with forced updated
+     */
+    public PlayerRespawnPointNearBlock withForced(boolean forced) {
+        return new PlayerRespawnPointNearBlock(EntityPlayerHandle.RespawnConfigHandle.of(
+                handle.dimension(), handle.position(), handle.angle(), forced));
+    }
+
     @Override
     public void applyToPlayer(Player player) {
         EntityPlayerHandle.fromBukkit(player).setRespawnConfigSilent(handle);

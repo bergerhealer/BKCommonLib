@@ -54,7 +54,12 @@ public abstract class WorldServerHandle extends WorldHandle {
     public abstract boolean addEntity(EntityHandle entity);
     public abstract MinecraftServerHandle getMinecraftServer();
     public abstract void saveLevel();
-    public abstract Location findSafeSpawn(PlayerRespawnPointNearBlock respawnPoint, boolean alsoWhenDestroyed, boolean isDeathRespawn);
+    public abstract Location findSafeSpawn(PlayerRespawnPointNearBlock respawnPoint, boolean isDeathRespawn);
+    @Deprecated
+    public org.bukkit.Location findSafeSpawn(PlayerRespawnPointNearBlock respawnPoint, boolean alsoWhenDestroyed, boolean isDeathRespawn) {
+        return findSafeSpawn(respawnPoint.withForced(alsoWhenDestroyed), isDeathRespawn);
+    }
+
     public static WorldServerHandle fromBukkit(org.bukkit.World world) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
     }
@@ -96,7 +101,7 @@ public abstract class WorldServerHandle extends WorldHandle {
         public final Template.Method.Converted<Boolean> addEntity = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<MinecraftServerHandle> getMinecraftServer = new Template.Method.Converted<MinecraftServerHandle>();
         public final Template.Method<Void> saveLevel = new Template.Method<Void>();
-        public final Template.Method<Location> findSafeSpawn = new Template.Method<Location>();
+        public final Template.Method.Converted<Location> findSafeSpawn = new Template.Method.Converted<Location>();
 
     }
 
