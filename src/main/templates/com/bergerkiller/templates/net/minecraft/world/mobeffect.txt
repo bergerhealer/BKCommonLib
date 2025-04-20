@@ -7,6 +7,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.craftbukkit.potion.CraftPotionUtil;
 
+import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
@@ -52,7 +53,7 @@ class MobEffect {
         // RegistryOps<NBTBase> registryops = this.registryAccess().<NBTBase>createSerializationContext(DynamicOpsNBT.INSTANCE);
         com.mojang.serialization.DynamicOps dynamicops = net.minecraft.nbt.DynamicOpsNBT.INSTANCE;
         return (MobEffect) MobEffect.CODEC.parse(dynamicops, compound)
-            .resultOrPartial(CommonTagCompound.createPartialErrorLogger(compound))
+            .resultOrPartial(NBTTagCompoundHandle.createPartialErrorLogger(compound))
             .orElse(null);
     }
 #elseif version >= 1.18

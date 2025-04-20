@@ -14,7 +14,11 @@ class Vector3f {
 #endif
 
     public org.bukkit.util.Vector toBukkit() {
+#if version >= 1.21.5
+        return new org.bukkit.util.Vector(instance.x(), instance.y(), instance.z());
+#else
         return new org.bukkit.util.Vector(instance.getX(), instance.getY(), instance.getZ());
+#endif
     }
 
     public (Vector3fHandle) Vector3f(float x, float y, float z);

@@ -9,6 +9,7 @@ import net.minecraft.world.level.IMaterial;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.item.ItemWorldMap;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -216,10 +217,40 @@ class ItemStack {
     }
 #endif
 
+#if version >= 1.21.5
+    #require ItemStack public java.util.LinkedHashSet getHiddenToolTipComponents() {
+        TooltipDisplay display = (TooltipDisplay) instance.get(DataComponents.TOOLTIP_DISPLAY);
+        java.util.LinkedHashSet hiddenDataComponents = new java.util.LinkedHashSet();
+        if (display.hideTooltip()) {
+            hiddenDataComponents.addAll(display.hiddenComponents());
+        }
+        return hiddenDataComponents;
+    }
 
-#if version >= 1.20.5
     public void hideTooltip() {
+        java.util.LinkedHashSet hiddenDataComponents = instance#getHiddenToolTipComponents();
+        hiddenDataComponents.add(DataComponents.ITEM_NAME);
+        hiddenDataComponents.add(DataComponents.CUSTOM_NAME);
+
+        instance.set(DataComponents.TOOLTIP_DISPLAY, new TooltipDisplay(true, hiddenDataComponents));
+    }
+
+    public void hideAllAttributes() {
+        java.util.LinkedHashSet hiddenDataComponents = instance#getHiddenToolTipComponents();
+        java.util.Iterator allDataComponentsIter = net.minecraft.core.registries.BuiltInRegistries.DATA_COMPONENT_TYPE.iterator();
+        while (allDataComponentsIter.hasNext()) {
+            hiddenDataComponents.add(allDataComponentsIter.next());
+        }
+
+        instance.set(DataComponents.TOOLTIP_DISPLAY, new TooltipDisplay(true, hiddenDataComponents));
+    }
+#elseif version >= 1.20.5
+    public void hideTooltip() {
+  #if version >= 1.21.5
+        instance.set(DataComponents.HIDE_TOOLTIP, new TooltipDisplay(true, ));
+  #else
         instance.set(DataComponents.HIDE_TOOLTIP, net.minecraft.util.Unit.INSTANCE);
+  #endif
     }
 
     public void hideAllAttributes() {
@@ -481,7 +512,13 @@ class ItemStack {
 #endif
     }
     public void setUnbreakable(boolean unbreakable) {
-#if version >= 1.20.5
+#if version >= 1.21.5
+        if (unbreakable) {
+            instance.set(DataComponents.UNBREAKABLE, net.minecraft.util.Unit.INSTANCE);
+        } else {
+            instance.remove(DataComponents.UNBREAKABLE);
+        }
+#elseif version >= 1.20.5
         // Preserve tooltip yes/no by only checking it changed
         if (unbreakable != instance.has(DataComponents.UNBREAKABLE)) {
             if (unbreakable) {

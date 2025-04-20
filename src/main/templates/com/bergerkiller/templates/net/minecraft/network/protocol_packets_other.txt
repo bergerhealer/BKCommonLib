@@ -1519,7 +1519,7 @@ class PacketPlayOutMapChunk extends Packet {
         java.util.Iterator iter = heightmaps.entrySet().iterator();
         while (iter.hasNext()) {
             java.util.Map$Entry entry = (java.util.Map$Entry) iter.next();
-            HeightMap$Type heightmapType = (HeightMap$Type) entry.getKey();
+            net.minecraft.world.level.levelgen.HeightMap$Type heightmapType = (net.minecraft.world.level.levelgen.HeightMap$Type) entry.getKey();
             long[] heightmapData = (long[]) entry.getValue();
             heightmapsNBT.putLongArray(heightmapType.getSerializedName(), heightmapData);
         }
@@ -1543,7 +1543,7 @@ class PacketPlayOutMapChunk extends Packet {
         // Convert NBT into Map<HeightMap.Type, long[]>
         java.util.Map heightmaps = new java.util.HashMap(heightmapsData.size());
 
-        HeightMap$Type[] heightmapTypes = HeightMap$Type.values();
+        net.minecraft.world.level.levelgen.HeightMap$Type[] heightmapTypes = net.minecraft.world.level.levelgen.HeightMap$Type.values();
 
         //   public Set<Map.Entry<String, NBTBase>> entrySet() {
         java.util.Iterator nbtEntryIter = heightmapsData.entrySet().iterator();
@@ -1553,7 +1553,7 @@ class PacketPlayOutMapChunk extends Packet {
             // Key -> HeightMap.Type
             // TODO: Use the Codec to avoid a for loop here
             String serializedName = (String) entry.getKey();
-            HeightMap$Type heightmapType = null;
+            net.minecraft.world.level.levelgen.HeightMap$Type heightmapType = null;
             for (int i = 0; i < heightmapTypes.length; i++) {
                 if (heightmapTypes[i].getSerializedName().equals(serializedName)) {
                     heightmapType = heightmapTypes[i];

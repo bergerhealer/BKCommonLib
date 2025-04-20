@@ -90,7 +90,17 @@ class IChatBaseComponent {
 
     public (IChatBaseComponentHandle) IChatBaseComponent setClickableURL(String url) {
         ChatModifier modifier = instance.getStyle();
-#if version >= 1.18
+#if version >= 1.21.5
+        java.net.URI parsedURI = null;
+        try {
+            parsedURI = new java.net.URI(url);
+        } catch (Throwable t) {
+            // Not a valid URL at all
+        }
+        if (parsedURI != null) {
+            modifier = modifier.withClickEvent(new ChatClickable$OpenUrl(parsedURI));
+        }
+#elseif version >= 1.18
         modifier = modifier.withClickEvent(new ChatClickable(ChatClickable$EnumClickAction.OPEN_URL, url));
 #else
         modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.OPEN_URL, url));
@@ -101,7 +111,9 @@ class IChatBaseComponent {
     public (IChatBaseComponentHandle) IChatBaseComponent setClickableContent(String content) {
 #if version >= 1.15
         ChatModifier modifier = instance.getStyle();
-  #if version >= 1.18
+  #if version >= 1.21.5
+        modifier = modifier.withClickEvent(new ChatClickable$CopyToClipboard(content));
+  #elseif version >= 1.18
         modifier = modifier.withClickEvent(new ChatClickable(ChatClickable$EnumClickAction.COPY_TO_CLIPBOARD, content));
   #else
         modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.COPY_TO_CLIPBOARD, content));
@@ -115,7 +127,9 @@ class IChatBaseComponent {
 
     public (IChatBaseComponentHandle) IChatBaseComponent setClickableSuggestedCommand(String command) {
         ChatModifier modifier = instance.getStyle();
-#if version >= 1.18
+#if version >= 1.21.5
+        modifier = modifier.withClickEvent(new ChatClickable$SuggestCommand(command));
+#elseif version >= 1.18
         modifier = modifier.withClickEvent(new ChatClickable(ChatClickable$EnumClickAction.SUGGEST_COMMAND, command));
 #else
         modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.SUGGEST_COMMAND, command));
@@ -125,7 +139,9 @@ class IChatBaseComponent {
 
     public (IChatBaseComponentHandle) IChatBaseComponent setClickableRunCommand(String command) {
         ChatModifier modifier = instance.getStyle();
-#if version >= 1.18
+#if version >= 1.21.5
+        modifier = modifier.withClickEvent(new ChatClickable$RunCommand(command));
+#elseif version >= 1.18
         modifier = modifier.withClickEvent(new ChatClickable(ChatClickable$EnumClickAction.RUN_COMMAND, command));
 #else
         modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.RUN_COMMAND, command));
@@ -135,7 +151,9 @@ class IChatBaseComponent {
 
     public (IChatBaseComponentHandle) IChatBaseComponent setHoverText((IChatBaseComponentHandle) IChatBaseComponent hoverText) {
         ChatModifier modifier = instance.getStyle();
-#if version >= 1.18
+#if version >= 1.21.5
+        modifier = modifier.withHoverEvent(new ChatHoverable$e(hoverText));
+#elseif version >= 1.18
         modifier = modifier.withHoverEvent(new ChatHoverable(ChatHoverable$EnumHoverAction.SHOW_TEXT, hoverText));
 #else
         modifier = modifier.setChatHoverable(new ChatHoverable(ChatHoverable$EnumHoverAction.SHOW_TEXT, hoverText));

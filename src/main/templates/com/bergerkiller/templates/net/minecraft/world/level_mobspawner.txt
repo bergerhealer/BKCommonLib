@@ -52,7 +52,11 @@ class MobSpawnerAbstract {
     public (MinecraftKeyHandle) MinecraftKey getMobName() {
         // No API :( will need to read NBT directly
         NBTTagCompound spawnedEntityNBT = instance.nextSpawnData.getEntityToSpawn();
+  #if version >= 1.21.5
+        return MinecraftKey.tryParse(spawnedEntityNBT.getStringOr("id", ""));
+  #else
         return MinecraftKey.tryParse(spawnedEntityNBT.getString("id"));
+  #endif
     }
     public void setMobName((MinecraftKeyHandle) MinecraftKey nameKey) {
         // Set NBT directly
