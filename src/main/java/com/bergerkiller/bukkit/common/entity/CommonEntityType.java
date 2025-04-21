@@ -27,8 +27,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -68,6 +66,7 @@ public class CommonEntityType {
             CommonPair.create(CommonMinecartTNT.class, CommonMinecartTNT::new),
             CommonPair.create(CommonMinecartRideable.class, CommonMinecartRideable::new),
             CommonPair.create(CommonMinecartCommandBlock.class, CommonMinecartCommandBlock::new),
+            CommonPair.create(CommonMinecartUnknown.class, CommonMinecartUnknown::new),
             CommonPair.create(CommonItem.class, CommonItem::new),
             CommonPair.<Minecart>create(CommonMinecart.class, CommonMinecart::new),
             CommonPair.<LivingEntity>create(CommonLivingEntity.class, CommonLivingEntity::new)
@@ -215,7 +214,16 @@ public class CommonEntityType {
 
         // Obtain Common class type and constructor
         Class<?> commonType = CommonEntity.class;
-        Class<?> entityClass = this.bukkitType.getType();
+        Class<?> entityClass;
+
+        // Note: Paper fix for 1.21.5 where they refer to Minecart.class instead of RideableMinecart.class
+        // https://github.com/PaperMC/Paper/commit/e983d3b61c614bbc5c4c8da37011f70de1ee8aa6 fixes it too
+        if (CommonBootstrap.evaluateMCVersion("==", "1.21.5") && entityType == EntityType.MINECART) {
+            entityClass = org.bukkit.entity.minecart.RideableMinecart.class;
+        } else {
+            entityClass = this.bukkitType.getType();
+        }
+
         Function<Entity, CommonEntity<?>> commonConstructor = CommonEntity::new;
         if (entityClass != null) {
             for (CommonPair pair : commonPairs) {
