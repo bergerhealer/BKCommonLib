@@ -286,8 +286,14 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
             return true;
         });
 
+        // From MC 1.21.4 to 1.21.5
+        this.register(4189, map -> {
+            Object type = map.get("type");
+            return !Helper.ADDED_MC_1_21_5.contains(type);
+        });
+
         // Maximum supported data version
-        this.max_version = 4189; // MC 1.21.4
+        this.max_version = 4325; // MC 1.21.5
     }
 
     // Registers a converter if it can convert from a future data version only
@@ -847,7 +853,7 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
 
         ));
 
-        // All material names (Material enum) added Minecraft 1.21.4 -> 1.21.4
+        // All material names (Material enum) added Minecraft 1.21.3 -> 1.21.4
         public static final Set<String> ADDED_MC_1_21_4 = makeSet(Arrays.asList(
                 "OPEN_EYEBLOSSOM", "CLOSED_EYEBLOSSOM",
                 "RESIN_CLUMP", "RESIN_BLOCK", "RESIN_BRICKS",
@@ -855,6 +861,14 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                 "RESIN_BRICK_WALL", "CHISELED_RESIN_BRICKS",
                 "RESIN_BRICK",
                 "POTTED_OPEN_EYEBLOSSOM", "POTTED_CLOSED_EYEBLOSSOM"
+        ));
+
+        // All material names (Material enum) added Minecraft 1.21.4 -> 1.21.5
+        public static final Set<String> ADDED_MC_1_21_5 = makeSet(Arrays.asList(
+                "BUSH", "FIREFLY_BUSH", "SHORT_DRY_GRASS", "TALL_DRY_GRASS",
+                "WILDFLOWERS", "LEAF_LITTER", "CACTUS_FLOWER",
+                "TEST_BLOCK", "TEST_INSTANCE_BLOCK",
+                "BLUE_EGG", "BROWN_EGG"
         ));
     }
 }
