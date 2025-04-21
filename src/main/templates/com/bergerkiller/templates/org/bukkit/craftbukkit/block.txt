@@ -48,7 +48,11 @@ class CraftBlockState {
   #endif
 
         instance.setData(blockData);
+  #if exists org.bukkit.craftbukkit.block.CraftBlockState public void setFlags(int flags);
+        instance.setFlags(3);
+  #else
         instance.setFlag(3);
+  #endif
 
         if (instance instanceof CraftBlockEntityState) {
             CraftBlockEntityState entityState = (CraftBlockEntityState) instance;
