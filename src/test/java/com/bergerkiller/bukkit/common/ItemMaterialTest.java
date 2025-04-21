@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -364,6 +365,29 @@ public class ItemMaterialTest {
 
         // Check all are contained, order does not matter
         assertTrue("Not enough variants: " + actual.size(), actual.size() >= 38);
+
+        // Add all items to a set. Each item should be unique.
+        HashSet<ItemStack> set = new HashSet<ItemStack>(actual);
+        assertEquals(actual.size(), set.size());
+    }
+
+    @Test
+    public void testGoatHornInstrumentVariants() {
+        if (!CommonBootstrap.evaluateMCVersion(">=", "1.19")) {
+            return;
+        }
+
+        // Retrieve from listing
+        Material potionMat = getMaterial("GOAT_HORN");
+        List<ItemStack> actual = ItemUtil.getItemVariants(potionMat);
+
+        // Verify all ItemStacks are actually POTION types
+        for (ItemStack item : actual) {
+            assertEquals(potionMat, item.getType());
+        }
+
+        // Check all are contained, order does not matter
+        assertTrue("Not enough variants: " + actual.size(), actual.size() >= 8);
 
         // Add all items to a set. Each item should be unique.
         HashSet<ItemStack> set = new HashSet<ItemStack>(actual);

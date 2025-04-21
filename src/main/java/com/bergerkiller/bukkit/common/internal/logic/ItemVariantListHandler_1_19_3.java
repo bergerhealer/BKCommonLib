@@ -98,6 +98,7 @@ class ItemVariantListHandler_1_19_3 extends ItemVariantListHandler {
     @Template.Import("net.minecraft.world.item.alchemy.PotionContents")
     @Template.Import("net.minecraft.core.Holder")
     @Template.Import("net.minecraft.tags.TagKey")
+    @Template.Import("net.minecraft.tags.InstrumentTags")
     @Template.Import("net.minecraft.core.IRegistry")
     @Template.Import("net.minecraft.core.registries.BuiltInRegistries")
     @Template.Import("org.bukkit.craftbukkit.CraftRegistry")
@@ -119,9 +120,13 @@ class ItemVariantListHandler_1_19_3 extends ItemVariantListHandler {
          * <GET_INSTRUMENT_VARIANTS>
          * public static List<ItemStack> getVariants(InstrumentItem item) {
          *     List result = new ArrayList();
-         * 
+         *
+         * #if version >= 1.21.5
+         *     TagKey instruments = InstrumentTags.GOAT_HORNS;
+         * #else
          *     #require InstrumentItem private final TagKey<Instrument> instruments;
          *     TagKey instruments = item#instruments;
+         * #endif
          *
          * #if version >= 1.21.2
          *     IRegistry registry = CraftRegistry.getMinecraftRegistry(net.minecraft.core.registries.Registries.INSTRUMENT);
