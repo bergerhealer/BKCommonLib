@@ -92,13 +92,21 @@ public class NullPacketDataSerializerInit {
                 })
                 .forEach(m -> {
                     if (m.getReturnType().equals(customRegistryType)) {
-                        Class<?> minecraftServerClass = CommonUtil.getClass("net.minecraft.server.MinecraftServer");
-                        String methodName = Resolver.resolveMethodName(minecraftServerClass, "getDefaultRegistryAccess", new Class<?>[0]);
-
                         MethodVisitor mv = cw.visitMethod(1, MPLType.getName(m), MPLType.getMethodDescriptor(m), (String)null, (String[])null);
                         mv.visitCode();
-                        mv.visitMethodInsn(INVOKESTATIC, MPLType.getInternalName(minecraftServerClass), methodName,
-                                "()" + MPLType.getDescriptor(customRegistryType), false);
+
+                        if (CommonBootstrap.evaluateMCVersion(">=", "1.21.5")) {
+                            Class<?> craftRegistryClass = CommonUtil.getClass("org.bukkit.craftbukkit.CraftRegistry", false);
+                            String methodName = Resolver.resolveMethodName(craftRegistryClass, "getMinecraftRegistry", new Class<?>[0]);
+                            mv.visitMethodInsn(INVOKESTATIC, MPLType.getInternalName(craftRegistryClass), methodName,
+                                    "()" + MPLType.getDescriptor(customRegistryType), false);
+                        } else {
+                            Class<?> minecraftServerClass = CommonUtil.getClass("net.minecraft.server.MinecraftServer");
+                            String methodName = Resolver.resolveMethodName(minecraftServerClass, "getDefaultRegistryAccess", new Class<?>[0]);
+                            mv.visitMethodInsn(INVOKESTATIC, MPLType.getInternalName(minecraftServerClass), methodName,
+                                    "()" + MPLType.getDescriptor(customRegistryType), false);
+                        }
+
                         mv.visitInsn(ARETURN);
                         mv.visitMaxs(MPLType.getType(customRegistryType).getSize(), 1);
                         mv.visitEnd();
