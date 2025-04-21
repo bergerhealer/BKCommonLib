@@ -12,7 +12,12 @@ class CraftBlockState {
     protected unknown int type;
     protected unknown org.bukkit.material.MaterialData data;
 #endif
+
+#if exists org.bukkit.craftbukkit.block.CraftBlockState protected int capturedFlags;
+    protected int flag:capturedFlags;
+#else
     protected int flag;
+#endif
 
     public (org.bukkit.block.BlockState) CraftBlockState(org.bukkit.block.Block block);
 
@@ -47,9 +52,13 @@ class CraftBlockState {
 
         if (instance instanceof CraftBlockEntityState) {
             CraftBlockEntityState entityState = (CraftBlockEntityState) instance;
-            #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final T extends TileEntity tileEntity;
+  #if exists org.bukkit.craftbukkit.block.CraftBlockEntityState private final T extends net.minecraft.world.level.block.entity.TileEntity tileEntity;
+            #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final T extends TileEntity blockEntity:tileEntity;
+  #else
+            #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final T extends TileEntity blockEntity;
+  #endif
             #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final T extends TileEntity snapshot;
-            entityState#tileEntity = tileEntity;
+            entityState#blockEntity = tileEntity;
             entityState#snapshot = tileEntity;
 
   #if exists org.bukkit.craftbukkit.block.CraftBlockEntityState private final Class<T> tileEntityClass;

@@ -1361,7 +1361,10 @@ class Entity {
      #     this.a(this.##METHODNAME##(), f1, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
      * }
      */
-#if version >= 1.9
+#if exists net.minecraft.world.entity.Entity public net.minecraft.sounds.SoundEffect getSwimSound();
+    // Paper made it public
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound();
+#elseif version >= 1.9
     protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound();
 #else
     protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String getSwimSound();
@@ -1474,7 +1477,9 @@ class Entity {
             net.minecraft.util.RandomSource random = instance.random; // Mojang random 1.19+, java Random before
             float pitch = 1.0F + (random.nextFloat() - random.nextFloat()) * 0.4F;
 
-  #if version >= 1.9
+  #if exists net.minecraft.world.entity.Entity public net.minecraft.sounds.SoundEffect getSwimSound();
+            SoundEffect swimSound = instance.getSwimSound();
+  #elseif version >= 1.9
             #require Entity protected SoundEffect getSwimSound();
             SoundEffect swimSound = instance#getSwimSound();
   #else
