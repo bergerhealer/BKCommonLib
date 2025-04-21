@@ -1516,7 +1516,7 @@ class Entity {
     // Note: counts rain too as being wet!
 #if version >= 1.21.5
     public boolean isWet() {
-        return instance.isInWater() || instance.isInRain() || instance.getInBlockState().is(Blocks.BUBBLE_COLUMN);
+        return instance.isInWaterOrRain() || instance.getInBlockState().is(Blocks.BUBBLE_COLUMN);
     }
 #else
   #select version >=

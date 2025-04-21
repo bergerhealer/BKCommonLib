@@ -35,7 +35,7 @@ class Vector3f {
         return net.minecraft.core.Vector3f.createWithoutValidityChecks((float)vector.getX(),
                                                                        (float)vector.getY(),
                                                                        (float)vector.getZ());
-#elseif version >= 1.12
+#elseif version >= 1.12 && version < 1.21.5
         Object v3 = com.bergerkiller.generated.net.minecraft.core.Vector3fHandle.T.newInstanceNull();
         #require net.minecraft.core.Vector3f protected final float x;
         #require net.minecraft.core.Vector3f protected final float y;

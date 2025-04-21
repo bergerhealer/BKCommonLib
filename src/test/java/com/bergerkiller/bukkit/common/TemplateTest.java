@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.stream.Stream;
 
 import com.bergerkiller.bukkit.common.utils.DebugUtil;
+import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.junit.Ignore;
@@ -419,6 +420,23 @@ public class TemplateTest {
             assertTrue(EntityArmorStandHandle.T.DATA_POSE_HEAD.isAvailable());
             assertTrue(EntityArmorStandHandle.T.DATA_POSE_LEG_LEFT.isAvailable());
             assertTrue(EntityArmorStandHandle.T.DATA_POSE_LEG_RIGHT.isAvailable());
+        }
+    }
+
+    @Test
+    public void testVector3fConversion() {
+        {
+            Vector3fHandle v = Vector3fHandle.fromBukkit(new org.bukkit.util.Vector(1, 2, 3));
+            assertEquals(1.0f, v.getX(), 1e-5f);
+            assertEquals(2.0f, v.getY(), 1e-5f);
+            assertEquals(3.0f, v.getZ(), 1e-5f);
+        }
+
+        {
+            Vector3fHandle v = Vector3fHandle.createNew(1.0f, 2.0f, 3.0f);
+            assertEquals(1.0f, v.getX(), 1e-5f);
+            assertEquals(2.0f, v.getY(), 1e-5f);
+            assertEquals(3.0f, v.getZ(), 1e-5f);
         }
     }
 
