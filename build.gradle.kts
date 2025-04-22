@@ -35,6 +35,9 @@ configurations {
     compileOnly {
         extendsFrom(internal)
     }
+    testImplementation {
+        extendsFrom(internal)
+    }
 }
 
 dependencies {
