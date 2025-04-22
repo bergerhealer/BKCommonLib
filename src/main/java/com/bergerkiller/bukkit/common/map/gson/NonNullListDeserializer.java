@@ -17,7 +17,7 @@ import com.google.gson.JsonParseException;
  *
  * @param <T>
  */
-public class NonNullListDeserializer<T> implements JsonDeserializer<List<T>> {
+class NonNullListDeserializer<T> implements JsonDeserializer<List<T>> {
 
     @Override
     public List<T> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException

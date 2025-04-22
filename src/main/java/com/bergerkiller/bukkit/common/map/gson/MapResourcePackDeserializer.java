@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.map.gson;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.util.BlockModelState;
 import com.bergerkiller.bukkit.common.map.util.ItemModel;
 import com.bergerkiller.bukkit.common.math.Vector3;
@@ -11,6 +12,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
+import io.leangen.geantyref.TypeToken;
 import org.bukkit.block.BlockFace;
 
 import java.io.IOException;
@@ -41,6 +43,9 @@ public final class MapResourcePackDeserializer {
         gsonBuilder.registerTypeAdapter(BlockModelState.VariantList.class, new VariantListDeserializer());
         gsonBuilder.registerTypeAdapter(BlockModelState.Condition.class, new ConditionalDeserializer());
         gsonBuilder.registerTypeAdapter(List.class, new NonNullListDeserializer());
+        gsonBuilder.registerTypeAdapter(new TypeToken<List<MapResourcePack.Metadata.SupportedFormatRange>>() {}.getType(),
+                new SupportedFormatRangeListDeserializer());
+
         ItemModel.registerDeserializers(gsonBuilder);
         this.gson = gsonBuilder.create();
     }

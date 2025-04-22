@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import com.bergerkiller.bukkit.common.bases.DeferredSupplier;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.map.gson.MapResourcePackDeserializer;
 import com.bergerkiller.bukkit.common.map.util.ItemModel;
@@ -1249,6 +1250,8 @@ public class MapResourcePack {
     public static class Metadata {
         private int pack_format;
         private String description;
+        private List<SupportedFormatRange> supported_formats = Collections.emptyList();
+        private final transient DeferredSupplier<Boolean> hasItemOverrides = DeferredSupplier.of(() -> isPackRangeSupported(46, Integer.MAX_VALUE));
 
         /**
          * Gets the pack_format value
@@ -1279,7 +1282,31 @@ public class MapResourcePack {
          *         item predicate system.
          */
         public boolean hasItemOverrides() {
-            return pack_format >= 46;
+            return hasItemOverrides.get();
+        }
+
+        /**
+         * Checks whether a this range supports one of the pack versions in the range specified.
+         * This tests for a particular resource pack feature that is supported between the
+         * min and max pack version specified.
+         *
+         * @param minPackFormat Minimum pack format for the feature
+         * @param maxPackFormat Maximum pack format for the feature
+         * @return True if the range is supported
+         */
+        public boolean isPackRangeSupported(int minPackFormat, int maxPackFormat) {
+            if (pack_format >= minPackFormat && pack_format <= maxPackFormat) {
+                return true;
+            }
+
+            if (supported_formats != null) {
+                for (SupportedFormatRange range : supported_formats) {
+                    if (range.isPackRangeSupported(minPackFormat, maxPackFormat)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         /**
@@ -1310,6 +1337,44 @@ public class MapResourcePack {
 
         public static class PackWrapper {
             public Metadata pack; // JSON file has a 'pack' field
+        }
+
+        public static class SupportedFormatRange {
+            private final int min_inclusive, max_inclusive;
+
+            public static SupportedFormatRange of(int packFormatVersion) {
+                return new SupportedFormatRange(packFormatVersion, packFormatVersion);
+            }
+
+            public static SupportedFormatRange of(int min_inclusive, int max_inclusive) {
+                return new SupportedFormatRange(min_inclusive, max_inclusive);
+            }
+
+            private SupportedFormatRange(int min_inclusive, int max_inclusive) {
+                this.min_inclusive = min_inclusive;
+                this.max_inclusive = max_inclusive;
+            }
+
+            /**
+             * Checks whether a this range supports one of the pack versions in the range specified.
+             * This tests for a particular resource pack feature that is supported between the
+             * min and max pack version specified.
+             *
+             * @param minPackFormat Minimum pack format for the feature
+             * @param maxPackFormat Maximum pack format for the feature
+             * @return True if the range is supported
+             */
+            public boolean isPackRangeSupported(int minPackFormat, int maxPackFormat) {
+                return minPackFormat <= this.max_inclusive && maxPackFormat >= this.min_inclusive;
+            }
+
+            public int min_inclusive() {
+                return min_inclusive;
+            }
+
+            public int max_inclusive() {
+                return max_inclusive;
+            }
         }
     }
 }
