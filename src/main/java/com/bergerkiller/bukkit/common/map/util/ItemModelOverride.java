@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.map.util;
 
+import com.bergerkiller.bukkit.common.IndentedStringBuilder;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,7 +57,7 @@ public interface ItemModelOverride extends ItemModelPredicate {
      * @return ItemModelOverride
      */
     static ItemModelOverride of(@Nullable final CommonItemStack itemStack, final List<ItemModel.MinecraftModel> models) {
-        return new ItemModelOverride() {
+        return new PrintableItemModelOverride() {
             @Override
             public boolean isMatching(CommonItemStack item) {
                 return true;
@@ -81,6 +82,23 @@ public interface ItemModelOverride extends ItemModelPredicate {
             public Optional<CommonItemStack> getItemStack() {
                 return Optional.ofNullable(itemStack);
             }
+
+            @Override
+            public String toString() {
+                return IndentedStringBuilder.toString(this);
+            }
+
+            @Override
+            public void toString(IndentedStringBuilder str) {
+                str.append("ItemModelOverride {");
+                IndentedStringBuilder ind = str.indent();
+                ind.append("\ntype: fallback")
+                        .append("\nitem ").append(itemStack)
+                        .append("\nmodels: [");
+                ind.indent().appendLines(models);
+                ind.append("\n]");
+                str.append("\n}");
+            }
         };
     }
 
@@ -93,7 +111,7 @@ public interface ItemModelOverride extends ItemModelPredicate {
      * @return ItemModelOverride
      */
     static ItemModelOverride of(@Nullable final CommonItemStack itemStack, final ItemModelPredicate predicate, final List<ItemModel.MinecraftModel> models) {
-        return new ItemModelOverride() {
+        return new PrintableItemModelOverride() {
             @Override
             public boolean isMatching(CommonItemStack item) {
                 return predicate.isMatching(item);
@@ -118,6 +136,27 @@ public interface ItemModelOverride extends ItemModelPredicate {
             public Optional<CommonItemStack> getItemStack() {
                 return Optional.ofNullable(itemStack);
             }
+
+            @Override
+            public String toString() {
+                return IndentedStringBuilder.toString(this);
+            }
+
+            @Override
+            public void toString(IndentedStringBuilder str) {
+                str.append("ItemModelOverride {");
+                IndentedStringBuilder ind = str.indent();
+                str.indent().append("\ntype: predicate")
+                        .append("\nitem ").append(itemStack)
+                        .append("\npredicate: ").append(predicate)
+                        .append("\nmodels: [");
+                ind.indent().appendLines(models);
+                ind.append("\n]");
+                str.append("\n}");
+            }
         };
+    }
+
+    interface PrintableItemModelOverride extends  ItemModelOverride, IndentedStringBuilder.AppendableToString {
     }
 }

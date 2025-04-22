@@ -502,7 +502,7 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
             public void toString(IndentedStringBuilder str) {
                 str.append("Override {");
                 str.indent()
-                        .append("\npredicate: [")
+                        .append("\npredicates: [")
                         .appendWithIndent(predicatesStr -> predicatesStr.appendLines(predicate))
                         .append("\n]")
                         .append("\nmodel: ").append(models.get(0)); // Always stores exactly one model
@@ -643,7 +643,7 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
             str.append("\n}");
         }
 
-        public static class Entry implements ItemModelPredicate {
+        public static class Entry implements ItemModelPredicate, IndentedStringBuilder.AppendableToString {
             protected transient ItemModelProperty property = ItemModelProperty.NONE;
             @SerializedName("threshold")
             public double minThreshold = -Double.MAX_VALUE;
@@ -667,6 +667,22 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
                 }
 
                 return ((ItemModelProperty.NumericProperty) property).setNumericValue(item, minThreshold);
+            }
+
+            @Override
+            public String toString() {
+                return IndentedStringBuilder.toString(this);
+            }
+
+            @Override
+            public void toString(IndentedStringBuilder str) {
+                str.append("RangeDispatch.Entry {");
+                str.indent()
+                        .append("\nproperty: ").append(property)
+                        .append("\nminThreshold: ").append(minThreshold)
+                        .append("\nmaxThreshold: ").append(maxThreshold)
+                        .append("\nmodel: ").append(model);
+                str.append("\n}");
             }
         }
     }
@@ -768,7 +784,7 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
             str.append("\n}");
         }
 
-        public static class Case implements ItemModelPredicate {
+        public static class Case implements ItemModelPredicate, IndentedStringBuilder.AppendableToString {
             protected transient ItemModelProperty property = ItemModelProperty.NONE;
             public List<String> when = Collections.emptyList(); // match-any
             public ItemModel model = MinecraftModel.NOT_SET;
@@ -793,6 +809,23 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
                 }
 
                 return ((ItemModelProperty.StringProperty) property).applyStringValue(item, when.get(0));
+            }
+
+            @Override
+            public String toString() {
+                return IndentedStringBuilder.toString(this);
+            }
+
+            @Override
+            public void toString(IndentedStringBuilder str) {
+                str.append("Select.Case {");
+                IndentedStringBuilder ind = str.indent();
+                ind.append("\nproperty: ").append(property)
+                        .append("\nwhen: [");
+                ind.indent().appendLines(when);
+                ind.append("\n]")
+                        .append("\nmodel: ").append(model);
+                str.append("\n}");
             }
         }
     }

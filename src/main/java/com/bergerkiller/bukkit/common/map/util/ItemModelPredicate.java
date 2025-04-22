@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.map.util;
 
+import com.bergerkiller.bukkit.common.IndentedStringBuilder;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.jetbrains.annotations.Nullable;
@@ -67,7 +68,7 @@ public interface ItemModelPredicate {
      * matching / apply logic. Each node also stores a List of MinecraftModel
      * values that are displayed there, which can be populated.
      */
-    final class ModelChain implements ItemModelPredicate {
+    final class ModelChain implements ItemModelPredicate, IndentedStringBuilder.AppendableToString {
         private final List<ModelChain> allChainLeafs;
         private final @Nullable ModelChain parent;
         private final @Nullable CommonItemStack itemStack;
@@ -219,6 +220,17 @@ public interface ItemModelPredicate {
             }
         }
 
+        private List<ItemModelPredicate> collectAllPredicates() {
+            ModelChain parent = this.parent;
+            if (parent == null) {
+                return Collections.emptyList();
+            } else {
+                return LogicUtil.combineUnmodifiableLists(
+                        parent.collectAllPredicates(),
+                        Collections.singletonList(predicate));
+            }
+        }
+
         @Override
         public boolean isMatchingAlways() {
             ModelChain parent = this.parent;
@@ -237,6 +249,22 @@ public interface ItemModelPredicate {
             } else {
                 return parent.tryMakeMatching(item).flatMap(predicate::tryMakeMatching);
             }
+        }
+
+        @Override
+        public String toString() {
+            return IndentedStringBuilder.toString(this);
+        }
+
+        @Override
+        public void toString(IndentedStringBuilder str) {
+            // Collect all predicates that are active for this chain leaf node and print them
+            str.append("ItemModelPredicate.Chain {");
+            IndentedStringBuilder ind = str.indent();
+            ind.append("\npredicates: [");
+            ind.indent().appendLines(collectAllPredicates());
+            ind.append("\n]");
+            str.append("\n}");
         }
     }
 }

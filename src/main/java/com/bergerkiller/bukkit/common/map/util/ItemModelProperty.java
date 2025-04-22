@@ -307,17 +307,40 @@ public abstract class ItemModelProperty implements IndentedStringBuilder.Appenda
          * @return ItemModelPredicate
          */
         default ItemModelPredicate asPredicate(boolean isTrue) {
-            return new ItemModelPredicate() {
-                @Override
-                public boolean isMatching(CommonItemStack item) {
-                    return isTrue == testCondition(item);
-                }
+            return new PrintableBooleanPredicate(this, isTrue);
+        }
+    }
 
-                @Override
-                public Optional<CommonItemStack> tryMakeMatching(CommonItemStack item) {
-                    return applyCondition(item, isTrue);
-                }
-            };
+    private static class PrintableBooleanPredicate implements ItemModelPredicate, IndentedStringBuilder.AppendableToString {
+        private final BooleanProperty property;
+        private final boolean isTrue;
+
+        public PrintableBooleanPredicate(BooleanProperty property, boolean isTrue) {
+            this.property = property;
+            this.isTrue = isTrue;
+        }
+
+        @Override
+        public boolean isMatching(CommonItemStack item) {
+            return isTrue == property.testCondition(item);
+        }
+
+        @Override
+        public Optional<CommonItemStack> tryMakeMatching(CommonItemStack item) {
+            return property.applyCondition(item, isTrue);
+        }
+
+        @Override
+        public String toString() {
+            return IndentedStringBuilder.toString(this);
+        }
+
+        @Override
+        public void toString(IndentedStringBuilder str) {
+            str.append("BooleanPredicate {");
+            str.indent().append("\nproperty: ").append(property)
+                    .append("\nwhen: ").append(isTrue);
+            str.append("\n}");
         }
     }
 

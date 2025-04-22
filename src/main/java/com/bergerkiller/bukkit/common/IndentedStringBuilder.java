@@ -104,15 +104,19 @@ public class IndentedStringBuilder {
 
     /**
      * Iterates all the appendable items specified and adds it on a new line. A newline is inserted before every
-     * single item.
+     * single item. Items that support {@link AppendableToString} use that method instead of the default
+     * toString().
      *
-     * @param lineItems Item values of type AppendableToString
+     * @param lineItems Item values
      * @return this
-     * @param <T> Value type of the items
      */
-    public <T extends AppendableToString> IndentedStringBuilder appendLines(Iterable<T> lineItems) {
-        for (T item : lineItems) {
-            item.toString(append("\n"));
+    public IndentedStringBuilder appendLines(Iterable<?> lineItems) {
+        for (Object item : lineItems) {
+            if (item instanceof AppendableToString) {
+                ((AppendableToString) item).toString(append("\n"));
+            } else {
+                append("\n").append(item);
+            }
         }
         return this;
     }
