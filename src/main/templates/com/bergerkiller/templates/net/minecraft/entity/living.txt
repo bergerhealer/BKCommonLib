@@ -143,15 +143,15 @@ class EntityLiving extends Entity {
 
         // Item attributes need to be re-applied later, they are lost as part of this reset
   #if version >= 1.21.5
-        #require net.minecraft.world.entity.EntityLiving private final Map<EnumItemSlot, ItemStack> lastEquipmentItems;
-        Map lastEquipmentItems = instance#lastEquipmentItems;
-        java.util.Iterator slotTypesIter = EnumItemSlot.VALUES.iterator();
-        while (slotTypesIter.hasNext()) {
-            EnumItemSlot slot = (EnumItemSlot) slotTypesIter.next();
-            if (lastEquipmentItems.containsKey(slot)) {
-                lastEquipmentItems.put(slot, ItemStack.EMPTY);
-            }
-        }
+        //#require net.minecraft.world.entity.EntityLiving private final Map<EnumItemSlot, ItemStack> lastEquipmentItems;
+        //Map lastEquipmentItems = instance#lastEquipmentItems;
+        //java.util.Iterator slotTypesIter = EnumItemSlot.VALUES.iterator();
+        //while (slotTypesIter.hasNext()) {
+        //    EnumItemSlot slot = (EnumItemSlot) slotTypesIter.next();
+        //    if (lastEquipmentItems.containsKey(slot)) {
+        //        lastEquipmentItems.put(slot, ItemStack.EMPTY);
+        //    }
+        //}
   #else
         #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> lastHandItemStacks;
         #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> lastArmorItemStacks;
