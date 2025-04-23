@@ -3,8 +3,12 @@ package net.minecraft.world.entity;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.syncher.DataWatcherObject;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.resources.RegistryOps;
+import net.minecraft.nbt.DynamicOpsNBT;
 import net.minecraft.world.effect.MobEffectList;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.entity.EntityEquipment;
 import net.minecraft.world.entity.ai.attributes.AttributeBase;
 import net.minecraft.world.entity.ai.attributes.AttributeDefaults;
 import net.minecraft.world.entity.ai.attributes.AttributeMapBase;
@@ -12,6 +16,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifiable;
 import net.minecraft.world.item.ItemStack;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
@@ -19,6 +24,7 @@ import com.bergerkiller.bukkit.common.wrappers.Holder;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeBaseHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeMapBaseHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
@@ -206,6 +212,37 @@ class EntityLiving extends Entity {
             #require net.minecraft.world.entity.EntityLiving protected void initAttributes:aW();
         #endif
         instance#initAttributes();
+#endif
+    }
+
+    public void loadEquipment((CommonTagCompound) NBTTagCompound data) {
+#if version >= 1.21.5
+        RegistryOps registryops = instance.registryAccess().createSerializationContext(DynamicOpsNBT.INSTANCE);
+
+        EntityEquipment equipment = (EntityEquipment) EntityEquipment.CODEC.parse(registryops, data)
+                        .resultOrPartial(NBTTagCompoundHandle.createPartialErrorLogger(data))
+                        .orElse(null);
+        if (equipment == null) {
+            equipment = new EntityEquipment();
+        }
+
+        instance.equipment.setAll(equipment);
+#endif
+    }
+
+    public (CommonTagCompound) NBTTagCompound saveEquipment() {
+#if version >= 1.21.5
+        EntityEquipment equipment = instance.equipment;
+
+        if (equipment.isEmpty()) {
+            return null;
+        }
+
+        RegistryOps registryops = instance.registryAccess().createSerializationContext(DynamicOpsNBT.INSTANCE);
+
+        return (NBTTagCompound) EntityEquipment.CODEC.encode(equipment, registryops, new NBTTagCompound());
+#else
+        return null;
 #endif
     }
 

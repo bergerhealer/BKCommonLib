@@ -17,6 +17,7 @@ import com.bergerkiller.generated.org.bukkit.block.BlockStateHandle;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.Inventory;
 
 /**
  * Contains utility functions for dealing with NBT data such as saving and loading
@@ -159,6 +160,51 @@ public class NBTUtil {
         } else {
             throw new IllegalArgumentException("This kind of inventory has an unknown type of handle: " + inventoryHandle.getClass().getName());
         }
+    }
+
+    /**
+     * Saves the equipment slots of an entity as a Tag Compound. Only works on Minecraft 1.21.5
+     * and later where this is used. Prior, this data was saved in the Inventory, which is saved with
+     * {@link #saveInventory(Inventory, CommonTagList)} instead.<br>
+     * <br>
+     * Will return {@link CommonTagCompound#EMPTY} if the entity has no equipment, or this is
+     * a Minecraft server version before 1.21.5. Check with {@link CommonTagCompound#isEmpty()}.
+     *
+     * @param equipment to save
+     * @return Saved equipment data tag, read-only. Empty tag if not supported or older Minecraft version.
+     */
+    public static CommonTagCompound saveEquipment(org.bukkit.inventory.EntityEquipment equipment) {
+        Entity holder = equipment.getHolder();
+        if (!(holder instanceof LivingEntity)) {
+            throw new UnsupportedOperationException("Cannot save equipment of a non-living entity: " + holder);
+        }
+
+        EntityLivingHandle handle = EntityLivingHandle.fromBukkit((LivingEntity) holder);
+        CommonTagCompound nbt = handle.saveEquipment();
+        if (nbt == null) {
+            nbt = CommonTagCompound.EMPTY;
+        }
+        return nbt;
+    }
+
+    /**
+     * Loads the equipment slots of an entity from the Tag Compound specified. Only works on Minecraft 1.21.5
+     * and later where this is used. Prior, this data was saved in the Inventory, which is loaded with
+     * {@link #loadInventory(Inventory, CommonTagList)} instead.<br>
+     * <br>
+     * Specifying {@link CommonTagCompound#EMPTY} will clear the entity's equipment slots.
+     *
+     * @param equipment to load
+     * @param data tag compound to load from
+     */
+    public static void loadEquipment(org.bukkit.inventory.EntityEquipment equipment, CommonTagCompound data) {
+        Entity holder = equipment.getHolder();
+        if (!(holder instanceof LivingEntity)) {
+            throw new UnsupportedOperationException("Cannot load equipment for a non-living entity: " + holder);
+        }
+
+        EntityLivingHandle handle = EntityLivingHandle.fromBukkit((LivingEntity) holder);
+        handle.loadEquipment(data);
     }
 
     /**

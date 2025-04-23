@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.world.entity;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
@@ -32,6 +33,8 @@ public abstract class EntityLivingHandle extends EntityHandle {
     /* ============================================================================== */
 
     public abstract void resetAttributes();
+    public abstract void loadEquipment(CommonTagCompound data);
+    public abstract CommonTagCompound saveEquipment();
     public abstract AttributeMapBaseHandle getAttributeMap();
     public abstract AttributeModifiableHandle getAttribute(Holder<AttributeBaseHandle> attribute);
     public abstract Collection<MobEffectHandle> getEffects();
@@ -82,6 +85,8 @@ public abstract class EntityLivingHandle extends EntityHandle {
         public final Template.Field.Boolean updateEffects = new Template.Field.Boolean();
 
         public final Template.Method<Void> resetAttributes = new Template.Method<Void>();
+        public final Template.Method.Converted<Void> loadEquipment = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<CommonTagCompound> saveEquipment = new Template.Method.Converted<CommonTagCompound>();
         public final Template.Method.Converted<AttributeMapBaseHandle> getAttributeMap = new Template.Method.Converted<AttributeMapBaseHandle>();
         public final Template.Method.Converted<AttributeModifiableHandle> getAttribute = new Template.Method.Converted<AttributeModifiableHandle>();
         public final Template.Method.Converted<Collection<MobEffectHandle>> getEffects = new Template.Method.Converted<Collection<MobEffectHandle>>();
