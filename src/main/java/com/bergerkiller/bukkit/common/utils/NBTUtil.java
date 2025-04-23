@@ -201,7 +201,7 @@ public class NBTUtil {
      * for some reason.
      *
      * @param equipment to load, can be null
-     * @param data tag compound to load from
+     * @param data tag compound to load from, can be empty or null to clear the equipment
      */
     public static void loadEquipment(org.bukkit.inventory.EntityEquipment equipment, CommonTagCompound data) {
         if (equipment == null) {
@@ -211,6 +211,10 @@ public class NBTUtil {
         Entity holder = equipment.getHolder();
         if (!(holder instanceof LivingEntity)) {
             throw new UnsupportedOperationException("Cannot load equipment for a non-living entity: " + holder);
+        }
+
+        if (data == null) {
+            data = CommonTagCompound.EMPTY;
         }
 
         EntityLivingHandle handle = EntityLivingHandle.fromBukkit((LivingEntity) holder);
