@@ -66,7 +66,7 @@ public class Common {
             "Common:Packet:MinecartMovementPacket",
             "Common:WorldUtil:HasFeatureFlag",
             "Common:ResourcePack:ItemModel",
-            "Common:NBTUtil:LoadSaveEquipment",
+            "Common:NBTUtil:LoadSaveEquipment"
     ).collect(Collectors.toSet());
 
     /**
