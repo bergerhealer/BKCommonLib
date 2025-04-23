@@ -215,24 +215,35 @@ class EntityLiving extends Entity {
 #endif
     }
 
+#if version >= 1.21.5
+  #if exists net.minecraft.world.entity.EntityLiving public net.minecraft.world.entity.EntityEquipment equipment;
+    #require EntityLiving public EntityEquipment equipment;
+  #else
+    // Paper yay!
+    #require EntityLiving protected EntityEquipment equipment;
+  #endif
+#endif
+
     public void loadEquipment((CommonTagCompound) NBTTagCompound data) {
 #if version >= 1.21.5
+        EntityEquipment equipment = instance#equipment;
+
         RegistryOps registryops = instance.registryAccess().createSerializationContext(DynamicOpsNBT.INSTANCE);
 
-        EntityEquipment equipment = (EntityEquipment) EntityEquipment.CODEC.parse(registryops, data)
+        EntityEquipment loadedEquipment = (EntityEquipment) EntityEquipment.CODEC.parse(registryops, data)
                         .resultOrPartial(NBTTagCompoundHandle.createPartialErrorLogger(data))
                         .orElse(null);
-        if (equipment == null) {
-            equipment = new EntityEquipment();
+        if (loadedEquipment == null) {
+            loadedEquipment = new EntityEquipment();
         }
 
-        instance.equipment.setAll(equipment);
+        equipment.setAll(loadedEquipment);
 #endif
     }
 
     public (CommonTagCompound) NBTTagCompound saveEquipment() {
 #if version >= 1.21.5
-        EntityEquipment equipment = instance.equipment;
+        EntityEquipment equipment = instance#equipment;
 
         if (equipment.isEmpty()) {
             return null;
