@@ -167,13 +167,17 @@ public class NBTUtil {
      * and later where this is used. Prior, this data was saved in the Inventory, which is saved with
      * {@link #saveInventory(Inventory, CommonTagList)} instead.<br>
      * <br>
-     * Will return {@link CommonTagCompound#EMPTY} if the entity has no equipment, or this is
+     * Will return {@link CommonTagCompound#EMPTY} if the entity has no equipment or is null, or this is
      * a Minecraft server version before 1.21.5. Check with {@link CommonTagCompound#isEmpty()}.
      *
-     * @param equipment to save
+     * @param equipment to save, can be null
      * @return Saved equipment data tag, read-only. Empty tag if not supported or older Minecraft version.
      */
     public static CommonTagCompound saveEquipment(org.bukkit.inventory.EntityEquipment equipment) {
+        if (equipment == null ){
+            return CommonTagCompound.EMPTY;
+        }
+
         Entity holder = equipment.getHolder();
         if (!(holder instanceof LivingEntity)) {
             throw new UnsupportedOperationException("Cannot save equipment of a non-living entity: " + holder);
@@ -192,12 +196,18 @@ public class NBTUtil {
      * and later where this is used. Prior, this data was saved in the Inventory, which is loaded with
      * {@link #loadInventory(Inventory, CommonTagList)} instead.<br>
      * <br>
-     * Specifying {@link CommonTagCompound#EMPTY} will clear the entity's equipment slots.
+     * Specifying {@link CommonTagCompound#EMPTY} will clear the entity's equipment slots. A null equipment
+     * input acts as a no-op. Handled here since LivingEntity getEquipment() is allowed to return null
+     * for some reason.
      *
-     * @param equipment to load
+     * @param equipment to load, can be null
      * @param data tag compound to load from
      */
     public static void loadEquipment(org.bukkit.inventory.EntityEquipment equipment, CommonTagCompound data) {
+        if (equipment == null) {
+            return;
+        }
+
         Entity holder = equipment.getHolder();
         if (!(holder instanceof LivingEntity)) {
             throw new UnsupportedOperationException("Cannot load equipment for a non-living entity: " + holder);
