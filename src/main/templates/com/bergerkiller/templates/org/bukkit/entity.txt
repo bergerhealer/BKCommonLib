@@ -160,15 +160,45 @@ class Entity {
             return false;
         }
 
-#if version >= 1.20.5
+#if exists org.bukkit.entity.LivingEntity public boolean canUseEquipmentSlot(org.bukkit.inventory.EquipmentSlot slot);
+        // Use Paper API for this if available
+        org.bukkit.entity.LivingEntity living = (org.bukkit.entity.LivingEntity) instance;
+        return living.canUseEquipmentSlot(slot);
+#else
+        // Used on Spigot servers / older paper
+
+  #if version >= 1.21
+        // Reject all equipment slots that aren't part of the hand or humanoid armor
+        // This implementation was borrowed from Paper and only applies to players (human entities)
+        // For 1.21.5 specifically, it prevents the SADDLE slot from returning true, but this is future-proofed
+        // for other slots being added.
+        if (instance instanceof org.bukkit.entity.HumanEntity) {
+            net.minecraft.world.entity.EnumItemSlot nmsEquipmentSlot = org.bukkit.craftbukkit.CraftEquipmentSlot.getNMS(slot);
+            return nmsEquipmentSlot.getType() == net.minecraft.world.entity.EnumItemSlot$Function.HUMANOID_ARMOR ||
+                   nmsEquipmentSlot.getType() == net.minecraft.world.entity.EnumItemSlot$Function.HAND;
+        }
+  #endif
+
+  #if version >= 1.20.5
         //BODY slot is not valid for players and armorstands!
         if (slot == org.bukkit.inventory.EquipmentSlot.BODY) {
             return !(instance instanceof org.bukkit.entity.HumanEntity ||
                      instance instanceof org.bukkit.entity.ArmorStand);
         }
-#endif
+  #endif
+
+  #if version >= 1.21
+        // Defer to NMS, which might catch some of this...
+        if (instance instanceof org.bukkit.craftbukkit.entity.CraftLivingEntity) {
+            net.minecraft.world.entity.EntityLiving nmsEntityLiving;
+            nmsEntityLiving = ((org.bukkit.craftbukkit.entity.CraftLivingEntity) instance).getHandle();
+            net.minecraft.world.entity.EnumItemSlot nmsEquipmentSlot = org.bukkit.craftbukkit.CraftEquipmentSlot.getNMS(slot);
+            return nmsEntityLiving.canUseSlot(nmsEquipmentSlot);
+        }
+  #endif
 
         return true;
+#endif
     }
 }
 
