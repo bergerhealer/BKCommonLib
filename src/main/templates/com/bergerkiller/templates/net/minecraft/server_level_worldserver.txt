@@ -605,7 +605,7 @@ class WorldServer extends World {
         java.util.Optional result = EntityPlayer.findRespawnAndUseSpawnBlock(instance, respawnPoint, ignoreRespawnAnchorUses);
   #else
         BlockPosition blockposition = (BlockPosition) respawnPoint.pos();
-        java.util.Optional result = EntityPlayer.findRespawnAndUseSpawnBlock(instance, blockposition, respawnPoint.angle(), alsoWhenDestroyed, ignoreRespawnAnchorUses);
+        java.util.Optional result = EntityPlayer.findRespawnAndUseSpawnBlock(instance, blockposition, respawnPoint.angle(), respawnPoint.forced(), ignoreRespawnAnchorUses);
   #endif
         EntityPlayer$RespawnPosAngle respawnPos = (EntityPlayer$RespawnPosAngle) result.orElse(null);
         if (respawnPos == null) {
@@ -620,13 +620,13 @@ class WorldServer extends World {
         BlockPosition blockposition = (BlockPosition) respawnPoint.pos();
         // Optional<Vec3D>
   #if version >= 1.18
-        java.util.Optional result = EntityHuman.findRespawnPositionAndUseSpawnBlock(instance, blockposition, respawnPoint.angle(), alsoWhenDestroyed, ignoreRespawnAnchorUses);
+        java.util.Optional result = EntityHuman.findRespawnPositionAndUseSpawnBlock(instance, blockposition, respawnPoint.angle(), respawnPoint.forced(), ignoreRespawnAnchorUses);
   #elseif version >= 1.16.2
-        java.util.Optional result = EntityHuman.getBed(instance, blockposition, respawnPoint.angle(), alsoWhenDestroyed, ignoreRespawnAnchorUses);
+        java.util.Optional result = EntityHuman.getBed(instance, blockposition, respawnPoint.angle(), respawnPoint.forced(), ignoreRespawnAnchorUses);
   #elseif version >= 1.16
-        java.util.Optional result = EntityHuman.getBed(instance, blockposition, alsoWhenDestroyed, ignoreRespawnAnchorUses);
+        java.util.Optional result = EntityHuman.getBed(instance, blockposition, respawnPoint.forced(), ignoreRespawnAnchorUses);
   #else
-        java.util.Optional result = EntityHuman.getBed((IWorldReader) instance, blockposition, alsoWhenDestroyed);
+        java.util.Optional result = EntityHuman.getBed((IWorldReader) instance, blockposition, respawnPoint.forced());
   #endif
         Vec3D vec3d = (Vec3D) result.orElse(null);
         if (vec3d == null) {
@@ -641,9 +641,9 @@ class WorldServer extends World {
 #else
         BlockPosition blockposition = (BlockPosition) respawnPoint.pos();
   #if version >= 1.13
-        BlockPosition result = EntityHuman.getBed((IBlockAccess) instance, blockposition, alsoWhenDestroyed);
+        BlockPosition result = EntityHuman.getBed((IBlockAccess) instance, blockposition, respawnPoint.forced());
   #else
-        BlockPosition result = EntityHuman.getBed((net.minecraft.world.level.World) instance, blockposition, alsoWhenDestroyed);
+        BlockPosition result = EntityHuman.getBed((net.minecraft.world.level.World) instance, blockposition, respawnPoint.forced());
   #endif
         if (result == null) {
             return null;
