@@ -148,16 +148,21 @@ class EntityLiving extends Entity {
         instance#craftAttributes = new_craftAttributes;
 
         // Item attributes need to be re-applied later, they are lost as part of this reset
+        // If Inventory is also changed this is less important, as the item changes will trigger an update too.
+        // But when the inventory does not change, no change will be detected.
+        //
+        // [MyWorlds] To reproduce, give yourself armor, then teleport between worlds where inventory is shared.
+        // Your armor slots will go away when you go to the other world despite still wearing armor.
   #if version >= 1.21.5
-        //#require net.minecraft.world.entity.EntityLiving private final Map<EnumItemSlot, ItemStack> lastEquipmentItems;
-        //Map lastEquipmentItems = instance#lastEquipmentItems;
-        //java.util.Iterator slotTypesIter = EnumItemSlot.VALUES.iterator();
-        //while (slotTypesIter.hasNext()) {
-        //    EnumItemSlot slot = (EnumItemSlot) slotTypesIter.next();
-        //    if (lastEquipmentItems.containsKey(slot)) {
-        //        lastEquipmentItems.put(slot, ItemStack.EMPTY);
-        //    }
-        //}
+        #require net.minecraft.world.entity.EntityLiving private final Map<EnumItemSlot, ItemStack> lastEquipmentItems;
+        Map lastEquipmentItems = instance#lastEquipmentItems;
+        java.util.Iterator slotTypesIter = EnumItemSlot.VALUES.iterator();
+        while (slotTypesIter.hasNext()) {
+            EnumItemSlot slot = (EnumItemSlot) slotTypesIter.next();
+            if (lastEquipmentItems.containsKey(slot)) {
+                lastEquipmentItems.put(slot, ItemStack.EMPTY);
+            }
+        }
   #else
         #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> lastHandItemStacks;
         #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> lastArmorItemStacks;
