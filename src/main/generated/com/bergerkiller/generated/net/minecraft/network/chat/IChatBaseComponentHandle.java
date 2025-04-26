@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.network.chat;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import org.bukkit.ChatColor;
 import java.util.Collection;
 
@@ -75,6 +76,14 @@ public abstract class IChatBaseComponentHandle extends Template.Handle {
             return T.jsonToChatComponent.invoke(jsonString);
         }
 
+        public static IChatBaseComponentHandle nbtToChatComponent(CommonTag nbt) {
+            return T.nbtToChatComponent.invoke(nbt);
+        }
+
+        public static CommonTag chatComponentToNBT(IChatBaseComponentHandle chatComponent) {
+            return T.chatComponentToNBT.invoke(chatComponent);
+        }
+
         public static IChatBaseComponentHandle empty() {
             return T.empty.invoke();
         }
@@ -94,6 +103,8 @@ public abstract class IChatBaseComponentHandle extends Template.Handle {
         public static final class ChatSerializerClass extends Template.Class<ChatSerializerHandle> {
             public final Template.StaticMethod.Converted<String> chatComponentToJson = new Template.StaticMethod.Converted<String>();
             public final Template.StaticMethod.Converted<IChatBaseComponentHandle> jsonToChatComponent = new Template.StaticMethod.Converted<IChatBaseComponentHandle>();
+            public final Template.StaticMethod.Converted<IChatBaseComponentHandle> nbtToChatComponent = new Template.StaticMethod.Converted<IChatBaseComponentHandle>();
+            public final Template.StaticMethod.Converted<CommonTag> chatComponentToNBT = new Template.StaticMethod.Converted<CommonTag>();
             public final Template.StaticMethod.Converted<IChatBaseComponentHandle> empty = new Template.StaticMethod.Converted<IChatBaseComponentHandle>();
             public final Template.StaticMethod.Converted<IChatBaseComponentHandle> newLine = new Template.StaticMethod.Converted<IChatBaseComponentHandle>();
             public final Template.StaticMethod.Converted<IChatBaseComponentHandle> modifiersToComponent = new Template.StaticMethod.Converted<IChatBaseComponentHandle>();

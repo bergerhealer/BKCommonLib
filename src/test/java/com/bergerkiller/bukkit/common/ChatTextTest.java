@@ -2,9 +2,13 @@ package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.bergerkiller.bukkit.common.nbt.CommonTag;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import org.bukkit.ChatColor;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -15,6 +19,77 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 public class ChatTextTest {
+
+    @Test
+    public void testNBTDeserializationSimple() {
+        CommonTag nbt;
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.21.5")) {
+            // Tag String plaintext
+            nbt = CommonTag.createForData("cool");
+        } else {
+            // JSON String
+            nbt = CommonTag.createForData("{\"text\":\"cool\"");
+        }
+
+        ChatText text = ChatText.fromNBT(nbt);
+        assertEquals("cool", text.getMessage());
+    }
+
+    @Test
+    public void testNBTDeserializationComplex() {
+        CommonTag nbt;
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.21.5")) {
+            // Tag String plaintext
+            CommonTagCompound nbtComp = new CommonTagCompound();
+            nbtComp.putValue("text", "");
+            CommonTagCompound extra = new CommonTagCompound();
+            extra.putValue("text", "cool");
+            extra.putValue("italic", true);
+            nbtComp.createList("extra").add(extra);
+            nbt = nbtComp;
+        } else {
+            // JSON String
+            nbt = CommonTag.createForData("{\"text\":\"\",\"extra\":[{\"text\":\"cool\",\"italic\":true}]}");
+        }
+
+        ChatText text = ChatText.fromNBT(nbt);
+        assertEquals(ChatColor.ITALIC + "cool", text.getMessage());
+    }
+
+    @Test
+    public void testNBTSerializationSimple() {
+        ChatText text = ChatText.fromMessage("cool");
+        CommonTag nbt = text.getNBT();
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.21.5")) {
+            //TODO: Should be NBTTagString but isnt because spigot code is ass!
+        } else {
+            // Encodes as json, verify it is equal to what normal encoded json is like
+            assertNotNull(nbt.getData(String.class));
+            assertEquals(text.getJson(), nbt.getData(String.class));
+        }
+    }
+
+    @Test
+    public void testNBTSerializationComplex() {
+        ChatText text = ChatText.fromMessage("cool");
+        text.setClickableContent("CONTENT");
+        CommonTag nbt = text.getNBT();
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.21.5")) {
+            // Verify the NBT structure that is outputed
+            assertTrue(nbt instanceof CommonTagCompound);
+
+            CommonTagCompound compound = (CommonTagCompound) nbt;
+            assertTrue(compound.containsKey("click_event"));
+            assertTrue(compound.containsKey("extra"));
+            CommonTagList list = (CommonTagList) compound.get("extra");
+            assertEquals(1, list.size());
+            assertEquals("cool", list.getValue(0, String.class));
+        } else {
+            // Encodes as json, verify it is equal to what normal encoded json is like
+            assertNotNull(nbt.getData(String.class));
+            assertEquals(text.getJson(), nbt.getData(String.class));
+        }
+    }
 
     @Test
     public void testIsEmpty() {

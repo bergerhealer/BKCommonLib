@@ -2,6 +2,11 @@ package net.minecraft.network.chat;
 
 import net.minecraft.EnumChatFormat;
 
+import net.minecraft.nbt.NBTTagString;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTBase;
+
+import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
 import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
 
 class IChatBaseComponent {
@@ -193,6 +198,59 @@ class IChatBaseComponent {
 #else
         public static (IChatBaseComponentHandle) IChatBaseComponent jsonToChatComponent:fromJson(String jsonString);
 #endif
+
+        public static (IChatBaseComponentHandle) IChatBaseComponent nbtToChatComponent((com.bergerkiller.bukkit.common.nbt.CommonTag) NBTBase nbt) {
+#if version >= 1.21.5
+            // Use the CODEC for this. It'll turn plaintext strings into NBTTagString, and more complicated
+            // values are turned into a NBT structure (component or list at root)
+            com.mojang.serialization.DynamicOps dynamicops = net.minecraft.nbt.DynamicOpsNBT.INSTANCE;
+            IChatBaseComponent component = (IChatBaseComponent) net.minecraft.network.chat.ComponentSerialization.CODEC.parse(dynamicops, nbt)
+                        .resultOrPartial(NBTTagCompoundHandle.createPartialErrorLogger(nbt))
+                        .orElse(null);
+            if (component == null) {
+                component = IChatBaseComponent.literal("");
+            }
+            return component;
+#else
+            // Only NBTTagString is supported on this version
+            if (nbt instanceof NBTTagString) {
+                String jsonString = ((NBTTagString) nbt).getAsString();
+  #if version >= 1.20.5
+                return IChatBaseComponent$ChatSerializer.fromJson(jsonString,
+                        net.minecraft.server.MinecraftServer.getDefaultRegistryAccess());
+  #else
+                return IChatBaseComponent$ChatSerializer.fromJson(jsonString);
+  #endif
+            } else {
+  #if version >= 1.19
+                return IChatBaseComponent.literal("");
+  #else
+                return new ChatComponentText("");
+  #endif
+            }
+#endif
+        }
+
+        public static (com.bergerkiller.bukkit.common.nbt.CommonTag) NBTBase chatComponentToNBT((IChatBaseComponentHandle) IChatBaseComponent chatComponent) {
+#if version >= 1.21.5
+            com.mojang.serialization.DynamicOps dynamicops = net.minecraft.nbt.DynamicOpsNBT.INSTANCE;
+            return (NBTBase) net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(
+                     dynamicops, chatComponent).getOrThrow();
+#else
+            // Serialize to json and return that as a NBTTagString
+  #if version >= 1.20.5
+            String jsonString = IChatBaseComponent$ChatSerializer.toJson(chatComponent,
+                                        net.minecraft.server.MinecraftServer.getDefaultRegistryAccess());
+  #else
+            String jsonString = IChatBaseComponent$ChatSerializer.toJson(chatComponent);
+  #endif
+  #if version >= 1.15
+            return NBTTagString.valueOf(jsonString);
+  #else
+            return new NBTTagString(jsonString);
+  #endif
+#endif
+        }
 
         public static (IChatBaseComponentHandle) IChatBaseComponent empty() {
 #if version >= 1.19

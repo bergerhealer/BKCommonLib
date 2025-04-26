@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.config.TempFileOutputStream;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
 import com.bergerkiller.generated.net.minecraft.nbt.NBTCompressedStreamToolsHandle;
 import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
@@ -137,6 +138,12 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
             String v = putGetRemove(op, key, String.class, (value == null) ? null : ((MinecraftKeyHandle) value).toString());
             if (v != null) {
                 return (T) MinecraftKeyHandle.createNew(v);
+            }
+        } else if (type == ChatText.class) {
+            // Encoded / decodes NBT data
+            CommonTag result = putGetRemove(op, key, CommonTag.class, (value == null) ? null : ((ChatText) value).getNBT());
+            if (result != null) {
+                return (T) ChatText.fromNBT(result);
             }
         } else if (type == boolean.class || type == Boolean.class) {
             // == Booleans (serialized as Byte) ==

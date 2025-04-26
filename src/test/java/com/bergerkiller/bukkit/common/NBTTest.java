@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common;
 
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import org.bukkit.block.BlockFace;
 import org.bukkit.permissions.PermissionDefault;
 import org.junit.Test;
@@ -17,6 +18,13 @@ import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
 import com.bergerkiller.generated.net.minecraft.nbt.NBTTagListHandle;
 
 public class NBTTest {
+
+    @Test
+    public void testPutGetChatText() {
+        CommonTagCompound nbt = new CommonTagCompound();
+        nbt.putValue("key", ChatText.fromMessage("hello, world!"));
+        assertEquals("hello, world!", nbt.getValue("key", ChatText.class).getMessage());
+    }
 
     @Test
     public void testNBTCreateTagForData() {

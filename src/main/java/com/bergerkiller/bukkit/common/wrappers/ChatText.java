@@ -3,6 +3,8 @@ package com.bergerkiller.bukkit.common.wrappers;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import com.bergerkiller.bukkit.common.nbt.CommonTag;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -45,6 +47,33 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
         } else {
             sender.sendMessage(this.getMessage());
         }
+    }
+
+    /**
+     * Encodes this chat text as NBT suitable for storing as metadata.
+     * On version 1.21.5 and later of the server this encodes the full component
+     * hierarchy. On versions before that, encodes this component as a json string
+     * and returns that.
+     *
+     * @return Encoded NBT
+     */
+    public final CommonTag getNBT() {
+        if (handle == null) {
+            return CommonTagCompound.EMPTY;
+        } else {
+            return IChatBaseComponentHandle.ChatSerializerHandle.chatComponentToNBT(handle);
+        }
+    }
+
+    /**
+     * Decodes NBT into chat text and assigns it to this ChatText. On version 1.21.5
+     * and later this supports the new nbt encoding, on versions older than that it
+     * only supports NBTTagString and decoding from json.
+     *
+     * @param nbt NBT to decode
+     */
+    public final void setNBT(CommonTag nbt) {
+        handle = IChatBaseComponentHandle.ChatSerializerHandle.nbtToChatComponent(nbt);
     }
 
     /**
@@ -383,6 +412,21 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
         }
         ChatText text = new ChatText();
         text.setJson(jsonText);
+        return text;
+    }
+
+    /**
+     * Decodes NBT-encoded chat messages into a Chat Text component
+     *
+     * @param nbt Input NBT message data
+     * @return ChatText
+     */
+    public static ChatText fromNBT(CommonTag nbt) {
+        if (nbt == null) {
+            return null;
+        }
+        ChatText text = new ChatText();
+        text.setNBT(nbt);
         return text;
     }
 
