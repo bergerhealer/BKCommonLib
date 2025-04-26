@@ -61,7 +61,9 @@ public class ChatTextTest {
         ChatText text = ChatText.fromMessage("cool");
         CommonTag nbt = text.getNBT();
         if (CommonBootstrap.evaluateMCVersion(">=", "1.21.5")) {
-            //TODO: Should be NBTTagString but isnt because spigot code is ass!
+            // Should be NBTTagString
+            assertNotNull(nbt.getData(String.class));
+            assertEquals("cool", nbt.getData(String.class));
         } else {
             // Encodes as json, verify it is equal to what normal encoded json is like
             assertNotNull(nbt.getData(String.class));
@@ -80,10 +82,7 @@ public class ChatTextTest {
 
             CommonTagCompound compound = (CommonTagCompound) nbt;
             assertTrue(compound.containsKey("click_event"));
-            assertTrue(compound.containsKey("extra"));
-            CommonTagList list = (CommonTagList) compound.get("extra");
-            assertEquals(1, list.size());
-            assertEquals("cool", list.getValue(0, String.class));
+            assertEquals("cool", compound.getValue("text", String.class));
         } else {
             // Encodes as json, verify it is equal to what normal encoded json is like
             assertNotNull(nbt.getData(String.class));
@@ -173,7 +172,7 @@ public class ChatTextTest {
         }
         if (Common.evaluateMCVersion(">=", "1.21.4")) {
             // Argh!
-            allowed.add("{\"text\":\"\",\"extra\":[{\"text\":\"\",\"strikethrough\":false,\"obfuscated\":false,\"bold\":false,\"italic\":false,\"underlined\":false,\"color\":\"red\"},{\"text\":\"\",\"color\":\"red\"}]}");
+            allowed.add("{\"text\":\"\",\"extra\":[{\"text\":\"\",\"color\":\"red\"}],\"strikethrough\":false,\"obfuscated\":false,\"bold\":false,\"italic\":false,\"underlined\":false,\"color\":\"red\"}");
         }
         String json = text.getJson();
         if (!allowed.contains(json)) {

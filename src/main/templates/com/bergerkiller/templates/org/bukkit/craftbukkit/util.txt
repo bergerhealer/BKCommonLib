@@ -160,5 +160,24 @@ class CraftChatMessage {
         return component#formatAsLegacyString();
     }
 
-    public static (IChatBaseComponentHandle[]) IChatBaseComponent[] fromString(String message, boolean keepNewlines);
+    public static (IChatBaseComponentHandle[]) IChatBaseComponent[] fromString(String message, boolean keepNewlines) {
+        IChatBaseComponent[] components = CraftChatMessage.fromString(message, keepNewlines);
+
+        // Eliminate a common case of a root empty component with only one sibling inside
+        // This is the case for most simple input messages
+        if (components.length == 1) {
+            IChatBaseComponent singleComponent = components[0];
+            java.util.List siblings = singleComponent.getSiblings();
+            if (siblings.size() == 1 && singleComponent.getStyle().isEmpty()) {
+                String text = singleComponent#getComponentText();
+                if (text.isEmpty()) {
+                    components[0] = (IChatBaseComponent) siblings.get(0);
+                }
+            }
+        }
+
+        return components;
+    }
+
+    //public static (IChatBaseComponentHandle[]) IChatBaseComponent[] fromString(String message, boolean keepNewlines);
 }
