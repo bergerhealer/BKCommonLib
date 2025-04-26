@@ -39,6 +39,7 @@ public class MapDisplayMarkers {
 
     List<MapIconHandle> serializeValuesAsMapIcons(MapDisplayMarkerTile tile) {
         return markersById.values().stream()
+                .filter(e -> e.tile == tile)
                 .map(e -> e.value)
                 .map(marker -> MapIconHandle.createNew(marker.getType(),
                         tile.encodeX(marker.getPositionX()),
