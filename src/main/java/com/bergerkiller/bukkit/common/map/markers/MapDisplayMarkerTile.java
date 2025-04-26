@@ -14,14 +14,20 @@ import com.bergerkiller.bukkit.common.map.MapMarker;
  * Metadata information about markers for a single 128x128 tile
  */
 public class MapDisplayMarkerTile {
+    private final IntVector2 coordinates;
     private final double offsetX, offsetY;
     private final List<MapMarker> visibleMarkers = new ArrayList<>();
     private final Set<Player> sentToPlayers = new HashSet<Player>();
     private boolean changed = false;
 
     public MapDisplayMarkerTile(IntVector2 coordinates) {
+        this.coordinates = coordinates;
         this.offsetX = (double) (coordinates.x << 7);
         this.offsetY = (double) (coordinates.z << 7);
+    }
+
+    public IntVector2 getCoordinates() {
+        return coordinates;
     }
 
     public boolean isEmpty() {
