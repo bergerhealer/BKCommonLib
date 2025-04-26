@@ -157,6 +157,17 @@ public class IntVector2 {
         return new IntVector3(x, y, z);
     }
 
+    /**
+     * Creates an IntVector2 with the specified x/z coordinates
+     *
+     * @param x X-coordinate
+     * @param z Z-coordinate
+     * @return new IntVector2
+     */
+    public static IntVector2 of(int x, int z) {
+        return new IntVector2(x, z);
+    }
+
     public static IntVector2 read(DataInputStream stream) throws IOException {
         return new IntVector2(stream.readInt(), stream.readInt());
     }
