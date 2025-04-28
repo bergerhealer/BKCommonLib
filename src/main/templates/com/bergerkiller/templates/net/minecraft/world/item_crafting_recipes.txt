@@ -197,7 +197,7 @@ optional class RecipeItemStack {
 #else
 
   #if version >= 1.17
-        #require net.minecraft.world.item.crafting.RecipeItemStack public ItemStack[] choicesRecipeItemStack:itemStacks;
+        #require net.minecraft.world.item.crafting.RecipeItemStack private ItemStack[] choicesRecipeItemStack:itemStacks;
   #elseif version >= 1.12
         #require net.minecraft.world.item.crafting.RecipeItemStack public final ItemStack[] choicesRecipeItemStack:choices;
   #endif

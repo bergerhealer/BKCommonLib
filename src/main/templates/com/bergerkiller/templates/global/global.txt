@@ -12,7 +12,9 @@ import net.minecraft.network.chat.contents.TranslatableContents;
         if (contents instanceof net.minecraft.network.chat.contents.LiteralContents) {
             return ((net.minecraft.network.chat.contents.LiteralContents) contents).text();
         } else if (contents instanceof TranslatableContents) {
-  #if exists io.papermc.paper.adventure.PaperAdventure
+  #if exists com.mohistmc.paper.adventure.PaperAdventure
+            return com.mohistmc.paper.adventure.PaperAdventure.asPlain(com.mohistmc.paper.adventure.PaperAdventure.asAdventure(instance), null);
+  #elseif exists io.papermc.paper.adventure.PaperAdventure
             return io.papermc.paper.adventure.PaperAdventure.asPlain(io.papermc.paper.adventure.PaperAdventure.asAdventure(instance), null);
   #else
             TranslatableContents trans = (TranslatableContents) contents;

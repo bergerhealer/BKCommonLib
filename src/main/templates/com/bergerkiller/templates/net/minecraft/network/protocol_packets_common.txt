@@ -303,18 +303,20 @@ class ServerboundClientInformationPacket extends Packet {
     public int getModelPartFlags() { return instance.information().modelCustomisation(); }
 #else
   #if version >= 1.17
-    #require ServerboundClientInformationPacket public readonly String locale:language;
+    #require ServerboundClientInformationPacket private readonly String locale:language;
   #elseif version >= 1.16
-    #require ServerboundClientInformationPacket public readonly String locale;
+    #require ServerboundClientInformationPacket private readonly String locale;
   #else
     #require ServerboundClientInformationPacket private readonly String locale:a;
   #endif
     public String getLocale() { return instance#locale; }
 
   #if version >= 1.17
-    #require ServerboundClientInformationPacket public readonly int view:viewDistance;
+    #require ServerboundClientInformationPacket private readonly int view:viewDistance;
   #elseif fieldexists net.minecraft.network.protocol.game.PacketPlayInSettings public int viewDistance
     #require ServerboundClientInformationPacket public readonly int view:viewDistance;
+  #elseif fieldexists net.minecraft.network.protocol.game.PacketPlayInSettings private int viewDistance
+    #require ServerboundClientInformationPacket private readonly int view:viewDistance;
   #else
     #require ServerboundClientInformationPacket private readonly int view:b;
   #endif
