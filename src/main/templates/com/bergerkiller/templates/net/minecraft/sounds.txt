@@ -80,7 +80,9 @@ class SoundEffect {
     }
 
     public static (SoundEffectHandle) SoundEffect byKey((MinecraftKeyHandle) MinecraftKey key) {
-#if version >= 1.13.1
+#if version >= 1.21.2
+        return (SoundEffect) net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.getValue((MinecraftKey) key);
+#elseif version >= 1.13.1
         return (SoundEffect) ((RegistryMaterials) net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT).get((MinecraftKey) key);
 #elseif version >= 1.9
         return (SoundEffect) SoundEffect.a.get((Object) key);
