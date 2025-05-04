@@ -228,21 +228,44 @@ class ItemStack {
     }
 
     public void hideTooltip() {
-        java.util.LinkedHashSet hiddenDataComponents = instance#getHiddenToolTipComponents();
-        hiddenDataComponents.add(DataComponents.ITEM_NAME);
-        hiddenDataComponents.add(DataComponents.CUSTOM_NAME);
-
-        instance.set(DataComponents.TOOLTIP_DISPLAY, new TooltipDisplay(true, hiddenDataComponents));
+        TooltipDisplay display = (TooltipDisplay) instance.get(DataComponents.TOOLTIP_DISPLAY);
+        if (display == null) {
+            instance.set(DataComponents.TOOLTIP_DISPLAY, new TooltipDisplay(true, new java.util.LinkedHashSet()));
+        } else if (!display.hideTooltip()) {
+            instance.set(DataComponents.TOOLTIP_DISPLAY, new TooltipDisplay(true, display.hiddenComponents()));
+        }
     }
 
     public void hideAllAttributes() {
         java.util.LinkedHashSet hiddenDataComponents = instance#getHiddenToolTipComponents();
         java.util.Iterator allDataComponentsIter = net.minecraft.core.registries.BuiltInRegistries.DATA_COMPONENT_TYPE.iterator();
         while (allDataComponentsIter.hasNext()) {
-            hiddenDataComponents.add(allDataComponentsIter.next());
+            net.minecraft.core.component.DataComponentType type = (net.minecraft.core.component.DataComponentType) allDataComponentsIter.next();
+
+            if (
+                type == DataComponents.LORE ||
+                type == DataComponents.CUSTOM_NAME ||
+                type == DataComponents.BREAK_SOUND ||
+                type == DataComponents.TOOLTIP_DISPLAY ||
+                type == DataComponents.ITEM_MODEL ||
+                type == DataComponents.DAMAGE ||
+                type == DataComponents.MAX_STACK_SIZE ||
+                type == DataComponents.MAX_DAMAGE ||
+                type == DataComponents.RARITY ||
+                type == DataComponents.TOOL ||
+                type == DataComponents.WEAPON ||
+                type == DataComponents.ENCHANTABLE ||
+                type == DataComponents.REPAIRABLE
+            ) {
+                continue;
+            }
+
+            if (instance.has(type)) {
+                hiddenDataComponents.add(type);
+            }
         }
 
-        instance.set(DataComponents.TOOLTIP_DISPLAY, new TooltipDisplay(true, hiddenDataComponents));
+        instance.set(DataComponents.TOOLTIP_DISPLAY, new TooltipDisplay(false, hiddenDataComponents));
     }
 #elseif version >= 1.20.5
     public void hideTooltip() {

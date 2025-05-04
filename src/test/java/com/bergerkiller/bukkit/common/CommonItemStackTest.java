@@ -20,6 +20,13 @@ import static org.junit.Assert.*;
 public class CommonItemStackTest {
 
     @Test
+    public void testVanillaDisplayName() {
+        // Note: display name is a translatable, which we decode into English.
+        CommonItemStack item = CommonItemStack.create(MaterialUtil.getFirst("DIAMOND_SWORD", "LEGACY_DIAMOND_SWORD"), 1);
+        assertEquals("Diamond sword", item.getDisplayNameMessage());
+    }
+
+    @Test
     public void testCustomModelDataLegacy() {
         CommonItemStack item = CommonItemStack.create(MaterialUtil.getFirst("DIAMOND_SWORD", "LEGACY_DIAMOND_SWORD"), 1);
         assertFalse(item.hasCustomModelData());
