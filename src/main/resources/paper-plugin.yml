@@ -11,6 +11,8 @@ dependencies:
     required: false
   - name: ProtocolLib
     required: false
+  - name: WorldGuard
+    required: false
   - name: WorldEdit
     required: false
   - name: FastAsyncWorldEdit
@@ -25,6 +27,7 @@ dependencies:
     required: false
 load-after:
   - name: ProtocolLib
+  - name: WorldGuard
 dev-url: ${url}
 bstats:
   enabled: true

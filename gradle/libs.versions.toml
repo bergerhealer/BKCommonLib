@@ -5,6 +5,7 @@ netty = "4.1.42.Final"
 log4j = "2.17.0"
 mountiplex = "3.24"
 regionchangetracker = "1.3"
+regionflagtracker= "1.0"
 colorconversionhelper = "1.03"
 softdependencylib = "1.05"
 timings = "1.0.4"
@@ -32,6 +33,8 @@ mountiplex = { module = "com.bergerkiller.mountiplex:Mountiplex", version.ref = 
 cloud-core-bom = { module = "org.incendo:cloud-bom", version.ref = "cloud_core" }
 cloud-minecraft-bom = { module = "org.incendo:cloud-minecraft-bom", version.ref = "cloud_minecraft" }
 regionchangetracker = { module = "com.bergerkiller.bukkit.regionchangetracker:BKCommonLib-RegionChangeTracker-Core", version.ref = "regionchangetracker" }
+regionflagtracker-api = { module = "com.bergerkiller.bukkit.regionflagtracker:BKCommonLib-RegionFlagTracker-API", version.ref = "regionflagtracker" }
+regionflagtracker-core = { module = "com.bergerkiller.bukkit.regionflagtracker:BKCommonLib-RegionFlagTracker-Core", version.ref = "regionflagtracker" }
 colorconversionhelper = { module = "com.bergerkiller.bukkit.colorconversionhelper:BKCommonLib-ColorConversionHelper", version.ref = "colorconversionhelper" }
 softdependency = { module = "com.bergerkiller.bukkit.softdependency:SoftDependency", version.ref = "softdependencylib" }
 timings = { module = "co.aikar:minecraft-timings", version.ref = "timings" }

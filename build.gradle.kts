@@ -70,6 +70,10 @@ dependencies {
     api(libs.mountiplex)
     // Region change tracker is included in BKCommonLib for the region block change event
     api(libs.regionchangetracker)
+    // Region flag tracker is included in BKCommonLib to allow other plugins to store region flags with WorldGuard
+    // We only expose the api to other plugins, but use the full core implementation ourselves for initialization.
+    api(libs.regionflagtracker.api)
+    internal(libs.regionflagtracker.core)
     // SoftDependency lib is included in BKCommonLib for its handy API
     api(libs.softdependency)
     // Aikar's minecraft timings library, https://github.com/aikar/minecraft-timings

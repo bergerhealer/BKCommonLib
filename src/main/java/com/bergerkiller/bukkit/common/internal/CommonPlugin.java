@@ -10,6 +10,7 @@ import com.bergerkiller.bukkit.common.bases.CheckedRunnable;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
 import com.bergerkiller.bukkit.common.collections.ImplicitlySharedSet;
 import com.bergerkiller.bukkit.common.collections.ObjectCache;
+import com.bergerkiller.bukkit.common.component.LibraryComponent;
 import com.bergerkiller.bukkit.common.component.LibraryComponentList;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.controller.EntityController;
@@ -42,6 +43,7 @@ import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.map.util.RGBColorToIntConversion;
 import com.bergerkiller.bukkit.common.offline.OfflineWorld;
 import com.bergerkiller.bukkit.common.protocol.PlayerGameInfo;
+import com.bergerkiller.bukkit.common.regionflagtracker.RegionFlagRegistryBaseImpl;
 import com.bergerkiller.bukkit.common.softdependency.SoftDependency;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
@@ -695,6 +697,17 @@ public class CommonPlugin extends PluginBase {
         // Enable all components in order
         this.components.enable(this.serverLogRecorder);
         this.components.enable(new CommonRegionChangeTracker(this));
+        this.components.enable("Region Flag Change Tracker", new LibraryComponent() {
+            @Override
+            public void enable() {
+                RegionFlagRegistryBaseImpl.instance().enable(CommonPlugin.this);
+            }
+
+            @Override
+            public void disable() {
+                RegionFlagRegistryBaseImpl.instance().disable();
+            }
+        });
         this.components.enableForVersions("Dimension to Holder conversion", "1.18.2", null,
                 MC1_18_2_Conversion::initComponent);
         this.components.enableCreate(OfflineWorld::initializeComponent);

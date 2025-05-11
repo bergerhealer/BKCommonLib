@@ -97,14 +97,15 @@ public class LibraryComponentList<E> extends LibraryComponentHolder<E> {
      * components. If enabling fails with an error, then the component
      * is not added and will not be disabled again later.
      *
-     * @param component
+     * @param identifier Identifier text to print if enabling fails for some reason
+     * @param component LibraryComponent
      * @return Input component, or null if enabling fails
      */
-    public <L extends LibraryComponent> L enable(final L component) {
+    public <L extends LibraryComponent> L enable(final String identifier, final L component) {
         return enable(new LibraryComponent.Conditional<E, L>() {
             @Override
             public String getIdentifier() {
-                return component.getClass().getSimpleName();
+                return identifier;
             }
 
             @Override
@@ -117,6 +118,18 @@ public class LibraryComponentList<E> extends LibraryComponentHolder<E> {
                 return component;
             }
         });
+    }
+
+    /**
+     * Tries to enable a component, adding it to the list of enabled
+     * components. If enabling fails with an error, then the component
+     * is not added and will not be disabled again later.
+     *
+     * @param component LibraryComponent
+     * @return Input component, or null if enabling fails
+     */
+    public <L extends LibraryComponent> L enable(final L component) {
+        return enable(component.getClass().getSimpleName(), component);
     }
 
     /**

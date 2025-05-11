@@ -67,7 +67,8 @@ public class Common {
             "Common:WorldUtil:HasFeatureFlag",
             "Common:ResourcePack:ItemModel",
             "Common:NBTUtil:LoadSaveEquipment",
-            "Common:NBT:ChatTextSerialization"
+            "Common:NBT:ChatTextSerialization",
+            "Module:RegionFlagTracker"
     ).collect(Collectors.toSet());
 
     /**
