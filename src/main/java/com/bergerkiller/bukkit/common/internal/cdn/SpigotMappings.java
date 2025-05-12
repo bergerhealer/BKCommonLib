@@ -1,26 +1,19 @@
 package com.bergerkiller.bukkit.common.internal.cdn;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.DeflaterOutputStream;
-import java.util.zip.InflaterInputStream;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.cdn.MojangIO.VersionManifest;
+import com.bergerkiller.bukkit.common.io.VersionedMappingsFileIO;
 import com.bergerkiller.bukkit.common.server.CraftBukkitServer;
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
 import com.google.common.collect.BiMap;
@@ -30,101 +23,13 @@ import com.google.common.collect.HashBiMap;
  * Communicates with hub.spigotmc.org to generate spigot &lt;&gt; mojang class
  * name mappings. These can also be efficiently saved/read from a file resource.
  */
-public class SpigotMappings {
-    /**
-     * All the mappings by minecraft version, is sorted in ascending (old - new) order
-     */
-    public final SortedMap<String, ClassMappings> byVersion = new TreeMap<>((a, b) -> {
-        if (a.equals(b)) {
-            return 0;
-        } else if (TextValueSequence.evaluateText(a, ">", b)) {
-            return 1;
-        } else {
-            return -1;
-        }
-    });
+public class SpigotMappings extends VersionedMappingsFileIO<SpigotMappings.ClassMappings> {
 
     /**
-     * Gets the spigot &lt;&gt; mojang class mappings on the specified Minecraft version
-     *
-     * @param minecraftVersion
-     * @return spigot &lt;&gt; mojang class name mappings
+     * Creates new empty SpigotMappings
      */
-    public ClassMappings get(String minecraftVersion) {
-        return byVersion.get(minecraftVersion);
-    }
-
-    /**
-     * Reads all the mappings from an input stream in binary format.
-     * Note: closes the input stream.
-     *
-     * @param inputStream Input stream
-     * @throws IOException
-     */
-    public void read(InputStream inputStream) throws IOException {
-        HashMap<String, String> spigotToMojang = new HashMap<>();
-        try (DataInputStream stream = new DataInputStream(new InflaterInputStream(inputStream))) {
-            int numVersions = stream.readInt();
-            if (numVersions == 0) {
-                return;
-            }
-
-            String version = stream.readUTF();
-            while (numVersions-- > 0) {
-                String nextVersion = version;
-                for (String entry; !(entry = stream.readUTF()).isEmpty();) {
-                    int sep = entry.indexOf('=');
-                    if (sep == -1) {
-                        // Version string
-                        nextVersion = entry;
-                        break;
-                    } else if (sep == (entry.length()-1)) {
-                        spigotToMojang.remove(entry.substring(0, sep));
-                    } else {
-                        spigotToMojang.put(entry.substring(0, sep), entry.substring(sep + 1));
-                    }
-                }
-
-                this.byVersion.put(version, new ClassMappings(spigotToMojang));
-
-                version = nextVersion;
-            }
-        }
-    }
-
-    /**
-     * Writes all the mappings to an output stream in binary format.
-     * Note: closes the output stream.
-     *
-     * @param outputStream Output stream
-     * @throws IOException
-     */
-    public void write(OutputStream outputStream) throws IOException {
-        try (DataOutputStream stream = new DataOutputStream(new DeflaterOutputStream(outputStream))) {
-            stream.writeInt(byVersion.size());
-            Map<String, String> previous = Collections.emptyMap();
-            for (Map.Entry<String, ClassMappings> e : byVersion.entrySet()) {
-                stream.writeUTF(e.getKey());
-                Map<String, String> mapping = e.getValue().spigotToMojang;
-
-                // For all entries in the previous map that are now missing, write a 'delete'
-                for (Map.Entry<String, String> c : previous.entrySet()) {
-                    if (!mapping.containsKey(c.getKey())) {
-                        stream.writeUTF(c.getKey() + "=");
-                    }
-                }
-                for (Map.Entry<String, String> c : mapping.entrySet()) {
-                    if (!previous.getOrDefault(c.getKey(), "").equals(c.getValue())) {
-                        stream.writeUTF(c.getKey() + "=" + c.getValue());
-                    }
-                }
-
-                previous = mapping; // Delta tracking
-            }
-
-            // Closes it out
-            stream.writeUTF("");
-        }
+    public SpigotMappings() {
+        super(TextValueSequence.STRING_COMPARATOR, ClassMappings::new);
     }
 
     /**
@@ -215,7 +120,7 @@ public class SpigotMappings {
         }
 
         // Store the result
-        this.byVersion.put(version, new ClassMappings(newMappings));
+        this.store(version, newMappings);
 
         // No longer need it.
         mappingsFile.delete();
@@ -252,7 +157,8 @@ public class SpigotMappings {
             }
         }
 
-        return spigotMappings.get(minecraftVersion);
+        return spigotMappings.get(minecraftVersion)
+                .orElseThrow(() -> new IllegalStateException("Version has no mappings"));
     }
 
     private static class SpigotVersionMeta {
@@ -266,6 +172,10 @@ public class SpigotMappings {
     public static class ClassMappings {
         private final BiMap<String, String> mojangToSpigot;
         private final BiMap<String, String> spigotToMojang;
+
+        private ClassMappings(VersionedMappingsFileIO.MappedVersion<ClassMappings> mappedVersion) {
+            this(mappedVersion.mappings);
+        }
 
         public ClassMappings(Map<String, String> spigotToMojang) {
             this.spigotToMojang = HashBiMap.create(spigotToMojang);
