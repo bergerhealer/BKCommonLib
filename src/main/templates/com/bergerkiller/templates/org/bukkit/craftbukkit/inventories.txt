@@ -2,6 +2,7 @@ package org.bukkit.craftbukkit.inventory;
 
 import net.minecraft.world.IInventory;
 import net.minecraft.world.inventory.InventoryMerchant;
+import net.minecraft.core.component.DataComponents;
 
 import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryMerchantHandle;
@@ -19,6 +20,14 @@ class CraftItemStack {
     public static org.bukkit.inventory.meta.ItemMeta deserializeItemMeta(java.util.Map<String, Object> values) {
         return SerializableMeta.deserialize(values);
     }
+
+#if version >= 1.21.4
+    public static optional Object deserializeCustomModelData(java.util.Map<String, Object> values) {
+        return new org.bukkit.craftbukkit.inventory.components.CraftCustomModelDataComponent(values);
+    }
+#else
+    public static optional Object deserializeCustomModelData:###(java.util.Map<String, Object> values);
+#endif
 }
 
 class CraftInventory extends org.bukkit.inventory.Inventory {

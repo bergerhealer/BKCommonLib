@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 import com.bergerkiller.bukkit.common.config.yaml.YamlListNode;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import org.bukkit.GameMode;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionDefault;
@@ -33,6 +34,112 @@ import com.bergerkiller.bukkit.common.io.AsyncTextWriter;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 
 public class YamlTest {
+
+    @Test
+    public void testPaperNBTItemStackCustomModelDataComplex() {
+        if (!CommonBootstrap.evaluateMCVersion(">=", "1.21.4")) {
+            return;
+        }
+
+        String yamlInputString = "" +
+                "key:\n" +
+                "  ==: org.bukkit.inventory.ItemStack\n" +
+                "  DataVersion: 4325\n" +
+                "  id: minecraft:diamond_sword\n" +
+                "  count: 15\n" +
+                "  components:\n" +
+                "    minecraft:custom_model_data: '{colors:[1,2,3],flags:[1b,0b,1b],floats:[1.0f,2.0f,4.0f],strings:[\"a\",\"b\",\"c\"]}'\n" +
+                "  schema_version: 1";
+
+        YamlNode root = new YamlNode();
+        root.loadFromString(yamlInputString);
+        CommonItemStack item = CommonItemStack.of(root.get("key", ItemStack.class));
+        assertEquals(MaterialUtil.getFirst("DIAMOND_SWORD", "LEGACY_DIAMOND_SWORD"), item.getType());
+        assertEquals(15, item.getAmount());
+        assertEquals(Arrays.asList(1, 2, 3), item.getCustomModelDataComponents().colors());
+        assertEquals(Arrays.asList(true, false, true), item.getCustomModelDataComponents().flags());
+        assertEquals(Arrays.asList(1.0f, 2.0f, 4.0f), item.getCustomModelDataComponents().floats());
+        assertEquals(Arrays.asList("a", "b", "c"), item.getCustomModelDataComponents().strings());
+    }
+
+    @Test
+    public void testPaperNBTItemStackCustomModelDataSimple() {
+        String yamlInputString = "" +
+                "key:\n" +
+                "  ==: org.bukkit.inventory.ItemStack\n" +
+                "  DataVersion: 4325\n" +
+                "  id: minecraft:diamond_sword\n" +
+                "  count: 15\n" +
+                "  components:\n" +
+                "    minecraft:custom_model_data: '{floats:[500.0f]}'\n" +
+                "  schema_version: 1";
+
+        YamlNode root = new YamlNode();
+        root.loadFromString(yamlInputString);
+        CommonItemStack item = CommonItemStack.of(root.get("key", ItemStack.class));
+        assertEquals(MaterialUtil.getFirst("DIAMOND_SWORD", "LEGACY_DIAMOND_SWORD"), item.getType());
+        assertEquals(15, item.getAmount());
+        assertEquals(500, item.getCustomModelData());
+    }
+
+    @Test
+    public void testPaperNBTItemStackUnbreakableDamage() {
+        String yamlInputString = "" +
+                "key:\n" +
+                "  ==: org.bukkit.inventory.ItemStack\n" +
+                "  DataVersion: 4325\n" +
+                "  id: minecraft:diamond_sword\n" +
+                "  count: 15\n" +
+                "  components:\n" +
+                "    minecraft:unbreakable: '{}'\n" +
+                "    minecraft:damage: '50'\n" +
+                "  schema_version: 1";
+
+        YamlNode root = new YamlNode();
+        root.loadFromString(yamlInputString);
+        CommonItemStack item = CommonItemStack.of(root.get("key", ItemStack.class));
+        assertEquals(MaterialUtil.getFirst("DIAMOND_SWORD", "LEGACY_DIAMOND_SWORD"), item.getType());
+        assertEquals(15, item.getAmount());
+        assertEquals(50, item.getDamage());
+        assertTrue(item.isUnbreakable());
+    }
+
+    @Test
+    public void testPaperNBTItemStackSimpleMissingType() {
+        // Missing types should turn into OAK_WOOD
+        // Also in Paper's NBT format.
+
+        String yamlInputString = "" +
+                "key:\n" +
+                "  ==: org.bukkit.inventory.ItemStack\n" +
+                "  DataVersion: 4325\n" +
+                "  id: minecraft:missing_type\n" +
+                "  count: 15\n" +
+                "  schema_version: 1";
+
+        YamlNode root = new YamlNode();
+        root.loadFromString(yamlInputString);
+        CommonItemStack item = CommonItemStack.of(root.get("key", ItemStack.class));
+        assertEquals(MaterialUtil.getFirst("OAK_WOOD", "LEGACY_WOOD"), item.getType());
+        assertEquals(1, item.getAmount());
+    }
+
+    @Test
+    public void testPaperNBTItemStackSimple() {
+        String yamlInputString = "" +
+                "key:\n" +
+                "  ==: org.bukkit.inventory.ItemStack\n" +
+                "  DataVersion: 4325\n" +
+                "  id: minecraft:diamond_sword\n" +
+                "  count: 15\n" +
+                "  schema_version: 1";
+
+        YamlNode root = new YamlNode();
+        root.loadFromString(yamlInputString);
+        CommonItemStack item = CommonItemStack.of(root.get("key", ItemStack.class));
+        assertEquals(MaterialUtil.getFirst("DIAMOND_SWORD", "LEGACY_DIAMOND_SWORD"), item.getType());
+        assertEquals(15, item.getAmount());
+    }
 
     @Test
     public void testInvalidProfileName() {

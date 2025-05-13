@@ -10,6 +10,10 @@ import java.util.List;
  * field.
  */
 public class CustomModelData extends BasicWrapper<CustomModelDataHandle> {
+    /**
+     * Constant for custom model data with nothing set (initially empty)
+     */
+    public static final CustomModelData EMPTY = new CustomModelData();
 
     public CustomModelData() {
         this.setHandle(CustomModelDataHandle.empty());

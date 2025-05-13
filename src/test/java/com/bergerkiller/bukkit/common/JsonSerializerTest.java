@@ -4,11 +4,13 @@ import com.bergerkiller.bukkit.common.config.JsonSerializer;
 import com.bergerkiller.bukkit.common.inventory.CommonItemMaterials;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import com.bergerkiller.bukkit.common.wrappers.CustomModelData;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.com.mojang.authlib.properties.PropertyHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -18,6 +20,23 @@ import static org.junit.Assert.*;
 
 public class JsonSerializerTest {
     final int dataVersion = CraftMagicNumbersHandle.getDataVersion();
+
+    @Test
+    public void testItemStackFromToJsonCMD() throws JsonSerializer.JsonSyntaxException {
+        CommonItemStack item = CommonItemStack.create(MaterialUtil.getFirst("DIAMOND_SWORD", "LEGACY_DIAMOND_SWORD"), 1)
+                .setCustomModelDataComponents(CustomModelData.EMPTY
+                        .withColors(Arrays.asList(1, 2, 3))
+                        .withFlags(Arrays.asList(true, false, true))
+                        .withFloats(Arrays.asList(1.0f, 2.0f, 3.0f))
+                        .withStrings(Arrays.asList("1", "a", "b")));
+
+        JsonSerializer serializer = new JsonSerializer();
+        String json = serializer.itemStackToJson(item.toBukkit());
+
+        CommonItemStack decoded = CommonItemStack.of(serializer.fromJsonToItemStack(json));
+
+        assertEquals(item, decoded);
+    }
 
     @Test
     public void testEmptyMapToJson() {

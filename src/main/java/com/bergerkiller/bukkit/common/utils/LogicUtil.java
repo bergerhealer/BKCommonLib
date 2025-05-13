@@ -1214,6 +1214,7 @@ public class LogicUtil {
      * @param serializable
      * @return serialized contents, empty map if serializable is null
      */
+    @SuppressWarnings("unchecked")
     public static Map<String, Object> serializeDeep(ConfigurationSerializable serializable) {
         if (serializable == null) {
             return Collections.emptyMap();
@@ -1238,11 +1239,35 @@ public class LogicUtil {
         boolean cloned = false;
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             Object value = entry.getValue();
+            Object newValue = value;
+
+            // Change the value into a new value if it has ConfigurationSerializable contents
             if (value instanceof ConfigurationSerializable) {
-                Map<String, Object> serialized = serializeDeep((ConfigurationSerializable) value);
+                newValue = serializeDeep((ConfigurationSerializable) value);
+            } else if (value instanceof List) {
+                // Lists of ConfigurationSerializable items
+                // Currently only used for the custom model data colors list
+                List<Object> list = (List<Object>) value;
+                boolean listCloned = false;
+                for (int i = 0; i < list.size(); i++) {
+                    Object listItem = list.get(i);
+                    if (listItem instanceof ConfigurationSerializable) {
+                        Map<String, Object> serializedListItem = serializeDeep((ConfigurationSerializable) listItem);
+                        if (!listCloned) {
+                            listCloned = true;
+                            list = new ArrayList<>(list);
+                            newValue = list;
+                        }
+                        list.set(i, serializedListItem);
+                    }
+                }
+            }
+
+            // If changed, modify the map. If not modifiable, clone the map.
+            if (value != newValue) {
                 if (!cloned) {
                     try {
-                        entry.setValue(serialized);
+                        entry.setValue(newValue);
                         continue;
                     } catch (UnsupportedOperationException ex) { /* Shouldn't happen but just in case */ }
 
@@ -1250,7 +1275,7 @@ public class LogicUtil {
                     cloned = true;
                 }
 
-                values.put(entry.getKey(), serialized);
+                values.put(entry.getKey(), newValue);
             }
         }
         return values;

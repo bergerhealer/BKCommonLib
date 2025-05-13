@@ -4,11 +4,11 @@ import java.util.Collections;
 import java.util.Map;
 
 import com.bergerkiller.bukkit.common.config.yaml.YamlDeserializer;
+import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.EmptyMapSerializer;
 import com.google.gson.GsonBuilder;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializer;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**

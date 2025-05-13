@@ -12,6 +12,9 @@ import java.util.function.Function;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializer;
+import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializerMigratorBukkit;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
@@ -31,7 +34,6 @@ import org.yaml.snakeyaml.resolver.Resolver;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.config.HeaderBuilder;
 import com.bergerkiller.bukkit.common.config.NodeBuilder;
-import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializer;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
@@ -396,8 +398,13 @@ public class YamlDeserializer {
 
             ItemStackDeserializer itemStackDeserializer = ItemStackDeserializer.INSTANCE;
             this.register("org.bukkit.inventory.ItemStack", itemStackDeserializer);
-            this.register("org.bukkit.inventory.ItemMeta", itemStackDeserializer.getItemMetaDeserializer());
-            this.register("ItemMeta", itemStackDeserializer.getItemMetaDeserializer());
+            this.register("org.bukkit.inventory.ItemMeta", itemStackDeserializer.getBukkitMigrator().getItemMetaDeserializer());
+            this.register("ItemMeta", itemStackDeserializer.getBukkitMigrator().getItemMetaDeserializer());
+
+            // Fix deserializing custom model data with colors having the wrong data type
+            if (CraftItemStackHandle.T.deserializeCustomModelData.isAvailable()) {
+                this.register("CustomModelData", ItemStackDeserializerMigratorBukkit::deserializeCustomModelData);
+            }
 
             // Fix deserializing profiles with invalid name causing errors to be logged
             if (CommonBootstrap.evaluateMCVersion(">=", "1.18.1")) {

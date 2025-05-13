@@ -1,5 +1,11 @@
 package com.bergerkiller.bukkit.common;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -7,9 +13,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializer;
+import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializerIdToMaterialMapper;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -27,7 +36,6 @@ import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
-import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializer;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
@@ -40,6 +48,36 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersH
  * Tests whether the material properties and ItemStack-related utilities are functional
  */
 public class ItemMaterialTest {
+
+    @Test
+    public void registerIdToMaterialMappings() {
+        ItemStackDeserializerIdToMaterialMapper mappings = new ItemStackDeserializerIdToMaterialMapper();
+
+        File mappingsFile = new File("src/main/resources/com/bergerkiller/bukkit/common/internal/resources/id_to_material_mappings.dat");
+        if (mappingsFile.exists()) {
+            try {
+                try (InputStream input = new FileInputStream(mappingsFile)) {
+                    mappings.read(input);
+                }
+            } catch (IOException ex) {
+                Logging.LOGGER.log(Level.SEVERE, "Failed to read class mappings", ex);
+            }
+        }
+
+        if (!mappings.storeCurrentDataVersion()) {
+            Logging.LOGGER.info("Id-to-material mappings are up-to-date.");
+            return;
+        }
+
+        Logging.LOGGER.warning("Id-to-material mappings have changed, writing out new file!");
+        try {
+            try (OutputStream output = new FileOutputStream(mappingsFile)) {
+                mappings.write(output);
+            }
+        } catch (IOException ex) {
+            Logging.LOGGER.log(Level.SEVERE, "Failed to write id-to-material mappings", ex);
+        }
+    }
 
     @Test
     public void testItemSetMaxStackSize() {
@@ -495,8 +533,11 @@ public class ItemMaterialTest {
     @Test
     public void testItemStackDeserializationVersion() {
         int curr = CraftMagicNumbersHandle.getDataVersion();
-        if (curr > ItemStackDeserializer.INSTANCE.getMaxSupportedDataVersion()) {
-            fail("ItemStackDeserializer needs to support the new Data Version (" + curr + ")");
+        if (curr > ItemStackDeserializer.INSTANCE.getBukkitMigrator().getMaximumDataVersion()) {
+            fail("ItemStackDeserializer [BUKKIT] needs to support the new Data Version (" + curr + ")");
+        }
+        if (curr > ItemStackDeserializer.INSTANCE.getPaperNBTMigrator().getMaximumDataVersion()) {
+            fail("ItemStackDeserializer [PAPER NBT] needs to support the new Data Version (" + curr + ")");
         }
     }
 

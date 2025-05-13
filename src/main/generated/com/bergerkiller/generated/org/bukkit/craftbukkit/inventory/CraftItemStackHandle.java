@@ -51,6 +51,8 @@ public abstract class CraftItemStackHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<ItemStack> asCraftCopy = new Template.StaticMethod.Converted<ItemStack>();
         public final Template.StaticMethod.Converted<ItemStack> asCraftMirror = new Template.StaticMethod.Converted<ItemStack>();
         public final Template.StaticMethod<ItemMeta> deserializeItemMeta = new Template.StaticMethod<ItemMeta>();
+        @Template.Optional
+        public final Template.StaticMethod<Object> deserializeCustomModelData = new Template.StaticMethod<Object>();
 
     }
 
