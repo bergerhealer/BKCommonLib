@@ -15,7 +15,7 @@ import java.util.function.Function;
 /**
  * Data-versioned data migrator for the before-deserialization Map format
  */
-public class ItemStackDeserializerMigrator {
+public abstract class ItemStackDeserializerMigrator {
     private final int curr_version;
     private int max_version;
     private final List<Entry> entries = new ArrayList<>();
@@ -64,12 +64,22 @@ public class ItemStackDeserializerMigrator {
     }
 
     /**
+     * Performs migrations/cleanup of the input data. This is always executed
+     * before actual migration begins, regardless of data version.
+     *
+     * @param args Input data
+     */
+    protected abstract void baseMigrate(Map<String, Object> args);
+
+    /**
      * Performs migration of the raw before-deserialization Map
      *
      * @param args Input data
      * @param dataVersionKey Key into the data containing the data version ("v")
      */
     public void migrate(Map<String, Object> args, String dataVersionKey) {
+        baseMigrate(args);
+
         Object version_raw = args.get(dataVersionKey);
         if (version_raw instanceof Number) {
             int version = ((Number) version_raw).intValue();

@@ -291,16 +291,17 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
     }
 
     @Override
-    public ItemStack apply(Map<String, Object> args) {
-        // Data migration of the Bukkit/Spigot format
-
+    protected void baseMigrate(Map<String, Object> args) {
         // Migrate double -> integer
         // Also takes care of older gson where metadata was stored without a == qualifier
         convertNumberToIntegerInMap(args, "amount");
         convertNumberToIntegerInMap(args, "damage");
         convertNumberToIntegerInMapValues(args, "enchantments");
         replaceMapInMap(args, "meta", metaDeserializer);
+    }
 
+    @Override
+    public ItemStack apply(Map<String, Object> args) {
         this.migrate(args, "v");
 
         try {

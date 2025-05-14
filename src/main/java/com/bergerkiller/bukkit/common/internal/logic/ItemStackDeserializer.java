@@ -18,10 +18,24 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
 
     private final ItemStackDeserializerMigratorBukkit bukkitMigrator = new ItemStackDeserializerMigratorBukkit();
     private final ItemStackDeserializerMigratorPaperNBT paperNBTMigrator = new ItemStackDeserializerMigratorPaperNBT();
-    private final boolean mustTransformPaperNBT;
+
+    /**
+     * Whether to parse NBT tags into ItemStacks directly. Paper natively supports this, but for
+     * Spigot we have our own datafixer migration / ItemStack parsing logic to deal with it.
+     * We only want to do this if the server is version 1.21.5 or newer. Paper won't serialize
+     * items in this format on 1.21.4 and before so there is no point in parsing those formats.
+     * And since data components are kind of recent as well, there is no point in maintaining
+     * migrations for it.<br>
+     * <br>
+     * Instead, at the 1.21.5 data version line we just convert the NBT directly into
+     * Bukkit/Spigot style ItemMeta. We lose a bunch of information this way, but at least some
+     * important details for item models will remain functional.
+     */
+    private final boolean canParseNBT;
 
     private ItemStackDeserializer() {
-        this.mustTransformPaperNBT = (bukkitMigrator.getCurrentDataVersion() < 4325 || !CommonBootstrap.isPaperServer());
+        // Only parse NBT on 1.21.5 and later
+        this.canParseNBT = paperNBTMigrator.getCurrentDataVersion() >= 4325 && CommonBootstrap.isPaperServer();
     }
 
     /**
@@ -45,19 +59,14 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
     @Override
     public ItemStack apply(Map<String, Object> args) {
         boolean isPaperNBTFormat = args.containsKey("schema_version");
-
-        // If data version is >= 1.21.5 AND it uses paper's NBT compound encoding,
-        // AND this server is not a paper server / version before 1.21.5, then
-        // undo this compound encoding and change it back to Spigot's encoding strategy.
-        if (isPaperNBTFormat && mustTransformPaperNBT) {
-            args = paperNBTMigrator.toBukkitEncoding(args);
-            isPaperNBTFormat = false;
-        }
-
         if (isPaperNBTFormat) {
-            return paperNBTMigrator.apply(args);
-        } else {
-            return bukkitMigrator.apply(args);
+            if (canParseNBT) {
+                return paperNBTMigrator.apply(args);
+            } else {
+                args = paperNBTMigrator.toBukkitEncoding(args);
+            }
         }
+
+        return bukkitMigrator.apply(args);
     }
 }
