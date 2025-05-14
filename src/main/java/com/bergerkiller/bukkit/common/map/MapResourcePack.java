@@ -707,6 +707,7 @@ public class MapResourcePack {
         }
 
         // If type is ITEMS and this is not supported by this pack, list models/item instead
+        // Do note that this does not support custom namespaces or subdirectories at all, just vanilla item names
         if (searchOptions.getResourceType() == ResourceType.ITEMS && !getMetadata().hasItemOverrides()) {
             //TODO: Utility?
             if (folder.equals("/")) {
@@ -719,15 +720,12 @@ public class MapResourcePack {
 
             forAllResources(searchOptions.clone()
                     .setResourceType(ResourceType.MODELS)
-                    .setFolder(folder),
+                    .setFolder(folder)
+                    .setDeep(false)
+                    .setPrependNamespace(false),
                     path -> {
                         // Omit item/ prefix
-                        int namespaceIndex = path.indexOf(':');
-                        if (namespaceIndex != -1) {
-                            callback.accept(path.substring(0, namespaceIndex + 1) + path.substring(namespaceIndex + 6));
-                        } else {
-                            callback.accept(path.substring(5));
-                        }
+                        callback.accept(path.substring(5));
                     });
             return;
         }
