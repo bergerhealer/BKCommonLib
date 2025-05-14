@@ -40,7 +40,6 @@ import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
 import com.bergerkiller.bukkit.common.internal.permissions.PermissionHandler;
 import com.bergerkiller.bukkit.common.internal.permissions.PermissionHandlerSelector;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
-import com.bergerkiller.bukkit.common.map.util.ModelInfoLookup;
 import com.bergerkiller.bukkit.common.map.util.RGBColorToIntConversion;
 import com.bergerkiller.bukkit.common.offline.OfflineWorld;
 import com.bergerkiller.bukkit.common.protocol.PlayerGameInfo;

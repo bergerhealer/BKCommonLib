@@ -714,9 +714,26 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * 
      * @param mojangson
      * @return parsed compound, null if no tag could be parsed
+     * @deprecated Use {@link #fromSNBT(String)} instead
      */
+    @Deprecated
     public static CommonTagCompound fromMojangson(String mojangson) {
-        NBTBaseHandle result = NBTTagCompoundHandle.fromMojangson(mojangson);
-        return (result == null) ? null : new CommonTagCompound(result.getRaw());
+        return fromSNBT(mojangson).getResult();
+    }
+
+    /**
+     * Parses a String in Mojang's <a href="https://minecraft.wiki/w/NBT_format#SNBT_format">SNBT format</a>
+     * into an NBT tag compound.
+     *
+     * @param snbtContent SNBT String
+     * @return parsed compound, null if no full tag compound could be parsed
+     */
+    public static SNBTResult<CommonTagCompound> fromSNBT(String snbtContent) {
+        try {
+            NBTTagCompoundHandle result = NBTCompressedStreamToolsHandle.parseTagCompoundFromSNBT(snbtContent);
+            return SNBTResult.success(result.toCommonTag());
+        } catch (Throwable t) {
+            return SNBTResult.error(NBTCompressedStreamToolsHandle.handleSNBTParseError(snbtContent, t));
+        }
     }
 }

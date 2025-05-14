@@ -524,6 +524,7 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.network.protocol.game.PacketPlayInClientCommand$EnumClientCommand", "net.minecraft.network.protocol.game.EnumClientCommand");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayInEntityAction$EnumPlayerAction", "net.minecraft.network.protocol.game.EnumPlayerAction");
             remappings.put("net.minecraft.world.scores.criteria.IScoreboardCriteria$EnumScoreboardHealthDisplay", "net.minecraft.world.scores.criteria.EnumScoreboardHealthDisplay");
+            remappings.put("net.minecraft.nbt.MojangsonParser$MojangsonTypeParser", "net.minecraft.nbt.MojangsonTypeParser");
         }
 
         // MapIcon$Type (MapDecorationType) did not exist before 1.11, we use a proxy class for 1.8 - 1.10.2

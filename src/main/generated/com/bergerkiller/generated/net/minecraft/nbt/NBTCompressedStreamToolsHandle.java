@@ -23,6 +23,18 @@ public abstract class NBTCompressedStreamToolsHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static NBTTagCompoundHandle parseTagCompoundFromSNBT(String snbtContent) {
+        return T.parseTagCompoundFromSNBT.invoke(snbtContent);
+    }
+
+    public static NBTBaseHandle parseTagFromSNBT(String snbtContent) {
+        return T.parseTagFromSNBT.invoke(snbtContent);
+    }
+
+    public static String handleSNBTParseError(String snbtContent, Throwable exception) {
+        return T.handleSNBTParseError.invoker.invoke(null,snbtContent, exception);
+    }
+
     public static void uncompressed_writeTag(NBTBaseHandle nbtbase, DataOutput dataoutput) {
         T.uncompressed_writeTag.invoke(nbtbase, dataoutput);
     }
@@ -52,6 +64,9 @@ public abstract class NBTCompressedStreamToolsHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class NBTCompressedStreamToolsClass extends Template.Class<NBTCompressedStreamToolsHandle> {
+        public final Template.StaticMethod.Converted<NBTTagCompoundHandle> parseTagCompoundFromSNBT = new Template.StaticMethod.Converted<NBTTagCompoundHandle>();
+        public final Template.StaticMethod.Converted<NBTBaseHandle> parseTagFromSNBT = new Template.StaticMethod.Converted<NBTBaseHandle>();
+        public final Template.StaticMethod<String> handleSNBTParseError = new Template.StaticMethod<String>();
         public final Template.StaticMethod.Converted<Void> uncompressed_writeTag = new Template.StaticMethod.Converted<Void>();
         public final Template.StaticMethod.Converted<NBTBaseHandle> uncompressed_readTag = new Template.StaticMethod.Converted<NBTBaseHandle>();
         public final Template.StaticMethod.Converted<Void> uncompressed_writeTagCompound = new Template.StaticMethod.Converted<Void>();

@@ -648,20 +648,6 @@ class NBTTagCompound extends NBTBase {
     public boolean containsKey:hasKey(String key);
 #endif
 
-    public static (NBTBaseHandle) NBTBase fromMojangson(String mojangson) {
-        try {
-#if version >= 1.21.5
-            return MojangsonParser.parseCompoundFully(mojangson);
-#elseif version >= 1.18
-            return MojangsonParser.parseTag(mojangson);
-#else
-            return MojangsonParser.parse(mojangson);
-#endif
-        } catch (Throwable t) {
-            return null;
-        }
-    }
-
     <code>
     public com.bergerkiller.bukkit.common.nbt.CommonTagCompound toCommonTag() {
         return new com.bergerkiller.bukkit.common.nbt.CommonTagCompound(this);
@@ -705,6 +691,84 @@ class NBTTagCompound extends NBTBase {
 }
 
 class NBTCompressedStreamTools {
+
+#if version >= 1.21.5
+    #require MojangsonParser public static NBTTagCompound snbtParseCompoundFully:parseCompoundFully(String snbtContent);
+#elseif version >= 1.18
+    #require MojangsonParser public static NBTTagCompound snbtParseCompoundFully:parseTag(String snbtContent);
+#else
+    #require MojangsonParser public static NBTTagCompound snbtParseCompoundFully:parse(String snbtContent);
+#endif
+
+    public static (NBTTagCompoundHandle) NBTTagCompound parseTagCompoundFromSNBT(String snbtContent) {
+        return #snbtParseCompoundFully(snbtContent);
+    }
+
+    public static (NBTBaseHandle) NBTBase parseTagFromSNBT(String snbtContent) {
+        // Is the input an ordinary compound? If so, we can use the
+        // static public method to parse it into an NBTTagCompound.
+        boolean isCompound = false;
+        for (int i = 0; i < snbtContent.length(); i++) {
+            char c = snbtContent.charAt(i);
+            // Note: putting a curly bracket char here bricks macro parser
+            if (c == 123) {
+                isCompound = true;
+                break;
+            } else if (c != ' ') {
+                break;
+            }
+        }
+
+        if (isCompound) {
+            return #snbtParseCompoundFully(snbtContent);
+        }
+
+#if version >= 1.21.5
+        #require MojangsonParser private static final MojangsonParser<NBTBase> NBT_OPS_PARSER;
+        MojangsonParser parser = #NBT_OPS_PARSER;
+        return (NBTBase) parser.parseFully(new com.mojang.brigadier.StringReader(snbtContent));
+#elseif version >= 1.18
+        MojangsonParser parser = new MojangsonParser(new com.mojang.brigadier.StringReader(snbtContent));
+        return parser.readValue();
+#elseif version >= 1.14
+        MojangsonParser parser = new MojangsonParser(new com.mojang.brigadier.StringReader(snbtContent));
+        return parser.d();
+#elseif version >= 1.13
+        MojangsonParser parser = new MojangsonParser(new com.mojang.brigadier.StringReader(snbtContent));
+        #require MojangsonParser protected NBTBase readValue:d();
+        return parser#readValue();
+#elseif version >= 1.12
+        #require MojangsonParser MojangsonParser createParser:<init>(String content);
+        #require MojangsonParser protected NBTBase readValue:d();
+        MojangsonParser parser = #createParser(snbtContent);
+        return parser#readValue();
+#else
+        #require MojangsonParser static MojangsonParser.MojangsonTypeParser createParserFor:a(String key, String content);
+        #require MojangsonParser.MojangsonTypeParser public abstract NBTBase completeParse:a();
+        MojangsonParser$MojangsonTypeParser parser = #createParserFor("tag", snbtContent);
+        return parser#completeParse();
+#endif
+    }
+
+    public static String handleSNBTParseError(String snbtContent, Throwable exception) {
+        if (exception instanceof com.bergerkiller.mountiplex.reflection.UnhandledInvokerCheckedException) {
+            exception = exception.getCause();
+        }
+
+#if version >= 1.13
+        if (exception instanceof com.mojang.brigadier.exceptions.CommandSyntaxException) {
+            return exception.getMessage();
+        }
+#else
+        if (exception instanceof net.minecraft.nbt.MojangsonParseException) {
+            return exception.getMessage();
+        }
+#endif
+
+        com.bergerkiller.bukkit.common.Logging.LOGGER.log(java.util.logging.Level.WARNING, "Error parsing SNBT: " + snbtContent, exception);
+        return "Unhandled exception: " + exception.getMessage();
+    }
+
 #if version >= 1.18
     // Uncompressed tag
     public static void uncompressed_writeTag:writeUnnamedTag((NBTBaseHandle) NBTBase nbtbase, java.io.DataOutput dataoutput);

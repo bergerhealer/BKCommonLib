@@ -1,10 +1,12 @@
 package com.bergerkiller.bukkit.common.nbt;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.wrappers.BasicWrapper;
 import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
 import com.bergerkiller.generated.net.minecraft.nbt.NBTCompressedStreamToolsHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingMap;
@@ -195,5 +197,71 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable 
             tag.readOnly = true;
         }
         return tag;
+    }
+
+    /**
+     * Parses a String in Mojang's <a href="https://minecraft.wiki/w/NBT_format#SNBT_format">SNBT format</a>
+     * into an NBT tag. This supports any type of tag, including numbers, lists and more.
+     *
+     * @param snbtContent SNBT String
+     * @return parsed tag, null if no full tag could be parsed
+     */
+    public static SNBTResult<? extends CommonTag> fromSNBT(String snbtContent) {
+        try {
+            NBTBaseHandle result = NBTCompressedStreamToolsHandle.parseTagFromSNBT(snbtContent);
+
+            // Sadly, it wraps it as NBTBaseHandle, not the derived type more suitable for what is returned
+            // This is fixed by creating the proper handle using createHandleForData()
+            return SNBTResult.success(NBTBaseHandle.createHandleForData(result.getRaw()).toCommonTag());
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return SNBTResult.error(NBTCompressedStreamToolsHandle.handleSNBTParseError(snbtContent, t));
+        }
+    }
+
+    /**
+     * The result of parsing Mojang's <a href="https://minecraft.wiki/w/NBT_format#SNBT_format">SNBT format</a>
+     * into a NBT Tag. If parsing fails, the parsing error is included in the result.
+     *
+     * @param <T> CommonTag type (if known)
+     */
+    public static class SNBTResult<T extends CommonTag> {
+        private final T result;
+        private final String errorMessage;
+
+        public static <T extends CommonTag> SNBTResult<T> error(String errorMessage) {
+            return new SNBTResult<>(null, errorMessage);
+        }
+
+        public static <T extends CommonTag> SNBTResult<T> success(T tag) {
+            return new SNBTResult<>(tag, null);
+        }
+
+        private SNBTResult(T result, String errorMessage) {
+            this.result = result;
+            this.errorMessage = errorMessage;
+        }
+
+        public boolean isSuccess() {
+            return result != null;
+        }
+
+        public String getErrorMessage() {
+            return errorMessage;
+        }
+
+        /**
+         * Gets the parsed tag, or null if not successful
+         *
+         * @return Result
+         */
+        public T getResult() {
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return isSuccess() ? "Success<" + getResult() + ">" : "Failure<" + getErrorMessage() + ">";
+        }
     }
 }

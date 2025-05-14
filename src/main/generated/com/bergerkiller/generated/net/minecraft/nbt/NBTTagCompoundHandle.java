@@ -29,10 +29,6 @@ public abstract class NBTTagCompoundHandle extends NBTBaseHandle {
         return T.create.invoke(map);
     }
 
-    public static NBTBaseHandle fromMojangson(String mojangson) {
-        return T.fromMojangson.invoke(mojangson);
-    }
-
     public abstract boolean isEmpty();
     public abstract int size();
     public abstract Set<String> getKeys();
@@ -93,7 +89,6 @@ public abstract class NBTTagCompoundHandle extends NBTBaseHandle {
 
         public final Template.StaticMethod.Converted<NBTTagCompoundHandle> createEmpty = new Template.StaticMethod.Converted<NBTTagCompoundHandle>();
         public final Template.StaticMethod.Converted<NBTTagCompoundHandle> create = new Template.StaticMethod.Converted<NBTTagCompoundHandle>();
-        public final Template.StaticMethod.Converted<NBTBaseHandle> fromMojangson = new Template.StaticMethod.Converted<NBTBaseHandle>();
 
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
         public final Template.Method<Integer> size = new Template.Method<Integer>();
