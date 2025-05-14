@@ -1,5 +1,9 @@
 package com.bergerkiller.bukkit.common.config;
 
+import com.bergerkiller.bukkit.common.nbt.CommonTag;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.nbt.CommonTagList;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,10 +19,17 @@ import java.util.function.IntFunction;
  * For example:
  * <pre>{colors:[1,2,3],flags:[1b,0b,1b],floats:[1.0f,2.0f,4.0f],strings:["a","b","c"]}</pre>
  */
-public class SNBTDeserializer {
+public class SNBTDeserializer<TO> {
+    private final Factory<TO, ?, ?> factory;
     private final String contents;
     private final int length;
     private int position = 0;
+
+    public SNBTDeserializer(String contents, Factory<TO, ?, ?> factory) {
+        this.contents = contents;
+        this.length = contents.length();
+        this.factory = factory;
+    }
 
     /**
      * Parses the SNBT-formatted String into the value it represents.
@@ -28,24 +39,31 @@ public class SNBTDeserializer {
      * @return Parsed content
      */
     public static Object parse(String snbtContent) {
-        return new SNBTDeserializer(snbtContent).next();
+        return new SNBTDeserializer<>(snbtContent, Factory.JAVA).next();
     }
 
-    public SNBTDeserializer(String contents) {
-        this.contents = contents;
-        this.length = contents.length();
+    /**
+     * Parses the SNBT-formatted String into the value it represents.
+     * Returned value can be a number, string, boolean, array, list, map or null.
+     *
+     * @param snbtContent Content to parse
+     * @param factory To deserialize the data into (pass NBT for CommonTag)
+     * @return Parsed content
+     */
+    public static <T> T parse(String snbtContent, Factory<T, ?, ?> factory) {
+        return new SNBTDeserializer<>(snbtContent, factory).next();
     }
 
-    public Object next() {
+    public TO next() {
         consumeWhitespace();
-        return nextValue();
+        return nextValue(this.factory);
     }
 
-    private Object nextValue() {
+    private <T, L extends T, M extends T> T nextValue(Factory<T, L, M> factory) {
         final int length = this.length;
         if (tryConsume('{')) {
             // Decode a map of key=value pairs
-            Map<String, Object> result = new LinkedHashMap<>();
+            M result = factory.createMap();
             while (true) {
                 consumeWhitespace();
 
@@ -60,20 +78,20 @@ public class SNBTDeserializer {
                 }
 
                 // Consume the key String
-                String key = nextCompoundKey();
+                String key = consumeCompoundKey();
 
                 // Consume the : delimiter
                 // Value-less key entries? Oh well, handle it I guess.
                 consumeWhitespace();
                 if (!tryConsume(':')) {
-                    result.put(key, null);
+                    factory.addToMap(result, key, factory.wrap(null));
                     continue;
                 }
 
                 // Consume the value
                 consumeWhitespace();
-                Object value = nextValue();
-                result.put(key, value);
+                T value = nextValue(factory);
+                factory.addToMap(result, key, value);
             }
             return result;
         } else if (tryConsume('[')) {
@@ -81,37 +99,40 @@ public class SNBTDeserializer {
             consumeWhitespace();
             NBTArrayFormat format = tryConsumeArrayFormat();
             if (format != null) {
-                consumeWhitespace();
+                return factory.wrap(format.build(consumeList(Factory.JAVA)));
             }
 
-            // Decode a list of values
-            List<Object> result = new ArrayList<>();
-            while (position < length && !tryConsume(']')) {
-                // List delimiter. Ignore a weird [,a,b,c,] style list
-                if (tryConsume(',')) {
-                    consumeWhitespace();
-                    continue;
-                }
-
-                result.add(nextValue());
-                consumeWhitespace();
-            }
-
-            return format != null ? format.build(result) : result;
+            // Normal list
+            return consumeList(factory);
         } else if (tryConsume('\"')) {
-            return nextString('\"');
+            return factory.wrap(consumeString('\"'));
         } else if (tryConsume('\'')) {
-            return nextString('\'');
+            return factory.wrap(consumeString('\''));
         } else if (tryConsume("true")) {
-            return (byte) 1;
+            return factory.wrap((byte) 1);
         } else if (tryConsume("false")) {
-            return (byte) 0;
+            return factory.wrap((byte) 0);
         } else {
-            return nextNumber();
+            return factory.wrap(consumeNumber());
         }
     }
 
-    private Object nextNumber() {
+    private <T, L extends T, M extends T> L consumeList(Factory<T, L, M> factory) {
+        L list = factory.createList();
+        while (position < length && !tryConsume(']')) {
+            // List delimiter. Ignore a weird [,a,b,c,] style list
+            if (tryConsume(',')) {
+                consumeWhitespace();
+                continue;
+            }
+
+            factory.addToList(list, nextValue(factory));
+            consumeWhitespace();
+        }
+        return list;
+    }
+
+    private Object consumeNumber() {
         // Primitive types (numbers)
         // Look for an end-delimiter for the surrounding structure
         // This can be: , ] }
@@ -155,11 +176,11 @@ public class SNBTDeserializer {
         return format.parse(contents.substring(numberStart, numberEnd));
     }
 
-    private String nextCompoundKey() {
+    private String consumeCompoundKey() {
         if (tryConsume('\"')) {
-            return nextString('\"');
+            return consumeString('\"');
         } else if (tryConsume('\'')) {
-            return nextString('\'');
+            return consumeString('\'');
         } else {
             // Only these characters are allowed (no spaces):
             // a-zA-Z0-9_-.+
@@ -196,7 +217,7 @@ public class SNBTDeserializer {
         }
     }
 
-    private String nextString(char delimiterQuoteChar) {
+    private String consumeString(char delimiterQuoteChar) {
         // Decode strings. Try optimized (no escaping) first. Must not contain \ characters.
         {
             int stringEnd = contents.indexOf(delimiterQuoteChar, position);
@@ -368,5 +389,79 @@ public class SNBTDeserializer {
         private interface ArraySetter<T> {
             void set(T array, int index, Object value);
         }
+    }
+
+    /**
+     * Factory that produces the deserialized result. Is here so that data can be
+     * deserialized into Map or with the CommonTag NBT API.
+     *
+     * @param <T> Base tag type
+     * @param <L> List container type
+     * @param <M> Map container type
+     */
+    public interface Factory<T, L extends T, M extends T> {
+        /** Decodes into Java Object, Map and List */
+        Factory<Object, List<Object>, Map<String, Object>> JAVA = new Factory<Object, List<Object>, Map<String, Object>>() {
+            @Override
+            public Object wrap(Object data) {
+                return data;
+            }
+
+            @Override
+            public List<Object> createList() {
+                return new ArrayList<>();
+            }
+
+            @Override
+            public Map<String, Object> createMap() {
+                return new LinkedHashMap<>();
+            }
+
+            @Override
+            public void addToList(List<Object> list, Object item) {
+                list.add(item);
+            }
+
+            @Override
+            public void addToMap(Map<String, Object> map, String key, Object value) {
+                map.put(key, value);
+            }
+        };
+        /** Decodes into NBT CommonTag, CommonTagList and CommonTagCompound */
+        Factory<CommonTag, CommonTagList, CommonTagCompound> NBT = new Factory<CommonTag, CommonTagList, CommonTagCompound>() {
+            @Override
+            public CommonTag wrap(Object data) {
+                if (data == null) {
+                    return CommonTag.createForData("");
+                }
+                return CommonTag.createForData(data);
+            }
+
+            @Override
+            public CommonTagList createList() {
+                return new CommonTagList();
+            }
+
+            @Override
+            public CommonTagCompound createMap() {
+                return new CommonTagCompound();
+            }
+
+            @Override
+            public void addToList(CommonTagList list, CommonTag item) {
+                list.add(item);
+            }
+
+            @Override
+            public void addToMap(CommonTagCompound map, String key, CommonTag value) {
+                map.put(key, value);
+            }
+        };
+
+        T wrap(Object data);
+        L createList();
+        M createMap();
+        void addToList(L list, T item);
+        void addToMap(M map, String key, T value);
     }
 }

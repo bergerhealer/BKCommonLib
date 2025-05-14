@@ -1,6 +1,9 @@
 package com.bergerkiller.bukkit.common;
 
 import com.bergerkiller.bukkit.common.config.SNBTDeserializer;
+import com.bergerkiller.bukkit.common.nbt.CommonTag;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -14,6 +17,23 @@ import static org.junit.Assert.assertEquals;
  * Tests {@link SNBTDeserializer}
  */
 public class SNBTDeserializerTest {
+
+    @Test
+    public void testIntoCommonTag() {
+        CommonTagCompound tag = (CommonTagCompound) SNBTDeserializer.parse("{array:[I;1,2,3],colors:[1,2,3],value:2s,map:{key:'value'}}", SNBTDeserializer.Factory.NBT);
+        CommonTag array = tag.get("array");
+        CommonTagList colors = (CommonTagList) tag.get("colors");
+        CommonTag value = tag.get("value");
+        CommonTagCompound map = (CommonTagCompound) tag.get("map");
+
+        assertArrayEquals(new int[] {1,2,3}, (int[]) array.getData());
+        assertEquals(3, colors.size());
+        assertEquals(1, colors.getValue(0));
+        assertEquals(2, colors.getValue(1));
+        assertEquals(3, colors.getValue(2));
+        assertEquals((short) 2, value.getData());
+        assertEquals("value", map.getValue("key"));
+    }
 
     @Test
     public void testCustomModelData() {
