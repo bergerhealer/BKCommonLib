@@ -75,14 +75,37 @@ public class VersionedMappingsFileIO<T> {
     /**
      * Gets the decoded mappings data of the version specified. If the exact
      * version is not stored, returns the mappings of the version that came before that.
+     * (Older version mappings).<br>
+     * <br>
+     * For example, if this contains mapping for 1.20 and 1.21, querying
+     * 1.20.5 will return the mappings of 1.20.
      *
      * @param version Version identifier
      * @return Mappings of this version or the newest version older than the one specified,
      *         or empty() if no versions apply (too old)
      */
-    public Optional<T> getClosest(String version) {
+    public Optional<T> getOrOlder(String version) {
         Iterator<MappedVersion<T>> iter = byVersion.headMap(version, true)
                 .descendingMap()
+                .values()
+                .iterator();
+        return iter.hasNext() ? Optional.of(iter.next().data()) : Optional.empty();
+    }
+
+    /**
+     * Gets the decoded mappings data of the version specified. If the exact
+     * version is not stored, returns the mappings of the version that came after that.
+     * (Newer version mappings).<br>
+     * <br>
+     * For example, if this contains mapping for 1.20 and 1.21, querying
+     * 1.20.5 will return the mappings of 1.21.
+     *
+     * @param version Version identifier
+     * @return Mappings of this version or the oldest version newer than the one specified,
+     *         or empty() if no versions apply (too new)
+     */
+    public Optional<T> getOrNewer(String version) {
+        Iterator<MappedVersion<T>> iter = byVersion.tailMap(version, true)
                 .values()
                 .iterator();
         return iter.hasNext() ? Optional.of(iter.next().data()) : Optional.empty();

@@ -40,8 +40,14 @@ public class ItemStackDeserializerIdToMaterialMapper extends VersionedMappingsFi
             Logging.LOGGER.log(Level.SEVERE, "Failed to read id-to-material mappings (corrupted jar?)", ex);
         }
 
-        String dataVersion = Integer.toString(CraftMagicNumbersHandle.getDataVersion());
-        if (!byVersion.containsKey(dataVersion)) {
+        int dataVersion = CraftMagicNumbersHandle.getDataVersion();
+        if (dataVersion < 4325) {
+            // Before 1.21.5 this format was not used and no configurations of it will exist
+            // A little redundant as getOrNewer will also block, but just to be safe.
+            return;
+        }
+
+        if (!getOrNewer(Integer.toString(dataVersion)).isPresent()) {
             Logging.LOGGER.warning("Id-to-material mappings are missing for data version " + dataVersion + " and will be regenerated");
             storeCurrentDataVersion();
         }

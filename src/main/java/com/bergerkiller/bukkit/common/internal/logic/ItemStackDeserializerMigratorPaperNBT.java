@@ -80,7 +80,7 @@ public class ItemStackDeserializerMigratorPaperNBT extends ItemStackDeserializer
         }
 
         // Attempt to convert the "id" field into a valid Material name using the id mapper
-        Map<String, String> idMappings = this.idMapper.getClosest(Integer.toString(dataVersion))
+        Map<String, String> idMappings = this.idMapper.getOrOlder(Integer.toString(dataVersion))
                 .orElse(null);
         if (idMappings == null) {
             ItemStackDeserializerMigratorBukkit.logFailDeserialize(args);
