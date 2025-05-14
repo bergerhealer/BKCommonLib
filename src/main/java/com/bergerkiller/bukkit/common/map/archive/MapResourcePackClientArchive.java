@@ -27,6 +27,7 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
     private final File clientJarFile;
     private final File clientJarTempFile;
     private Map<String, List<String>> directories = null;
+    private Map<String, List<String>> deepDirectories = null;
     private JarFile archive = null;
 
     public MapResourcePackClientArchive() {
@@ -156,7 +157,7 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
     }
 
     @Override
-    public List<String> listFiles(String folder) throws IOException {
+    public List<String> listFiles(String folder, boolean deep) throws IOException {
         if (this.directories == null) {
             if (this.archive == null) {
                 return Collections.emptyList();
@@ -167,7 +168,14 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
             }
         }
 
-        return this.directories.getOrDefault(folder, Collections.emptyList());
+        if (deep) {
+            if (this.deepDirectories == null) {
+                this.deepDirectories = MapResourcePackZipArchive.computeDeepDirectories(this.directories);
+            }
+            return this.deepDirectories.getOrDefault(folder, Collections.emptyList());
+        } else {
+            return this.directories.getOrDefault(folder, Collections.emptyList());
+        }
     }
 
     private static class DownloadFailure extends RuntimeException {

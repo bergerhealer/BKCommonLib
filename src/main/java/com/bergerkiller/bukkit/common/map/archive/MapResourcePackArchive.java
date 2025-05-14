@@ -68,11 +68,24 @@ public interface MapResourcePackArchive {
     InputStream openFileStream(String path) throws IOException;
 
     /**
-     * Lists all the files that exist inside a folder of this resource pack archive
+     * Lists all the files that exist inside a folder of this resource pack archive.
+     * Does not list files in subdirectories.
      *
      * @param folder Folder relative to the root of the archive to list
      * @return List of files found in the folder
      * @throws IOException when an error occurs trying to access the archive
      */
-    List<String> listFiles(String folder) throws IOException;
+    default List<String> listFiles(String folder) throws IOException {
+        return listFiles(folder, false);
+    }
+
+    /**
+     * Lists all the files that exist inside a folder of this resource pack archive
+     *
+     * @param folder Folder relative to the root of the archive to list
+     * @param deep If true, also lists files that are inside subdirectories of this folder
+     * @return List of files found in the folder
+     * @throws IOException when an error occurs trying to access the archive
+     */
+    List<String> listFiles(String folder, boolean deep) throws IOException;
 }

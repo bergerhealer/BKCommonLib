@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.CustomModelData;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -62,6 +63,8 @@ public abstract class ItemStackHandle extends Template.Handle {
     public abstract void setFireworksFlightDuration(int duration);
     public abstract GameProfileHandle getSkullProfile();
     public abstract void setSkullProfile(GameProfileHandle profile);
+    public abstract MinecraftKeyHandle getItemModel();
+    public abstract void setItemModel(MinecraftKeyHandle key);
     public abstract boolean hasCustomModelData();
     public abstract boolean hasCustomModelDataValue();
     public abstract CustomModelData getCustomModelData();
@@ -140,6 +143,8 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.Method<Void> setFireworksFlightDuration = new Template.Method<Void>();
         public final Template.Method.Converted<GameProfileHandle> getSkullProfile = new Template.Method.Converted<GameProfileHandle>();
         public final Template.Method.Converted<Void> setSkullProfile = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<MinecraftKeyHandle> getItemModel = new Template.Method.Converted<MinecraftKeyHandle>();
+        public final Template.Method.Converted<Void> setItemModel = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> hasCustomModelData = new Template.Method<Boolean>();
         public final Template.Method<Boolean> hasCustomModelDataValue = new Template.Method<Boolean>();
         public final Template.Method.Converted<CustomModelData> getCustomModelData = new Template.Method.Converted<CustomModelData>();

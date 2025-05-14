@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.inventory;
 
-import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.map.util.ModelInfoLookup;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
@@ -10,11 +9,11 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.CustomModelData;
 import com.bergerkiller.bukkit.common.wrappers.ItemRenderOptions;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
@@ -706,6 +705,60 @@ public final class CommonItemStack implements Cloneable {
         getHandle()
                 .orElseThrow(() -> new IllegalStateException("Can not set skull on an empty item"))
                 .setSkullProfile(profile);
+        return this;
+    }
+
+    /**
+     * Gets whether an item model is set for this item. If false, the vanilla
+     * item model is used.
+     *
+     * @return True if an item model is set for this item
+     */
+    public boolean hasItemModel() {
+        return getHandle(true)
+                .map(ItemStackHandle::getItemModel)
+                .isPresent();
+    }
+
+    /**
+     * Gets the item model set for this item. If none are set and it defaults
+     * to the vanilla item model, returns <i>null</i>
+     *
+     * @return set item model, or <i>null</i> if not set
+     */
+    public MinecraftKeyHandle getItemModel() {
+        return getHandle(true)
+                .map(ItemStackHandle::getItemModel)
+                .orElse(null);
+    }
+
+    /**
+     * Sets a new item model key on this item with a key-formatted String.
+     * Supports namespaced keys like custom:path/to/model.
+     *
+     * @param itemModelName Name of the item model. Must be a valid all-lowercased
+     *                      name or it will clear the item model. Can be null to clear the item
+     *                      model of this item and reset back to vanilla.
+     * @return this CommonItemStack
+     * @see MinecraftKeyHandle#isValid(String) 
+     */
+    public CommonItemStack setItemModel(String itemModelName) {
+        return setItemModel(itemModelName != null
+                ? MinecraftKeyHandle.createNew(itemModelName)
+                : (MinecraftKeyHandle) null);
+    }
+
+    /**
+     * Sets a new item model key on this item.
+     *
+     * @param itemModelKey MinecraftKeyHandle representing the item model key.
+     *                     Can be null to reset back to the vanilla item model.
+     * @return this CommonItemStack
+     */
+    public CommonItemStack setItemModel(MinecraftKeyHandle itemModelKey) {
+        getHandle()
+                .orElseThrow(() -> new IllegalStateException("Can not set item model on an empty item"))
+                .setItemModel(itemModelKey);
         return this;
     }
 

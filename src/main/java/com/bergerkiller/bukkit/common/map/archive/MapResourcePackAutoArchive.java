@@ -59,8 +59,8 @@ public class MapResourcePackAutoArchive implements MapResourcePackArchive {
     }
 
     @Override
-    public List<String> listFiles(String folder) throws IOException {
+    public List<String> listFiles(String folder, boolean deep) throws IOException {
         if (this.archive == null) return Collections.emptyList();
-        return this.archive.listFiles(folder);
+        return this.archive.listFiles(folder, deep);
     }
 }

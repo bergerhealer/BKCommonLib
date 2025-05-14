@@ -23,6 +23,7 @@ import com.bergerkiller.bukkit.common.Logging;
 public class MapResourcePackZipArchive implements MapResourcePackArchive {
     private ZipFile archive = null;
     private Map<String, List<String>> directories = null;
+    private Map<String, List<String>> deepDirectories = null;
     private final File zipFile;
 
     public MapResourcePackZipArchive(File zipFile) {
@@ -78,7 +79,7 @@ public class MapResourcePackZipArchive implements MapResourcePackArchive {
     }
 
     @Override
-    public List<String> listFiles(String folder) throws IOException {
+    public List<String> listFiles(String folder, boolean deep) throws IOException {
         if (this.directories == null) {
             if (this.archive == null) {
                 return Collections.emptyList();
@@ -87,7 +88,14 @@ public class MapResourcePackZipArchive implements MapResourcePackArchive {
             }
         }
 
-        return this.directories.getOrDefault(folder, Collections.emptyList());
+        if (deep) {
+            if (this.deepDirectories == null) {
+                this.deepDirectories = computeDeepDirectories(this.directories);
+            }
+            return this.deepDirectories.getOrDefault(folder, Collections.emptyList());
+        } else {
+            return this.directories.getOrDefault(folder, Collections.emptyList());
+        }
     }
 
     static Map<String, List<String>> readDirectories(Stream<? extends ZipEntry> entries) {
@@ -101,10 +109,52 @@ public class MapResourcePackZipArchive implements MapResourcePackArchive {
                        String name = (parentEndIdx == -1) ? path : path.substring(parentEndIdx+1);
                        dirs.computeIfAbsent(parentPath, un -> new ArrayList<>()).add(name);
                    });
+
+            dirs.values().forEach(Collections::sort);
             return dirs;
         } catch (Throwable t) {
             Logging.LOGGER.log(Level.SEVERE, "Failed to index resource pack archive", t);
             return Collections.emptyMap();
         }
+    }
+
+    static Map<String, List<String>> computeDeepDirectories(Map<String, List<String>> directories) {
+        Map<String, List<String>> deep = new HashMap<>(directories.size());
+
+        // Go by all keys and look for parent directories, and populate accordingly
+        for (Map.Entry<String, List<String>> e : directories.entrySet()) {
+            String key = e.getKey();
+            List<String> files = e.getValue();
+
+            deep.computeIfAbsent(key, k -> new ArrayList<>()).addAll(files);
+            while (!key.equals("/")) {
+                String prefix;
+
+                {
+                    int nextIndex = key.lastIndexOf('/', key.length() - 2);
+                    if (nextIndex != -1) {
+                        // Parent folder
+                        prefix = key.substring(nextIndex + 1);
+                        key = key.substring(0, nextIndex + 1);
+                    } else {
+                        // Root
+                        prefix = key;
+                        key = "/";
+                    }
+                }
+
+                // Clone the list with the key prefix at this level added in front
+                files = new ArrayList<>(files);
+                for (int i = 0; i < files.size(); i++) {
+                    files.set(i, prefix + files.get(i));
+                }
+
+                // Add to deep map
+                deep.computeIfAbsent(key, k -> new ArrayList<>()).addAll(files);
+            }
+        }
+
+        deep.values().forEach(Collections::sort);
+        return deep;
     }
 }

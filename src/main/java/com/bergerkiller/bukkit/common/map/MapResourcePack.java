@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 import com.bergerkiller.bukkit.common.bases.DeferredSupplier;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
@@ -468,28 +468,20 @@ public class MapResourcePack {
      *         to read what overrides have been configured. This set is unmodifiable.
      */
     public Set<String> listOverriddenItemModelNames() {
-        boolean unmodifiable = true;
-        Set<String> allOverridenModels = Collections.emptySet();
+        Set<String> allOverridenModels = new LinkedHashSet<>();
         for (MapResourcePack p = this; p != null && p != MapResourcePack.VANILLA; p = p.getBase()) {
-            Set<String> packModels = p.listResources(ResourceType.ITEMS, "/", false);
-            if (packModels.isEmpty()) {
-                continue;
-            }
+            for (String namespace : p.listNamespaces(false)) {
+                SearchOptions searchOptions = SearchOptions.create()
+                        .setResourceType(ResourceType.ITEMS)
+                        .setNamespace(namespace)
+                        .setIncludingParentPacks(false)
+                        .setDeep(true)
+                        .setPrependNamespace(!namespace.equals("minecraft"));
 
-            if (allOverridenModels.isEmpty()) {
-                allOverridenModels = packModels;
-            } else {
-                if (unmodifiable) {
-                    unmodifiable = false;
-                    allOverridenModels = new LinkedHashSet<>(allOverridenModels);
-                    allOverridenModels.addAll(packModels);
-                }
+                p.forAllResources(searchOptions, allOverridenModels::add);
             }
         }
-        if (!unmodifiable) {
-            allOverridenModels = Collections.unmodifiableSet(allOverridenModels);
-        }
-        return allOverridenModels;
+        return Collections.unmodifiableSet(allOverridenModels);
     }
 
     /**
@@ -624,13 +616,13 @@ public class MapResourcePack {
      *
      * @param type Type of resources to find
      * @param folder Folder relative to the resource type root to look for files
-     * @param recurse Whether to include resources found in parent resource packs in the results
+     * @param includingParentPacks Whether to include resources found in parent resource packs in the results
      * @return Set of files matching this resource type found in the folder. Without extension.
      *         These paths can be directly used with methods like {@link #getTexture(String)}
      *         and {@link #getConfig(String)}.
      */
-    public Set<String> listResources(ResourceType type, String folder, boolean recurse) {
-        return listResources(type, "minecraft", folder, recurse);
+    public Set<String> listResources(ResourceType type, String folder, boolean includingParentPacks) {
+        return listResources(type, "minecraft", folder, includingParentPacks);
     }
 
     /**
@@ -661,19 +653,61 @@ public class MapResourcePack {
      * @param type Type of resources to find
      * @param namespace Namespace, the default is "minecraft" for vanilla assets
      * @param folder Folder relative to the resource type root to look for files
-     * @param recurse Whether to also list resources found in parent resource packs
+     * @param includingParentPacks Whether to also list resources found in parent resource packs
      * @return Set of files matching this resource type found in the folder. Without extension.
      *         These paths can be directly used with methods like {@link #getTexture(String)}
      *         and {@link #getConfig(String)}.
      */
-    public Set<String> listResources(ResourceType type, String namespace, String folder, boolean recurse) {
+    public Set<String> listResources(ResourceType type, String namespace, String folder, boolean includingParentPacks) {
+        return listResources(SearchOptions.create()
+                .setResourceType(type)
+                .setNamespace(namespace)
+                .setFolder(folder)
+                .setIncludingParentPacks(includingParentPacks));
+    }
+
+    /**
+     * Lists all the resources found inside a folder of the given resource type. As some resources
+     * like models sit in a specific root directory, the folder path is relative to that directory.
+     * For example, to list textures, the <i>assets/minecraft/textures</i> prefix can be omitted.<br>
+     * <br>
+     * If recurse is true, also lists resources found in the parent resource packs.
+     *
+     * @param searchOptions Search Options
+     * @return Set of files matching this resource type found in the folder. Without extension.
+     *         These paths can be directly used with methods like {@link #getTexture(String)}
+     *         and {@link #getConfig(String)}.
+     */
+    public Set<String> listResources(SearchOptions searchOptions) {
+        Set<String> result = new LinkedHashSet<>();
+        forAllResources(searchOptions, result::add);
+        return result;
+    }
+
+    /**
+     * Iterates all the resources found inside a folder of the given resource type, and calls the
+     * callback function with them. As some resources like models sit in a specific root directory,
+     * the folder path is relative to that directory. For example, to list textures, the
+     * <i>assets/minecraft/textures</i> prefix can be omitted.<br>
+     * <br>
+     * If recurse is true, also lists resources found in the parent resource packs.
+     *
+     * @param searchOptions Search Options
+     * @param callback Callback called with every item found
+     */
+    public void forAllResources(SearchOptions searchOptions, Consumer<String> callback) {
+        if (searchOptions.getResourceType() == null) {
+            throw new IllegalArgumentException("Resource Type is not set");
+        }
+
         // Must end with / to be a valid zip directory 'file'
+        String folder = searchOptions.getFolder();
         if (!folder.endsWith("/")) {
             folder += "/";
         }
 
         // If type is ITEMS and this is not supported by this pack, list models/item instead
-        if (type == ResourceType.ITEMS && !getMetadata().hasItemOverrides()) {
+        if (searchOptions.getResourceType() == ResourceType.ITEMS && !getMetadata().hasItemOverrides()) {
             //TODO: Utility?
             if (folder.equals("/")) {
                 folder = "item";
@@ -682,28 +716,29 @@ public class MapResourcePack {
             } else {
                 folder = "item/" + folder;
             }
-            Set<String> paths = listResources(ResourceType.MODELS, namespace, folder, recurse);
 
-            // Omit item/ prefix
-            if (paths.isEmpty()) {
-                return Collections.emptySet();
-            } else {
-                return paths.stream()
-                        .map(s -> s.substring(5))
-                        .collect(Collectors.toCollection(LinkedHashSet::new));
-            }
+            forAllResources(searchOptions.clone()
+                    .setResourceType(ResourceType.MODELS)
+                    .setFolder(folder),
+                    path -> {
+                        // Omit item/ prefix
+                        int namespaceIndex = path.indexOf(':');
+                        if (namespaceIndex != -1) {
+                            callback.accept(path.substring(0, namespaceIndex + 1) + path.substring(namespaceIndex + 6));
+                        } else {
+                            callback.accept(path.substring(5));
+                        }
+                    });
+            return;
         }
 
-        String zipFolderPath;
-        if (folder.equals("/")) {
-            zipFolderPath = type.getRoot(namespace);
-        } else {
-            zipFolderPath = type.getRoot(namespace) + folder;
-        }
-
-        Set<String> result = new HashSet<>();
-        this.listResources(type, folder, zipFolderPath, result, false, recurse);
-        return result;
+        this.forAllArchiveEntries(
+                searchOptions.getResourceType(),
+                searchOptions.getFullArchivePath(),
+                false,
+                searchOptions.isIncludingParentPacks(),
+                searchOptions.isDeep(),
+                path -> callback.accept(searchOptions.populatePathPrefix(path)));
     }
 
     /**
@@ -724,7 +759,7 @@ public class MapResourcePack {
      */
     public Set<String> listNamespaces(boolean recurse) {
         Set<String> result = new HashSet<>();
-        this.listResources(null, "", "assets/", result, true, recurse);
+        this.forAllArchiveEntries(null, "assets/", true, recurse, false, result::add);
         return result;
     }
 
@@ -751,11 +786,11 @@ public class MapResourcePack {
      *
      * @param type Type of resources to list directories of in a folder
      * @param folder Folder relative to the resource type root to look for files
-     * @param recurse Whether to include directories found in parent resource packs
+     * @param includingParentPacks Whether to include directories found in parent resource packs
      * @return Set of directory paths that are child of the folder path specified
      */
-    public Set<String> listDirectories(ResourceType type, String folder, boolean recurse) {
-        return listDirectories(type, "minecraft", folder, recurse);
+    public Set<String> listDirectories(ResourceType type, String folder, boolean includingParentPacks) {
+        return listDirectories(type, "minecraft", folder, includingParentPacks);
     }
 
     /**
@@ -779,25 +814,37 @@ public class MapResourcePack {
      * @param type Type of resources to list directories of in a folder
      * @param namespace Namespace, the default is "minecraft" for vanilla models
      * @param folder Folder relative to the resource type root to look for files
-     * @param recurse Whether to include directories found in parent resource packs
+     * @param includingParentPacks Whether to include directories found in parent resource packs
      * @return Set of directory paths that are child of the folder path specified
      */
-    public Set<String> listDirectories(ResourceType type, String namespace, String folder, boolean recurse) {
-        // Must end with / to be a valid zip directory 'file'
-        if (!folder.endsWith("/")) {
-            folder += "/";
-        }
+    public Set<String> listDirectories(ResourceType type, String namespace, String folder, boolean includingParentPacks) {
+        return listDirectories(SearchOptions.create()
+                .setResourceType(type)
+                .setNamespace(namespace)
+                .setFolder(folder)
+                .setIncludingParentPacks(includingParentPacks));
+    }
 
-        String zipFolderPath;
-        if (folder.equals("/")) {
-            zipFolderPath = type.getRoot(namespace);
-            folder = ""; // Don't return results starting with /
-        } else {
-            zipFolderPath = type.getRoot(namespace) + folder;
+    /**
+     * Lists all the sub-directories storing resources of a given resource type. The resource
+     * type is used to decide the root path, same as {@link #listResources(SearchOptions)}.
+     *
+     * @param searchOptions Search Options
+     * @return Set of directory paths that are child of the folder path specified
+     */
+    public Set<String> listDirectories(SearchOptions searchOptions) {
+        if (searchOptions.getResourceType() == null) {
+            throw new IllegalArgumentException("Resource Type is not set");
         }
 
         Set<String> result = new HashSet<>();
-        this.listResources(type, folder, zipFolderPath, result, true, recurse);
+        this.forAllArchiveEntries(
+                searchOptions.getResourceType(),
+                searchOptions.getFullArchivePath(),
+                true,
+                searchOptions.isIncludingParentPacks(),
+                searchOptions.isDeep(),
+                path -> result.add(searchOptions.populatePathPrefix(path)));
         return result;
     }
 
@@ -1042,29 +1089,35 @@ public class MapResourcePack {
      * Called by the main listResources() function to fill a set of strings with files
      * found in a folder.
      *
-     * @param type
-     * @param folder
-     * @param rootRelFolder
-     * @param result
+     * @param type Resource type, defining the root directory to look in
+     * @param rootArchivePath Folder in the archive to search in
      * @param directories Whether to list directories instead of files
      * @param recurse Whether to also look at base resource packs of this resource pack
+     * @param deep Whether to include contents of subdirectories in the results
+     * @param callback Callback function called for every result provided
      */
-    protected void listResources(ResourceType type, String folder, String rootRelFolder, Set<String> result, boolean directories, boolean recurse) {
+    protected void forAllArchiveEntries(
+            ResourceType type,
+            String rootArchivePath,
+            boolean directories,
+            boolean recurse,
+            boolean deep,
+            Consumer<String> callback
+    ) {
         // =null: failed to load resource pack file
         this.handleLoad(true, false);
         if (this.archive != null) {
-            String prefix = (folder.equals("/") ? "": folder);
             try {
                 if (directories) {
-                    for (String file : this.archive.listFiles(rootRelFolder)) {
+                    for (String file : this.archive.listFiles(rootArchivePath, deep)) {
                         if (file.endsWith("/")) {
-                            result.add(prefix + file.substring(0, file.length() - 1));
+                            callback.accept(file.substring(0, file.length() - 1));
                         }
                     }
                 } else {
-                    for (String file : this.archive.listFiles(rootRelFolder)) {
+                    for (String file : this.archive.listFiles(rootArchivePath, deep)) {
                         if (type.isExtension(file)) {
-                            result.add(prefix + file.substring(0, file.length() - type.getExtension().length()));
+                            callback.accept(file.substring(0, file.length() - type.getExtension().length()));
                         }
                     }
                 }
@@ -1074,7 +1127,7 @@ public class MapResourcePack {
 
         // Ask base pack as well!
         if (recurse && this.baseResourcePack != null) {
-            this.baseResourcePack.listResources(type, folder, rootRelFolder, result, directories, recurse);
+            this.baseResourcePack.forAllArchiveEntries(type, rootArchivePath, directories, recurse, false, callback);
         }
     }
 
@@ -1375,6 +1428,152 @@ public class MapResourcePack {
             public int max_inclusive() {
                 return max_inclusive;
             }
+        }
+    }
+
+    /**
+     * Options for searching for resource files in the resource pack
+     */
+    public static class SearchOptions implements Cloneable {
+        private ResourceType resourceType = null;
+        private String namespace = "minecraft";
+        private String folder = "/";
+        private boolean includingParentPacks = false;
+        private boolean deep = false;
+        private boolean prependNamespace = false;
+
+        /**
+         * Creates new SearchOptions with default settings.
+         * Must at least set the resource type to search for.
+         *
+         * @return New SearchOptions
+         */
+        public static SearchOptions create() {
+            return new SearchOptions();
+        }
+
+        public SearchOptions() {
+        }
+
+        public ResourceType getResourceType() {
+            return resourceType;
+        }
+
+        public SearchOptions setResourceType(ResourceType type) {
+            this.resourceType = type;
+            return this;
+        }
+
+        public String getNamespace() {
+            return namespace;
+        }
+
+        public SearchOptions setNamespace(String namespace) {
+            this.namespace = namespace;
+            return this;
+        }
+
+        public String getFolder() {
+            return folder;
+        }
+
+        public SearchOptions setFolder(String folder) {
+            if (!folder.endsWith("/")) {
+                folder += "/";
+            }
+            this.folder = folder;
+            return this;
+        }
+
+        /**
+         * Gets whether to include resources in the results that are in resource packs that are a
+         * base of the one being searched.
+         *
+         * @return True if recursing into parent resource packs
+         */
+        public boolean isIncludingParentPacks() {
+            return includingParentPacks;
+        }
+
+        /**
+         * Sets whether to include resources in the results that are in resource packs that are a
+         * base of the one being searched.
+         *
+         * @param includingParentPacks True to recurse into parent resource packs
+         * @return this
+         */
+        public SearchOptions setIncludingParentPacks(boolean includingParentPacks) {
+            this.includingParentPacks = includingParentPacks;
+            return this;
+        }
+
+        /**
+         * Gets whether to deep-search and include files/folders that are inside subdirectories
+         * of the search folder.
+         *
+         * @return True if deep-searching
+         */
+        public boolean isDeep() {
+            return deep;
+        }
+
+        /**
+         * Sets whether to deep-search and include files/folders that are inside subdirectories
+         * of the search folder.
+         *
+         * @param deep Whether to do a deep-search
+         * @return this
+         */
+        public SearchOptions setDeep(boolean deep) {
+            this.deep = deep;
+            return this;
+        }
+
+        public boolean isPrependNamespace() {
+            return prependNamespace;
+        }
+
+        public SearchOptions setPrependNamespace(boolean prepend) {
+            this.prependNamespace = prepend;
+            return this;
+        }
+
+        public boolean isRootPath() {
+            return folder.equals("/");
+        }
+
+        public String getFullArchivePath() {
+            if (isRootPath()) {
+                return resourceType.getRoot(namespace);
+            } else {
+                return resourceType.getRoot(namespace) + folder;
+            }
+        }
+
+        /**
+         * Depending on these search options, populates information around the path
+         * such as namespace and the folder.
+         *
+         * @param path Relative path result
+         * @return Populated path
+         */
+        public String populatePathPrefix(String path) {
+            if (isRootPath()) {
+                return isPrependNamespace() ? namespace + ":" + path : path;
+            } else {
+                return isPrependNamespace() ? namespace + ":" + folder + path : folder + path;
+            }
+        }
+
+        @Override
+        public SearchOptions clone() {
+            return create()
+                    .setResourceType(this.getResourceType())
+                    .setNamespace(this.getNamespace())
+                    .setFolder(this.getFolder())
+                    .setIncludingParentPacks(this.isIncludingParentPacks())
+                    .setPrependNamespace(this.isPrependNamespace())
+                    .setDeep(this.isDeep());
         }
     }
 }

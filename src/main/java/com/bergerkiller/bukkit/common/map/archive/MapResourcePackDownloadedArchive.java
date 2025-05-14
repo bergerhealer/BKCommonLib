@@ -310,8 +310,8 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
     }
 
     @Override
-    public List<String> listFiles(String folder) throws IOException {
-        return (this.archive == null) ? Collections.emptyList() : this.archive.listFiles(folder);
+    public List<String> listFiles(String folder, boolean deep) throws IOException {
+        return (this.archive == null) ? Collections.emptyList() : this.archive.listFiles(folder, deep);
     }
 
     private static class PackDownload {

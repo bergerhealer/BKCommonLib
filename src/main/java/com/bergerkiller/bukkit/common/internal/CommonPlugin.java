@@ -40,6 +40,7 @@ import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
 import com.bergerkiller.bukkit.common.internal.permissions.PermissionHandler;
 import com.bergerkiller.bukkit.common.internal.permissions.PermissionHandlerSelector;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
+import com.bergerkiller.bukkit.common.map.util.ModelInfoLookup;
 import com.bergerkiller.bukkit.common.map.util.RGBColorToIntConversion;
 import com.bergerkiller.bukkit.common.offline.OfflineWorld;
 import com.bergerkiller.bukkit.common.protocol.PlayerGameInfo;
@@ -47,6 +48,7 @@ import com.bergerkiller.bukkit.common.regionflagtracker.RegionFlagRegistryBaseIm
 import com.bergerkiller.bukkit.common.softdependency.SoftDependency;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -60,6 +62,7 @@ import com.bergerkiller.mountiplex.reflection.util.asm.ASMUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
@@ -124,6 +127,7 @@ public class CommonPlugin extends PluginBase {
     private boolean forceSynchronousSaving = false;
     private boolean isDebugCommandRegistered = false;
     private boolean cloudDisableBrigadier = false;
+    private Material fallbackItemModelType = null;
 
     public CommonPlugin() {
         // Before proceeding, make sure the jar file isn't lacking required stuff
@@ -199,6 +203,24 @@ public class CommonPlugin extends PluginBase {
 
     public boolean isCloudBrigadierDisabled() {
         return cloudDisableBrigadier;
+    }
+
+    public Material getFallbackItemModelType() {
+        Material m = fallbackItemModelType;
+        if (m == null) {
+            fallbackItemModelType = m = getDefaultFallbackItemModelType();
+        }
+        return m;
+    }
+
+    /**
+     * Gets the default fallback item model type that this library chooses, if not overridden
+     * in the configuration.
+     *
+     * @return Default item model type material
+     */
+    public static Material getDefaultFallbackItemModelType() {
+        return MaterialUtil.getFirst("IRON_NUGGET", "LEGACY_IRON_NUGGET");
     }
 
     public <T> TypedValue<T> getDebugVariable(String name, Class<T> type, T value) {
@@ -641,6 +663,9 @@ public class CommonPlugin extends PluginBase {
         config.addHeader("trackForcedChunkCreationStack", "Once a missed close is detected, tracking is automatically started anyway.");
         config.addHeader("trackForcedChunkCreationStack", "As such, this option is primarily useful to diagnose this problem at server startup");
         boolean trackForcedChunkCreationStack = config.get("trackForcedChunkCreationStack", false);
+        config.setHeader("fallbackItemModelType", "\nMaterial type to use for custom-namespace item models in resource pack listing");
+        config.addHeader("fallbackItemModelType", "Is used on Minecraft 1.21.2 and later with the item_model data component");
+        this.fallbackItemModelType = config.get("fallbackItemModelType", getDefaultFallbackItemModelType());
         config.save();
 
         if (preloadTemplateClasses) {

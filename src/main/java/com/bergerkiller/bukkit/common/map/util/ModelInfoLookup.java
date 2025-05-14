@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.map.util;
 
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
@@ -172,12 +173,33 @@ public class ModelInfoLookup {
      * @return The item that displays this model, or empty if not found
      */
     public static Optional<CommonItemStack> findItemStackByModelName(String itemModelName) {
-        ModelNameEntry entry = byItemName.get(itemModelName);
+        int nameSpace = itemModelName.indexOf(':');
+        ModelNameEntry entry;
+        if (nameSpace == -1) {
+            entry = byItemName.get(itemModelName);
+        } else if (itemModelName.startsWith("minecraft")) {
+            entry = byItemName.get(itemModelName.substring(10));
+        } else {
+            entry = null; // Custom namespaces don't exist as vanilla items
+        }
+
         if (entry != null) {
             return entry.toItemStack();
-        } else {
-            return Optional.empty();
         }
+
+        // Try to create a dummy ItemStack with the custom_model data component set
+        if (CommonCapabilities.HAS_ITEM_MODEL_COMPONENT) {
+            MinecraftKeyHandle key = MinecraftKeyHandle.createNew(itemModelName);
+            if (key != null) {
+                Material type = CommonPlugin.hasInstance()
+                        ? CommonPlugin.getInstance().getFallbackItemModelType()
+                        : CommonPlugin.getDefaultFallbackItemModelType();
+
+                return Optional.of(CommonItemStack.create(type, 1).setItemModel(key));
+            }
+        }
+
+        return Optional.empty();
     }
 
     /**

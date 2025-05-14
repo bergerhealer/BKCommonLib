@@ -19,10 +19,12 @@ import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagByte;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.nbt.GameProfileSerializer;
+import net.minecraft.resources.MinecraftKey;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipesFurnaceHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
@@ -789,6 +791,27 @@ class ItemStack {
         }
 #endif
     }
+
+#if version >= 1.21.2
+    public (MinecraftKeyHandle) MinecraftKey getItemModel() {
+        return (MinecraftKey) instance.get(DataComponents.ITEM_MODEL);
+    }
+
+    public void setItemModel((MinecraftKeyHandle) MinecraftKey key) {
+        if (key != null) {
+            instance.set(DataComponents.ITEM_MODEL, key);
+        } else {
+            instance.remove(DataComponents.ITEM_MODEL);
+        }
+    }
+#else
+    public (MinecraftKeyHandle) MinecraftKey getItemModel() {
+        return null;
+    }
+
+    public void setItemModel((MinecraftKeyHandle) MinecraftKey key) {
+    }
+#endif
 
 #if version >= 1.21.4
     public boolean hasCustomModelData() {
