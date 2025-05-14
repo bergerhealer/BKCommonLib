@@ -99,11 +99,27 @@ public class MapResourcePackTest {
         assertEquals(46, pack.getMetadata().getPackFormat());
         assertTrue(pack.getMetadata().hasItemOverrides());
 
-        // Verify it can detect the golden tool overrides and doesn't list anything else
+        // Verify it can detect the golden tool overrides and also all custom-namespace overrides
+        // which uses the item_model data component to display it.
         // golden_pickaxe: Uses unbreakable + damage values (condition + range_dispatch)
         // golden_axe: Uses custom model data flags / int (range_dispatch)
         // golden_sword: Uses custom model data flags + strings (condition + select)
-        assertEquals(new HashSet<>(Arrays.asList("golden_pickaxe", "golden_axe", "golden_sword")),
+        assertEquals(new HashSet<>(Arrays.asList("golden_pickaxe", "golden_axe", "golden_sword",
+                        "traincarts:maxi/coaster_cart_red",
+                        "traincarts:maxi/coaster_cart_green",
+                        "traincarts:maxi/coaster_cart_blue",
+                        "traincarts:nubx/carriage_blue_base",
+                        "traincarts:nubx/carriage_blue_full",
+                        "traincarts:nubx/carriage_green_base",
+                        "traincarts:nubx/carriage_green_full",
+                        "traincarts:nubx/carriage_red_base",
+                        "traincarts:nubx/carriage_red_full",
+                        "traincarts:nubx/carriage_wheels",
+                        "traincarts:nubx/locomotive_base",
+                        "traincarts:nubx/locomotive_full",
+                        "traincarts:nubx/locomotive_piston",
+                        "traincarts:nubx/locomotive_wheels"
+                )),
                 pack.listOverriddenItemModelNames());
 
         /*
