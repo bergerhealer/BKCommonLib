@@ -220,7 +220,7 @@ public class CommonPlugin extends PluginBase {
      * @return Default item model type material
      */
     public static Material getDefaultFallbackItemModelType() {
-        return MaterialUtil.getFirst("IRON_NUGGET", "LEGACY_IRON_NUGGET");
+        return MaterialUtil.getFirst("IRON_NUGGET", "LEGACY_IRON_NUGGET", "LEGACY_GOLD_NUGGET");
     }
 
     public <T> TypedValue<T> getDebugVariable(String name, Class<T> type, T value) {
