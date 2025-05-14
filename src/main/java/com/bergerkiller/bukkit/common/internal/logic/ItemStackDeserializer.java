@@ -17,7 +17,7 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
     public static final ItemStackDeserializer INSTANCE = new ItemStackDeserializer();
 
     private final ItemStackDeserializerMigratorBukkit bukkitMigrator = new ItemStackDeserializerMigratorBukkit();
-    private final ItemStackDeserializerMigratorPaperNBT paperNBTMigrator = new ItemStackDeserializerMigratorPaperNBT();
+    private final ItemStackDeserializerMigratorNBT nbtMigrator = new ItemStackDeserializerMigratorNBT();
 
     /**
      * Whether to parse NBT tags into ItemStacks directly. Paper natively supports this, but for
@@ -35,7 +35,7 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
 
     private ItemStackDeserializer() {
         // Only parse NBT on 1.21.5 and later
-        this.canParseNBT = paperNBTMigrator.getCurrentDataVersion() >= 4325 && CommonBootstrap.isPaperServer();
+        this.canParseNBT = nbtMigrator.getCurrentDataVersion() >= 4325 && CommonBootstrap.isPaperServer();
     }
 
     /**
@@ -52,8 +52,8 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
      *
      * @return Paper NBT Migrator
      */
-    public ItemStackDeserializerMigratorPaperNBT getPaperNBTMigrator() {
-        return paperNBTMigrator;
+    public ItemStackDeserializerMigratorNBT getNBTMigrator() {
+        return nbtMigrator;
     }
 
     @Override
@@ -61,9 +61,9 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         boolean isPaperNBTFormat = args.containsKey("schema_version");
         if (isPaperNBTFormat) {
             if (canParseNBT) {
-                return paperNBTMigrator.apply(args);
+                return nbtMigrator.apply(args);
             } else {
-                args = paperNBTMigrator.toBukkitEncoding(args);
+                args = nbtMigrator.toBukkitEncoding(args);
             }
         }
 

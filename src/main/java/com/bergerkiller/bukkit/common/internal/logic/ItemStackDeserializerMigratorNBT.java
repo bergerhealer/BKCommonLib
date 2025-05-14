@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * Converts Paper's NBT encoding of ItemStacks, like:
+ * Parses Paper's NBT encoding of ItemStacks, like:
  * <pre>
  * ==: org.bukkit.inventory.ItemStack
  * DataVersion: 4325
@@ -19,7 +19,8 @@ import java.util.function.Function;
  * count: 1
  * schema_version: 1
  * </pre>
- * Back into a Spigot (or legacy) supported format, like so:
+ * Into ItemStacks. If parsing isn't supported, can migrate it back into a Spigot
+ * (or legacy) supported format, like so:
  * <pre>
  * ==: org.bukkit.inventory.ItemStack
  * v: 4325
@@ -28,10 +29,10 @@ import java.util.function.Function;
  * This is only used for data versions beyond 4325 (1.21.5), as this mechanism
  * did not exist on prior versions.
  */
-public class ItemStackDeserializerMigratorPaperNBT extends ItemStackDeserializerMigrator implements Function<Map<String, Object>, ItemStack> {
-    private final PaperNBTToBukkit paperNBTToBukkit = new PaperNBTToBukkit();
+public class ItemStackDeserializerMigratorNBT extends ItemStackDeserializerMigrator implements Function<Map<String, Object>, ItemStack> {
+    private final NBTToBukkit nbtToBukkit = new NBTToBukkit();
 
-    ItemStackDeserializerMigratorPaperNBT() {
+    ItemStackDeserializerMigratorNBT() {
         // Maximum supported data version
         this.setMaximumDataVersion(4325); // MC 1.21.5
     }
@@ -45,7 +46,7 @@ public class ItemStackDeserializerMigratorPaperNBT extends ItemStackDeserializer
      */
     public Map<String, Object> toBukkitEncoding(Map<String, Object> args) {
         this.migrate(args, "DataVersion");
-        return paperNBTToBukkit.apply(args);
+        return nbtToBukkit.apply(args);
     }
 
     @Override
@@ -68,16 +69,16 @@ public class ItemStackDeserializerMigratorPaperNBT extends ItemStackDeserializer
     }
 
     /**
-     * Converts Paper NBT encoded data to Bukkit/Spigot's ItemMeta encoded data.
+     * Converts (Paper) NBT encoded data to Bukkit/Spigot's ItemMeta encoded data.
      * This only operates on data saved for Minecraft 1.21.5.
      * Older data is not supported (paper did not encode to it on older versions), and newer
      * data is migrated down to 1.21.5 before this is used.
      */
-    public static class PaperNBTToBukkit implements Function<Map<String, Object>, Map<String, Object>> {
+    public static class NBTToBukkit implements Function<Map<String, Object>, Map<String, Object>> {
         private final ItemStackDeserializerIdToMaterialMapper idMapper;
         private final Map<String, ComponentMapper> componentMappers = new HashMap<>();
 
-        public PaperNBTToBukkit() {
+        public NBTToBukkit() {
             this.idMapper = new ItemStackDeserializerIdToMaterialMapper();
             this.idMapper.loadMappings();
             this.componentMappers.put("minecraft:custom_model_data", (result, nbtData) -> {

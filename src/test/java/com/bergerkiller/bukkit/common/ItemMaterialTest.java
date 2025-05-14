@@ -536,8 +536,8 @@ public class ItemMaterialTest {
         if (curr > ItemStackDeserializer.INSTANCE.getBukkitMigrator().getMaximumDataVersion()) {
             fail("ItemStackDeserializer [BUKKIT] needs to support the new Data Version (" + curr + ")");
         }
-        if (curr > ItemStackDeserializer.INSTANCE.getPaperNBTMigrator().getMaximumDataVersion()) {
-            fail("ItemStackDeserializer [PAPER NBT] needs to support the new Data Version (" + curr + ")");
+        if (curr > ItemStackDeserializer.INSTANCE.getNBTMigrator().getMaximumDataVersion()) {
+            fail("ItemStackDeserializer [NBT] needs to support the new Data Version (" + curr + ")");
         }
     }
 
