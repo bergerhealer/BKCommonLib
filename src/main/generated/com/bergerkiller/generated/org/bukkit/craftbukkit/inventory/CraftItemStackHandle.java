@@ -53,6 +53,8 @@ public abstract class CraftItemStackHandle extends Template.Handle {
         public final Template.StaticMethod<ItemMeta> deserializeItemMeta = new Template.StaticMethod<ItemMeta>();
         @Template.Optional
         public final Template.StaticMethod<Object> deserializeCustomModelData = new Template.StaticMethod<Object>();
+        @Template.Optional
+        public final Template.StaticMethod.Converted<ItemStack> deserializeNBT = new Template.StaticMethod.Converted<ItemStack>();
 
     }
 

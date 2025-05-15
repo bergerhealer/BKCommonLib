@@ -3,6 +3,12 @@ package org.bukkit.craftbukkit.inventory;
 import net.minecraft.world.IInventory;
 import net.minecraft.world.inventory.InventoryMerchant;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTBase;
+
+import org.bukkit.craftbukkit.util.CraftMagicNumbers;
+
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryMerchantHandle;
@@ -27,6 +33,41 @@ class CraftItemStack {
     }
 #else
     public static optional Object deserializeCustomModelData:###(java.util.Map<String, Object> values);
+#endif
+
+#if version >= 1.21.5
+    public static optional org.bukkit.inventory.ItemStack deserializeNBT((CommonTagCompound) NBTTagCompound nbt) {
+  #if paper
+        // Use Paper UnsafeValues API
+        #require CraftMagicNumbers private org.bukkit.inventory.ItemStack deserializeItem(NBTTagCompound nbt);
+        return CraftMagicNumbers.INSTANCE#deserializeItem(nbt);
+  #else
+        // Use Spigot/NMS DFU
+        final int dataVersion = nbt.getIntOr("DataVersion", 0);
+
+        com.mojang.serialization.Dynamic migratedDynamic = net.minecraft.util.datafix.DataConverterRegistry.getDataFixer().update(
+                net.minecraft.util.datafix.fixes.DataConverterTypes.ITEM_STACK,
+                new com.mojang.serialization.Dynamic(net.minecraft.nbt.DynamicOpsNBT.INSTANCE, nbt),
+                dataVersion,
+                CraftMagicNumbers.INSTANCE.getDataVersion());
+
+        if (migratedDynamic.getValue() == null) {
+            throw new IllegalArgumentException("Failed to perform data migration of itemstack");
+        }
+
+        java.util.Optional itemOpt = net.minecraft.world.item.ItemStack.parse(
+                org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry(),
+                (NBTBase) migratedDynamic.getValue());
+        if (!itemOpt.isPresent()) {
+            return null;
+        }
+
+        net.minecraft.world.item.ItemStack item = (net.minecraft.world.item.ItemStack) itemOpt.get();
+        return CraftItemStack.asCraftMirror(item);
+  #endif
+    }
+#else
+    public static optional org.bukkit.inventory.ItemStack deserializeNBT:###((CommonTagCompound) NBTTagCompound nbt);
 #endif
 }
 

@@ -108,7 +108,7 @@ public abstract class ItemStackDeserializerMigrator {
     }
 
     protected static void logFailDeserialize(Map<String, Object> args) {
-        Logging.LOGGER_CONFIG.warning("Failed to deserialize ItemStack:\n" + stringifyPrintDocument(args));
+        Logging.LOGGER_CONFIG.warning("Failed to deserialize ItemStack: " + stringifyPrintDocument(args));
     }
 
     private static String stringifyPrintDocument(Object value) {
@@ -125,6 +125,7 @@ public abstract class ItemStackDeserializerMigrator {
                 return;
             }
 
+            str.append('\n');
             for (Map.Entry<?, ?> e : map.entrySet()) {
                 stringifyIndent(str, indent + 1);
                 str.append(e.getKey()).append(": ");
@@ -137,6 +138,7 @@ public abstract class ItemStackDeserializerMigrator {
                 str.append("[]");
                 return;
             }
+            str.append('\n');
             for (Object listItem : list) {
                 stringifyIndent(str, indent);
                 str.append("- ");

@@ -106,7 +106,7 @@ public class YamlTest {
 
     @Test
     public void testPaperNBTItemStackSimpleMissingType() {
-        // Missing types should turn into OAK_WOOD
+        // Missing types should turn into empty items
         // Also in Paper's NBT format.
 
         String yamlInputString = "" +
@@ -120,8 +120,7 @@ public class YamlTest {
         YamlNode root = new YamlNode();
         root.loadFromString(yamlInputString);
         CommonItemStack item = CommonItemStack.of(root.get("key", ItemStack.class));
-        assertEquals(MaterialUtil.getFirst("OAK_WOOD", "LEGACY_WOOD"), item.getType());
-        assertEquals(1, item.getAmount());
+        assertTrue(item.isEmpty());
     }
 
     @Test

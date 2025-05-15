@@ -1,6 +1,10 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
 import com.bergerkiller.bukkit.common.config.SNBTDeserializer;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.nbt.CommonTag;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 import org.bukkit.Color;
 import org.bukkit.inventory.ItemStack;
 
@@ -31,8 +35,11 @@ import java.util.function.Function;
  */
 public class ItemStackDeserializerMigratorNBT extends ItemStackDeserializerMigrator implements Function<Map<String, Object>, ItemStack> {
     private final NBTToBukkit nbtToBukkit = new NBTToBukkit();
+    private final boolean isPaperServer;
 
     ItemStackDeserializerMigratorNBT() {
+        isPaperServer = CommonBootstrap.isPaperServer();
+
         // Maximum supported data version
         this.setMaximumDataVersion(4325); // MC 1.21.5
     }
@@ -61,7 +68,29 @@ public class ItemStackDeserializerMigratorNBT extends ItemStackDeserializerMigra
         this.migrate(args, "DataVersion");
 
         try {
-            return ItemStack.deserialize(args);
+            // On Paper we can just call deserialize(), which handles NBT properly
+            if (isPaperServer) {
+                return ItemStack.deserialize(args);
+            }
+
+            // On Spigot, we have to turn the args into NBT, and then deserialize that.
+            // See also Paper's implementation of this (CraftMagicNumbers deserializeStack(args)
+            CommonTagCompound tag = new CommonTagCompound();
+            readInteger(args.get("DataVersion")).ifPresent(dataVersion -> tag.putValue("DataVersion", dataVersion));
+            readString(args.get("id")).ifPresent(id -> tag.putValue("id", id));
+            readInteger(args.get("count")).ifPresent(count -> tag.putValue("count", count));
+            readMap(args.get("components")).ifPresent(componentsMap -> {
+                CommonTagCompound components = new CommonTagCompound();
+                for (Map.Entry<String, Object> component : componentsMap.entrySet()) {
+                    String snbt = readString(component.getValue()).orElseThrow(() -> new IllegalStateException(
+                            "Missing component value for " + component.getKey()));
+                    CommonTag componentTag = CommonTag.fromSNBT(snbt).getResultOrThrow(RuntimeException::new);
+                    components.put(component.getKey(), componentTag);
+                }
+                tag.put("components", components);
+            });
+
+            return CraftItemStackHandle.T.deserializeNBT.invoke(tag);
         } catch (RuntimeException ex) {
             logFailDeserialize(args);
             throw ex;

@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
-import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
@@ -35,7 +34,7 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
 
     private ItemStackDeserializer() {
         // Only parse NBT on 1.21.5 and later
-        this.canParseNBT = nbtMigrator.getCurrentDataVersion() >= 4325 && CommonBootstrap.isPaperServer();
+        this.canParseNBT = nbtMigrator.getCurrentDataVersion() >= 4325;
     }
 
     /**

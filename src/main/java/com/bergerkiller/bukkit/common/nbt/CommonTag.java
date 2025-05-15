@@ -14,6 +14,7 @@ import com.bergerkiller.mountiplex.conversion.util.ConvertingMap;
 import java.io.*;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * An NBT Tag wrapper implementation to safely operate on tags<br><br>
@@ -257,6 +258,22 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable 
          */
         public T getResult() {
             return result;
+        }
+
+        /**
+         * Gets the result. If there is no result due to a parsing error, calls the function
+         * to create a new runtime exception. This is then thrown.
+         *
+         * @param errorCreator Function to create a runtime exception
+         * @return Result
+         * @param <E> Error type
+         */
+        public <E extends RuntimeException> T getResultOrThrow(Function<String, E> errorCreator) {
+            if (result != null) {
+                return result;
+            } else {
+                throw errorCreator.apply(errorMessage);
+            }
         }
 
         @Override
