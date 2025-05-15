@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
-import org.bukkit.Material;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
@@ -22,7 +22,7 @@ public class SoundTest {
 
     @Test
     public void testSoundConstant() {
-        assertEquals("minecraft", SoundEffect.CLICK.getName().getNamespace());
+        assertEquals(MinecraftKeyHandle.DEFAULT_NAMESPACE, SoundEffect.CLICK.getName().getNamespace());
         if (CommonCapabilities.KEYED_EFFECTS) {
             assertEquals("minecraft:ui.button.click", SoundEffect.CLICK.getPath());
             assertEquals("ui.button.click", SoundEffect.CLICK.getName().getName());

@@ -228,12 +228,7 @@ public class ModelInfoLookup {
     }
 
     public static String lookupItem(CommonItemStack itemStack) {
-        MinecraftKeyHandle itemModel = itemStack.getItemModel();
-        if (itemModel.getNamespace().equals("minecraft")) {
-            return itemModel.getName();
-        } else {
-            return itemModel.toString();
-        }
+        return itemStack.getItemModel().toShortString();
     }
 
     /**

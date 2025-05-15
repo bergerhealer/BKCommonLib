@@ -376,7 +376,7 @@ public final class MapMarker {
         }
 
         private static void register(String registryName, String name, String displayName, Color color) {
-            MinecraftKeyHandle key = MinecraftKeyHandle.createNew("minecraft", registryName);
+            MinecraftKeyHandle key = MinecraftKeyHandle.createNew(MinecraftKeyHandle.DEFAULT_NAMESPACE, registryName);
             byKey.put(key, new TypeInfo(key, name, displayName, color));
         }
 

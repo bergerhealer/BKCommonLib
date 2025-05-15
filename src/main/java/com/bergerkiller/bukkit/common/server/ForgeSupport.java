@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 
@@ -177,7 +178,7 @@ public class ForgeSupport {
         }
 
         public String toBukkitName() {
-            if (namespace.equals("minecraft")) {
+            if (namespace.equals(MinecraftKeyHandle.DEFAULT_NAMESPACE)) {
                 // Vanilla dimensions
                 if (dimension.equals("overworld")) {
                     // World name itself
