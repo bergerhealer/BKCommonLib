@@ -534,7 +534,7 @@ public class ModelInfoLookup {
 
             Object itemHandle = HandleConversion.toItemHandle(itemMaterial);
             Object minecraftKey = RegistryMaterialsHandle.T.getKey.invoke(ItemHandle.getRegistry(), itemHandle);
-            itemName = MinecraftKeyHandle.T.name.get(minecraftKey);
+            itemName = MinecraftKeyHandle.T.getName.invoke(minecraftKey);
 
             // Perform renames needed to get the correct item model name
             String typeName = CommonLegacyMaterials.getMaterialName(itemMaterial);

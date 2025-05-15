@@ -23,6 +23,18 @@ public abstract class MinecraftKeyHandle extends Template.Handle {
         return T.createNew.invoke(keyToken);
     }
 
+    public abstract String getName();
+    public abstract String getNamespace();
+    public static final String DEFAULT_NAMESPACE = "minecraft";
+
+    public boolean isDefaultNamespace() {
+        return DEFAULT_NAMESPACE.equals(getNamespace());
+    }
+
+    public String toShortString() {
+        return isDefaultNamespace() ? getName() : toString();
+    }
+
     public static boolean isValid(String key) {
         return createNew(key) != null;
     }
@@ -58,10 +70,6 @@ public abstract class MinecraftKeyHandle extends Template.Handle {
     public static MinecraftKeyHandle createNew(String namespace, String name) {
         return T.createNew2.invoke(namespace, name);
     }
-    @Template.Readonly
-    public abstract String getNamespace();
-    @Template.Readonly
-    public abstract String getName();
     /**
      * Stores class members for <b>net.minecraft.resources.MinecraftKey</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -70,14 +78,12 @@ public abstract class MinecraftKeyHandle extends Template.Handle {
         @Template.Optional
         public final Template.Constructor<Object> constr_code_parts = new Template.Constructor<Object>();
 
-        @Template.Readonly
-        public final Template.Field<String> namespace = new Template.Field<String>();
-        @Template.Readonly
-        public final Template.Field<String> name = new Template.Field<String>();
-
         public final Template.StaticMethod.Converted<MinecraftKeyHandle> createNew = new Template.StaticMethod.Converted<MinecraftKeyHandle>();
         @Template.Optional
         public final Template.StaticMethod.Converted<MinecraftKeyHandle> createNew2 = new Template.StaticMethod.Converted<MinecraftKeyHandle>();
+
+        public final Template.Method<String> getName = new Template.Method<String>();
+        public final Template.Method<String> getNamespace = new Template.Method<String>();
 
     }
 

@@ -220,7 +220,7 @@ class WorldServer extends World {
     }
 
     public static (org.bukkit.World) WorldServer getByDimensionKey((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> key) {
-        String name = (String) com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle.T.name.get(key.name);
+        String name = (String) com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle.T.getName.invoke(key.name);
         MinecraftServer server = MinecraftServer.getServer();
 
   #if version >= 1.13.1

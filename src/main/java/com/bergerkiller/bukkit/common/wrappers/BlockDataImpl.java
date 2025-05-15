@@ -381,7 +381,7 @@ class BlockDataImpl extends BlockData {
     @Override
     public String getBlockName() {
         Object minecraftKey = RegistryMaterialsHandle.T.getKey.invoke(BlockHandle.getRegistry(), this.getBlockRaw());
-        return MinecraftKeyHandle.T.name.get(minecraftKey);
+        return MinecraftKeyHandle.T.getName.invoke(minecraftKey);
     }
 
     @Override

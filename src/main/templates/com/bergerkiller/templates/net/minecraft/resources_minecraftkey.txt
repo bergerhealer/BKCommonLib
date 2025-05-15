@@ -9,15 +9,24 @@ import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.core.RegistryMaterialsHandle;
 
 class MinecraftKey {
-#if version >= 1.17
-    protected final readonly String namespace;
-    protected final readonly String name:path;
+#if version >= 1.18
+    public String getName:getPath();
+    public String getNamespace();
 #elseif version >= 1.14.4
-    protected final readonly String namespace;
-    protected final readonly String name:key;
+    public String getName:getKey();
+    public String getNamespace();
+#elseif version >= 1.12
+    public String getName:getKey();
+    public String getNamespace:b();
+#elseif version >= 1.9
+    public String getName:a();
+    public String getNamespace:b();
 #else
-    protected final readonly String namespace:a;
-    protected final readonly String name:b;
+    public String getName:a();
+    public String getNamespace() {
+        #require MinecraftKey protected final readonly String namespaceField:a;
+        return instance#namespaceField;
+    }
 #endif
 
     // Used in generated code. Does not exist on 1.13 and later.
@@ -53,8 +62,8 @@ class MinecraftKey {
             return null;
         }
         MinecraftKey key = new MinecraftKey(keyToken);
-        String namespace = (String) MinecraftKeyHandle.T.namespace.get(key);
-        String name = (String) MinecraftKeyHandle.T.name.get(key);
+        String namespace = (String) MinecraftKeyHandle.T.getNamespace.invoke(key);
+        String name = (String) MinecraftKeyHandle.T.getName.invoke(key);
         if (!MinecraftKeyHandle.isValidNamespace(namespace)) {
             return null;
         }
@@ -79,6 +88,16 @@ class MinecraftKey {
 #endif
 
     <code>
+    public static final String DEFAULT_NAMESPACE = "minecraft";
+
+    public boolean isDefaultNamespace() {
+        return DEFAULT_NAMESPACE.equals(getNamespace());
+    }
+
+    public String toShortString() {
+        return isDefaultNamespace() ? getName() : toString();
+    }
+
     public static boolean isValid(String key) {
         return createNew(key) != null;
     }
