@@ -793,8 +793,20 @@ class ItemStack {
     }
 
 #if version >= 1.21.2
+    public boolean hasItemModelSet() {
+        return instance.hasNonDefault(DataComponents.ITEM_MODEL);
+    }
+
     public (MinecraftKeyHandle) MinecraftKey getItemModel() {
         return (MinecraftKey) instance.get(DataComponents.ITEM_MODEL);
+    }
+
+    public (MinecraftKeyHandle) MinecraftKey getItemModelIfSet() {
+        if (instance.hasNonDefault(DataComponents.ITEM_MODEL)) {
+            return (MinecraftKey) instance.get(DataComponents.ITEM_MODEL);
+        } else {
+            return null;
+        }
     }
 
     public void setItemModel((MinecraftKeyHandle) MinecraftKey key) {
@@ -805,7 +817,15 @@ class ItemStack {
         }
     }
 #else
+    public boolean hasItemModelSet() {
+        return false;
+    }
+
     public (MinecraftKeyHandle) MinecraftKey getItemModel() {
+        return null;
+    }
+
+    public (MinecraftKeyHandle) MinecraftKey getItemModelIfSet() {
         return null;
     }
 

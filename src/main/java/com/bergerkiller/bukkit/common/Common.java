@@ -69,7 +69,8 @@ public class Common {
             "Common:NBTUtil:LoadSaveEquipment",
             "Common:NBT:ChatTextSerialization",
             "Module:RegionFlagTracker",
-            "Common:CommonItemStack:ItemModel"
+            "Common:CommonItemStack:ItemModel",
+            "Common:CommonItemStack:MimicAsType"
     ).collect(Collectors.toSet());
 
     /**

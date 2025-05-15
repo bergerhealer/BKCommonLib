@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common;
 
+import com.bergerkiller.bukkit.common.inventory.CommonItemMaterials;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
@@ -18,6 +19,22 @@ import static com.bergerkiller.bukkit.common.utils.MaterialUtil.getFirst;
 import static org.junit.Assert.*;
 
 public class CommonItemStackTest {
+
+    @Test
+    public void testMimicAsType() {
+        if (!CommonItemStack.canSetItemModel()) {
+            return;
+        }
+
+        CommonItemStack item = CommonItemStack.create(MaterialUtil.getFirst("DIAMOND_SWORD", "LEGACY_DIAMOND_SWORD"), 1);
+        System.out.println(item.getItemModel());
+        assertFalse(item.hasItemModel());
+
+        item.mimicAsType(CommonItemMaterials.STICK); // Hits like a wet noodle
+
+        assertEquals(CommonItemMaterials.STICK, item.getType());
+        assertEquals("minecraft:diamond_sword", item.getItemModel().toString());
+    }
 
     @Test
     public void testVanillaDisplayName() {

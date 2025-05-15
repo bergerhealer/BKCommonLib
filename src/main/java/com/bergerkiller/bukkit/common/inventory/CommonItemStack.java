@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.inventory;
 
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.map.util.ModelInfoLookup;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
@@ -716,20 +717,36 @@ public final class CommonItemStack implements Cloneable {
      */
     public boolean hasItemModel() {
         return getHandle(true)
-                .map(ItemStackHandle::getItemModel)
-                .isPresent();
+                .map(ItemStackHandle::hasItemModelSet)
+                .orElse(Boolean.FALSE);
     }
 
     /**
      * Gets the item model set for this item. If none are set and it defaults
-     * to the vanilla item model, returns <i>null</i>
+     * to the vanilla item model, returns the name of this vanilla item model.
      *
      * @return set item model, or <i>null</i> if not set
+     * @see ModelInfoLookup#lookupVanillaItemModel(CommonItemStack)
      */
     public MinecraftKeyHandle getItemModel() {
+        if (CommonCapabilities.HAS_ITEM_MODEL_COMPONENT) {
+            return getHandle(true)
+                    .map(ItemStackHandle::getItemModel)
+                    .orElseGet(() -> ModelInfoLookup.lookupVanillaItemModel(this));
+        } else {
+            return ModelInfoLookup.lookupVanillaItemModel(this);
+        }
+    }
+
+    /**
+     * Gets the item model set for this item. If none are set and it defaults
+     * to the vanilla item model, returns <i>empty</i>
+     *
+     * @return set item model, or <i>empty</i> if not set
+     */
+    public Optional<MinecraftKeyHandle> getItemModelIfSet() {
         return getHandle(true)
-                .map(ItemStackHandle::getItemModel)
-                .orElse(null);
+                .map(ItemStackHandle::getItemModelIfSet);
     }
 
     /**
@@ -760,6 +777,41 @@ public final class CommonItemStack implements Cloneable {
                 .orElseThrow(() -> new IllegalStateException("Can not set item model on an empty item"))
                 .setItemModel(itemModelKey);
         return this;
+    }
+
+    /**
+     * Sets the {@link #setItemModel(String) item model} of this item to the type currently set,
+     * and sets the type of this item to the type specified, if item models are supported. This
+     * makes this item have the game behavior of the input type while still looking like (mimicing)
+     * the original type.<br>
+     * <br>
+     * If the server version is older than 1.21.2 this method does nothing, as item models are not
+     * supported there.<br>
+     * <br>
+     * <b>Use: </b>Call this method when creating new "tool" items to make them behave like a different
+     * item than is displayed. This can for example prevent block items from triggering block placement
+     * by the player.
+     *
+     * @param type Material Type to set on this item, that the game will use the behavior of
+     * @return this CommonItemStack
+     */
+    public CommonItemStack mimicAsType(Material type) {
+        if (CommonCapabilities.HAS_ITEM_MODEL_COMPONENT) {
+            MinecraftKeyHandle itemModel = this.getItemModel();
+            setType(type);
+            setItemModel(itemModel);
+        }
+        return this;
+    }
+
+    /**
+     * Gets whether this version of the server supports setting a custom item model override
+     * on items. If false, then {@link #setItemModel(MinecraftKeyHandle)} is a no-op.
+     *
+     * @return True if item models can be set on items
+     */
+    public static boolean canSetItemModel() {
+        return CommonCapabilities.HAS_ITEM_MODEL_COMPONENT;
     }
 
     /**
