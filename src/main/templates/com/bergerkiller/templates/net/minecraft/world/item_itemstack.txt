@@ -392,7 +392,7 @@ class ItemStack {
             return; // No work needed
         }
 
-        meta.addEnchant(org.bukkit.inventory.meta.Enchantment.ARROW_DAMAGE, 1, true);
+        meta.addEnchant(org.bukkit.enchantments.Enchantment.ARROW_DAMAGE, 1, true);
 
         org.bukkit.inventory.ItemFlag[] flagsToAdd = new org.bukkit.inventory.ItemFlag[1];
         flagsToAdd[0] = org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS;
