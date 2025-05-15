@@ -46,6 +46,7 @@ public abstract class ItemStackHandle extends Template.Handle {
     public abstract void setCustomName(ChatText name);
     public abstract void hideTooltip();
     public abstract void hideAllAttributes();
+    public abstract void addGlint();
     public abstract List<ChatText> getLores();
     public abstract void addLore(ChatText line);
     public abstract void clearLores();
@@ -128,6 +129,7 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.Method.Converted<Void> setCustomName = new Template.Method.Converted<Void>();
         public final Template.Method<Void> hideTooltip = new Template.Method<Void>();
         public final Template.Method<Void> hideAllAttributes = new Template.Method<Void>();
+        public final Template.Method<Void> addGlint = new Template.Method<Void>();
         public final Template.Method.Converted<List<ChatText>> getLores = new Template.Method.Converted<List<ChatText>>();
         public final Template.Method.Converted<Void> addLore = new Template.Method.Converted<Void>();
         public final Template.Method<Void> clearLores = new Template.Method<Void>();

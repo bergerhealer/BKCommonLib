@@ -376,6 +376,31 @@ class ItemStack {
     }
 #endif
 
+    public void addGlint() {
+#if version >= 1.20.5
+        instance.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, Boolean.TRUE);
+#else
+        // Use Bukkit API to check for enchantments. If there are any, do nothing,
+        // as glint already exists. If not, add a dummy enchantment and modify the
+        // item flags to hide it in the tooltip.
+        org.bukkit.inventory.ItemStack itemStack = org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(instance);
+        org.bukkit.inventory.meta.ItemMeta meta = itemStack.getItemMeta();
+        if (meta == null) {
+            return; // Fail silently I guess?
+        }
+        if (meta.hasEnchants()) {
+            return; // No work needed
+        }
+
+        meta.addEnchant(org.bukkit.inventory.meta.Enchantment.ARROW_DAMAGE, 1, true);
+
+        org.bukkit.inventory.ItemFlag[] flagsToAdd = new org.bukkit.inventory.ItemFlag[1];
+        flagsToAdd[0] = org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS;
+        meta.addItemFlags(flagsToAdd);
+
+        itemStack.setItemMeta(meta);
+#endif
+    }
 
 #if version >= 1.20.5
     public (List<ChatText>) List<IChatBaseComponent> getLores() {

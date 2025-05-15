@@ -966,6 +966,19 @@ public final class CommonItemStack implements Cloneable {
     }
 
     /**
+     * Adds an enchantment glint to this item. On Minecraft 1.20.5 and later this is done
+     * with the glint override property. On versions before that, a dummy enchantment is set
+     * and hide flags adjusted to not show enchantments in the tooltip. If enchantments already
+     * exist, no enchantments are added.
+     *
+     * @return this CommonItemStack
+     */
+    public CommonItemStack addGlint() {
+        getHandle().ifPresent(ItemStackHandle::addGlint);
+        return this;
+    }
+
+    /**
      * Adds a Bukkit Enchantment of a certain level to this item, in an unsafe way.
      * Works when addEnchantment doesn't.
      *

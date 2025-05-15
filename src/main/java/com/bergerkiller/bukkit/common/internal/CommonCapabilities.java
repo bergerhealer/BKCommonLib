@@ -303,6 +303,11 @@ public class CommonCapabilities {
     public static final boolean HAS_SIGN_OPEN_EVENT = HAS_SIGN_OPEN_EVENT_PAPER || CommonBootstrap.evaluateMCVersion(">=", "1.20.2");
 
     /**
+     * Since Minecraft 1.20.5 (Bukkit) has a setEnchantmentGlintOverride function for items
+     */
+    public static final boolean HAS_ITEMSTACK_GLINT_OVERRIDE = CommonBootstrap.evaluateMCVersion(">=", "1.20.5");
+
+    /**
      * Since Minecraft 1.21.2 item stacks can have an item_model data component set for them, to
      * customize what model is shown for them.
      */

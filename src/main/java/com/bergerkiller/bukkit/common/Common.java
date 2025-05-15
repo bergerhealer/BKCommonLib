@@ -70,7 +70,8 @@ public class Common {
             "Common:NBT:ChatTextSerialization",
             "Module:RegionFlagTracker",
             "Common:CommonItemStack:ItemModel",
-            "Common:CommonItemStack:MimicAsType"
+            "Common:CommonItemStack:MimicAsType",
+            "Common:CommonItemStack:AddGlint"
     ).collect(Collectors.toSet());
 
     /**
