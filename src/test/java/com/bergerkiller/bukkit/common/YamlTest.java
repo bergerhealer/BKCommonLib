@@ -18,6 +18,7 @@ import com.bergerkiller.bukkit.common.config.yaml.YamlListNode;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionDefault;
@@ -34,6 +35,42 @@ import com.bergerkiller.bukkit.common.io.AsyncTextWriter;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 
 public class YamlTest {
+
+    @Test
+    public void testPaperNBTCustomNamePlain() {
+        String yamlInputString = "" +
+                "key:\n" +
+                "  ==: org.bukkit.inventory.ItemStack\n" +
+                "  DataVersion: 4325\n" +
+                "  id: minecraft:diamond_sword\n" +
+                "  count: 1\n" +
+                "  components:\n" +
+                "    minecraft:custom_name: '\"My Custom Name\"'\n" +
+                "  schema_version: 1";
+
+        YamlNode root = new YamlNode();
+        root.loadFromString(yamlInputString);
+        CommonItemStack item = CommonItemStack.of(root.get("key", ItemStack.class));
+        assertEquals("My Custom Name", item.getCustomNameMessage());
+    }
+
+    @Test
+    public void testPaperNBTCustomNameFormatted() {
+        String yamlInputString = "" +
+                "key:\n" +
+                "  ==: org.bukkit.inventory.ItemStack\n" +
+                "  DataVersion: 4325\n" +
+                "  id: minecraft:diamond_sword\n" +
+                "  count: 1\n" +
+                "  components:\n" +
+                "    minecraft:custom_name: '{bold:0b,color:\"red\",italic:0b,obfuscated:0b,strikethrough:0b,text:\"My Custom Name\",underlined:0b}'\n" +
+                "  schema_version: 1";
+
+        YamlNode root = new YamlNode();
+        root.loadFromString(yamlInputString);
+        CommonItemStack item = CommonItemStack.of(root.get("key", ItemStack.class));
+        assertEquals(ChatColor.RED + "My Custom Name", item.getCustomNameMessage());
+    }
 
     @Test
     public void testPaperNBTItemModel() {

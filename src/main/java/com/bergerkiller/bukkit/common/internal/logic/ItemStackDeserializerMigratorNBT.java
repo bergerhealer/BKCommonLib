@@ -5,9 +5,14 @@ import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
 import org.bukkit.Color;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -105,11 +110,13 @@ public class ItemStackDeserializerMigratorNBT extends ItemStackDeserializerMigra
      */
     public static class NBTToBukkit implements Function<Map<String, Object>, Map<String, Object>> {
         private final ItemStackDeserializerIdToMaterialMapper idMapper;
+        private final NBTChatComponentsToJson chatComponentsToJson;
         private final Map<String, ComponentMapper> componentMappers = new HashMap<>();
 
         public NBTToBukkit() {
             this.idMapper = new ItemStackDeserializerIdToMaterialMapper();
             this.idMapper.loadMappings();
+            this.chatComponentsToJson = new NBTChatComponentsToJson();
             this.componentMappers.put("minecraft:custom_model_data", (result, nbtData) -> {
                 Map<String, Object> cmd = new LinkedHashMap<>();
                 cmd.put("==", "CustomModelData");
@@ -139,6 +146,11 @@ public class ItemStackDeserializerMigratorNBT extends ItemStackDeserializerMigra
             this.componentMappers.put("minecraft:item_model", (result, nbtData) -> {
                 if (nbtData instanceof String) {
                     prepareMetadata(result).put("item-model", nbtData);
+                }
+            });
+            this.componentMappers.put("minecraft:custom_name", (result, nbtData) -> {
+                if (nbtData != null) {
+                    prepareMetadata(result).put("display-name", chatComponentsToJson.toJson(nbtData));
                 }
             });
         }
@@ -216,6 +228,33 @@ public class ItemStackDeserializerMigratorNBT extends ItemStackDeserializerMigra
         @FunctionalInterface
         private interface ComponentMapper {
             void apply(Map<String, Object> result, Object nbtData);
+        }
+    }
+
+    /**
+     * Attempts to convert a ChatComponent encoded as an NBT document (but as java Map/List/etc.), into
+     * a GSON String as used on older versions of Minecraft. If the String is invalid, it'll turn
+     * into a plaintext representation when deserializing later. No errors are generally thrown even
+     * if the format is garbage.
+     */
+    private static class NBTChatComponentsToJson {
+        private final Gson gson;
+
+        public NBTChatComponentsToJson() {
+            GsonBuilder builder = new GsonBuilder();
+            builder.registerTypeAdapter(Byte.class, (JsonSerializer<Byte>) (src, type, jsonSerializationContext)
+                    -> new JsonPrimitive(src != 0));
+            this.gson = builder.create();
+        }
+
+        public String toJson(Object nbtData) {
+            // A plaintext String must be encoded as a full valid json blob instead
+            // For this, we got to add some garbage
+            if (nbtData instanceof String) {
+                nbtData = Collections.singletonMap("text", nbtData);
+            }
+
+            return gson.toJson(nbtData);
         }
     }
 }
