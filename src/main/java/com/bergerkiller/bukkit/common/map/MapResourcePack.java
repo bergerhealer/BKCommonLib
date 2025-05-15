@@ -405,7 +405,8 @@ public class MapResourcePack {
      * {@link ItemModel.MinecraftModel#NOT_SET}. This can be checked using
      * {@link ItemModel#hasValidModels()}, which will return false in that case.
      *
-     * @param itemName Name of the item, e.g. "golden_pickaxe"
+     * @param itemName Name of the item, e.g. "golden_pickaxe". Is allowed to
+     *                 contain namespaces.
      * @return the item model configuration
      */
     public ItemModel getItemModelConfig(String itemName) {

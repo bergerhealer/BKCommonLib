@@ -227,6 +227,18 @@ public class ModelInfoLookup {
     }
 
     public static String lookupItem(CommonItemStack itemStack) {
+        // Check for an item-model data component override
+        {
+            MinecraftKeyHandle itemModel = itemStack.getItemModel();
+            if (itemModel != null) {
+                if (itemModel.getNamespace().equals("minecraft")) {
+                    return itemModel.getName();
+                } else {
+                    return itemModel.toString();
+                }
+            }
+        }
+
         List<ModelNameEntry> entries = byMaterial.get(itemStack.getType());
         if (entries.size() > 1) {
             // Got to match it to the item
