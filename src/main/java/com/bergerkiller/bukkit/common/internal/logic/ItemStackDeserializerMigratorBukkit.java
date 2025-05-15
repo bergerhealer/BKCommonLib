@@ -32,7 +32,6 @@ import org.bukkit.inventory.meta.ItemMeta;
  * and double -> integer conversion, to add support for deserialization from JSON.
  */
 public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMigrator implements Function<Map<String, Object>, ItemStack> {
-    private static final Material FALLBACK_MATERIAL = MaterialUtil.getFirst("OAK_WOOD", "LEGACY_WOOD");
     private final ItemMetaDeserializer metaDeserializer = new ItemMetaDeserializer();
 
     ItemStackDeserializerMigratorBukkit() {
@@ -326,9 +325,8 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
                 }
             }
 
-            // Type doesn't exist on this version of Minecraft. As work-around, return
-            // a generic wood block
-            return new ItemStack(FALLBACK_MATERIAL);
+            // Type doesn't exist on this version of Minecraft. Return null (empty item)
+            return null;
         } catch (RuntimeException ex) {
             logFailDeserialize(args);
             throw ex;
