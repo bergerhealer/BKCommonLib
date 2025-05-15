@@ -154,8 +154,6 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
                 Object rawSpawnCluster = mobs.get(n);
                 EntityType entityType = entityTypeFunc.apply(rawSpawnCluster).entityType;
 
-                System.out.println("Handle " + world.getName() + " " + blockposition + " " + entityType);
-
                 if (eventFactory.handleCreaturePreSpawn(world, pos.getX(), pos.getY(), pos.getZ(), entityType,
                         CreatureSpawnEvent.SpawnReason.NATURAL))
                 {
