@@ -36,6 +36,30 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
 public class YamlTest {
 
     @Test
+    public void testPaperNBTItemModel() {
+        if (!CommonBootstrap.evaluateMCVersion(">=", "1.21.2")) {
+            return;
+        }
+
+        String yamlInputString = "" +
+                "key:\n" +
+                "  ==: org.bukkit.inventory.ItemStack\n" +
+                "  DataVersion: 4325\n" +
+                "  id: minecraft:iron_nugget\n" +
+                "  count: 2\n" +
+                "  components:\n" +
+                "    minecraft:item_model: '\"traincarts:maxi/coaster_cart_green\"'\n" +
+                "  schema_version: 1";
+
+        YamlNode root = new YamlNode();
+        root.loadFromString(yamlInputString);
+        CommonItemStack item = CommonItemStack.of(root.get("key", ItemStack.class));
+        assertEquals(MaterialUtil.getMaterial("IRON_NUGGET"), item.getType());
+        assertEquals(2, item.getAmount());
+        assertEquals("traincarts:maxi/coaster_cart_green", item.getItemModel().toString());
+    }
+
+    @Test
     public void testPaperNBTItemStackCustomModelDataComplex() {
         if (!CommonBootstrap.evaluateMCVersion(">=", "1.21.4")) {
             return;

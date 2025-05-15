@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
@@ -14,6 +15,13 @@ import java.util.function.Function;
  */
 public class ItemStackDeserializer implements Function<Map<String, Object>, ItemStack> {
     public static final ItemStackDeserializer INSTANCE = new ItemStackDeserializer();
+
+    /**
+     * Whether to enable parsing NBT into ItemStacks on Spigot server. If false, it
+     * will convert it to Bukkit's format and parse that instead. This can be set to
+     * false and all yaml tests can then be run to verify to-bukkit migration works.
+     */
+    private static final boolean ALLOW_PARSE_NBT_ON_SPIGOT = true;
 
     private final ItemStackDeserializerMigratorBukkit bukkitMigrator = new ItemStackDeserializerMigratorBukkit();
     private final ItemStackDeserializerMigratorNBT nbtMigrator = new ItemStackDeserializerMigratorNBT();
@@ -34,7 +42,8 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
 
     private ItemStackDeserializer() {
         // Only parse NBT on 1.21.5 and later
-        this.canParseNBT = nbtMigrator.getCurrentDataVersion() >= 4325;
+        this.canParseNBT = nbtMigrator.getCurrentDataVersion() >= 4325 &&
+                (ALLOW_PARSE_NBT_ON_SPIGOT || CommonBootstrap.isPaperServer());
     }
 
     /**

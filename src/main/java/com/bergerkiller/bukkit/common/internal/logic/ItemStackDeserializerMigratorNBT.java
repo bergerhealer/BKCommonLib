@@ -136,6 +136,11 @@ public class ItemStackDeserializerMigratorNBT extends ItemStackDeserializerMigra
                     prepareMetadata(result).put("Damage", ((Number) nbtData).intValue());
                 }
             });
+            this.componentMappers.put("minecraft:item_model", (result, nbtData) -> {
+                if (nbtData instanceof String) {
+                    prepareMetadata(result).put("item-model", nbtData);
+                }
+            });
         }
 
         @Override
