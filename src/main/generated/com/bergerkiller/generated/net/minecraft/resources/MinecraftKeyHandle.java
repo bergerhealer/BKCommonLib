@@ -58,10 +58,10 @@ public abstract class MinecraftKeyHandle extends Template.Handle {
     public static MinecraftKeyHandle createNew(String namespace, String name) {
         return T.createNew2.invoke(namespace, name);
     }
+    @Template.Readonly
     public abstract String getNamespace();
-    public abstract void setNamespace(String value);
+    @Template.Readonly
     public abstract String getName();
-    public abstract void setName(String value);
     /**
      * Stores class members for <b>net.minecraft.resources.MinecraftKey</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -70,7 +70,9 @@ public abstract class MinecraftKeyHandle extends Template.Handle {
         @Template.Optional
         public final Template.Constructor<Object> constr_code_parts = new Template.Constructor<Object>();
 
+        @Template.Readonly
         public final Template.Field<String> namespace = new Template.Field<String>();
+        @Template.Readonly
         public final Template.Field<String> name = new Template.Field<String>();
 
         public final Template.StaticMethod.Converted<MinecraftKeyHandle> createNew = new Template.StaticMethod.Converted<MinecraftKeyHandle>();

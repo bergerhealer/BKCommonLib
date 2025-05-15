@@ -10,14 +10,14 @@ import com.bergerkiller.generated.net.minecraft.core.RegistryMaterialsHandle;
 
 class MinecraftKey {
 #if version >= 1.17
-    protected final String namespace;
-    protected final String name:path;
+    protected final readonly String namespace;
+    protected final readonly String name:path;
 #elseif version >= 1.14.4
-    protected final String namespace;
-    protected final String name:key;
+    protected final readonly String namespace;
+    protected final readonly String name:key;
 #else
-    protected final String namespace:a;
-    protected final String name:b;
+    protected final readonly String namespace:a;
+    protected final readonly String name:b;
 #endif
 
     // Used in generated code. Does not exist on 1.13 and later.
