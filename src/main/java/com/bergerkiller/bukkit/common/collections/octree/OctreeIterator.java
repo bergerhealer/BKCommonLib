@@ -8,19 +8,20 @@ import java.util.NoSuchElementException;
  * Includes facility to extend it and add node cluster filtering.
  */
 public class OctreeIterator<T> implements Iterator<T> {
+    private static final int COORD_NOT_DIRTY = -1;
+
     protected final Octree<T> tree;
     protected final int[] index;
-    private boolean coord_dirty;
     private int x;
     private int y;
     private int z;
+    private int coordDirtyDepth = 32;
     private int depth;
     private IteratorState state;
     private int skipIntersectionBelowDepth;
 
     public OctreeIterator(Octree<T> tree) {
         this.tree = tree;
-        this.coord_dirty = true;
         this.index = new int[33];
         this.reset();
     }
@@ -33,6 +34,7 @@ public class OctreeIterator<T> implements Iterator<T> {
         this.index[this.depth] = 0;
         this.skipIntersectionBelowDepth = -1;
         this.state = IteratorState.INITIAL;
+        this.coordDirtyDepth = 32;
     }
 
     /**
@@ -52,8 +54,8 @@ public class OctreeIterator<T> implements Iterator<T> {
      * @return X-coordinate
      */
     public int getX() {
-        if (this.coord_dirty) {
-            this.genCoord();
+        if (this.coordDirtyDepth != COORD_NOT_DIRTY) {
+            this.syncCoord();
         }
         return this.x;
     }
@@ -64,8 +66,8 @@ public class OctreeIterator<T> implements Iterator<T> {
      * @return Y-coordinate
      */
     public int getY() {
-        if (this.coord_dirty) {
-            this.genCoord();
+        if (this.coordDirtyDepth != COORD_NOT_DIRTY) {
+            this.syncCoord();
         }
         return this.y;
     }
@@ -76,8 +78,8 @@ public class OctreeIterator<T> implements Iterator<T> {
      * @return Z-coordinate
      */
     public int getZ() {
-        if (this.coord_dirty) {
-            this.genCoord();
+        if (this.coordDirtyDepth != COORD_NOT_DIRTY) {
+            this.syncCoord();
         }
         return this.z;
     }
@@ -233,7 +235,7 @@ public class OctreeIterator<T> implements Iterator<T> {
 
                         this.index[31] = node_index;
                         this.index[32] = parent;
-                        this.coord_dirty = true;
+                        this.coordDirtyDepth = 32;
 
                         Intersection intersection = this.intersect();
                         if (intersection == Intersection.PARTIAL) {
@@ -273,7 +275,10 @@ public class OctreeIterator<T> implements Iterator<T> {
      * @param parent node from which to start looking
      */
     private void findFirstValueSkipIntersection(int parent) {
-        this.coord_dirty = true;
+        if (this.depth > this.coordDirtyDepth) {
+            this.coordDirtyDepth = this.depth;
+        }
+
         while (this.depth > 0) {
             int node_index = this.tree.table[parent];
             this.index[this.depth] = parent | (node_index & 0x7);
@@ -308,14 +313,17 @@ public class OctreeIterator<T> implements Iterator<T> {
                 // Store this node and the changed parent in the index
                 this.index[this.depth+1] = parent;
                 this.index[this.depth] = node_index;
-                this.coord_dirty = true;
+
+                // X/Y/Z needs to be refreshed at this point
+                if ((this.depth + 1) > this.coordDirtyDepth) {
+                    this.coordDirtyDepth = this.depth + 1;
+                }
 
                 Intersection intersection = this.intersect();
                 if (intersection == Intersection.PARTIAL) {
                     if (this.depth == 0) {
                         // End node reached, this should technically not happen as it is
                         // inside the final value node at this point. But we shall allow it...
-                        this.coord_dirty = true;
                         return;
                     } else {
                         // Continue looping with the new node as a parent
@@ -363,6 +371,9 @@ public class OctreeIterator<T> implements Iterator<T> {
             int node_index;
             while (true) {
                 if ((++parent & 0x7) != 0 && (node_index = this.tree.table[parent]) != 0) {
+                    if (this.depth > this.coordDirtyDepth) {
+                        this.coordDirtyDepth = this.depth;
+                    }
                     this.index[this.depth--] = (parent & ~0x7) | (node_index & 0x7);
                     this.findFirstValueSkipIntersection(node_index & ~0x7);
                     return false;
@@ -388,9 +399,11 @@ public class OctreeIterator<T> implements Iterator<T> {
                 node_index &= ~0x7;
 
                 // Store this node and the changed parent in the index
+                if (this.depth > this.coordDirtyDepth) {
+                    this.coordDirtyDepth = this.depth;
+                }
                 this.index[this.depth] = parent;
                 this.index[--this.depth] = node_index;
-                this.coord_dirty = true;
 
                 Intersection intersection = this.intersect();
                 if (intersection == Intersection.INSIDE) {
@@ -420,37 +433,28 @@ public class OctreeIterator<T> implements Iterator<T> {
         this.index[0] = 0;
     }
 
-    private void genCoord() {
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
-        int node;
-        for (int n = 32; n >= 3; n--) {
-            node = this.index[n];
-            this.x |= (node & 0x1);
-            this.x <<= 1;
-            this.y |= (node & 0x2);
-            this.y <<= 1;
-            this.z <<= 1;
-            this.z |= (node & 0x4);
+    private void syncCoord() {
+        int depth = this.depth;
+
+        // Collect the x/y/z bits of the depth that has changed since last time
+        int x_updated = 0, y_updated = 0, z_updated = 0;
+        for (int n = coordDirtyDepth; n >= depth + 1; n--) {
+            int node = this.index[n];
+            x_updated <<= 1;
+            y_updated <<= 1;
+            z_updated <<= 1;
+            x_updated |= (node & 0x1);
+            y_updated |= ((node & 0x2) >>> 1);
+            z_updated |= ((node & 0x4) >>> 2);
         }
 
-        node = this.index[2];
-        this.z |= (node & 0x4) >> 1;
-        this.y |= (node & 0x2);
-        this.x |= (node & 0x1);
-        this.x <<= 1;
+        // Drop bits beyond depth/updated and set the updated bits
+        int keepMask = (coordDirtyDepth == 32) ? 0 : -(1 << coordDirtyDepth);
+        this.x = (this.x & keepMask) | (x_updated << depth);
+        this.y = (this.y & keepMask) | (y_updated << depth);
+        this.z = (this.z & keepMask) | (z_updated << depth);
 
-        node = this.index[1];
-        this.z |= (node & 0x4) >> 2;
-        this.y |= (node & 0x2) >> 1;
-        this.x |= (node & 0x1);
-
-        int mask = ~((1<<this.depth)-1);
-        this.x &= mask;
-        this.y &= mask;
-        this.z &= mask;
-        this.coord_dirty = false;
+        this.coordDirtyDepth = COORD_NOT_DIRTY;
     }
 
     private static enum IteratorState {

@@ -18,6 +18,52 @@ import com.bergerkiller.bukkit.common.collections.octree.Octree;
 
 public class OctreeTest {
 
+    @Ignore
+    @Test
+    public void benchmarkCuboid() {
+        // 0.117
+        Octree<String> tree = new Octree<>();
+
+        // Fill octree with a bunch of garbage to query
+        Random r = new Random(1000000L);
+        for (int n = 0; n < 10000; n++) {
+            int x = r.nextInt(4000) - 2000;
+            int y = r.nextInt(4000) - 2000;
+            int z = r.nextInt(4000) - 2000;
+            tree.put(x, y, z, "[" + x + " " + y + " " + z + "]");
+        }
+
+        System.out.println("Benchmarking...");
+
+        long total = 0;
+        int loops = 0;
+        int n = 0;
+        while (true) {
+            long a = System.nanoTime();
+
+            OctreeIterator<String> iter = tree.cuboid(IntVector3.of(-1000, -1000, -1000), IntVector3.of(1000, 1000, 1000)).iterator();
+            long l = 0;
+            int cnt = 0;
+            while (iter.hasNext()) {
+                iter.next();
+
+                l += iter.getX();
+                l += iter.getY();
+                l += iter.getZ();
+                cnt++;
+            }
+
+            long b = System.nanoTime();
+            total += b - a;
+            loops++;
+
+            if (++n > 5000) {
+                n = 0;
+                System.out.println("Perf: " + (0.000001 * (double) total / loops) + "ms/iteration");
+            }
+        }
+    }
+
     /**
      * Forces a huge amount of random values with a random cuboid search over it,
      * lots of times.
