@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+import com.bergerkiller.bukkit.common.bases.IntCuboid;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.collections.IndexedCollection;
 
@@ -191,6 +192,19 @@ public class Octree<T> implements OctreeIterable<T> {
      */
     public OctreeIterable<T> cuboid(final IntVector3 min, final IntVector3 max) {
         return () -> new OctreeCuboidIterator<T>(Octree.this, min, max);
+    }
+
+    /**
+     * Gets a view of the contents of this tree that lay inside a cuboid area.<br>
+     * <br>
+     * <b>Note:</b> the cuboid {@link IntCuboid#max} is exclusive, not inclusive like
+     * the other cuboid method of this class is.
+     *
+     * @param cuboid IntCuboid with the min/max coordinate
+     * @return iterable
+     */
+    public OctreeIterable<T> cuboid(final IntCuboid cuboid) {
+        return cuboid(cuboid.min, cuboid.max.subtract(1, 1, 1));
     }
 
     protected boolean clean(int parent) {

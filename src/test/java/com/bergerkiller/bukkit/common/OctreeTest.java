@@ -3,8 +3,13 @@ package com.bergerkiller.bukkit.common;
 import static org.junit.Assert.*;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Random;
+import java.util.Set;
 
+import com.bergerkiller.bukkit.common.bases.IntCuboid;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.collections.octree.OctreeIterator;
@@ -12,6 +17,51 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.collections.octree.Octree;
 
 public class OctreeTest {
+
+    /**
+     * Forces a huge amount of random values with a random cuboid search over it,
+     * lots of times.
+     */
+    @Ignore
+    @Test
+    public void fuzzTest() {
+        for (int i = 0; i < 1000; i++) {
+            Octree<String> tree = new Octree<>();
+
+            Random r = new Random();
+            Set<IntVector3> expectedCoords = new HashSet<>();
+
+            IntCuboid cuboid = IntCuboid.create(
+                    IntVector3.of(
+                            -2000 + r.nextInt(1500),
+                            -2000 + r.nextInt(1500),
+                            -2000 + r.nextInt(1500)),
+                    IntVector3.of(
+                            2000 + r.nextInt(1500),
+                            2000 + r.nextInt(1500),
+                            2000 + r.nextInt(1500)));
+
+            for (int n = 0; n < 10000; n++) {
+                int x = r.nextInt(4000) - 2000;
+                int y = r.nextInt(4000) - 2000;
+                int z = r.nextInt(4000) - 2000;
+                if (cuboid.contains(x, y, z)) {
+                    expectedCoords.add(IntVector3.of(x, y, z));
+                }
+                tree.put(x, y, z, "[" + x + " " + y + " " + z + "]");
+            }
+
+            Set<IntVector3> containedInZone = new HashSet<>(expectedCoords.size());
+
+            OctreeIterator<String> iter = tree.cuboid(cuboid).iterator();
+            while (iter.hasNext()) {
+                iter.next();
+                containedInZone.add(IntVector3.of(iter.getX(), iter.getY(), iter.getZ()));
+            }
+
+            assertEquals(expectedCoords, containedInZone);
+        }
+    }
 
     private void putDemoValues(Octree<String> tree) {
         tree.put(0, 0, 0, "A");
@@ -141,6 +191,18 @@ public class OctreeTest {
         assertEquals(10, iter.getX());
         assertEquals(100, iter.getY());
         assertEquals(1000, iter.getZ());
+        assertFalse(iter.hasNext());
+    }
+
+    @Test
+    public void testInvalidCuboid() {
+        // Tests an invalid cuboid (max is less than min) to simulate an 'empty' cuboid search
+        // Should return no values and exit sanely
+        Octree<String> tree = new Octree<String>();
+        putDemoValues(tree);
+
+        IntVector3 block = new IntVector3(10, 100, 1000);
+        OctreeIterator<String> iter = tree.cuboid(block, block.subtract(1, 1, 1)).iterator();
         assertFalse(iter.hasNext());
     }
 

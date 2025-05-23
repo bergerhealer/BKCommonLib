@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import com.bergerkiller.bukkit.common.bases.IntCuboid;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -114,6 +115,21 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
      */
     public DoubleOctreeIterable<T> cuboid(final IntVector3 min, final IntVector3 max) {
         return () -> new DoubleOctreeIterator<T>(new OctreeCuboidIterator<Entry<T>>(DoubleOctree.this.tree, min, max));
+    }
+
+    /**
+     * Gets a view of the contents of this tree that lay inside a cuboid area.
+     * The maximum coordinate includes all values inside that block of values.
+     * If this is {1,2,3} then this will includes coordinates such as {1.2, 2.99, 3.0}.<br>
+     * <br>
+     * <b>Note:</b> the cuboid {@link IntCuboid#max} is exclusive, not inclusive like
+     * the other cuboid method of this class is.
+     *
+     * @param cuboid IntCuboid with the min/max coordinate
+     * @return iterable
+     */
+    public DoubleOctreeIterable<T> cuboid(final IntCuboid cuboid) {
+        return cuboid(cuboid.min, cuboid.max.subtract(1, 1, 1));
     }
 
     /**
