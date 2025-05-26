@@ -647,9 +647,20 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
                     // This is because lists don't have a clear header
                     this.yaml.setValue("");
                 } else {
+                    // If parent is a node that is part of a node-list, make sure to include an extra - in the key
+                    // if this is the first element of that node list.
+                    //
+                    // This is normally already handled in the value logic down below, where it makes use of
+                    // Collections.singletonList to force an extra -.
+                    // This branch of the code must also handle that.
+                    boolean isFirstNodeListElement = this.parent instanceof YamlNode
+                            && this.parent.getParent() instanceof YamlListNode &&
+                            this == this.parent._children.get(0);
+
                     // # Header line
                     // key:\n
-                    this.yaml.setValue(YamlSerializer.INSTANCE.serializeKey(this.path.name(), header, this.path.depth()));
+                    this.yaml.setValue(YamlSerializer.INSTANCE.serializeKey(this.path.name(), header,
+                            this.path.depth(), isFirstNodeListElement));
                 }
             } else {
                 Object value = this.value;

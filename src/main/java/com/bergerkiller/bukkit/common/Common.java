@@ -72,7 +72,8 @@ public class Common {
             "Common:CommonItemStack:ItemModel",
             "Common:CommonItemStack:MimicAsType",
             "Common:CommonItemStack:AddGlint",
-            "Common:JSONSerializer:NullItemStack"
+            "Common:JSONSerializer:NullItemStack",
+            "Common:Yaml:ListOfListFix"
     ).collect(Collectors.toSet());
 
     /**

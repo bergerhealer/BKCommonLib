@@ -37,6 +37,90 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
 public class YamlTest {
 
     @Test
+    public void testArrayInNodeList() {
+        YamlNode root = new YamlNode();
+        List<YamlNode> nodes = root.getNodeList("nodes", false);
+        {
+            YamlNode arrayOne = new YamlNode();
+            arrayOne.set("array", Arrays.asList(1, 2, 3));
+            nodes.add(arrayOne);
+        }
+        {
+            YamlNode arrayTwo = new YamlNode();
+            List<YamlNode> arrayTwoNodes = arrayTwo.getNodeList("nodes", false);
+            {
+                YamlNode deepNode = new YamlNode();
+                deepNode.set("key", "value1");
+                deepNode.set("other", 12);
+                arrayTwoNodes.add(deepNode);
+            }
+            {
+                YamlNode deepNode = new YamlNode();
+                deepNode.set("key", "value2");
+                deepNode.set("other", 21);
+                arrayTwoNodes.add(deepNode);
+            }
+            nodes.add(arrayTwo);
+        }
+        {
+            // Array in array in array in array...
+            YamlNode arrayThree = new YamlNode();
+            arrayThree.set("deepArray", Arrays.asList(
+                    Arrays.asList(
+                            Arrays.asList(1, 2, 3),
+                            Arrays.asList(4, 5, 6),
+                            Arrays.asList(7, 8, 9)
+                    ),
+                    Arrays.asList(
+                            Arrays.asList("a", "b"),
+                            Arrays.asList("c", "d")
+                    )
+            ));
+            nodes.add(arrayThree);
+        }
+
+        String serialized = root.toString();
+
+        assertEquals("" +
+                "nodes:\n" +
+                "  - array:\n" +
+                "      - 1\n" +
+                "      - 2\n" +
+                "      - 3\n" +
+                "  - nodes:\n" +
+                "      - key: value1\n" +
+                "        other: 12\n" +
+                "      - key: value2\n" +
+                "        other: 21\n" +
+                "  - deepArray:\n" +
+                "      - - - 1\n" +
+                "          - 2\n" +
+                "          - 3\n" +
+                "        - - 4\n" +
+                "          - 5\n" +
+                "          - 6\n" +
+                "        - - 7\n" +
+                "          - 8\n" +
+                "          - 9\n" +
+                "      - - - a\n" +
+                "          - b\n" +
+                "        - - c\n" +
+                "          - d\n",
+                serialized);
+
+        // Because this YAML is so horrendous also verify it can be parsed again the same way,
+        // and that the output is equal to what we put in before
+        {
+            YamlNode parsedRoot = new YamlNode();
+            parsedRoot.loadFromString(serialized);
+            assertEquals(root, parsedRoot);
+
+            // Just an extra check, in case equals() is bugging out...
+            assertEquals("b", parsedRoot.get("nodes[2].deepArray[1][0][1]"));
+        }
+    }
+
+    @Test
     public void testPaperNBTCustomNamePlain() {
         String yamlInputString = "" +
                 "key:\n" +

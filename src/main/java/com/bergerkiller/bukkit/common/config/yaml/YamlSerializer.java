@@ -323,19 +323,27 @@ public class YamlSerializer {
      * @param key     The key to write
      * @param header  The text to put in front prefixed with #-characters, empty String or null for no header
      * @param indent  The number of indentation levels to add
+     * @param isListElement Whether this is a list element, and some of the space is replaced with a - list char
      * @return YAML-encoded String
      */
-    public synchronized String serializeKey(String key, String header, int indent) {
+    public synchronized String serializeKey(String key, String header, int indent, boolean isListElement) {
         // Append the header, if one exists
         appendHeader(header, indent);
 
+        // Do indent first
+        appendIndent(indent);
+
+        // If list element, replace part of the indent spacing with -
+        if (isListElement && indent > 0) {
+            builder.setCharAt(builder.length() - 2, '-');
+        }
+
         if (key.length() == 1 && key.charAt(0) == '*') {
             // If key is '*' write without quotes around it
-            appendIndent(indent);
             builder.append("*:\n");
         } else {
             // Append the key: by writing key: 0
-            appendKeyValue(key, 0, indent, true);
+            appendKeyValue(key, 0, 0, true);
 
             // Replace the ' 0\n' portion with a newline
             builder.setLength(builder.length() - 3);
