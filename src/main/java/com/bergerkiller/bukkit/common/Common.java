@@ -71,7 +71,8 @@ public class Common {
             "Module:RegionFlagTracker",
             "Common:CommonItemStack:ItemModel",
             "Common:CommonItemStack:MimicAsType",
-            "Common:CommonItemStack:AddGlint"
+            "Common:CommonItemStack:AddGlint",
+            "Common:JSONSerializer:NullItemStack"
     ).collect(Collectors.toSet());
 
     /**

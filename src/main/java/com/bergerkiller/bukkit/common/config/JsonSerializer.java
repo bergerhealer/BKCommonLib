@@ -21,6 +21,10 @@ public class JsonSerializer {
             .create();
 
     public ItemStack fromJsonToItemStack(String json) throws JsonSyntaxException {
+        if ("null".equals(json)) {
+            return null;
+        }
+
         Map<String, Object> mapping = jsonToMap(json);
         Object result = YamlDeserializer.INSTANCE.deserializeMapping(mapping);
         if (result instanceof Map) {
@@ -46,6 +50,10 @@ public class JsonSerializer {
     }
 
     public String itemStackToJson(ItemStack item) {
+        if (item == null) {
+            return "null";
+        }
+
         Map<String, Object> map = LogicUtil.serializeDeep(item);
         map.remove("==");
         return mapToJson(map);
