@@ -653,8 +653,7 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
                     // This is normally already handled in the value logic down below, where it makes use of
                     // Collections.singletonList to force an extra -.
                     // This branch of the code must also handle that.
-                    boolean isFirstNodeListElement = this.parent instanceof YamlNode
-                            && this.parent.getParent() instanceof YamlListNode &&
+                    boolean isFirstNodeListElement = this.parent.getYamlParent() instanceof YamlListNode &&
                             this == this.parent._children.get(0);
 
                     // # Header line

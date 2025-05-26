@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.bergerkiller.bukkit.common.inventory.CommonItemMaterials;
@@ -22,6 +23,94 @@ import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 public class ConfigTest {
     static {
         CommonBootstrap.initServer();
+    }
+
+    /**
+     * Same as the test for YamlNode but done again with ConfigurationNode because
+     * there is an instanceof hell. We really want to make sure it's working...
+     */
+    @Test
+    public void testArrayInNodeList() {
+        ConfigurationNode root = new ConfigurationNode();
+        List<ConfigurationNode> nodes = root.getNodeList("nodes", false);
+        {
+            ConfigurationNode arrayOne = new ConfigurationNode();
+            arrayOne.set("array", Arrays.asList(1, 2, 3));
+            nodes.add(arrayOne);
+        }
+        {
+            ConfigurationNode arrayTwo = new ConfigurationNode();
+            List<ConfigurationNode> arrayTwoNodes = arrayTwo.getNodeList("nodes", false);
+            {
+                ConfigurationNode deepNode = new ConfigurationNode();
+                deepNode.set("key", "value1");
+                deepNode.set("other", 12);
+                arrayTwoNodes.add(deepNode);
+            }
+            {
+                ConfigurationNode deepNode = new ConfigurationNode();
+                deepNode.set("key", "value2");
+                deepNode.set("other", 21);
+                arrayTwoNodes.add(deepNode);
+            }
+            nodes.add(arrayTwo);
+        }
+        {
+            // Array in array in array in array...
+            ConfigurationNode arrayThree = new ConfigurationNode();
+            arrayThree.set("deepArray", Arrays.asList(
+                    Arrays.asList(
+                            Arrays.asList(1, 2, 3),
+                            Arrays.asList(4, 5, 6),
+                            Arrays.asList(7, 8, 9)
+                    ),
+                    Arrays.asList(
+                            Arrays.asList("a", "b"),
+                            Arrays.asList("c", "d")
+                    )
+            ));
+            nodes.add(arrayThree);
+        }
+
+        String serialized = root.toString();
+
+        assertEquals("" +
+                        "nodes:\n" +
+                        "  - array:\n" +
+                        "      - 1\n" +
+                        "      - 2\n" +
+                        "      - 3\n" +
+                        "  - nodes:\n" +
+                        "      - key: value1\n" +
+                        "        other: 12\n" +
+                        "      - key: value2\n" +
+                        "        other: 21\n" +
+                        "  - deepArray:\n" +
+                        "      - - - 1\n" +
+                        "          - 2\n" +
+                        "          - 3\n" +
+                        "        - - 4\n" +
+                        "          - 5\n" +
+                        "          - 6\n" +
+                        "        - - 7\n" +
+                        "          - 8\n" +
+                        "          - 9\n" +
+                        "      - - - a\n" +
+                        "          - b\n" +
+                        "        - - c\n" +
+                        "          - d\n",
+                serialized);
+
+        // Because this YAML is so horrendous also verify it can be parsed again the same way,
+        // and that the output is equal to what we put in before
+        {
+            ConfigurationNode parsedRoot = new ConfigurationNode();
+            parsedRoot.loadFromString(serialized);
+            assertEquals(root, parsedRoot);
+
+            // Just an extra check, in case equals() is bugging out...
+            assertEquals("b", parsedRoot.get("nodes[2].deepArray[1][0][1]"));
+        }
     }
 
     @Test
