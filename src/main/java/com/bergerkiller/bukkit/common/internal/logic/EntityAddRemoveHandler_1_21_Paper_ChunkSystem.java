@@ -154,7 +154,9 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
         public void processEvents() {
             while (!pendingAddEvents.isEmpty()) {
                 PendingAddEvent pending = pendingAddEvents.poll();
-                CommonPlugin.getInstance().notifyAdded(pending.world ,pending.entity);
+                if (pending != null) { // Multithreaded ticking with Leaf server can cause this
+                    CommonPlugin.getInstance().notifyAdded(pending.world, pending.entity);
+                }
             }
         }
 
