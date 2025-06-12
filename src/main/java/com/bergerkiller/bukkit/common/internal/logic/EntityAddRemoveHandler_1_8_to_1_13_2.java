@@ -185,7 +185,12 @@ class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler {
     }
 
     @Override
-    public void processEvents() {
+    public void processEvents(World world) {
+        // Unused
+    }
+
+    @Override
+    public void processEventsForAllWorlds() {
         // Unused
     }
 

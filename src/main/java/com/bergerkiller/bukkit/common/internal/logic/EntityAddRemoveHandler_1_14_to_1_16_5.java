@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 import org.bukkit.Chunk;
@@ -52,7 +53,7 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
     private final FastField<?> entitiesByIdField = new FastField<Object>();
     private final FastField<Map<UUID, Object>> entitiesByUUIDField = new FastField<Map<UUID, Object>>();
     private final SafeField<Queue<Object>> entitiesToAddField;
-    private final List<EntitiesByUUIDMapHook> hooks = new ArrayList<EntitiesByUUIDMapHook>();
+    private final Map<World, EntitiesByUUIDMapHook> hooks = new ConcurrentHashMap<>();
     private final FastMethod<Object> tuinitySwapEntityInWorldEntityListMethod = new FastMethod<Object>();
     private final FastMethod<Object> tuinitySwapEntityInWorldEntityIterationSetMethod = new FastMethod<Object>();
     private final ChunkEntitySliceHandler chunkEntitySliceHandler;
@@ -174,7 +175,7 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
         if (!(base instanceof EntitiesByUUIDMapHook)) {
             EntitiesByUUIDMapHook hook = new EntitiesByUUIDMapHook(this, world, base);
             this.entitiesByUUIDField.set(nmsWorldHandle, hook);
-            hooks.add(hook);
+            hooks.put(world, hook);
         }
     }
 
@@ -184,13 +185,14 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
         Map<UUID, Object> value = this.entitiesByUUIDField.get(nmsWorldHandle);
         if (value instanceof EntitiesByUUIDMapHook) {
             this.entitiesByUUIDField.set(nmsWorldHandle, ((EntitiesByUUIDMapHook) value).getBase());
-            hooks.remove(value);
+            hooks.remove(world, value);
         }
     }
 
     @Override
-    public void processEvents() {
-        for (EntitiesByUUIDMapHook hook : hooks) {
+    public void processEvents(World world) {
+        EntitiesByUUIDMapHook hook = hooks.get(world);
+        if (hook != null) {
             hook.processEvents();
         }
     }

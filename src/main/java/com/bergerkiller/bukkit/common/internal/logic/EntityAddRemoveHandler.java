@@ -118,9 +118,24 @@ public abstract class EntityAddRemoveHandler implements LazyInitializedObject, L
     }
 
     /**
-     * Processes pending events at a time where this is safe to do
+     * Processes pending events at a time where this is safe to do.
+     * Called every tick for all loaded worlds of the server,
+     * or when significant things happen in a world like a chunk
+     * is loaded in.
+     *
+     * @param world World on which to process all events
      */
-    public abstract void processEvents();
+    public abstract void processEvents(World world);
+
+    /**
+     * Processes pending events at a time where this is safe to do.
+     * Called once every tick.
+     */
+    public void processEventsForAllWorlds() {
+        for (World world : Bukkit.getWorlds()) {
+            processEvents(world);
+        }
+    }
 
     /**
      * Gets whether the entities inside the given chunk have been loaded already.
@@ -194,12 +209,12 @@ public abstract class EntityAddRemoveHandler implements LazyInitializedObject, L
     }
 
     protected final void notifyChunkEntitiesLoaded(Chunk chunk) {
-        this.processEvents();
+        this.processEvents(chunk.getWorld());
         CommonUtil.callEvent(new ChunkLoadEntitiesEvent(chunk));
     }
 
     protected final void notifyChunkEntitiesUnloaded(Chunk chunk) {
-        this.processEvents();
+        this.processEvents(chunk.getWorld());
         CommonUtil.callEvent(new ChunkUnloadEntitiesEvent(chunk));
     }
 

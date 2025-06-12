@@ -1072,7 +1072,7 @@ public class CommonPlugin extends PluginBase {
         public void run() {
             // Make sure all entity add events have been notified
             // This runs every tick, which guarantees processEvents() is called at least once per tick
-            EntityAddRemoveHandler.INSTANCE.processEvents();
+            EntityAddRemoveHandler.INSTANCE.processEventsForAllWorlds();
 
             CommonPlugin plugin = getInstance();
             if (plugin.entitiesRemovedFromServer.isEmpty()) {

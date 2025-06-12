@@ -1,11 +1,12 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
@@ -55,7 +56,7 @@ class EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem extends EntityAddRemoveHan
     private final Class<?> levelCallbackType;
     private final FastMethod<Object> getEntityLookupMethod = new FastMethod<Object>();
     private final FastField<Object> callbacksField = new FastField<Object>();
-    private final List<LevelCallbackHandler> hooks = new ArrayList<LevelCallbackHandler>();
+    private final Map<World, LevelCallbackHandler> hooks = new ConcurrentHashMap<>();
     private final AddRemoveHandlerLogic removeHandler;
     private final ChunkEntitiesLoadedHandler chunkEntitiesLoadedHandler;
     private final Class<?> levelCallbackHookType;
@@ -116,8 +117,9 @@ class EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem extends EntityAddRemoveHan
     }
 
     @Override
-    public void processEvents() {
-        for (LevelCallbackHandler hook : hooks) {
+    public void processEvents(World world) {
+        LevelCallbackHandler hook = hooks.get(world);
+        if (hook != null) {
             hook.processEvents();
         }
     }
@@ -148,7 +150,7 @@ class EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem extends EntityAddRemoveHan
                 LevelCallbackHandler handler = new LevelCallbackHandler(this, world);
                 Object hook = this.levelCallbackHookType.getConstructors()[0].newInstance(callbacks, handler);
                 callbacksField.set(sectionManager, hook);
-                hooks.add(handler);
+                hooks.put(world, handler);
             } catch (Throwable t) {
                 Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to instantiate a level hook callback", t);
             }
@@ -165,7 +167,7 @@ class EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem extends EntityAddRemoveHan
             // De-register the handler
             LevelCallbackHandler handler = SafeField.get(callbacks, "callback", LevelCallbackHandler.class);
             if (handler != null) {
-                hooks.remove(handler);
+                hooks.remove(world, handler);
             }
 
             // Retrieve the value of the 'base' field and restore the field value to that

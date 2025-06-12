@@ -14,6 +14,7 @@ import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityHa
 import com.bergerkiller.generated.org.bukkit.inventory.PlayerInventoryHandle;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Hanging;
@@ -56,16 +57,17 @@ public class EntityUtil extends EntityPropertyUtil {
      * @param entity to add
      */
     public static void addEntity(org.bukkit.entity.Entity entity) {
+        World world = entity.getWorld();
         EntityHandle nmsentity = CommonNMS.getHandle(entity);
         WorldServerHandle nmsworld = nmsentity.getWorldServer();
-        entity.getWorld().getChunkAt(MathUtil.toChunk(nmsentity.getLocX()), MathUtil.toChunk(nmsentity.getLocZ()));
+        world.getChunkAt(MathUtil.toChunk(nmsentity.getLocX()), MathUtil.toChunk(nmsentity.getLocZ()));
         nmsentity.setDestroyed(false);
         // Remove an entity tracker for this entity if it was present
         nmsworld.getEntityTracker().stopTracking(entity);
         // Add the entity to the world
         nmsworld.addEntity(nmsentity);
         // Process add-related events right now
-        EntityAddRemoveHandler.INSTANCE.processEvents();
+        EntityAddRemoveHandler.INSTANCE.processEvents(world);
     }
 
     /**

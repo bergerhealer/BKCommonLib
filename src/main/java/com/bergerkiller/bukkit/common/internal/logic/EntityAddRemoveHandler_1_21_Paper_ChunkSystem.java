@@ -26,10 +26,13 @@ import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.event.world.ChunkEvent;
 import org.bukkit.plugin.EventExecutor;
 
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Since Minecraft 1.21 Paper migrated a lot of chunk system stuff to a new package.
@@ -61,8 +64,13 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
     }
 
     @Override
-    public void processEvents() {
-        addRemoveEventHandler.processEvents();
+    public void processEvents(World world) {
+        addRemoveEventHandler.processEvents(world);
+    }
+
+    @Override
+    public void processEventsForAllWorlds() {
+        addRemoveEventHandler.processEventsForAllWorlds();
     }
 
     @Override
@@ -99,7 +107,7 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
      */
     private static class EntityAddRemoveEventHandlerUsingPaperWorldEntityEvents implements LazyInitializedObject, Listener {
         private final EntityAddRemoveHandler_1_21_Paper_ChunkSystem handler;
-        private final Queue<PendingAddEvent> pendingAddEvents = new LinkedList<>();
+        private final Map<World, Queue<Entity>> pendingAddEvents = new HashMap<>();
         private final FastMethod<World> addToWorldGetWorldMethod = new FastMethod<>();
         private final FastMethod<World> removeFromWorldGetWorldMethod = new FastMethod<>();
 
@@ -135,11 +143,19 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
             }, plugin);
         }
 
+        private synchronized Queue<Entity> getPendingAddQueue(World world) {
+            return pendingAddEvents.computeIfAbsent(world, w -> new ConcurrentLinkedQueue<>());
+        }
+
+        private synchronized void removePendingIfNotInWorlds(List<World> loadedWorlds) {
+            pendingAddEvents.keySet().removeIf(world -> !loadedWorlds.contains(world));
+        }
+
         private void onEntityAddedToWorld(EntityEvent event) {
             Entity entity = event.getEntity();
             World world = addToWorldGetWorldMethod.invoke(event);
 
-            pendingAddEvents.add(new PendingAddEvent(world, entity));
+            getPendingAddQueue(world).add(entity);
             handler.notifyAddedEarly(world, entity);
         }
 
@@ -147,15 +163,28 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
             Entity entity = event.getEntity();
             World world = removeFromWorldGetWorldMethod.invoke(event);
 
-            pendingAddEvents.removeIf(e -> e.entity == entity);
+            getPendingAddQueue(world).remove(entity);
             handler.notifyRemoved(world, entity);
         }
 
-        public void processEvents() {
-            while (!pendingAddEvents.isEmpty()) {
-                PendingAddEvent pending = pendingAddEvents.poll();
-                if (pending != null) { // Multithreaded ticking with Leaf server can cause this
-                    CommonPlugin.getInstance().notifyAdded(pending.world, pending.entity);
+        public void processEventsForAllWorlds() {
+            // Purge entries in the mapping of worlds that are no longer loaded
+            List<World> loadedWorlds = Bukkit.getWorlds();
+            removePendingIfNotInWorlds(loadedWorlds);
+
+            // Process all entries in the mapping we still got
+            for (World world : loadedWorlds) {
+                processEvents(world);
+            }
+        }
+
+        public void processEvents(World world) {
+            // Initial get of the queue for this world
+            Queue<Entity> pendingInWorld = getPendingAddQueue(world);
+            while (!pendingInWorld.isEmpty()) {
+                Entity pendingEntity = pendingInWorld.poll();
+                if (pendingEntity != null) { // Multithreaded ticking with Leaf server can cause this
+                    CommonPlugin.getInstance().notifyAdded(world, pendingEntity);
                 }
             }
         }
@@ -164,16 +193,6 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
         public void forceInitialization() {
             addToWorldGetWorldMethod.forceInitialization();
             removeFromWorldGetWorldMethod.forceInitialization();
-        }
-
-        private static class PendingAddEvent {
-            public final World world;
-            public final Entity entity;
-
-            public PendingAddEvent(World world, Entity entity) {
-                this.world = world;
-                this.entity = entity;
-            }
         }
     }
 
