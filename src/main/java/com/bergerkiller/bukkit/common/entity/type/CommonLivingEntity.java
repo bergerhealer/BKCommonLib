@@ -151,7 +151,7 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      * @return Forward movement
      */
     public double getForwardMovement() {
-        return (double) EntityLivingHandle.T.forwardMovement.getFloat(this.handle.getRaw());
+        return EntityLivingHandle.T.getMoveIntent.invoke(getHandle()).getZ();
     }
 
     /**

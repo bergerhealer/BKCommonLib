@@ -21,7 +21,6 @@ public class NMSEntityLiving extends NMSEntity {
     public static final FieldAccessor<Boolean> updateEffects = EntityLivingHandle.T.updateEffects.toFieldAccessor();
 
     public static final FieldAccessor<Float> lastDamage = EntityLivingHandle.T.lastDamage.toFieldAccessor();
-    public static final FieldAccessor<Float> forwardMovement = EntityLivingHandle.T.forwardMovement.toFieldAccessor();
 
     public static final MethodAccessor<Void> resetAttributes = EntityLivingHandle.T.resetAttributes.toMethodAccessor();
     public static final MethodAccessor<Object> getAttributesMap = EntityLivingHandle.T.getAttributeMap.raw.toMethodAccessor();

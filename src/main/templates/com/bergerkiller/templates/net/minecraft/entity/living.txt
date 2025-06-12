@@ -14,6 +14,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeDefaults;
 import net.minecraft.world.entity.ai.attributes.AttributeMapBase;
 import net.minecraft.world.entity.ai.attributes.AttributeModifiable;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3D;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
@@ -296,75 +297,81 @@ class EntityLiving extends Entity {
     public float lastDamage;
 #endif
 
-#if version >= 1.17
-    protected unknown boolean jumping;
-    public float sideMovement:xxa;
-    public unknown float yya;
-    public float forwardMovement:zza;
-#elseif version >= 1.16.2
-    protected unknown boolean jumping;
-    public float sideMovement:aR;
-    public unknown float aS;
-    public float forwardMovement:aT;
-#elseif version >= 1.16
-    protected unknown boolean jumping;
-    public float sideMovement:aY;
-    public unknown float aZ;
-    public float forwardMovement:ba;
-#elseif version >= 1.15
-    protected unknown boolean jumping;
-    public float sideMovement:aZ;
-    public unknown float ba;
-    public float forwardMovement:bb;
-#elseif version >= 1.14
-    protected unknown boolean jumping;
-    public float sideMovement:bb;
-    public unknown float bc;
-    public float forwardMovement:bd;
-    public unknown float be;
-#elseif version >= 1.13
-    protected unknown boolean bg;
-    public float sideMovement:bh;
-    public unknown float bi;
-    public float forwardMovement:bj;
-    public unknown float bk;
-#elseif version >= 1.12
-    protected unknown boolean bd;
-    public float sideMovement:be;
-    public unknown float bf;
-    public float forwardMovement:bg;
-    public unknown float bh;
-#elseif version >= 1.11
-    protected unknown boolean bd;
-    public float sideMovement:be;
-    public float forwardMovement:bf;
-    public unknown float bg;
-#elseif version >= 1.10.2
-    protected unknown boolean be;
-    public float sideMovement:bf;
-    public float forwardMovement:bg;
-    public unknown float bh;
-#elseif version >= 1.9.4
-    protected unknown boolean bd;
-    public float sideMovement:be;
-    public float forwardMovement:bf;
-    public unknown float bg;
-#elseif version >= 1.9
-    protected unknown boolean bc;
-    public float sideMovement:bd;
-    public float forwardMovement:be;
-    public unknown float bf;
-#elseif version >= 1.8.3
-    protected unknown boolean aY;
-    public float sideMovement:aZ;
-    public float forwardMovement:ba;
-    protected unknown float bb;
-#else
-    protected unknown boolean aW;
-    public float sideMovement:aX;
-    public float forwardMovement:aY;
-    protected unknown float aZ;
+    public (org.bukkit.util.Vector) Vec3D getMoveIntent() {
+#if version >= 1.21.2
+        if (instance instanceof net.minecraft.server.level.EntityPlayer) {
+            return ((net.minecraft.server.level.EntityPlayer) instance).getLastClientMoveIntent();
+        }
 #endif
+
+#if version >= 1.17
+        #require EntityLiving public readonly float moveIntentX:xxa;
+        #require EntityLiving public readonly float moveIntentY:yya;
+        #require EntityLiving public readonly float moveIntentZ:yya;
+#elseif version >= 1.16.2
+        #require EntityLiving public readonly float moveIntentX:aR;
+        #require EntityLiving public readonly float moveIntentY:aS;
+        #require EntityLiving public readonly float moveIntentZ:aT;
+#elseif version >= 1.16
+        #require EntityLiving public readonly float moveIntentX:aY;
+        #require EntityLiving public readonly float moveIntentY:aZ;
+        #require EntityLiving public readonly float moveIntentZ:ba;
+#elseif version >= 1.15
+        #require EntityLiving public readonly float moveIntentX:aZ;
+        #require EntityLiving public readonly float moveIntentY:ba;
+        #require EntityLiving public readonly float moveIntentZ:bb;
+#elseif version >= 1.14
+        #require EntityLiving public readonly float moveIntentX:bb;
+        #require EntityLiving public readonly float moveIntentY:bc;
+        #require EntityLiving public readonly float moveIntentZ:bd;
+#elseif version >= 1.13
+        #require EntityLiving public readonly float moveIntentX:bh;
+        #require EntityLiving public readonly float moveIntentY:bi;
+        #require EntityLiving public readonly float moveIntentZ:bj;
+#elseif version >= 1.12
+        #require EntityLiving public readonly float moveIntentX:be;
+        #require EntityLiving public readonly float moveIntentY:bf;
+        #require EntityLiving public readonly float moveIntentZ:bg;
+#elseif version >= 1.11
+        #require EntityLiving public readonly float moveIntentX:be;
+        #require EntityLiving public readonly float moveIntentZ:bf;
+#elseif version >= 1.10.2
+        #require EntityLiving public readonly float moveIntentX:bf;
+        #require EntityLiving public readonly float moveIntentZ:bg;
+#elseif version >= 1.9.4
+        #require EntityLiving public readonly float moveIntentX:be;
+        #require EntityLiving public readonly float moveIntentZ:bf;
+#elseif version >= 1.9
+        #require EntityLiving public readonly float moveIntentX:bd;
+        #require EntityLiving public readonly float moveIntentZ:be;
+#elseif version >= 1.8.3
+        #require EntityLiving public readonly float moveIntentX:aZ;
+        #require EntityLiving public readonly float moveIntentZ:ba;
+#else
+        #require EntityLiving public readonly float moveIntentX:aX;
+        #require EntityLiving public readonly float moveIntentZ:aY;
+#endif
+
+        float x = instance#moveIntentX;
+#if version >= 1.12
+        float y = instance#moveIntentY;
+#else
+        float y = 0.0f;
+#endif
+        float z = instance#moveIntentZ;
+
+        return new Vec3D((double) x, (double) y, (double) z);
+    }
+
+    <code>
+    public float getSideMovement() {
+        return (float) getMoveIntent().getX();
+    }
+
+    public float getForwardMovement() {
+        return (float) getMoveIntent().getZ();
+    }
+    </code>
 
 #if version >= 1.17
     public boolean updateEffects:effectsDirty;
