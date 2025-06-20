@@ -75,7 +75,6 @@ public class Conversion {
     public static final InputConverter<Object> toLongHashSetHandle = getConverterToHandle("com.bergerkiller.bukkit.common.internal.LongHashSet");
     public static final InputConverter<Object> toIntHashMapHandle = getConverterToHandle("net.minecraft.util.IntHashMap");
     public static final InputConverter<Object> toUseActionHandle = getConverterToHandle("net.minecraft.network.protocol.game.PacketPlayInUseEntity.EnumEntityUseAction");
-    public static final InputConverter<Object> toScoreboardActionHandle = getConverterToHandle("net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore.EnumScoreboardAction");
     public static final InputConverter<Object> toBlockDataHandle = getConverterToHandle("net.minecraft.world.level.block.state.IBlockData");
     public static final InputConverter<Object> toChunkSectionHandle = getConverterToHandle("net.minecraft.world.level.chunk.ChunkSection");
     public static final InputConverter<Object> toMobEffectList = getConverterToHandle("net.minecraft.world.effect.MobEffectList");

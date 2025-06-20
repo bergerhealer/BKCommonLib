@@ -43,6 +43,7 @@ public abstract class PlayerFileDataHandler implements LazyInitializedObject, Li
         void base_save(HumanEntity human);
     }
 
+    // hooks WorldNBTStorage
     @ClassHook.HookPackage("net.minecraft.server")
     @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
     protected static class PlayerFileDataHook extends ClassHook<PlayerFileDataHook> implements PlayerFileDataHandler.Hook {
