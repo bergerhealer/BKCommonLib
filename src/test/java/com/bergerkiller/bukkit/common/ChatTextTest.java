@@ -137,6 +137,12 @@ public class ChatTextTest {
     }
 
     @Test
+    public void testFromGson() {
+        ChatText text = ChatText.fromJson("{\"extra\":[{\"color\":\"red\",\"text\":\"hello world\"}],\"text\":\"\"}");
+        assertEquals(ChatColor.RED + "hello world", text.getMessage());
+    }
+
+    @Test
     public void testSuffixStyle() {
         // Test that a String with a suffix chat style character preserves the style
         String msg = "Prefix" + ChatColor.RED.toString();
