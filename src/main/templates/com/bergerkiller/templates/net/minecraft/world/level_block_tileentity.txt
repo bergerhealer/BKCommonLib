@@ -10,6 +10,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.World;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
@@ -74,7 +76,17 @@ class TileEntity {
 #endif
     }
 
-#if version >= 1.20.5
+#if version >= 1.21.6
+    public void load((BlockData) IBlockData blockData, (CommonTagCompound) NBTTagCompound nbttagcompound) {
+        net.minecraft.util.ProblemReporter$ScopedCollector reporter = #createScopedProblemReporter();
+        try {
+            ValueInput input = #createTagValueInput(reporter, instance.getLevel().registryAccess(), nbttagcompound);
+            instance.loadWithComponents(input);
+        } finally {
+            reporter.close();
+        }
+    }
+#elseif version >= 1.20.5
     public void load((BlockData) IBlockData blockData, (CommonTagCompound) NBTTagCompound nbttagcompound) {
         instance.loadWithComponents(nbttagcompound, instance.getLevel().registryAccess());
     }
@@ -94,8 +106,13 @@ class TileEntity {
     }
 #endif
 
-#if version >= 1.20.5
-    public final (CommonTagCompound) NBTTagCompound save() {
+#if version >= 1.21.6
+    public (CommonTagCompound) NBTTagCompound save() {
+        // Note: if ever removed, the same ProblemReporter crap as load()
+        return instance.saveWithFullMetadata(instance.getLevel().registryAccess());
+    }
+#elseif version >= 1.20.5
+    public (CommonTagCompound) NBTTagCompound save() {
         return instance.saveWithFullMetadata(instance.getLevel().registryAccess());
     }
 #elseif version >= 1.18

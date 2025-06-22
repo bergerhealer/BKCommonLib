@@ -17,8 +17,21 @@ class InventoryEnderChest extends IInventory {
     public void loadFromNBT((CommonTagList) NBTTagList nbttaglist) {
         #require InventoryEnderChest private final EntityHuman owner;
         EntityHuman owner = instance#owner;
-        instance.fromTag(nbttaglist, owner.registryAccess());
+        net.minecraft.core.HolderLookup$a holderLookup = owner.registryAccess();
+
+  #if version >= 1.21.6
+        net.minecraft.util.ProblemReporter$ScopedCollector reporter = #createScopedProblemReporter();
+        try {
+            net.minecraft.world.level.storage.ValueInput$TypedInputList valueList = #createTagListValueInput(reporter, holderLookup, net.minecraft.world.ItemStackWithSlot.CODEC, nbttaglist);
+            instance.fromSlots(valueList);
+        } finally {
+            reporter.close();
+        }
+  #else
+        instance.fromTag(nbttaglist, holderLookup);
+  #endif
     }
+
 #elseif version >= 1.18
     public void loadFromNBT:fromTag((CommonTagList) NBTTagList nbttaglist)
 #else
@@ -29,8 +42,23 @@ class InventoryEnderChest extends IInventory {
     public (CommonTagList) NBTTagList saveToNBT() {
         #require InventoryEnderChest private final EntityHuman owner;
         EntityHuman owner = instance#owner;
+        net.minecraft.core.HolderLookup$a holderLookup = owner.registryAccess();
+
+  #if version >= 1.21.6
+        net.minecraft.util.ProblemReporter$ScopedCollector reporter = #createScopedProblemReporter();
+        try {
+            NBTTagList nbttaglist = new NBTTagList();
+            net.minecraft.world.level.storage.ValueOutput$TypedOutputList valueList = #createTagListValueOutput(reporter, holderLookup, net.minecraft.world.ItemStackWithSlot.CODEC, nbttaglist);
+            instance.storeAsSlots(valueList);
+            return nbttaglist;
+        } finally {
+            reporter.close();
+        }
+  #else
         return instance.createTag(owner.registryAccess());
+  #endif
     }
+
 #elseif version >= 1.18
     public (CommonTagList) NBTTagList saveToNBT:createTag()
 #elseif version >= 1.16

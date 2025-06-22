@@ -13,6 +13,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryMerchantHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
 
 class CraftItemStack {
     (Object) net.minecraft.world.item.ItemStack handle;
@@ -55,9 +56,19 @@ class CraftItemStack {
             throw new IllegalArgumentException("Failed to perform data migration of itemstack");
         }
 
+        net.minecraft.core.HolderLookup$a holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
+        NBTBase migratedNBT = (NBTBase) migratedDynamic.getValue();
+    #if version >= 1.21.6
+        java.util.Optional itemOpt = net.minecraft.world.item.ItemStack.CODEC.parse(
+                holderLookup.createSerializationContext(net.minecraft.nbt.DynamicOpsNBT.INSTANCE),
+                migratedNBT
+            )
+            .resultOrPartial(NBTBaseHandle.createPartialErrorLogger(migratedNBT));
+    #else
         java.util.Optional itemOpt = net.minecraft.world.item.ItemStack.parse(
-                org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry(),
-                (NBTBase) migratedDynamic.getValue());
+                holderLookup,
+                migratedNBT);
+    #endif
         if (!itemOpt.isPresent()) {
             return null;
         }
