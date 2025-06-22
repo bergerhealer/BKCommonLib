@@ -22,6 +22,8 @@ import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.World;
 import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.phys.Vec3D;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
@@ -39,6 +41,7 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.storage.ValueOutputHandle;
 
 class Entity {
 #if version >= 1.9
@@ -1979,28 +1982,55 @@ class Entity {
     public void onTick:s_();
 #endif
 
-#if version >= 1.18
+#if version >= 1.21.6
+    public void loadFromNBT((CommonTagCompound) NBTTagCompound compound) {
+        net.minecraft.util.ProblemReporter$ScopedCollector reporter = #createScopedProblemReporter();
+        try {
+            ValueInput input = #createTagValueInput(reporter, instance.registryAccess(), compound);
+            instance.load(input);
+        } finally {
+            reporter.close();
+        }
+    }
+#elseif version >= 1.18
     public void loadFromNBT:load((CommonTagCompound) NBTTagCompound compound);
-    public boolean onEntitySave:saveAsPassenger((CommonTagCompound) NBTTagCompound compound);
 #elseif version >= 1.17
     public void loadFromNBT:load((CommonTagCompound) NBTTagCompound compound);
-    public boolean onEntitySave:d((CommonTagCompound) NBTTagCompound compound);
 #elseif version >= 1.16
     public void loadFromNBT:load((CommonTagCompound) NBTTagCompound compound);
-    public boolean onEntitySave:a_((CommonTagCompound) NBTTagCompound compound);
 #else
     public void loadFromNBT:f((CommonTagCompound) NBTTagCompound compound);
-    public boolean onEntitySave:c((CommonTagCompound) NBTTagCompound compound);
 #endif
 
-#if version >= 1.18
-    public (void) NBTTagCompound saveToNBT:saveWithoutId((CommonTagCompound) NBTTagCompound compound);
-#elseif version >= 1.12
-    public (void) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
-#elseif version >= 1.9.4
-    public (void) NBTTagCompound saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
+    // Note: ValueOutput == NBTTagCompound on versions before 1.21.
+    // Paper/spigot and across versions these parameters changed a lot
+    // The API has all parameters that can possibly be specified (for paper)
+    // Unsupported ones are ignored.
+    public void saveWithoutId((ValueOutputHandle) ValueOutput valueoutput, boolean includeAll, boolean includeNonSaveable, boolean forceSerialization) {
+#if version >= 1.21.4 && paper
+        instance.saveWithoutId(valueoutput, includeAll, includeNonSaveable, forceSerialization);
+#elseif version >= 1.20.3
+        instance.saveWithoutId(valueoutput, includeAll);
 #else
-    public void saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
+        instance.saveWithoutId(valueoutput);
+#endif
+    }
+
+#if version >= 1.21.6
+    public void saveToNBT((CommonTagCompound) NBTTagCompound compound) {
+        net.minecraft.util.ProblemReporter$ScopedCollector reporter = #createScopedProblemReporter();
+        try {
+            ValueOutput output = #createTagValueOutput(reporter, instance.registryAccess(), compound);
+            instance.saveWithoutId(output);
+        } finally {
+            reporter.close();
+        }
+    }
+#else
+    public void saveToNBT((CommonTagCompound) NBTTagCompound compound) {
+        // NBTTagCompound == ValueOutput so call the other one directly
+        instance.saveWithoutId(compound);
+    }
 #endif
 
     public int getId();

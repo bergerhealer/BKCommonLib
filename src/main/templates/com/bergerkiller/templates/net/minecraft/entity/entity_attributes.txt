@@ -1,10 +1,13 @@
 package net.minecraft.world.entity.ai.attributes;
 
+import net.minecraft.resources.RegistryOps;
+import net.minecraft.nbt.DynamicOpsNBT;
 import net.minecraft.nbt.NBTTagList;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 
+import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeBaseHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeMapBaseHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
@@ -95,7 +98,28 @@ class AttributeMapBase {
     }
 #endif
 
-#if version >= 1.18
+#if version >= 1.21.6
+    public void loadFromNBT((CommonTagList) NBTTagList nbttaglist) {
+        net.minecraft.core.HolderLookup$a holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
+        RegistryOps registryops = holderLookup.createSerializationContext(DynamicOpsNBT.INSTANCE);
+
+        java.util.List packed = (java.util.List) AttributeModifiable$a.LIST_CODEC.parse(registryops, nbttaglist)
+            .resultOrPartial(NBTBaseHandle.createPartialErrorLogger(nbttaglist))
+            .orElse(null);
+
+        if (packed != null) {
+            instance.apply(packed);
+        }
+    }
+    public (CommonTagList) NBTTagList saveToNBT() {
+        net.minecraft.core.HolderLookup$a holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
+        RegistryOps registryops = holderLookup.createSerializationContext(DynamicOpsNBT.INSTANCE);
+
+        java.util.List packed = instance.pack();
+
+        return (NBTTagList) AttributeModifiable$a.LIST_CODEC.encode(packed, registryops, new NBTTagList());
+    }
+#elseif version >= 1.18
     public void loadFromNBT:load((CommonTagList) NBTTagList nbttaglist);
     public (CommonTagList) NBTTagList saveToNBT:save();
 #elseif version >= 1.16

@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 import com.bergerkiller.bukkit.common.controller.EntityPositionApplier;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.generated.net.minecraft.world.level.storage.ValueOutputHandle;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import org.bukkit.entity.Entity;
@@ -19,7 +20,6 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.InteractionResult;
@@ -546,17 +546,44 @@ public class EntityHook extends ClassHook<EntityHook> {
         return LocaleLanguageHandle.INSTANCE().get("entity." + name + ".name");
     }
 
-    @HookMethod("public boolean onEntitySave:???(NBTTagCompound nbttagcompound)")
-    public boolean onEntitySave(Object tag) {
+    private boolean handleSaveAsPassenger(Object valueoutput, boolean includeAll, boolean includeNonSaveable, boolean forceSerialization) {
         Object handle = this.instance();
         if (!EntityHandle.T.isSavingAllowed.invoke(handle)) {
             return false;
         }
 
-        CommonTagCompound commonTag = CommonTagCompound.create(tag);
-        commonTag.putValue("id", getSavedName(this.instance()));
-        EntityHandle.T.saveToNBT.invoke(handle, commonTag);
+        ValueOutputHandle.T.putString.invoke(valueoutput, "id", getSavedName(this.instance()));
+        EntityHandle.T.saveWithoutId.raw.invoke(handle, valueoutput, includeAll, includeNonSaveable, forceSerialization);
         return true;
+    }
+
+    // Base NMS method, with all default options set. Always exists.
+    @HookMethod("public boolean saveAsPassenger(net.minecraft.world.level.storage.ValueOutput valueOutput)")
+    public boolean onSaveAsPassenger(Object valueoutput) {
+        return handleSaveAsPassenger(valueoutput, true, false, false);
+    }
+
+    // Paper added a bunch of flags here
+    @HookMethodCondition("paper && version >= 1.21.4")
+    @HookMethod("public boolean saveAsPassenger(net.minecraft.world.level.storage.ValueOutput valueOutput, boolean includeAll, boolean includeNonSaveable, boolean forceSerialization)")
+    public boolean onSaveAsPassengerPaperMultiFlags(Object valueoutput, boolean includeAll, boolean includeNonSaveable, boolean forceSerialization) {
+        return handleSaveAsPassenger(valueoutput, includeAll, includeNonSaveable, forceSerialization);
+    }
+
+    // includeAll option flag by CraftBukkit since 1.20.3, for Paper specifically
+    // Here because we don't have good () logic for #if
+    @HookMethodCondition("paper && version >= 1.20.3 && version < 1.21.4")
+    @HookMethod("public boolean saveAsPassenger(net.minecraft.world.level.storage.ValueOutput valueOutput, boolean includeAll)")
+    public boolean onSaveAsPassengerPaperIncludeAll(Object valueoutput, boolean includeAll) {
+        return handleSaveAsPassenger(valueoutput, includeAll, false, false);
+    }
+
+    // includeAll option flag by CraftBukkit since 1.20.3
+    // Alternative methods are used on Paper, which can also add extra bool args we need to handle
+    @HookMethodCondition("!paper && version >= 1.20.3")
+    @HookMethod("public boolean saveAsPassenger(net.minecraft.world.level.storage.ValueOutput valueOutput, boolean includeAll)")
+    public boolean onSaveAsPassengerSpigotIncludeAll(Object valueoutput, boolean includeAll) {
+        return handleSaveAsPassenger(valueoutput, includeAll, false, false);
     }
 
     // This only has to be hooked on Minecraft 1.12.2 and before, where the implementation
@@ -570,7 +597,7 @@ public class EntityHook extends ClassHook<EntityHook> {
             if (EntityHandle.T.isPassenger.invoke(handle)) {
                 return false;
             } else {
-                return this.onEntitySave(tag);
+                return this.onSaveAsPassenger(tag);
             }
         } catch (Throwable t) {
             Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the save callback", t);

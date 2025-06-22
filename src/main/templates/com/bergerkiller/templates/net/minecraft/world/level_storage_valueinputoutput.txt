@@ -1,0 +1,9 @@
+package net.minecraft.world.level.storage;
+
+// Note: is for NBTTagCompound on 1.21.5 and before
+class ValueOutput {
+    public abstract void putString(String key, String value);
+}
+
+class ValueInput {
+}

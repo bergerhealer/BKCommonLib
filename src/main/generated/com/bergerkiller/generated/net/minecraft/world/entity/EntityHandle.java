@@ -15,6 +15,7 @@ import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryH
 import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.damagesource.DamageSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.storage.ValueOutputHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -128,7 +129,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract EntityHandle getDriverEntity();
     public abstract void onTick();
     public abstract void loadFromNBT(CommonTagCompound compound);
-    public abstract boolean onEntitySave(CommonTagCompound compound);
+    public abstract void saveWithoutId(ValueOutputHandle valueoutput, boolean includeAll, boolean includeNonSaveable, boolean forceSerialization);
     public abstract void saveToNBT(CommonTagCompound compound);
     public abstract int getId();
     public abstract UUID getUniqueID();
@@ -392,7 +393,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<EntityHandle> getDriverEntity = new Template.Method.Converted<EntityHandle>();
         public final Template.Method<Void> onTick = new Template.Method<Void>();
         public final Template.Method.Converted<Void> loadFromNBT = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<Boolean> onEntitySave = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<Void> saveWithoutId = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> saveToNBT = new Template.Method.Converted<Void>();
         public final Template.Method<Integer> getId = new Template.Method<Integer>();
         public final Template.Method<UUID> getUniqueID = new Template.Method<UUID>();

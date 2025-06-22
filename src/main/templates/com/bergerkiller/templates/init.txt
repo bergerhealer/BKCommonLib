@@ -115,6 +115,7 @@
 #include /net/minecraft/world/level_chunkcoordintpair.txt
 #include /net/minecraft/world/level_dimensionmanager.txt
 #include /net/minecraft/world/level_heightmap.txt
+#include /net/minecraft/world/level_storage_valueinputoutput.txt
 #include /net/minecraft/world/level_mapicon.txt
 #include /net/minecraft/world/level_mobspawner.txt
 #include /net/minecraft/world/level_world.txt

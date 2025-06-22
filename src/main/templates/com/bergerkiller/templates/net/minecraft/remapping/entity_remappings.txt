@@ -2,6 +2,8 @@ import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.sounds.SoundEffect;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.level.storage.ValueOutput;
 
 #if version >= 1.17
     #remap net.minecraft.world.entity.Entity private int remainingFireTicks;
@@ -80,3 +82,38 @@ import net.minecraft.sounds.SoundEffect;
 #case 1.9:     #remap net.minecraft.world.entity.Entity public Entity getControllingPassenger:bt();
 // Does not exist before 1.9
 #endselect
+
+// Save functions
+#select version >=
+#case 1.21.6:  #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger(ValueOutput valueOutput);
+#case 1.18:    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger(NBTTagCompound nbttagcompound);
+#case 1.17:    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger:d(NBTTagCompound nbttagcompound);
+#case 1.16:    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger:a_(NBTTagCompound nbttagcompound);
+#case else:    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger:c(NBTTagCompound nbttagcompound);
+#endselect
+
+#select version >=
+#case 1.21.6:  #remap net.minecraft.world.entity.Entity public void saveWithoutId(ValueOutput valueOutput);
+#case 1.18:    #remap net.minecraft.world.entity.Entity public NBTTagCompound saveWithoutId(NBTTagCompound nbttagcompound);
+#case 1.12:    #remap net.minecraft.world.entity.Entity public NBTTagCompound saveWithoutId:save(NBTTagCompound nbttagcompound);
+#case 1.9.4:   #remap net.minecraft.world.entity.Entity public NBTTagCompound saveWithoutId:e(NBTTagCompound nbttagcompound);
+#case else:    #remap net.minecraft.world.entity.Entity public void saveWithoutId:e(NBTTagCompound nbttagcompound);
+#endselect
+
+// CraftBukkit added an includeAll option flag
+// Paper also added some extra flags in later versions
+// This is here to validate as part of tests these these functions exist, as they're important for the
+// EntityHook logic.
+#if version >= 1.21.6 && paper
+    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger(ValueOutput valueOutput, boolean includeAll, boolean includeNonSaveable, boolean forceSerialization);
+    #remap net.minecraft.world.entity.Entity public void saveWithoutId(ValueOutput valueOutput, boolean includeAll, boolean includeNonSaveable, boolean forceSerialization);
+#elseif version >= 1.21.6
+    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger(ValueOutput valueOutput, boolean includeAll);
+    #remap net.minecraft.world.entity.Entity public void saveWithoutId(ValueOutput valueOutput, boolean includeAll);
+#elseif version >= 1.21.4 && paper
+    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger(NBTTagCompound nbttagcompound, boolean includeAll, boolean includeNonSaveable, boolean forceSerialization);
+    #remap net.minecraft.world.entity.Entity public NBTTagCompound saveWithoutId(NBTTagCompound nbttagcompound, boolean includeAll, boolean includeNonSaveable, boolean forceSerialization);
+#elseif version >= 1.20.3
+    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger(NBTTagCompound nbttagcompound, boolean includeAll);
+    #remap net.minecraft.world.entity.Entity public NBTTagCompound saveWithoutId(NBTTagCompound nbttagcompound, boolean includeAll);
+#endif

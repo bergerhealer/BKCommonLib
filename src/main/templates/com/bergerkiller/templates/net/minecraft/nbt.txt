@@ -217,6 +217,15 @@ class NBTBase {
         TypeInfo info = findTypeInfo(data);
         return info.handleClass.createHandle(info.constructor.apply(data));
     }
+
+    // Used for decoding records/values using Codecs
+    public static java.util.function.Consumer<String> createPartialErrorLogger(Object nbtBase) {
+        return (s) -> {
+            String nbtToStr = (nbtBase == null) ? "[null]" : nbtBase.toString();
+            com.bergerkiller.bukkit.common.Logging.LOGGER.severe(
+                    "Failed to read (" + nbtToStr + "): " + s);
+        };
+    }
     </code>
 
     class NBTTagString extends NBTBase {
@@ -677,15 +686,6 @@ class NBTTagCompound extends NBTBase {
             }
         }
         str.append('}');
-    }
-
-    // Used for decoding records/values using Codecs
-    public static java.util.function.Consumer<String> createPartialErrorLogger(Object nbtBase) {
-        return (s) -> {
-            String nbtToStr = (nbtBase == null) ? "[null]" : nbtBase.toString();
-            com.bergerkiller.bukkit.common.Logging.LOGGER.severe(
-                    "Failed to read (" + nbtToStr + "): " + s);
-        };
     }
     </code>
 }

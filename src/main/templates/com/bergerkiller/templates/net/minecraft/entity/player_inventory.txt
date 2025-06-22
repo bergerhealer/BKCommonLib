@@ -6,13 +6,38 @@ import net.minecraft.world.IInventory;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 
 class PlayerInventory extends IInventory {
-#if version >= 1.18
+#if version >= 1.21.6
+    public (CommonTagList) NBTTagList saveToNBT((CommonTagList) NBTTagList nbttaglist) {
+        net.minecraft.core.HolderLookup$a holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
+        net.minecraft.util.ProblemReporter$ScopedCollector reporter = #createScopedProblemReporter();
+        try {
+            net.minecraft.world.level.storage.ValueOutput$TypedOutputList valueList = #createTagListValueOutput(reporter, holderLookup, net.minecraft.world.ItemStackWithSlot.CODEC, nbttaglist);
+            instance.save(valueList);
+        } finally {
+            reporter.close();
+        }
+    }
+    public void loadFromNBT((CommonTagList) NBTTagList nbttaglist) {
+        net.minecraft.core.HolderLookup$a holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
+        net.minecraft.util.ProblemReporter$ScopedCollector reporter = #createScopedProblemReporter();
+        try {
+            net.minecraft.world.level.storage.ValueInput$TypedInputList valueList = #createTagListValueInput(reporter, holderLookup, net.minecraft.world.ItemStackWithSlot.CODEC, nbttaglist);
+            instance.load(valueList);
+        } finally {
+            reporter.close();
+        }
+    }
+#elseif version >= 1.18
     public (CommonTagList) NBTTagList saveToNBT:save((CommonTagList) NBTTagList nbttaglist);
     public void loadFromNBT:load((CommonTagList) NBTTagList nbttaglist);
-    public static int getHotbarSize:getSelectionSize();
 #else
     public (CommonTagList) NBTTagList saveToNBT:a((CommonTagList) NBTTagList nbttaglist);
     public void loadFromNBT:b((CommonTagList) NBTTagList nbttaglist);
+#endif
+
+#if version >= 1.18
+    public static int getHotbarSize:getSelectionSize();
+#else
     public static int getHotbarSize();
 #endif
 }

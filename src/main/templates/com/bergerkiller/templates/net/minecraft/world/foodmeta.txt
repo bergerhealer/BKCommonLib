@@ -2,14 +2,38 @@ package net.minecraft.world.food;
 
 import net.minecraft.nbt.NBTTagCompound;
 
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 class FoodMetaData {
-#if version >= 1.18
-    public void loadFromNBT:readAdditionalSaveData((CommonTagCompound) NBTTagCompound compound)
-    public void saveToNBT:addAdditionalSaveData((CommonTagCompound) NBTTagCompound compound)
+#if version >= 1.21.5
+    public void loadFromNBT((CommonTagCompound) NBTTagCompound compound) {
+        net.minecraft.core.HolderLookup$a holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
+        net.minecraft.util.ProblemReporter$ScopedCollector reporter = #createScopedProblemReporter();
+        try {
+            ValueInput input = #createTagValueInput(reporter, holderLookup, compound);
+            instance.readAdditionalSaveData(input);
+        } finally {
+            reporter.close();
+        }
+    }
+    public void saveToNBT((CommonTagCompound) NBTTagCompound compound) {
+        net.minecraft.core.HolderLookup$a holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
+        net.minecraft.util.ProblemReporter$ScopedCollector reporter = #createScopedProblemReporter();
+        try {
+            ValueOutput output = #createTagValueOutput(reporter, holderLookup, compound);
+            instance.addAdditionalSaveData(output);
+        } finally {
+            reporter.close();
+        }
+    }
+#elseif version >= 1.18
+    public void loadFromNBT:readAdditionalSaveData((CommonTagCompound) NBTTagCompound compound);
+    public void saveToNBT:addAdditionalSaveData((CommonTagCompound) NBTTagCompound compound);
 #else
-    public void loadFromNBT:a((CommonTagCompound) NBTTagCompound compound)
-    public void saveToNBT:b((CommonTagCompound) NBTTagCompound compound)
+    public void loadFromNBT:a((CommonTagCompound) NBTTagCompound compound);
+    public void saveToNBT:b((CommonTagCompound) NBTTagCompound compound);
 #endif
 }

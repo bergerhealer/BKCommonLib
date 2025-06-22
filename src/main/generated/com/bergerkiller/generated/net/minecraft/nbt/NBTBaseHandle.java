@@ -207,6 +207,14 @@ public abstract class NBTBaseHandle extends Template.Handle {
         TypeInfo info = findTypeInfo(data);
         return info.handleClass.createHandle(info.constructor.apply(data));
     }
+
+    public static java.util.function.Consumer<String> createPartialErrorLogger(Object nbtBase) {
+        return (s) -> {
+            String nbtToStr = (nbtBase == null) ? "[null]" : nbtBase.toString();
+            com.bergerkiller.bukkit.common.Logging.LOGGER.severe(
+                    "Failed to read (" + nbtToStr + "): " + s);
+        };
+    }
     /**
      * Stores class members for <b>net.minecraft.nbt.NBTBase</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

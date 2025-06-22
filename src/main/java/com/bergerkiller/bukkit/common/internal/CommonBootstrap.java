@@ -824,6 +824,23 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.server.level.EntityPlayer$RespawnConfig", "com.bergerkiller.bukkit.common.internal.proxy.PlayerRespawnConfig_pre_1_21_5");
         }
 
+        // 1.21.6 mappings
+        if (evaluateMCVersion(">=", "1.21.6")) {
+            // Broken obfuscated crap on spigot :(
+            remappings.put("net.minecraft.util.ProblemReporter$ScopedCollector", "net.minecraft.util.ProblemReporter$j");
+            remappings.put("net.minecraft.world.level.storage.ValueInput$TypedInputList", "net.minecraft.world.level.storage.ValueInput$a");
+            remappings.put("net.minecraft.world.level.storage.ValueOutput$TypedOutputList", "net.minecraft.world.level.storage.ValueOutput$a");
+            remappings.put("net.minecraft.world.level.storage.TagValueInput$TypedListWrapper", "net.minecraft.world.level.storage.TagValueInput$f");
+            remappings.put("net.minecraft.world.level.storage.TagValueOutput$TypedListWrapper", "net.minecraft.world.level.storage.TagValueOutput$e");
+        } else {
+            // On versions before ValueOutput/Input existed, pretend they use NBTTagCompound instead
+            // This makes the internal API look simple
+            remappings.put("net.minecraft.world.level.storage.ValueOutput", "net.minecraft.nbt.NBTTagCompound");
+            remappings.put("net.minecraft.world.level.storage.ValueInput", "net.minecraft.nbt.NBTTagCompound");
+            remappings.put("net.minecraft.world.level.storage.TagValueOutput", "net.minecraft.nbt.NBTTagCompound");
+            remappings.put("net.minecraft.world.level.storage.TagValueInput", "net.minecraft.nbt.NBTTagCompound");
+        }
+
         // There have been various locations where starlight was installed
         // This was also part of tuinity at some point, but was then ported into paper
         {
