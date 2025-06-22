@@ -20,7 +20,9 @@ class NetworkManager {
 #endif
 
     // Only used on 1.20.2+ in the callback for a QueuedPacket
-#if version >= 1.20.2
+#if version >= 1.21.6
+    private void queue_sendPacketImpl:sendPacket((Object) Packet<?> packet, (Object) io.netty.channel.ChannelFutureListener packetsendlistener, boolean flush);
+#elseif version >= 1.20.2
     private void queue_sendPacketImpl:sendPacket((Object) Packet<?> packet, (Object) PacketSendListener packetsendlistener, boolean flush);
 #else
     private void queue_sendPacketImpl((Object) Object packet, (Object) Object packetsendlistener, boolean flush) {
@@ -50,7 +52,17 @@ class NetworkManager {
         java.util.Queue queue = networkManager#packetQueue;
 
         Object queuedPacket;
-  #if version >= 1.20.2
+  #if version >= 1.21.6
+    #if exists net.minecraft.network.NetworkManager.PacketSendAction
+        #require net.minecraft.network.NetworkManager.PacketSendAction private net.minecraft.network.NetworkManager.PacketSendAction createQueuedPacket:<init>(net.minecraft.network.protocol.Packet<?> packet, io.netty.channel.ChannelFutureListener listener, boolean flush);
+        queuedPacket = #createQueuedPacket((net.minecraft.network.protocol.Packet) packet, (io.netty.channel.ChannelFutureListener) null, false);
+    #else
+        #if paper
+            #warning Connection PacketSendAction class was not identified, errors might occur queueing packets!
+        #endif
+        queuedPacket = new com.bergerkiller.bukkit.common.internal.proxy.QueuedPacket_1_20_2(packet, null, false);
+    #endif
+  #elseif version >= 1.20.2
     #if exists net.minecraft.network.NetworkManager.PacketSendAction
         #require net.minecraft.network.NetworkManager.PacketSendAction private net.minecraft.network.NetworkManager.PacketSendAction createQueuedPacket:<init>(net.minecraft.network.protocol.Packet<?> packet, net.minecraft.network.PacketSendListener listener, boolean flush);
         queuedPacket = #createQueuedPacket((net.minecraft.network.protocol.Packet) packet, (net.minecraft.network.PacketSendListener) null, false);
