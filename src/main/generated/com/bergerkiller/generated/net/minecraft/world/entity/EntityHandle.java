@@ -120,7 +120,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setBoundingBox(AxisAlignedBBHandle axisalignedbb);
     public abstract float getHeadRotation();
     public abstract void setHeadRotation(float angle);
-    public abstract AxisAlignedBBHandle getOtherBoundingBox();
+    public abstract boolean canCollideWith(EntityHandle otherEntity);
     public abstract AxisAlignedBBHandle getEntityBoundingBox(EntityHandle entity);
     public abstract void setPositionFromBoundingBox();
     public abstract void handleFireBlockTick();
@@ -382,7 +382,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Void> setBoundingBox = new Template.Method.Converted<Void>();
         public final Template.Method<Float> getHeadRotation = new Template.Method<Float>();
         public final Template.Method<Void> setHeadRotation = new Template.Method<Void>();
-        public final Template.Method.Converted<AxisAlignedBBHandle> getOtherBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
+        public final Template.Method.Converted<Boolean> canCollideWith = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<AxisAlignedBBHandle> getEntityBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method<Void> setPositionFromBoundingBox = new Template.Method<Void>();
         public final Template.Method<Void> handleFireBlockTick = new Template.Method<Void>();

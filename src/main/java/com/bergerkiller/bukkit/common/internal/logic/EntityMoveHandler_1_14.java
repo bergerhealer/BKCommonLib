@@ -111,44 +111,48 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
         AxisAlignedBBHandle axisalignedbb = voxelshapeBounds.getBoundingBox();
         VoxelShapeHandle shape = VoxelShapeHandle.empty();
 
-        if (entity != null && this.entityCollisionEnabled) {
+        if (this.entityCollisionEnabled) {
             List<EntityHandle> list = entity.getWorld().getNearbyEntities(entity, axisalignedbb.growUniform(0.25D));
 
             for (EntityHandle entity1 : list) {
-                if (!entity.isInSameVehicle(entity1)) {
-                    // BKCommonLib start: block collision event handler
-                    AxisAlignedBBHandle axisalignedbb1 = entity1.getOtherBoundingBox();
-                    if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(axisalignedbb)
-                            && controller.onEntityCollision(entity1.getBukkitEntity())) {
-
-                        shape = VoxelShapeHandle.merge(shape, VoxelShapeHandle.fromAABB(axisalignedbb1));
-                    }
-
-                    axisalignedbb1 = entity.getEntityBoundingBox(entity1);
-                    if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(axisalignedbb)
-                            && controller.onEntityCollision(entity1.getBukkitEntity())) {
-
-                        shape = VoxelShapeHandle.merge(shape, VoxelShapeHandle.fromAABB(axisalignedbb1));
-                    }
-                    // BKCommonLib end
-
-                    /*
-                    if (axisalignedbb1 != null && axisalignedbb1.c(axisalignedbb)) {
-                        voxelshape1 = VoxelShapes.b(voxelshape1, VoxelShapes.a(axisalignedbb1), OperatorBoolean.OR);
-                        if (flag) {
-                            break;
-                        }
-                    }
-
-                    axisalignedbb1 = entity.j(entity1);
-                    if (axisalignedbb1 != null && axisalignedbb1.c(axisalignedbb)) {
-                        voxelshape1 = VoxelShapes.b(voxelshape1, VoxelShapes.a(axisalignedbb1), OperatorBoolean.OR);
-                        if (flag) {
-                            break;
-                        }
-                    }
-                    */
+                if (entity.isInSameVehicle(entity1)) {
+                    continue;
                 }
+
+                // BKCommonLib start: block collision event handler
+                if (entity.canCollideWith(entity1)) {
+                    AxisAlignedBBHandle axisalignedbb1 = entity1.getBoundingBox();
+                    if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(axisalignedbb)
+                            && controller.onEntityCollision(entity1.getBukkitEntity())) {
+
+                        shape = VoxelShapeHandle.merge(shape, VoxelShapeHandle.fromAABB(axisalignedbb1));
+                    }
+                }
+
+                AxisAlignedBBHandle axisalignedbb2 = entity.getEntityBoundingBox(entity1);
+                if (axisalignedbb2 != null && axisalignedbb2.bbTransformA(axisalignedbb)
+                        && controller.onEntityCollision(entity1.getBukkitEntity())) {
+
+                    shape = VoxelShapeHandle.merge(shape, VoxelShapeHandle.fromAABB(axisalignedbb2));
+                }
+                // BKCommonLib end
+
+                /*
+                if (axisalignedbb1 != null && axisalignedbb1.c(axisalignedbb)) {
+                    voxelshape1 = VoxelShapes.b(voxelshape1, VoxelShapes.a(axisalignedbb1), OperatorBoolean.OR);
+                    if (flag) {
+                        break;
+                    }
+                }
+
+                axisalignedbb1 = entity.j(entity1);
+                if (axisalignedbb1 != null && axisalignedbb1.c(axisalignedbb)) {
+                    voxelshape1 = VoxelShapes.b(voxelshape1, VoxelShapes.a(axisalignedbb1), OperatorBoolean.OR);
+                    if (flag) {
+                        break;
+                    }
+                }
+                */
             }
         }
 

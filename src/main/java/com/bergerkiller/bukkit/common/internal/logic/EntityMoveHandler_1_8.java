@@ -75,14 +75,16 @@ class EntityMoveHandler_1_8 extends EntityMoveHandler {
         for (EntityHandle entity1 : list) {
             if (CommonCapabilities.VEHICLES_COLLIDE_WITH_PASSENGERS || !entity.isInSameVehicle(entity1)) {
                 // BKCommonLib start: block collision event handler
-                AxisAlignedBBHandle axisalignedbb1 = entity1.getOtherBoundingBox();
-                if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(movedBounds)) {
-                    removeFromList(foundBounds, axisalignedbb1);
+                if (entity.canCollideWith(entity1)) {
+                    AxisAlignedBBHandle axisalignedbb1 = entity1.getBoundingBox();
+                    if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(movedBounds)) {
+                        removeFromList(foundBounds, axisalignedbb1);
+                    }
                 }
 
-                axisalignedbb1 = entity.getEntityBoundingBox(entity1);
-                if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(movedBounds)) {
-                    removeFromList(foundBounds, axisalignedbb1);
+                AxisAlignedBBHandle axisalignedbb2 = entity.getEntityBoundingBox(entity1);
+                if (axisalignedbb2 != null && axisalignedbb2.bbTransformA(movedBounds)) {
+                    removeFromList(foundBounds, axisalignedbb2);
                 }
                 // BKCommonLib end
 
@@ -108,34 +110,38 @@ class EntityMoveHandler_1_8 extends EntityMoveHandler {
             List<EntityHandle> list = entity.getWorld().getNearbyEntities(entity, axisalignedbb.growUniform(0.25D));
 
             for (EntityHandle entity1 : list) {
-                if (!entity.isInSameVehicle(entity1)) {
-                    // BKCommonLib start: block collision event handler
-                    AxisAlignedBBHandle axisalignedbb1 = entity1.getOtherBoundingBox();
-                    if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(axisalignedbb)
-                            && controller.onEntityCollision(entity1.getBukkitEntity())) {
-
-                        collisions_buffer.add(axisalignedbb1);
-                    }
-
-                    axisalignedbb1 = entity.getEntityBoundingBox(entity1);
-                    if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(axisalignedbb)
-                            && controller.onEntityCollision(entity1.getBukkitEntity())) {
-
-                        collisions_buffer.add(axisalignedbb1);
-                    }
-                    // BKCommonLib end
-
-                    /*
-                    if ((axisalignedbb1 != null) && (axisalignedbb1.c(axisalignedbb))) {
-                        list.add(axisalignedbb1);
-                    }
-
-                    axisalignedbb1 = entity.j(entity1);
-                    if ((axisalignedbb1 != null) && (axisalignedbb1.c(axisalignedbb))) {
-                        list.add(axisalignedbb1);
-                    }
-                    */
+                if (entity.isInSameVehicle(entity1)) {
+                    continue;
                 }
+
+                // BKCommonLib start: block collision event handler
+                if (entity.canCollideWith(entity1)) {
+                    AxisAlignedBBHandle axisalignedbb1 = entity1.getBoundingBox();
+                    if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(axisalignedbb)
+                            && controller.onEntityCollision(entity1.getBukkitEntity())) {
+
+                        collisions_buffer.add(axisalignedbb1);
+                    }
+                }
+
+                AxisAlignedBBHandle axisalignedbb2 = entity.getEntityBoundingBox(entity1);
+                if (axisalignedbb2 != null && axisalignedbb2.bbTransformA(axisalignedbb)
+                        && controller.onEntityCollision(entity1.getBukkitEntity())) {
+
+                    collisions_buffer.add(axisalignedbb2);
+                }
+                // BKCommonLib end
+
+                /*
+                if ((axisalignedbb1 != null) && (axisalignedbb1.c(axisalignedbb))) {
+                    list.add(axisalignedbb1);
+                }
+
+                axisalignedbb1 = entity.j(entity1);
+                if ((axisalignedbb1 != null) && (axisalignedbb1.c(axisalignedbb))) {
+                    list.add(axisalignedbb1);
+                }
+                */
             }
         }
     }

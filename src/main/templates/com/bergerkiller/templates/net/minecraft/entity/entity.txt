@@ -1832,30 +1832,29 @@ class Entity {
 #case else:  public void setHeadRotation:f(float angle);
 #endselect
 
-#select version >=
-#case 1.16.2
-    // Since 1.16.2 there's a flag, which gets whether the 'other' bounding box exists
-    // Only the Shulker and Boat entity appear to use this flag
-    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox() {
-  #if version >= 1.18
-        return instance.canBeCollidedWith() ? instance.getBoundingBox() : null;
-  #elseif version >= 1.17
-        return instance.bi() ? instance.getBoundingBox() : null;
-  #elseif version >= 1.16.4
-        return instance.aZ() ? instance.getBoundingBox() : null;
-  #else
-        return instance.aY() ? instance.getBoundingBox() : null;
-  #endif
-    }
-#case 1.16:   public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ay();
-#case 1.15:   public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:au();
-#case 1.14.3: public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:aq();
-#case 1.14:   public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ap();
-#case 1.12:   public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:al();
-#case 1.10.2: public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ag();
-#case 1.9:    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:af();
-#case else:   public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:S();
-#endselect
+#if version >= 1.16.2
+  // Method exists here
+  #select version >=
+  #case 1.18:  public boolean canCollideWith((EntityHandle) Entity otherEntity);
+  #case 1.17:  public boolean canCollideWith:h((EntityHandle) Entity entity);
+  #case else:  public boolean canCollideWith:j((EntityHandle) Entity entity);
+  #endselect
+#else
+  // Only a method exists that returns a collidable bounding box for the other entity
+  // This is implemented by shulker / boat to return non-null if alive and such
+  public boolean canCollideWith((EntityHandle) Entity otherEntity) {
+  #select version >=
+  #case 1.16:   return otherEntity.ay() != null;
+  #case 1.15:   return otherEntity.au() != null;
+  #case 1.14.3: return otherEntity.aq() != null;
+  #case 1.14:   return otherEntity.ap() != null;
+  #case 1.12:   return otherEntity.al() != null;
+  #case 1.10.2: return otherEntity.ag() != null;
+  #case 1.9:    return otherEntity.af() != null;
+  #case else:   return otherEntity.S() != null;
+  #endselect
+  }
+#endif
 
 #if version >= 1.16.2
     // Since 1.16.2 this was removed, implementation taken from 1.16.1 (minecart/strider/etc.)
