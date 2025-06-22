@@ -61,7 +61,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
         if (handle == null) {
             return CommonTagCompound.EMPTY;
         } else {
-            return IChatBaseComponentHandle.ChatSerializerHandle.chatComponentToNBT(handle);
+            return IChatBaseComponentHandle.chatComponentToNBT(handle);
         }
     }
 
@@ -73,7 +73,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
      * @param nbt NBT to decode
      */
     public final void setNBT(CommonTag nbt) {
-        handle = IChatBaseComponentHandle.ChatSerializerHandle.nbtToChatComponent(nbt);
+        handle = IChatBaseComponentHandle.nbtToChatComponent(nbt);
     }
 
     /**
@@ -85,7 +85,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
         if (handle == null) {
             return "{}";
         } else {
-            return IChatBaseComponentHandle.ChatSerializerHandle.chatComponentToJson(handle);
+            return IChatBaseComponentHandle.chatComponentToJson(handle);
         }
     }
 
@@ -95,7 +95,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
      * @param jsonText to set to
      */
     public final void setJson(String jsonText) {
-        handle = IChatBaseComponentHandle.ChatSerializerHandle.jsonToChatComponent(jsonText);
+        handle = IChatBaseComponentHandle.jsonToChatComponent(jsonText);
     }
 
     /**
@@ -147,7 +147,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
     public final void setMessage(String messageText) {
         // Optimization for empty strings
         if (messageText.isEmpty()) {
-            handle = IChatBaseComponentHandle.ChatSerializerHandle.empty();
+            handle = IChatBaseComponentHandle.empty();
             return;
         }
 
@@ -171,7 +171,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
             break;
         }
         if (!trailing_formatting_chars.isEmpty()) {
-            handle = handle.addSibling(IChatBaseComponentHandle.ChatSerializerHandle.modifiersToComponent(trailing_formatting_chars));
+            handle = handle.addSibling(IChatBaseComponentHandle.modifiersToComponent(trailing_formatting_chars));
         }
     }
 
@@ -245,7 +245,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
      * @return this
      */
     public final ChatText appendNewLine() {
-        return append(IChatBaseComponentHandle.ChatSerializerHandle.newLine());
+        return append(IChatBaseComponentHandle.newLine());
     }
 
     /**
@@ -472,7 +472,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
             return null;
         }
         ChatText text = new ChatText();
-        text.setHandle(IChatBaseComponentHandle.ChatSerializerHandle.modifiersToComponent(Collections.singleton(color)));
+        text.setHandle(IChatBaseComponentHandle.modifiersToComponent(Collections.singleton(color)));
         return text;
     }
 

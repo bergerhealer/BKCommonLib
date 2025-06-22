@@ -162,9 +162,6 @@ public class TemplateTest {
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.util.WeightedRandomChoiceHandle")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.util.WeightedRandomHandle.WeightedRandomChoiceHandle";
                 }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.network.chat.ChatSerializerHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle.ChatSerializerHandle";
-                }
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.EnumScoreboardActionHandle")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle";
                 }
