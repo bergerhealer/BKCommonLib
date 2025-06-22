@@ -11,6 +11,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.server.CommonServer;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
+import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassDeclarationResolver;
 
@@ -18,6 +19,7 @@ public class TemplateResolver implements ClassDeclarationResolver {
     private HashMap<Class<?>, List<ClassDeclaration>> classes = new HashMap<Class<?>, List<ClassDeclaration>>();
     private boolean classes_loaded = false;
     private String version = "UNKNOWN";
+    private ClassResolver globalSourceResolver = ClassResolver.DEFAULT;
     private final Map<String, String> variables = new HashMap<>();
 
     private final String[] supported_mc_versions = new String[] {
@@ -60,6 +62,11 @@ public class TemplateResolver implements ClassDeclarationResolver {
         variables.putAll(this.variables);
     }
 
+    @Override
+    public ClassResolver getRootClassResolver(String classPath, Class<?> classType) {
+        return globalSourceResolver;
+    }
+
     /**
      * Gets all Class Declarations that are available at runtime
      * 
@@ -95,6 +102,7 @@ public class TemplateResolver implements ClassDeclarationResolver {
 
             ClassLoader classLoader = TemplateResolver.class.getClassLoader();
             SourceDeclaration sourceDec = SourceDeclaration.parseFromResources(classLoader, templatePath, this.variables);
+            globalSourceResolver = sourceDec.getResolver();
             for (ClassDeclaration cdec : sourceDec.classes) {
                 register(cdec);
             }
