@@ -28,6 +28,7 @@ import com.bergerkiller.bukkit.common.conversion.type.MapConversion;
 import com.bergerkiller.bukkit.common.conversion.type.ScoreboardDisplaySlotConversion;
 import com.bergerkiller.bukkit.common.conversion.type.SerializedEnumConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
+import com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporterInit;
 import com.bergerkiller.bukkit.common.internal.logic.UnsetDataWatcherItemInit;
 import com.bergerkiller.bukkit.common.wrappers.Brightness;
 import com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode;
@@ -827,7 +828,6 @@ public class CommonBootstrap {
         // 1.21.6 mappings
         if (evaluateMCVersion(">=", "1.21.6")) {
             // Broken obfuscated crap on spigot :(
-            remappings.put("net.minecraft.util.ProblemReporter$ScopedCollector", "net.minecraft.util.ProblemReporter$j");
             remappings.put("net.minecraft.world.level.storage.ValueInput$TypedInputList", "net.minecraft.world.level.storage.ValueInput$a");
             remappings.put("net.minecraft.world.level.storage.ValueOutput$TypedOutputList", "net.minecraft.world.level.storage.ValueOutput$a");
             remappings.put("net.minecraft.world.level.storage.TagValueInput$TypedListWrapper", "net.minecraft.world.level.storage.TagValueInput$f");
@@ -915,6 +915,7 @@ public class CommonBootstrap {
 
         // Initialize this one right away, as it's used in generated code
         NullPacketDataSerializerInit.initialize();
+        ScopedProblemReporterInit.initialize();
         UnsetDataWatcherItemInit.initialize();
 
         // Register converters

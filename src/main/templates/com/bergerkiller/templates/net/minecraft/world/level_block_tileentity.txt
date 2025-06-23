@@ -78,7 +78,7 @@ class TileEntity {
 
 #if version >= 1.21.6
     public void load((BlockData) IBlockData blockData, (CommonTagCompound) NBTTagCompound nbttagcompound) {
-        net.minecraft.util.ProblemReporter$ScopedCollector reporter = #createScopedProblemReporter();
+        com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporter reporter = #createScopedProblemReporter();
         try {
             ValueInput input = #createTagValueInput(reporter, instance.getLevel().registryAccess(), nbttagcompound);
             instance.loadWithComponents(input);

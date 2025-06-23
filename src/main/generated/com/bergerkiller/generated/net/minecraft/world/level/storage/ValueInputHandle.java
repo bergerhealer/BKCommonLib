@@ -21,12 +21,12 @@ public abstract class ValueInputHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static ValueInputHandle forNBTOnWorld(Object problemReporter, World world, CommonTagCompound nbttagcompound) {
-        return T.forNBTOnWorld.invoke(problemReporter, world, nbttagcompound);
+    public static ValueInputHandle forNBTOnWorld(Object problemreporter, World world, CommonTagCompound nbttagcompound) {
+        return T.forNBTOnWorld.invoke(problemreporter, world, nbttagcompound);
     }
 
-    public static ValueInputHandle forNBT(Object problemReporter, Object holderLookup, CommonTagCompound nbttagcompound) {
-        return T.forNBT.invoke(problemReporter, holderLookup, nbttagcompound);
+    public static ValueInputHandle forNBT(Object problemreporter, Object holderLookup, CommonTagCompound nbttagcompound) {
+        return T.forNBT.invoke(problemreporter, holderLookup, nbttagcompound);
     }
 
     public abstract CommonTagCompound asNBT();

@@ -50,7 +50,7 @@ public class NullPacketDataSerializerInit {
         // If class already exists, the library was probably reloaded. The generated class doesn't touch
         // any of this library's code, so it's fine to keep using that one.
         try {
-            Class.forName(CLASS_NAME);
+            Resolver.getClassByExactName(CLASS_NAME);
             return;
         } catch (ClassNotFoundException ex) { /* expected */ }
 

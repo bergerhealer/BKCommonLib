@@ -5,7 +5,9 @@ import static org.junit.Assert.*;
 import java.lang.reflect.Modifier;
 import java.util.Set;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.hooks.AdvancementDataPlayerHook;
+import com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporterInit;
 import com.bergerkiller.bukkit.common.wrappers.InteractionResult;
 import com.bergerkiller.bukkit.common.wrappers.RelativeFlags;
 import org.junit.Assert;
@@ -87,6 +89,20 @@ public class InternalLogicInitializeTest {
     @Test
     public void testEntityMoveHandler() {
         EntityMoveHandler.assertInitialized();
+    }
+
+    @Test
+    public void testScopedProblemReporter() {
+        if (!CommonBootstrap.evaluateMCVersion(">=", "1.21.6")) {
+            return;
+        }
+
+        ScopedProblemReporterInit.initialize();
+        try {
+            Resolver.getClassByExactName(ScopedProblemReporterInit.CLASS_NAME);
+        } catch (Throwable t) {
+            fail("Scoped problem reporter not initialized");
+        }
     }
 
     @Test

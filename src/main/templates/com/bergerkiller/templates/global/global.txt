@@ -222,22 +222,22 @@ import net.minecraft.world.level.storage.TagValueInput;
 
 // This is all needed for serialization functions (save/load) on 1.21.6+
 #if version >= 1.21.6
-    #require net.minecraft.util.ProblemReporter.ScopedCollector public static net.minecraft.util.ProblemReporter.ScopedCollector createScopedProblemReporter() {
-        return new net.minecraft.util.ProblemReporter$ScopedCollector(
+    #require net.minecraft.util.ProblemReporter public static com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporter createScopedProblemReporter() {
+        return new com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporter(
                 com.bergerkiller.bukkit.common.Logging.LOGGER);
     }
 
     #require TagValueOutput public static ValueOutput createTagValueOutput(net.minecraft.util.ProblemReporter problemreporter, net.minecraft.core.HolderLookup.a holderlookup_a, net.minecraft.nbt.NBTTagCompound nbttagcompound) {
         #require TagValueOutput static TagValueOutput tagValueOutputCtor:<init>(net.minecraft.util.ProblemReporter problemreporter, com.mojang.serialization.DynamicOps<net.minecraft.nbt.NBTBase> dynamicops, net.minecraft.nbt.NBTTagCompound nbttagcompound);
 
-        com.mojang.serialization.DynamicOps<net.minecraft.nbt.NBTBase> dynamicops = holderlookup_a.createSerializationContext(net.minecraft.nbt.DynamicOpsNBT.INSTANCE);
+        com.mojang.serialization.DynamicOps dynamicops = holderlookup_a.createSerializationContext(net.minecraft.nbt.DynamicOpsNBT.INSTANCE);
         return #tagValueOutputCtor(problemreporter, dynamicops, nbttagcompound);
     }
 
     #require TagValueOutput public static ValueOutput.TypedOutputList createTagListValueOutput(net.minecraft.util.ProblemReporter problemreporter, net.minecraft.core.HolderLookup.a holderlookup_a, com.mojang.serialization.Codec codec, net.minecraft.nbt.NBTTagList nbttaglist) {
         #require TagValueOutput.TypedListWrapper static TagValueInput.TypedListWrapper tagListOutputCtor:<init>(net.minecraft.util.ProblemReporter problemreporter, String s, com.mojang.serialization.DynamicOps<net.minecraft.nbt.NBTBase> dynamicops, com.mojang.serialization.Codec codec, net.minecraft.nbt.NBTTagList nbttaglist);
 
-        com.mojang.serialization.DynamicOps<net.minecraft.nbt.NBTBase> dynamicops = holderlookup_a.createSerializationContext(net.minecraft.nbt.DynamicOpsNBT.INSTANCE);
+        com.mojang.serialization.DynamicOps dynamicops = holderlookup_a.createSerializationContext(net.minecraft.nbt.DynamicOpsNBT.INSTANCE);
         return (ValueOutput.TypedOutputList) #tagListOutputCtor(problemreporter, "", dynamicops, codec, nbttaglist);
     }
 
@@ -251,6 +251,6 @@ import net.minecraft.world.level.storage.TagValueInput;
         }
 
         #require TagValueInput.TypedListWrapper static TagValueInput.TypedListWrapper tagListInputCtor:<init>(net.minecraft.util.ProblemReporter problemreporter, String s, net.minecraft.world.level.storage.ValueInputContextHelper context, com.mojang.serialization.Codec codec, net.minecraft.nbt.NBTTagList nbttaglist);
-        return (ValueInput.TypedInputList) #tagListInputCtor(problemreporter, "", context, codec, nbttaglist);
+        return (ValueInput$TypedInputList) #tagListInputCtor(problemreporter, "", context, codec, nbttaglist);
     }
 #endif

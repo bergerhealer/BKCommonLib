@@ -9,7 +9,7 @@ class PlayerInventory extends IInventory {
 #if version >= 1.21.6
     public (CommonTagList) NBTTagList saveToNBT((CommonTagList) NBTTagList nbttaglist) {
         net.minecraft.core.HolderLookup$a holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
-        net.minecraft.util.ProblemReporter$ScopedCollector reporter = #createScopedProblemReporter();
+        com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporter reporter = #createScopedProblemReporter();
         try {
             net.minecraft.world.level.storage.ValueOutput$TypedOutputList valueList = #createTagListValueOutput(reporter, holderLookup, net.minecraft.world.ItemStackWithSlot.CODEC, nbttaglist);
             instance.save(valueList);
@@ -19,7 +19,7 @@ class PlayerInventory extends IInventory {
     }
     public void loadFromNBT((CommonTagList) NBTTagList nbttaglist) {
         net.minecraft.core.HolderLookup$a holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
-        net.minecraft.util.ProblemReporter$ScopedCollector reporter = #createScopedProblemReporter();
+        com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporter reporter = #createScopedProblemReporter();
         try {
             net.minecraft.world.level.storage.ValueInput$TypedInputList valueList = #createTagListValueInput(reporter, holderLookup, net.minecraft.world.ItemStackWithSlot.CODEC, nbttaglist);
             instance.load(valueList);
