@@ -5,7 +5,6 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.controller.PlayerDataController;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
-import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.players.PlayerListHandle;
@@ -159,10 +158,9 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
     @ClassHook.HookImport("net.minecraft.world.entity.player.EntityHuman")
     @ClassHook.HookImport("net.minecraft.util.ProblemReporter")
     @ClassHook.HookImport("net.minecraft.core.IRegistryCustom")
+    @ClassHook.HookImport("net.minecraft.nbt.NBTTagCompound")
     @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
     protected static class PlayerFileDataHook extends ClassHook<PlayerFileDataHook> implements Hook {
-        private static final boolean LOAD_RETURNS_OPTIONAL = CommonBootstrap.evaluateMCVersion(">=", "1.20.5");
-        private static final boolean HAS_OFFLINE_LOAD = CommonBootstrap.evaluateMCVersion(">=", "1.20.5");
         public PlayerDataController controller = null;
         private PlayerFileDataHandler_1_21_6 handler = null;
         private final ThreadLocal<LocalCallState> activeCallState = new ThreadLocal<>();
@@ -172,8 +170,29 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
             base.handler = handler;
         }
 
+        @HookMethodCondition("paper")
+        @HookMethod("public Optional<NBTTagCompound> load(String name, String uuid, ProblemReporter problemReporter)")
+        public java.util.Optional<Object> loadOfflinePaper(String name, String uuid, Object problemReporter) {
+            if (this.controller != null) {
+                CommonTagCompound compound = null;
+                try {
+                    activeCallState.set(new LocalCallState(problemReporter, null));
+                    compound = this.controller.onLoadOffline(name, uuid);
+                } catch (Throwable t) {
+                    Logging.LOGGER.log(Level.SEVERE, "Failed to handle onLoadOffline() on " + this.controller, t);
+                } finally {
+                    activeCallState.remove();
+                }
+                return (compound == null) ? java.util.Optional.empty()
+                        : java.util.Optional.of(compound.getRawHandle());
+            }
+
+            return base.loadOfflinePaper(name, uuid, problemReporter);
+        }
+
+        @HookMethodCondition("!paper")
         @HookMethod("public Optional<ValueInput> load(String name, String uuid, ProblemReporter problemreporter, IRegistryCustom registryAccess)")
-        public java.util.Optional<Object> loadOffline(String name, String uuid, Object problemReporter, Object registryAccess) {
+        public java.util.Optional<Object> loadOfflineSpigot(String name, String uuid, Object problemReporter, Object registryAccess) {
             if (this.controller != null) {
                 CommonTagCompound compound = null;
                 try {
@@ -189,7 +208,7 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
                                 problemReporter, registryAccess, compound).getRaw());
             }
 
-            return base.loadOffline(name, uuid, problemReporter, registryAccess);
+            return base.loadOfflineSpigot(name, uuid, problemReporter, registryAccess);
         }
 
         @HookMethod("public java.util.Optional<ValueInput> load(EntityHuman entityhuman, ProblemReporter problemreporter)")
@@ -255,17 +274,17 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
             {
                 // Re-use a problem reporter / registry access if this is during an active (on-thread) load call
                 // This way if a hook onLoad calls super onOfflineLoad, it doesn't create a whole new problem reporter
+                // The registryAccess field might be null, then we use the server registry access if needed
                 LocalCallState localCallState = activeCallState.get();
-                if (localCallState != null && localCallState.problemReporter != null && localCallState.registryAccess != null) {
+                if (localCallState != null) {
                     return base_load_offline_with_reporter(playerName, playerUUID,
                             localCallState.problemReporter, localCallState.registryAccess);
                 }
             }
 
-            Object registryAccess = handler.getServerRegistryAccess.invoke(null);
             ProblemReporterHandle problemReporter = ProblemReporterHandle.createScoped();
             try {
-                return base_load_offline_with_reporter(playerName, playerUUID, problemReporter.getRaw(), registryAccess);
+                return base_load_offline_with_reporter(playerName, playerUUID, problemReporter.getRaw(), null);
             } finally {
                 problemReporter.close();
             }
@@ -284,10 +303,21 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
         }
 
         private CommonTagCompound base_load_offline_with_reporter(String name, String uuid, Object problemReporter, Object registryAccess) {
-            return base.loadOffline(name, uuid, problemReporter, registryAccess)
-                    .map(ValueInputHandle::createHandle)
-                    .map(ValueInputHandle::asNBT)
-                    .orElse(null);
+            if (Common.IS_PAPERSPIGOT_SERVER) {
+                return base.loadOfflinePaper(name, uuid, problemReporter)
+                        .map(ValueInputHandle::createHandle)
+                        .map(ValueInputHandle::asNBT)
+                        .orElse(null);
+            } else {
+                if (registryAccess == null) {
+                    registryAccess = handler.getServerRegistryAccess.invoke(null);
+                }
+
+                return base.loadOfflineSpigot(name, uuid, problemReporter, registryAccess)
+                        .map(ValueInputHandle::createHandle)
+                        .map(ValueInputHandle::asNBT)
+                        .orElse(null);
+            }
         }
 
         private static class LocalCallState {
