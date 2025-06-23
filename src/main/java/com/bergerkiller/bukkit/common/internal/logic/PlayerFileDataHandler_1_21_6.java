@@ -1,21 +1,17 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
-import java.io.File;
-import java.util.logging.Level;
-
-import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
-import com.bergerkiller.mountiplex.reflection.ClassHook;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.controller.PlayerDataController;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.players.PlayerListHandle;
+import com.bergerkiller.generated.net.minecraft.util.ProblemReporterHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.storage.ValueInputHandle;
+import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
@@ -24,17 +20,23 @@ import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+
+import java.io.File;
+import java.util.logging.Level;
 
 /**
  * Handler for Minecraft 1.16 and later
  */
-class PlayerFileDataHandler_1_16 extends PlayerFileDataHandler {
+class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
     private final FastMethod<File> getPlayerFolderOfWorld = new FastMethod<File>();
+    private final FastMethod<Object> getServerRegistryAccess = new FastMethod<>();
     private final FastField<Object> playerListFileDataField;
 
-    public PlayerFileDataHandler_1_16() {
+    public PlayerFileDataHandler_1_21_6() {
         ClassResolver resolver = new ClassResolver();
         resolver.setDeclaredClassName("net.minecraft.server.level.WorldServer");
         resolver.setVariable("version", Common.MC_VERSION);
@@ -45,19 +47,26 @@ class PlayerFileDataHandler_1_16 extends PlayerFileDataHandler {
         {
             MethodDeclaration getPlayerFolderOfWorldMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess("" +
                     "public java.io.File getPlayerDir() {\n" +
-                    "#if version > 1.21.4 && paper\n" +
+                    "#if paper\n" +
                     "    return new java.io.File(instance.levelStorageAccess.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
-                    "#elseif version == 1.21.4 && paper && exists net.minecraft.server.level.WorldServer public final net.minecraft.world.level.storage.Convertable.ConversionSession levelStorageAccess;\n" +
-                    "    return new java.io.File(instance.levelStorageAccess.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
-                    "#elseif version >= 1.18\n" +
-                    "    return new java.io.File(instance.convertable.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
                     "#else\n" +
-                    "    return new java.io.File(instance.convertable.a(instance.getDimensionKey()), \"playerdata\");\n" +
+                    "    return new java.io.File(instance.convertable.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
                     "#endif\n" +
                     "}", resolver));
-            getPlayerFolderOfWorld.init(getPlayerFolderOfWorldMethod);  
+            getPlayerFolderOfWorld.init(getPlayerFolderOfWorldMethod);
+            getPlayerFolderOfWorld.forceInitialization();
         }
-        String fieldName = CommonBootstrap.evaluateMCVersion(">=", "1.17") ? "playerIo" : "playerFileData";
+
+        {
+            MethodDeclaration getServerRegistryAccessMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess("" +
+                    "public static net.minecraft.core.IRegistryCustom getServerRegistryAccess() {\n" +
+                    "    return org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();\n" +
+                    "}", resolver));
+            getServerRegistryAccess.init(getServerRegistryAccessMethod);
+            getServerRegistryAccess.forceInitialization();
+        }
+
+        String fieldName = "playerIo";
         Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.WorldNBTStorage");
         String realFieldName = Resolver.resolveFieldName(PlayerListHandle.T.getType(), fieldName);
         playerListFileDataField = CommonUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), realFieldName, playerFileDataType).getFastField());
@@ -128,6 +137,7 @@ class PlayerFileDataHandler_1_16 extends PlayerFileDataHandler {
             return hook;
         } else if ((hook == null) && (action != HookAction.UNHOOK)) {
             hook = new PlayerFileDataHook();
+            hook.setHandler(this);
             if (action == HookAction.MOCK) {
                 hook.mock(playerFileData);
             } else {
@@ -136,6 +146,7 @@ class PlayerFileDataHandler_1_16 extends PlayerFileDataHandler {
         } else if ((hook != null) && (action == HookAction.UNHOOK)) {
             playerListFileDataField.set(playerList, PlayerFileDataHook.unhook(playerFileData));
             hook = new PlayerFileDataHook();
+            hook.setHandler(this);
             hook.mock(playerFileData);
         }
         return hook;
@@ -143,51 +154,65 @@ class PlayerFileDataHandler_1_16 extends PlayerFileDataHandler {
 
     // hooks WorldNBTStorage
     @ClassHook.HookPackage("net.minecraft.server")
+    @ClassHook.HookImport("net.minecraft.world.level.storage.ValueInput")
+    @ClassHook.HookImport("net.minecraft.world.level.storage.ValueOutput")
+    @ClassHook.HookImport("net.minecraft.world.entity.player.EntityHuman")
+    @ClassHook.HookImport("net.minecraft.util.ProblemReporter")
+    @ClassHook.HookImport("net.minecraft.core.IRegistryCustom")
     @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
-    protected static class PlayerFileDataHook extends ClassHook<PlayerFileDataHook> implements PlayerFileDataHandler.Hook {
+    protected static class PlayerFileDataHook extends ClassHook<PlayerFileDataHook> implements Hook {
         private static final boolean LOAD_RETURNS_OPTIONAL = CommonBootstrap.evaluateMCVersion(">=", "1.20.5");
         private static final boolean HAS_OFFLINE_LOAD = CommonBootstrap.evaluateMCVersion(">=", "1.20.5");
         public PlayerDataController controller = null;
+        private PlayerFileDataHandler_1_21_6 handler = null;
+        private final ThreadLocal<LocalCallState> activeCallState = new ThreadLocal<>();
 
-        @HookMethodCondition("version >= 1.20.5")
-        @HookMethod("public java.util.Optional<net.minecraft.nbt.NBTTagCompound> load(String name, String uuid)")
-        public java.util.Optional<Object> loadOfflineOpt(String name, String uuid) {
+        private void setHandler(PlayerFileDataHandler_1_21_6 handler) {
+            this.handler = handler;
+            base.handler = handler;
+        }
+
+        @HookMethod("public Optional<ValueInput> load(String name, String uuid, ProblemReporter problemreporter, IRegistryCustom registryAccess)")
+        public java.util.Optional<Object> loadOffline(String name, String uuid, Object problemReporter, Object registryAccess) {
             if (this.controller != null) {
                 CommonTagCompound compound = null;
                 try {
+                    activeCallState.set(new LocalCallState(problemReporter, registryAccess));
                     compound = this.controller.onLoadOffline(name, uuid);
                 } catch (Throwable t) {
                     Logging.LOGGER.log(Level.SEVERE, "Failed to handle onLoadOffline() on " + this.controller, t);
+                } finally {
+                    activeCallState.remove();
                 }
                 return (compound == null) ? java.util.Optional.empty()
-                        : java.util.Optional.of(compound.getRawHandle());
+                        : java.util.Optional.of(ValueInputHandle.forNBT(
+                                problemReporter, registryAccess, compound).getRaw());
             }
-            return base.loadOfflineOpt(name, uuid);
+
+            return base.loadOffline(name, uuid, problemReporter, registryAccess);
         }
 
-        @HookMethodCondition("version >= 1.20.5")
-        @HookMethod("public abstract java.util.Optional<net.minecraft.nbt.NBTTagCompound> load(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
-        public java.util.Optional<Object> loadOpt(Object entityHuman) {
+        @HookMethod("public java.util.Optional<ValueInput> load(EntityHuman entityhuman, ProblemReporter problemreporter)")
+        public java.util.Optional<Object> load(Object entityHuman, Object problemReporter) {
             if (this.controller != null) {
                 Player player = CommonUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);
                 if (player != null) {
                     CommonTagCompound compound = null;
                     try {
+                        activeCallState.set(new LocalCallState(problemReporter, null));
                         compound = this.controller.onLoad(player);
                     } catch (Throwable t) {
                         Logging.LOGGER.log(Level.SEVERE, "Failed to handle onLoad() on " + this.controller, t);
+                    } finally {
+                        activeCallState.remove();
                     }
                     return (compound == null) ? java.util.Optional.empty()
-                            : java.util.Optional.of(compound.getRawHandle());
+                            : java.util.Optional.of(ValueInputHandle.forNBTOnWorld(
+                                    problemReporter, player.getWorld(), compound).getRaw());
                 }
             }
-            return base_load_raw(entityHuman);
-        }
 
-        @HookMethodCondition("version < 1.20.5")
-        @HookMethod("public abstract net.minecraft.nbt.NBTTagCompound load(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
-        public Object load(Object entityHuman) {
-            return this.loadOpt(entityHuman).orElse(null);
+            return base.load(entityHuman, problemReporter);
         }
 
         @HookMethod("public abstract void save(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
@@ -208,31 +233,71 @@ class PlayerFileDataHandler_1_16 extends PlayerFileDataHandler {
 
         @Override
         public CommonTagCompound base_load(HumanEntity human) {
-            return base_load_raw(HandleConversion.toEntityHandle(human))
-                    .map(CommonTagCompound::create).orElse(null);
+            {
+                // Re-use a problem reporter if this is during an active (on-thread) load call
+                // This way if a hook onLoad calls super onLoad, it doesn't create a whole new problem reporter
+                LocalCallState localCallState = activeCallState.get();
+                if (localCallState != null) {
+                    return base_load_with_reporter(human, localCallState.problemReporter);
+                }
+            }
+
+            ProblemReporterHandle problemReporter = ProblemReporterHandle.createScoped();
+            try {
+                return base_load_with_reporter(human, problemReporter.getRaw());
+            } finally {
+                problemReporter.close();
+            }
         }
 
         @Override
         public CommonTagCompound base_load_offline(String playerName, String playerUUID) {
-            if (HAS_OFFLINE_LOAD) {
-                return base.loadOfflineOpt(playerName, playerUUID)
-                        .map(CommonTagCompound::create).orElse(null);
-            } else {
-                throw new UnsupportedOperationException("Not supported on this version of Minecraft");
+            {
+                // Re-use a problem reporter / registry access if this is during an active (on-thread) load call
+                // This way if a hook onLoad calls super onOfflineLoad, it doesn't create a whole new problem reporter
+                LocalCallState localCallState = activeCallState.get();
+                if (localCallState != null && localCallState.problemReporter != null && localCallState.registryAccess != null) {
+                    return base_load_offline_with_reporter(playerName, playerUUID,
+                            localCallState.problemReporter, localCallState.registryAccess);
+                }
             }
-        }
 
-        private java.util.Optional<Object> base_load_raw(Object entityHuman) {
-            if (LOAD_RETURNS_OPTIONAL) {
-                return base.loadOpt(entityHuman);
-            } else {
-                return java.util.Optional.ofNullable(base.load(entityHuman));
+            Object registryAccess = handler.getServerRegistryAccess.invoke(null);
+            ProblemReporterHandle problemReporter = ProblemReporterHandle.createScoped();
+            try {
+                return base_load_offline_with_reporter(playerName, playerUUID, problemReporter.getRaw(), registryAccess);
+            } finally {
+                problemReporter.close();
             }
         }
 
         @Override
         public void base_save(HumanEntity human) {
             base.save(HandleConversion.toEntityHandle(human));
+        }
+
+        private CommonTagCompound base_load_with_reporter(HumanEntity human, Object problemReporter) {
+            return base.load(HandleConversion.toEntityHandle(human), problemReporter)
+                    .map(ValueInputHandle::createHandle)
+                    .map(ValueInputHandle::asNBT)
+                    .orElse(null);
+        }
+
+        private CommonTagCompound base_load_offline_with_reporter(String name, String uuid, Object problemReporter, Object registryAccess) {
+            return base.loadOffline(name, uuid, problemReporter, registryAccess)
+                    .map(ValueInputHandle::createHandle)
+                    .map(ValueInputHandle::asNBT)
+                    .orElse(null);
+        }
+
+        private static class LocalCallState {
+            public final Object problemReporter;
+            public final Object registryAccess;
+
+            public LocalCallState(Object problemReporter, Object registryAccess) {
+                this.problemReporter = problemReporter;
+                this.registryAccess = registryAccess;
+            }
         }
     }
 

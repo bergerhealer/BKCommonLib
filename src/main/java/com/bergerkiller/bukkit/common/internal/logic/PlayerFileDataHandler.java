@@ -17,7 +17,8 @@ import com.bergerkiller.mountiplex.reflection.util.LazyInitializedObject;
 public abstract class PlayerFileDataHandler implements LazyInitializedObject, LibraryComponent {
     public static final PlayerFileDataHandler INSTANCE = LibraryComponentSelector.forModule(PlayerFileDataHandler.class)
             .addVersionOption(null, "1.15.2", PlayerFileDataHandler_1_8_to_1_15_2::new)
-            .addVersionOption("1.16", null, PlayerFileDataHandler_1_16::new)
+            .addVersionOption("1.16", "1.21.5", PlayerFileDataHandler_1_16_to_1_21_5::new)
+            .addVersionOption("1.21.6", null, PlayerFileDataHandler_1_21_6::new)
             .update();
 
     public abstract PlayerDataController get();

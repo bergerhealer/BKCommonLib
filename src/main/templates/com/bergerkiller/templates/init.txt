@@ -93,6 +93,7 @@
 #include /net/minecraft/util_inthashmap.txt
 #include /net/minecraft/util_registryid.txt
 #include /net/minecraft/util_random.txt
+#include /net/minecraft/util_problemreporter.txt
 #include /net/minecraft/world/damagesource.txt
 #include /net/minecraft/world/foodmeta.txt
 #include /net/minecraft/world/inventory.txt

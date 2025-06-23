@@ -1,0 +1,18 @@
+package net.minecraft.util;
+
+import com.bergerkiller.generated.net.minecraft.util.ProblemReporterHandle;
+
+// Since 1.21.6
+class ProblemReporter {
+
+    public static (ProblemReporterHandle) ProblemReporter createScoped() {
+        // Global macro
+        return #createScopedProblemReporter();
+    }
+
+    public void close() {
+        if (instance instanceof AutoCloseable) {
+            ((AutoCloseable) instance).close();
+        }
+    }
+}
