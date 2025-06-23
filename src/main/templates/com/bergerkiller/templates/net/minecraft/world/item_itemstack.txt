@@ -135,6 +135,25 @@ class ItemStack {
 #endif
     }
 
+    // This is done on Paper as a fix when calling ItemStack setType(), but is not
+    // done on Spigot. This function is called in CommonItemStack setType() to work
+    // around this problem.
+    //
+    // Basically, it ensures the components map is derived from the new item's base components.
+    // Without doing this, it breaks serialization of data components after this point.
+    public void refreshPatchMap() {
+#if !paper && version >= 1.20.5
+        net.minecraft.core.component.DataComponentPatch patch = instance.getComponentsPatch();
+
+        net.minecraft.core.component.PatchedDataComponentMap newComponents;
+        newComponents = new net.minecraft.core.component.PatchedDataComponentMap(instance.getItem().components());
+        #require ItemStack final net.minecraft.core.component.PatchedDataComponentMap components;
+        instance#components = newComponents;
+
+        instance.applyComponents(patch);
+#endif
+    }
+
 #if version >= 1.20.5
     public (ChatText) IChatBaseComponent getCustomName() {
         return (IChatBaseComponent) instance.get(DataComponents.CUSTOM_NAME);

@@ -362,8 +362,18 @@ public final class CommonItemStack implements Cloneable {
      * @return this CommonItemStack
      */
     public CommonItemStack setType(Material type) {
-        toBukkit(true).setType(type);
+        ItemStack bukkitItemStack = toBukkit(true);
+        if (bukkitItemStack.getType() == type) {
+            return this;
+        }
+
+        bukkitItemStack.setType(type);
         this.invalidateItemStackHandle();
+
+        // This is important for Spigot. After calling setType(), the patch components map
+        // is outdated and still derived from the old type. This function rebuilds the
+        // components map, ensuring it's derived from the new type.
+        getHandle(false).ifPresent(ItemStackHandle::refreshPatchMap);
         return this;
     }
 
