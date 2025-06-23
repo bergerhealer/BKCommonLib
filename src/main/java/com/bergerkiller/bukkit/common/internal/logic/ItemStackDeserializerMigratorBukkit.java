@@ -281,8 +281,14 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
             return !Helper.ADDED_MC_1_21_5.contains(type);
         });
 
+        // From MC 1.21.5 to 1.21.6
+        this.register(4325, map -> {
+            Object type = map.get("type");
+            return !Helper.ADDED_MC_1_21_6.contains(type);
+        });
+
         // Maximum supported data version
-        this.setMaximumDataVersion(4325); // MC 1.21.5
+        this.setMaximumDataVersion(4435); // MC 1.21.6
     }
 
     public ItemMetaDeserializer getItemMetaDeserializer() {
@@ -787,5 +793,11 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
                 "TEST_BLOCK", "TEST_INSTANCE_BLOCK",
                 "BLUE_EGG", "BROWN_EGG"
         ));
+
+        // All material names (Material enum) added Minecraft 1.21.5 -> 1.21.6
+        public static final Set<String> ADDED_MC_1_21_6 = makeSet(
+                makeColoredMaterials("HARNESS"),
+                Arrays.asList("DRIED_GHAST", "HAPPY_GHAST_SPAWN_EGG", "MUSIC_DISC_TEARS")
+        );
     }
 }

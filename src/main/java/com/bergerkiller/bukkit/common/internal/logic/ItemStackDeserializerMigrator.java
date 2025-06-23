@@ -22,7 +22,7 @@ public abstract class ItemStackDeserializerMigrator {
 
     public ItemStackDeserializerMigrator() {
         curr_version = CraftMagicNumbersHandle.getDataVersion();
-        max_version = curr_version;
+        max_version = 0;
     }
 
     /**
