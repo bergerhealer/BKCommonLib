@@ -7,7 +7,9 @@ class ProblemReporter {
 
     public static (ProblemReporterHandle) ProblemReporter createScoped() {
         // Global macro
+#if version >= 1.21.6
         return #createScopedProblemReporter();
+#endif
     }
 
     public void close() {

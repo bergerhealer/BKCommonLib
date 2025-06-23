@@ -33,7 +33,7 @@ class ValueInput {
 #if version >= 1.21.6
         return TagValueInput.create(problemreporter, world.registryAccess(), nbttagcompound);
 #else
-        return nbtTagCompound;
+        return nbttagcompound;
 #endif
     }
 
@@ -41,7 +41,7 @@ class ValueInput {
 #if version >= 1.21.6
         return TagValueInput.create(problemreporter, holderLookup, nbttagcompound);
 #else
-        return nbtTagCompound;
+        return nbttagcompound;
 #endif
     }
 }
