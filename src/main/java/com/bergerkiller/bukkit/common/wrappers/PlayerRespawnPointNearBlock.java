@@ -6,6 +6,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import org.bukkit.Location;
@@ -25,7 +26,7 @@ public class PlayerRespawnPointNearBlock extends PlayerRespawnPoint {
     private WeakReference<World> cachedWorld = LogicUtil.nullWeakReference();
 
     public PlayerRespawnPointNearBlock(ResourceKey<World> dimensionKey, int blockX, int blockY, int blockZ, float angle, boolean forced) {
-        this(EntityPlayerHandle.RespawnConfigHandle.of(dimensionKey, new IntVector3(blockX, blockY, blockZ), angle, forced));
+        this(EntityPlayerHandle.RespawnConfigHandle.of(dimensionKey, null, new IntVector3(blockX, blockY, blockZ), angle, forced));
     }
 
     public PlayerRespawnPointNearBlock(World world, int blockX, int blockY, int blockZ, float angle, boolean forced) {
@@ -127,7 +128,7 @@ public class PlayerRespawnPointNearBlock extends PlayerRespawnPoint {
      */
     public PlayerRespawnPointNearBlock withForced(boolean forced) {
         return new PlayerRespawnPointNearBlock(EntityPlayerHandle.RespawnConfigHandle.of(
-                handle.dimension(), handle.position(), handle.angle(), forced));
+                handle.dimension(), handle.worldName(), handle.position(), handle.angle(), forced));
     }
 
     @Override
@@ -138,8 +139,6 @@ public class PlayerRespawnPointNearBlock extends PlayerRespawnPoint {
     @Override
     public void toNBT(CommonTagCompound nbt) {
         if (CommonCapabilities.IS_RESPAWN_POINT_PACKED) {
-            EntityPlayerHandle.RespawnConfigHandle.codecToNBT(handle, nbt);
-
             // Just in case...
             nbt.remove("SpawnWorld");
             nbt.remove("SpawnDimension");
@@ -148,12 +147,29 @@ public class PlayerRespawnPointNearBlock extends PlayerRespawnPoint {
             nbt.remove("SpawnZ");
             nbt.remove("SpawnAngle");
             nbt.remove("SpawnForced");
+
+            EntityPlayerHandle.RespawnConfigHandle.codecToNBT(handle, nbt);
         } else {
             if (CommonCapabilities.PLAYER_SPAWN_WORLD_IS_DIMENSION_KEY) {
-                nbt.putMinecraftKey("SpawnDimension", WorldUtil.getDimensionKey(getWorld()).getName());
+                ResourceKey<World> dimension = handle.dimension();
+                if (dimension == null) {
+                    PlayerRespawnPoint.NONE.toNBT(nbt);
+                    return;
+                }
+                nbt.putMinecraftKey("SpawnDimension", dimension.getName());
                 nbt.remove("SpawnWorld");
             } else {
-                nbt.putValue("SpawnWorld", getWorld().getName());
+                String worldName = handle.worldName();
+                if (worldName == null) {
+                    World world = getWorld();
+                    if (world == null) {
+                        PlayerRespawnPoint.NONE.toNBT(nbt);
+                        return;
+                    } else {
+                        worldName = world.getName();
+                    }
+                }
+                nbt.putValue("SpawnWorld", worldName);
                 nbt.remove("SpawnDimension");
             }
             IntVector3 blockPos = getBlockPosition();

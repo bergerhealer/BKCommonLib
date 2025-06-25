@@ -99,8 +99,8 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
 
         /* ============================================================================== */
 
-        public static RespawnConfigHandle of(ResourceKey<World> dimension, IntVector3 position, float angle, boolean forced) {
-            return T.of.invoke(dimension, position, angle, forced);
+        public static RespawnConfigHandle of(ResourceKey<World> dimension, String worldName, IntVector3 position, float angle, boolean forced) {
+            return T.of.invoke(dimension, worldName, position, angle, forced);
         }
 
         public static RespawnConfigHandle codecFromNBT(CommonTagCompound nbt) {
@@ -113,6 +113,7 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
 
         public abstract ResourceKey<World> dimension();
         public abstract IntVector3 position();
+        public abstract String worldName();
         public abstract float angle();
         public abstract boolean forced();
         public org.bukkit.World world() {
@@ -120,7 +121,7 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
         }
 
         public static EntityPlayerHandle.RespawnConfigHandle of(org.bukkit.World world, IntVector3 position, float angle, boolean forced) {
-            return of(com.bergerkiller.bukkit.common.utils.WorldUtil.getDimensionKey(world), position, angle, forced);
+            return of(com.bergerkiller.bukkit.common.utils.WorldUtil.getDimensionKey(world), world.getName(), position, angle, forced);
         }
         /**
          * Stores class members for <b>net.minecraft.server.level.EntityPlayer.RespawnConfig</b>.
@@ -133,6 +134,7 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
 
             public final Template.Method.Converted<ResourceKey<World>> dimension = new Template.Method.Converted<ResourceKey<World>>();
             public final Template.Method.Converted<IntVector3> position = new Template.Method.Converted<IntVector3>();
+            public final Template.Method<String> worldName = new Template.Method<String>();
             public final Template.Method<Float> angle = new Template.Method<Float>();
             public final Template.Method<Boolean> forced = new Template.Method<Boolean>();
 

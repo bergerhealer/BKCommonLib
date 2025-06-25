@@ -113,13 +113,17 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         // World dimension on 1.16 and later
         // Before
         ResourceKey dimension;
+        String worldName;
   #if version >= 1.18
         dimension = instance.getRespawnDimension();
+        worldName = null;
   #elseif version >= 1.16
         dimension = instance.getSpawnDimension();
+        worldName = null;
   #else
         //TODO: Do this conversion without first looking up the World?
         dimension = null;
+        worldName = instance.spawnWorld;
         if (instance.spawnWorld != null) {
             org.bukkit.World bukkitSpawnWorld = org.bukkit.Bukkit.getWorld(instance.spawnWorld);
             if (bukkitSpawnWorld != null) {
@@ -129,7 +133,7 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         }
   #endif
 
-        if (dimension == null) return null;
+        if (dimension == null && worldName == null) return null;
 
         BlockPosition position = instance#spawnCoord;
         if (position == null) return null;
@@ -142,7 +146,7 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 
         boolean forced = instance#spawnForced;
 
-        return new EntityPlayer$RespawnConfig(dimension, position, angle, forced);
+        return new EntityPlayer$RespawnConfig(dimension, worldName, position, angle, forced);
     }
 
     public void setRespawnConfigSilent((EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig respawnConfig) {
@@ -442,6 +446,9 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 #if version >= 1.21.5
         public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension();
         public (IntVector3) BlockPosition position:pos();
+        public String worldName() {
+            return null; // Not available
+        }
 #else
         public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension() {
             return (ResourceKey) instance.dimension();
@@ -450,13 +457,19 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         public (IntVector3) BlockPosition position() {
             return (BlockPosition) instance.pos();
         }
+
+        public String worldName();
 #endif
 
         public float angle();
         public boolean forced();
 
-        public static (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig of((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension, (IntVector3) BlockPosition position, float angle, boolean forced) {
+        public static (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig of((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension, String worldName, (IntVector3) BlockPosition position, float angle, boolean forced) {
+#if version >= 1.21.5
             return new EntityPlayer$RespawnConfig(dimension, position, angle, forced);
+#else
+            return new EntityPlayer$RespawnConfig(dimension, worldName, position, angle, forced);
+#endif
         }
 
         public static (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig codecFromNBT((CommonTagCompound) NBTTagCompound nbt) {
@@ -483,7 +496,7 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         }
 
         public static EntityPlayerHandle.RespawnConfigHandle of(org.bukkit.World world, IntVector3 position, float angle, boolean forced) {
-            return of(com.bergerkiller.bukkit.common.utils.WorldUtil.getDimensionKey(world), position, angle, forced);
+            return of(com.bergerkiller.bukkit.common.utils.WorldUtil.getDimensionKey(world), world.getName(), position, angle, forced);
         }
         </code>
     }
