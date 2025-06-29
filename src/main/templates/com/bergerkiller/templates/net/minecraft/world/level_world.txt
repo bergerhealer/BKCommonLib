@@ -12,6 +12,7 @@ import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.phys.MovingObjectPosition;
 import net.minecraft.world.phys.MovingObjectPosition$EnumMovingObjectType;
 import net.minecraft.world.phys.Vec3D;
+import net.minecraft.util.MathHelper;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockDataRegistry;
@@ -286,18 +287,29 @@ class World extends IBlockAccess {
 
 #if version >= 1.18
     public boolean isBurnArea((AxisAlignedBBHandle) AxisAlignedBB bounds) {
-        java.util.stream.Stream iblockdata_in_bounds_stream = instance.getBlockStatesIfLoaded(bounds);
-        java.util.Iterator iter = iblockdata_in_bounds_stream.iterator();
-        while (iter.hasNext()) {
-            IBlockData iblockdata1 = (IBlockData) iter.next();
+        int b_minX = MathHelper.floor(bounds.minX);
+        int b_minY = MathHelper.floor(bounds.minY);
+        int b_minZ = MathHelper.floor(bounds.minZ);
+        int b_maxX = MathHelper.floor(bounds.maxX);
+        int b_maxY = MathHelper.floor(bounds.maxY);
+        int b_maxZ = MathHelper.floor(bounds.maxZ);
+        if (!instance.hasChunksAt(b_minX, b_minY, b_minZ, b_maxX, b_maxY, b_maxZ)) {
+            return false;
+        }
+
+        java.util.Iterator blockPosIter = BlockPosition.betweenClosed(b_minX, b_minY, b_minZ, b_maxX, b_maxY, b_maxZ).iterator();
+        while (blockPosIter.hasNext()) {
+            BlockPosition pos = (BlockPosition) blockPosIter.next();
+            IBlockData iblockdata = instance.getBlockState(pos);
   #if version >= 1.18.2
-            if (iblockdata1.is((net.minecraft.tags.TagKey) net.minecraft.tags.TagsBlock.FIRE) || iblockdata1.is(net.minecraft.world.level.block.Blocks.LAVA)) {
+            if (iblockdata.is((net.minecraft.tags.TagKey) net.minecraft.tags.TagsBlock.FIRE) || iblockdata.is(net.minecraft.world.level.block.Blocks.LAVA)) {
   #else
-            if (iblockdata1.is((net.minecraft.tags.Tag) net.minecraft.tags.TagsBlock.FIRE) || iblockdata1.is(net.minecraft.world.level.block.Blocks.LAVA)) {
+            if (iblockdata.is((net.minecraft.tags.Tag) net.minecraft.tags.TagsBlock.FIRE) || iblockdata.is(net.minecraft.world.level.block.Blocks.LAVA)) {
   #endif
                 return true;
             }
         }
+
         return false;
     }
 #elseif version >= 1.16
