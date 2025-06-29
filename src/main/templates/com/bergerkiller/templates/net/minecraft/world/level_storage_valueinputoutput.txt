@@ -29,19 +29,21 @@ class ValueInput {
 #endif
     }
 
-    public static (ValueInputHandle) ValueInput forNBTOnWorld((Object) ProblemReporter problemreporter, (org.bukkit.World) net.minecraft.world.level.World world, (CommonTagCompound) NBTTagCompound nbttagcompound) {
 #if version >= 1.21.6
+    public static (ValueInputHandle) ValueInput forNBTOnWorld((Object) ProblemReporter problemreporter, (org.bukkit.World) net.minecraft.world.level.World world, (CommonTagCompound) NBTTagCompound nbttagcompound) {
         return TagValueInput.create(problemreporter, world.registryAccess(), nbttagcompound);
-#else
-        return nbttagcompound;
-#endif
     }
 
     public static (ValueInputHandle) ValueInput forNBT((Object) ProblemReporter problemreporter, (Object) HolderLookup.a holderLookup, (CommonTagCompound) NBTTagCompound nbttagcompound) {
-#if version >= 1.21.6
         return TagValueInput.create(problemreporter, holderLookup, nbttagcompound);
-#else
-        return nbttagcompound;
-#endif
     }
+#else
+    public static (ValueInputHandle) ValueInput forNBTOnWorld((Object) Object problemreporter, (org.bukkit.World) Object world, (CommonTagCompound) Object nbttagcompound) {
+        return nbttagcompound;
+    }
+
+    public static (ValueInputHandle) ValueInput forNBT((Object) Object problemreporter, (Object) Object holderLookup, (CommonTagCompound) Object nbttagcompound) {
+        return nbttagcompound;
+    }
+#endif
 }
