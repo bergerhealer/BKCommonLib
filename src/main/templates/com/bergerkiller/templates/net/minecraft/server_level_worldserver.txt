@@ -319,15 +319,17 @@ class WorldServer extends World {
         net.minecraft.world.level.TicketStorage ticketStorage = cps.ticketStorage;
   #endif
 
+        // Translate ticket radius to ticket level
+        int ticketLevel = net.minecraft.server.level.ChunkLevel.byStatus(FullChunkStatus.FULL) - radius;
+
         // On Paper we use the constructor, they removed the of() function for some dumb reason
   #if exists net.minecraft.server.level.Ticket public static Ticket of(TicketType tickettype, int i, Object key);
-        Ticket ticket = Ticket.of(TicketType.PLUGIN_TICKET, radius, (Object) plugin);
+        Ticket ticket = Ticket.of(TicketType.PLUGIN_TICKET, ticketLevel, (Object) plugin);
   #else
-        Ticket ticket = new Ticket(TicketType.PLUGIN_TICKET, radius, (Object) plugin);
+        Ticket ticket = new Ticket(TicketType.PLUGIN_TICKET, ticketLevel, (Object) plugin);
   #endif
 
         ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(x, z);
-
 
         if (loaded) {
             ticketStorage.addTicket(ticket, chunkCoord);
@@ -351,9 +353,6 @@ class WorldServer extends World {
 
         ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(x, z);
   #if version >= 1.21.5
-          #require
-
-
           if (loaded) {
               chunkDistanceManager.addRegionTicket(TicketType.PLUGIN_TICKET, chunkCoord, radius, plugin);
           } else {
