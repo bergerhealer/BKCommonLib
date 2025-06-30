@@ -287,8 +287,11 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
             return !Helper.ADDED_MC_1_21_6.contains(type);
         });
 
+        // From MC 1.21.6 to 1.21.7
+        this.register(4435, ConverterFunction.NO_CONVERSION);
+
         // Maximum supported data version
-        this.setMaximumDataVersion(4435); // MC 1.21.6
+        this.setMaximumDataVersion(4438); // MC 1.21.7
     }
 
     public ItemMetaDeserializer getItemMetaDeserializer() {
