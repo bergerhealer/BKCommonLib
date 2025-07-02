@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.map.gson;
 
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -22,7 +23,11 @@ class SupportedFormatRangeListDeserializer implements JsonDeserializer<List<MapR
     public List<MapResourcePack.Metadata.SupportedFormatRange> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         List<JsonElement> elements;
         if (jsonElement.isJsonArray()) {
-            elements = jsonElement.getAsJsonArray().asList();
+            JsonArray array = jsonElement.getAsJsonArray();
+            elements = new ArrayList<>(array.size());
+            for (int i = 0; i < array.size(); i++) {
+                elements.add(array.get(i));
+            }
         } else {
             elements = Collections.singletonList(jsonElement);
         }
