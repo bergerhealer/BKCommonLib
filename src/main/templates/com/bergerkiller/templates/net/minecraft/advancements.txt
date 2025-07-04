@@ -5,7 +5,13 @@ optional class Advancement {
 
     public static org.bukkit.advancement.Advancement toBukkit(Object advancement_or_holder) {
 #if version >= 1.20.2
+  #if exists net.minecraft.advancements.AdvancementHolder public final org.bukkit.advancement.Advancement toBukkit();
         return ((AdvancementHolder) advancement_or_holder).toBukkit();
+  #elseif exists org.bukkit.craftbukkit.advancement.CraftAdvancement public CraftAdvancement(net.minecraft.advancements.AdvancementHolder handle);
+        return new org.bukkit.craftbukkit.advancement.CraftAdvancement((AdvancementHolder) advancement_or_holder);
+  #else
+        #error No conversion from AdvancementHolder to CraftAdvancement detected
+  #endif
 #else
         return ((Advancement) advancement_or_holder).bukkit;
 #endif

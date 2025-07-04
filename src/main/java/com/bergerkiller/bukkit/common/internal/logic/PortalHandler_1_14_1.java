@@ -228,7 +228,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
         /*
          * <IS_MAIN_WORLD>
          * public static boolean isMainEndWorld(org.bukkit.World world) {
-         *     World world = ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
+         *     World world = (World) ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
          * #if version >= 1.18
          *     return world.dimension() == World.END;
          * #elseif version >= 1.17
@@ -250,7 +250,13 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
          *     PortalTravelAgent agent = new PortalTravelAgent(world);
          * #if version >= 1.21
+         *   #if forge && !exists net.minecraft.world.level.portal.PortalTravelAgent public java.util.Optional<net.minecraft.core.BlockPosition> findClosestPortalPosition(net.minecraft.core.BlockPosition blockposition, net.minecraft.world.level.border.WorldBorder worldborder, int radius);
+         *     // We must use the bool method, the craftbukkit-added radius version doesn't exist
+         *     boolean isSmallRadius = (radius <= 16);
+         *     java.util.Optional opt_result = agent.findClosestPortalPosition(blockposition, isSmallRadius, world.getWorldBorder());
+         *   #else
          *     java.util.Optional opt_result = agent.findClosestPortalPosition(blockposition, world.getWorldBorder(), radius);
+         *   #endif
          *     if (!opt_result.isPresent()) {
          *         return null;
          *     }
@@ -313,7 +319,12 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *     } else {
          *         axis = (Math.random() < 0.5) ? EnumDirection$EnumAxis.Z : EnumDirection$EnumAxis.X;
          *     }
+         *     #require PortalTravelAgent public java.util.Optional<net.minecraft.BlockUtil.Rectangle> createPortal();
+         *   #if forge && !exists net.minecraft.world.level.portal.PortalTravelAgent public java.util.Optional<net.minecraft.BlockUtil.Rectangle> createPortal(net.minecraft.core.BlockPosition blockposition, net.minecraft.core.EnumDirection.EnumAxis enumdirection_enumaxis, net.minecraft.world.entity.Entity entity, int createRadius);
+         *     agent.createPortal(blockposition, axis);
+         *   #else
          *     agent.createPortal(blockposition, axis, initiator, createRadius);
+         *   #endif
          * #elseif version >= 1.16
          *     // Use default entity if null, set it up properly
          *     if (initiator == null) {

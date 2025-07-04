@@ -201,10 +201,19 @@ class ClientboundCustomPayloadPacket extends Packet {
 #if version >= 1.20.5
         CustomPacketPayload payload = instance.payload();
         if (payload instanceof DiscardedPayload) {
+            DiscardedPayload discarded = (DiscardedPayload) payload;
   #if exists net.minecraft.network.protocol.common.custom.DiscardedPayload public byte[] data();
-            return ((DiscardedPayload) payload).data();
+    #if forge && exists net.minecraft.network.protocol.common.custom.DiscardedPayload public byte[] bridge$getData();
+            return discarded.bridge$getData();
+    #else
+            return discarded.data();
+    #endif
   #else
-            io.netty.buffer.ByteBuf payloadData = ((DiscardedPayload) payload).data();
+    #if forge && exists net.minecraft.network.protocol.common.custom.DiscardedPayload public io.netty.buffer.ByteBuf bridge$getData();
+            io.netty.buffer.ByteBuf payloadData = discarded.bridge$getData();
+    #else
+            io.netty.buffer.ByteBuf payloadData = discarded.data();
+    #endif
             byte[] data = new byte[payloadData.readableBytes()];
             payloadData.readBytes(data);
             return data;

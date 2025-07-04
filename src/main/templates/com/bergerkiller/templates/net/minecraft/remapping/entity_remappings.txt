@@ -128,10 +128,18 @@ import net.minecraft.world.level.storage.ValueOutput;
 #endif
 #if version >= 1.21
     #remap net.minecraft.world.entity.Entity public final void igniteForSeconds(float seconds);
+  #if forge && exists net.minecraft.world.entity.Entity public void setSecondsOnFire(float seconds, boolean callEvent);
+    #remap net.minecraft.world.entity.Entity public final void igniteForSeconds:setSecondsOnFire(float seconds, boolean callEvent);
+  #else
     #remap net.minecraft.world.entity.Entity public final void igniteForSeconds(float seconds, boolean callEvent);
+  #endif
 #elseif version >= 1.20.5
     #remap net.minecraft.world.entity.Entity public final void igniteForSeconds(int seconds);
+  #if forge && exists net.minecraft.world.entity.Entity public void setSecondsOnFire(int seconds, boolean callEvent);
+    #remap net.minecraft.world.entity.Entity public final void igniteForSeconds:setSecondsOnFire(int seconds, boolean callEvent);
+  #else
     #remap net.minecraft.world.entity.Entity public final void igniteForSeconds(int seconds, boolean callEvent);
+  #endif
 #elseif version >= 1.18
     #remap net.minecraft.world.entity.Entity public void igniteForSeconds:setSecondsOnFire(int seconds);
     #remap net.minecraft.world.entity.Entity public void igniteForSeconds:setSecondsOnFire(int seconds, boolean callEvent);
