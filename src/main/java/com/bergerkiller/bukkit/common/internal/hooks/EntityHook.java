@@ -46,6 +46,7 @@ public class EntityHook extends ClassHook<EntityHook> {
     private EntityController<?> controller = null;
     private boolean controllerPositionsPassengers = false;
     private Throwable stack = null;
+    private boolean isHandlingBaseDie = false;
 
     public void setStack(Throwable t) {
         this.stack = t;
@@ -431,11 +432,16 @@ public class EntityHook extends ClassHook<EntityHook> {
     }
 
     public void onBaseDeath(boolean killed) {
-        if (CommonCapabilities.ENTITY_REMOVE_WITH_REASON) {
-            BASE_ENTITY_REMOVED.remove(base, killed ? ENTITY_REMOVE_REASON_KILLED
-                                                    : ENTITY_REMOVE_REASON_DISCARDED, null);
-        } else {
-            base.die();
+        try {
+            isHandlingBaseDie = true;
+            if (CommonCapabilities.ENTITY_REMOVE_WITH_REASON) {
+                BASE_ENTITY_REMOVED.remove(base, killed ? ENTITY_REMOVE_REASON_KILLED
+                        : ENTITY_REMOVE_REASON_DISCARDED, null);
+            } else {
+                base.die();
+            }
+        } finally {
+            isHandlingBaseDie = false;
         }
     }
 
@@ -443,7 +449,7 @@ public class EntityHook extends ClassHook<EntityHook> {
     @HookMethod("public void die()")
     public void die() {
         try {
-            if (checkController()) {
+            if (!isHandlingBaseDie && checkController()) {
                 controller.onDie(true);
             } else {
                 base.die();
@@ -457,7 +463,9 @@ public class EntityHook extends ClassHook<EntityHook> {
     @HookMethod("public void remove:???(net.minecraft.world.entity.Entity.RemovalReason removalReason)")
     public void onEntityRemoved(Object removalReason) {
         try {
-            if (checkController()) {
+            if (isHandlingBaseDie) {
+                base.onEntityRemoved(removalReason);
+            } else if (checkController()) {
                 if (removalReason == ENTITY_REMOVE_REASON_KILLED) {
                     controller.onDie(true);
                 } else if (removalReason == ENTITY_REMOVE_REASON_DISCARDED) {
@@ -479,7 +487,9 @@ public class EntityHook extends ClassHook<EntityHook> {
     @HookMethod("public void remove(net.minecraft.world.entity.Entity.RemovalReason removalReason, org.bukkit.event.entity.EntityRemoveEvent.Cause cause);")
     public void onEntityRemovedWithCause(Object removalReason, Object removeEventCause) {
         try {
-            if (checkController()) {
+            if (isHandlingBaseDie) {
+                base.onEntityRemovedWithCause(removalReason, removeEventCause);
+            } else if (checkController()) {
                 if (removalReason == ENTITY_REMOVE_REASON_KILLED) {
                     controller.onDie(true);
                 } else if (removalReason == ENTITY_REMOVE_REASON_DISCARDED) {
