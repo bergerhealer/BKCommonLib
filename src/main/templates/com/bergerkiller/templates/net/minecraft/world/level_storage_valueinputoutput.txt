@@ -38,11 +38,11 @@ class ValueInput {
         return TagValueInput.create(problemreporter, holderLookup, nbttagcompound);
     }
 #else
-    public static (ValueInputHandle) ValueInput forNBTOnWorld((Object) Object problemreporter, (org.bukkit.World) Object world, (CommonTagCompound) Object nbttagcompound) {
+    public static (ValueInputHandle) ValueInput forNBTOnWorld((Object) Object problemreporter, (org.bukkit.World) Object world, (CommonTagCompound) NBTTagCompound nbttagcompound) {
         return nbttagcompound;
     }
 
-    public static (ValueInputHandle) ValueInput forNBT((Object) Object problemreporter, (Object) Object holderLookup, (CommonTagCompound) Object nbttagcompound) {
+    public static (ValueInputHandle) ValueInput forNBT((Object) Object problemreporter, (Object) Object holderLookup, (CommonTagCompound) NBTTagCompound nbttagcompound) {
         return nbttagcompound;
     }
 #endif
