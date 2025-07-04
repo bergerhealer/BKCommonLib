@@ -17,6 +17,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -189,13 +190,13 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
                 if (whenElement.isJsonArray()) {
                     JsonArray whenArray = whenElement.getAsJsonArray();
                     int whenCount = whenArray.size();
-                    ArrayList<String> whenArrayValues = new ArrayList<>(whenCount);
+                    ArrayList<Select.WhenValue> whenArrayValues = new ArrayList<>(whenCount);
                     for (int i = 0; i < whenCount; i++) {
-                        whenArrayValues.add(whenArray.get(i).getAsString());
+                        whenArrayValues.add(Select.WhenValue.deserialize(whenArray.get(i)));
                     }
                     c.when = Collections.unmodifiableList(whenArrayValues);
                 } else {
-                    c.when = Collections.singletonList(whenElement.getAsString());
+                    c.when = Collections.singletonList(Select.WhenValue.deserialize(whenElement));
                 }
             } else {
                 c.when = Collections.emptyList();
@@ -729,10 +730,9 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
 
         @Override
         public List<MinecraftModel> resolveModels(CommonItemStack item) {
-            if (property instanceof ItemModelProperty.StringProperty) {
-                String propertyValue = ((ItemModelProperty.StringProperty) property).getStringValue(item);
-                for (Case c : cases) {
-                    if (c.when.contains(propertyValue)) {
+            for (Case c : cases) {
+                for (Select.WhenValue whenValue : c.when) {
+                    if (whenValue.isMatching(property, item)) {
                         return c.model.resolveModels(item);
                     }
                 }
@@ -784,31 +784,129 @@ public abstract class ItemModel implements IndentedStringBuilder.AppendableToStr
             str.append("\n}");
         }
 
+        /**
+         * A value checked against the property for a case of the select.
+         * For most properties this is just a String value. Sometimes has additional
+         * properties for specialized cases.
+         */
+        public interface WhenValue {
+            /**
+             * Modifies an item so that this value is selected for the property specified
+             *
+             * @param property ItemModelProperty
+             * @param item CommonItemStack
+             * @return Updated item, or empty if the property is not supported or the value cannot be used
+             */
+            Optional<CommonItemStack> tryMakeMatching(ItemModelProperty property, CommonItemStack item);
+
+            /**
+             * Gets whether this condition value is true for the property and item specified
+             *
+             * @param property ItemModelProperty
+             * @param item CommonItemStack
+             * @return True if matching
+             */
+            boolean isMatching(ItemModelProperty property, CommonItemStack item);
+
+            // Internal use...
+            static WhenValue deserialize(JsonElement element) {
+                if (element.isJsonObject()) {
+                    JsonObject obj = element.getAsJsonObject();
+                    Map<String, String> dict = new LinkedHashMap<>();
+                    for (String key : obj.keySet()) {
+                        dict.put(key, obj.get(key).getAsString());
+                    }
+                    return new WhenDictValue(dict);
+                } else {
+                    return new WhenStringValue(element.getAsString());
+                }
+            }
+        }
+
+        /**
+         * Single string case value. This is usually used.
+         */
+        public static final class WhenStringValue implements WhenValue {
+            public final String value;
+
+            public WhenStringValue(String value) {
+                this.value = value;
+            }
+
+            @Override
+            public Optional<CommonItemStack> tryMakeMatching(ItemModelProperty property, CommonItemStack item) {
+                if (property instanceof ItemModelProperty.StringProperty) {
+                    return ((ItemModelProperty.StringProperty) property).applyStringValue(item, value);
+                } else {
+                    return Optional.empty();
+                }
+            }
+
+            @Override
+            public boolean isMatching(ItemModelProperty property, CommonItemStack item) {
+                if (property instanceof ItemModelProperty.StringProperty) {
+                    String propertyValue = ((ItemModelProperty.StringProperty) property).getStringValue(item);
+                    return value.equals(propertyValue);
+                } else {
+                    return false;
+                }
+            }
+
+            @Override
+            public String toString() {
+                return this.value;
+            }
+        }
+
+        /**
+         * A dictionary of key-value pairs for the case value. Used for the "component"
+         * property.
+         */
+        public static final class WhenDictValue implements WhenValue {
+            public final Map<String, String> dict;
+
+            public WhenDictValue(Map<String, String> dict) {
+                this.dict = dict;
+            }
+
+            @Override
+            public Optional<CommonItemStack> tryMakeMatching(ItemModelProperty property, CommonItemStack item) {
+                return Optional.empty(); //TODO: Implement?
+            }
+
+            @Override
+            public boolean isMatching(ItemModelProperty property, CommonItemStack item) {
+                return false; //TODO: Implement?
+            }
+
+            @Override
+            public String toString() {
+                return dict.toString();
+            }
+        }
+
         public static class Case implements ItemModelPredicate, IndentedStringBuilder.AppendableToString {
             protected transient ItemModelProperty property = ItemModelProperty.NONE;
-            public List<String> when = Collections.emptyList(); // match-any
+            public List<WhenValue> when = Collections.emptyList(); // match-any
             public ItemModel model = MinecraftModel.NOT_SET;
 
             @Override
             public boolean isMatching(CommonItemStack item) {
-                if (!(property instanceof ItemModelProperty.StringProperty)) {
-                    return false;
+                for (WhenValue whenValue : when) {
+                    if (whenValue.isMatching(property, item)) {
+                        return true;
+                    }
                 }
-
-                String propertyValue = ((ItemModelProperty.StringProperty) property).getStringValue(item);
-                return when.contains(propertyValue);
+                return false;
             }
 
             @Override
             public Optional<CommonItemStack> tryMakeMatching(CommonItemStack item) {
-                if (!(property instanceof ItemModelProperty.StringProperty)) {
-                    return Optional.empty();
-                }
                 if (when.isEmpty()) {
                     return Optional.of(item); // Always matches I guess?
+                } else {
+                    return when.get(0).tryMakeMatching(property, item);
                 }
-
-                return ((ItemModelProperty.StringProperty) property).applyStringValue(item, when.get(0));
             }
 
             @Override
