@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import com.bergerkiller.bukkit.common.bases.DeferredSupplier;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.map.gson.MapResourcePackDeserializer;
+import com.bergerkiller.bukkit.common.map.gson.types.ResourcePackDescription;
 import com.bergerkiller.bukkit.common.map.util.ItemModel;
 import com.bergerkiller.bukkit.common.map.util.VanillaResourcePackFormat;
 import org.bukkit.Material;
@@ -1301,7 +1302,7 @@ public class MapResourcePack {
      */
     public static class Metadata {
         private int pack_format;
-        private String description;
+        private ResourcePackDescription description;
         private List<SupportedFormatRange> supported_formats = Collections.emptyList();
         private final transient DeferredSupplier<Boolean> hasItemOverrides = DeferredSupplier.of(() -> isPackRangeSupported(46, Integer.MAX_VALUE));
 
@@ -1320,11 +1321,11 @@ public class MapResourcePack {
          * @return Description
          */
         public String getDescription() {
-            return hasDescription() ? description : "No Description";
+            return hasDescription() ? description.plainContent : "No Description";
         }
 
         public boolean hasDescription() {
-            return description != null && !description.isEmpty();
+            return description != null && !description.plainContent.isEmpty();
         }
 
         /**
@@ -1370,7 +1371,7 @@ public class MapResourcePack {
         public static Metadata fallback(String errorReason) {
             Metadata metadata = new Metadata();
             metadata.pack_format = VanillaResourcePackFormat.getLatestPackFormat();
-            metadata.description = "Unknown Resource pack - " + errorReason;
+            metadata.description = new ResourcePackDescription("Unknown Resource pack - " + errorReason);
             return metadata;
         }
 
@@ -1383,7 +1384,7 @@ public class MapResourcePack {
         public static Metadata vanilla(String mcVersion) {
             Metadata metadata = new Metadata();
             metadata.pack_format = VanillaResourcePackFormat.getPackFormat(mcVersion);
-            metadata.description = "Vanilla Minecraft " + mcVersion;
+            metadata.description = new ResourcePackDescription("Vanilla Minecraft " + mcVersion);
             return metadata;
         }
 
