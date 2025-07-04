@@ -117,3 +117,27 @@ import net.minecraft.world.level.storage.ValueOutput;
     #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger(NBTTagCompound nbttagcompound, boolean includeAll);
     #remap net.minecraft.world.entity.Entity public NBTTagCompound saveWithoutId(NBTTagCompound nbttagcompound, boolean includeAll);
 #endif
+
+// This function is a nightmare, especially on forge...
+#if version >= 1.18
+    #remap net.minecraft.world.entity.Entity public boolean isOnFire();
+    #remap net.minecraft.world.entity.Entity public int getFireImmuneTicks();
+#else
+    #remap net.minecraft.world.entity.Entity public boolean isOnFire:isBurning();
+    #remap net.minecraft.world.entity.Entity public int getFireImmuneTicks:getMaxFireTicks();
+#endif
+#if version >= 1.21
+    #remap net.minecraft.world.entity.Entity public final void igniteForSeconds(float seconds);
+    #remap net.minecraft.world.entity.Entity public final void igniteForSeconds(float seconds, boolean callEvent);
+#elseif version >= 1.20.5
+    #remap net.minecraft.world.entity.Entity public final void igniteForSeconds(int seconds);
+    #remap net.minecraft.world.entity.Entity public final void igniteForSeconds(int seconds, boolean callEvent);
+#elseif version >= 1.18
+    #remap net.minecraft.world.entity.Entity public void igniteForSeconds:setSecondsOnFire(int seconds);
+    #remap net.minecraft.world.entity.Entity public void igniteForSeconds:setSecondsOnFire(int seconds, boolean callEvent);
+#elseif version >= 1.13.2
+    #remap net.minecraft.world.entity.Entity public void igniteForSeconds:setOnFire(int seconds);
+    #remap net.minecraft.world.entity.Entity public void igniteForSeconds:setOnFire(int seconds, boolean callEvent);
+#else
+    #remap net.minecraft.world.entity.Entity public void igniteForSeconds:setOnFire(int seconds);
+#endif

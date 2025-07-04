@@ -1910,39 +1910,23 @@ class Entity {
 #else
                 int duration = event.getDuration();
 #endif
-
-#if version >= 1.21
+#if version >= 1.13.2
                 instance.igniteForSeconds(duration, false);
-#elseif version >= 1.20.5
-                instance.igniteForSeconds(duration, false);
-#elseif version >= 1.18
-                instance.setSecondsOnFire(duration, false);
-#elseif version >= 1.13.2
-                instance.setOnFire(duration, false);
 #else
-                instance.setOnFire(duration);
+                instance.igniteForSeconds(duration);
 #endif
             }
             // CraftBukkit end
         }
     }
 
+    public boolean isBurning:isOnFire();
+    public optional int prop_getMaxFireTicks:getFireImmuneTicks();
+
 #if version >= 1.21
-    public boolean isBurning:isOnFire();
     public void setOnFire:igniteForSeconds((float) float numSeconds);
-    public optional int prop_getMaxFireTicks:getFireImmuneTicks();
-#elseif version >= 1.20.5
-    public boolean isBurning:isOnFire();
-    public void setOnFire:igniteForSeconds((float) int numSeconds);
-    public optional int prop_getMaxFireTicks:getFireImmuneTicks();
-#elseif version >= 1.18
-    public boolean isBurning:isOnFire();
-    public void setOnFire:setSecondsOnFire((float) int numSeconds);
-    public optional int prop_getMaxFireTicks:getFireImmuneTicks();
 #else
-    public boolean isBurning();
-    public void setOnFire((float) int numSeconds);
-    public optional int prop_getMaxFireTicks:getMaxFireTicks();
+    public void setOnFire:igniteForSeconds((float) int numSeconds);
 #endif
 
     <code>

@@ -387,9 +387,9 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Void> setPositionFromBoundingBox = new Template.Method<Void>();
         public final Template.Method<Void> handleFireBlockTick = new Template.Method<Void>();
         public final Template.Method<Boolean> isBurning = new Template.Method<Boolean>();
-        public final Template.Method.Converted<Void> setOnFire = new Template.Method.Converted<Void>();
         @Template.Optional
         public final Template.Method<Integer> prop_getMaxFireTicks = new Template.Method<Integer>();
+        public final Template.Method.Converted<Void> setOnFire = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<EntityHandle> getDriverEntity = new Template.Method.Converted<EntityHandle>();
         public final Template.Method<Void> onTick = new Template.Method<Void>();
         public final Template.Method.Converted<Void> loadFromNBT = new Template.Method.Converted<Void>();
