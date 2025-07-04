@@ -611,10 +611,9 @@ public abstract class PluginBase extends JavaPlugin {
                     }
                 }
             } else {
-                log(Level.SEVERE, "Encountered a critical error");
+                getLogger().log(Level.SEVERE, "Encountered a critical error", reason);
             }
             log(Level.SEVERE, "Please, check for an updated version of " + pluginCause + " before reporting this bug!");
-            StackTraceFilter.SERVER.print(reason);
         }
     }
 
