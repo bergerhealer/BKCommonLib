@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -36,6 +37,14 @@ final class OfflineWorldLoadedChangeListener implements LibraryComponent, Offlin
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler(priority = EventPriority.LOWEST)
             public void onWorldInit(WorldInitEvent event) {
+                OfflineWorld.BukkitWorldSupplier supplier = OfflineWorld.of(event.getWorld()).loadedWorldSupplier;
+                if (supplier instanceof WorldSupplier) {
+                    ((WorldSupplier) supplier).update(event.getWorld());
+                }
+            }
+
+            @EventHandler(priority = EventPriority.LOWEST)
+            public void onWorldLoad(WorldLoadEvent event) {
                 OfflineWorld.BukkitWorldSupplier supplier = OfflineWorld.of(event.getWorld()).loadedWorldSupplier;
                 if (supplier instanceof WorldSupplier) {
                     ((WorldSupplier) supplier).update(event.getWorld());
