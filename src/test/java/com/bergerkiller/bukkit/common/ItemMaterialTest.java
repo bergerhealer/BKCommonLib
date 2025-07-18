@@ -50,7 +50,7 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersH
 public class ItemMaterialTest {
 
     @Test
-    public void registerIdToMaterialMappings() {
+    public void generateIdToMaterialMappings() {
         ItemStackDeserializerIdToMaterialMapper mappings = new ItemStackDeserializerIdToMaterialMapper();
 
         File mappingsFile = new File("src/main/resources/com/bergerkiller/bukkit/common/internal/resources/id_to_material_mappings.dat");
