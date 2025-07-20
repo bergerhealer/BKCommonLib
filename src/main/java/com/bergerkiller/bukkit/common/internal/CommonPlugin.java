@@ -126,6 +126,7 @@ public class CommonPlugin extends PluginBase {
     private boolean forceSynchronousSaving = false;
     private boolean isDebugCommandRegistered = false;
     private boolean cloudDisableBrigadier = false;
+    private boolean enableProtocolLibPacketHandler = true;
     private Material fallbackItemModelType = null;
 
     public CommonPlugin() {
@@ -418,7 +419,7 @@ public class CommonPlugin extends PluginBase {
     private boolean updatePacketHandler() {
         try {
             Class<? extends PacketHandler> handlerClass = CommonPacketHandler.class;
-            if (CommonUtil.isPluginEnabled("ProtocolLib")) {
+            if (this.enableProtocolLibPacketHandler && CommonUtil.isPluginEnabled("ProtocolLib")) {
                 if (ProtocolLibPacketHandler.isBundlePacketWorking()) {
                     handlerClass = ProtocolLibPacketHandler.class;
                 } else if (!warnedAboutBrokenBundlePacket) {
@@ -592,12 +593,6 @@ public class CommonPlugin extends PluginBase {
             return;
         }
 
-        // Set the packet handler to use before enabling further - it could fail!
-        if (!this.updatePacketHandler()) {
-            this.onCriticalStartupFailure("Critical failure updating the packet handler");
-            return;
-        }
-
         // Allow this to fail if there's big problems, as this is an optional requirement
         try {
             CommonBootstrap.preloadCriticalComponents();
@@ -665,11 +660,20 @@ public class CommonPlugin extends PluginBase {
         config.setHeader("fallbackItemModelType", "\nMaterial type to use for custom-namespace item models in resource pack listing");
         config.addHeader("fallbackItemModelType", "Is used on Minecraft 1.21.2 and later with the item_model data component");
         this.fallbackItemModelType = config.get("fallbackItemModelType", getDefaultFallbackItemModelType());
+        config.setHeader("enableProtocolLibPacketHandler", "\nWhether to use ProtocolLib for handling packets, if that plugin is installed");
+        config.addHeader("enableProtocolLibPacketHandler", "Disabling this could cause bugs when multiple plugins mess with packets");
+        this.enableProtocolLibPacketHandler = config.get("enableProtocolLibPacketHandler", true);
         config.save();
 
         if (preloadTemplateClasses) {
             CommonBootstrap.preloadTemplateClasses(null);
             BlockPhysicsEventDataAccessor.init();
+        }
+
+        // Set the packet handler to use before enabling further - it could fail!
+        if (!this.updatePacketHandler()) {
+            this.onCriticalStartupFailure("Critical failure updating the packet handler");
+            return;
         }
 
         // Welcome message
