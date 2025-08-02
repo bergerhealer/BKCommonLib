@@ -8,7 +8,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 class FoodMetaData {
-#if version >= 1.21.5
+#if version >= 1.21.6
     public void loadFromNBT((CommonTagCompound) NBTTagCompound compound) {
         net.minecraft.core.HolderLookup$a holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
         com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporter reporter = #createScopedProblemReporter();
