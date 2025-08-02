@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.lang.reflect.Method;
 
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -34,6 +35,7 @@ import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
  * using the locX/Y/Z fields.
  */
 class PortalHandler_1_14_1 extends PortalHandler implements Listener {
+    private static final Material OBSIDIAN_TYPE = MaterialUtil.getFirst("OBSIDIAN", "LEGACY_OBSIDIAN");
     private final PortalTravelAgentHandle _pta = Template.Class.create(PortalTravelAgentHandle.class, Common.TEMPLATE_RESOLVER);
     private boolean _anticipatingNetherPairCreateEvent = false;
     private Block _createdNetherPortalBlock;
@@ -137,6 +139,12 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
     public Block createEndPlatform(World world, Entity initiator) {
         _endPlatformCreated = false;
         Block block = _pta.createEndPlatform(world, HandleConversion.toEntityHandle(initiator));
+
+        // When no initiator is set, no portal create event is fired, causing breakage
+        if (initiator == null && !_endPlatformCreated) {
+            _endPlatformCreated = block.getType() == OBSIDIAN_TYPE;
+        }
+
         return _endPlatformCreated ? block : null;
     }
 
@@ -454,7 +462,11 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          * #endif
          *
          * #if version >= 1.21
-         *     net.minecraft.world.level.levelgen.feature.EndPlatformFeature.createEndPlatform(world, platformPos, true);
+         *     BlockPosition fixedPos = new BlockPosition(
+         *         platformPos.getX(),
+         *         platformPos.getY() - 1,
+         *         platformPos.getZ());
+         *     net.minecraft.world.level.levelgen.feature.EndPlatformFeature.createEndPlatform(world, fixedPos, true, entityInitiator);
          *
          * #elseif version >= 1.18
          *   #if exists net.minecraft.server.level.WorldServer public static void makeObsidianPlatform(net.minecraft.server.level.WorldServer worldserver, net.minecraft.world.entity.Entity entity);
