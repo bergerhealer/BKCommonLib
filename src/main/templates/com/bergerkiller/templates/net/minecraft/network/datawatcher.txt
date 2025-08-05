@@ -77,13 +77,24 @@ class DataWatcher {
 #if version >= 1.20.5
     #set datawatcher_storage array
     #require DataWatcher private final DataWatcher.Item<?>[] itemsById;
-#elseif version >= 1.14
+#elseif version >= 1.17
+  #if exists net.minecraft.network.syncher.DataWatcher private final java.util.Map<Integer, DataWatcher.Item<?>> itemsById;
+    // Forge hybrids (Arclight 1.17?)
+    #set datawatcher_storage java_map
+    #require DataWatcher private final java.util.Map<Integer, DataWatcher.Item<?>> itemsById;
+  #else
     #set datawatcher_storage fastutil_map
-    #if version >= 1.17
-        #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<DataWatcher.Item<?>> itemsById;
-    #else
-        #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<DataWatcher.Item<?>> itemsById:entries;
-    #endif
+    #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<DataWatcher.Item<?>> itemsById;
+  #endif
+#elseif version >= 1.14
+  #if exists net.minecraft.network.syncher.DataWatcher private final java.util.Map<Integer, DataWatcher.Item<?>> entries;
+    // Forge hybrids (Arclight 1.16)
+    #set datawatcher_storage java_map
+    #require DataWatcher private final java.util.Map<Integer, DataWatcher.Item<?>> itemsById:entries;
+  #else
+    #set datawatcher_storage fastutil_map
+    #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<DataWatcher.Item<?>> itemsById:entries;
+  #endif
 #elseif exists net.minecraft.network.syncher.DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<DataWatcher.Item<?>> dataValues;
     // Some server forks (1.8) do this
     #set datawatcher_storage fastutil_map
