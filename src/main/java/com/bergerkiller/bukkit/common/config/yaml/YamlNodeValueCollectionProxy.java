@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.config.yaml;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 import com.bergerkiller.bukkit.common.collections.CollectionBasics;
 
@@ -58,7 +57,7 @@ public class YamlNodeValueCollectionProxy implements Collection<Object>, YamlNod
         if (index == -1) {
             return false;
         } else {
-            _node.removeChildEntryAt(index);
+            _node.removeChildEntryAtAndGetValue(index);
             return true;
         }
     }

@@ -402,7 +402,7 @@ public class StringTreeNode {
         // Only (flat) children changed
         StringTreeNode node = this;
         do {
-            // If null all parents are aleady null too and we can stop
+            // If null all parents are already null too and we can stop
             TreeNodeBuffer buffer = node._buffer;
             if (buffer._flatChildren == null) {
                 break;

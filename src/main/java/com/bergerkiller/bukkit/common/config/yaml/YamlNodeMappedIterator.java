@@ -200,7 +200,7 @@ interface YamlNodeMappedIterator<T> extends Iterator<T> {
         public void remove() {
             if (_nextCalled) {
                 _nextCalled = false;
-                _node.removeChildEntryAt(--_index);
+                _node.removeChildEntryAtAndGetValue(--_index);
             } else {
                 throw new NoSuchElementException("Next must be called before remove()");
             }

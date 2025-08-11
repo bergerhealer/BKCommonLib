@@ -65,7 +65,7 @@ class YamlNodeKeySetProxy<T> implements Set<T> {
         if (index == -1) {
             return false;
         } else {
-            _node.removeChildEntryAt(index);
+            _node.removeChildEntryAtAndGetValue(index);
             return true;
         }
     }

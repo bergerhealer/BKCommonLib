@@ -445,7 +445,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
         int num_children = this._children.size();
         if (num_children > 0) {
             do {
-                this.removeChildEntryAtWithoutEvent(--num_children);
+                this.removeChildEntryAtWithoutEventAndGetValue(--num_children);
             } while (num_children > 0);
             this._entry.callChangeListeners();
         }
@@ -1668,19 +1668,19 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     protected void removeChildEntry(YamlEntry entry) {
         int index = this._children.indexOf(entry);
         if (index != -1) {
-            removeChildEntryAt(index);
+            removeChildEntryAtAndGetValue(index);
         } else {
             throw new IllegalArgumentException("The entry is not a child of this node");
         }
     }
 
-    protected YamlEntry removeChildEntryAt(int index) {
-        YamlEntry entry = this.removeChildEntryAtWithoutEvent(index);
+    protected Object removeChildEntryAtAndGetValue(int index) {
+        Object removedValue = this.removeChildEntryAtWithoutEventAndGetValue(index);
         this._entry.callChangeListeners();
-        return entry;
+        return removedValue;
     }
 
-    protected YamlEntry removeChildEntryAtWithoutEvent(int index) {
+    protected Object removeChildEntryAtWithoutEventAndGetValue(int index) {
         if (index < 0 || index >= this._children.size()) {
             throw new IndexOutOfBoundsException("Index " + index + " is out of bounds");
         }
@@ -1695,8 +1695,9 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
             this._entry.markYamlChanged();
         }
 
-        // May be useful?
-        return entry;
+        // Entry is now invalid, but we can safely return its value
+        // After detaching, if the entry is a node, it'll refer to a new YamlEntry already
+        return entry.getValue();
     }
 
     private static abstract class DelayedRemovalOperation {
@@ -1742,7 +1743,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
                 if (childCloneToRemove != null) {
                     int index = node._children.indexOf(childCloneToRemove);
                     if (index != -1) {
-                        node.removeChildEntryAtWithoutEvent(index);
+                        node.removeChildEntryAtWithoutEventAndGetValue(index);
                         changed = true;
                     }
                 }
@@ -1775,7 +1776,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
                     continue;
                 }
 
-                node.removeChildEntryAtWithoutEvent(startIdx);
+                node.removeChildEntryAtWithoutEventAndGetValue(startIdx);
                 changed = true;
             }
 

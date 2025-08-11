@@ -63,12 +63,12 @@ public class YamlNodeIndexedValueList extends AbstractList<Object> implements Ya
 
     @Override
     public Object remove(int index) {
-        Object result = _node.removeChildEntryAtWithoutEvent(index);
+        Object removedValue = _node.removeChildEntryAtWithoutEventAndGetValue(index);
         if (_namedByIndex) {
             this.updateIndexFrom(index);
         }
         _node._entry.callChangeListeners();
-        return result;
+        return removedValue;
     }
 
     @Override

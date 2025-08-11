@@ -67,7 +67,7 @@ public class YamlNodeMapProxy implements Map<String, Object> {
         if (index == -1) {
             return null;
         } else {
-            return _node.removeChildEntryAt(index).getValue();
+            return _node.removeChildEntryAtAndGetValue(index);
         }
     }
 

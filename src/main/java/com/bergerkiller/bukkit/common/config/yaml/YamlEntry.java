@@ -447,6 +447,7 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
             listenersToSet = newNode._entry.listeners;
 
             // Re-assign the node's entry and root to refer to ourself
+            YamlRoot oldRoot = newNode._root;
             newNode._entry = this;
             newNode._root = this.parent._root;
 
@@ -456,6 +457,7 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
                 while (iter.hasNext()) {
                     YamlEntry childEntry = iter.next();
                     YamlPath newChildPath = this.path.child(childEntry.path.name());
+                    oldRoot.removeEntry(childEntry); // Remove entry from old root, cannot be used again
                     StringTreeNode newChildYaml = this.yaml.add();
                     iter.set(childEntry.copyToParent(newNode, newNode._root, newChildPath, newChildYaml, true));
                 }
@@ -478,8 +480,6 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
     // This entry is not removed or detached and remains functional to store other values
     private void removeNodeValue() {
         if (this.isAbstractNode()) {
-            YamlNodeAbstract<?> node = this.getAbstractNode();
-            node._root.removeChildEntries(node);
             this.copyToParent(null, new YamlRoot(), YamlPath.ROOT, new StringTreeNode(), false);
         }
     }
@@ -490,8 +490,12 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
      * All nodes and values get a new entry with the updated path and yaml.<br>
      * <br>
      * <b>Note: </b>this entry is not removed from the original root and parent, so the entry can be repurposed
-     * to store different data. Call {@link YamlRoot#removeEntry(YamlEntry)} to remove this entry before
-     * calling this function if this is desired, or use {@link YamlRoot#detach(YamlEntry)}.
+     * to store different data. Call {@link YamlRoot#detach(YamlEntry)} if this is desired. This entry is
+     * allowed to be a disposed one for this method.<br>
+     * <br>
+     * <b>Note: </b>Entries of nested children of this node do all get detached and disposed of, and cannot be repurposed.
+     * The children list of this node is regenerated with new entries, if this is a node. These children are also
+     * removed from the old root, assuming that they were removed.
      * 
      * @param newParent  The new parent node for the entry, null if it is a root node
      * @param newRoot    The new root to store the entry in
@@ -517,6 +521,7 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
         if (this.isAbstractNode()) {
             // Store the new entry in the node
             YamlNodeAbstract<?> node = this.getAbstractNode();
+            YamlRoot oldRoot = node._root;
             node._root = newRoot;
             node._entry = newEntry;
 
@@ -525,6 +530,7 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
             while (iter.hasNext()) {
                 YamlEntry childEntry = iter.next();
                 YamlPath newChildPath = newPath.child(childEntry.getKey());
+                oldRoot.removeEntry(childEntry); // Remove from the old root as well, cannot be used again
                 StringTreeNode newChildYaml = newYaml.add();
                 iter.set(childEntry.copyToParent(node, newRoot, newChildPath, newChildYaml, copyListeners));
             }

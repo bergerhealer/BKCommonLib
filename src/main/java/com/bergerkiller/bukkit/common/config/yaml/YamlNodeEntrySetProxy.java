@@ -77,7 +77,7 @@ public class YamlNodeEntrySetProxy implements Set<Map.Entry<String, Object>> {
             public void remove() {
                 if (_canRemove) {
                     _canRemove = false;
-                    _node.removeChildEntryAt(--_index);
+                    _node.removeChildEntryAtAndGetValue(--_index);
                 } else {
                     throw new NoSuchElementException("Next must be called before remove()");
                 }
@@ -101,7 +101,7 @@ public class YamlNodeEntrySetProxy implements Set<Map.Entry<String, Object>> {
         if (index == -1) {
             return false;
         } else {
-            _node.removeChildEntryAt(index);
+            _node.removeChildEntryAtAndGetValue(index);
             return true;
         }
     }

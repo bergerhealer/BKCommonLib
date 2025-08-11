@@ -35,7 +35,6 @@ public class YamlRoot {
     public void detach(YamlEntry entry) {
         this.removeEntry(entry);
         if (entry.isAbstractNode()) {
-            this.removeChildEntries(entry.getAbstractNode());
             entry.copyToParent(null, new YamlRoot(), YamlPath.ROOT, new StringTreeNode(), true);
         }
     }
@@ -52,19 +51,16 @@ public class YamlRoot {
         this._entries.put(newPath, entry);
     }
 
-    public void removeEntry(YamlEntry entry) {
-        entry.checkNotDisposed();
+    protected void removeEntry(YamlEntry entry) {
+        // In some situations the entry is already removed from everything
+        // This avoids issues due to double-removal.
+        if (entry.disposed) {
+            return;
+        }
+
         entry.yaml.remove();
         this._entries.remove(entry.getYamlPath());
-    }
-
-    public void removeChildEntries(YamlNodeAbstract<?> node) {
-        for (YamlEntry entry : node._children) {
-            removeEntry(entry);
-            if (entry.isAbstractNode()) {
-                removeChildEntries(entry.getAbstractNode());
-            }
-        }
+        entry.disposed = true;
     }
 
     public void putEntry(YamlEntry entry) {
