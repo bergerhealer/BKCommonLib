@@ -141,7 +141,9 @@ public class YamlNodeIndexedValueList extends AbstractList<Object> implements Ya
         });
         boolean changed = false;
         for (int i = 0; i < node._children.size(); i++) {
-            changed |= node._children.get(i).yaml.setIndex(i);
+            YamlEntry entry = node._children.get(i);
+            entry.checkNotDisposed();
+            changed |= entry.yaml.setIndex(i);
         }
         if (changed) {
             node._entry.callChangeListeners();

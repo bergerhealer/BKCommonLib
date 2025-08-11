@@ -53,6 +53,7 @@ public class YamlRoot {
     }
 
     public void removeEntry(YamlEntry entry) {
+        entry.checkNotDisposed();
         entry.yaml.remove();
         this._entries.remove(entry.getYamlPath());
     }

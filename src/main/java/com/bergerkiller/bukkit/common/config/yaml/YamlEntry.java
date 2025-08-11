@@ -27,6 +27,7 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
     protected final StringTreeNode yaml;
     protected boolean yaml_needs_generating;
     protected boolean yaml_check_children;
+    protected boolean disposed = false;
     private String header;
     protected Object value;
     protected YamlChangeListener[] listeners;
@@ -57,6 +58,16 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
         this.listeners = NO_LISTENERS;
         this.all_listeners = (parent == null) ? NO_LISTENERS : parent._entry.all_listeners;
         this.markYamlChanged(); // Updates check_children of parent
+    }
+
+    /**
+     * If the YAML of this entry was reassigned to a different entry, and this entry has been disposed
+     * because of it, throws an error when this is called. This is to protect against corruption.
+     */
+    protected void checkNotDisposed() {
+        if (this.disposed) {
+            throw new IllegalStateException("This YamlEntry [" + this.path + "] is disposed. Why is it still referenced?");
+        }
     }
 
     /**
@@ -326,6 +337,8 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
      */
     @Override
     public Object setValue(Object value) {
+        checkNotDisposed();
+
         Object oldValue = this.value;
         if (oldValue == value) {
             return oldValue;
@@ -614,6 +627,8 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
     }
 
     private void generateYaml() {
+        checkNotDisposed();
+
         // Call generateYaml() on the children
         if (this.yaml_check_children) {
             this.yaml_check_children = false;

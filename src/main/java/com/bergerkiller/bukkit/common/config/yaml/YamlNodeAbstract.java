@@ -1424,12 +1424,15 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      */
     protected YamlEntry cloneChildEntry(int index) {
         YamlEntry oldEntry = this._children.get(index);
+        oldEntry.checkNotDisposed();
+
         YamlEntry newEntry = new YamlEntry(this, oldEntry.getYamlPath(), oldEntry.yaml);
         newEntry.assignProperties(oldEntry);
         newEntry.yaml_check_children = oldEntry.yaml_check_children;
         newEntry.yaml_needs_generating = oldEntry.yaml_needs_generating;
         newEntry.listeners = oldEntry.listeners;
         newEntry.all_listeners = oldEntry.all_listeners;
+        oldEntry.disposed = true; // Make sure it cannot be used anymore
         this._children.set(index, newEntry);
         this._root.putEntry(newEntry);
         if (oldEntry.isAbstractNode()) {
@@ -1564,6 +1567,8 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     }
 
     protected YamlEntry createChildEntry(int index, YamlPath path) {
+        this._entry.checkNotDisposed();
+
         // We can only insert children when the path is relative to this node
         // Create the parent entries first when path has multiple depths
         if (!path.parent().equals(this._entry.getYamlPath())) {
