@@ -19,8 +19,10 @@ class ValueInput {
 
     public (CommonTagCompound) NBTTagCompound asNBT() {
 #if version >= 1.21.6
+        #require TagValueInput private final net.minecraft.nbt.NBTTagCompound input;
         if (instance instanceof TagValueInput) {
-            return ((TagValueInput) instance).input;
+            TagValueInput tvi = (TagValueInput) instance;
+            return tvi#input;
         }
 
         throw new UnsupportedOperationException("Input is not NBT: " + instance.getClass().getName());
