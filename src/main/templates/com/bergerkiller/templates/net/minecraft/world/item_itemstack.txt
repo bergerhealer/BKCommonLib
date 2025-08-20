@@ -3,6 +3,7 @@ package net.minecraft.world.item;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.IMaterial;
@@ -876,6 +877,40 @@ class ItemStack {
     public void setItemModel((MinecraftKeyHandle) MinecraftKey key) {
     }
 #endif
+
+    public void fixDataComponentErrors() {
+#if version >= 1.20.5
+        CustomData cmd = (CustomData) instance.get(DataComponents.ENTITY_DATA);
+        if (cmd != null && !cmd.getUnsafe().contains("id")) {
+            // What type of entity ID for this entity data tag
+            net.minecraft.world.item.Item item = instance.getItem();
+            EntityTypes entityType = null;
+            if (item == net.minecraft.world.item.Items.COD_BUCKET) {
+                entityType = EntityTypes.COD;
+            } else if (item == net.minecraft.world.item.Items.PUFFERFISH_BUCKET) {
+                entityType = EntityTypes.PUFFERFISH;
+            } else if (item == net.minecraft.world.item.Items.SALMON_BUCKET) {
+                entityType = EntityTypes.SALMON;
+            } else if (item == net.minecraft.world.item.Items.ITEM_FRAME) {
+                entityType = EntityTypes.ITEM_FRAME;
+            } else if (item == net.minecraft.world.item.Items.GLOW_ITEM_FRAME) {
+                entityType = EntityTypes.GLOW_ITEM_FRAME;
+            } else if (item == net.minecraft.world.item.Items.PAINTING) {
+                entityType = EntityTypes.PAINTING;
+            } else {
+                // Unknown entity type from item. Discard the custom data tag entirely to
+                // avoid errors later on.
+                instance.remove(DataComponents.ENTITY_DATA);
+                return;
+            }
+
+            NBTTagCompound nbt = cmd.copyTag();
+            nbt.putString("id", EntityTypes.getKey(entityType).toString());
+            cmd = CustomData.of(nbt);
+            instance.set(DataComponents.ENTITY_DATA, cmd);
+        }
+#endif
+    }
 
 #if version >= 1.21.4
     public boolean hasCustomModelData() {

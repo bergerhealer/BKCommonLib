@@ -311,7 +311,7 @@ public class YamlSerializer {
      * @param value to serialize
      * @return YAML-encoded String
      */
-    public synchronized String serialize(Object value) {
+    public synchronized String serialize(Object value) throws SerializeException {
         return serialize(value, "", 1);
     }
 
@@ -343,7 +343,12 @@ public class YamlSerializer {
             builder.append("*:\n");
         } else {
             // Append the key: by writing key: 0
-            appendKeyValue(key, 0, 0, true);
+            try {
+                appendKeyValue(key, 0, 0, true);
+            } catch (SerializeException ex) {
+                /* This is never going to happen for a basic String key... */
+                throw new RuntimeException("Unexpected error serializing key '" + key + "'", ex.getCause());
+            }
 
             // Replace the ' 0\n' portion with a newline
             builder.setLength(builder.length() - 3);
@@ -364,7 +369,7 @@ public class YamlSerializer {
      * @return YAML-encoded String
      */
     @SuppressWarnings("unchecked")
-    public synchronized String serialize(Object value, String header, int indent) {
+    public synchronized String serialize(Object value, String header, int indent) throws SerializeException {
         // Append the header, if one exists
         appendHeader(header, indent);
 
@@ -388,7 +393,7 @@ public class YamlSerializer {
         appendHeader(this.builder, header, indent);
     }
 
-    private void appendKeyValue(String key, Object value, int indent, boolean indentFirstLine) {
+    private void appendKeyValue(String key, Object value, int indent, boolean indentFirstLine) throws SerializeException {
         // If key is not a String literal, really strange formatting rules may happen
         // For example, a multiline string will write ? |-\n  text\n  text\n: for the key
         // Just don't bother and let Snakeyaml deal with those rare cases
@@ -449,8 +454,14 @@ public class YamlSerializer {
         appendValue(Collections.singletonMap(key, value), indent, false);
     }
 
-    private void appendValue(Object value, int indent, boolean indentFirstLine) {
-        appendNode(this.representer.represent(value), indent, indentFirstLine);
+    private void appendValue(Object value, int indent, boolean indentFirstLine) throws SerializeException {
+        final Node node;
+        try {
+            node = this.representer.represent(value);
+        } catch (Throwable t) {
+            throw new SerializeException(value, t);
+        }
+        appendNode(node, indent, indentFirstLine);
     }
 
     private void appendIndent(int indent) {
@@ -587,5 +598,16 @@ public class YamlSerializer {
         }
 
         return true;
+    }
+
+    /**
+     * Exception thrown when an error occurs trying to serialize a yaml value.
+     * Should be handled in such a way that yaml is written omitting the problematic value,
+     * without corrupting the entire file.
+     */
+    public static final class SerializeException extends Exception {
+        public SerializeException(Object value, Throwable cause) {
+            super("Failed to serialize: " + value, cause);
+        }
     }
 }

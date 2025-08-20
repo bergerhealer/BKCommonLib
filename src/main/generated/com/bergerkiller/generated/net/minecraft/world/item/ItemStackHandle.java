@@ -69,6 +69,7 @@ public abstract class ItemStackHandle extends Template.Handle {
     public abstract MinecraftKeyHandle getItemModel();
     public abstract MinecraftKeyHandle getItemModelIfSet();
     public abstract void setItemModel(MinecraftKeyHandle key);
+    public abstract void fixDataComponentErrors();
     public abstract boolean hasCustomModelData();
     public abstract boolean hasCustomModelDataValue();
     public abstract CustomModelData getCustomModelData();
@@ -153,6 +154,7 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.Method.Converted<MinecraftKeyHandle> getItemModel = new Template.Method.Converted<MinecraftKeyHandle>();
         public final Template.Method.Converted<MinecraftKeyHandle> getItemModelIfSet = new Template.Method.Converted<MinecraftKeyHandle>();
         public final Template.Method.Converted<Void> setItemModel = new Template.Method.Converted<Void>();
+        public final Template.Method<Void> fixDataComponentErrors = new Template.Method<Void>();
         public final Template.Method<Boolean> hasCustomModelData = new Template.Method<Boolean>();
         public final Template.Method<Boolean> hasCustomModelDataValue = new Template.Method<Boolean>();
         public final Template.Method.Converted<CustomModelData> getCustomModelData = new Template.Method.Converted<CustomModelData>();

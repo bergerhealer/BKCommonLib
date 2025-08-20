@@ -613,8 +613,9 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
      * 
      * @param value
      * @return YAML formatted String
+     * @throws YamlSerializer.SerializeException If something goes wrong serializing the value
      */
-    private String serializeYamlValue(Object value) {
+    private String serializeYamlValue(Object value) throws YamlSerializer.SerializeException {
         // When value is the first item of a parent list, we want to prefix it with an (additional) -
         // This is done by wrapping the value into a list and adjusting indent
         int indent = this.path.depth();
@@ -718,7 +719,14 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
                 }
 
                 // Store it
-                this.yaml.setValue(this.serializeYamlValue(value));
+                try {
+                    this.yaml.setValue(this.serializeYamlValue(value));
+                } catch (YamlSerializer.SerializeException ex) {
+                    // On error, just store nothing here
+                    // TODO: There might be edge cases like lists where this needs more special handling
+                    Logging.LOGGER_CONFIG.log(Level.SEVERE, "Failed to serialize YAML value stored at \"" + path + "\"", ex);
+                    this.yaml.setValue("");
+                }
             }
         }
     }

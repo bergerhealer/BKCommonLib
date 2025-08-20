@@ -12,6 +12,9 @@ import java.util.function.Function;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.google.common.collect.MapMaker;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -33,6 +36,7 @@ import org.bukkit.inventory.meta.ItemMeta;
  */
 public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMigrator implements Function<Map<String, Object>, ItemStack> {
     private final ItemMetaDeserializer metaDeserializer = new ItemMetaDeserializer();
+    private final Class<?> META_ENTITY_TAG_CLASS = CommonUtil.getClass("org.bukkit.craftbukkit.inventory.CraftMetaEntityTag");
 
     ItemStackDeserializerMigratorBukkit() {
         // All data versions where the ItemStack YAML had a change that requires conversion
@@ -315,8 +319,9 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
     public ItemStack apply(Map<String, Object> args) {
         this.migrate(args, "v");
 
+        ItemStack result;
         try {
-            return ItemStack.deserialize(args);
+            result = ItemStack.deserialize(args);
         } catch (NullPointerException | IllegalArgumentException ex) {
             // This is sometimes thrown when the Material type cannot be found
             Object typeNameObj = args.get("type");
@@ -343,6 +348,37 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
             logFailDeserialize(args);
             throw ex;
         }
+
+        // Fixes an issue with data component serialization (Paper)
+        // Among which, this was an issue with paintings not storing an "id" field for the entity_tag
+        try {
+            result = fixItemStackComponents(result);
+        } catch (Throwable t) {
+            logFailDeserialize(args);
+            throw new RuntimeException("Failed to fix itemstack after deserialization", t);
+        }
+
+        return result;
+    }
+
+    private ItemStack fixItemStackComponents(ItemStack itemstack) {
+        // If item is not a CraftItemStack and uses the CraftMetaEntityTag, migrate
+        // the item to a CraftItemStack first so that proper migrations are performed.
+        if (!CommonItemStack.isCraftItemStack(itemstack)) {
+            ItemMeta itemMeta = itemstack.getItemMeta();
+            if (META_ENTITY_TAG_CLASS != null && META_ENTITY_TAG_CLASS.isInstance(itemMeta)) {
+                itemstack = CraftItemStackHandle.asCraftCopy(itemstack);
+            } else {
+                return itemstack; // No fixes
+            }
+        }
+
+        // We know it's a CraftItemStack, so this conversion will work ok
+        Object handle = CraftItemStackHandle.T.handle.get(itemstack);
+        if (handle != null) {
+            ItemStackHandle.T.fixDataComponentErrors.invoke(handle);
+        }
+        return itemstack;
     }
 
     private static ConfigurationSerializable deserializeFireworkEffect(java.util.Map<String, Object> values) {
