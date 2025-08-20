@@ -22,8 +22,28 @@ import org.incendo.cloud.suggestion.SuggestionProviderHolder;
 public interface QuotedArgumentParser<C, T> extends SuggestionProviderHolder<C> {
 
     /**
+     * If the input parser is derived from a QuotedArgumentParser using {@link #createParser()},
+     * returns that parser object.
+     *
+     * @param parser ArgumentParser
+     * @return QuotedArgumentParser if ArgumentParser is derived from one, <i>null</i> otherwise
+     * @param <C> Command Sender Type
+     * @param <T> Argument Value Type
+     */
+    static <C, T> QuotedArgumentParser<C, T> getFromParser(ArgumentParser<C, T> parser) {
+        if (parser instanceof QuotedArgumentParserProxy) {
+            return ((QuotedArgumentParserProxy<C, T>) parser).getParser();
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Creates the ArgumentParser that parses command input as a quoted string, and then
-     * calls into this parser.
+     * calls into this parser.<br>
+     * <br>
+     * <i>Note: </i>you can use {@link #getFromParser(ArgumentParser)} to retrieve the original
+     * quoted argument parser again from this returned parser, if needed.
      *
      * @return ArgumentParser
      */

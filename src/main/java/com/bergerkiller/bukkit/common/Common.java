@@ -73,7 +73,8 @@ public class Common {
             "Common:CommonItemStack:MimicAsType",
             "Common:CommonItemStack:AddGlint",
             "Common:JSONSerializer:NullItemStack",
-            "Common:Yaml:ListOfListFix"
+            "Common:Yaml:ListOfListFix",
+            "Common:Cloud:QuotedArgumentParserFromParser"
     ).collect(Collectors.toSet());
 
     /**

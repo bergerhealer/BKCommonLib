@@ -34,6 +34,10 @@ final class QuotedArgumentParserProxy<C, T> implements ArgumentParser<C, T>, Sug
         this.parser = parser;
     }
 
+    public QuotedArgumentParser<C, T> getParser() {
+        return parser;
+    }
+
     public UnquotedCharacterFilter getCharFilter() {
         return parser.isStrictQuoteEscaping() ? UnquotedCharacterFilter.STRICT : UnquotedCharacterFilter.PERMISSIVE;
     }
