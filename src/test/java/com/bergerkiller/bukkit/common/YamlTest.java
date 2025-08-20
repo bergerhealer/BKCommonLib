@@ -1443,7 +1443,7 @@ public class YamlTest {
     }
 
     @Test
-    public void testYamlSerializerWithIndent() {
+    public void testYamlSerializerWithIndent() throws YamlSerializer.SerializeException {
         YamlSerializer serializer = YamlSerializer.INSTANCE;
         assertEquals("hello, world!\n", serializer.serialize("hello, world!", "", 1));
         assertEquals("hello, world!\n", serializer.serialize("hello, world!", "", 1));
@@ -1453,7 +1453,7 @@ public class YamlTest {
     }
 
     @Test
-    public void testYamlSerializer() {
+    public void testYamlSerializer() throws YamlSerializer.SerializeException {
         // Verify that the Serializer is able to serialize basic values and perform escaping rules
         YamlSerializer serializer = YamlSerializer.INSTANCE;
         assertEquals("hello, world!\n", serializer.serialize("hello, world!"));
@@ -1535,7 +1535,7 @@ public class YamlTest {
     }
 
     @Test
-    public void testYamlSerializerIndent() {
+    public void testYamlSerializerIndent() throws YamlSerializer.SerializeException {
         // Verify that the Serializer uses correct indentation based on the input
         // Indent level 0 and 1 are the same, with the only difference being that
         // at indent level 0 a #> header instead of # is used.
