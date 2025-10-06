@@ -894,14 +894,14 @@ class ItemStack {
 #endif
 
     public void fixDataComponentErrors() {
-#if version >= 1.20.5
+#if version >= 1.21.9
+        //TODO: Is this needed / can we fix missing id fields here?
+        // The new TypedEntityData type seems to already guarantee an id is set, so
+        // most likely the parsing before it gets to this point now :(
+#elseif version >= 1.20.5
         CustomData cmd = (CustomData) instance.get(DataComponents.ENTITY_DATA);
         if (cmd != null) {
-  #if version >= 1.21.9
-            NBTTagCompound tag = cmd#cmd_tag;
-  #else
             NBTTagCompound tag = cmd.getUnsafe();
-  #endif
             if (!tag.contains("id")) {
                 // What type of entity ID for this entity data tag
                 net.minecraft.world.item.Item item = instance.getItem();

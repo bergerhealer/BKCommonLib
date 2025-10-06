@@ -44,7 +44,12 @@ import net.minecraft.world.level.saveddata.maps.MapId;
         return null;
     }
 
+  #if version >= 1.21.9
+    #require net.minecraft.world.item.component.CustomData private final readonly NBTTagCompound cmd_tag:tag;
+    NBTTagCompound metadata = customData#cmd_tag; // Note: unmodifiable!
+  #else
     NBTTagCompound metadata = customData.getUnsafe(); // Note: unmodifiable!
+  #endif
 #else
     NBTTagCompound metadata = instance.getTag();
 #endif
