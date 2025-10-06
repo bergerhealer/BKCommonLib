@@ -10,6 +10,8 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
@@ -297,8 +299,14 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
         // From MC 1.21.7 to 1.21.8
         this.register(4438, ConverterFunction.NO_CONVERSION);
 
+        // From MC 1.21.8 to 1.21.9
+        this.register(4440, map -> {
+            Object type = map.get("type");
+            return !Helper.ADDED_MC_1_21_9.contains(type);
+        });
+
         // Maximum supported data version
-        this.setMaximumDataVersion(4440); // MC 1.21.8
+        this.setMaximumDataVersion(4554); // MC 1.21.9
     }
 
     public ItemMetaDeserializer getItemMetaDeserializer() {
@@ -511,7 +519,23 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
             return result;
         }
 
-        private static List<String> makeWoodMaterials(String woodName) {
+        private static Stream<String> forWoodTypes_1_21_9() {
+            return Stream.of(
+                    "ACACIA", "BAMBOO", "BIRCH",
+                    "CHERRY", "CRIMSON", "DARK_OAK",
+                    "JUNGLE", "MANGROVE", "OAK",
+                    "PALE_OAK", "SPRUCE", "WARPED");
+        }
+
+        private static Stream<String> forCopperTypes_1_21_9() {
+            return Stream.of(
+                    "COPPER", "EXPOSED_COPPER", "WEATHERED_COPPER",
+                    "OXIDIZED_COPPER", "WAXED_COPPER", "WAXED_EXPOSED_COPPER",
+                    "WAXED_WEATHERED_COPPER", "WAXED_OXIDIZED_COPPER"
+            );
+        }
+
+        private static List<String> makeMaterialsOfWoodCategory(String woodName) {
             return Arrays.asList(
                     woodName + "_PLANKS", woodName + "_SAPLING",
                     woodName + "_LOG", woodName + "_WOOD",
@@ -735,7 +759,7 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
 
         // All material names (Material enum) added Minecraft 1.19.3 -> 1.19.4
         public static final Set<String> ADDED_MC_1_19_4 = makeSet(
-                makeWoodMaterials("CHERRY"),
+                makeMaterialsOfWoodCategory("CHERRY"),
                 Arrays.asList(
                         "SUSPICIOUS_SAND",
                         "TORCHFLOWER", "PINK_PETALS",
@@ -809,7 +833,7 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
 
         // All material names (Material enum) added Minecraft 1.21.1 -> 1.21.2
         public static final Set<String> ADDED_MC_1_21_2 = makeSet(
-                makeWoodMaterials("PALE_OAK"),
+                makeMaterialsOfWoodCategory("PALE_OAK"),
                 makeColoredMaterials("BUNDLE"),
                 Arrays.asList(
                         "PALE_MOSS_CARPET", "PALE_HANGING_MOSS", "PALE_MOSS_BLOCK",
@@ -840,6 +864,28 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
         public static final Set<String> ADDED_MC_1_21_6 = makeSet(
                 makeColoredMaterials("HARNESS"),
                 Arrays.asList("DRIED_GHAST", "HAPPY_GHAST_SPAWN_EGG", "MUSIC_DISC_TEARS")
+        );
+
+        // All material names (Material enum) added Minecraft 1.21.8 -> 1.21.9
+        public static final Set<String> ADDED_MC_1_21_9 = makeSet(
+                forWoodTypes_1_21_9().map(t -> t + "_SHELF").collect(Collectors.toList()),
+                forCopperTypes_1_21_9().map(t -> t + "_BARS").collect(Collectors.toList()),
+                forCopperTypes_1_21_9().map(t -> t + "_CHAIN").collect(Collectors.toList()),
+                forCopperTypes_1_21_9().map(t -> t + "_LANTERN").collect(Collectors.toList()),
+                forCopperTypes_1_21_9().map(t -> t + "_CHEST").collect(Collectors.toList()),
+                forCopperTypes_1_21_9().map(t -> t + "_GOLEM_STATUE").collect(Collectors.toList()),
+                forCopperTypes_1_21_9()
+                        .filter(t -> !t.equals("COPPER"))
+                        .map(t -> t.substring(0, t.length() - 7) + "_LIGHTNING_ROD")
+                        .collect(Collectors.toList()),
+                Arrays.asList(
+                        "COPPER_TORCH", "COPPER_WALL_TORCH",
+                        "COPPER_SWORD", "COPPER_SHOVEL",
+                        "COPPER_PICKAXE", "COPPER_AXE", "COPPER_HOE",
+                        "COPPER_HELMET", "COPPER_CHESTPLATE", "COPPER_LEGGINGS",
+                        "COPPER_BOOTS", "COPPER_GOLEM_SPAWN_EGG",
+                        "COPPER_HORSE_ARMOR", "COPPER_NUGGET"
+                )
         );
     }
 }
