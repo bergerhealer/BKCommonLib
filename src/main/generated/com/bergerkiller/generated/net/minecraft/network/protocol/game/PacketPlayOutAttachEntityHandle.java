@@ -21,6 +21,10 @@ public abstract class PacketPlayOutAttachEntityHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public static PacketPlayOutAttachEntityHandle createNew() {
+        return T.createNew.invoke();
+    }
+
     public static PacketPlayOutAttachEntityHandle createNewMount(Entity passengerEntity, Entity vehicleEntity) {
         return T.createNewMount.invoke(passengerEntity, vehicleEntity);
     }
@@ -32,7 +36,7 @@ public abstract class PacketPlayOutAttachEntityHandle extends PacketHandle {
     public abstract boolean isLeash();
     public abstract void setIsLeash(boolean isLeash);
     public static PacketPlayOutAttachEntityHandle createNewLeash(int leashedEntityId, int holderEntityId) {
-        PacketPlayOutAttachEntityHandle packet = T.newHandleNull();
+        PacketPlayOutAttachEntityHandle packet = createNew();
         packet.setVehicleId(holderEntityId);
         packet.setPassengerId(leashedEntityId);
         packet.setIsLeash(true);
@@ -43,7 +47,7 @@ public abstract class PacketPlayOutAttachEntityHandle extends PacketHandle {
         if (!T.leashId.isAvailable()) {
             throw new UnsupportedOperationException("Not supported >= MC 1.9, use Mount packet instead");
         }
-        PacketPlayOutAttachEntityHandle packet = T.newHandleNull();
+        PacketPlayOutAttachEntityHandle packet = createNew();
         packet.setVehicleId(vehicleEntityId);
         packet.setPassengerId(passengerEntityId);
         packet.setIsLeash(false);
@@ -63,6 +67,7 @@ public abstract class PacketPlayOutAttachEntityHandle extends PacketHandle {
         public final Template.Field.Integer passengerId = new Template.Field.Integer();
         public final Template.Field.Integer vehicleId = new Template.Field.Integer();
 
+        public final Template.StaticMethod.Converted<PacketPlayOutAttachEntityHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutAttachEntityHandle>();
         public final Template.StaticMethod.Converted<PacketPlayOutAttachEntityHandle> createNewMount = new Template.StaticMethod.Converted<PacketPlayOutAttachEntityHandle>();
         public final Template.StaticMethod.Converted<PacketPlayOutAttachEntityHandle> createNewLeash = new Template.StaticMethod.Converted<PacketPlayOutAttachEntityHandle>();
 

@@ -2158,6 +2158,15 @@ class PacketPlayOutAttachEntity extends Packet {
     private int vehicleId:c;
 #endif
 
+    public static (PacketPlayOutAttachEntityHandle) PacketPlayOutAttachEntity createNew() {
+#if version >= 1.17
+        #require net.minecraft.network.protocol.game.PacketPlayOutAttachEntity private PacketPlayOutAttachEntity createSpawnPacket:<init>(net.minecraft.network.PacketDataSerializer serializer);
+        return #createSpawnPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#else
+        return new PacketPlayOutAttachEntity();
+#endif
+    }
+
 #if version >= 1.9
     public boolean isLeash() {
         return true;
@@ -2196,7 +2205,7 @@ class PacketPlayOutAttachEntity extends Packet {
 
     <code>
     public static PacketPlayOutAttachEntityHandle createNewLeash(int leashedEntityId, int holderEntityId) {
-        PacketPlayOutAttachEntityHandle packet = T.newHandleNull();
+        PacketPlayOutAttachEntityHandle packet = createNew();
         packet.setVehicleId(holderEntityId);
         packet.setPassengerId(leashedEntityId);
         packet.setIsLeash(true);
@@ -2207,7 +2216,7 @@ class PacketPlayOutAttachEntity extends Packet {
         if (!T.leashId.isAvailable()) {
             throw new UnsupportedOperationException("Not supported >= MC 1.9, use Mount packet instead");
         }
-        PacketPlayOutAttachEntityHandle packet = T.newHandleNull();
+        PacketPlayOutAttachEntityHandle packet = createNew();
         packet.setVehicleId(vehicleEntityId);
         packet.setPassengerId(passengerEntityId);
         packet.setIsLeash(false);

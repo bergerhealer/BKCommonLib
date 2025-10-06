@@ -83,9 +83,8 @@ public class VehicleMountHandler_1_8_to_1_8_8 extends VehicleMountHandler_BaseIm
     }
 
     private final void sendAttach(SpawnedEntity vehicle, SpawnedEntity passenger) {
-        PacketPlayOutAttachEntityHandle attach = PacketPlayOutAttachEntityHandle.T.newHandleNull();
-        attach.setVehicleId((vehicle == null) ? -1 : vehicle.id);
-        attach.setPassengerId(passenger.id);
-        queuePacket(attach);
+        queuePacket(PacketPlayOutAttachEntityHandle.createNewMount(
+                passenger.id,
+                (vehicle == null) ? -1 : vehicle.id));
     }
 }
