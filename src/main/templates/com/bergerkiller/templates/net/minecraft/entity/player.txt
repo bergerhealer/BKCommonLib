@@ -447,10 +447,10 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         // Some layers of abstraction were introduced with 1.21.9
 
         public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension() {
-            return instance.respawnData().globalPos().dimension();
+            return instance.respawnData().dimension();
         }
         public (IntVector3) BlockPosition position() {
-            return instance.respawnData().globalPos().pos();
+            return instance.respawnData().pos();
         }
         public String worldName() {
             return null; // Not available

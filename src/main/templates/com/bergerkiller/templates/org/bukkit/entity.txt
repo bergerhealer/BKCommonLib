@@ -49,7 +49,12 @@ class Entity {
             return false;
         }
 
-  #if version >= 1.18
+  #if version >= 1.21.9
+        // startRiding(boolean forceRide, boolean sendMountPackets);
+        if (!passengerHandle.startRiding(vehicleHandle, true, true)) {
+            return false;
+        }
+  #elseif version >= 1.18
         if (!passengerHandle.startRiding(vehicleHandle, true)) {
             return false;
         }

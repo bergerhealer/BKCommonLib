@@ -590,9 +590,16 @@ class WorldServer extends World {
         // If isDeathRespawn is true, removes one use tick from a bed respawn anchor, if used
         boolean ignoreRespawnAnchorUses = !isDeathRespawn;
 
+        // Extract Dimension
+#if version >= 1.21.9
+        net.minecraft.resources.ResourceKey dimension = respawnPoint.respawnData().dimension();
+#else
+        net.minecraft.resources.ResourceKey dimension = (net.minecraft.resources.ResourceKey) respawnPoint.dimension();
+#endif
+
         // We will need the Bukkit World from the dimension regardless
         // If this lookup fails, fail right away as we cannot proceed
-        WorldServer nmsWorld = (WorldServer) com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.T.getByDimensionKey.raw().invoke(respawnPoint.dimension());
+        WorldServer nmsWorld = (WorldServer) com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.T.getByDimensionKey.raw().invoke(dimension);
         if (nmsWorld == null) {
             return null;
         }

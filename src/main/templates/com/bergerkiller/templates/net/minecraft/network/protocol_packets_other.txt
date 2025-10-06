@@ -16,6 +16,7 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagLongArray;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.WorldServer;
+import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.EntityPlayer.RespawnConfig;
 import net.minecraft.sounds.SoundCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeMapBase;
@@ -3245,7 +3246,7 @@ class PacketPlayOutSpawnPosition extends Packet {
     }
 
     public (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig getSpawn() {
-        return new EntityPlayer$RespawnConfig(instance.respawnData(), true);
+        return new net.minecraft.server.level.EntityPlayer$RespawnConfig(instance.respawnData(), true);
     }
 #else
     public static (PacketPlayOutSpawnPositionHandle) PacketPlayOutSpawnPosition createNew((EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig spawnConfig) {

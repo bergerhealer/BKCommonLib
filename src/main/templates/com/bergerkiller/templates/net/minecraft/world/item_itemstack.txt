@@ -783,7 +783,11 @@ class ItemStack {
 
 
     public (GameProfileHandle) GameProfile getSkullProfile() {
-#if version >= 1.20.5
+#if version >= 1.21.9
+        net.minecraft.world.item.component.ResolvableProfile resolvableProfile;
+        resolvableProfile = (net.minecraft.world.item.component.ResolvableProfile) instance.get(DataComponents.PROFILE);
+        return (resolvableProfile == null) ? null : resolvableProfile.partialProfile();
+#elseif version >= 1.20.5
         net.minecraft.world.item.component.ResolvableProfile resolvableProfile;
         resolvableProfile = (net.minecraft.world.item.component.ResolvableProfile) instance.get(DataComponents.PROFILE);
         return (resolvableProfile == null) ? null : resolvableProfile.gameProfile();
@@ -806,7 +810,13 @@ class ItemStack {
     }
 
     public void setSkullProfile((GameProfileHandle) GameProfile profile) {
-#if version >= 1.20.5
+#if version >= 1.21.9
+        if (profile != null) {
+            instance.set(DataComponents.PROFILE, net.minecraft.world.item.component.ResolvableProfile.createResolved(profile));
+        } else {
+            instance.remove(DataComponents.PROFILE);
+        }
+#elseif version >= 1.20.5
         if (profile != null) {
             instance.set(DataComponents.PROFILE, new net.minecraft.world.item.component.ResolvableProfile(profile));
         } else {
@@ -836,6 +846,11 @@ class ItemStack {
         }
 #endif
     }
+
+    // Sometimes we want read-only access to the tag. Frustrated since 1.21.9 when getUnsafe() was removed.
+#if version >= 1.21.9
+    #require net.minecraft.world.item.component.CustomData private final readonly NBTTagCompound cmd_tag:tag;
+#endif
 
 #if version >= 1.21.2
     public boolean hasItemModelSet() {
@@ -881,33 +896,41 @@ class ItemStack {
     public void fixDataComponentErrors() {
 #if version >= 1.20.5
         CustomData cmd = (CustomData) instance.get(DataComponents.ENTITY_DATA);
-        if (cmd != null && !cmd.getUnsafe().contains("id")) {
-            // What type of entity ID for this entity data tag
-            net.minecraft.world.item.Item item = instance.getItem();
-            EntityTypes entityType = null;
-            if (item == net.minecraft.world.item.Items.COD_BUCKET) {
-                entityType = EntityTypes.COD;
-            } else if (item == net.minecraft.world.item.Items.PUFFERFISH_BUCKET) {
-                entityType = EntityTypes.PUFFERFISH;
-            } else if (item == net.minecraft.world.item.Items.SALMON_BUCKET) {
-                entityType = EntityTypes.SALMON;
-            } else if (item == net.minecraft.world.item.Items.ITEM_FRAME) {
-                entityType = EntityTypes.ITEM_FRAME;
-            } else if (item == net.minecraft.world.item.Items.GLOW_ITEM_FRAME) {
-                entityType = EntityTypes.GLOW_ITEM_FRAME;
-            } else if (item == net.minecraft.world.item.Items.PAINTING) {
-                entityType = EntityTypes.PAINTING;
-            } else {
-                // Unknown entity type from item. Discard the custom data tag entirely to
-                // avoid errors later on.
-                instance.remove(DataComponents.ENTITY_DATA);
-                return;
-            }
+        if (cmd != null) {
+  #if version >= 1.21.9
+            NBTTagCompound tag = cmd#cmd_tag;
+  #else
+            NBTTagCompound tag = cmd.getUnsafe();
+  #endif
+            if (!tag.contains("id")) {
+                // What type of entity ID for this entity data tag
+                net.minecraft.world.item.Item item = instance.getItem();
+                EntityTypes entityType = null;
+                if (item == net.minecraft.world.item.Items.COD_BUCKET) {
+                    entityType = EntityTypes.COD;
+                } else if (item == net.minecraft.world.item.Items.PUFFERFISH_BUCKET) {
+                    entityType = EntityTypes.PUFFERFISH;
+                } else if (item == net.minecraft.world.item.Items.SALMON_BUCKET) {
+                    entityType = EntityTypes.SALMON;
+                } else if (item == net.minecraft.world.item.Items.ITEM_FRAME) {
+                    entityType = EntityTypes.ITEM_FRAME;
+                } else if (item == net.minecraft.world.item.Items.GLOW_ITEM_FRAME) {
+                    entityType = EntityTypes.GLOW_ITEM_FRAME;
+                } else if (item == net.minecraft.world.item.Items.PAINTING) {
+                    entityType = EntityTypes.PAINTING;
+                }
 
-            NBTTagCompound nbt = cmd.copyTag();
-            nbt.putString("id", EntityTypes.getKey(entityType).toString());
-            cmd = CustomData.of(nbt);
-            instance.set(DataComponents.ENTITY_DATA, cmd);
+                if (entityType != null) {
+                    NBTTagCompound nbt = cmd.copyTag();
+                    nbt.putString("id", EntityTypes.getKey(entityType).toString());
+                    cmd = CustomData.of(nbt);
+                    instance.set(DataComponents.ENTITY_DATA, cmd);
+                } else {
+                    // Unknown entity type from item. Discard the custom data tag entirely to
+                    // avoid errors later on.
+                    instance.remove(DataComponents.ENTITY_DATA);
+                }
+            }
         }
 #endif
     }
@@ -1036,7 +1059,6 @@ class ItemStack {
     }
 #endif
 
-
 #if version >= 1.20.5
     public boolean hasCustomData() {
         return instance.has(DataComponents.CUSTOM_DATA);
@@ -1049,8 +1071,16 @@ class ItemStack {
 
     public CommonTagCompound getCustomData() {
         CustomData customData = (CustomData) instance.get(DataComponents.CUSTOM_DATA);
-        return (customData != null) ? CommonTagCompound.createReadOnly(customData.getUnsafe())
-                                    : CommonTagCompound.EMPTY;
+        if (customData == null) {
+            return CommonTagCompound.EMPTY;
+        }
+
+  #if version >= 1.21.9
+        NBTTagCompound tag = customData#cmd_tag;
+  #else
+        NBTTagCompound tag = customData.getUnsafe();
+  #endif
+        return CommonTagCompound.createReadOnly(tag);
     }
 
     public void setCustomData((CommonTagCompound) NBTTagCompound tag) {

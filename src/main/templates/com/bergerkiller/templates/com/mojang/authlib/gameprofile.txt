@@ -13,10 +13,30 @@ class GameProfile {
 #if version >= 1.21.9
     public UUID getId:id();
     public String getName:name();
+
+    public void clearProperties() {
+        instance.properties().clear();
+    }
+
+    public Set<String> getPropertyKeys() {
+        return instance.properties().keySet();
+    }
+
+    public (Collection<PropertyHandle>) Collection<Property> getProperties(String key) {
+        return instance.properties().get(key);
+    }
+
+    public boolean putProperty(String key, (PropertyHandle) Property property) {
+        return instance.properties().put(key, property);
+    }
+
+    public void setAllProperties((GameProfileHandle) GameProfile profile) {
+        instance.properties().clear();
+        instance.properties().putAll(profile.properties());
+    }
 #else
     public UUID getId();
     public String getName();
-#endif
 
     public void clearProperties() {
         instance.getProperties().clear();
@@ -38,6 +58,7 @@ class GameProfile {
         instance.getProperties().clear();
         instance.getProperties().putAll(profile.getProperties());
     }
+#endif
 
     <code>
     public static GameProfileHandle getForPlayer(org.bukkit.entity.HumanEntity player) {

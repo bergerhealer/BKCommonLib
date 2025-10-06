@@ -16,7 +16,7 @@ class PlayerList {
     public int getMaxPlayers();
     public void setMaxPlayers(int maxPlayers) {
         // Defer to server
-        instance.getServer().setMaxPlayers(maxPlayers);
+        ((net.minecraft.server.dedicated.DedicatedServer) instance.getServer()).setMaxPlayers(maxPlayers);
     }
 #else
     #require PlayerList protected int maxPlayers;
