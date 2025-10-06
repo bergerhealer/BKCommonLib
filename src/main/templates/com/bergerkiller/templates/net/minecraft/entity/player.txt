@@ -443,13 +443,52 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 
     // Since 1.21.5, before it uses a proxy class
     public class EntityPlayer.RespawnConfig {
-#if version >= 1.21.5
+#if version >= 1.21.9
+        // Some layers of abstraction were introduced with 1.21.9
+
+        public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension() {
+            return instance.respawnData().globalPos().dimension();
+        }
+        public (IntVector3) BlockPosition position() {
+            return instance.respawnData().globalPos().pos();
+        }
+        public String worldName() {
+            return null; // Not available
+        }
+
+        public float yaw() {
+            return instance.respawnData().yaw();
+        }
+        public float pitch() {
+            return instance.respawnData().pitch();
+        }
+        public boolean forced();
+
+        public static (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig of((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension, String worldName, (IntVector3) BlockPosition position, float yaw, float pitch, boolean forced) {
+            return new EntityPlayer$RespawnConfig(
+                net.minecraft.world.level.storage.WorldData$RespawnData.of(dimension, position, yaw, pitch),
+                forced );
+        }
+
+        public static (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig codecFromNBT((CommonTagCompound) NBTTagCompound nbt) {
+            return (EntityPlayer$RespawnConfig) nbt.read("respawn", EntityPlayer$RespawnConfig.CODEC).orElse(null);
+        }
+
+        public static void codecToNBT((EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig respawnConfig, (CommonTagCompound) NBTTagCompound nbt) {
+            if (respawnConfig != null) {
+                nbt.store("respawn", EntityPlayer$RespawnConfig.CODEC, respawnConfig);
+            } else {
+                nbt.remove("respawn");
+            }
+        }
+#else
+  #if version >= 1.21.5
         public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension();
         public (IntVector3) BlockPosition position:pos();
         public String worldName() {
             return null; // Not available
         }
-#else
+  #else
         public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension() {
             return (ResourceKey) instance.dimension();
         }
@@ -459,38 +498,47 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         }
 
         public String worldName();
-#endif
+  #endif
 
-        public float angle();
+        public float yaw:angle();
+        public float pitch() {
+            return 0.0f; // Not available
+        }
         public boolean forced();
 
-        public static (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig of((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension, String worldName, (IntVector3) BlockPosition position, float angle, boolean forced) {
-#if version >= 1.21.5
-            return new EntityPlayer$RespawnConfig(dimension, position, angle, forced);
-#else
-            return new EntityPlayer$RespawnConfig(dimension, worldName, position, angle, forced);
-#endif
+        public static (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig of((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension, String worldName, (IntVector3) BlockPosition position, float yaw, float pitch, boolean forced) {
+  #if version >= 1.21.5
+            return new EntityPlayer$RespawnConfig(dimension, position, yaw, forced);
+  #else
+            return new EntityPlayer$RespawnConfig(dimension, worldName, position, yaw, forced);
+  #endif
         }
 
         public static (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig codecFromNBT((CommonTagCompound) NBTTagCompound nbt) {
-#if version >= 1.21.5
+  #if version >= 1.21.5
             return (EntityPlayer$RespawnConfig) nbt.read("respawn", EntityPlayer$RespawnConfig.CODEC).orElse(null);
-#else
+  #else
             return null;
-#endif
+  #endif
         }
 
         public static void codecToNBT((EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig respawnConfig, (CommonTagCompound) NBTTagCompound nbt) {
-#if version >= 1.21.5
+  #if version >= 1.21.5
             if (respawnConfig != null) {
                 nbt.store("respawn", EntityPlayer$RespawnConfig.CODEC, respawnConfig);
             } else {
                 nbt.remove("respawn");
             }
-#endif
+  #endif
         }
+#endif
 
         <code>
+        @Deprecated
+        public static EntityPlayerHandle.RespawnConfigHandle of(com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World> dimension, String worldName, IntVector3 position, float yaw, boolean forced) {
+            return of(dimension, worldName, position, yaw, 0.0f, forced);
+        }
+
         public org.bukkit.World world() {
             return com.bergerkiller.bukkit.common.utils.WorldUtil.getWorldByDimensionKey(this.dimension());
         }

@@ -37,8 +37,13 @@ public abstract class PlayerRespawnPoint {
         }
 
         @Override
-        public float getAngle() {
-            return 0;
+        public float getYaw() {
+            return 0.0f;
+        }
+
+        @Override
+        public float getPitch() {
+            return 0.0f;
         }
 
         @Override
@@ -213,10 +218,30 @@ public abstract class PlayerRespawnPoint {
     /**
      * Gets the horizontal rotation angle of the player.
      * Not used before Minecraft 1.16.2.
+     *
+     * @return rotation angle
+     * @deprecated Use {@link #getYaw()} instead
+     */
+    @Deprecated
+    public final float getAngle() {
+        return getYaw();
+    }
+
+    /**
+     * Gets the horizontal rotation angle of the player.
+     * Not used before Minecraft 1.16.2.
      * 
      * @return rotation angle
      */
-    public abstract float getAngle();
+    public abstract float getYaw();
+
+    /**
+     * Gets the vertical rotation angle of the player.
+     * Not used before Minecraft 1.21.9.
+     *
+     * @return rotation angle
+     */
+    public abstract float getPitch();
 
     /**
      * Encodes this player respawn point and saves it to NBT, formatted in the

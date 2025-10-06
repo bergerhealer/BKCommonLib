@@ -5,8 +5,6 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import org.bukkit.Location;
@@ -66,8 +64,13 @@ public class PlayerRespawnPointNearBlock extends PlayerRespawnPoint {
     }
 
     @Override
-    public float getAngle() {
-        return handle.angle();
+    public float getYaw() {
+        return handle.yaw();
+    }
+
+    @Override
+    public float getPitch() {
+        return handle.pitch();
     }
 
     /**
@@ -128,7 +131,7 @@ public class PlayerRespawnPointNearBlock extends PlayerRespawnPoint {
      */
     public PlayerRespawnPointNearBlock withForced(boolean forced) {
         return new PlayerRespawnPointNearBlock(EntityPlayerHandle.RespawnConfigHandle.of(
-                handle.dimension(), handle.worldName(), handle.position(), handle.angle(), forced));
+                handle.dimension(), handle.worldName(), handle.position(), handle.yaw(), handle.pitch(), forced));
     }
 
     @Override
