@@ -125,7 +125,7 @@ public class ItemMaterialTest {
             }
         }
     }
-    
+
     @Test
     public void testMaterialProperties() {
         // Requires Block now. Test broken.
@@ -253,45 +253,6 @@ public class ItemMaterialTest {
             .checkOthers(false)
             .done();
 
-        {
-            PropertyTest<Boolean> test = testProperty(MaterialUtil.ISPOWERSOURCE, "ISPOWERSOURCE");
-            test.checkNewAndLegacy("ACTIVATOR_RAIL", false) // these read power, not write
-                .checkNewAndLegacy("POWERED_RAIL", false) // these read power, not write
-                .checkNewAndLegacy("HOPPER", false) // these read power, not write
-                .checkData(org.bukkit.material.Command.class, false) // these read power, not write
-                .checkData(org.bukkit.material.PistonBaseMaterial.class, false) // these read power, not write
-                .checkData(DetectorRail.class, true)
-                .checkProperty(MaterialUtil.ISPRESSUREPLATE, true)
-                .checkNewAndLegacy("DAYLIGHT_DETECTOR", true)
-                .checkLegacy("DAYLIGHT_DETECTOR_INVERTED", true)
-                .checkNewAndLegacy("TRAPPED_CHEST", true)
-                .checkNewAndLegacy("REDSTONE_BLOCK", true)
-                .check("LECTERN", true) // since mc 1.14
-                .check("LIGHTNING_ROD", true) // since mc 1.17
-                .check("SCULK_SENSOR", true) // since mc 1.17
-                .check("CALIBRATED_SCULK_SENSOR", true); // since mc 1.20
-
-            if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
-                // TODO!
-            } else {
-                test.check(Material.getMaterial("DAYLIGHT_DETECTOR_INVERTED"), true)
-                    .check(Material.getMaterial("DIODE_BLOCK_OFF"), true)
-                    .check(Material.getMaterial("DIODE_BLOCK_ON"), true)
-                    .check(Material.getMaterial("REDSTONE_COMPARATOR_ON"), true)
-                    .check(Material.getMaterial("REDSTONE_COMPARATOR_OFF"), true);
-            }
-
-            if (Common.evaluateMCVersion(">=", "1.19.4")) {
-                test.check(Material.getMaterial("JUKEBOX"), true)
-                    .check(Material.getMaterial("LEGACY_JUKEBOX"), true);
-            }
-
-            test.check(ParseUtil.parseMaterial("OBSERVER", null), true)
-                .checkData(org.bukkit.material.Redstone.class, true) // when new redstone-like types are added, this should fail
-                .checkOthers(false)
-                .done();
-        }
-
         testProperty(MaterialUtil.ISFUEL, "ISFUEL")
             .check(Material.COAL, true)
             .check("OAK_PLANKS", true)
@@ -309,6 +270,56 @@ public class ItemMaterialTest {
             .check(Material.GLASS, false)
             .check(Material.DIRT, false)
             .check(Material.BAKED_POTATO, false)
+            .done();
+    }
+
+    @Test
+    public void testIsPowerSource() {
+        PropertyTest<Boolean> test = testProperty(MaterialUtil.ISPOWERSOURCE, "ISPOWERSOURCE");
+        test.checkNewAndLegacy("ACTIVATOR_RAIL", false) // these read power, not write
+            .checkNewAndLegacy("POWERED_RAIL", false) // these read power, not write
+            .checkNewAndLegacy("HOPPER", false) // these read power, not write
+            .checkData(org.bukkit.material.Command.class, false) // these read power, not write
+            .checkData(org.bukkit.material.PistonBaseMaterial.class, false) // these read power, not write
+            .checkData(DetectorRail.class, true)
+            .checkProperty(MaterialUtil.ISPRESSUREPLATE, true)
+            .checkNewAndLegacy("DAYLIGHT_DETECTOR", true)
+            .checkLegacy("DAYLIGHT_DETECTOR_INVERTED", true)
+            .checkNewAndLegacy("TRAPPED_CHEST", true)
+            .checkNewAndLegacy("REDSTONE_BLOCK", true)
+            .check("LECTERN", true) // since mc 1.14
+            .check("LIGHTNING_ROD", true) // since mc 1.17
+            .check("SCULK_SENSOR", true) // since mc 1.17
+            .check("CALIBRATED_SCULK_SENSOR", true); // since mc 1.20
+
+        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            // TODO!
+        } else {
+            test.check(Material.getMaterial("DAYLIGHT_DETECTOR_INVERTED"), true)
+                .check(Material.getMaterial("DIODE_BLOCK_OFF"), true)
+                .check(Material.getMaterial("DIODE_BLOCK_ON"), true)
+                .check(Material.getMaterial("REDSTONE_COMPARATOR_ON"), true)
+                .check(Material.getMaterial("REDSTONE_COMPARATOR_OFF"), true);
+        }
+
+        if (Common.evaluateMCVersion(">=", "1.19.4")) {
+            test.check(Material.getMaterial("JUKEBOX"), true)
+                .check(Material.getMaterial("LEGACY_JUKEBOX"), true);
+        }
+
+        if (Common.evaluateMCVersion(">=", "1.21.9")) {
+            test.check(Material.getMaterial("WAXED_LIGHTNING_ROD"), true)
+                .check(Material.getMaterial("WAXED_EXPOSED_LIGHTNING_ROD"), true)
+                .check(Material.getMaterial("WEATHERED_LIGHTNING_ROD"), true)
+                .check(Material.getMaterial("EXPOSED_LIGHTNING_ROD"), true)
+                .check(Material.getMaterial("WAXED_OXIDIZED_LIGHTNING_ROD"), true)
+                .check(Material.getMaterial("WAXED_WEATHERED_LIGHTNING_ROD"), true)
+                .check(Material.getMaterial("OXIDIZED_LIGHTNING_ROD"), true);
+        }
+
+        test.check(ParseUtil.parseMaterial("OBSERVER", null), true)
+            .checkData(org.bukkit.material.Redstone.class, true) // when new redstone-like types are added, this should fail
+            .checkOthers(false)
             .done();
     }
 

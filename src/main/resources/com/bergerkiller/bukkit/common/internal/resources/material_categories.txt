@@ -232,6 +232,9 @@ ISSWORD:
 #if version >= 1.16
   NETHERITE_SWORD
 #endif
+#if version >= 1.21.9
+  COPPER_SWORD
+#endif
 
 ISBOOTS:
   LEATHER_BOOTS
@@ -246,6 +249,9 @@ ISBOOTS:
   LEGACY_CHAINMAIL_BOOTS
 #if version >= 1.16
   NETHERITE_BOOTS
+#endif
+#if version >= 1.21.9
+  COPPER_BOOTS
 #endif
 
 ISLEGGINGS:
@@ -262,6 +268,9 @@ ISLEGGINGS:
 #if version >= 1.16
   NETHERITE_LEGGINGS
 #endif
+#if version >= 1.21.9
+  COPPER_LEGGINGS
+#endif
 
 ISCHESTPLATE:
   LEATHER_CHESTPLATE
@@ -276,6 +285,9 @@ ISCHESTPLATE:
   LEGACY_CHAINMAIL_CHESTPLATE
 #if version >= 1.16
   NETHERITE_CHESTPLATE
+#endif
+#if version >= 1.21.9
+  COPPER_CHESTPLATE
 #endif
 
 ISHELMET:
@@ -292,6 +304,9 @@ ISHELMET:
   LEGACY_CHAINMAIL_HELMET
 #if version >= 1.16
   NETHERITE_HELMET
+#endif
+#if version >= 1.21.9
+  COPPER_HELMET
 #endif
 
 ISLEATHERARMOR:
