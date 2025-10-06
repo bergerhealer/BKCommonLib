@@ -282,9 +282,13 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             EntityTrackerEntryHandle.T.setState.invoke(to.getRaw(), to_state);
 
             // Copy state too. Preserve the 'broadcast()' lambda, as it refers to the entry we want to keep!
-            java.util.function.Consumer<?> to_state_broadcastMethod = EntityTrackerEntryStateHandle.T.broadcastMethod.get(to_state.getRaw());
-            EntityTrackerEntryStateHandle.T.copyHandle(from.getState(), to_state);
-            EntityTrackerEntryStateHandle.T.broadcastMethod.set(to_state.getRaw(), to_state_broadcastMethod);
+            if (EntityTrackerEntryStateHandle.T.broadcastMethod.isAvailable()) {
+                java.util.function.Consumer<?> to_state_broadcastMethod = EntityTrackerEntryStateHandle.T.broadcastMethod.get(to_state.getRaw());
+                EntityTrackerEntryStateHandle.T.copyHandle(from.getState(), to_state);
+                EntityTrackerEntryStateHandle.T.broadcastMethod.set(to_state.getRaw(), to_state_broadcastMethod);
+            } else {
+                EntityTrackerEntryStateHandle.T.copyHandle(from.getState(), to_state);
+            }
         }
     }
 

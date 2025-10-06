@@ -460,28 +460,29 @@ class EntityTrackerEntry {
 // Alias for EntityTrackerEntry, but because we're using PlayerChunkMap$EntityTracker as
 // main handle on 1.14 it is renamed to differentiate the two.
 class EntityTrackerEntryState {
-#if version >= 1.21
+#if version >= 1.17
     private final (EntityHandle) Entity entity;
     private final int updateInterval;
     private final boolean isMobile:trackDelta;
-    private optional final java.util.function.Consumer broadcastMethod:broadcast;
-#elseif version >= 1.17
-    private final (EntityHandle) Entity entity;
-    private final int updateInterval;
-    private final boolean isMobile:trackDelta;
-    private optional final java.util.function.Consumer broadcastMethod:broadcast;
 #elseif version >= 1.14
     private final (EntityHandle) Entity entity:tracker;
     private final int updateInterval:d;
     private final boolean isMobile:e;
-    private optional final java.util.function.Consumer broadcastMethod:f;
 #elseif version >= 1.9
     private final readonly (EntityHandle) Entity entity:tracker;
     private final int updateInterval:g;
-    private optional final java.util.function.Consumer broadcastMethod:###;
 #else
     public final readonly (EntityHandle) Entity entity:tracker;
     public int updateInterval:c;
+#endif
+
+#if version >= 1.21.9
+    private optional final java.util.function.Consumer broadcastMethod:###;
+#elseif version >= 1.17
+    private optional final java.util.function.Consumer broadcastMethod:broadcast;
+#elseif version >= 1.14
+    private optional final java.util.function.Consumer broadcastMethod:f;
+#else
     private optional final java.util.function.Consumer broadcastMethod:###;
 #endif
 
