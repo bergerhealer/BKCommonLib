@@ -71,9 +71,11 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
         EntityTrackerEntryHandle.T.setState.raw.invoke(hookedTracker, state);
 
         // Swap out the broadcast consumer field with one that refers to this tracker instead
-        EntityTrackerEntryStateHandle.T.broadcastMethod.set(state, packet -> {
-            EntityTrackerEntryHandle.T.broadcastRawPacket.raw.invoke(hookedTracker, packet);
-        });
+        if (EntityTrackerEntryStateHandle.T.broadcastMethod.isAvailable()) {
+            EntityTrackerEntryStateHandle.T.broadcastMethod.set(state, packet -> {
+                EntityTrackerEntryHandle.T.broadcastRawPacket.raw.invoke(hookedTracker, packet);
+            });
+        }
 
         return hookedTracker;
     }
