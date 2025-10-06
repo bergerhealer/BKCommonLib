@@ -2279,7 +2279,17 @@ public class NMSPacketClasses {
     @Deprecated
     public static class NMSPacketPlayOutSpawnPosition extends NMSPacket {
 
-        public final TranslatorFieldAccessor<IntVector3> position = PacketPlayOutSpawnPositionHandle.T.position.toFieldAccessor();
+        public final FieldAccessor<IntVector3> position = new SafeDirectField<IntVector3>() {
+            @Override
+            public IntVector3 get(Object o) {
+                return PacketPlayOutSpawnPositionHandle.T.getSpawn.invoke(o).position();
+            }
+
+            @Override
+            public boolean set(Object o, IntVector3 intVector3) {
+                return false;
+            }
+        };
     }
 
     public static class NMSPacketPlayOutStatistic extends NMSPacket {
