@@ -64,7 +64,7 @@ public class JsonSerializerTest {
         GameProfileHandle profile = GameProfileHandle.createNew(
                 UUID.fromString("04049c90-d3e9-4621-9caf-0000aaa58540"),
                 "HeadDatabase");
-        profile.putProperty("textures", PropertyHandle.createNew("textures",
+        profile = profile.withPropertyPut("textures", PropertyHandle.createNew("textures",
                         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjllNzVlMDQxNTFlN2NkZThlN2YxNDlkYWU5MmYwYzE0ZWY1ZjNmZjQ1Y2QzMjM5NTc4NzZiMGFkZDJjNDk0OSJ9fX0="));
 
         String json = serializer.itemStackToJson(

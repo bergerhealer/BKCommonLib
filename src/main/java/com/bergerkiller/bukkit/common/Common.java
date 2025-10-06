@@ -74,7 +74,8 @@ public class Common {
             "Common:CommonItemStack:AddGlint",
             "Common:JSONSerializer:NullItemStack",
             "Common:Yaml:ListOfListFix",
-            "Common:Cloud:QuotedArgumentParserFromParser"
+            "Common:Cloud:QuotedArgumentParserFromParser",
+            "Minecraft:GameProfile:Immutable"
     ).collect(Collectors.toSet());
 
     /**

@@ -7,16 +7,36 @@ import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
+import com.google.common.collect.Multimap;
+
 class GameProfile {
-    public (GameProfileHandle) GameProfile(UUID uuid, String name);
+    public static (GameProfileHandle) GameProfile createNew(UUID uuid, String name, Multimap<String, PropertyHandle> properties) {
+        com.mojang.authlib.properties.PropertyMap propertyMap;
+        if (properties.isEmpty()) {
+            propertyMap = com.mojang.authlib.properties.PropertyMap.EMPTY;
+        } else {
+            // Map properties back into a new MultiMap with PropertyHandle values
+            com.google.common.collect.Multimap builder = com.google.common.collect.ArrayListMultimap.create(properties.keySet().size(), 2);
+
+            // Copy key-values over
+            java.util.Iterator iter = properties.entries().iterator();
+            while (iter.hasNext()) {
+                java.util.Map$Entry entry = (java.util.Map$Entry) iter.next();
+                PropertyHandle value = (PropertyHandle) entry.getValue();
+                builder.put(entry.getKey(), value.getRaw());
+            }
+
+            // Construct (also makes it immutable with 1.21.9+)
+            propertyMap = new com.mojang.authlib.properties.PropertyMap(builder);
+        }
+
+        // Construct an (immutable) profile
+        return new GameProfile(uuid, name, propertyMap);
+    }
 
 #if version >= 1.21.9
     public UUID getId:id();
     public String getName:name();
-
-    public void clearProperties() {
-        instance.properties().clear();
-    }
 
     public Set<String> getPropertyKeys() {
         return instance.properties().keySet();
@@ -25,22 +45,9 @@ class GameProfile {
     public (Collection<PropertyHandle>) Collection<Property> getProperties(String key) {
         return instance.properties().get(key);
     }
-
-    public boolean putProperty(String key, (PropertyHandle) Property property) {
-        return instance.properties().put(key, property);
-    }
-
-    public void setAllProperties((GameProfileHandle) GameProfile profile) {
-        instance.properties().clear();
-        instance.properties().putAll(profile.properties());
-    }
 #else
     public UUID getId();
     public String getName();
-
-    public void clearProperties() {
-        instance.getProperties().clear();
-    }
 
     public Set<String> getPropertyKeys() {
         return instance.getProperties().keySet();
@@ -49,18 +56,49 @@ class GameProfile {
     public (Collection<PropertyHandle>) Collection<Property> getProperties(String key) {
         return instance.getProperties().get(key);
     }
-
-    public boolean putProperty(String key, (PropertyHandle) Property property) {
-        return instance.getProperties().put(key, property);
-    }
-
-    public void setAllProperties((GameProfileHandle) GameProfile profile) {
-        instance.getProperties().clear();
-        instance.getProperties().putAll(profile.getProperties());
-    }
 #endif
 
+    public Multimap<String, PropertyHandle> getMutableProperties() {
+#if version >= 1.21.9
+        com.mojang.authlib.properties.PropertyMap properties = instance.properties();
+#else
+        com.mojang.authlib.properties.PropertyMap properties = instance.getProperties();
+#endif
+
+        Multimap mutableProperties = com.google.common.collect.ArrayListMultimap.create(properties.keySet().size(), 2);
+
+        java.util.Iterator iter = properties.entries().iterator();
+        while (iter.hasNext()) {
+            java.util.Map$Entry entry = (java.util.Map$Entry) iter.next();
+            mutableProperties.put(entry.getKey(), PropertyHandle.createHandle(entry.getValue()));
+        }
+
+        return mutableProperties;
+    }
+
     <code>
+    public static GameProfileHandle createNew(UUID uuid, String name) {
+        return createNew(uuid, name, com.google.common.collect.ImmutableMultimap.of());
+    }
+
+    public GameProfileHandle withProperties(Multimap<String, PropertyHandle> properties) {
+        return createNew(getId(), getName(), properties);
+    }
+
+    public GameProfileHandle withPropertiesOf(GameProfileHandle profile) {
+        return withProperties(profile.getMutableProperties());
+    }
+
+    public GameProfileHandle withPropertiesChanged(java.util.function.Consumer<Multimap<String, PropertyHandle>> mutator) {
+        Multimap<String, PropertyHandle> properties = getMutableProperties();
+        mutator.accept(properties);
+        return withProperties(properties);
+    }
+
+    public GameProfileHandle withPropertyPut(String key, PropertyHandle property) {
+        return withPropertiesChanged(p -> p.put(key, property));
+    }
+
     public static GameProfileHandle getForPlayer(org.bukkit.entity.HumanEntity player) {
         Object handle = com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player);
         return com.bergerkiller.generated.net.minecraft.world.entity.player.EntityHumanHandle.T.gameProfile.get(handle);
