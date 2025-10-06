@@ -8,14 +8,13 @@ import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.players.PlayerListHandle;
-import com.bergerkiller.generated.net.minecraft.util.ProblemReporterHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.storage.ValueInputHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
+import com.bergerkiller.mountiplex.reflection.util.FastConstructor;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
@@ -25,17 +24,20 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.util.UUID;
 import java.util.logging.Level;
 
 /**
- * Handler for Minecraft 1.21.6 and later
+ * Handler for Minecraft 1.21.9 and later
  */
-class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
+class PlayerFileDataHandler_1_21_9 extends PlayerFileDataHandler {
     private final FastMethod<File> getPlayerFolderOfWorld = new FastMethod<File>();
-    private final FastMethod<Object> getServerRegistryAccess = new FastMethod<>();
     private final FastField<Object> playerListFileDataField;
+    private final FastMethod<UUID> nameAndId_getId = new FastMethod<>();
+    private final FastMethod<String> nameAndId_getName = new FastMethod<>();
+    private final FastConstructor<Object> nameAndId_ctor_id_name = new FastConstructor<>();
 
-    public PlayerFileDataHandler_1_21_6() {
+    public PlayerFileDataHandler_1_21_9() throws Exception {
         ClassResolver resolver = new ClassResolver();
         resolver.setDeclaredClassName("net.minecraft.server.level.WorldServer");
         resolver.setVariable("version", Common.MC_VERSION);
@@ -56,19 +58,19 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
             getPlayerFolderOfWorld.forceInitialization();
         }
 
-        {
-            MethodDeclaration getServerRegistryAccessMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess("" +
-                    "public static net.minecraft.core.IRegistryCustom getServerRegistryAccess() {\n" +
-                    "    return org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();\n" +
-                    "}", resolver));
-            getServerRegistryAccess.init(getServerRegistryAccessMethod);
-            getServerRegistryAccess.forceInitialization();
-        }
-
         String fieldName = "playerIo";
         Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.WorldNBTStorage");
         String realFieldName = Resolver.resolveFieldName(PlayerListHandle.T.getType(), fieldName);
         playerListFileDataField = CommonUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), realFieldName, playerFileDataType).getFastField());
+
+        // For accessing NameAndId input into load/save/etc.
+        Class<?> nameAndIdType = CommonUtil.getClass("net.minecraft.server.players.NameAndId");
+        if (nameAndIdType == null) {
+            throw new UnsupportedOperationException("NameAndId class not found");
+        }
+        nameAndId_getId.init(Resolver.resolveAndGetDeclaredMethod(nameAndIdType, "id"));
+        nameAndId_getName.init(Resolver.resolveAndGetDeclaredMethod(nameAndIdType, "name"));
+        nameAndId_ctor_id_name.init(nameAndIdType.getConstructor(UUID.class, String.class));
     }
 
     @Override
@@ -162,76 +164,49 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
     @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
     protected static class PlayerFileDataHook extends ClassHook<PlayerFileDataHook> implements Hook {
         public PlayerDataController controller = null;
-        private PlayerFileDataHandler_1_21_6 handler = null;
-        private final ThreadLocal<LocalCallState> activeCallState = new ThreadLocal<>();
+        private PlayerFileDataHandler_1_21_9 handler = null;
 
-        private void setHandler(PlayerFileDataHandler_1_21_6 handler) {
+        private void setHandler(PlayerFileDataHandler_1_21_9 handler) {
             this.handler = handler;
             base.handler = handler;
         }
 
-        @HookMethodCondition("paper")
-        @HookMethod("public Optional<NBTTagCompound> load(String name, String uuid, ProblemReporter problemReporter)")
-        public java.util.Optional<Object> loadOfflinePaper(String name, String uuid, Object problemReporter) {
+        @HookMethod("public Optional<NBTTagCompound> load(NameAndId nameandid)")
+        public java.util.Optional<Object> loadOffline(Object nameAndId) {
             if (this.controller != null) {
                 CommonTagCompound compound = null;
+                UUID uuid = handler.nameAndId_getId.invoke(nameAndId);
+                String name = handler.nameAndId_getName.invoke(nameAndId);
+
                 try {
-                    activeCallState.set(new LocalCallState(problemReporter, null));
-                    compound = this.controller.onLoadOffline(name, uuid);
+                    compound = this.controller.onLoadOffline(name, uuid.toString());
                 } catch (Throwable t) {
                     Logging.LOGGER.log(Level.SEVERE, "Failed to handle onLoadOffline() on " + this.controller, t);
-                } finally {
-                    activeCallState.remove();
                 }
                 return (compound == null) ? java.util.Optional.empty()
                         : java.util.Optional.of(compound.getRawHandle());
             }
 
-            return base.loadOfflinePaper(name, uuid, problemReporter);
+            return base.loadOffline(nameAndId);
         }
 
-        @HookMethodCondition("!paper")
-        @HookMethod("public Optional<ValueInput> load(String name, String uuid, ProblemReporter problemreporter, IRegistryCustom registryAccess)")
-        public java.util.Optional<Object> loadOfflineSpigot(String name, String uuid, Object problemReporter, Object registryAccess) {
-            if (this.controller != null) {
-                CommonTagCompound compound = null;
-                try {
-                    activeCallState.set(new LocalCallState(problemReporter, registryAccess));
-                    compound = this.controller.onLoadOffline(name, uuid);
-                } catch (Throwable t) {
-                    Logging.LOGGER.log(Level.SEVERE, "Failed to handle onLoadOffline() on " + this.controller, t);
-                } finally {
-                    activeCallState.remove();
-                }
-                return (compound == null) ? java.util.Optional.empty()
-                        : java.util.Optional.of(ValueInputHandle.forNBT(
-                                problemReporter, registryAccess, compound).getRaw());
-            }
-
-            return base.loadOfflineSpigot(name, uuid, problemReporter, registryAccess);
-        }
-
-        @HookMethod("public java.util.Optional<ValueInput> load(EntityHuman entityhuman, ProblemReporter problemreporter)")
-        public java.util.Optional<Object> load(Object entityHuman, Object problemReporter) {
+        @HookMethod("public java.util.Optional<NBTTagCompound> load(EntityHuman entityhuman)")
+        public java.util.Optional<Object> load(Object entityHuman) {
             if (this.controller != null) {
                 Player player = CommonUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);
                 if (player != null) {
                     CommonTagCompound compound = null;
                     try {
-                        activeCallState.set(new LocalCallState(problemReporter, null));
                         compound = this.controller.onLoad(player);
                     } catch (Throwable t) {
                         Logging.LOGGER.log(Level.SEVERE, "Failed to handle onLoad() on " + this.controller, t);
-                    } finally {
-                        activeCallState.remove();
                     }
                     return (compound == null) ? java.util.Optional.empty()
-                            : java.util.Optional.of(ValueInputHandle.forNBTOnWorld(
-                                    problemReporter, player.getWorld(), compound).getRaw());
+                            : java.util.Optional.of(compound.getRawHandle());
                 }
             }
 
-            return base.load(entityHuman, problemReporter);
+            return base.load(entityHuman);
         }
 
         @HookMethod("public abstract void save(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
@@ -252,82 +227,29 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
 
         @Override
         public CommonTagCompound base_load(HumanEntity human) {
-            {
-                // Re-use a problem reporter if this is during an active (on-thread) load call
-                // This way if a hook onLoad calls super onLoad, it doesn't create a whole new problem reporter
-                LocalCallState localCallState = activeCallState.get();
-                if (localCallState != null) {
-                    return base_load_with_reporter(human, localCallState.problemReporter);
-                }
-            }
-
-            ProblemReporterHandle problemReporter = ProblemReporterHandle.createScoped();
-            try {
-                return base_load_with_reporter(human, problemReporter.getRaw());
-            } finally {
-                problemReporter.close();
-            }
+            return base.load(HandleConversion.toEntityHandle(human))
+                    .map(CommonTagCompound::create)
+                    .orElse(null);
         }
 
         @Override
-        public CommonTagCompound base_load_offline(String playerName, String playerUUID) {
-            {
-                // Re-use a problem reporter / registry access if this is during an active (on-thread) load call
-                // This way if a hook onLoad calls super onOfflineLoad, it doesn't create a whole new problem reporter
-                // The registryAccess field might be null, then we use the server registry access if needed
-                LocalCallState localCallState = activeCallState.get();
-                if (localCallState != null) {
-                    return base_load_offline_with_reporter(playerName, playerUUID,
-                            localCallState.problemReporter, localCallState.registryAccess);
-                }
+        public CommonTagCompound base_load_offline(String playerName, String playerUUIDStr) {
+            UUID playerUUID;
+            try {
+                playerUUID = UUID.fromString(playerUUIDStr);
+            } catch (IllegalArgumentException ex) {
+                return null;
             }
 
-            ProblemReporterHandle problemReporter = ProblemReporterHandle.createScoped();
-            try {
-                return base_load_offline_with_reporter(playerName, playerUUID, problemReporter.getRaw(), null);
-            } finally {
-                problemReporter.close();
-            }
+            Object nameAndId = this.handler.nameAndId_ctor_id_name.newInstance(playerUUID, playerName);
+            return base.loadOffline(nameAndId)
+                    .map(CommonTagCompound::create)
+                    .orElse(null);
         }
 
         @Override
         public void base_save(HumanEntity human) {
             base.save(HandleConversion.toEntityHandle(human));
-        }
-
-        private CommonTagCompound base_load_with_reporter(HumanEntity human, Object problemReporter) {
-            return base.load(HandleConversion.toEntityHandle(human), problemReporter)
-                    .map(ValueInputHandle::createHandle)
-                    .map(ValueInputHandle::asNBT)
-                    .orElse(null);
-        }
-
-        private CommonTagCompound base_load_offline_with_reporter(String name, String uuid, Object problemReporter, Object registryAccess) {
-            if (Common.IS_PAPERSPIGOT_SERVER) {
-                return base.loadOfflinePaper(name, uuid, problemReporter)
-                        .map(ValueInputHandle::createHandle)
-                        .map(ValueInputHandle::asNBT)
-                        .orElse(null);
-            } else {
-                if (registryAccess == null) {
-                    registryAccess = handler.getServerRegistryAccess.invoke(null);
-                }
-
-                return base.loadOfflineSpigot(name, uuid, problemReporter, registryAccess)
-                        .map(ValueInputHandle::createHandle)
-                        .map(ValueInputHandle::asNBT)
-                        .orElse(null);
-            }
-        }
-
-        private static class LocalCallState {
-            public final Object problemReporter;
-            public final Object registryAccess;
-
-            public LocalCallState(Object problemReporter, Object registryAccess) {
-                this.problemReporter = problemReporter;
-                this.registryAccess = registryAccess;
-            }
         }
     }
 

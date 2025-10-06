@@ -18,7 +18,8 @@ public abstract class PlayerFileDataHandler implements LazyInitializedObject, Li
     public static final PlayerFileDataHandler INSTANCE = LibraryComponentSelector.forModule(PlayerFileDataHandler.class)
             .addVersionOption(null, "1.15.2", PlayerFileDataHandler_1_8_to_1_15_2::new)
             .addVersionOption("1.16", "1.21.5", PlayerFileDataHandler_1_16_to_1_21_5::new)
-            .addVersionOption("1.21.6", null, PlayerFileDataHandler_1_21_6::new)
+            .addVersionOption("1.21.6", "1.21.8", PlayerFileDataHandler_1_21_6::new)
+            .addVersionOption("1.21.9", null, PlayerFileDataHandler_1_21_9::new)
             .update();
 
     public abstract PlayerDataController get();
