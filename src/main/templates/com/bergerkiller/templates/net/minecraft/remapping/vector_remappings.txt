@@ -1,0 +1,20 @@
+// Vec3D is used in a lot of APIs and code, so it makes more sense to remap the fields
+// for older Minecraft versions here and keep the code clean.
+
+#if version >= 1.9
+    #remap net.minecraft.world.phys.Vec3D public final double x;
+    #remap net.minecraft.world.phys.Vec3D public final double y;
+    #remap net.minecraft.world.phys.Vec3D public final double z;
+#else
+    #remap net.minecraft.world.phys.Vec3D public final double x:a;
+    #remap net.minecraft.world.phys.Vec3D public final double y:b;
+    #remap net.minecraft.world.phys.Vec3D public final double z:c;
+#endif
+
+#if version >= 1.17
+    #remap net.minecraft.world.phys.Vec3D public static final net.minecraft.world.phys.Vec3D ZERO;
+#elseif version >= 1.16.3
+    #remap net.minecraft.world.phys.Vec3D public static final net.minecraft.world.phys.Vec3D ZERO:ORIGIN;
+#else
+    #remap net.minecraft.world.phys.Vec3D public static final net.minecraft.world.phys.Vec3D ZERO:a;
+#endif

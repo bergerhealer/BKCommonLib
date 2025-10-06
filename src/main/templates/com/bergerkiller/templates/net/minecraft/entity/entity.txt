@@ -692,13 +692,7 @@ class Entity {
     }
 
     public void setNotCollidingWithBlock() {
-  #if version >= 1.17
         instance#collidingWithBlockMultiplier = Vec3D.ZERO;
-  #elseif version >= 1.16.3
-        instance#collidingWithBlockMultiplier = Vec3D.ORIGIN;
-  #else
-        instance#collidingWithBlockMultiplier = Vec3D.a;
-  #endif
     }
 #else
     // On Minecraft 1.13.2 and before, there was only a 'collidingWithBlock' property

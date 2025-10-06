@@ -287,9 +287,9 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *   #endif
          * #else
          *   #if version >= 1.15.2
-         *     net.minecraft.world.level.block.state.pattern.ShapeDetector$Shape result = agent.findPortal(blockposition, Vec3D.a, EnumDirection.NORTH, 0.5, 1.0, true, radius);
+         *     net.minecraft.world.level.block.state.pattern.ShapeDetector$Shape result = agent.findPortal(blockposition, Vec3D.ZERO, EnumDirection.NORTH, 0.5, 1.0, true, radius);
          *   #else
-         *     net.minecraft.world.level.block.state.pattern.ShapeDetector$Shape result = agent.a(blockposition, Vec3D.a, EnumDirection.NORTH, 0.5, 1.0, true);
+         *     net.minecraft.world.level.block.state.pattern.ShapeDetector$Shape result = agent.a(blockposition, Vec3D.ZERO, EnumDirection.NORTH, 0.5, 1.0, true);
          *   #endif
          *     if (result == null) {
          *         return null;

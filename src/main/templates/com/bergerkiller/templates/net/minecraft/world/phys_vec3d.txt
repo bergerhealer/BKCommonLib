@@ -3,7 +3,6 @@ package net.minecraft.world.phys;
 import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
 
 class Vec3D {
-#if version >= 1.9
     public final double x;
     public final double y;
     public final double z;
@@ -11,15 +10,6 @@ class Vec3D {
     public org.bukkit.util.Vector toBukkit() {
         return new org.bukkit.util.Vector(instance.x, instance.y, instance.z);
     }
-#else
-    public final double x:a;
-    public final double y:b;
-    public final double z:c;
-
-    public org.bukkit.util.Vector toBukkit() {
-        return new org.bukkit.util.Vector(instance.a, instance.b, instance.c);
-    }
-#endif
 
     public (Vec3DHandle) Vec3D(double x, double y, double z);
 

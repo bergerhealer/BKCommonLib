@@ -23,22 +23,23 @@ public abstract class PlayerListHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract int getMaxPlayers();
+    public abstract void setMaxPlayers(int maxPlayers);
     public abstract CommonTagCompound migratePlayerData(CommonTagCompound playerProfileData);
     public abstract void savePlayers();
     public abstract void savePlayerFile(Player entityplayer);
     public abstract void sendRawPacketNearby(World world, double x, double y, double z, double radius, Object packet);
     public abstract List<Player> getPlayers();
     public abstract void setPlayers(List<Player> value);
-    public abstract int getMaxPlayers();
-    public abstract void setMaxPlayers(int value);
     /**
      * Stores class members for <b>net.minecraft.server.players.PlayerList</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PlayerListClass extends Template.Class<PlayerListHandle> {
         public final Template.Field.Converted<List<Player>> players = new Template.Field.Converted<List<Player>>();
-        public final Template.Field.Integer maxPlayers = new Template.Field.Integer();
 
+        public final Template.Method<Integer> getMaxPlayers = new Template.Method<Integer>();
+        public final Template.Method<Void> setMaxPlayers = new Template.Method<Void>();
         public final Template.Method.Converted<CommonTagCompound> migratePlayerData = new Template.Method.Converted<CommonTagCompound>();
         public final Template.Method<Void> savePlayers = new Template.Method<Void>();
         public final Template.Method.Converted<Void> savePlayerFile = new Template.Method.Converted<Void>();

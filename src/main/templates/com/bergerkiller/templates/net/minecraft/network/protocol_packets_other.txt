@@ -531,13 +531,7 @@ class PacketPlayInUseItem extends Packet {
         #require net.minecraft.network.protocol.game.PacketPlayInUseItem private net.minecraft.world.phys.MovingObjectPositionBlock movingObject:a;
   #endif
 
-  #if version >= 1.17
         Vec3D origin = Vec3D.ZERO;
-  #elseif version >= 1.16.3
-        Vec3D origin = Vec3D.ORIGIN;
-  #else
-        Vec3D origin = Vec3D.a;
-  #endif
 
         moving = net.minecraft.world.phys.MovingObjectPositionBlock.a(origin, EnumDirection.DOWN, BlockPosition.ZERO);
         instance#movingObject = moving; 

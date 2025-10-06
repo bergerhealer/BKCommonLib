@@ -139,7 +139,7 @@ class PortalHandler_1_14 extends PortalHandler {
          *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
          *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
          *     PortalTravelAgent agent = new PortalTravelAgent(world);
-         *     net.minecraft.world.level.block.state.pattern.ShapeDetector$Shape result = agent.a(blockposition, Vec3D.a, EnumDirection.NORTH, 0.5, 1.0, true);
+         *     net.minecraft.world.level.block.state.pattern.ShapeDetector$Shape result = agent.a(blockposition, Vec3D.ZERO, EnumDirection.NORTH, 0.5, 1.0, true);
          *     if (result == null) {
          *         return null;
          *     }

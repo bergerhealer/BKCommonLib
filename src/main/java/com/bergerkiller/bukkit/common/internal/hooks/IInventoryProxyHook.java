@@ -145,8 +145,19 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
     public void startOpen(Object entityHuman) {
     }
 
-    @HookMethod("public abstract void stopOpen:???(EntityHuman paramEntityHuman)")
-    public void closeContainer(Object entityHuman) {
+    @HookMethodCondition("version < 1.18")
+    @HookMethod("public abstract void stopOpen:closeContainer(EntityHuman paramEntityHuman)")
+    public void closeContainerV1(Object entityHuman) {
+    }
+
+    @HookMethodCondition("version >= 1.18 && version < 1.21.9")
+    @HookMethod("public abstract void stopOpen(EntityHuman paramEntityHuman)")
+    public void closeContainerV2(Object entityHuman) {
+    }
+
+    @HookMethodCondition("version >= 1.21.9")
+    @HookMethod("public abstract void stopOpen(net.minecraft.world.entity.ContainerUser containerUser)")
+    public void closeContainerV3(Object containerUser) {
     }
 
     @HookMethodCondition("version <= 1.13.2")

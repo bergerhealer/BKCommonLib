@@ -1339,9 +1339,18 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutEntityVelocity extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = PacketPlayOutEntityVelocityHandle.T.entityId.toFieldAccessor();
-        public final FieldAccessor<Integer> motX = PacketPlayOutEntityVelocityHandle.T.motX_raw.toFieldAccessor();
-        public final FieldAccessor<Integer> motY = PacketPlayOutEntityVelocityHandle.T.motY_raw.toFieldAccessor();
-        public final FieldAccessor<Integer> motZ = PacketPlayOutEntityVelocityHandle.T.motZ_raw.toFieldAccessor();
+        public final FieldAccessor<Vector> motion = new SafeDirectField<Vector>() {
+            @Override
+            public Vector get(Object o) {
+                return PacketPlayOutEntityVelocityHandle.T.getMotVector.invoke(o);
+            }
+
+            @Override
+            public boolean set(Object o, Vector vector) {
+                PacketPlayOutEntityVelocityHandle.T.setMotVector.invoke(o, vector);
+                return true;
+            }
+        };
 
         @Deprecated
         public CommonPacket newInstance(org.bukkit.entity.Entity entity) {

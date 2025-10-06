@@ -10,8 +10,13 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 class GameProfile {
     public (GameProfileHandle) GameProfile(UUID uuid, String name);
 
+#if version >= 1.21.9
+    public UUID getId:id();
+    public String getName:name();
+#else
     public UUID getId();
     public String getName();
+#endif
 
     public void clearProperties() {
         instance.getProperties().clear();

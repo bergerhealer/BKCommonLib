@@ -387,19 +387,13 @@ optional class PacketPlayInBoatMove {
 class PacketPlayOutEntityVelocity extends Packet {
 #if version >= 1.17
     private int entityId:id;
-    private int motX_raw:xa;
-    private int motY_raw:ya;
-    private int motZ_raw:za;
 #else
     private int entityId:a;
-    private int motX_raw:b;
-    private int motY_raw:c;
-    private int motZ_raw:d;
 #endif
 
     public static (PacketPlayOutEntityVelocityHandle) PacketPlayOutEntityVelocity createNew(int entityId, double motX, double motY, double motZ) {
 #if version >= 1.14
-        return new PacketPlayOutEntityVelocity(entityId, new net.minecraft.world.phys.Vec3D(motX, motY, motZ));
+        return new PacketPlayOutEntityVelocity(entityId, new Vec3D(motX, motY, motZ));
 #else
         return new PacketPlayOutEntityVelocity(entityId, motX, motY, motZ);
 #endif
@@ -407,34 +401,98 @@ class PacketPlayOutEntityVelocity extends Packet {
 
     public (PacketPlayOutEntityVelocityHandle) PacketPlayOutEntityVelocity((org.bukkit.entity.Entity) Entity entity);
 
+#if version >= 1.21.9
+    #require PacketPlayOutEntityVelocity private final Vec3D movement;
+
+    public (org.bukkit.util.Vector) Vec3D getMotVector:getMovement();
+
+    public void setMotVector((org.bukkit.util.Vector) Vec3D movement) {
+        instance#movement = movement;
+    }
+
+    public double getMotX() { return instance.getMovement().x; }
+    public double getMotY() { return instance.getMovement().y; }
+    public double getMotZ() { return instance.getMovement().z; }
+
+    public void setMotX(double x) {
+        Vec3D movement = instance.getMovement();
+        Vec3D updated = new Vec3D(x, movement.y, movement.z);
+        instance#movement = updated;
+    }
+    public void setMotY(double y) {
+        Vec3D movement = instance.getMovement();
+        Vec3D updated = new Vec3D(movement.x, y, movement.z);
+        instance#movement = updated;
+    }
+    public void setMotZ(double z) {
+        Vec3D movement = instance.getMovement();
+        Vec3D updated = new Vec3D(movement.x, movement.y, z);
+        instance#movement = updated;
+    }
+#else
+  #if version >= 1.17
+    #require PacketPlayOutEntityVelocity private int motX_raw:xa;
+    #require PacketPlayOutEntityVelocity private int motY_raw:ya;
+    #require PacketPlayOutEntityVelocity private int motZ_raw:za;
+  #else
+    #require PacketPlayOutEntityVelocity private int motX_raw:b;
+    #require PacketPlayOutEntityVelocity private int motY_raw:c;
+    #require PacketPlayOutEntityVelocity private int motZ_raw:d;
+  #endif
+
+    public (org.bukkit.util.Vector) Vec3D getMotVector:getMovement() {
+        int motX_raw = instance#motX_raw;
+        int motY_raw = instance#motY_raw;
+        int motZ_raw = instance#motZ_raw;
+        return new Vec3D( com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motX_raw),
+                          com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motY_raw),
+                          com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motZ_raw) );
+    }
+
+    public void setMotVector((org.bukkit.util.Vector) Vec3D movement) {
+        int motX_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(movement.x);
+        int motY_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(movement.y);
+        int motZ_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(movement.z);
+        instance#motX_raw = motX_raw;
+        instance#motY_raw = motY_raw;
+        instance#motZ_raw = motZ_raw;
+    }
+
+    public double getMotX() {
+        int motX_raw = instance#motX_raw;
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motX_raw);
+    }
+
+    public double getMotY() {
+        int motY_raw = instance#motY_raw;
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motY_raw);
+    }
+
+    public double getMotZ() {
+        int motZ_raw = instance#motZ_raw;
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motZ_raw);
+    }
+
+    public void setMotX(double x) {
+        int motX_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(x);
+        instance#motX_raw = motX_raw;
+    }
+
+    public void setMotY(double y) {
+        int motY_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(y);
+        instance#motY_raw = motY_raw;
+    }
+
+    public void setMotZ(double z) {
+        int motZ_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(z);
+        instance#motZ_raw = motZ_raw;
+    }
+#endif
+
     <code>
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
         return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_VELOCITY;
-    }
-
-    public double getMotX() {
-        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motX_raw.getInteger(getRaw()));
-    }
-
-    public double getMotY() {
-        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motY_raw.getInteger(getRaw()));
-    }
-
-    public double getMotZ() {
-        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motZ_raw.getInteger(getRaw()));
-    }
-
-    public void setMotX(double motX) {
-        T.motX_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motX));
-    }
-
-    public void setMotY(double motY) {
-        T.motY_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motY));
-    }
-
-    public void setMotZ(double motZ) {
-        T.motZ_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motZ));
     }
     </code>
 }

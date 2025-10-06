@@ -243,7 +243,11 @@ class EntityMinecartTNT extends EntityMinecartAbstract {
     private int fuse:a;
 #endif
 
-#if exists net.minecraft.world.entity.vehicle.EntityMinecartTNT public void explode(double damage);
+#if version >= 1.21.9
+    public void explode(double damage) {
+        instance.explode((net.minecraft.world.damagesource.DamageSource) null, damage);
+    }
+#elseif exists net.minecraft.world.entity.vehicle.EntityMinecartTNT public void explode(double damage);
     public void explode(double damage);
 #elseif version >= 1.18
     protected void explode(double damage);

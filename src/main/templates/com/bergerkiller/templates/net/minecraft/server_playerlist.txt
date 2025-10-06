@@ -11,7 +11,19 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 class PlayerList {
     public final (List<org.bukkit.entity.Player) List<EntityPlayer> players;
 
-    protected int maxPlayers;
+    //TODO: Is this actually used for anything at the moment?
+#if version >= 1.21.9
+    public int getMaxPlayers();
+    public void setMaxPlayers(int maxPlayers) {
+        // Defer to server
+        instance.getServer().setMaxPlayers(maxPlayers);
+    }
+#else
+    #require PlayerList protected int maxPlayers;
+
+    public int getMaxPlayers() { return instance#maxPlayers; }
+    public void setMaxPlayers(int maxPlayers) { instance#maxPlayers = maxPlayers; }
+#endif
 
     public (CommonTagCompound) NBTTagCompound migratePlayerData((CommonTagCompound) NBTTagCompound playerProfileData) {
 #if version >= 1.20.5
