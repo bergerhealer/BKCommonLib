@@ -5,7 +5,7 @@ import net.minecraft.core.EnumDirection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.syncher.DataWatcher;
 import net.minecraft.world.entity.EntityTypes;
-
+import net.minecraft.world.phys.Vec3D;
 import com.bergerkiller.bukkit.common.internal.logic.ProtocolMath;
 
 import org.bukkit.block.BlockFace;
@@ -33,9 +33,6 @@ class PacketPlayOutSpawnEntity extends Packet {
     private optional double posX_1_10_2:x;
     private optional double posY_1_10_2:y;
     private optional double posZ_1_10_2:z;
-    private optional int motX_raw:xa;
-    private optional int motY_raw:ya;
-    private optional int motZ_raw:za;
   #if version >= 1.19
     private unknown byte xRot;
     private unknown byte yRot;
@@ -59,9 +56,6 @@ class PacketPlayOutSpawnEntity extends Packet {
     private optional double posX_1_10_2:c;
     private optional double posY_1_10_2:d;
     private optional double posZ_1_10_2:e;
-    private optional int motX_raw:f;
-    private optional int motY_raw:g;
-    private optional int motZ_raw:h;
     private unknown int pitch_raw:i;
     private unknown int yaw_raw:j;
 
@@ -83,9 +77,6 @@ class PacketPlayOutSpawnEntity extends Packet {
     private optional double posX_1_10_2:###;
     private optional double posY_1_10_2:###;
     private optional double posZ_1_10_2:###;
-    private optional int motX_raw:e;
-    private optional int motY_raw:f;
-    private optional int motZ_raw:g;
     private unknown int pitch_raw:h;
     private unknown int yaw_raw:i;
     private optional int opt_entityTypeId:j;
@@ -93,10 +84,30 @@ class PacketPlayOutSpawnEntity extends Packet {
     private int extraData:k;
 #endif
 
+#if version >= 1.21.9
+    #require PacketPlayOutSpawnEntity private final Vec3D movement;
+#elseif version >= 1.17
+    #require PacketPlayOutSpawnEntity private int motX_raw:xa;
+    #require PacketPlayOutSpawnEntity private int motY_raw:ya;
+    #require PacketPlayOutSpawnEntity private int motZ_raw:za;
+#elseif version >= 1.9
+    #require PacketPlayOutSpawnEntity private int motX_raw:f;
+    #require PacketPlayOutSpawnEntity private int motY_raw:g;
+    #require PacketPlayOutSpawnEntity private int motZ_raw:h;
+#else
+    #require PacketPlayOutSpawnEntity private int motX_raw:e;
+    #require PacketPlayOutSpawnEntity private int motY_raw:f;
+    #require PacketPlayOutSpawnEntity private int motZ_raw:g;
+#endif
+
     public static (PacketPlayOutSpawnEntityHandle) PacketPlayOutSpawnEntity createNew() {
 #if version >= 1.20.5
         #require net.minecraft.network.protocol.game.PacketPlayOutSpawnEntity private PacketPlayOutSpawnEntity createSpawnPacket:<init>(net.minecraft.network.RegistryFriendlyByteBuf serializer);
-        return #createSpawnPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+        PacketPlayOutSpawnEntity packet = #createSpawnPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+  #if version >= 1.21.9
+        packet#movement = Vec3D.ZERO;
+  #endif
+        return packet;
 #elseif version >= 1.17
         return new PacketPlayOutSpawnEntity(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
@@ -151,6 +162,87 @@ class PacketPlayOutSpawnEntity extends Packet {
     public void setPitch(float pitch) {
         int prot = ProtocolMath.serializeRotation(pitch);
         instance#xRot = prot;
+    }
+#endif
+
+#if version >= 1.21.9
+    public (org.bukkit.util.Vector) Vec3D getMotVector:getMovement();
+
+    public void setMotVector((org.bukkit.util.Vector) Vec3D motVector) {
+        instance#movement = motVector;
+    }
+
+    public double getMotX() { return instance.getMovement().x; }
+    public double getMotY() { return instance.getMovement().y; }
+    public double getMotZ() { return instance.getMovement().z; }
+
+    public void setMotX(double motX) {
+        Vec3D movement = instance.getMovement();
+        if (movement == null) movement = Vec3D.ZERO; // Bugfix for past use of newHandleNull()
+        Vec3D updated = new Vec3D(motX, movement.y, movement.z);
+        instance#movement = updated;
+    }
+
+    public void setMotY(double motY) {
+        Vec3D movement = instance.getMovement();
+        if (movement == null) movement = Vec3D.ZERO; // Bugfix for past use of newHandleNull()
+        Vec3D updated = new Vec3D(movement.x, motY, movement.z);
+        instance#movement = updated;
+    }
+
+    public void setMotZ(double motZ) {
+        Vec3D movement = instance.getMovement();
+        if (movement == null) movement = Vec3D.ZERO; // Bugfix for past use of newHandleNull()
+        Vec3D updated = new Vec3D(movement.x, movement.y, motZ);
+        instance#movement = updated;
+    }
+#else
+    public (org.bukkit.util.Vector) Vec3D getMotVector() {
+        int motX_raw = instance#motX_raw;
+        int motY_raw = instance#motY_raw;
+        int motZ_raw = instance#motZ_raw;
+        return new Vec3D( com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motX_raw),
+                          com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motY_raw),
+                          com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motZ_raw) );
+    }
+
+    public void setMotVector((org.bukkit.util.Vector) Vec3D motVector) {
+        int motX_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motVector.x);
+        int motY_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motVector.y);
+        int motZ_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motVector.z);
+        instance#motX_raw = motX_raw;
+        instance#motY_raw = motY_raw;
+        instance#motZ_raw = motZ_raw;
+    }
+
+    public double getMotX() {
+        int motX_raw = instance#motX_raw;
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motX_raw);
+    }
+
+    public double getMotY() {
+        int motY_raw = instance#motY_raw;
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motY_raw);
+    }
+
+    public double getMotZ() {
+        int motZ_raw = instance#motZ_raw;
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motZ_raw);
+    }
+
+    public void setMotX(double motX) {
+        int motX_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motX);
+        instance#motX_raw = motX_raw;
+    }
+
+    public void setMotY(double motY) {
+        int motY_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motY);
+        instance#motY_raw = motY_raw;
+    }
+
+    public void setMotZ(double motZ) {
+        int motZ_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motZ);
+        instance#motZ_raw = motZ_raw;
     }
 #endif
 
@@ -263,30 +355,6 @@ class PacketPlayOutSpawnEntity extends Packet {
     public void setPosZ(double posZ) {
         setProtocolPosition(T.posZ_1_8_8, T.posZ_1_10_2, posZ);
     }
-
-    public double getMotX() {
-        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motX_raw.getInteger(getRaw()));
-    }
-
-    public double getMotY() {
-        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motY_raw.getInteger(getRaw()));
-    }
-
-    public double getMotZ() {
-        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motZ_raw.getInteger(getRaw()));
-    }
-
-    public void setMotX(double motX) {
-        T.motX_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motX));
-    }
-
-    public void setMotY(double motY) {
-        T.motY_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motY));
-    }
-
-    public void setMotZ(double motZ) {
-        T.motZ_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motZ));
-    }
     </code>
 }
 
@@ -354,12 +422,19 @@ class PacketPlayOutNamedEntitySpawn extends Packet {
     private unknown List<DataWatcher.WatchableObject> dataWatcherItems:j;
 #endif
 
+#if version >= 1.21.9
+    #require PacketPlayOutNamedEntitySpawn private final Vec3D movement;
+#endif
+
     public static (PacketPlayOutNamedEntitySpawnHandle) PacketPlayOutNamedEntitySpawn createNew() {
 #if version >= 1.20.5
         #require net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn private PacketPlayOutNamedEntitySpawn createSpawnPacket:<init>(net.minecraft.network.RegistryFriendlyByteBuf serializer);
         PacketPlayOutNamedEntitySpawn packet = #createSpawnPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
         #require PacketPlayOutNamedEntitySpawn private final EntityTypes<?> type;
         packet#type = EntityTypes.PLAYER;
+  #if version >= 1.21.9
+        packet#movement = Vec3D.ZERO;
+  #endif
         return packet;
 #elseif version >= 1.20.2
         PacketPlayOutNamedEntitySpawn packet = new PacketPlayOutNamedEntitySpawn(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
@@ -468,36 +543,44 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
 
 #if version >= 1.19
     private optional UUID entityUUID:uuid;
-    private optional int motX_raw:xa;
-    private optional int motY_raw:ya;
-    private optional int motZ_raw:za;
     private optional byte pitch_raw:xRot;
     private optional byte yaw_raw:yRot;
     private optional byte headYaw_raw:yHeadRot;
 #elseif version >= 1.17
     private optional UUID entityUUID:uuid;
-    private optional int motX_raw:xd;
-    private optional int motY_raw:yd;
-    private optional int motZ_raw:zd;
     private optional byte yaw_raw:yRot;
     private optional byte pitch_raw:xRot;
     private optional byte headYaw_raw:yHeadRot;
 #elseif version >= 1.9
     private optional UUID entityUUID:b;
-    private optional int motX_raw:g;
-    private optional int motY_raw:h;
-    private optional int motZ_raw:i;
     private optional byte yaw_raw:j;
     private optional byte pitch_raw:k;
     private optional byte headYaw_raw:l;
 #else
     private optional UUID entityUUID:###;
-    private optional int motX_raw:f;
-    private optional int motY_raw:g;
-    private optional int motZ_raw:h;
     private optional byte yaw_raw:i;
     private optional byte pitch_raw:j;
     private optional byte headYaw_raw:k;
+#endif
+
+#if version >= 1.21.9
+    #require PacketPlayOutSpawnEntityLiving private final Vec3D movement;
+#elseif version >= 1.19
+    #require PacketPlayOutSpawnEntityLiving private int motX_raw:xa;
+    #require PacketPlayOutSpawnEntityLiving private int motY_raw:ya;
+    #require PacketPlayOutSpawnEntityLiving private int motZ_raw:za;
+#elseif version >= 1.17
+    #require PacketPlayOutSpawnEntityLiving private int motX_raw:xd;
+    #require PacketPlayOutSpawnEntityLiving private int motY_raw:yd;
+    #require PacketPlayOutSpawnEntityLiving private int motZ_raw:zd;
+#elseif version >= 1.9
+    #require PacketPlayOutSpawnEntityLiving private int motX_raw:g;
+    #require PacketPlayOutSpawnEntityLiving private int motY_raw:h;
+    #require PacketPlayOutSpawnEntityLiving private int motZ_raw:i;
+#else
+    #require PacketPlayOutSpawnEntityLiving private int motX_raw:f;
+    #require PacketPlayOutSpawnEntityLiving private int motY_raw:g;
+    #require PacketPlayOutSpawnEntityLiving private int motZ_raw:h;
 #endif
 
     // DataWatcher and items list was removed since MC 1.15
@@ -514,7 +597,11 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
     public static (PacketPlayOutSpawnEntityLivingHandle) PacketPlayOutSpawnEntityLiving createNew() {
 #if version >= 1.20.5
         #require net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLiving private PacketPlayOutSpawnEntityLiving createSpawnPacket:<init>(net.minecraft.network.RegistryFriendlyByteBuf serializer);
-        return #createSpawnPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+        PacketPlayOutSpawnEntityLiving packet = #createSpawnPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+  #if version >= 1.21.9
+        packet#movement = Vec3D.ZERO;
+  #endif
+        return packet;
 #elseif version >= 1.17
         return new PacketPlayOutSpawnEntityLiving(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
@@ -640,6 +727,88 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
     }
 #endif
 
+    // Velocity (Motion)
+#if version >= 1.21.9
+    public (org.bukkit.util.Vector) Vec3D getMotVector:getMovement();
+
+    public void setMotVector((org.bukkit.util.Vector) Vec3D motVector) {
+        instance#movement = motVector;
+    }
+
+    public double getMotX() { return instance.getMovement().x; }
+    public double getMotY() { return instance.getMovement().y; }
+    public double getMotZ() { return instance.getMovement().z; }
+
+    public void setMotX(double motX) {
+        Vec3D movement = instance.getMovement();
+        if (movement == null) movement = Vec3D.ZERO; // Bugfix for past use of newHandleNull()
+        Vec3D updated = new Vec3D(motX, movement.y, movement.z);
+        instance#movement = updated;
+    }
+
+    public void setMotY(double motY) {
+        Vec3D movement = instance.getMovement();
+        if (movement == null) movement = Vec3D.ZERO; // Bugfix for past use of newHandleNull()
+        Vec3D updated = new Vec3D(movement.x, motY, movement.z);
+        instance#movement = updated;
+    }
+
+    public void setMotZ(double motZ) {
+        Vec3D movement = instance.getMovement();
+        if (movement == null) movement = Vec3D.ZERO; // Bugfix for past use of newHandleNull()
+        Vec3D updated = new Vec3D(movement.x, movement.y, motZ);
+        instance#movement = updated;
+    }
+#else
+    public (org.bukkit.util.Vector) Vec3D getMotVector() {
+        int motX_raw = instance#motX_raw;
+        int motY_raw = instance#motY_raw;
+        int motZ_raw = instance#motZ_raw;
+        return new Vec3D( com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motX_raw),
+                          com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motY_raw),
+                          com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motZ_raw) );
+    }
+
+    public void setMotVector((org.bukkit.util.Vector) Vec3D motVector) {
+        int motX_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motVector.x);
+        int motY_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motVector.y);
+        int motZ_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motVector.z);
+        instance#motX_raw = motX_raw;
+        instance#motY_raw = motY_raw;
+        instance#motZ_raw = motZ_raw;
+    }
+
+    public double getMotX() {
+        int motX_raw = instance#motX_raw;
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motX_raw);
+    }
+
+    public double getMotY() {
+        int motY_raw = instance#motY_raw;
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motY_raw);
+    }
+
+    public double getMotZ() {
+        int motZ_raw = instance#motZ_raw;
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motZ_raw);
+    }
+
+    public void setMotX(double motX) {
+        int motX_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motX);
+        instance#motX_raw = motX_raw;
+    }
+
+    public void setMotY(double motY) {
+        int motY_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motY);
+        instance#motY_raw = motY_raw;
+    }
+
+    public void setMotZ(double motZ) {
+        int motZ_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motZ);
+        instance#motZ_raw = motZ_raw;
+    }
+#endif
+
     <code>
     public boolean hasDataWatcherSupport() {
         return T.opt_dataWatcher.isAvailable();
@@ -689,30 +858,6 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
 
     public org.bukkit.entity.EntityType getEntityType() {
         return getCommonEntityType().entityType;
-    }
-
-    public double getMotX() {
-        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motX_raw.getInteger(getRaw()));
-    }
-
-    public double getMotY() {
-        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motY_raw.getInteger(getRaw()));
-    }
-
-    public double getMotZ() {
-        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motZ_raw.getInteger(getRaw()));
-    }
-
-    public void setMotX(double motX) {
-        T.motX_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motX));
-    }
-
-    public void setMotY(double motY) {
-        T.motY_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motY));
-    }
-
-    public void setMotZ(double motZ) {
-        T.motZ_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motZ));
     }
 
     public float getYaw() {

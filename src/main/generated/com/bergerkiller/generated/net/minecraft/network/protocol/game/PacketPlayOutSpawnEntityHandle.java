@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
+import org.bukkit.util.Vector;
 import java.util.UUID;
 
 /**
@@ -30,6 +31,14 @@ public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
     public abstract float getPitch();
     public abstract void setYaw(float yaw);
     public abstract void setPitch(float pitch);
+    public abstract Vector getMotVector();
+    public abstract void setMotVector(Vector motVector);
+    public abstract double getMotX();
+    public abstract double getMotY();
+    public abstract double getMotZ();
+    public abstract void setMotX(double motX);
+    public abstract void setMotY(double motY);
+    public abstract void setMotZ(double motZ);
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
         return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_SPAWN;
@@ -138,30 +147,6 @@ public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
     public void setPosZ(double posZ) {
         setProtocolPosition(T.posZ_1_8_8, T.posZ_1_10_2, posZ);
     }
-
-    public double getMotX() {
-        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motX_raw.getInteger(getRaw()));
-    }
-
-    public double getMotY() {
-        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motY_raw.getInteger(getRaw()));
-    }
-
-    public double getMotZ() {
-        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motZ_raw.getInteger(getRaw()));
-    }
-
-    public void setMotX(double motX) {
-        T.motX_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motX));
-    }
-
-    public void setMotY(double motY) {
-        T.motY_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motY));
-    }
-
-    public void setMotZ(double motZ) {
-        T.motZ_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motZ));
-    }
     public abstract int getEntityId();
     public abstract void setEntityId(int value);
     public abstract int getExtraData();
@@ -189,12 +174,6 @@ public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
         @Template.Optional
         public final Template.Field.Double posZ_1_10_2 = new Template.Field.Double();
         @Template.Optional
-        public final Template.Field.Integer motX_raw = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Integer motY_raw = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Integer motZ_raw = new Template.Field.Integer();
-        @Template.Optional
         public final Template.Field.Integer opt_entityTypeId = new Template.Field.Integer();
         public final Template.Field.Integer extraData = new Template.Field.Integer();
 
@@ -204,6 +183,14 @@ public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
         public final Template.Method<Float> getPitch = new Template.Method<Float>();
         public final Template.Method<Void> setYaw = new Template.Method<Void>();
         public final Template.Method<Void> setPitch = new Template.Method<Void>();
+        public final Template.Method.Converted<Vector> getMotVector = new Template.Method.Converted<Vector>();
+        public final Template.Method.Converted<Void> setMotVector = new Template.Method.Converted<Void>();
+        public final Template.Method<Double> getMotX = new Template.Method<Double>();
+        public final Template.Method<Double> getMotY = new Template.Method<Double>();
+        public final Template.Method<Double> getMotZ = new Template.Method<Double>();
+        public final Template.Method<Void> setMotX = new Template.Method<Void>();
+        public final Template.Method<Void> setMotY = new Template.Method<Void>();
+        public final Template.Method<Void> setMotZ = new Template.Method<Void>();
 
     }
 

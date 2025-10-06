@@ -7,7 +7,9 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMountHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeamHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLivingHandle;
+import net.minecraft.network.protocol.game.PacketPlayOutSpawnEntity;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -17,6 +19,14 @@ import com.bergerkiller.bukkit.common.resources.BlockStateType;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTileEntityDataHandle;
 
 public class PacketTest {
+
+    @Test
+    public void testInitialMovementVector() {
+        PacketPlayOutSpawnEntityHandle packet = PacketPlayOutSpawnEntityHandle.createNew();
+        assertEquals(new org.bukkit.util.Vector(), packet.getMotVector());
+        packet.setMotY(0.2);
+        assertEquals(new org.bukkit.util.Vector(0.0, 0.2, 0.0), packet.getMotVector());
+    }
 
     @Test
     public void testBundleOutgoing() {
