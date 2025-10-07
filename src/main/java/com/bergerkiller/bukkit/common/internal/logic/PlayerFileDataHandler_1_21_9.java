@@ -155,11 +155,8 @@ class PlayerFileDataHandler_1_21_9 extends PlayerFileDataHandler {
 
     // hooks WorldNBTStorage
     @ClassHook.HookPackage("net.minecraft.server")
-    @ClassHook.HookImport("net.minecraft.world.level.storage.ValueInput")
-    @ClassHook.HookImport("net.minecraft.world.level.storage.ValueOutput")
     @ClassHook.HookImport("net.minecraft.world.entity.player.EntityHuman")
-    @ClassHook.HookImport("net.minecraft.util.ProblemReporter")
-    @ClassHook.HookImport("net.minecraft.core.IRegistryCustom")
+    @ClassHook.HookImport("net.minecraft.server.players.NameAndId")
     @ClassHook.HookImport("net.minecraft.nbt.NBTTagCompound")
     @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
     protected static class PlayerFileDataHook extends ClassHook<PlayerFileDataHook> implements Hook {
@@ -190,25 +187,6 @@ class PlayerFileDataHandler_1_21_9 extends PlayerFileDataHandler {
             return base.loadOffline(nameAndId);
         }
 
-        @HookMethod("public java.util.Optional<NBTTagCompound> load(EntityHuman entityhuman)")
-        public java.util.Optional<Object> load(Object entityHuman) {
-            if (this.controller != null) {
-                Player player = CommonUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);
-                if (player != null) {
-                    CommonTagCompound compound = null;
-                    try {
-                        compound = this.controller.onLoad(player);
-                    } catch (Throwable t) {
-                        Logging.LOGGER.log(Level.SEVERE, "Failed to handle onLoad() on " + this.controller, t);
-                    }
-                    return (compound == null) ? java.util.Optional.empty()
-                            : java.util.Optional.of(compound.getRawHandle());
-                }
-            }
-
-            return base.load(entityHuman);
-        }
-
         @HookMethod("public abstract void save(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
         public void save(Object entityHuman) {
             if (this.controller != null) {
@@ -227,9 +205,7 @@ class PlayerFileDataHandler_1_21_9 extends PlayerFileDataHandler {
 
         @Override
         public CommonTagCompound base_load(HumanEntity human) {
-            return base.load(HandleConversion.toEntityHandle(human))
-                    .map(CommonTagCompound::create)
-                    .orElse(null);
+            throw new UnsupportedOperationException("Not supported on 1.21.9+");
         }
 
         @Override
