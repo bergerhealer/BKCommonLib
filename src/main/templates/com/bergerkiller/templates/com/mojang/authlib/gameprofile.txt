@@ -11,6 +11,7 @@ import com.google.common.collect.Multimap;
 
 class GameProfile {
     public static (GameProfileHandle) GameProfile createNew(UUID uuid, String name, Multimap<String, PropertyHandle> properties) {
+#if version >= 1.21.9
         com.mojang.authlib.properties.PropertyMap propertyMap;
         if (properties.isEmpty()) {
             propertyMap = com.mojang.authlib.properties.PropertyMap.EMPTY;
@@ -32,6 +33,20 @@ class GameProfile {
 
         // Construct an (immutable) profile
         return new GameProfile(uuid, name, propertyMap);
+#else
+        // Construct a new mutable profile
+        GameProfile profile = new GameProfile(uuid, name);
+
+        // Copy key-values over
+        java.util.Iterator iter = properties.entries().iterator();
+        while (iter.hasNext()) {
+            java.util.Map$Entry entry = (java.util.Map$Entry) iter.next();
+            PropertyHandle value = (PropertyHandle) entry.getValue();
+            profile.getProperties().put((String) entry.getKey(), (com.mojang.authlib.properties.Property) value.getRaw());
+        }
+
+        return profile;
+#endif
     }
 
 #if version >= 1.21.9

@@ -3288,9 +3288,9 @@ class PacketPlayOutSpawnPosition extends Packet {
         // Pack it into a RespawnConfig object
         // For older versions of Minecraft we use our own proxy class
   #if version >= 1.21.5
-        return new EntityPlayer$RespawnConfig(null, position, yaw, true);
+        return new net.minecraft.server.level.EntityPlayer$RespawnConfig(null, position, yaw, true);
   #else
-        return new EntityPlayer$RespawnConfig(null, null, position, yaw, true);
+        return new net.minecraft.server.level.EntityPlayer$RespawnConfig(null, null, position, yaw, true);
   #endif
     }
 #endif
