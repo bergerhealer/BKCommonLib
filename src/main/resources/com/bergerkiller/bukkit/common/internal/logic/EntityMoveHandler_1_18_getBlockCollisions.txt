@@ -56,7 +56,11 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
                             if (!VoxelShapes.joinIsNotEmpty(voxelshape, voxelshape6, OperatorBoolean.AND)) {
                                 continue;
                             }
+#if exists org.bukkit.craftbukkit.block.CraftBlock public static CraftBlock at(net.minecraft.world.level.GeneratorAccess world, net.minecraft.core.BlockPosition position);
+                            org.bukkit.craftbukkit.block.CraftBlock cb_block = org.bukkit.craftbukkit.block.CraftBlock.at(this, blockposition_b.immutable());
+#else
                             org.bukkit.craftbukkit.block.CraftBlock cb_block = new org.bukkit.craftbukkit.block.CraftBlock(this, blockposition_b.immutable());
+#endif
                             if (!handler.onBlockCollided(cb_block)) {
                                 continue;
                             }
