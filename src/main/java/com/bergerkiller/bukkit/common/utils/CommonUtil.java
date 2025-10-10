@@ -536,7 +536,9 @@ public class CommonUtil {
      *
      * @param value to cast
      * @return value cast in an unsafe way
+     * @deprecated Moved to LogicUtil, this one will probably stick around though
      */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static <T> T unsafeCast(Object value) {
         return (T) value;
@@ -549,7 +551,9 @@ public class CommonUtil {
      * @param object to cast
      * @param type to cast to
      * @return The cast object, or null
+     * @deprecated Moved to LogicUtil, this one will probably stick around though
      */
+    @Deprecated
     public static <T> T tryCast(Object object, Class<T> type) {
         return tryCast(object, type, null);
     }
@@ -562,7 +566,9 @@ public class CommonUtil {
      * @param type to cast to
      * @param def to return on cast failure
      * @return The cast object, or def
+     * @deprecated Moved to LogicUtil, this one will probably stick around though
      */
+    @Deprecated
     public static <T> T tryCast(Object object, Class<T> type, T def) {
         if (type.isInstance(object)) {
             return type.cast(object);

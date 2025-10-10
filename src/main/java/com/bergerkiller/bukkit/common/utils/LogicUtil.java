@@ -227,6 +227,35 @@ public class LogicUtil {
     }
 
     /**
+     * Tries to cast the object to the type specified, returning null upon
+     * failure
+     *
+     * @param object to cast
+     * @param type to cast to
+     * @return The cast object, or null
+     */
+    public static <T> T tryCast(Object object, Class<T> type) {
+        return tryCast(object, type, null);
+    }
+
+    /**
+     * Tries to cast the object to the type specified, returning def upon
+     * failure
+     *
+     * @param object to cast
+     * @param type to cast to
+     * @param def to return on cast failure
+     * @return The cast object, or def
+     */
+    public static <T> T tryCast(Object object, Class<T> type, T def) {
+        if (type.isInstance(object)) {
+            return type.cast(object);
+        } else {
+            return def;
+        }
+    }
+
+    /**
      * Checks whether an element index is within range of a collection
      *
      * @param collection to check
