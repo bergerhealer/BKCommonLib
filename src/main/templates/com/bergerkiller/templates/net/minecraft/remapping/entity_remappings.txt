@@ -121,11 +121,17 @@ import net.minecraft.world.level.storage.ValueOutput;
 // This function is a nightmare, especially on forge...
 #if version >= 1.18
     #remap net.minecraft.world.entity.Entity public boolean isOnFire();
-    #remap net.minecraft.world.entity.Entity public int getFireImmuneTicks();
 #else
     #remap net.minecraft.world.entity.Entity public boolean isOnFire:isBurning();
-    #remap net.minecraft.world.entity.Entity public int getFireImmuneTicks:getMaxFireTicks();
 #endif
+
+#select version >=
+#case 1.18:  #remap net.minecraft.world.entity.Entity public int getFireImmuneTicks();
+#case 1.11:  #remap net.minecraft.world.entity.Entity public int getFireImmuneTicks:getMaxFireTicks();
+#case 1.9:   #remap net.minecraft.world.entity.Entity public int getFireImmuneTicks:V();
+#case else:  #remap net.minecraft.world.entity.Entity public int getFireImmuneTicks:L();
+#endselect
+
 #if version >= 1.21
     #remap net.minecraft.world.entity.Entity public final void igniteForSeconds(float seconds);
   #if forge && exists net.minecraft.world.entity.Entity public void setSecondsOnFire(float seconds, boolean callEvent);
