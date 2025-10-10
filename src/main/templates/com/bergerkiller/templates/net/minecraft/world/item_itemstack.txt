@@ -10,6 +10,7 @@ import net.minecraft.world.level.IMaterial;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.item.ItemWorldMap;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.TypedEntityData;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.nbt.NBTBase;
@@ -893,48 +894,6 @@ class ItemStack {
     }
 #endif
 
-    public void fixDataComponentErrors() {
-#if version >= 1.21.9
-        //TODO: Is this needed / can we fix missing id fields here?
-        // The new TypedEntityData type seems to already guarantee an id is set, so
-        // most likely the parsing before it gets to this point now :(
-#elseif version >= 1.20.5
-        CustomData cmd = (CustomData) instance.get(DataComponents.ENTITY_DATA);
-        if (cmd != null) {
-            NBTTagCompound tag = cmd.getUnsafe();
-            if (!tag.contains("id")) {
-                // What type of entity ID for this entity data tag
-                net.minecraft.world.item.Item item = instance.getItem();
-                EntityTypes entityType = null;
-                if (item == net.minecraft.world.item.Items.COD_BUCKET) {
-                    entityType = EntityTypes.COD;
-                } else if (item == net.minecraft.world.item.Items.PUFFERFISH_BUCKET) {
-                    entityType = EntityTypes.PUFFERFISH;
-                } else if (item == net.minecraft.world.item.Items.SALMON_BUCKET) {
-                    entityType = EntityTypes.SALMON;
-                } else if (item == net.minecraft.world.item.Items.ITEM_FRAME) {
-                    entityType = EntityTypes.ITEM_FRAME;
-                } else if (item == net.minecraft.world.item.Items.GLOW_ITEM_FRAME) {
-                    entityType = EntityTypes.GLOW_ITEM_FRAME;
-                } else if (item == net.minecraft.world.item.Items.PAINTING) {
-                    entityType = EntityTypes.PAINTING;
-                }
-
-                if (entityType != null) {
-                    NBTTagCompound nbt = cmd.copyTag();
-                    nbt.putString("id", EntityTypes.getKey(entityType).toString());
-                    cmd = CustomData.of(nbt);
-                    instance.set(DataComponents.ENTITY_DATA, cmd);
-                } else {
-                    // Unknown entity type from item. Discard the custom data tag entirely to
-                    // avoid errors later on.
-                    instance.remove(DataComponents.ENTITY_DATA);
-                }
-            }
-        }
-#endif
-    }
-
 #if version >= 1.21.4
     public boolean hasCustomModelData() {
         return instance.has(DataComponents.CUSTOM_MODEL_DATA);
@@ -1183,6 +1142,72 @@ class ItemStack {
         instance.getOrCreateTag().putInt("map", mapId);
 #else
         instance.setData(mapId);
+#endif
+    }
+
+    public String getPaintingName() {
+#if version >= 1.21.9
+        TypedEntityData entityData = (TypedEntityData) instance.get(DataComponents.ENTITY_DATA);
+        if (entityData == null) return null;
+        NBTTagCompound tag = entityData.getUnsafe();
+#elseif version >= 1.20.5
+        CustomData cmd = (CustomData) instance.get(DataComponents.ENTITY_DATA);
+        if (cmd == null) return null;
+        NBTTagCompound tag = cmd.getUnsafe();
+#else
+        NBTTagCompound fullTag = instance.getTag();
+        if (fullTag == null) return null;
+        NBTBase tagBase = fullTag.get("EntityTag");
+        if (!(tagBase instanceof NBTTagCompound)) return null;
+        NBTTagCompound tag = (NBTTagCompound) tagBase;
+#endif
+        NBTBase tagVariant = tag.get("variant");
+        if (!(tagVariant instanceof NBTTagString)) return null;
+        return ((NBTTagString) tagVariant).getAsString();
+    }
+
+    public void setPaintingName(String name) {
+#if version >= 1.21.9
+        if (name == null) {
+            instance.remove(DataComponents.ENTITY_DATA);
+        } else {
+            NBTTagCompound tag = new NBTTagCompound();
+            tag.putString("variant", name);
+            TypedEntityData entityData = TypedEntityData.of(EntityTypes.PAINTING, tag);
+            instance.set(DataComponents.ENTITY_DATA, entityData);
+        }
+#elseif version >= 1.20.5
+        if (name == null) {
+            instance.remove(DataComponents.ENTITY_DATA);
+        } else {
+            NBTTagCompound tag = new NBTTagCompound();
+            tag.putString("id", EntityTypes.getKey(EntityTypes.PAINTING).toString());
+            tag.putString("variant", name);
+            CustomData entityData = CustomData.of(tag);
+            instance.set(DataComponents.ENTITY_DATA, entityData);
+        }
+#else
+        if (name == null) {
+            NBTTagCompound tag = instance.getTag();
+            if (tag == null) return;
+            NBTBase entityTagBase = tag.get("EntityTag");
+            if (!(entityTagBase instanceof NBTTagCompound)) return;
+            NBTTagCompound entityTag = (NBTTagCompound) entityTagBase;
+            entityTag.remove("variant");
+            if (entityTag.isEmpty()) {
+                tag.remove("EntityTag");
+            }
+            instance#removeTagIfEmpty();
+        } else {
+            NBTTagCompound tag = instance#getOrCreateTag();
+            NBTBase entityTagBase = tag.get("EntityTag");
+            if (!(entityTagBase instanceof NBTTagCompound)) {
+                entityTagBase = new NBTTagCompound();
+                tag.put("EntityTag", entityTagBase);
+            }
+            NBTTagCompound entityTag = (NBTTagCompound) entityTagBase;
+            entityTag.putString("variant", name);
+        }
 #endif
     }
 

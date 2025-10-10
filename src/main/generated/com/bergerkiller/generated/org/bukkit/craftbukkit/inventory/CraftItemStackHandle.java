@@ -38,6 +38,10 @@ public abstract class CraftItemStackHandle extends Template.Handle {
         return T.deserializeItemMeta.invoker.invoke(null,values);
     }
 
+    public static boolean isCorruptedEntityTag(ItemMeta itemMeta) {
+        return T.isCorruptedEntityTag.invoker.invoke(null,itemMeta);
+    }
+
     public abstract Object getHandle();
     public abstract void setHandle(Object value);
     /**
@@ -55,6 +59,7 @@ public abstract class CraftItemStackHandle extends Template.Handle {
         public final Template.StaticMethod<Object> deserializeCustomModelData = new Template.StaticMethod<Object>();
         @Template.Optional
         public final Template.StaticMethod.Converted<ItemStack> deserializeNBT = new Template.StaticMethod.Converted<ItemStack>();
+        public final Template.StaticMethod<Boolean> isCorruptedEntityTag = new Template.StaticMethod<Boolean>();
 
     }
 

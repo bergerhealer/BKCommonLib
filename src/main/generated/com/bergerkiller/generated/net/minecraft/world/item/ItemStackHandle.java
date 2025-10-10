@@ -69,7 +69,6 @@ public abstract class ItemStackHandle extends Template.Handle {
     public abstract MinecraftKeyHandle getItemModel();
     public abstract MinecraftKeyHandle getItemModelIfSet();
     public abstract void setItemModel(MinecraftKeyHandle key);
-    public abstract void fixDataComponentErrors();
     public abstract boolean hasCustomModelData();
     public abstract boolean hasCustomModelDataValue();
     public abstract CustomModelData getCustomModelData();
@@ -88,6 +87,8 @@ public abstract class ItemStackHandle extends Template.Handle {
     public abstract boolean isMapItem();
     public abstract int getMapId();
     public abstract void setMapId(int mapId);
+    public abstract String getPaintingName();
+    public abstract void setPaintingName(String name);
     public abstract UUID getMapDisplayDynamicOnlyUUID();
     public abstract UUID getMapDisplayUUID();
     public static final ItemStackHandle EMPTY_ITEM;
@@ -154,7 +155,6 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.Method.Converted<MinecraftKeyHandle> getItemModel = new Template.Method.Converted<MinecraftKeyHandle>();
         public final Template.Method.Converted<MinecraftKeyHandle> getItemModelIfSet = new Template.Method.Converted<MinecraftKeyHandle>();
         public final Template.Method.Converted<Void> setItemModel = new Template.Method.Converted<Void>();
-        public final Template.Method<Void> fixDataComponentErrors = new Template.Method<Void>();
         public final Template.Method<Boolean> hasCustomModelData = new Template.Method<Boolean>();
         public final Template.Method<Boolean> hasCustomModelDataValue = new Template.Method<Boolean>();
         public final Template.Method.Converted<CustomModelData> getCustomModelData = new Template.Method.Converted<CustomModelData>();
@@ -173,6 +173,8 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.Method<Boolean> isMapItem = new Template.Method<Boolean>();
         public final Template.Method<Integer> getMapId = new Template.Method<Integer>();
         public final Template.Method<Void> setMapId = new Template.Method<Void>();
+        public final Template.Method<String> getPaintingName = new Template.Method<String>();
+        public final Template.Method<Void> setPaintingName = new Template.Method<Void>();
         public final Template.Method<UUID> getMapDisplayDynamicOnlyUUID = new Template.Method<UUID>();
         public final Template.Method<UUID> getMapDisplayUUID = new Template.Method<UUID>();
 

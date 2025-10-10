@@ -21,6 +21,14 @@ import static org.junit.Assert.*;
 public class CommonItemStackTest {
 
     @Test
+    public void testPaintingVariant() {
+        CommonItemStack item = CommonItemStack.create(MaterialUtil.getFirst("PAINTING", "LEGACY_PAINTING"), 1);
+        assertNull(item.getPaintingName());
+        item.setPaintingName("minecraft:sea");
+        assertEquals("minecraft:sea", item.getPaintingName());
+    }
+
+    @Test
     public void testMimicAsType() {
         if (!CommonItemStack.canSetItemModel()) {
             return;

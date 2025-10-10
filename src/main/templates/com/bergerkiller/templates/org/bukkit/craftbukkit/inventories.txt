@@ -3,6 +3,7 @@ package org.bukkit.craftbukkit.inventory;
 import net.minecraft.world.IInventory;
 import net.minecraft.world.inventory.InventoryMerchant;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.TypedEntityData;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTBase;
 
@@ -80,6 +81,33 @@ class CraftItemStack {
 #else
     public static optional org.bukkit.inventory.ItemStack deserializeNBT:###((CommonTagCompound) NBTTagCompound nbt);
 #endif
+
+    public static boolean isCorruptedEntityTag(org.bukkit.inventory.meta.ItemMeta itemMeta) {
+        // Since 1.20.5 an "id" field must be present
+#if version >= 1.20.5
+        if (!(itemMeta instanceof org.bukkit.craftbukkit.inventory.CraftMetaEntityTag)) {
+            return false;
+        }
+
+        org.bukkit.craftbukkit.inventory.CraftMetaEntityTag craftMeta = (org.bukkit.craftbukkit.inventory.CraftMetaEntityTag) itemMeta;
+
+  #if version >= 1.21.9 && exists org.bukkit.craftbukkit.inventory.CraftMetaEntityTag net.minecraft.world.item.component.TypedEntityData<net.minecraft.world.entity.EntityTypes<?>> entityTag;
+        // Used on spigot 1.21.9+
+        #require org.bukkit.craftbukkit.inventory.CraftMetaEntityTag TypedEntityData<net.minecraft.world.entity.EntityTypes<?>> entityTag;
+        TypedEntityData entityTag = craftMeta#entityTag;
+        return entityTag == null;
+  #else
+        // Paper and versions before 1.21.9 stored the nbt tag
+        #require org.bukkit.craftbukkit.inventory.CraftMetaEntityTag net.minecraft.nbt.NBTTagCompound entityTag;
+        net.minecraft.nbt.NBTTagCompound entityTag = craftMeta#entityTag;
+        if (entityTag == null) return false;
+        net.minecraft.nbt.NBTBase idTag = entityTag.get("id");
+        return !(idTag instanceof net.minecraft.nbt.NBTTagString);
+  #endif
+#else
+        return false;
+#endif
+    }
 }
 
 class CraftInventory extends org.bukkit.inventory.Inventory {

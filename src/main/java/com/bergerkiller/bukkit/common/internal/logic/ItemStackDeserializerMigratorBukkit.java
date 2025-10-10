@@ -1,7 +1,10 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,9 +17,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.google.common.collect.MapMaker;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -37,8 +39,8 @@ import org.bukkit.inventory.meta.ItemMeta;
  * and double -> integer conversion, to add support for deserialization from JSON.
  */
 public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMigrator implements Function<Map<String, Object>, ItemStack> {
+    private static final boolean IS_ENTITY_TAG_META_SUPPORTED = CommonBootstrap.evaluateMCVersion(">=", "1.16.2");
     private final ItemMetaDeserializer metaDeserializer = new ItemMetaDeserializer();
-    private final Class<?> META_ENTITY_TAG_CLASS = CommonUtil.getClass("org.bukkit.craftbukkit.inventory.CraftMetaEntityTag");
 
     ItemStackDeserializerMigratorBukkit() {
         // All data versions where the ItemStack YAML had a change that requires conversion
@@ -51,10 +53,13 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
             // cache the original Map that de-serialized into this meta in a WeakHashMap for
             // that reason.
             Object meta = map.get("meta");
-            if (meta != null) {
-                Map<String, Object> metaMap = metaDeserializer.legacyCachedMeta.get(meta);
-                if (metaMap != null) {
-                    map.putAll(metaMap);
+            if (meta instanceof ItemMeta) {
+                Map<String, Object> metaArgs = metaDeserializer.getArgsUsedForMeta((ItemMeta) meta);
+                if (metaArgs != null) {
+                    Object damage = metaArgs.get("Damage");
+                    if (damage != null) {
+                        map.put("damage", damage);
+                    }
                 }
             }
 
@@ -330,9 +335,12 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
     public ItemStack apply(Map<String, Object> args) {
         this.migrate(args, "v");
 
-        ItemStack result;
+        // Fixes a bug that the "id" field is missing in the encoded item meta
+        // Infers that id field from the type of item
+        fixEntityTagItemMeta(args);
+
         try {
-            result = ItemStack.deserialize(args);
+            return ItemStack.deserialize(args);
         } catch (NullPointerException | IllegalArgumentException ex) {
             // This is sometimes thrown when the Material type cannot be found
             Object typeNameObj = args.get("type");
@@ -358,38 +366,84 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
         } catch (RuntimeException ex) {
             logFailDeserialize(args);
             throw ex;
-        }
-
-        // Fixes an issue with data component serialization (Paper)
-        // Among which, this was an issue with paintings not storing an "id" field for the entity_tag
-        try {
-            result = fixItemStackComponents(result);
-        } catch (Throwable t) {
-            logFailDeserialize(args);
-            throw new RuntimeException("Failed to fix itemstack after deserialization", t);
-        }
-
-        return result;
-    }
-
-    private ItemStack fixItemStackComponents(ItemStack itemstack) {
-        // If item is not a CraftItemStack and uses the CraftMetaEntityTag, migrate
-        // the item to a CraftItemStack first so that proper migrations are performed.
-        if (!CommonItemStack.isCraftItemStack(itemstack)) {
-            ItemMeta itemMeta = itemstack.getItemMeta();
-            if (META_ENTITY_TAG_CLASS != null && META_ENTITY_TAG_CLASS.isInstance(itemMeta)) {
-                itemstack = CraftItemStackHandle.asCraftCopy(itemstack);
-            } else {
-                return itemstack; // No fixes
+        } finally {
+            // Clean up the original args map we had tied to the ItemMeta
+            Object metaUnsafe = args.get("meta");
+            if (metaUnsafe instanceof ItemMeta) {
+                metaDeserializer.cleanupArgsUsedForMeta((ItemMeta) metaUnsafe);
             }
         }
+    }
 
-        // We know it's a CraftItemStack, so this conversion will work ok
-        Object handle = CraftItemStackHandle.T.handle.get(itemstack);
-        if (handle != null) {
-            ItemStackHandle.T.fixDataComponentErrors.invoke(handle);
+    private void fixEntityTagItemMeta(Map<String, Object> args) {
+        ItemMeta meta = LogicUtil.tryCast(args.get("meta"), ItemMeta.class);
+        if (meta == null || !CraftItemStackHandle.isCorruptedEntityTag(meta)) {
+            return;
         }
-        return itemstack;
+
+        // It's corrupted. Attempt fixing the "args" ourselves.
+        // Do this by parsing the item meta "internal data" as NBT and inserting an "id"
+        // field based on the type of item this is. This information is not available
+        // at the time of parsing ItemMeta, so it cannot be fixed in that parser.
+
+        String type = LogicUtil.tryCast(args.get("type"), String.class);
+        Map<String, Object> metaArgs = metaDeserializer.getArgsUsedForMeta(meta);
+        if (type == null || metaArgs == null) {
+            return; // Corrupted entirely?
+        }
+
+        String internalData = LogicUtil.tryCast(metaArgs.get("internal"), String.class);
+        if (internalData == null) {
+            return; // What?
+        }
+
+        CommonTagCompound nbt;
+        try {
+            byte[] compressedBytes = Base64.getDecoder().decode(internalData);
+            try (ByteArrayInputStream byteStream = new ByteArrayInputStream(compressedBytes)) {
+                nbt = CommonTagCompound.readFromStream(byteStream, true);
+                if (nbt == null) {
+                    return; // What?
+                }
+            }
+        } catch (IllegalArgumentException ex) {
+            // Not base64?
+            return;
+        } catch (Exception ex) {
+            // Corrupted internal data, just throw whatever comes from that...
+            return;
+        }
+
+        CommonTagCompound entityTag = LogicUtil.tryCast(nbt.get("EntityTag"), CommonTagCompound.class);
+        if (entityTag == null) {
+            return; // Odd.
+        }
+        if (entityTag.containsKey("id")) {
+            return; // Actually is valid so this is not our problem to deal with
+        }
+
+        String entityTypeId = Helper.TYPE_TO_ENTITY_TAG_ID.get(type);
+        if (entityTypeId == null) {
+            // ItemMeta is not compatible for this type of item. Erase.
+            args.remove("meta");
+            return;
+        }
+
+        // Re-encode as base64 with id field set
+        String newInternalData;
+        entityTag.putValue("id", entityTypeId);
+        try (ByteArrayOutputStream outStream = new ByteArrayOutputStream()) {
+            nbt.writeToStream(outStream, true);
+            newInternalData = Base64.getEncoder().encodeToString(outStream.toByteArray());
+        } catch (Exception ex) {
+            args.remove("meta");
+            return; // Should never happen
+        }
+
+        // Set internal data and re-deserialize the ItemMeta from this mapping
+        metaDeserializer.cleanupArgsUsedForMeta(meta);
+        metaArgs.put("internal", newInternalData);
+        args.put("meta", metaDeserializer.applyWithoutFixes(metaArgs));
     }
 
     private static ConfigurationSerializable deserializeFireworkEffect(java.util.Map<String, Object> values) {
@@ -411,7 +465,8 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
     }
 
     public class ItemMetaDeserializer implements Function<Map<String, Object>, ItemMeta> {
-        private final Map<Object, Map<String, Object>> legacyCachedMeta = new MapMaker().weakKeys().concurrencyLevel(4).makeMap();
+        /** Caches the input args to ItemMeta deserialize(), mapped to the object it produced */
+        private final Map<ItemMeta, Map<String, Object>> itemMetaToArgs = new MapMaker().weakKeys().concurrencyLevel(4).makeMap();
 
         /**
          * ItemMeta de-serializer that migrates double to integer where required for GSON decoding.<br>
@@ -476,22 +531,55 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
                 return new org.bukkit.potion.PotionEffect(potionEffect);
             });
 
-            ItemMeta meta = CraftItemStackHandle.deserializeItemMeta(mapping);
-
-            if (CommonCapabilities.NEEDS_LEGACY_ITEMMETA_MIGRATION) {
-                Object damage = mapping.get("Damage");
-                if (damage != null) {
-                    Map<String, Object> itemStackMeta = new HashMap<>();
-                    itemStackMeta.put("damage", damage);
-                    legacyCachedMeta.put(meta, itemStackMeta);
-                }
+            // If meta-type is ENTITY_TAG but this is not supported, switch it UNSPECIFIC to still allow it to work
+            // This preserves the original NBT but just falls back to the default CraftMetaItem type
+            if (!IS_ENTITY_TAG_META_SUPPORTED && "ENTITY_TAG".equals(mapping.get("meta-type"))) {
+                mapping.put("meta-type", "UNSPECIFIC");
             }
 
+            return applyWithoutFixes(mapping);
+        }
+
+        public ItemMeta applyWithoutFixes(Map<String, Object> mapping) {
+            ItemMeta meta = CraftItemStackHandle.deserializeItemMeta(mapping);
+            itemMetaToArgs.put(meta, mapping);
             return meta;
+        }
+
+        /**
+         * Gets the original (cleaned up) arguments used for deserializing an ItemMeta object.
+         * These arguments are kept around for as long the ItemMeta is not garbage-collected,
+         * or {@link #cleanupArgsUsedForMeta(ItemMeta)} is called.
+         *
+         * @param meta ItemMeta
+         * @return Map args, or null if the ItemMeta was not deserialized by this deserializer
+         */
+        public Map<String, Object> getArgsUsedForMeta(ItemMeta meta) {
+            return itemMetaToArgs.get(meta);
+        }
+
+        /**
+         * Cleans up the args mapped to an ItemMeta instance, so that this data can be garbage
+         * collected earlier.
+         *
+         * @param meta ItemMeta
+         */
+        public void cleanupArgsUsedForMeta(ItemMeta meta) {
+            itemMetaToArgs.remove(meta);
         }
     }
 
     private static class Helper {
+        public static final Map<String, String> TYPE_TO_ENTITY_TAG_ID = new HashMap<>();
+        static {
+            TYPE_TO_ENTITY_TAG_ID.put("COD_BUCKET", "minecraft:cod");
+            TYPE_TO_ENTITY_TAG_ID.put("PUFFERFISH_BUCKET", "minecraft:pufferfish");
+            TYPE_TO_ENTITY_TAG_ID.put("SALMON_BUCKET", "minecraft:salmon");
+            TYPE_TO_ENTITY_TAG_ID.put("ITEM_FRAME", "minecraft:item_frame");
+            TYPE_TO_ENTITY_TAG_ID.put("GLOW_ITEM_FRAME", "minecraft:glow_item_frame");
+            TYPE_TO_ENTITY_TAG_ID.put("PAINTING", "minecraft:painting");
+        }
+
         // Remappings from 1.13 materials to the 1.12.2 and before LEGACY material names
         public static final Map<String, String> LEGACY_MAPPING_1_13 = new HashMap<>();
         static {

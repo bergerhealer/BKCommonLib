@@ -37,6 +37,90 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
 public class YamlTest {
 
     @Test
+    public void testPaintingWithoutIdInEntityTagInvalidType() {
+        String inputYaml = "" +
+                "item:\n" +
+                "  ==: org.bukkit.inventory.ItemStack\n" +
+                "  v: 2000\n" +
+                "  type: STICK\n" +
+                "  meta:\n" +
+                "    ==: ItemMeta\n" +
+                "    meta-type: ENTITY_TAG\n" +
+                "    internal: H4sIAAAAAAAA/+NiYOBi4HTNK8ksqQxJTOdgYC9LLMpMzCth4M3NzEtNLkpMK7EqTk1kYAAAPJTPYioAAAA=";
+
+        YamlNode yaml = new YamlNode();
+        yaml.loadFromString(inputYaml);
+
+        CommonItemStack item = CommonItemStack.of(yaml.get("item", ItemStack.class));
+        assertEquals(MaterialUtil.getFirst("STICK", "LEGACY_STICK"), item.getType());
+        assertNull(item.getPaintingName());
+    }
+
+    @Test
+    public void testPaintingWithoutIdInEntityTag() {
+        /*
+        // You can decode the internal data string with this code:
+        String dataStr = "H4sIAAAAAAAA/+NiYOBi4HTNK8ksqQxJTOdgYC9LLMpMzCth4M3NzEtNLkpMK7EqTk3kYGDKTGEQQogVJGbmlWTmpTMwAACqs3tqQwAAAA==";
+        byte[] compressedBytes = Base64.getDecoder().decode(dataStr);
+        ByteArrayInputStream byteStream = new ByteArrayInputStream(compressedBytes);
+        CommonTagCompound nbt = CommonTagCompound.readFromStream(byteStream, true);
+         */
+
+        /*
+        // You can encode the internal data string with this code:
+        CommonTagCompound nbt = new CommonTagCompound();
+        CommonTagCompound entityTag = nbt.createCompound("EntityTag");
+        entityTag.putValue("id", "minecraft:painting");
+        entityTag.putValue("variant", "minecraft:sea");
+        try {
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            nbt.writeToStream(outStream, true);
+            String newStr = Base64.getEncoder().encodeToString(outStream.toByteArray());
+            System.out.println(newStr);
+        } catch (java.io.IOException ex) {
+            throw new IllegalStateException("Unexpected IOException", ex);
+        }
+        */
+
+        String inputYaml = "" +
+                "item:\n" +
+                "  ==: org.bukkit.inventory.ItemStack\n" +
+                "  v: 2000\n" +
+                "  type: PAINTING\n" +
+                "  meta:\n" +
+                "    ==: ItemMeta\n" +
+                "    meta-type: ENTITY_TAG\n" +
+                "    internal: H4sIAAAAAAAA/+NiYOBi4HTNK8ksqQxJTOdgYC9LLMpMzCth4M3NzEtNLkpMK7EqTk1kYAAAPJTPYioAAAA=";
+
+        YamlNode yaml = new YamlNode();
+        yaml.loadFromString(inputYaml);
+
+        CommonItemStack item = CommonItemStack.of(yaml.get("item", ItemStack.class));
+        assertEquals(MaterialUtil.getFirst("PAINTING", "LEGACY_PAINTING"), item.getType());
+        assertEquals("minecraft:sea", item.getPaintingName());
+    }
+
+    @Test
+    public void testPaintingWithIdInEntityTag() {
+        String inputYaml = "" +
+                "item:\n" +
+                "  ==: org.bukkit.inventory.ItemStack\n" +
+                "  v: 4440\n" +
+                "  type: PAINTING\n" +
+                "  meta:\n" +
+                "    ==: ItemMeta\n" +
+                "    meta-type: ENTITY_TAG\n" +
+                "    internal: H4sIAAAAAAAA/+NiYOBi4HTNK8ksqQxJTOdgYC9LLMpMzCth4M3NzEtNLkpMK7EqTk3kYGDKTGEQQogVJGbmlWTmpTMwAACqs3tqQwAAAA==";
+
+        YamlNode yaml = new YamlNode();
+        yaml.loadFromString(inputYaml);
+
+        CommonItemStack item = CommonItemStack.of(yaml.get("item", ItemStack.class));
+        assertEquals(MaterialUtil.getFirst("PAINTING", "LEGACY_PAINTING"), item.getType());
+        assertEquals("minecraft:sea", item.getPaintingName());
+    }
+
+    @Test
     public void testArrayInNodeList() {
         YamlNode root = new YamlNode();
         List<YamlNode> nodes = root.getNodeList("nodes", false);

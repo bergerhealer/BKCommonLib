@@ -89,12 +89,6 @@ public class CommonCapabilities {
     public static final boolean REVISED_CHUNK_ENTITY_SLICE = CommonBootstrap.evaluateMCVersion(">=", "1.8.3");
 
     /**
-     * Between Minecraft 1.8 and 1.12.2 we must hook the ItemMeta de-serializer because otherwise
-     * we cannot restore some properties like "Damage" into the ItemStack.
-     */
-    public static final boolean NEEDS_LEGACY_ITEMMETA_MIGRATION = !CommonBootstrap.evaluateMCVersion(">=", "1.13");
-
-    /**
      * Since Minecraft 1.13 the Material enum was entirely overhauled
      */
     public static final boolean MATERIAL_ENUM_CHANGES = CommonBootstrap.evaluateMCVersion(">=", "1.13");
