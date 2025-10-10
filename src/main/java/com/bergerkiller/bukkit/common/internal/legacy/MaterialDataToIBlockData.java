@@ -7,6 +7,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.material.MaterialData;
@@ -203,7 +204,7 @@ public class MaterialDataToIBlockData {
         }
 
         Material legacyType = IBlockDataToMaterialData.toLegacy(materialdata.getItemType());
-        IBlockDataBuilder<MaterialData> builder = CommonUtil.unsafeCast(iblockdataBuilders.get(legacyType));
+        IBlockDataBuilder<MaterialData> builder = LogicUtil.unsafeCast(iblockdataBuilders.get(legacyType));
         try {
             IBlockDataHandle blockData = IBlockDataHandle.createHandle(craftBukkitgetIBlockData.invoke(null, materialdata));
             if (builder != null) {

@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.nbt;
 
 import com.bergerkiller.bukkit.common.collections.CollectionBasics;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
 import com.bergerkiller.generated.net.minecraft.nbt.NBTTagListHandle;
@@ -419,7 +418,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      * @return Wrapper class suitable for the given handle
      */
     public static CommonTagList create(Object handle) {
-        return CommonUtil.tryCast(CommonTag.create(handle), CommonTagList.class);
+        return LogicUtil.tryCast(CommonTag.create(handle), CommonTagList.class);
     }
 
     /**

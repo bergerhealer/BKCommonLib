@@ -9,7 +9,6 @@ import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonDisabledEntity;
 import com.bergerkiller.bukkit.common.math.Quaternion;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
@@ -877,7 +876,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
             if (internalType != null) {
                 if (serializer == null) {
-                    serializer = Type.getForType(CommonUtil.unsafeCast(internalType.type));
+                    serializer = Type.getForType(LogicUtil.unsafeCast(internalType.type));
                 }
 
                 this._serializer = serializer.setInternalOptional(internalType.optional);

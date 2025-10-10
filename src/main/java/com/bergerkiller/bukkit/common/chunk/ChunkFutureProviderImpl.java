@@ -159,11 +159,11 @@ abstract class ChunkFutureProviderImpl implements ChunkFutureProvider, Listener,
         Chain chain = entries.get(key);
         Entry entry;
         if (chain == null) {
-            chain = new Chain(this, key, world, mode, passChunkToFuture, CommonUtil.unsafeCast(future));
+            chain = new Chain(this, key, world, mode, passChunkToFuture, LogicUtil.unsafeCast(future));
             entry = chain.first;
             entries.put(key, chain);
         } else {
-            entry = chain.add(world, mode, passChunkToFuture, CommonUtil.unsafeCast(future));
+            entry = chain.add(world, mode, passChunkToFuture, LogicUtil.unsafeCast(future));
         }
 
         // This may randomly instantly remove it if the operation was done asynchronously!

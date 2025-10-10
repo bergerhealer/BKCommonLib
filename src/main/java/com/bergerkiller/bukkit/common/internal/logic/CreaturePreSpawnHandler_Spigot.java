@@ -57,13 +57,13 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
         }
 
         if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
-            cpsChunkGeneratorField = CommonUtil.unsafeCast(SafeField.create(ChunkProviderServerHandle.T.getType(),
+            cpsChunkGeneratorField = LogicUtil.unsafeCast(SafeField.create(ChunkProviderServerHandle.T.getType(),
                     "generator", CommonUtil.getClass("net.minecraft.world.level.chunk.ChunkGenerator")));
         } else if (CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
-            cpsChunkGeneratorField = CommonUtil.unsafeCast(SafeField.create(ChunkProviderServerHandle.T.getType(),
+            cpsChunkGeneratorField = LogicUtil.unsafeCast(SafeField.create(ChunkProviderServerHandle.T.getType(),
                     "chunkGenerator", CommonUtil.getClass("net.minecraft.world.level.chunk.ChunkGenerator")));
         } else {
-            cpsChunkGeneratorField = CommonUtil.unsafeCast(SafeField.create(ChunkProviderServerHandle.T.getType(),
+            cpsChunkGeneratorField = LogicUtil.unsafeCast(SafeField.create(ChunkProviderServerHandle.T.getType(),
                     "chunkProvider", CommonUtil.getClass("net.minecraft.world.level.chunk.IChunkProvider")));
         }
 

@@ -6,6 +6,7 @@ import java.util.Scanner;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
@@ -176,7 +177,7 @@ class EntityMoveHandler_1_13 extends EntityMoveHandler {
 
         public HandlerLogic() throws Throwable {
             // Turn Stream<VoxelShape> into Stream<VoxelShapeHandle>
-            streamConverter = CommonUtil.unsafeCast(Conversion.find(
+            streamConverter = LogicUtil.unsafeCast(Conversion.find(
                     TypeDeclaration.createGeneric(Stream.class, VoxelShapeHandle.T.getType()),
                     TypeDeclaration.createGeneric(Stream.class, VoxelShapeHandle.class)));
 

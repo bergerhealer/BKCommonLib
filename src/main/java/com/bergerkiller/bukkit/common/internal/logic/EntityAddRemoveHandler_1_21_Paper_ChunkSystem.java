@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
@@ -27,7 +28,6 @@ import org.bukkit.event.world.ChunkEvent;
 import org.bukkit.plugin.EventExecutor;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -116,7 +116,7 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
         }
 
         public void enable(CommonPlugin plugin) {
-            Class<? extends EntityEvent> entitiesLoadEventType = CommonUtil.unsafeCast(CommonUtil.getClass("com.destroystokyo.paper.event.entity.EntityAddToWorldEvent"));
+            Class<? extends EntityEvent> entitiesLoadEventType = LogicUtil.unsafeCast(CommonUtil.getClass("com.destroystokyo.paper.event.entity.EntityAddToWorldEvent"));
             try {
                 addToWorldGetWorldMethod.init(entitiesLoadEventType.getMethod("getWorld"));
             } catch (Throwable t) {
@@ -129,7 +129,7 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
                 }
             }, plugin);
 
-            Class<? extends EntityEvent> entitiesUnloadEventType = CommonUtil.unsafeCast(CommonUtil.getClass("com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent"));
+            Class<? extends EntityEvent> entitiesUnloadEventType = LogicUtil.unsafeCast(CommonUtil.getClass("com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent"));
             try {
                 removeFromWorldGetWorldMethod.init(entitiesUnloadEventType.getMethod("getWorld"));
             } catch (Throwable t) {
@@ -531,7 +531,7 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
 
         @Override
         public void enable(final EntityAddRemoveHandler_1_21_Paper_ChunkSystem handler, CommonPlugin plugin) {
-            Class<? extends Event> entitiesLoadEventType = CommonUtil.unsafeCast(CommonUtil.getClass("org.bukkit.event.world.EntitiesLoadEvent"));
+            Class<? extends Event> entitiesLoadEventType = LogicUtil.unsafeCast(CommonUtil.getClass("org.bukkit.event.world.EntitiesLoadEvent"));
             Bukkit.getPluginManager().registerEvent(entitiesLoadEventType, this, EventPriority.LOWEST, new EventExecutor() {
                 @Override
                 public void execute(Listener listener, Event event) throws EventException {
@@ -539,7 +539,7 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
                 }
             }, plugin);
 
-            Class<? extends Event> entitiesUnloadEventType = CommonUtil.unsafeCast(CommonUtil.getClass("org.bukkit.event.world.EntitiesUnloadEvent"));
+            Class<? extends Event> entitiesUnloadEventType = LogicUtil.unsafeCast(CommonUtil.getClass("org.bukkit.event.world.EntitiesUnloadEvent"));
             Bukkit.getPluginManager().registerEvent(entitiesUnloadEventType, this, EventPriority.LOWEST, new EventExecutor() {
                 @Override
                 public void execute(Listener listener, Event event) throws EventException {

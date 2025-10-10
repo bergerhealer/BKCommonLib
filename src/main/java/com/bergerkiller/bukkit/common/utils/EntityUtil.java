@@ -37,7 +37,7 @@ public class EntityUtil extends EntityPropertyUtil {
      * @return the found Entity, or null if not found
      */
     public static <T extends org.bukkit.entity.Entity> T getEntity(org.bukkit.World world, UUID uid, Class<T> type) {
-        return CommonUtil.tryCast(getEntity(world, uid), type);
+        return LogicUtil.tryCast(getEntity(world, uid), type);
     }
 
     /**

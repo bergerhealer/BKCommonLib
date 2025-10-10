@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.server.dedicated.DedicatedPlayerListHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
@@ -110,7 +111,7 @@ public class CommonNMS {
     }
 
     public static Object getRawHandle(org.bukkit.entity.Entity e, Template.Class<?> type) {
-        return CommonUtil.tryCast(HandleConversion.toEntityHandle(e), type.getType());
+        return LogicUtil.tryCast(HandleConversion.toEntityHandle(e), type.getType());
     }
 
     public static <T extends Template.Handle> T getHandle(org.bukkit.entity.Entity e, Template.Class<T> type) {

@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 import java.util.Map;
 
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -16,7 +17,6 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.collections.BlockFaceSet;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
@@ -384,7 +384,7 @@ public abstract class BlockData extends BlockDataRegistry {
      * @return Block Material Data, or null on failure
      */
     public final <T extends MaterialData> T newMaterialData(Class<T> type) {
-        return CommonUtil.tryCast(newMaterialData(), type);
+        return LogicUtil.tryCast(newMaterialData(), type);
     }
 
     /* ====================================================================== */

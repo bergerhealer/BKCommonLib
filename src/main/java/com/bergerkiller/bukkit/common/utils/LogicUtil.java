@@ -499,7 +499,7 @@ public class LogicUtil {
      * @throws IllegalArgumentException If the type has no clone method
      */
     public static <T> UnaryOperator<T> findCloneMethod(Class<T> type) {
-        return CommonUtil.unsafeCast(synchronizeCopyOnWrite(LogicUtil.class, () -> _cloneMethodCache, type, (map, inType) -> map.get(inType), (map, inType) -> {
+        return unsafeCast(synchronizeCopyOnWrite(LogicUtil.class, () -> _cloneMethodCache, type, (map, inType) -> map.get(inType), (map, inType) -> {
             // Generate new operator
             Method cloneMethod;
             try {
@@ -766,7 +766,7 @@ public class LogicUtil {
             return Arrays.copyOf(input, len - 1);
         }
 
-        T[] rval = CommonUtil.unsafeCast(createArray(input.getClass().getComponentType(), input.length - 1));
+        T[] rval = LogicUtil.unsafeCast(createArray(input.getClass().getComponentType(), input.length - 1));
         System.arraycopy(input, 0, rval, 0, index);
         System.arraycopy(input, index + 1, rval, index, input.length - index - 1);
         return rval;

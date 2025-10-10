@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.IBlockStateHandle;
 
 import java.util.Collection;
@@ -28,7 +28,7 @@ public abstract class BlockState<T extends Comparable<?>> extends BasicWrapper<I
      * @return values
      */
     public Collection<T> values() {
-        return CommonUtil.unsafeCast(handle.getValues());
+        return LogicUtil.unsafeCast(handle.getValues());
     }
 
     /**

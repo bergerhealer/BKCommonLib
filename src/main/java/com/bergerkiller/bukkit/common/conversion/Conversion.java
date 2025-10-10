@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.*;
 import com.bergerkiller.mountiplex.conversion.Converter;
 import com.bergerkiller.mountiplex.conversion.type.InputConverter;
@@ -93,8 +94,8 @@ public class Conversion {
     public static final InputConverter<BlockState> toBlockState = getConverterTo(BlockState.class);
     public static final InputConverter<CommonTag> toCommonTag = getConverterTo(CommonTag.class);
     public static final InputConverter<DataWatcher> toDataWatcher = getConverterTo(DataWatcher.class);
-    public static final InputConverter<DataWatcher.Key<?>> toDataWatcherKey = CommonUtil.unsafeCast(getConverterTo(DataWatcher.Key.class));
-    public static final InputConverter<DataWatcher.Item<?>> toDataWatcherItem = CommonUtil.unsafeCast(getConverterTo(DataWatcher.Item.class));
+    public static final InputConverter<DataWatcher.Key<?>> toDataWatcherKey = LogicUtil.unsafeCast(getConverterTo(DataWatcher.Key.class));
+    public static final InputConverter<DataWatcher.Item<?>> toDataWatcherItem = LogicUtil.unsafeCast(getConverterTo(DataWatcher.Item.class));
     public static final InputConverter<ItemStack> toItemStack = getConverterTo(ItemStack.class);
     public static final InputConverter<Material> toMaterial = getConverterTo(Material.class);
     public static final InputConverter<Inventory> toInventory = getConverterTo(Inventory.class);
@@ -108,7 +109,7 @@ public class Conversion {
     public static final InputConverter<PlayerAbilities> toPlayerAbilities = getConverterTo(PlayerAbilities.class);
     public static final InputConverter<EntityTracker> toEntityTracker = getConverterTo(EntityTracker.class);
     public static final InputConverter<LongHashSet> toLongHashSet = getConverterTo(LongHashSet.class);
-    public static final InputConverter<IntHashMap<Object>> toIntHashMap = CommonUtil.unsafeCast(getConverterTo(IntHashMap.class));
+    public static final InputConverter<IntHashMap<Object>> toIntHashMap = LogicUtil.unsafeCast(getConverterTo(IntHashMap.class));
     public static final InputConverter<BlockData> toBlockData = getConverterTo(BlockData.class);
     public static final InputConverter<ChunkSection> toChunkSection = getConverterTo(ChunkSection.class);
     public static final InputConverter<PotionEffectType> toPotionEffectType = getConverterTo(PotionEffectType.class);

@@ -4,7 +4,7 @@ import com.bergerkiller.bukkit.common.BlockLocation;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.config.TempFileOutputStream;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
 import com.bergerkiller.generated.net.minecraft.nbt.NBTCompressedStreamToolsHandle;
@@ -695,7 +695,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @return Wrapper class suitable for the given handle
      */
     public static CommonTagCompound create(Object handle) {
-        return CommonUtil.tryCast(CommonTag.create(handle), CommonTagCompound.class);
+        return LogicUtil.tryCast(CommonTag.create(handle), CommonTagCompound.class);
     }
 
     /**

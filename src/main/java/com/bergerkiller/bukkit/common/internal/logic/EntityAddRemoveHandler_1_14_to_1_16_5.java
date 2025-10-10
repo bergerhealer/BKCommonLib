@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -89,7 +90,7 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
 
         {
             String fieldName = Resolver.resolveFieldName(WorldServerHandle.T.getType(), "entitiesToAdd");
-            this.entitiesToAddField = CommonUtil.unsafeCast(SafeField.create(WorldServerHandle.T.getType(), fieldName, Queue.class));
+            this.entitiesToAddField = LogicUtil.unsafeCast(SafeField.create(WorldServerHandle.T.getType(), fieldName, Queue.class));
         }
 
         // Tuinity support: 'loadedEntities' field of WorldServer

@@ -4,7 +4,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.cloud.captions.BKCommonLibCaptionKeys;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
@@ -160,7 +160,7 @@ public class SoundEffectParser<C> implements ArgumentParser<C, ResourceKey<Sound
                 },
                 (Consumer<BrigadierMappingBuilder<?, ?>>) builder -> {
                     builderTo.invoke(builder, (Function<Object, Object>) o -> createResourceLocationArgument.invoke(null));
-                    builder.suggestedBy(CommonUtil.unsafeCast(suggestionProvider));
+                    builder.suggestedBy(LogicUtil.unsafeCast(suggestionProvider));
                 }
         );
     }

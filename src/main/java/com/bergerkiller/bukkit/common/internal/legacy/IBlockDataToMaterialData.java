@@ -65,7 +65,7 @@ public class IBlockDataToMaterialData {
 
                 java.lang.reflect.Field f = craftLegacyClass.getDeclaredField("dataToMaterial");
                 f.setAccessible(true);
-                iblockdataToMaterialdata_map = CommonUtil.unsafeCast(f.get(null));
+                iblockdataToMaterialdata_map = LogicUtil.unsafeCast(f.get(null));
                 f.setAccessible(false);
             } catch (Throwable t) {
                 Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize CraftLegacy dataToMaterial", t);

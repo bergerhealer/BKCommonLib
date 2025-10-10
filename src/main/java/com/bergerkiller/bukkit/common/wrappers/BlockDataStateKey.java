@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 
 import java.util.Collection;
 
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.IBlockStateHandle;
 
 /**
@@ -31,7 +31,7 @@ public class BlockDataStateKey<T extends Comparable<?>> extends BlockState<T> {
      * @return values
      */
     public Collection<T> values() {
-        return CommonUtil.unsafeCast(handle.getValues());
+        return LogicUtil.unsafeCast(handle.getValues());
     }
 
     /**

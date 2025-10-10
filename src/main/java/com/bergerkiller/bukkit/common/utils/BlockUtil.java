@@ -201,7 +201,7 @@ public class BlockUtil extends MaterialUtil {
      * casting failed
      */
     public static <T> T getData(org.bukkit.block.Block block, Class<T> type) {
-        return CommonUtil.tryCast(getData(block), type);
+        return LogicUtil.tryCast(getData(block), type);
     }
 
     /**
@@ -478,7 +478,7 @@ public class BlockUtil extends MaterialUtil {
      * possible
      */
     public static <T extends BlockState> T getState(org.bukkit.block.Block block, Class<T> type) {
-        return CommonUtil.tryCast(getState(block), type);
+        return LogicUtil.tryCast(getState(block), type);
     }
 
     public static org.bukkit.material.Rails getRails(org.bukkit.block.Block railsblock) {

@@ -2,10 +2,10 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.util.List;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.conversion.Converter;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
@@ -20,7 +20,7 @@ class ItemVariantListHandler_1_12_1 extends ItemVariantListHandler {
 
     @Override
     public void enable() throws Throwable {
-        converter = CommonUtil.unsafeCast(Conversion.find(TypeDeclaration.parse("net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack>"),
+        converter = LogicUtil.unsafeCast(Conversion.find(TypeDeclaration.parse("net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack>"),
                                                           TypeDeclaration.createGeneric(List.class, ItemStack.class)));
         if (converter == null) {
             throw new IllegalStateException("Converter from NonNullList<ItemStack> to List<bukkit.ItemStack> not found!");

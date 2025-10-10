@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
  * Simple cache of objects. Each cache consists of an allocator method, which creates
@@ -26,8 +27,8 @@ public final class ObjectCache<T> {
     private static final ObjectCache<?> HASHMAP_CACHE = create(HashMap::new, HashMap::clear);
 
     private ObjectCache(Supplier<?> allocator, Consumer<?> resetMethod) {
-        _allocator = CommonUtil.unsafeCast(allocator);
-        _resetMethod = CommonUtil.unsafeCast(resetMethod);
+        _allocator = LogicUtil.unsafeCast(allocator);
+        _resetMethod = LogicUtil.unsafeCast(resetMethod);
         _root = new Entry<T>(this, null);
     }
 

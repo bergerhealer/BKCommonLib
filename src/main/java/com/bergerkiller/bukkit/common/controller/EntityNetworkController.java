@@ -377,7 +377,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             if (this.entry != null) {
                 EntityTrackerEntryHook oldHook = EntityTypingHandler.INSTANCE.getEntityTrackerEntryHook(this.entry.getRaw());
                 if (oldHook != null && oldHook.getController() == this) {
-                    EntityNetworkController<CommonEntity<?>> defaultController = CommonUtil.unsafeCast(new DefaultEntityNetworkController());
+                    EntityNetworkController<CommonEntity<?>> defaultController = LogicUtil.unsafeCast(new DefaultEntityNetworkController());
                     defaultController.bind(this.entity, this.entry.getRaw());
                 }
             }
@@ -887,7 +887,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
                 ArrayList<org.bukkit.entity.Entity> old_passengers_bu = new ArrayList<org.bukkit.entity.Entity>(old_passengers);  
 
                 // Update the raw List. This prevents converters being used in the final List.
-                List<Object> newList = CommonUtil.unsafeCast(EntityTrackerEntryStateHandle.T.opt_passengers.raw.get(state.getRaw()));
+                List<Object> newList = LogicUtil.unsafeCast(EntityTrackerEntryStateHandle.T.opt_passengers.raw.get(state.getRaw()));
                 if (newList instanceof ArrayList) {
                     newList.clear();
                 } else {

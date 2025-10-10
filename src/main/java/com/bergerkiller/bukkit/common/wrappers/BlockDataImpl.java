@@ -658,7 +658,7 @@ class BlockDataImpl extends BlockData {
 
     @Override
     public <T extends Comparable<?>> T getState(BlockDataStateKey<T> stateKey) {
-        return CommonUtil.unsafeCast(this.data.get(stateKey.getBackingHandle()));
+        return LogicUtil.unsafeCast(this.data.get(stateKey.getBackingHandle()));
     }
 
     @Override

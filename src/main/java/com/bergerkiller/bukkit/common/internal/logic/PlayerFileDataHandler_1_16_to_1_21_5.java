@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -60,7 +61,7 @@ class PlayerFileDataHandler_1_16_to_1_21_5 extends PlayerFileDataHandler {
         String fieldName = CommonBootstrap.evaluateMCVersion(">=", "1.17") ? "playerIo" : "playerFileData";
         Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.WorldNBTStorage");
         String realFieldName = Resolver.resolveFieldName(PlayerListHandle.T.getType(), fieldName);
-        playerListFileDataField = CommonUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), realFieldName, playerFileDataType).getFastField());
+        playerListFileDataField = LogicUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), realFieldName, playerFileDataType).getFastField());
     }
 
     @Override
@@ -169,7 +170,7 @@ class PlayerFileDataHandler_1_16_to_1_21_5 extends PlayerFileDataHandler {
         @HookMethod("public abstract java.util.Optional<net.minecraft.nbt.NBTTagCompound> load(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
         public java.util.Optional<Object> loadOpt(Object entityHuman) {
             if (this.controller != null) {
-                Player player = CommonUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);
+                Player player = LogicUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);
                 if (player != null) {
                     CommonTagCompound compound = null;
                     try {
@@ -193,7 +194,7 @@ class PlayerFileDataHandler_1_16_to_1_21_5 extends PlayerFileDataHandler {
         @HookMethod("public abstract void save(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
         public void save(Object entityHuman) {
             if (this.controller != null) {
-                Player player = CommonUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);
+                Player player = LogicUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);
                 if (player != null) {
                     try {
                         this.controller.onSave(player);

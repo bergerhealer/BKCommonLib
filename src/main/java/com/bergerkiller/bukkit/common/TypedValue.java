@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 
 /**
@@ -31,7 +31,7 @@ public class TypedValue<T> {
      */
     public void parseSet(String text) {
         if (this.type == boolean.class || this.type == Boolean.class) {
-            value = CommonUtil.unsafeCast(ParseUtil.parseBool(text));
+            value = LogicUtil.unsafeCast(ParseUtil.parseBool(text));
         } else {
             value = Conversion.convert(text, type, value);
         }

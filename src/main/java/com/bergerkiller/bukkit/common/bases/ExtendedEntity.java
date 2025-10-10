@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.bukkit.Chunk;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
@@ -290,7 +291,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return the NMS entity handle, cast to the given type
      */
     public <H> H getHandle(Class<H> type) {
-        return CommonUtil.tryCast(handle.getRaw(), type);
+        return LogicUtil.tryCast(handle.getRaw(), type);
     }
 
     /**
@@ -686,7 +687,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      */
     @Deprecated
     public Player getPlayerPassenger() {
-        return CommonUtil.tryCast(getPassenger(), Player.class);
+        return LogicUtil.tryCast(getPassenger(), Player.class);
     }
 
     /**

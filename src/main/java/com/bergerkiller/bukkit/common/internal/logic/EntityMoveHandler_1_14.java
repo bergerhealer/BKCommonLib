@@ -6,12 +6,12 @@ import java.util.Scanner;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
@@ -169,7 +169,7 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
 
         public HandlerLogic() throws Throwable {
             // Turn Stream<VoxelShape> into Stream<VoxelShapeHandle>
-            streamConverter = CommonUtil.unsafeCast(Conversion.find(
+            streamConverter = LogicUtil.unsafeCast(Conversion.find(
                     TypeDeclaration.createGeneric(Stream.class, VoxelShapeHandle.T.getType()),
                     TypeDeclaration.createGeneric(Stream.class, VoxelShapeHandle.class)));
 

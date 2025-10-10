@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -820,7 +821,7 @@ class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
 
         @Override
         public void enable(final EntityAddRemoveHandler_1_17 handler, CommonPlugin plugin) {
-            Class<? extends Event> entitiesLoadEventType = CommonUtil.unsafeCast(CommonUtil.getClass("org.bukkit.event.world.EntitiesLoadEvent"));
+            Class<? extends Event> entitiesLoadEventType = LogicUtil.unsafeCast(CommonUtil.getClass("org.bukkit.event.world.EntitiesLoadEvent"));
             Bukkit.getPluginManager().registerEvent(entitiesLoadEventType, this, EventPriority.LOWEST, new EventExecutor() {
                 @Override
                 public void execute(Listener listener, Event event) throws EventException {
@@ -828,7 +829,7 @@ class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
                 }
             }, plugin);
 
-            Class<? extends Event> entitiesUnloadEventType = CommonUtil.unsafeCast(CommonUtil.getClass("org.bukkit.event.world.EntitiesUnloadEvent"));
+            Class<? extends Event> entitiesUnloadEventType = LogicUtil.unsafeCast(CommonUtil.getClass("org.bukkit.event.world.EntitiesUnloadEvent"));
             Bukkit.getPluginManager().registerEvent(entitiesUnloadEventType, this, EventPriority.LOWEST, new EventExecutor() {
                 @Override
                 public void execute(Listener listener, Event event) throws EventException {

@@ -19,6 +19,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
@@ -128,7 +129,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         }
         EntityTrackerEntryHook hook = EntityTypingHandler.INSTANCE.getEntityTrackerEntryHook(entityTrackerEntry);
         if (hook != null) {
-            return CommonUtil.unsafeCast(hook.getController());
+            return LogicUtil.unsafeCast(hook.getController());
         }
         if (EntityTrackerEntryHandle.T.isType(entityTrackerEntry)) {
             result = new DefaultEntityNetworkController();
@@ -827,7 +828,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
      * failed/entity is invalid
      */
     public static <T extends org.bukkit.entity.Entity, C extends CommonEntity<? extends T>> C get(T entity, Class<C> type) {
-        return CommonUtil.tryCast(get(entity), type);
+        return LogicUtil.tryCast(get(entity), type);
     }
 
     /**

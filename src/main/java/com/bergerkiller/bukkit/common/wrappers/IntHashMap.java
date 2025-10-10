@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 import java.util.List;
 
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.util.IntHashMapHandle;
 
 /**
@@ -96,7 +97,7 @@ public class IntHashMap<T> extends BasicWrapper<IntHashMapHandle> implements Clo
      * @return list of hashmap entries
      */
     public List<Entry<T>> entries() {
-        return CommonUtil.unsafeCast(this.handle.getEntries());
+        return LogicUtil.unsafeCast(this.handle.getEntries());
     }
 
     /**

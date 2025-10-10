@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -51,7 +51,7 @@ public class BasicWrapper<T extends Template.Handle> {
      * fails
      */
     public <H> H getRawHandle(Class<H> type) {
-        return CommonUtil.tryCast(handle.getRaw(), type);
+        return LogicUtil.tryCast(handle.getRaw(), type);
     }
 
     /**
@@ -67,7 +67,7 @@ public class BasicWrapper<T extends Template.Handle> {
      */
     @Deprecated
     public <H> H getHandle(Class<H> type) {
-        return CommonUtil.tryCast(handle.getRaw(), type);
+        return LogicUtil.tryCast(handle.getRaw(), type);
     }
 
     @Override

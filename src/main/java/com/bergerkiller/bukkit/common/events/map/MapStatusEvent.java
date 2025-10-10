@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.events.map;
 
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
  * Event broadcast by widgets, allowing other widgets to be informed of status changes
@@ -50,7 +50,7 @@ public class MapStatusEvent {
      * @return argument cast to the type
      */
     public <T> T getArgument(Class<T> type) {
-        return CommonUtil.tryCast(this.argument, type);
+        return LogicUtil.tryCast(this.argument, type);
     }
 
     @Override

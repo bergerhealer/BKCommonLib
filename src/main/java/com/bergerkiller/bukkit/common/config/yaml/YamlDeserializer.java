@@ -172,7 +172,7 @@ public class YamlDeserializer {
         try {
             this.preParser.open(reader);
             Output output = new Output();
-            output.root = CommonUtil.tryCast(this.yaml.load(this.preParser), Map.class, Collections.emptyMap());
+            output.root = LogicUtil.tryCast(this.yaml.load(this.preParser), Map.class, Collections.emptyMap());
             output.headers = new HashMap<YamlPath, String>(this.preParser.headers);
             if (this.preParser.mainHeader.length() > 0) {
                 output.headers.put(YamlPath.ROOT, this.preParser.mainHeader.toString());
@@ -490,7 +490,7 @@ public class YamlDeserializer {
         public Object construct(Map<?, ?> mapping) {
             String serialized_type = LogicUtil.applyIfNotNull(mapping.get(ConfigurationSerialization.SERIALIZED_TYPE_KEY), Object::toString, null);
             if (serialized_type != null) {
-                Map<String, Object> typed = CommonUtil.unsafeCast(mapping);
+                Map<String, Object> typed = LogicUtil.unsafeCast(mapping);
 
                 // If any entries in the mapping uses non-String keys, convert those to a String
                 // Almost all the time this operation is unneeded, so we do a detection step first
@@ -555,7 +555,7 @@ public class YamlDeserializer {
 
         private void initConstructor(SafeConstructor ctor) {
             try {
-                Map<Tag, Construct> yamlConstructors = CommonUtil.unsafeCast(SafeField.get(ctor, "yamlConstructors", Map.class));
+                Map<Tag, Construct> yamlConstructors = LogicUtil.unsafeCast(SafeField.get(ctor, "yamlConstructors", Map.class));
 
                 // Replace the 'Map' constructor with one that handles our custom type de-serialization logic
                 // The original 'Map' constructor is re-purposed to construct the map itself (super call)

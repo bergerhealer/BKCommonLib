@@ -4,11 +4,11 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 
 public class IntHashMapTest {
@@ -42,7 +42,7 @@ public class IntHashMapTest {
         Object handle = DuplexConversion.intHashMap.convertReverse(test);
         assertNotNull(handle);
 
-        IntHashMap<String> original = CommonUtil.unsafeCast(Conversion.toIntHashMap.convert(handle));
+        IntHashMap<String> original = LogicUtil.unsafeCast(Conversion.toIntHashMap.convert(handle));
         assertNotNull(original);
         assertEquals("test_string", original.get(154));
 

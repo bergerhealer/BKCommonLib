@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.server.players.PlayerListHandle;
 import com.bergerkiller.generated.net.minecraft.util.ProblemReporterHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.storage.ValueInputHandle;
@@ -68,7 +69,7 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
         String fieldName = "playerIo";
         Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.WorldNBTStorage");
         String realFieldName = Resolver.resolveFieldName(PlayerListHandle.T.getType(), fieldName);
-        playerListFileDataField = CommonUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), realFieldName, playerFileDataType).getFastField());
+        playerListFileDataField = LogicUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), realFieldName, playerFileDataType).getFastField());
     }
 
     @Override
@@ -214,7 +215,7 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
         @HookMethod("public java.util.Optional<ValueInput> load(EntityHuman entityhuman, ProblemReporter problemreporter)")
         public java.util.Optional<Object> load(Object entityHuman, Object problemReporter) {
             if (this.controller != null) {
-                Player player = CommonUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);
+                Player player = LogicUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);
                 if (player != null) {
                     CommonTagCompound compound = null;
                     try {
@@ -237,7 +238,7 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
         @HookMethod("public abstract void save(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
         public void save(Object entityHuman) {
             if (this.controller != null) {
-                Player player = CommonUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);
+                Player player = LogicUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);
                 if (player != null) {
                     try {
                         this.controller.onSave(player);

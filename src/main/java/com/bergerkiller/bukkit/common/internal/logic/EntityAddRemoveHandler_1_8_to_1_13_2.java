@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -78,9 +79,9 @@ class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler {
         }
 
         if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
-            accessListField = CommonUtil.unsafeCast(SafeField.create(WorldHandle.T.getType(), "v", List.class));
+            accessListField = LogicUtil.unsafeCast(SafeField.create(WorldHandle.T.getType(), "v", List.class));
         } else {
-            accessListField = CommonUtil.unsafeCast(SafeField.create(WorldHandle.T.getType(), "u", List.class));
+            accessListField = LogicUtil.unsafeCast(SafeField.create(WorldHandle.T.getType(), "u", List.class));
         }
 
         {
