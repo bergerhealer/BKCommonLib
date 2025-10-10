@@ -720,6 +720,30 @@ public final class CommonItemStack implements Cloneable {
     }
 
     /**
+     * Gets the name of the painting set on this painting item, if one is set. This name can be taken
+     * over in the entity data of the item.
+     *
+     * @return Painting name, or <i>Null</i> if not present
+     */
+    public String getPaintingName() {
+        return getHandle(true).map(ItemStackHandle::getPaintingName).orElse(null);
+    }
+
+    /**
+     * Gets the name of the painting set on this painting item. This name can be taken
+     * over in the entity data of the item. If null, clears the data.
+     *
+     * @param name Painting name to set, or <i>null</i> to clear it
+     * @return this CommonItemStack
+     */
+    public CommonItemStack setPaintingName(String name) {
+        getHandle()
+                .orElseThrow(() -> new IllegalStateException("Can not set painting name on an empty item"))
+                .setPaintingName(name);
+        return this;
+    }
+
+    /**
      * Gets whether an item model is set for this item. If false, the vanilla
      * item model is used.
      *
