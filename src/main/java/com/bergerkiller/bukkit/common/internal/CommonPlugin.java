@@ -58,6 +58,8 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.util.asm.ASMUtil;
 
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -74,6 +76,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.incendo.cloud.minecraft.extras.AudienceProvider;
 
 import java.io.File;
 import java.lang.ref.SoftReference;
@@ -675,6 +678,18 @@ public class CommonPlugin extends PluginBase {
             this.onCriticalStartupFailure("Critical failure updating the packet handler");
             return;
         }
+
+        new Task(this) {
+            @Override
+            public void run() {
+                try (BukkitAudiences aud = BukkitAudiences.create(this.getPlugin())) {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        player.sendMessage("OLD STYLE HELLO");
+                        aud.player(player).sendMessage(Component.text("Hello!"));
+                    }
+                }
+            }
+        }.start(20, 20);
 
         // Welcome message
         final List<String> welcomeMessages = Arrays.asList(

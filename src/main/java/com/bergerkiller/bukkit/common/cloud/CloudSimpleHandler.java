@@ -13,11 +13,17 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.bergerkiller.bukkit.common.cloud.audiences.PaperAdventureAdapter;
 import com.bergerkiller.bukkit.common.cloud.captions.BKCommonLibCaptionRegistry;
 import com.bergerkiller.bukkit.common.cloud.parsers.SoundEffectParser;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import net.kyori.adventure.chat.ChatType;
+import net.kyori.adventure.chat.SignedMessage;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -224,6 +230,34 @@ public class CloudSimpleHandler {
 
         // Used by the help system
         this.bukkitAudiences = BukkitAudiences.create(plugin);
+
+        /*
+        // Testing!
+        PaperAdventureAdapter adapter = Template.Class.create(PaperAdventureAdapter.class, Common.TEMPLATE_RESOLVER);
+        adapter.forceInitialization();
+
+        {
+            Object o = adapter.adaptKey(Key.key("test", "world"));
+            System.out.println("RESULT: " + o);
+            Key key = adapter.reverseKey(o);
+            System.out.println("RESULT REV: " + key);
+        }
+
+        {
+            Object o = adapter.adaptChatType(ChatType.SAY_COMMAND);
+            System.out.println("RESULT: " + o);
+            ChatType type = adapter.reverseChatType(o);
+            System.out.println("RESULT REV: " + type);
+        }
+
+        {
+            Object o = adapter.adaptSignedMessage(SignedMessage.system("cool", Component.text("test")));
+            System.out.println("RESULT: " + o);
+            SignedMessage type = adapter.reverseSignedMessage(o);
+            System.out.println("RESULT REV: " + type + " " + type.message() + " " + type.unsignedContent());
+        }
+
+         */
     }
 
     private void handleException(CommandSender sender, Throwable exception) throws Throwable {
