@@ -1873,12 +1873,9 @@ class Entity {
         instance.setPositionRaw((aabb.minX + aabb.maxX) / 2.0, aabb.minY, (aabb.minZ + aabb.maxZ) / 2.0);
   #endif
     }
-#elseif version >= 1.9
-    public void setPositionFromBoundingBox:recalcPosition();
-#elseif exists net.minecraft.world.entity.Entity protected void recalcPosition();
-    // Azurite server
-    protected void setPositionFromBoundingBox:recalcPosition();
 #else
+    // public since 1.9, but private will still match
+    // On some servers like Azurite it's protected
     private void setPositionFromBoundingBox:recalcPosition();
 #endif
 

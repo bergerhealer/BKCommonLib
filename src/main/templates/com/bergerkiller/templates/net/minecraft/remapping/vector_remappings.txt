@@ -15,6 +15,6 @@
     #remap net.minecraft.world.phys.Vec3D public static final net.minecraft.world.phys.Vec3D ZERO;
 #elseif version >= 1.16.3
     #remap net.minecraft.world.phys.Vec3D public static final net.minecraft.world.phys.Vec3D ZERO:ORIGIN;
-#else
+#elseif version >= 1.9
     #remap net.minecraft.world.phys.Vec3D public static final net.minecraft.world.phys.Vec3D ZERO:a;
 #endif

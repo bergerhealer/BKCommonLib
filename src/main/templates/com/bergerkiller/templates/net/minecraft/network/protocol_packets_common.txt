@@ -347,19 +347,22 @@ class ServerboundClientInformationPacket extends Packet {
     //TODO: textFilteringEnabled
 #endif
 
-#if version >= 1.17
-    #require ServerboundClientInformationPacket private net.minecraft.world.entity.EnumMainHand mainHand;
-#elseif version >= 1.9
-    #require ServerboundClientInformationPacket private net.minecraft.world.entity.EnumMainHand mainHand:f;
-#endif
-
+#if version >= 1.9
     public (HumanHand) net.minecraft.world.entity.EnumMainHand getMainHand() {
-#if version >= 1.20.2
+  #if version >= 1.17
+        #require ServerboundClientInformationPacket private net.minecraft.world.entity.EnumMainHand mainHand;
+  #else
+        #require ServerboundClientInformationPacket private net.minecraft.world.entity.EnumMainHand mainHand:f;
+  #endif
+  #if version >= 1.20.2
         return instance.information().mainHand();
-#elseif version >= 1.9
+  #else
         return instance#mainHand;
-#else
-        return HumanHand.RIGHT;
-#endif
+  #endif
     }
+#else
+    public (HumanHand) HumanHand getMainHand() {
+        return HumanHand.RIGHT;
+    }
+#endif
 }
