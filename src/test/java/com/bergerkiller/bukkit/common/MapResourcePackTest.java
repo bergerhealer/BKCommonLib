@@ -15,7 +15,6 @@ import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.map.util.ItemModel;
 import com.bergerkiller.bukkit.common.map.util.ItemModelOverride;
-import com.bergerkiller.bukkit.common.map.util.VanillaResourcePackFormat;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -38,9 +37,12 @@ public class MapResourcePackTest {
 
     @Test
     public void testPackFormat() {
-        assertEquals(8, VanillaResourcePackFormat.getPackFormat("1.18.1"));
-        assertEquals(VanillaResourcePackFormat.getLatestPackFormat(),
-                VanillaResourcePackFormat.getPackFormat(CommonBootstrap.initCommonServer().getMinecraftVersion()));
+        assertEquals(MapResourcePack.PackVersion.of(1), MapResourcePack.PackVersion.byGameVersion("1.8"));
+        assertEquals(MapResourcePack.PackVersion.of(7), MapResourcePack.PackVersion.byGameVersion("1.17.1"));
+        assertEquals(MapResourcePack.PackVersion.of(8), MapResourcePack.PackVersion.byGameVersion("1.18"));
+        assertEquals(MapResourcePack.PackVersion.of(8), MapResourcePack.PackVersion.byGameVersion("1.18.1"));
+        assertEquals(MapResourcePack.PackVersion.HIGHEST_KNOWN,
+                MapResourcePack.PackVersion.byGameVersion(CommonBootstrap.initCommonServer().getMinecraftVersion()));
     }
 
     @Test
@@ -50,7 +52,7 @@ public class MapResourcePackTest {
 
         // Sanity check
         assertEquals(12, pack.getMetadata().getPackFormat());
-        assertFalse(pack.getMetadata().hasItemOverrides());
+        assertFalse(pack.getMetadata().hasItemModels());
 
         // Verify it can detect the golden_pickaxe override and doesn't list anything else
         assertEquals(Collections.singleton("golden_pickaxe"), pack.listOverriddenItemModelNames());
@@ -97,7 +99,7 @@ public class MapResourcePackTest {
 
         // Sanity check
         assertEquals(46, pack.getMetadata().getPackFormat());
-        assertTrue(pack.getMetadata().hasItemOverrides());
+        assertTrue(pack.getMetadata().hasItemModels());
 
         // Verify it can detect the golden tool overrides and also all custom-namespace overrides
         // which uses the item_model data component to display it.

@@ -15,12 +15,12 @@ import java.util.List;
 
 /**
  * As per Mojang docs, turns 49, [49], [49, 61] and {min_inclusive: 49, max_inclusive: 61} into a valid
- * List of SupportedFormatRange elements. For use in parsing pack.mcmeta.
+ * List of PackVersionRange elements. For use in parsing pack.mcmeta.
  */
-class SupportedFormatRangeListDeserializer implements JsonDeserializer<List<MapResourcePack.Metadata.SupportedFormatRange>> {
+class PackVersionRangeListDeserializer implements JsonDeserializer<List<MapResourcePack.PackVersionRange>> {
 
     @Override
-    public List<MapResourcePack.Metadata.SupportedFormatRange> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+    public List<MapResourcePack.PackVersionRange> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         List<JsonElement> elements;
         if (jsonElement.isJsonArray()) {
             JsonArray array = jsonElement.getAsJsonArray();
@@ -32,8 +32,8 @@ class SupportedFormatRangeListDeserializer implements JsonDeserializer<List<MapR
             elements = Collections.singletonList(jsonElement);
         }
 
-        // Decode each value into a SupportedFormatRange
-        List<MapResourcePack.Metadata.SupportedFormatRange> ranges = new ArrayList<>(elements.size());
+        // Decode each value into a PackVersionRange
+        List<MapResourcePack.PackVersionRange> ranges = new ArrayList<>(elements.size());
         for (JsonElement element : elements) {
             if (element.isJsonObject()) {
                 // min_inclusive / max_inclusive
@@ -41,12 +41,12 @@ class SupportedFormatRangeListDeserializer implements JsonDeserializer<List<MapR
                 JsonElement min_inclusive_el = obj.get("min_inclusive");
                 JsonElement max_inclusive_el = obj.get("max_inclusive");
                 if (isNumberPrimitive(min_inclusive_el) && isNumberPrimitive(max_inclusive_el)) {
-                    ranges.add(MapResourcePack.Metadata.SupportedFormatRange.of(
+                    ranges.add(MapResourcePack.PackVersionRange.of(
                             min_inclusive_el.getAsInt(),
                             max_inclusive_el.getAsInt()));
                 }
             } else if (isNumberPrimitive(element)) {
-                ranges.add(MapResourcePack.Metadata.SupportedFormatRange.of(
+                ranges.add(MapResourcePack.PackVersionRange.of(
                         element.getAsInt()));
             }
         }

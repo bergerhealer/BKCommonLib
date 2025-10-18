@@ -6,11 +6,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
@@ -19,7 +22,7 @@ import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.map.gson.MapResourcePackDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.types.ResourcePackDescription;
 import com.bergerkiller.bukkit.common.map.util.ItemModel;
-import com.bergerkiller.bukkit.common.map.util.VanillaResourcePackFormat;
+import com.bergerkiller.mountiplex.logic.TextValueSequence;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -423,22 +426,23 @@ public class MapResourcePack {
 
         // Attempt to load the item model details. This could fail if files are corrupted or invalid.
         ItemModel.Root root;
-        if (getMetadata().hasItemOverrides()) {
+        if (getMetadata().hasItemModels()) {
             root = this.openGsonObject(ItemModel.Root.class, ResourceType.ITEMS, itemName);
         } else {
             ItemModel.MinecraftModel vanillaModel = ItemModel.MinecraftModel.of("item/" + itemName);
-            ItemModel.Overrides overrides = openGsonObject(ItemModel.Overrides.class, ResourceType.MODELS, vanillaModel.model);
-            if (overrides != null) {
-                overrides.fallback = vanillaModel;
-                if (baseItemStack != null) {
-                    for (ItemModel.Overrides.OverriddenModel override : overrides.overrides) {
-                        override.itemStack = override.tryMakeMatching(baseItemStack).orElse(null);
+            root = new ItemModel.Root();
+            root.model = vanillaModel;
+            if (getMetadata().hasItemPredicateOverrides()) {
+                ItemModel.Overrides overrides = openGsonObject(ItemModel.Overrides.class, ResourceType.MODELS, vanillaModel.model);
+                if (overrides != null) {
+                    overrides.fallback = vanillaModel;
+                    if (baseItemStack != null) {
+                        for (ItemModel.Overrides.OverriddenModel override : overrides.overrides) {
+                            override.itemStack = override.tryMakeMatching(baseItemStack).orElse(null);
+                        }
                     }
+                    root.model = overrides;
                 }
-                root = new ItemModel.Root();
-                root.model = overrides;
-            } else {
-                root = null;
             }
         }
 
@@ -710,7 +714,7 @@ public class MapResourcePack {
 
         // If type is ITEMS and this is not supported by this pack, list models/item instead
         // Do note that this does not support custom namespaces or subdirectories at all, just vanilla item names
-        if (searchOptions.getResourceType() == ResourceType.ITEMS && !getMetadata().hasItemOverrides()) {
+        if (searchOptions.getResourceType() == ResourceType.ITEMS && !getMetadata().hasItemModels()) {
             //TODO: Utility?
             if (folder.equals("/")) {
                 folder = "item";
@@ -1298,13 +1302,263 @@ public class MapResourcePack {
     }
 
     /**
+     * The major and minor version as Mojang started using for resource packs
+     * since Minecraft 1.21.9. For older packs minor version is always ignored.
+     */
+    public static final class PackVersion {
+        /** Helper version for major version 0, acting as a lower bound that always matches */
+        public static final PackVersion MINIMUM = of(0);
+        /** Helper version for major version max, acting as an upper bound that always matches */
+        public static final PackVersion MAXIMUM = of(Integer.MAX_VALUE);
+
+        private static final NavigableMap<TextValueSequence, PackVersion> BY_VERSION = new TreeMap<>();
+        static {
+            BY_VERSION.put(TextValueSequence.parse("1.6.1"), of(1));
+            BY_VERSION.put(TextValueSequence.parse("1.9"), of(2));
+            BY_VERSION.put(TextValueSequence.parse("1.11"), of(3));
+            BY_VERSION.put(TextValueSequence.parse("1.13"), of(4));
+            BY_VERSION.put(TextValueSequence.parse("1.15"), of(5));
+            BY_VERSION.put(TextValueSequence.parse("1.16.2"), of(6));
+            BY_VERSION.put(TextValueSequence.parse("1.17"), of(7));
+            BY_VERSION.put(TextValueSequence.parse("1.18"), of(8));
+            BY_VERSION.put(TextValueSequence.parse("1.19"), of(9));
+            BY_VERSION.put(TextValueSequence.parse("1.19.3"), of(12));
+            BY_VERSION.put(TextValueSequence.parse("1.19.4"), of(13));
+            BY_VERSION.put(TextValueSequence.parse("1.20"), of(15));
+            BY_VERSION.put(TextValueSequence.parse("1.20.2"), of(18));
+            BY_VERSION.put(TextValueSequence.parse("1.20.3"), of(22));
+            BY_VERSION.put(TextValueSequence.parse("1.20.5"), of(32));
+            BY_VERSION.put(TextValueSequence.parse("1.21"), of(34));
+            BY_VERSION.put(TextValueSequence.parse("1.21.2"), of(42));
+            BY_VERSION.put(TextValueSequence.parse("1.21.4"), of(46));
+            BY_VERSION.put(TextValueSequence.parse("1.21.5"), of(55));
+            BY_VERSION.put(TextValueSequence.parse("1.21.6"), of(63));
+            BY_VERSION.put(TextValueSequence.parse("1.21.7"), of(64));
+            BY_VERSION.put(TextValueSequence.parse("1.21.9"), of(69));
+        }
+
+        /**
+         * The highest known pack version that has been compiled into BKCommonLib
+         */
+        public static final PackVersion HIGHEST_KNOWN = BY_VERSION.descendingMap().values().iterator().next();
+
+        /**
+         * The preferred resource pack version that the server supports, if the client and
+         * server used the exact same version. BKCommonLib will honor this version if possible.
+         * If not, it will support an older pack format that is supported. If none exists,
+         * then uses newer formats on a best-attempt basis.
+         */
+        public static final PackVersion SERVER = byGameVersion(CommonBootstrap.initCommonServer().getMinecraftVersion());
+
+        private final int major;
+        private final int minor;
+        private final boolean anyMinor;
+
+        private PackVersion(int major, int minor, boolean anyMinor) {
+            this.major = major;
+            this.minor = minor;
+            this.anyMinor = anyMinor;
+        }
+
+        public static PackVersion of(int major, int minor) {
+            return new PackVersion(major, minor, false);
+        }
+
+        public static PackVersion of(int major) {
+            return new PackVersion(major, 0, true);
+        }
+
+        /**
+         * Major pack format version
+         *
+         * @return Major pack format
+         */
+        public int major() {
+            return major;
+        }
+
+        /**
+         * Whether this pack format version matches any minor version,
+         * because none was specified.
+         *
+         * @return True if any minor version matches
+         */
+        public boolean anyMinor() {
+            return anyMinor;
+        }
+
+        /**
+         * Minor pack format version. Usually 0.
+         *
+         * @return Minor pack format
+         * @see #anyMinor()
+         */
+        public int minor() {
+            return minor;
+        }
+
+        /**
+         * Gets whether this pack version is equal to or greater than the
+         * version specified. If either version allows any minor version, then
+         * will return true if the major versions match. If not, the minor versions
+         * must also be greater or equal to one another.
+         *
+         * @param other Other PackVersion to compare against
+         * @return True if this &gt;= other
+         */
+        public boolean isAtLeast(PackVersion other) {
+            if (this.major > other.major) {
+                return true;
+            } else if (this.major < other.major) {
+                return false;
+            } else if (this.anyMinor || other.anyMinor) {
+                return true;
+            } else {
+                return this.minor >= other.minor;
+            }
+        }
+
+        /**
+         * Gets whether this pack version is equal to or less than the
+         * version specified. If either version allows any minor version, then
+         * will return true if the major versions match. If not, the minor versions
+         * must also be less or equal to one another.
+         *
+         * @param other Other PackVersion to compare against
+         * @return True if this &lt;= other
+         */
+        public boolean isAtMost(PackVersion other) {
+            if (this.major < other.major) {
+                return true;
+            } else if (this.major > other.major) {
+                return false;
+            } else if (this.anyMinor || other.anyMinor) {
+                return true;
+            } else {
+                return this.minor <= other.minor;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * major + minor;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            } else if (o instanceof PackVersion) {
+                PackVersion other = (PackVersion) o;
+                return major == other.major && minor == other.minor && anyMinor == other.anyMinor;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public String toString() {
+            return this.major + "." + (anyMinor ? "ANY" : this.minor);
+        }
+
+        /**
+         * Gets a resource pack <b>PackVersion</b> value by the Minecraft client game version since which it was
+         * introduced. See: <a href="https://minecraft.wiki/w/Pack_format">Minecraft wiki: pack_format</a>
+         *
+         * @param minecraftVersion Minecraft game version
+         * @return Resource pack format used on that game version
+         */
+        public static PackVersion byGameVersion(String minecraftVersion) {
+            TextValueSequence minecraftSeq = TextValueSequence.parse(minecraftVersion);
+
+            // Sort older values and select the highest version
+            {
+                Iterator<PackVersion> iter = BY_VERSION.headMap(minecraftSeq, true).descendingMap().values().iterator();
+                if (iter.hasNext()) {
+                    return iter.next();
+                }
+            }
+
+            return MINIMUM;
+        }
+    }
+
+    /**
+     * A range of {@link PackVersion} with a minimum (inclusive) and maximum (inclusive)
+     * pack version.
+     */
+    public static final class PackVersionRange {
+        /**
+         * When the version is within this range, then it will interpret <code>min_format</code> and
+         * <code>max_format</code> metadata fields in pack.mcmeta.
+         */
+        public static final PackVersionRange USES_MIN_MAX_FORMAT = of(PackVersion.of(65), PackVersion.MAXIMUM);
+
+        /**
+         * When the version is within this range, then it will parse item predicates using the legacy
+         * syntax. The new item model system is not used.
+         */
+        public static final PackVersionRange USES_ITEM_PREDICATE_OVERRIDES = of(PackVersion.of(2), PackVersion.of(45));
+
+        /**
+         * When the version is within this range, then it will parse item models using the item model
+         * syntax. The old predicates system is no longer used.
+         */
+        public static final PackVersionRange USES_ITEM_MODELS = of(PackVersion.of(46), PackVersion.MAXIMUM);
+
+        private final PackVersion min_inclusive, max_inclusive;
+
+        public static PackVersionRange of(int packFormatMajorVersion) {
+            PackVersion asPackVersion = PackVersion.of(packFormatMajorVersion);
+            return new PackVersionRange(asPackVersion, asPackVersion);
+        }
+
+        public static PackVersionRange of(int min_inclusive_major, int max_inclusive_major) {
+            return new PackVersionRange(PackVersion.of(min_inclusive_major), PackVersion.of(max_inclusive_major));
+        }
+
+        public static PackVersionRange of(PackVersion min_inclusive, PackVersion max_inclusive) {
+            return new PackVersionRange(min_inclusive, max_inclusive);
+        }
+
+        private PackVersionRange(PackVersion min_inclusive, PackVersion max_inclusive) {
+            this.min_inclusive = min_inclusive;
+            this.max_inclusive = max_inclusive;
+        }
+
+        /**
+         * Checks whether a this range supports one of the pack versions in the range specified.
+         * This tests for a particular resource pack feature that is supported between the
+         * min and max pack version specified.
+         *
+         * @param usedFormat Pack format version that is used to interpret the resource pack
+         * @return True if the range is supported
+         */
+        public boolean isSupported(PackVersion usedFormat) {
+            return usedFormat.isAtMost(this.max_inclusive) && usedFormat.isAtLeast(this.min_inclusive);
+        }
+
+        public PackVersion min_inclusive() {
+            return min_inclusive;
+        }
+
+        public PackVersion max_inclusive() {
+            return max_inclusive;
+        }
+    }
+
+    /**
      * Contents of <b>pack.mcmeta</b>
      */
     public static class Metadata {
         private int pack_format;
+        private PackVersion min_format;
+        private PackVersion max_format;
         private ResourcePackDescription description;
-        private List<SupportedFormatRange> supported_formats = Collections.emptyList();
-        private final transient DeferredSupplier<Boolean> hasItemOverrides = DeferredSupplier.of(() -> isPackRangeSupported(46, Integer.MAX_VALUE));
+        private List<PackVersionRange> supported_formats = Collections.emptyList();
+        private final transient DeferredSupplier<Boolean> hasItemModels = DeferredSupplier.of(() -> PackVersionRange.USES_ITEM_MODELS.isSupported(getUsedPackVersion()));
+        private final transient DeferredSupplier<Boolean> hasItemPredicateOverrides = DeferredSupplier.of(() -> PackVersionRange.USES_ITEM_PREDICATE_OVERRIDES.isSupported(getUsedPackVersion()));
+        private transient PackVersion usedPackVersion = null;
 
         /**
          * Gets the pack_format value
@@ -1329,37 +1583,102 @@ public class MapResourcePack {
         }
 
         /**
-         * Gets whether this resource pack version makes use of {@link ResourceType#ITEMS item model} overrides.
+         * Gets whether this resource pack version makes use of {@link ResourceType#ITEMS item models}.
          *
-         * @return True if this resource pack makes use of item model overrides. False if it uses the old
+         * @return True if this resource pack makes use of item models. False if it uses the old
          *         item predicate system.
          */
-        public boolean hasItemOverrides() {
-            return hasItemOverrides.get();
+        public boolean hasItemModels() {
+            return hasItemModels.get();
         }
 
         /**
-         * Checks whether a this range supports one of the pack versions in the range specified.
-         * This tests for a particular resource pack feature that is supported between the
-         * min and max pack version specified.
+         * Gets whether this resource pack version defines item overrides using the (legacy) item predicates system.
+         * Is <i>false</i> when {@link #hasItemModels()} is <i>true</i> or on very old pack versions.
          *
-         * @param minPackFormat Minimum pack format for the feature
-         * @param maxPackFormat Maximum pack format for the feature
-         * @return True if the range is supported
+         * @return True if the item predicate system is used for this pack
          */
-        public boolean isPackRangeSupported(int minPackFormat, int maxPackFormat) {
-            if (pack_format >= minPackFormat && pack_format <= maxPackFormat) {
-                return true;
-            }
+        public boolean hasItemPredicateOverrides() {
+            return hasItemPredicateOverrides.get();
+        }
 
-            if (supported_formats != null) {
-                for (SupportedFormatRange range : supported_formats) {
-                    if (range.isPackRangeSupported(minPackFormat, maxPackFormat)) {
-                        return true;
-                    }
+        /**
+         * Gets the resource pack format version that is used by BKCommonLib when working with this resource pack.
+         * This version is automatically chosen by comparing {@link PackVersion#SERVER} against all the
+         * major formats that this resource pack supports.
+         *
+         * @return PackVersion chosen to use this resource pack
+         */
+        public PackVersion getUsedPackVersion() {
+            PackVersion cached = this.usedPackVersion;
+            if (cached == null) {
+                this.usedPackVersion = cached = calculateUsedPackVersion(PackVersion.SERVER);
+            }
+            return cached;
+        }
+
+        private PackVersion calculateUsedPackVersion(PackVersion preferredVersion) {
+            // If min_format and max_format are to be used, and they are available in this resource pack,
+            // check that the server pack version is within range. If not, clamp.
+            // If the server is too old, it allows us to still interpret newer resource packs.
+            // If the server is too new, we can pick the most recent format we do support.
+            if (min_format != null && max_format != null && PackVersionRange.USES_MIN_MAX_FORMAT.isSupported(preferredVersion)) {
+                // This is a 1.21.9+ resource pack on a 1.21.9+ interpreter
+                // We don't touch the old deprecated format options here, and just clamp on min/max
+                if (!preferredVersion.isAtMost(max_format)) {
+                    return max_format;
+                } else if (!preferredVersion.isAtLeast(min_format)) {
+                    return min_format;
+                } else {
+                    return preferredVersion;
                 }
             }
-            return false;
+
+            // Interpret legacy format options when the version is old enough
+            if (supported_formats != null) {
+                // See if the exact server format is supported
+                for (PackVersionRange range : supported_formats) {
+                    if (range.isSupported(preferredVersion)) {
+                        return preferredVersion;
+                    }
+                }
+
+                // Downgrade: look for a pack version that is older than the preferred version
+                // If multiple are older, pick the newest one
+                PackVersion bestVersion = null;
+                for (PackVersionRange range : supported_formats) {
+                    // Range max must be below preferred version
+                    if (range.max_inclusive().isAtLeast(preferredVersion)) {
+                        continue;
+                    }
+
+                    if (bestVersion == null || range.max_inclusive().isAtLeast(bestVersion)) {
+                        bestVersion = range.max_inclusive();
+                    }
+                }
+                if (bestVersion != null) {
+                    return bestVersion;
+                }
+
+                // Upgrade: look for a pack version that is newer than the preferred version
+                // If multiple are newer, pick the oldest one
+                for (PackVersionRange range : supported_formats) {
+                    // Range max must be below preferred version
+                    if (range.min_inclusive().isAtMost(preferredVersion)) {
+                        continue;
+                    }
+
+                    if (bestVersion == null || range.min_inclusive().isAtMost(bestVersion)) {
+                        bestVersion = range.max_inclusive();
+                    }
+                }
+                if (bestVersion != null) {
+                    return bestVersion;
+                }
+            }
+
+            // Rely exclusively on the pack_format
+            return PackVersion.of(pack_format);
         }
 
         /**
@@ -1370,7 +1689,9 @@ public class MapResourcePack {
          */
         public static Metadata fallback(String errorReason) {
             Metadata metadata = new Metadata();
-            metadata.pack_format = VanillaResourcePackFormat.getLatestPackFormat();
+            metadata.pack_format = PackVersion.HIGHEST_KNOWN.major();
+            metadata.min_format = PackVersion.HIGHEST_KNOWN;
+            metadata.max_format = PackVersion.HIGHEST_KNOWN;
             metadata.description = new ResourcePackDescription("Unknown Resource pack - " + errorReason);
             return metadata;
         }
@@ -1383,51 +1704,25 @@ public class MapResourcePack {
          */
         public static Metadata vanilla(String mcVersion) {
             Metadata metadata = new Metadata();
-            metadata.pack_format = VanillaResourcePackFormat.getPackFormat(mcVersion);
+            metadata.min_format = PackVersion.byGameVersion(mcVersion);
+            metadata.max_format = metadata.min_format;
+            metadata.pack_format = metadata.min_format.major();
             metadata.description = new ResourcePackDescription("Vanilla Minecraft " + mcVersion);
             return metadata;
         }
 
-        public static class PackWrapper {
-            public Metadata pack; // JSON file has a 'pack' field
+        public static class Overlay {
+            public String directory = "";
+            public List<PackVersionRange> formats = Collections.emptyList();
         }
 
-        public static class SupportedFormatRange {
-            private final int min_inclusive, max_inclusive;
+        public static class Overlays {
+            public List<Overlay> entries = Collections.emptyList();
+        }
 
-            public static SupportedFormatRange of(int packFormatVersion) {
-                return new SupportedFormatRange(packFormatVersion, packFormatVersion);
-            }
-
-            public static SupportedFormatRange of(int min_inclusive, int max_inclusive) {
-                return new SupportedFormatRange(min_inclusive, max_inclusive);
-            }
-
-            private SupportedFormatRange(int min_inclusive, int max_inclusive) {
-                this.min_inclusive = min_inclusive;
-                this.max_inclusive = max_inclusive;
-            }
-
-            /**
-             * Checks whether a this range supports one of the pack versions in the range specified.
-             * This tests for a particular resource pack feature that is supported between the
-             * min and max pack version specified.
-             *
-             * @param minPackFormat Minimum pack format for the feature
-             * @param maxPackFormat Maximum pack format for the feature
-             * @return True if the range is supported
-             */
-            public boolean isPackRangeSupported(int minPackFormat, int maxPackFormat) {
-                return minPackFormat <= this.max_inclusive && maxPackFormat >= this.min_inclusive;
-            }
-
-            public int min_inclusive() {
-                return min_inclusive;
-            }
-
-            public int max_inclusive() {
-                return max_inclusive;
-            }
+        public static class PackWrapper {
+            public Metadata pack; // JSON file has a 'pack' field
+            public Overlays overlays = new Overlays(); // Version-specific directories
         }
     }
 

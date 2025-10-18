@@ -44,8 +44,9 @@ public final class MapResourcePackDeserializer {
         gsonBuilder.registerTypeAdapter(BlockModelState.VariantList.class, new VariantListDeserializer());
         gsonBuilder.registerTypeAdapter(BlockModelState.Condition.class, new ConditionalDeserializer());
         gsonBuilder.registerTypeAdapter(List.class, new NonNullListDeserializer());
-        gsonBuilder.registerTypeAdapter(new TypeToken<List<MapResourcePack.Metadata.SupportedFormatRange>>() {}.getType(),
-                new SupportedFormatRangeListDeserializer());
+        gsonBuilder.registerTypeAdapter(MapResourcePack.PackVersion.class, new PackVersionDeserializer());
+        gsonBuilder.registerTypeAdapter(new TypeToken<List<MapResourcePack.PackVersionRange>>() {}.getType(),
+                new PackVersionRangeListDeserializer());
         gsonBuilder.registerTypeAdapter(ResourcePackDescription.class, new ResourcePackDescription.Deserializer());
 
         ItemModel.registerDeserializers(gsonBuilder);
