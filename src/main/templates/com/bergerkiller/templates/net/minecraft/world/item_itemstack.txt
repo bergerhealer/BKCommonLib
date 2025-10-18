@@ -854,8 +854,22 @@ class ItemStack {
 #endif
 
 #if version >= 1.21.2
+  #if version >= 1.21.4
+    #require ItemStack public boolean hasNonDefault(net.minecraft.core.component.DataComponentType<?> type);
+  #else
+    #require ItemStack public boolean hasNonDefault(net.minecraft.core.component.DataComponentType<?> type) {
+        net.minecraft.core.component.DataComponentMap components = instance.getComponents();
+        if (components instanceof net.minecraft.core.component.PatchedDataComponentMap) {
+            net.minecraft.core.component.PatchedDataComponentMap patched = (net.minecraft.core.component.PatchedDataComponentMap) components;
+            return patched.asPatch().get(type) != null;
+        } else {
+            return false;
+        }
+    }
+  #endif
+
     public boolean hasItemModelSet() {
-        return instance.hasNonDefault(DataComponents.ITEM_MODEL);
+        return instance#hasNonDefault(DataComponents.ITEM_MODEL);
     }
 
     public (MinecraftKeyHandle) MinecraftKey getItemModel() {
@@ -863,7 +877,7 @@ class ItemStack {
     }
 
     public (MinecraftKeyHandle) MinecraftKey getItemModelIfSet() {
-        if (instance.hasNonDefault(DataComponents.ITEM_MODEL)) {
+        if ( instance#hasNonDefault(DataComponents.ITEM_MODEL) ) {
             return (MinecraftKey) instance.get(DataComponents.ITEM_MODEL);
         } else {
             return null;
