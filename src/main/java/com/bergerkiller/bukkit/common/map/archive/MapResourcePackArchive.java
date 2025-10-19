@@ -44,6 +44,7 @@ public interface MapResourcePackArchive {
                 return MapResourcePack.Metadata.fallback("corrupt pack.mcmeta");
             }
 
+            wrap.postLoad();
             return wrap.pack;
         } catch (Throwable t) {
             Logging.LOGGER_MAPDISPLAY.log(Level.WARNING, "Resource pack " + name() + " pack.mcmeta could not be loaded", t);
@@ -57,6 +58,17 @@ public interface MapResourcePackArchive {
      * @param lazy whether this is a lazy-load call. Allows logging of warnings if it can take a while.
      */
     void load(boolean lazy);
+
+    /**
+     * After this resource pack archive is {@link #load(boolean) loaded} and the resource pack
+     * metadata is {@link #tryLoadMetadata(MapResourcePackDeserializer) retrieved}, this method
+     * is called to configure the archive's behavior. This should configure overlay layers
+     * configured in the pack metadata file.
+     *
+     * @param metadata Resource pack metadata (pack.mcmeta)
+     */
+    default void configure(MapResourcePack.Metadata metadata) {
+    }
 
     /**
      * Attempts to find and open an input stream for a file inside the archive

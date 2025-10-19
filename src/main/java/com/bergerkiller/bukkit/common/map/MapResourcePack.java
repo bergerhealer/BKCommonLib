@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import com.bergerkiller.bukkit.common.bases.DeferredSupplier;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
@@ -261,6 +262,8 @@ public class MapResourcePack {
             }
             this.metadata = this.archive.tryLoadMetadata(this.deserializer);
             this.metadata.preferredPackVersion = this.preferredPackVersion;
+
+            this.archive.configure(this.metadata);
         }
 
         // Recursively load the parent packs too
@@ -1360,7 +1363,7 @@ public class MapResourcePack {
             BY_VERSION.put(TextValueSequence.parse("1.21.5"), of(55));
             BY_VERSION.put(TextValueSequence.parse("1.21.6"), of(63));
             BY_VERSION.put(TextValueSequence.parse("1.21.7"), of(64));
-            BY_VERSION.put(TextValueSequence.parse("1.21.9"), of(69));
+            BY_VERSION.put(TextValueSequence.parse("1.21.9"), of(65));
         }
 
         /**
@@ -1582,10 +1585,12 @@ public class MapResourcePack {
         private PackVersion max_format;
         private ResourcePackDescription description;
         private List<PackVersionRange> supported_formats = Collections.emptyList();
+        private transient PackVersion preferredPackVersion = PackVersion.SERVER;
+        private transient Overlays overlays = null; // Taken from PackWrapper
+        private final transient DeferredSupplier<PackVersion> usedPackVersion = DeferredSupplier.of(this::calculateUsedPackVersion);
+        private final transient DeferredSupplier<List<Overlay>> usedOverlays = DeferredSupplier.of(this::calculateUsedOverlays);
         private final transient DeferredSupplier<Boolean> hasItemModels = DeferredSupplier.of(() -> PackVersionRange.USES_ITEM_MODELS.isSupported(getUsedPackVersion()));
         private final transient DeferredSupplier<Boolean> hasItemPredicateOverrides = DeferredSupplier.of(() -> PackVersionRange.USES_ITEM_PREDICATE_OVERRIDES.isSupported(getUsedPackVersion()));
-        private transient PackVersion preferredPackVersion = PackVersion.SERVER;
-        private transient PackVersion usedPackVersion = null;
 
         /**
          * Gets the pack_format value
@@ -1643,27 +1648,23 @@ public class MapResourcePack {
          * @return PackVersion chosen to interpret this resource pack
          */
         public PackVersion getUsedPackVersion() {
-            PackVersion cached = this.usedPackVersion;
-            if (cached == null) {
-                this.usedPackVersion = cached = calculateUsedPackVersion(this.preferredPackVersion);
-            }
-            return cached;
+            return usedPackVersion.get();
         }
 
-        private PackVersion calculateUsedPackVersion(PackVersion preferredVersion) {
+        private PackVersion calculateUsedPackVersion() {
             // If min_format and max_format are to be used, and they are available in this resource pack,
             // check that the server pack version is within range. If not, clamp.
             // If the server is too old, it allows us to still interpret newer resource packs.
             // If the server is too new, we can pick the most recent format we do support.
-            if (min_format != null && max_format != null && PackVersionRange.USES_MIN_MAX_FORMAT.isSupported(preferredVersion)) {
+            if (min_format != null && max_format != null && PackVersionRange.USES_MIN_MAX_FORMAT.isSupported(preferredPackVersion)) {
                 // This is a 1.21.9+ resource pack on a 1.21.9+ interpreter
                 // We don't touch the old deprecated format options here, and just clamp on min/max
-                if (!preferredVersion.isAtMost(max_format)) {
+                if (!preferredPackVersion.isAtMost(max_format)) {
                     return max_format;
-                } else if (!preferredVersion.isAtLeast(min_format)) {
+                } else if (!preferredPackVersion.isAtLeast(min_format)) {
                     return min_format;
                 } else {
-                    return preferredVersion;
+                    return preferredPackVersion;
                 }
             }
 
@@ -1671,8 +1672,8 @@ public class MapResourcePack {
             if (supported_formats != null) {
                 // See if the exact server format is supported
                 for (PackVersionRange range : supported_formats) {
-                    if (range.isSupported(preferredVersion)) {
-                        return preferredVersion;
+                    if (range.isSupported(preferredPackVersion)) {
+                        return preferredPackVersion;
                     }
                 }
 
@@ -1681,7 +1682,7 @@ public class MapResourcePack {
                 PackVersion bestVersion = null;
                 for (PackVersionRange range : supported_formats) {
                     // Range max must be below preferred version
-                    if (range.max_inclusive().isAtLeast(preferredVersion)) {
+                    if (range.max_inclusive().isAtLeast(preferredPackVersion)) {
                         continue;
                     }
 
@@ -1697,7 +1698,7 @@ public class MapResourcePack {
                 // If multiple are newer, pick the oldest one
                 for (PackVersionRange range : supported_formats) {
                     // Range max must be below preferred version
-                    if (range.min_inclusive().isAtMost(preferredVersion)) {
+                    if (range.min_inclusive().isAtMost(preferredPackVersion)) {
                         continue;
                     }
 
@@ -1712,6 +1713,47 @@ public class MapResourcePack {
 
             // Rely exclusively on the pack_format
             return PackVersion.of(pack_format);
+        }
+
+        /**
+         * Gets a List of overlays active when loading this resource pack. The overlays to use are
+         * decided using {@link #getUsedPackVersion()}. Can be an empty list if no overlays are
+         * used or configured.<br>
+         * <br>
+         * If more than one overlay is returned, the later overlay replaces the files in the earlier
+         * overlay. All overlays replace the files in the base resource pack (Minecraft assets).
+         *
+         * @return Active overlays
+         */
+        public List<Overlay> getUsedOverlays() {
+            return usedOverlays.get();
+        }
+
+        private List<Overlay> calculateUsedOverlays() {
+            if (overlays == null || overlays.entries == null || overlays.entries.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            final PackVersion usedPackVersion = getUsedPackVersion();
+            final boolean useMinMaxFormat = PackVersionRange.USES_MIN_MAX_FORMAT.isSupported(usedPackVersion);
+
+            return overlays.entries.stream()
+                    .filter(o -> {
+                        // For 1.21.9+ packs on a 1.21.9+ server
+                        if (useMinMaxFormat && o.min_format != null && o.max_format != null) {
+                            return usedPackVersion.isAtLeast(o.min_format) && usedPackVersion.isAtMost(o.max_format);
+                        }
+
+                        // Older packs use the 'formats' list
+                        for (PackVersionRange range : o.formats) {
+                            if (range.isSupported(usedPackVersion)) {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    })
+                    .collect(Collectors.toList());
         }
 
         /**
@@ -1744,9 +1786,15 @@ public class MapResourcePack {
             return metadata;
         }
 
+        /**
+         * A single Overlay configuration. Contains a directory to use as an extra
+         * root folder for Minecraft assets.
+         */
         public static class Overlay {
             public String directory = "";
             public List<PackVersionRange> formats = Collections.emptyList();
+            public PackVersion min_format = null;
+            public PackVersion max_format = null;
         }
 
         public static class Overlays {
@@ -1755,7 +1803,11 @@ public class MapResourcePack {
 
         public static class PackWrapper {
             public Metadata pack; // JSON file has a 'pack' field
-            public Overlays overlays = new Overlays(); // Version-specific directories
+            public Overlays overlays = null; // Version format-specific directories
+
+            public void postLoad() {
+                pack.overlays = this.overlays;
+            }
         }
     }
 

@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.map.MapResourcePack;
 
 /**
  * An archive that automatically detects the correct archive class to use.
@@ -49,6 +50,13 @@ public class MapResourcePackAutoArchive implements MapResourcePackArchive {
     public void load(boolean lazy) {
         if (this.archive != null) {
             this.archive.load(lazy);
+        }
+    }
+
+    @Override
+    public void configure(MapResourcePack.Metadata metadata) {
+        if (this.archive != null) {
+            this.archive.configure(metadata);
         }
     }
 

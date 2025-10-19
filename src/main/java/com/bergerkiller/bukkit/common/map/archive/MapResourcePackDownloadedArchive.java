@@ -28,6 +28,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -183,6 +184,13 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
             this.archive.load(lazy);
         } else {
             this.archive = null;
+        }
+    }
+
+    @Override
+    public void configure(MapResourcePack.Metadata metadata) {
+        if (this.archive != null) {
+            this.archive.configure(metadata);
         }
     }
 

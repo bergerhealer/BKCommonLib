@@ -3,9 +3,7 @@ package com.bergerkiller.bukkit.common.map.archive;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,8 +24,7 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
     private final Logger log;
     private final File clientJarFile;
     private final File clientJarTempFile;
-    private Map<String, List<String>> directories = null;
-    private Map<String, List<String>> deepDirectories = null;
+    private final FileOverlayView overlayView = new FileOverlayView();
     private JarFile archive = null;
 
     public MapResourcePackClientArchive() {
@@ -66,6 +63,8 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
      */
     @Override
     public void load(boolean lazy) {
+        overlayView.clear();
+
         if (this.archive == null && !this.clientJarFile.exists()) {
             if (lazy) {
                 log.severe("The client for Minecraft " + minecraftVersion + " is presently not installed");
@@ -132,16 +131,27 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
     }
 
     private void loadArchive() {
-        if (clientJarFile.exists()) {
-            try {
-                this.archive = new JarFile(this.clientJarFile);
-            } catch (IOException ex) {
-                this.archive = null;
-                log.severe("Failed to load the Minecraft client jar for accessing resources!");
-                log.severe("In case the file is corrupt, try deleting it so it is re-downloaded:");
-                log.severe("> " + this.clientJarFile.getAbsolutePath());
-                log.log(Level.SEVERE, "Loading " + this.clientJarFile.getName() + " failed!", ex);
-            }
+        if (!clientJarFile.exists()) {
+            return;
+        }
+
+        try {
+            this.archive = new JarFile(this.clientJarFile);
+        } catch (IOException ex) {
+            this.archive = null;
+            log.severe("Failed to load the Minecraft client jar for accessing resources!");
+            log.severe("In case the file is corrupt, try deleting it so it is re-downloaded:");
+            log.severe("> " + this.clientJarFile.getAbsolutePath());
+            log.log(Level.SEVERE, "Loading " + this.clientJarFile.getName() + " failed!", ex);
+            return;
+        }
+
+        try {
+            overlayView.load(loader -> {
+                archive.stream().map(ZipEntry::getName).forEach(loader::add);
+            });
+        } catch (Throwable t) {
+            Logging.LOGGER.log(Level.SEVERE, "Failed to index resource pack archive", t);
         }
     }
 
@@ -158,24 +168,7 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
 
     @Override
     public List<String> listFiles(String folder, boolean deep) throws IOException {
-        if (this.directories == null) {
-            if (this.archive == null) {
-                return Collections.emptyList();
-            } else {
-                this.directories = MapResourcePackZipArchive.readDirectories(this.archive.stream()
-                        .filter(e -> e.getName().startsWith("assets/minecraft") ||
-                                     e.getName().startsWith("data/minecraft")));
-            }
-        }
-
-        if (deep) {
-            if (this.deepDirectories == null) {
-                this.deepDirectories = MapResourcePackZipArchive.computeDeepDirectories(this.directories);
-            }
-            return this.deepDirectories.getOrDefault(folder, Collections.emptyList());
-        } else {
-            return this.directories.getOrDefault(folder, Collections.emptyList());
-        }
+        return overlayView.listFiles(folder, deep);
     }
 
     private static class DownloadFailure extends RuntimeException {
