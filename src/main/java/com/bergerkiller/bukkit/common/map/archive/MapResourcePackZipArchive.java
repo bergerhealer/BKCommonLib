@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -50,6 +51,9 @@ public class MapResourcePackZipArchive implements MapResourcePackArchive {
 
     @Override
     public void configure(MapResourcePack.Metadata metadata) {
+        overlayView.addOverlays(metadata.getUsedOverlays().stream()
+                .map(o -> o.directory)
+                .collect(Collectors.toList()));
     }
 
     private boolean openArchive() {
@@ -84,7 +88,8 @@ public class MapResourcePackZipArchive implements MapResourcePackArchive {
     @Override
     public InputStream openFileStream(String path) throws IOException {
         if (this.archive != null) {
-            ZipEntry entry = this.archive.getEntry(path);
+            String absolutePath = overlayView.getAbsoluteFilePath(path);
+            ZipEntry entry = this.archive.getEntry(absolutePath);
             if (entry != null) {
                 return this.archive.getInputStream(entry);
             }

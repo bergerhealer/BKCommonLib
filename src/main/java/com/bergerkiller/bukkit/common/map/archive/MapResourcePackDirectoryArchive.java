@@ -14,6 +14,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 /**
  * Retrieves assets from a resource pack stored as an uncompressed directory
@@ -64,7 +65,8 @@ public class MapResourcePackDirectoryArchive implements MapResourcePackArchive {
 
     @Override
     public InputStream openFileStream(String path) throws IOException {
-        File sub = new File(directory, path);
+        String absolutePath = overlayView.getAbsoluteFilePath(path);
+        File sub = new File(directory, absolutePath);
         if (sub.isFile()) {
             return new FileInputStream(sub);
         }
@@ -73,6 +75,9 @@ public class MapResourcePackDirectoryArchive implements MapResourcePackArchive {
 
     @Override
     public void configure(MapResourcePack.Metadata metadata) {
+        overlayView.addOverlays(metadata.getUsedOverlays().stream()
+                .map(o -> o.directory)
+                .collect(Collectors.toList()));
     }
 
     @Override

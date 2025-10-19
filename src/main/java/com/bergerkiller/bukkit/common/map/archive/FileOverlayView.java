@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.map.archive;
 
+import com.bergerkiller.bukkit.common.IndentedStringBuilder;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +19,8 @@ class FileOverlayView {
     private DirectoryEntry root = new DirectoryEntry("/");
     /** All directory entries mapped to their absolute (overlay-mapped) folder */
     private final Map<String, DirectoryEntry> directories = new HashMap<>();
+    /** Configured overlay directories */
+    private final List<String> overlayDirectories = new ArrayList<>();
 
     /**
      * Lists all of the files and directories inside of a directory
@@ -44,6 +48,10 @@ class FileOverlayView {
      *         inside the previously-loaded directory tree.
      */
     public String getAbsoluteFilePath(String filePath) {
+        if (overlayDirectories.isEmpty()) {
+            return filePath;
+        }
+
         int directoryEnd = filePath.lastIndexOf('/');
 
         // Directories are not supported (they are merged and such, so they don't have only one location)
@@ -96,14 +104,9 @@ class FileOverlayView {
         final DirectoryTreeBuilder tree = new DirectoryTreeBuilder(new DirectoryEntry("/"));
         tree.load(loaderFunc);
 
-        // Load into this overlay view, not that loading has succeeded
-        // Make the directory entries read-only from this point
+        // Assign
         this.root = tree.root;
-        tree.entries.values().forEach(DirectoryEntry::makeReadOnly);
-
-        // Initially, no overlays are loaded in yet, so make the overlay entries
-        // the same as the absolute path entries.
-        tree.entries.values().forEach(DirectoryEntry::reset);
+        this.directories.clear(); // Ensure emptied
 
         // If overlay rules were already added, apply them to the tree now
         applyOverlays();
@@ -112,8 +115,71 @@ class FileOverlayView {
         loadDirectoryTree();
     }
 
-    public void applyOverlays() {
-        //TODO: Implement
+    /**
+     * Adds a new overlay directory. The specified directory is made available
+     * at the root path.
+     *
+     * @param directory Directory path to add as overlay
+     */
+    public void addOverlay(String directory) {
+        addOverlays(Collections.singletonList(directory));
+    }
+
+    /**
+     * Adds a new overlay directory. The specified directory is made available
+     * at the root path.
+     *
+     * @param directories Directory paths to add as overlay (in order)
+     */
+    public void addOverlays(Iterable<String> directories) {
+        boolean changed = false;
+        for (String directory : directories) {
+            // Clean directory path so it is in the syntax that we expect
+            // This comes from the resource pack configuration, so we don't know
+            // what people put there.
+            if (!directory.endsWith("/")) {
+                directory += "/";
+            }
+            if (directory.startsWith("/")) {
+                directory = directory.substring(1);
+            }
+            if (directory.equals("/")) {
+                continue; // This would cause chaos...
+            }
+
+            overlayDirectories.remove(directory); // Avoid dupes
+            overlayDirectories.add(directory);
+            changed = true;
+        }
+        if (!changed) {
+            return;
+        }
+
+        // Reset the data structure as if we just finished load()
+        this.root.resetRecurse();
+        this.directories.clear();
+
+        // Rebuild overlays
+        applyOverlays();
+
+        // Initialize the by-path lookup table and all the (flattened) lists of names
+        loadDirectoryTree();
+    }
+
+    private void applyOverlays() {
+        for (String directoryPath : overlayDirectories) {
+            DirectoryEntry directory = root.findDirectory(directoryPath);
+            if (directory == null) {
+                System.out.println("NOT FOUND: " + directoryPath);
+                continue;
+            }
+
+            System.out.println("APPLY OVERLAY: " + directoryPath);
+
+            // Merge the contents of this directory into the root entry
+            // Replace existing File Entries that share the same name (later overrides older)
+            root = root.mergeWith(directory);
+        }
     }
 
     private void loadDirectoryTree() {
@@ -135,9 +201,6 @@ class FileOverlayView {
             this.root = root;
         }
 
-        // For during directory lookup
-        private int currIdx, lastIdx;
-
         public DirectoryEntry add(final String directory) {
             // Fast: already existing (or added) or the root / directory (already added)
             {
@@ -148,22 +211,15 @@ class FileOverlayView {
             }
 
             // Slow: navigate the directory folder by folder and initialize each as an entry
-            lastIdx = 0;
+            final DirectorySplitter splitter = new DirectorySplitter(directory);
             DirectoryEntry entry = root;
-            boolean lookupInCache = true;
-            while ((currIdx = (directory.indexOf('/', lastIdx) + 1)) != 0) {
-                String subDirAbsolutePathKey = directory.substring(0, currIdx);
-
+            while (splitter.next()) {
                 final DirectoryEntry parentEntry = entry;
-                entry = entries.computeIfAbsent(subDirAbsolutePathKey, subDirAbsolutePath -> {
+                entry = entries.computeIfAbsent(splitter.currentDirectoryPath(), subDirAbsolutePath -> {
                     // Does not exist, create a new one with this name
-                    String subDirName = directory.substring(lastIdx, currIdx);
-                    return parentEntry.addDirectory(subDirName);
+                    return parentEntry.addDirectory(splitter.currentDirectoryName());
                 });
-
-                lastIdx = currIdx;
             }
-
             return entry;
         }
 
@@ -179,6 +235,43 @@ class FileOverlayView {
                     add(directory).addFile(directory, path.substring(directoryIdx + 1));
                 }
             });
+
+            // Make the directory entries read-only from this point
+            entries.values().forEach(DirectoryEntry::makeReadOnly);
+
+            // Initially, no overlays are loaded in yet, so make the overlay entries
+            // the same as the absolute path entries.
+            entries.values().forEach(DirectoryEntry::reset);
+        }
+    }
+
+    /**
+     * Splits a valid directory path into separate directories
+     * in order from root to leaf. Provides information about the
+     * name of the current directory as well as the full path accumulated
+     * so far.<br>
+     * <br>
+     * Does not work for the root (/) directory.
+     */
+    private static class DirectorySplitter {
+        private final String directory;
+        private int currIdx = 0, lastIdx = 0;
+
+        public DirectorySplitter(String directory) {
+            this.directory = directory;
+        }
+
+        public boolean next() {
+            lastIdx = currIdx;
+            return (currIdx = (directory.indexOf('/', lastIdx) + 1)) != 0;
+        }
+
+        public String currentDirectoryPath() {
+            return directory.substring(0, currIdx);
+        }
+
+        public String currentDirectoryName() {
+            return directory.substring(lastIdx, currIdx);
         }
     }
 
@@ -214,6 +307,27 @@ class FileOverlayView {
             super(name);
         }
 
+        @Override
+        public DirectoryEntry mergeWith(Entry other) {
+            if (!(other instanceof DirectoryEntry)) {
+                return this; // Not supported. Should we error?
+            }
+
+            // Go by the contents of the directory and merge each
+            for (final Entry subEntry : ((DirectoryEntry) other).entries) {
+                this.entriesWithOverlays.compute(subEntry.name, (name, existingSubEntry) -> {
+                    if (existingSubEntry != null) {
+                        return existingSubEntry.mergeWith(subEntry);
+                    } else {
+                        return subEntry;
+                    }
+                });
+            }
+
+            // Just keep the same instance, we only update entriesWithOverlays
+            return this;
+        }
+
         public void makeReadOnly() {
             if (this.entries instanceof ArrayList) {
                 ((ArrayList<?>) this.entries).trimToSize();
@@ -228,6 +342,15 @@ class FileOverlayView {
             deepNameList = null;
         }
 
+        public void resetRecurse() {
+            reset();
+            for (Entry e : entries) {
+                if (e instanceof DirectoryEntry) {
+                    ((DirectoryEntry) e).resetRecurse();
+                }
+            }
+        }
+
         public void loadIntoDirectoriesMap(Map<String, DirectoryEntry> directories, String currentPath) {
             for (Entry e : entriesWithOverlays.values()) {
                 if (e instanceof DirectoryEntry) {
@@ -240,6 +363,11 @@ class FileOverlayView {
         }
 
         public List<String> initDeepNameLists(boolean isRoot) {
+            // Avoid double-calculation due to overlay repeats
+            if (this.deepNameList != null) {
+                return this.deepNameList;
+            }
+
             final ArrayList<String> nameList = new ArrayList<>(this.entriesWithOverlays.size());
             final ArrayList<String> deepNameList = new ArrayList<>(this.entriesWithOverlays.size());
 
@@ -273,6 +401,26 @@ class FileOverlayView {
             return this.deepNameList;
         }
 
+        public DirectoryEntry findDirectory(String directory) {
+            DirectorySplitter splitter = new DirectorySplitter(directory);
+            DirectoryEntry curr = this;
+            while (splitter.next()) {
+                String name = splitter.currentDirectoryName();
+                boolean found = false;
+                for (Entry e : curr.entries) {
+                    if (e instanceof DirectoryEntry && name.equals(e.name)) {
+                        curr = (DirectoryEntry) e;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    return null;
+                }
+            }
+            return curr;
+        }
+
         public DirectoryEntry addDirectory(String name) {
             DirectoryEntry e = new DirectoryEntry(name);
             this.entries.add(e);
@@ -291,6 +439,13 @@ class FileOverlayView {
                 return -1;
             }
         }
+
+        @Override
+        public void toString(IndentedStringBuilder str) {
+            str.append("Dir{").append(name).append("}: [")
+                    .appendWithIndent(predicatesStr -> predicatesStr.appendLines(entriesWithOverlays.values()))
+                    .append("\n]");
+        }
     }
 
     private static class FileEntry extends Entry {
@@ -303,6 +458,12 @@ class FileOverlayView {
         }
 
         @Override
+        public Entry mergeWith(Entry other) {
+            // Simply replace this file with the one in the new layer
+            return other;
+        }
+
+        @Override
         public int compareTo(Entry o) {
             if (o instanceof FileEntry) {
                 return super.compareTo(o);
@@ -310,14 +471,26 @@ class FileOverlayView {
                 return 1;
             }
         }
+
+        @Override
+        public void toString(IndentedStringBuilder str) {
+            str.append("File{").append(name).append(" -> ").append(absolutePath).append("}");
+        }
     }
 
-    private static class Entry implements Comparable<Entry> {
+    private static abstract class Entry implements Comparable<Entry>, IndentedStringBuilder.AppendableToString {
         /** Name of the file or directory */
         public final String name;
 
         public Entry(String name) {
             this.name = name;
+        }
+
+        public abstract Entry mergeWith(Entry other);
+
+        @Override
+        public final String toString() {
+            return IndentedStringBuilder.toString(this);
         }
 
         @Override

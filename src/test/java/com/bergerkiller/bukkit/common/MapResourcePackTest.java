@@ -59,7 +59,42 @@ public class MapResourcePackTest {
         assertFalse(pack.getMetadata().hasItemModels());
         assertTrue(pack.getMetadata().hasItemPredicateOverrides());
 
-        //TODO: Overlays
+        // Verify it can detect the golden_pickaxe override and doesn't list anything else
+        assertEquals(Collections.singleton("golden_pickaxe"), pack.listOverriddenItemModelNames());
+
+        // Verify all the overrides we expect are listed in the same order as the overrides listing
+        // TODO: Merge these into one method
+        List<ItemModelOverride> overrides = pack.getItemModelConfig("golden_pickaxe").listAllOverrides();
+        CommonItemStack item = CommonItemStack.create(MaterialUtil.getFirst("GOLDEN_PICKAXE", "LEGACY_GOLDEN_PICKAXE"), 1);
+
+        // Verify the overrides match what we expect
+        List<OverrideResult> results = validateOverrides(item, overrides);
+
+        //System.out.println(results);
+
+        assertEquals(16, results.size());
+
+        results.get(0).assertUnbreakableWithDamage("traincarts:nubx/traincarts_locomotive_full", 10);
+        results.get(1).assertUnbreakableWithDamage("traincarts:nubx/traincarts_locomotive_base", 11);
+        results.get(2).assertUnbreakableWithDamage("traincarts:nubx/traincarts_locomotive_wheels", 12);
+        results.get(3).assertUnbreakableWithDamage("traincarts:nubx/traincarts_locomotive_piston", 13);
+
+        results.get(4).assertUnbreakableWithDamage("traincarts:maxi/coaster_cart_red", 17);
+        results.get(5).assertUnbreakableWithDamage("traincarts:maxi/coaster_cart_green", 18);
+        results.get(6).assertUnbreakableWithDamage("traincarts:maxi/coaster_cart_blue", 19);
+
+        results.get(7).assertUnbreakableWithDamage("traincarts:nubx/traincarts_carriage_red_full", 20);
+        results.get(8).assertUnbreakableWithDamage("traincarts:nubx/traincarts_carriage_green_full", 21);
+        results.get(9).assertUnbreakableWithDamage("traincarts:nubx/traincarts_carriage_blue_full", 22);
+        results.get(10).assertUnbreakableWithDamage("traincarts:nubx/traincarts_carriage_red_base", 23);
+        results.get(11).assertUnbreakableWithDamage("traincarts:nubx/traincarts_carriage_green_base", 24);
+        results.get(12).assertUnbreakableWithDamage("traincarts:nubx/traincarts_carriage_blue_base", 25);
+        results.get(13).assertUnbreakableWithDamage("traincarts:nubx/traincarts_carriage_wheels", 26);
+
+        results.get(14).assertDefaultItem("minecraft:item/golden_pickaxe");
+        results.get(15).assertDefaultItem("item/golden_pickaxe");
+
+        //System.out.println(pack.getItemModel("golden_pickaxe"));
     }
 
     @Test
@@ -75,7 +110,26 @@ public class MapResourcePackTest {
         assertTrue(pack.getMetadata().hasItemModels());
         assertFalse(pack.getMetadata().hasItemPredicateOverrides());
 
-        //TODO: Overlays
+        // Verify it can detect the golden tool overrides and also all custom-namespace overrides
+        // which uses the item_model data component to display it.
+        // golden_pickaxe: Uses unbreakable + damage values (condition + range_dispatch)
+        assertEquals(new HashSet<>(Arrays.asList("golden_pickaxe",
+                        "traincarts:maxi/coaster_cart_red",
+                        "traincarts:maxi/coaster_cart_green",
+                        "traincarts:maxi/coaster_cart_blue",
+                        "traincarts:nubx/carriage_blue_base",
+                        "traincarts:nubx/carriage_blue_full",
+                        "traincarts:nubx/carriage_green_base",
+                        "traincarts:nubx/carriage_green_full",
+                        "traincarts:nubx/carriage_red_base",
+                        "traincarts:nubx/carriage_red_full",
+                        "traincarts:nubx/carriage_wheels",
+                        "traincarts:nubx/locomotive_base",
+                        "traincarts:nubx/locomotive_full",
+                        "traincarts:nubx/locomotive_piston",
+                        "traincarts:nubx/locomotive_wheels"
+                )),
+                pack.listOverriddenItemModelNames());
     }
 
     @Test
