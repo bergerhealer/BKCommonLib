@@ -47,6 +47,38 @@ public class MapResourcePackTest {
     }
 
     @Test
+    public void testPackMultiVersionLegacy() {
+        MapResourcePack pack = MapResourcePack.builder().resourcePackPath("./misc/resource_packs/TestPack_TrainCarts_Demo_TP_v4_MultiVer.zip")
+                .preferredPackVersion(MapResourcePack.PackVersion.byGameVersion("1.20.2"))
+                .build();
+
+        pack.load();
+
+        // Sanity check
+        assertEquals(MapResourcePack.PackVersion.of(18), pack.getMetadata().getUsedPackVersion());
+        assertFalse(pack.getMetadata().hasItemModels());
+        assertTrue(pack.getMetadata().hasItemPredicateOverrides());
+
+        //TODO: Overlays
+    }
+
+    @Test
+    public void testPackMultiVersionModern() {
+        MapResourcePack pack = MapResourcePack.builder().resourcePackPath("./misc/resource_packs/TestPack_TrainCarts_Demo_TP_v4_MultiVer.zip")
+                .preferredPackVersion(MapResourcePack.PackVersion.byGameVersion("1.21.4"))
+                .build();
+
+        pack.load();
+
+        // Sanity check
+        assertEquals(MapResourcePack.PackVersion.of(46), pack.getMetadata().getUsedPackVersion());
+        assertTrue(pack.getMetadata().hasItemModels());
+        assertFalse(pack.getMetadata().hasItemPredicateOverrides());
+
+        //TODO: Overlays
+    }
+
+    @Test
     public void testPackItemModelsLegacy() {
         MapResourcePack pack = MapResourcePack.builder().resourcePackPath("./misc/resource_packs/TestPack_TrainCarts_Demo_TP_v4_1_19_3.zip")
                 .preferredPackVersion(MapResourcePack.PackVersion.byGameVersion("1.21.4"))
@@ -55,8 +87,9 @@ public class MapResourcePackTest {
         pack.load();
 
         // Sanity check
-        assertEquals(12, pack.getMetadata().getPackFormat());
+        assertEquals(MapResourcePack.PackVersion.of(12), pack.getMetadata().getUsedPackVersion());
         assertFalse(pack.getMetadata().hasItemModels());
+        assertTrue(pack.getMetadata().hasItemPredicateOverrides());
 
         // Verify it can detect the golden_pickaxe override and doesn't list anything else
         assertEquals(Collections.singleton("golden_pickaxe"), pack.listOverriddenItemModelNames());
@@ -105,8 +138,9 @@ public class MapResourcePackTest {
         pack.load();
 
         // Sanity check
-        assertEquals(46, pack.getMetadata().getPackFormat());
+        assertEquals(MapResourcePack.PackVersion.of(46), pack.getMetadata().getUsedPackVersion());
         assertTrue(pack.getMetadata().hasItemModels());
+        assertFalse(pack.getMetadata().hasItemPredicateOverrides());
 
         // Verify it can detect the golden tool overrides and also all custom-namespace overrides
         // which uses the item_model data component to display it.

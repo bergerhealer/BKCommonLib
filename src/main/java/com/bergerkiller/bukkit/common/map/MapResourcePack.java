@@ -1591,7 +1591,10 @@ public class MapResourcePack {
          * Gets the pack_format value
          *
          * @return Pack format
+         * @deprecated Use {@link #getUsedPackVersion()} instead for the actual version
+         *             BKCommonLib is interpreting this pack as
          */
+        @Deprecated
         public int getPackFormat() {
             return pack_format;
         }
