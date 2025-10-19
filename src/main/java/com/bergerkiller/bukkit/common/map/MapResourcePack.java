@@ -94,7 +94,7 @@ public class MapResourcePack {
      * This downloading is only performed once. Doing this here prevents long lag pauses the first time
      * your plugin accesses this resource pack.</b>
      */
-    public static final MapResourcePack SERVER = new MapResourcePack("server");
+    public static final MapResourcePack SERVER = builder().resourcePackPath("server").build();
 
     private final MapResourcePack baseResourcePack;
     protected MapResourcePackArchive archive;
@@ -109,26 +109,41 @@ public class MapResourcePack {
     private boolean loaded = false;
 
     /**
-     * Loads a new resource pack, extending the default {@link #VANILLA} resource pack
+     * Returns a new {@link Builder} for creating a new {@link MapResourcePack}. Configure the
+     * resource pack path and hash or other settings to change how the resource pack behaves.
+     * The builder offers more fine-tuned control over behavior than the constructors do.<br>
+     * <br>
+     * Call {@link Builder#build()} after configuring to create the MapResourcePack.
+     * It uses the {@link #VANILLA} resource pack as a base pack by default.
+     *
+     * @return Builder
+     */
+    public static Builder builder() {
+        return new Builder(VANILLA);
+    }
+
+    /**
+     * Creates a new resource pack, extending the default {@link #VANILLA} resource pack
      * 
      * @param resourcePackPath of the resource pack to load. File or URL.
      */
     public MapResourcePack(String resourcePackPath) {
-        this(VANILLA, resourcePackPath, "");
+        this(builder().resourcePackPath(resourcePackPath));
     }
 
     /**
-     * Loads a new resource pack, extending the default {@link #VANILLA} resource pack
+     * Creates a new resource pack, extending the default {@link #VANILLA} resource pack
      * 
      * @param resourcePackPath of the resource pack to load. File or URL.
      * @param resourcePackHash SHA1 hash of the resource pack to detect changes (when URL)
      */
     public MapResourcePack(String resourcePackPath, String resourcePackHash) {
-        this(VANILLA, resourcePackPath, resourcePackHash);
+        this(builder().resourcePackPath(resourcePackPath)
+                .resourcePackHash(resourcePackHash));
     }
 
     /**
-     * Loads a new resource pack, extending another one
+     * Creates a new resource pack, extending another one
      * 
      * @param baseResourcePack to extend
      * @param resourcePackPath of the resource pack to load. File path or URL.
@@ -138,19 +153,32 @@ public class MapResourcePack {
     }
 
     /**
-     * Loads a new resource pack, extending another one
-     * 
+     * Creates a new resource pack, extending another one
+     *
      * @param baseResourcePack to extend
      * @param resourcePackPath of the resource pack to load. File path or URL.
      * @param resourcePackHash SHA1 hash of the resource pack to detect changes (when URL)
      */
     public MapResourcePack(MapResourcePack baseResourcePack, String resourcePackPath, String resourcePackHash) {
-        this.baseResourcePack = baseResourcePack;
+        this(new Builder(baseResourcePack)
+                .resourcePackPath(resourcePackPath)
+                .resourcePackHash(resourcePackHash));
+    }
+
+    /**
+     * Creates a new resource pack making use of the configuration set in the {@link Builder}
+     * 
+     * @param builder Build configuration for the new resource pack
+     */
+    protected MapResourcePack(Builder builder) {
+        this.baseResourcePack = builder.baseResourcePack;
         this.archive = null;
 
         // Detect the appropriate archive to use
 
         // Server-defined. Take over the options from the server.properties
+        String resourcePackPath = builder.resourcePackPath;
+        String resourcePackHash = builder.resourcePackHash;
         if (resourcePackPath != null && resourcePackPath.equalsIgnoreCase("server")) {
             if (CommonBootstrap.isTestMode()) {
                 resourcePackPath = "vanilla";
@@ -1869,6 +1897,69 @@ public class MapResourcePack {
                     .setIncludingParentPacks(this.isIncludingParentPacks())
                     .setPrependNamespace(this.isPrependNamespace())
                     .setDeep(this.isDeep());
+        }
+    }
+
+    /**
+     * Configures a new resource pack. Sets up the settings for this resource pack,
+     * but does not load the file right away after creating. For that, call
+     * {@link MapResourcePack#load()}.
+     */
+    public static final class Builder {
+        private MapResourcePack baseResourcePack;
+        private String resourcePackPath;
+        private String resourcePackHash;
+
+        public Builder(MapResourcePack baseResourcePack) {
+            this.baseResourcePack = baseResourcePack;
+            this.resourcePackPath = "";
+            this.resourcePackHash = "";
+        }
+
+        /**
+         * Changes the base resource pack that is extended. Is normally
+         * {@link #VANILLA}.
+         *
+         * @param baseResourcePack New resource pack to extend. Can be <i>null</i> to extend none.
+         * @return this Builder
+         */
+        public Builder baseResourcePack(MapResourcePack baseResourcePack) {
+            this.baseResourcePack = baseResourcePack;
+            return this;
+        }
+
+        /**
+         * Changes the path or URL to the resource pack to load
+         *
+         * @param resourcePackPath Path or URL to the resource pack
+         * @return this Builder
+         */
+        public Builder resourcePackPath(String resourcePackPath) {
+            this.resourcePackPath = resourcePackPath;
+            return this;
+        }
+
+        /**
+         * Changes the SHA-1 hash to verify the resource pack contents with.
+         * Primarily useful for downloaded resource packs (URL) to redownload them
+         * when the hash changes.
+         *
+         * @param resourcePackHash SHA-1 hash of the resource pack
+         * @return this Builder
+         */
+        public Builder resourcePackHash(String resourcePackHash) {
+            this.resourcePackHash = resourcePackHash;
+            return this;
+        }
+
+        /**
+         * Takes the configuration of this Builder and constructs a new MapResourcePack.
+         * Call {@link MapResourcePack#load()} to actually load it to avoid lag on first use.
+         *
+         * @return new MapResourcePack
+         */
+        public MapResourcePack build() {
+            return new MapResourcePack(this);
         }
     }
 }
