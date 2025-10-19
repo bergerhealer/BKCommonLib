@@ -41,13 +41,17 @@ public class MapResourcePackTest {
         assertEquals(MapResourcePack.PackVersion.of(7), MapResourcePack.PackVersion.byGameVersion("1.17.1"));
         assertEquals(MapResourcePack.PackVersion.of(8), MapResourcePack.PackVersion.byGameVersion("1.18"));
         assertEquals(MapResourcePack.PackVersion.of(8), MapResourcePack.PackVersion.byGameVersion("1.18.1"));
+        assertEquals(MapResourcePack.PackVersion.HIGHEST_KNOWN, MapResourcePack.PackVersion.byGameVersion("1.99.9"));
         assertEquals(MapResourcePack.PackVersion.HIGHEST_KNOWN,
                 MapResourcePack.PackVersion.byGameVersion(CommonBootstrap.initCommonServer().getMinecraftVersion()));
     }
 
     @Test
     public void testPackItemModelsLegacy() {
-        MapResourcePack pack = new MapResourcePack("./misc/resource_packs/TestPack_TrainCarts_Demo_TP_v4_1_19_3.zip");
+        MapResourcePack pack = MapResourcePack.builder().resourcePackPath("./misc/resource_packs/TestPack_TrainCarts_Demo_TP_v4_1_19_3.zip")
+                .preferredPackVersion(MapResourcePack.PackVersion.byGameVersion("1.21.4"))
+                .build();
+
         pack.load();
 
         // Sanity check
@@ -94,7 +98,10 @@ public class MapResourcePackTest {
 
     @Test
     public void testPackItemModelsModern() {
-        MapResourcePack pack = new MapResourcePack("./misc/resource_packs/TestPack_TrainCarts_Demo_TP_v4_1_21_4.zip");
+        MapResourcePack pack = MapResourcePack.builder().resourcePackPath("./misc/resource_packs/TestPack_TrainCarts_Demo_TP_v4_1_21_4.zip")
+                .preferredPackVersion(MapResourcePack.PackVersion.byGameVersion("1.21.4"))
+                .build();
+
         pack.load();
 
         // Sanity check
