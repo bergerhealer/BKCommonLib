@@ -97,6 +97,7 @@ public class MapResourcePack {
     public static final MapResourcePack SERVER = builder().resourcePackPath("server").build();
 
     private final MapResourcePack baseResourcePack;
+    private final PackVersion preferredPackVersion;
     protected MapResourcePackArchive archive;
     protected Metadata metadata = null; // loaded in load()
     private final Map<String, MapTexture> textureCache = new HashMap<String, MapTexture>();
@@ -172,6 +173,7 @@ public class MapResourcePack {
      */
     protected MapResourcePack(Builder builder) {
         this.baseResourcePack = builder.baseResourcePack;
+        this.preferredPackVersion = builder.preferredPackVersion;
         this.archive = null;
 
         // Detect the appropriate archive to use
@@ -206,12 +208,6 @@ public class MapResourcePack {
 
         // Auto-detect the right way to use it
         this.archive = new MapResourcePackAutoArchive(resourcePackPath, resourcePackHash);
-    }
-
-    // constructor only used by the Vanilla texture pack
-    protected MapResourcePack() {
-        this.baseResourcePack = null;
-        this.archive = null;
     }
 
     /**
@@ -251,6 +247,7 @@ public class MapResourcePack {
         }
         this.loaded = true;
         this.metadata = Metadata.fallback("Failed to load resource pack");
+        this.metadata.preferredPackVersion = this.preferredPackVersion;
         if (lazy && !recurse) {
             Logging.LOGGER_MAPDISPLAY.warning("[Developer] You must call MapResourcePack.load() when enabling your plugin!");
             Logging.LOGGER_MAPDISPLAY.warning("[Developer] This avoids stalling the server while downloading large resource packs/Minecraft client.");
@@ -263,6 +260,7 @@ public class MapResourcePack {
                 this.deserializer = MapResourcePackDeserializer.create();
             }
             this.metadata = this.archive.tryLoadMetadata(this.deserializer);
+            this.metadata.preferredPackVersion = this.preferredPackVersion;
         }
 
         // Recursively load the parent packs too
@@ -1586,6 +1584,7 @@ public class MapResourcePack {
         private List<PackVersionRange> supported_formats = Collections.emptyList();
         private final transient DeferredSupplier<Boolean> hasItemModels = DeferredSupplier.of(() -> PackVersionRange.USES_ITEM_MODELS.isSupported(getUsedPackVersion()));
         private final transient DeferredSupplier<Boolean> hasItemPredicateOverrides = DeferredSupplier.of(() -> PackVersionRange.USES_ITEM_PREDICATE_OVERRIDES.isSupported(getUsedPackVersion()));
+        private transient PackVersion preferredPackVersion = PackVersion.SERVER;
         private transient PackVersion usedPackVersion = null;
 
         /**
@@ -1631,16 +1630,19 @@ public class MapResourcePack {
         }
 
         /**
-         * Gets the resource pack format version that is used by BKCommonLib when working with this resource pack.
-         * This version is automatically chosen by comparing {@link PackVersion#SERVER} against all the
-         * major formats that this resource pack supports.
+         * Gets the resource pack format version that is used by BKCommonLib when interpreting this resource pack.
+         * This version is automatically chosen by comparing
+         * {@link Builder#preferredPackVersion(PackVersion) preferredPackVersion(PackVersion)} against the
+         * formats supported by the resource pack.<br>
+         * <br>
+         * If no preferred pack version was configured, it tries to use {@link PackVersion#SERVER}.
          *
-         * @return PackVersion chosen to use this resource pack
+         * @return PackVersion chosen to interpret this resource pack
          */
         public PackVersion getUsedPackVersion() {
             PackVersion cached = this.usedPackVersion;
             if (cached == null) {
-                this.usedPackVersion = cached = calculateUsedPackVersion(PackVersion.SERVER);
+                this.usedPackVersion = cached = calculateUsedPackVersion(this.preferredPackVersion);
             }
             return cached;
         }
@@ -1909,11 +1911,13 @@ public class MapResourcePack {
         private MapResourcePack baseResourcePack;
         private String resourcePackPath;
         private String resourcePackHash;
+        private PackVersion preferredPackVersion;
 
         public Builder(MapResourcePack baseResourcePack) {
             this.baseResourcePack = baseResourcePack;
             this.resourcePackPath = "";
             this.resourcePackHash = "";
+            this.preferredPackVersion = PackVersion.SERVER;
         }
 
         /**
@@ -1949,6 +1953,22 @@ public class MapResourcePack {
          */
         public Builder resourcePackHash(String resourcePackHash) {
             this.resourcePackHash = resourcePackHash;
+            return this;
+        }
+
+        /**
+         * Changes the preferred Pack Version to use when loading this resource pack.
+         * Since BKCommonLib supports all resource pack formats, and packs can be multi-format
+         * these days, this controls which one to load. It controls the overlay layers to use
+         * and whether to use item models or legacy item predicates.<br>
+         * <br>
+         * Uses {@link PackVersion#SERVER} by default.
+         *
+         * @param packVersion PackVersion to prefer when loading
+         * @return this Builder
+         */
+        public Builder preferredPackVersion(PackVersion packVersion) {
+            this.preferredPackVersion = packVersion;
             return this;
         }
 
