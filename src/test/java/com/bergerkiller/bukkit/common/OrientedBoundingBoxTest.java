@@ -19,12 +19,11 @@ public class OrientedBoundingBoxTest {
         OrientedBoundingBox box_b = new OrientedBoundingBox(new Vector(0, 0, 0), new Vector(2.3, 2.3, 2.3),
                 Quaternion.fromYawPitchRoll(45.0, 45.0, 45.0));
 
-        VertexPoints box_a_vert = box_a.getVertices();
-        VertexPoints box_b_vert = box_b.getVertices();
-
-        // Current: 10s
+        // Current:
+        //   VertexPointsBasicImpl: 8.8s
+        //   VertexPointsSIMD256Impl: 5.8s
         for (long l = 0; l < 10000000; l++) {
-            assertTrue(VertexPoints.areVerticesOverlapping(box_a_vert, box_b_vert,
+            assertTrue(VertexPoints.areVerticesOverlapping(box_a.getVertices(), box_b.getVertices(),
                     OrientedBoundingBox.createSeparatingAxisIterator(box_a.getOrientation(), box_b.getOrientation())));
         }
     }

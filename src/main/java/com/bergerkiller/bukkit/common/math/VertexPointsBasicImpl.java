@@ -7,7 +7,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Stores all of the vertex points in a simple double[] array
+ * Basic implementation for any size VertexPoints. Internally represents the
+ * points as a flat double[] array to optimize memory accesses.
  */
 class VertexPointsBasicImpl implements VertexPoints {
     /** Size */
@@ -77,8 +78,8 @@ class VertexPointsBasicImpl implements VertexPoints {
         points[pos] = value.getZ();
     }
 
-    public static final class BoxBuilder implements VertexPoints.BoxBuilder {
-        private final List<Vector> points;
+    public static class BoxBuilder implements VertexPoints.BoxBuilder {
+        protected final List<Vector> points;
 
         public BoxBuilder() {
             points = new ArrayList<Vector>(8);

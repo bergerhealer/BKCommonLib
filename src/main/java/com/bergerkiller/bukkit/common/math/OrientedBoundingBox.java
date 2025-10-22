@@ -17,6 +17,7 @@ public class OrientedBoundingBox {
     private final Vector radius = new Vector();
     private final Quaternion orientation = new Quaternion();
     private boolean is_orientation_set = false;
+    private VertexPoints cachedVertexPoints = null;
 
     /**
      * Default constructor with position {0,0,0}, size {0,0,0} and orientation
@@ -95,6 +96,7 @@ public class OrientedBoundingBox {
      */
     public void setPosition(Vector pos) {
         MathUtil.setVector(position, pos);
+        cachedVertexPoints = null;
     }
 
     /**
@@ -106,6 +108,7 @@ public class OrientedBoundingBox {
      */
     public void setPosition(double x, double y, double z) {
         MathUtil.setVector(position, x, y, z);
+        cachedVertexPoints = null;
     }
 
     /**
@@ -126,6 +129,7 @@ public class OrientedBoundingBox {
      */
     public void setSize(double sx, double sy, double sz) {
         MathUtil.setVector(this.radius, 0.5*sx, 0.5*sy, 0.5*sz);
+        cachedVertexPoints = null;
     }
 
     /**
@@ -142,6 +146,7 @@ public class OrientedBoundingBox {
             this.is_orientation_set = true;
             this.orientation.setTo(orientation);
         }
+        cachedVertexPoints = null;
     }
 
     /**
@@ -492,13 +497,16 @@ public class OrientedBoundingBox {
      * @return An array of 8 vertices
      */
     public VertexPoints getVertices() {
-        //TODO: Cache
-        VertexPoints.BoxBuilder boxBuilder = VertexPoints.boxBuilder()
-                .halfSize(radius);
-        if (is_orientation_set) {
-            boxBuilder = boxBuilder.rotate(orientation);
+        VertexPoints cached = cachedVertexPoints;
+        if (cached == null) {
+            VertexPoints.BoxBuilder boxBuilder = VertexPoints.boxBuilder()
+                    .halfSize(radius);
+            if (is_orientation_set) {
+                boxBuilder = boxBuilder.rotate(orientation);
+            }
+            cachedVertexPoints = cached = boxBuilder.translate(position).build();
         }
-        return boxBuilder.translate(position).build();
+        return cached;
     }
 
     /**
