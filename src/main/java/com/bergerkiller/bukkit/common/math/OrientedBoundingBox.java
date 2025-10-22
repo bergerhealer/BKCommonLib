@@ -27,7 +27,7 @@ public class OrientedBoundingBox {
 
     /**
      * Initializes and sets the position, size and orientation specified
-     * 
+     *
      * @param position The position
      * @param size The size
      * @param orientation The orientation
@@ -61,7 +61,7 @@ public class OrientedBoundingBox {
     /**
      * Gets the middle position of this oriented bounding box.
      * The returned value is a copy and can be modified.
-     * 
+     *
      * @return position
      */
     public Vector getPosition() {
@@ -71,7 +71,7 @@ public class OrientedBoundingBox {
     /**
      * Gets the size of this oriented bounding box.
      * The returned value is a copy and can be modified.
-     * 
+     *
      * @return size
      */
     public Vector getSize() {
@@ -81,7 +81,7 @@ public class OrientedBoundingBox {
     /**
      * Gets the orientation of this oriented bounding box.
      * The returned value is a copy and can be modified.
-     * 
+     *
      * @return orientation
      */
     public Quaternion getOrientation() {
@@ -90,7 +90,7 @@ public class OrientedBoundingBox {
 
     /**
      * Sets the middle position of this oriented bounding box.
-     * 
+     *
      * @param pos The position to set to
      */
     public void setPosition(Vector pos) {
@@ -99,7 +99,7 @@ public class OrientedBoundingBox {
 
     /**
      * Sets the middle position of this oriented bounding box.
-     * 
+     *
      * @param x The x-coordinate of the new position
      * @param y The y-coordinate of the new position
      * @param z The z-coordinate of the new position
@@ -110,7 +110,7 @@ public class OrientedBoundingBox {
 
     /**
      * Sets the size of this oriented bounding box
-     * 
+     *
      * @param size The size to set to
      */
     public void setSize(Vector size) {
@@ -119,7 +119,7 @@ public class OrientedBoundingBox {
 
     /**
      * Sets the size of this oriented bounding box
-     * 
+     *
      * @param sx The size along the x-axis
      * @param sy The size along the y-axis
      * @param sz The size along the z-axis
@@ -152,13 +152,26 @@ public class OrientedBoundingBox {
      * @return True if the point is inside this oriented bounding box
      */
     public boolean isInside(Vector point) {
+        return isInside(point.getX(), point.getY(), point.getZ());
+    }
+
+    /**
+     * Tests whether a point vector is inside this bounding box. Equivalent to testing
+     * {@link #distanceToPoint(Vector)} is inside.
+     *
+     * @param x X-coordinate of the point to test inside
+     * @param y Y-coordinate of the point to test inside
+     * @param z Z-coordinate of the point to test inside
+     * @return True if the point is inside this oriented bounding box
+     */
+    public boolean isInside(double x, double y, double z) {
         // Transform the point into the local space of the bounding box
-        Vector localPoint = point.clone().subtract(this.position);
+        Vector localPoint = new Vector(x, y, z).subtract(this.position);
         if (this.is_orientation_set) {
             this.orientation.invTransformPoint(localPoint);
         }
 
-        // Calculate the closest point on the box in local space
+        // Test this local point is within the AABB
         return testLocalPointInside(localPoint.getX(), localPoint.getY(), localPoint.getZ());
     }
 
@@ -180,9 +193,9 @@ public class OrientedBoundingBox {
         // Calculate the closest point on the box in local space
         Vector rad = this.radius;
         Vector closestPoint = new Vector(
-            MathUtil.clamp(localPoint.getX(), -rad.getX(), rad.getX()),
-            MathUtil.clamp(localPoint.getY(), -rad.getY(), rad.getY()),
-            MathUtil.clamp(localPoint.getZ(), -rad.getZ(), rad.getZ())
+                MathUtil.clamp(localPoint.getX(), -rad.getX(), rad.getX()),
+                MathUtil.clamp(localPoint.getY(), -rad.getY(), rad.getY()),
+                MathUtil.clamp(localPoint.getZ(), -rad.getZ(), rad.getZ())
         );
 
         // If inside the box, return an inside result and skip the normal vector / rotation stuff
@@ -259,7 +272,7 @@ public class OrientedBoundingBox {
     /**
      * Performs a hit test to see whether this collision box is hit when
      * looked at from a known position into a certain direction.
-     * 
+     *
      * @param startX Start position of the ray, X-coordinate
      * @param startY Start position of the ray, Y-coordinate
      * @param startZ Start position of the ray, Z-coordinate
@@ -310,7 +323,7 @@ public class OrientedBoundingBox {
     /**
      * Performs a hit test to see whether this collision box is hit when
      * looked at from a known position into a certain direction.
-     * 
+     *
      * @param startPosition Start position coordinates
      * @param startDirection Direction of the ray
      * @return hit test results, including the distance, position and surface normal
@@ -354,7 +367,7 @@ public class OrientedBoundingBox {
     /**
      * Performs a hit test to see whether this collision box is hit when
      * looked at from a known eye location
-     * 
+     *
      * @param eyeLocation
      * @return hit test results, including the distance, position and surface normal
      */
@@ -443,6 +456,184 @@ public class OrientedBoundingBox {
     private boolean testLocalPointInside(double x, double y, double z) {
         Vector rad = this.radius;
         return Math.abs(x) <= rad.getX() && Math.abs(y) <= rad.getY() && Math.abs(z) <= rad.getZ();
+    }
+
+    /**
+     * Checks if this OBB overlaps with another OBB using SAT.
+     *
+     * @param other The other oriented bounding box
+     * @return True if the boxes overlap, false otherwise
+     */
+    public boolean hasOverlap(OrientedBoundingBox other) {
+        return VertexPoints.areVerticesOverlapping(this.getVertices(), other.getVertices(),
+                new SATAxisIterator(this.getOrientation(), other.getOrientation()));
+    }
+
+    /**
+     * Tests if another OrientedBoundingBox is fully inside of this OrientedBoundingBox.
+     * Note: does not test intersection, for that use {@link #hasOverlap(OrientedBoundingBox)}
+     *
+     * @param other The OrientedBoundingBox to test is inside this one
+     * @return True if the specified OBB is completely inside this one, false otherwise
+     */
+    public boolean isInside(OrientedBoundingBox other) {
+        VertexPoints.PointIterator iter = other.getVertices().pointIterator();
+        while (iter.next()) {
+            if (!this.isInside(iter.x(), iter.y(), iter.z())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Gets the 8 vertices of this OBB in world coordinates.
+     *
+     * @return An array of 8 vertices
+     */
+    public VertexPoints getVertices() {
+        Vector halfSize = radius;
+
+        //TODO: Cache
+        VertexPointsBasicImpl points = new VertexPointsBasicImpl(8);
+        points.set(0, new Vector(-halfSize.getX(), -halfSize.getY(), -halfSize.getZ()));
+        points.set(1, new Vector(-halfSize.getX(), -halfSize.getY(), halfSize.getZ()));
+        points.set(2, new Vector(-halfSize.getX(), halfSize.getY(), -halfSize.getZ()));
+        points.set(3, new Vector(-halfSize.getX(), halfSize.getY(), halfSize.getZ()));
+        points.set(4, new Vector(halfSize.getX(), -halfSize.getY(), -halfSize.getZ()));
+        points.set(5, new Vector(halfSize.getX(), -halfSize.getY(), halfSize.getZ()));
+        points.set(6, new Vector(halfSize.getX(), halfSize.getY(), -halfSize.getZ()));
+        points.set(7, new Vector(halfSize.getX(), halfSize.getY(), halfSize.getZ()));
+
+        if (is_orientation_set) {
+            Quaternion orientation = getOrientation();
+            for (int i = 0; i < 8; i++) {
+                Vector p = points.get(i);
+                orientation.transformPoint(p);
+                p.add(position);
+                points.set(i, p);
+            }
+        } else {
+            for (int i = 0; i < 8; i++) {
+                Vector p = points.get(i);
+                p.add(position);
+                points.set(i, p);
+            }
+        }
+
+        return points;
+    }
+
+    /**
+     * Returns a PointIterator that iterates over the normalized axis for comparing two oriented
+     * bounding box orientations.
+     *
+     * @param box1Ori Orientation of box 1
+     * @param box2Ori Orientation of box 2
+     * @return PointIterator
+     * @see VertexPoints#areVerticesOverlapping(VertexPoints, VertexPoints, VertexPoints.PointIterator) 
+     */
+    public static VertexPoints.PointIterator createSeparatingAxisIterator(Quaternion box1Ori, Quaternion box2Ori) {
+        return new SATAxisIterator(box1Ori, box2Ori);
+    }
+
+    /**
+     * Generates all the axis vectors required for SAT. This is used for testing
+     * intersection between two oriented bounding boxes.
+     */
+    private static final class SATAxisIterator extends VertexPoints.PointIterator {
+        private final Vector box1Right, box1Up, box1Forward, box2Right, box2Up, box2Forward;
+        private final AxisProducer[] producers;
+        private int producerIdx = 0;
+
+        private static final AxisProducer[] PRODUCER_SAME_ORIENTATIONS = new AxisProducer[] {
+                /* The three axis of the first box */
+                iter -> { iter.load(iter.box1Right); return true; },
+                iter -> { iter.load(iter.box1Up); return true; },
+                iter -> { iter.load(iter.box1Forward); return true; },
+
+                /* Cross products of the different axis */
+                iter -> iter.loadCross(iter.box1Right, iter.box2Up),
+                iter -> iter.loadCross(iter.box1Right, iter.box2Forward),
+                iter -> iter.loadCross(iter.box1Up, iter.box2Forward),
+                iter -> iter.loadCross(iter.box1Up, iter.box2Right),
+                iter -> iter.loadCross(iter.box1Forward, iter.box2Up),
+                iter -> iter.loadCross(iter.box1Forward, iter.box2Right),
+        };
+
+        private static final AxisProducer[] PRODUCER_DIFFERENT_ORIENTATIONS = new AxisProducer[] {
+                /* The three axis of the first box */
+                iter -> { iter.load(iter.box1Right); return true; },
+                iter -> { iter.load(iter.box1Up); return true; },
+                iter -> { iter.load(iter.box1Forward); return true; },
+
+                /* The three axis of the second box */
+                iter -> { iter.load(iter.box2Right); return true; },
+                iter -> { iter.load(iter.box2Up); return true; },
+                iter -> { iter.load(iter.box2Forward); return true; },
+
+                /* The three cross-products produced by comparing the axis of the different boxes */
+                iter -> iter.loadCross(iter.box1Right, iter.box2Right),
+                iter -> iter.loadCross(iter.box1Up, iter.box2Up),
+                iter -> iter.loadCross(iter.box1Forward, iter.box2Forward),
+
+                /* Cross products of the different axis */
+                iter -> iter.loadCross(iter.box1Right, iter.box2Up),
+                iter -> iter.loadCross(iter.box1Right, iter.box2Forward),
+                iter -> iter.loadCross(iter.box1Up, iter.box2Forward),
+                iter -> iter.loadCross(iter.box1Up, iter.box2Right),
+                iter -> iter.loadCross(iter.box1Forward, iter.box2Up),
+                iter -> iter.loadCross(iter.box1Forward, iter.box2Right),
+        };
+
+        public SATAxisIterator(Quaternion box1Ori, Quaternion box2Ori) {
+            box1Right = box1Ori.rightVector();
+            box1Up = box1Ori.upVector();
+            box1Forward = box1Ori.forwardVector();
+            if (box1Ori.equals(box2Ori)) {
+                box2Right = box1Right;
+                box2Up = box1Up;
+                box2Forward = box1Forward;
+                producers = PRODUCER_SAME_ORIENTATIONS;
+            } else {
+                box2Right = box2Ori.rightVector();
+                box2Up = box2Ori.upVector();
+                box2Forward = box2Ori.forwardVector();
+                producers = PRODUCER_DIFFERENT_ORIENTATIONS;
+            }
+        }
+
+        @Override
+        public boolean next() {
+            AxisProducer[] producers = this.producers;
+            int producerIdx = this.producerIdx;
+            while (producerIdx < producers.length) {
+                if (producers[producerIdx++].load(this)) {
+                    this.producerIdx = producerIdx;
+                    ++this.index;
+                    return true;
+                }
+            }
+            this.producerIdx = producerIdx;
+            return false;
+        }
+
+        protected boolean loadCross(Vector a, Vector b) {
+            Vector axis = a.clone().crossProduct(b);
+            double lengthSquared = axis.lengthSquared();
+            if (lengthSquared < 1e-6) {
+                return false; // Axes are parallel, no need to test
+            } else {
+                axis.multiply(MathUtil.getNormalizationFactorLS(lengthSquared));
+                load(axis);
+                return true;
+            }
+        }
+
+        @FunctionalInterface
+        private interface AxisProducer {
+            boolean load(SATAxisIterator iter);
+        }
     }
 
     /**
