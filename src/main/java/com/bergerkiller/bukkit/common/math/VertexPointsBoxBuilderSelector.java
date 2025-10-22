@@ -6,6 +6,10 @@ final class VertexPointsBoxBuilderSelector {
     public static final Supplier<VertexPoints.BoxBuilder> BUILDER_IMPL = selectBuilderImpl();
 
     private static Supplier<VertexPoints.BoxBuilder> selectBuilderImpl() {
+        return VertexPointsBasicImpl.BoxBuilder::new;
+
+        //TODO: Dynamic load
+        /*
         try {
             // Check if Vector API is available
             Class.forName("jdk.incubator.vector.DoubleVector");
@@ -24,5 +28,6 @@ final class VertexPointsBoxBuilderSelector {
         }
 
         return VertexPointsBasicImpl.BoxBuilder::new;
+         */
     }
 }
