@@ -492,36 +492,13 @@ public class OrientedBoundingBox {
      * @return An array of 8 vertices
      */
     public VertexPoints getVertices() {
-        Vector halfSize = radius;
-
         //TODO: Cache
-        VertexPointsBasicImpl points = new VertexPointsBasicImpl(8);
-        points.set(0, new Vector(-halfSize.getX(), -halfSize.getY(), -halfSize.getZ()));
-        points.set(1, new Vector(-halfSize.getX(), -halfSize.getY(), halfSize.getZ()));
-        points.set(2, new Vector(-halfSize.getX(), halfSize.getY(), -halfSize.getZ()));
-        points.set(3, new Vector(-halfSize.getX(), halfSize.getY(), halfSize.getZ()));
-        points.set(4, new Vector(halfSize.getX(), -halfSize.getY(), -halfSize.getZ()));
-        points.set(5, new Vector(halfSize.getX(), -halfSize.getY(), halfSize.getZ()));
-        points.set(6, new Vector(halfSize.getX(), halfSize.getY(), -halfSize.getZ()));
-        points.set(7, new Vector(halfSize.getX(), halfSize.getY(), halfSize.getZ()));
-
+        VertexPoints.BoxBuilder boxBuilder = VertexPoints.boxBuilder()
+                .halfSize(radius);
         if (is_orientation_set) {
-            Quaternion orientation = getOrientation();
-            for (int i = 0; i < 8; i++) {
-                Vector p = points.get(i);
-                orientation.transformPoint(p);
-                p.add(position);
-                points.set(i, p);
-            }
-        } else {
-            for (int i = 0; i < 8; i++) {
-                Vector p = points.get(i);
-                p.add(position);
-                points.set(i, p);
-            }
+            boxBuilder = boxBuilder.rotate(orientation);
         }
-
-        return points;
+        return boxBuilder.translate(position).build();
     }
 
     /**

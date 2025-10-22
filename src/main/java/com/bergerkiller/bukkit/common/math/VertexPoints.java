@@ -344,4 +344,92 @@ public interface VertexPoints extends Iterable<Vector> {
     interface PointConsumer {
         void accept(int index, double x, double y, double z);
     }
+
+    /**
+     * Returns a new {@link BoxBuilder} for constructing a box-shaped set of vertex points
+     * optimized for this platform.
+     *
+     * @return BoxBuilder
+     */
+    static BoxBuilder boxBuilder() {
+        return VertexPointsBoxBuilderSelector.BUILDER_IMPL.get();
+    }
+
+    /**
+     * Special VertexPoints builder for box-shapes (fixed 8 vertices).
+     * The implementation will use SIMD optimizations if available.<br>
+     * <br>
+     * Always call {@link #size(double, double, double)} (or halfSize) before
+     * calling the other operations, as it will reset other operations.
+     */
+    interface BoxBuilder {
+        /**
+         * Initializes a box with the size specified. You can rotate and position
+         * this box later.
+         *
+         * @param size Axis-aligned size
+         * @return this BoxBuilder
+         */
+        default BoxBuilder size(Vector size) {
+            return size(size.getX(), size.getY(), size.getZ());
+        }
+
+        /**
+         * Initializes a box with the half-size specified. You can rotate and position
+         * this box later.
+         *
+         * @param halfSize Half axis-aligned size (radius)
+         * @return this BoxBuilder
+         */
+        default BoxBuilder halfSize(Vector halfSize) {
+            return halfSize(halfSize.getX(), halfSize.getY(), halfSize.getZ());
+        }
+
+        /**
+         * Initializes a box with the size specified. You can rotate and position
+         * this box later.
+         *
+         * @param sx Axis-aligned size for X
+         * @param sy Axis-aligned size for Y
+         * @param sz Axis-aligned size for Z
+         * @return this BoxBuilder
+         */
+        default BoxBuilder size(double sx, double sy, double sz) {
+            return halfSize(0.5 * sx, 0.5 * sy, 0.5 * sz);
+        }
+
+        /**
+         * Initializes a box with the half-size specified. You can rotate and position
+         * this box later.
+         *
+         * @param hsx Half axis-aligned size (radius) for X
+         * @param hsy Half axis-aligned size (radius) for Y
+         * @param hsz Half axis-aligned size (radius) for Z
+         * @return this BoxBuilder
+         */
+        BoxBuilder halfSize(double hsx, double hsy, double hsz);
+
+        /**
+         * Rotates the box previously set with size/halfSize.
+         *
+         * @param rotation Rotation transformation
+         * @return this BoxBuilder
+         */
+        BoxBuilder rotate(Quaternion rotation);
+
+        /**
+         * Translates the box in 3D space
+         *
+         * @param translation Translation offset vector
+         * @return this BoxBuilder
+         */
+        BoxBuilder translate(Vector translation);
+
+        /**
+         * Takes all previous transformations and builds an optimized VertexPoints for the box
+         *
+         * @return new VertexPoints
+         */
+        VertexPoints build();
+    }
 }
