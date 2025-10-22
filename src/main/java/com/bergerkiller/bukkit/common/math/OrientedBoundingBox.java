@@ -145,6 +145,24 @@ public class OrientedBoundingBox {
     }
 
     /**
+     * Tests whether a point vector is inside this bounding box. Equivalent to testing
+     * {@link #distanceToPoint(Vector)} is inside.
+     *
+     * @param point The point to test inside
+     * @return True if the point is inside this oriented bounding box
+     */
+    public boolean isInside(Vector point) {
+        // Transform the point into the local space of the bounding box
+        Vector localPoint = point.clone().subtract(this.position);
+        if (this.is_orientation_set) {
+            this.orientation.invTransformPoint(localPoint);
+        }
+
+        // Calculate the closest point on the box in local space
+        return testLocalPointInside(localPoint.getX(), localPoint.getY(), localPoint.getZ());
+    }
+
+    /**
      * Calculates the shortest distance from a point to this oriented bounding box
      * and returns the hit test result, including the closest position, distance,
      * and normal vector.
@@ -266,8 +284,7 @@ public class OrientedBoundingBox {
         double pz = startZ - midPos.getZ();
 
         // Check start point already inside box
-        Vector rad = this.radius;
-        if (Math.abs(px) <= rad.getX() && Math.abs(py) <= rad.getY() && Math.abs(pz) <= rad.getZ()) {
+        if (testLocalPointInside(px, py, pz)) {
             return HitTestResult.inside(new Vector(startX, startY, startZ));
         }
 
@@ -306,8 +323,7 @@ public class OrientedBoundingBox {
         }
 
         // Check start point already inside box
-        Vector rad = this.radius;
-        if (Math.abs(p.getX()) <= rad.getX() && Math.abs(p.getY()) <= rad.getY() && Math.abs(p.getZ()) <= rad.getZ()) {
+        if (testLocalPointInside(p.getX(), p.getY(), p.getZ())) {
             return HitTestResult.inside(startPosition);
         }
 
@@ -422,6 +438,11 @@ public class OrientedBoundingBox {
 
         // Compute exact position and normal vector from the distance and face
         return new HitTestResult(new Vector(), FaceUtil.faceToVector(min_dir), min_distance);
+    }
+
+    private boolean testLocalPointInside(double x, double y, double z) {
+        Vector rad = this.radius;
+        return Math.abs(x) <= rad.getX() && Math.abs(y) <= rad.getY() && Math.abs(z) <= rad.getZ();
     }
 
     /**

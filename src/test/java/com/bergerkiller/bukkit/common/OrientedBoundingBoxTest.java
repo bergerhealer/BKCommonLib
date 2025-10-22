@@ -37,6 +37,22 @@ public class OrientedBoundingBoxTest {
     }
 
     @Test
+    public void testDistanceToPointInside() {
+        OrientedBoundingBox box = new OrientedBoundingBox(new Vector(0, 0, 0), new Vector(4, 4, 4),
+                Quaternion.fromYawPitchRoll(0.0, 45, 0.0));
+
+        // Test a point that is inside the box, but it would only be if rotated 45 degrees
+        // If rotation isn't taken into account, this test would fail
+        Vector start = new Vector(2.5, 0, 0);
+        OrientedBoundingBox.HitTestResult result = box.distanceToPoint(start);
+
+        assertTrue(result.success());
+        assertTrue(result.inside());
+        assertTrue(box.isInside(start));
+        assertEquals(0.0, result.distance(), 1e-10);
+    }
+
+    @Test
     public void testDistanceToPointWithRotation() {
         OrientedBoundingBox box = new OrientedBoundingBox(new Vector(0, 0, 0), new Vector(4, 4, 4),
                 Quaternion.fromYawPitchRoll(0.0, 45, 0.0));
@@ -48,6 +64,7 @@ public class OrientedBoundingBoxTest {
 
         assertTrue(result.success());
         assertFalse(result.inside());
+        assertFalse(box.isInside(start));
         assertEquals(7.0 - Math.sqrt(4*4 + 4*4) / 2, result.distance(), 1e-10);
         MathUtilTest.testVectorsEqual(new Vector(Math.sqrt(4*4 + 4*4) / 2, 0, 0), result.position(), 1e-10);
 
@@ -66,6 +83,7 @@ public class OrientedBoundingBoxTest {
 
         assertTrue(result.success());
         assertFalse(result.inside());
+        assertFalse(box.isInside(start));
         assertEquals(5.0, result.distance(), 0.0);
         assertEquals(new Vector(2, 0, 0), result.position());
         assertEquals(new Vector(1, 0, 0), result.normal());
@@ -82,6 +100,7 @@ public class OrientedBoundingBoxTest {
 
         assertTrue(result.success());
         assertFalse(result.inside());
+        assertFalse(box.isInside(start));
         assertEquals(5.0, result.distance(), 0.0);
         assertEquals(new Vector(0, -2, 0), result.position());
         assertEquals(new Vector(0, -1, 0), result.normal());
@@ -98,6 +117,7 @@ public class OrientedBoundingBoxTest {
 
         assertTrue(result.success());
         assertFalse(result.inside());
+        assertFalse(box.isInside(start));
         assertEquals(5.0, result.distance(), 0.0);
         assertEquals(new Vector(0, 0, -2), result.position());
         assertEquals(new Vector(0, 0, -1), result.normal());
