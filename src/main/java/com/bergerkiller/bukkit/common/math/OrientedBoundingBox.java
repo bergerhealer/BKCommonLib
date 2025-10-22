@@ -145,6 +145,59 @@ public class OrientedBoundingBox {
     }
 
     /**
+     * Calculates the shortest distance from a point to this oriented bounding box
+     * and returns the hit test result, including the closest position, distance,
+     * and normal vector.
+     *
+     * @param point The point to calculate the distance to.
+     * @return A HitTestResult containing the closest position, distance, and normal vector.
+     */
+    public HitTestResult distanceToPoint(Vector point) {
+        // Transform the point into the local space of the bounding box
+        Vector localPoint = point.clone().subtract(this.position);
+        if (this.is_orientation_set) {
+            this.orientation.invTransformPoint(localPoint);
+        }
+
+        // Calculate the closest point on the box in local space
+        Vector rad = this.radius;
+        Vector closestPoint = new Vector(
+            MathUtil.clamp(localPoint.getX(), -rad.getX(), rad.getX()),
+            MathUtil.clamp(localPoint.getY(), -rad.getY(), rad.getY()),
+            MathUtil.clamp(localPoint.getZ(), -rad.getZ(), rad.getZ())
+        );
+
+        // If inside the box, return an inside result and skip the normal vector / rotation stuff
+        if (localPoint.equals(closestPoint)) {
+            MathUtil.setVector(closestPoint, point);
+            return HitTestResult.inside(closestPoint);
+        }
+
+        // Calculate the normal vector
+        Vector normal = new Vector();
+        double dx = Math.abs(closestPoint.getX() - localPoint.getX());
+        double dy = Math.abs(closestPoint.getY() - localPoint.getY());
+        double dz = Math.abs(closestPoint.getZ() - localPoint.getZ());
+        if (dx > dy && dx > dz) {
+            normal.setX(Math.signum(localPoint.getX()));
+        } else if (dy > dz) {
+            normal.setY(Math.signum(localPoint.getY()));
+        } else {
+            normal.setZ(Math.signum(localPoint.getZ()));
+        }
+
+        // Transform the closest point and normal back to world space
+        if (this.is_orientation_set) {
+            this.orientation.transformPoint(closestPoint);
+            this.orientation.transformPoint(normal);
+        }
+        closestPoint.add(this.position);
+
+        // Return the hit test result
+        return new HitTestResult(closestPoint, normal, point.distance(closestPoint));
+    }
+
+    /**
      * Performs a hit test to see whether this collision box is hit when
      * looked at from a known position into a certain direction.
      *

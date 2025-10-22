@@ -1,0 +1,211 @@
+package com.bergerkiller.bukkit.common.math;
+
+import static org.junit.Assert.*;
+
+import com.bergerkiller.bukkit.common.MathUtilTest;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
+import org.bukkit.util.Vector;
+import org.junit.Test;
+
+public class OrientedBoundingBoxTest {
+
+    @Test
+    public void testHitTestOutsideBox() {
+        OrientedBoundingBox box = new OrientedBoundingBox(new Vector(0, 0, 0), new Vector(2, 2, 2), null);
+
+        // Test a ray that misses the box
+        Vector start = new Vector(5, 5, 5);
+        Vector direction = new Vector(1, 1, 1).normalize();
+        OrientedBoundingBox.HitTestResult result = box.performHitTest(start, direction);
+
+        assertFalse(result.success());
+        assertEquals(Double.MAX_VALUE, result.distance(), 0.0);
+    }
+
+    @Test
+    public void testHitTestInsideBox() {
+        OrientedBoundingBox box = new OrientedBoundingBox(new Vector(0, 0, 0), new Vector(2, 2, 2), null);
+
+        // Test a ray starting inside the box
+        Vector start = new Vector(0.5, 0.5, 0.5);
+        Vector direction = new Vector(1, 0, 0).normalize();
+        OrientedBoundingBox.HitTestResult result = box.performHitTest(start, direction);
+
+        assertTrue(result.success());
+        assertTrue(result.inside());
+        assertEquals(0.0, result.distance(), 0.0);
+    }
+
+    @Test
+    public void testDistanceToPointWithRotation() {
+        OrientedBoundingBox box = new OrientedBoundingBox(new Vector(0, 0, 0), new Vector(4, 4, 4),
+                Quaternion.fromYawPitchRoll(0.0, 45, 0.0));
+
+        // Test a ray that hits the surface of the box
+        // Box has a 2-wide edge from origin, so starting at 7 we expect a distance of 5
+        Vector start = new Vector(7, 0, 0);
+        OrientedBoundingBox.HitTestResult result = box.distanceToPoint(start);
+
+        assertTrue(result.success());
+        assertFalse(result.inside());
+        assertEquals(7.0 - Math.sqrt(4*4 + 4*4) / 2, result.distance(), 1e-10);
+        MathUtilTest.testVectorsEqual(new Vector(Math.sqrt(4*4 + 4*4) / 2, 0, 0), result.position(), 1e-10);
+
+        // Note: is on edge of cube so might as well be the other edge
+        MathUtilTest.testVectorsEqual(new Vector(MathUtil.HALFROOTOFTWO, 0, -MathUtil.HALFROOTOFTWO), result.normal(), 1e-8);
+    }
+
+    @Test
+    public void testDistanceToPointX() {
+        OrientedBoundingBox box = new OrientedBoundingBox(new Vector(0, 0, 0), new Vector(4, 4, 4), null);
+
+        // Test a ray that hits the surface of the box
+        // Box has a 2-wide edge from origin, so starting at 7 we expect a distance of 5
+        Vector start = new Vector(7, 0, 0);
+        OrientedBoundingBox.HitTestResult result = box.distanceToPoint(start);
+
+        assertTrue(result.success());
+        assertFalse(result.inside());
+        assertEquals(5.0, result.distance(), 0.0);
+        assertEquals(new Vector(2, 0, 0), result.position());
+        assertEquals(new Vector(1, 0, 0), result.normal());
+    }
+
+    @Test
+    public void testDistanceToPointY() {
+        OrientedBoundingBox box = new OrientedBoundingBox(new Vector(0, 0, 0), new Vector(4, 4, 4), null);
+
+        // Test a ray that hits the surface of the box
+        // Box has a 2-wide edge from origin, so starting at 7 we expect a distance of 5
+        Vector start = new Vector(0, -7, 0);
+        OrientedBoundingBox.HitTestResult result = box.distanceToPoint(start);
+
+        assertTrue(result.success());
+        assertFalse(result.inside());
+        assertEquals(5.0, result.distance(), 0.0);
+        assertEquals(new Vector(0, -2, 0), result.position());
+        assertEquals(new Vector(0, -1, 0), result.normal());
+    }
+
+    @Test
+    public void testDistanceToPointZ() {
+        OrientedBoundingBox box = new OrientedBoundingBox(new Vector(0, 0, 0), new Vector(4, 4, 4), null);
+
+        // Test a ray that hits the surface of the box
+        // Box has a 2-wide edge from origin, so starting at 7 we expect a distance of 5
+        Vector start = new Vector(0, 0, -7);
+        OrientedBoundingBox.HitTestResult result = box.distanceToPoint(start);
+
+        assertTrue(result.success());
+        assertFalse(result.inside());
+        assertEquals(5.0, result.distance(), 0.0);
+        assertEquals(new Vector(0, 0, -2), result.position());
+        assertEquals(new Vector(0, 0, -1), result.normal());
+    }
+
+    @Test
+    public void testHitTestSurfaceHitWithRotation() {
+        OrientedBoundingBox box = new OrientedBoundingBox(new Vector(0, 0, 0), new Vector(4, 4, 4),
+                Quaternion.fromYawPitchRoll(0.0, 45, 0.0));
+
+        // Test a ray that hits the surface of the box
+        // Box has a 2-wide edge from origin, so starting at 7 we expect a distance of 5
+        Vector start = new Vector(7, 0, 0);
+        Vector direction = new Vector(-1, 0, 0).normalize();
+        OrientedBoundingBox.HitTestResult result = box.performHitTest(start, direction);
+
+        assertTrue(result.success());
+        assertFalse(result.inside());
+        assertEquals(7.0 - Math.sqrt(4*4 + 4*4) / 2, result.distance(), 1e-10);
+        MathUtilTest.testVectorsEqual(new Vector(Math.sqrt(4*4 + 4*4) / 2, 0, 0), result.position(), 1e-10);
+
+        // Note: is on edge of cube so might as well be the other edge
+        MathUtilTest.testVectorsEqual(new Vector(MathUtil.HALFROOTOFTWO, 0, -MathUtil.HALFROOTOFTWO), result.normal(), 1e-8);
+    }
+
+    @Test
+    public void testHitTestSurfaceHitX() {
+        OrientedBoundingBox box = new OrientedBoundingBox(new Vector(0, 0, 0), new Vector(4, 4, 4), null);
+
+        // Test a ray that hits the surface of the box
+        // Box has a 2-wide edge from origin, so starting at 7 we expect a distance of 5
+        Vector start = new Vector(7, 0, 0);
+        Vector direction = new Vector(-1, 0, 0).normalize();
+        OrientedBoundingBox.HitTestResult result = box.performHitTest(start, direction);
+
+        assertTrue(result.success());
+        assertFalse(result.inside());
+        assertEquals(5.0, result.distance(), 0.0);
+        assertEquals(new Vector(2, 0, 0), result.position());
+        assertEquals(new Vector(1, 0, 0), result.normal());
+    }
+
+    @Test
+    public void testHitTestSurfaceHitY() {
+        OrientedBoundingBox box = new OrientedBoundingBox(new Vector(0, 0, 0), new Vector(4, 4, 4), null);
+
+        // Test a ray that hits the surface of the box
+        // Box has a 2-wide edge from origin, so starting at 7 we expect a distance of 5
+        Vector start = new Vector(0, -7, 0);
+        Vector direction = new Vector(0, 1, 0).normalize();
+        OrientedBoundingBox.HitTestResult result = box.performHitTest(start, direction);
+
+        assertTrue(result.success());
+        assertFalse(result.inside());
+        assertEquals(5.0, result.distance(), 0.0);
+        assertEquals(new Vector(0, -2, 0), result.position());
+        assertEquals(new Vector(0, -1, 0), result.normal());
+    }
+
+    @Test
+    public void testHitTestSurfaceHitZ() {
+        OrientedBoundingBox box = new OrientedBoundingBox(new Vector(0, 0, 0), new Vector(4, 4, 4), null);
+
+        // Test a ray that hits the surface of the box
+        // Box has a 2-wide edge from origin, so starting at 7 we expect a distance of 5
+        Vector start = new Vector(0, 0, -7);
+        Vector direction = new Vector(0, 0, 1).normalize();
+        OrientedBoundingBox.HitTestResult result = box.performHitTest(start, direction);
+
+        assertTrue(result.success());
+        assertFalse(result.inside());
+        assertEquals(5.0, result.distance(), 0.0);
+        assertEquals(new Vector(0, 0, -2), result.position());
+        assertEquals(new Vector(0, 0, -1), result.normal());
+    }
+
+    @Test
+    public void testSetSize() {
+        OrientedBoundingBox box = new OrientedBoundingBox(new Vector(0, 0, 0), new Vector(4, 4, 4), null);
+
+        // Verify initial size
+        assertEquals(new Vector(4, 4, 4), box.getSize());
+
+        // Update size
+        box.setSize(new Vector(6, 6, 6));
+        assertEquals(new Vector(6, 6, 6), box.getSize());
+
+        // Update size with individual components
+        box.setSize(8, 8, 8);
+        assertEquals(new Vector(8, 8, 8), box.getSize());
+    }
+
+    @Test
+    public void testSetPosition() {
+        OrientedBoundingBox box = new OrientedBoundingBox(new Vector(0, 0, 0), new Vector(2, 2, 2), null);
+
+        // Update position
+        box.setPosition(new Vector(10, 10, 10));
+        assertEquals(new Vector(10, 10, 10), box.getPosition());
+    }
+
+    @Test
+    public void testSetOrientation() {
+        OrientedBoundingBox box = new OrientedBoundingBox(new Vector(0, 0, 0), new Vector(2, 2, 2), null);
+
+        // Update orientation
+        Quaternion orientation = Quaternion.fromAxisAngles(0, 1, 0, 90);
+        box.setOrientation(orientation);
+        assertEquals(orientation, box.getOrientation());
+    }
+}
