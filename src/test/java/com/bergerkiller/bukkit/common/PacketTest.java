@@ -9,7 +9,6 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeamHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLivingHandle;
-import net.minecraft.network.protocol.game.PacketPlayOutSpawnEntity;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
