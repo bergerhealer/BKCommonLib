@@ -321,13 +321,17 @@ public interface VertexPoints extends Iterable<Vector> {
          * @return True if a valid normalized cross product was loaded into this iterator
          */
         protected boolean tryLoadNormalizedCrossProduct(Vector left, Vector right) {
-            Vector axis = left.clone().crossProduct(right);
-            double lengthSquared = axis.lengthSquared();
+            double x = left.getY() * right.getZ() - right.getY() * left.getZ();
+            double y = left.getZ() * right.getX() - right.getZ() * left.getX();
+            double z = left.getX() * right.getY() - right.getX() * left.getY();
+            double lengthSquared = (x*x) + (y*y) + (z*z);
             if (lengthSquared < 1e-6) {
                 return false; // Axes are parallel, no need to test
             } else {
-                axis.multiply(MathUtil.getNormalizationFactorLS(lengthSquared));
-                load(axis);
+                double normFactor = MathUtil.getNormalizationFactorLS(lengthSquared);
+                this.x = x * normFactor;
+                this.y = y * normFactor;
+                this.z = z * normFactor;
                 return true;
             }
         }
