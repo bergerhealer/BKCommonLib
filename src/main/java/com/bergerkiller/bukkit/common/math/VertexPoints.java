@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.math;
 
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -308,6 +309,27 @@ public interface VertexPoints extends Iterable<Vector> {
             x = v.getX();
             y = v.getY();
             z = v.getZ();
+        }
+
+        /**
+         * Tries to create a cross product between two vectors, and if non-zero, normalizes it and
+         * loads it into this iterator and returns true. If not successful (zero-length result),
+         * returns false.
+         *
+         * @param left Left-hand operand for the cross product
+         * @param right Right-hand operand for the cross product
+         * @return True if a valid normalized cross product was loaded into this iterator
+         */
+        protected boolean tryLoadNormalizedCrossProduct(Vector left, Vector right) {
+            Vector axis = left.clone().crossProduct(right);
+            double lengthSquared = axis.lengthSquared();
+            if (lengthSquared < 1e-6) {
+                return false; // Axes are parallel, no need to test
+            } else {
+                axis.multiply(MathUtil.getNormalizationFactorLS(lengthSquared));
+                load(axis);
+                return true;
+            }
         }
     }
 

@@ -466,7 +466,7 @@ public class OrientedBoundingBox {
      */
     public boolean hasOverlap(OrientedBoundingBox other) {
         return VertexPoints.areVerticesOverlapping(this.getVertices(), other.getVertices(),
-                new SATAxisIterator(this.getOrientation(), other.getOrientation()));
+                createSeparatingAxisIterator(this.getOrientation(), other.getOrientation()));
     }
 
     /**
@@ -534,105 +534,102 @@ public class OrientedBoundingBox {
      * @see VertexPoints#areVerticesOverlapping(VertexPoints, VertexPoints, VertexPoints.PointIterator) 
      */
     public static VertexPoints.PointIterator createSeparatingAxisIterator(Quaternion box1Ori, Quaternion box2Ori) {
-        return new SATAxisIterator(box1Ori, box2Ori);
+        return box1Ori.equals(box2Ori) ? new SATAxisIteratorAligned(box1Ori)
+                                       : new SATAxisIteratorMisaligned(box1Ori, box2Ori);
     }
 
     /**
      * Generates all the axis vectors required for SAT. This is used for testing
-     * intersection between two oriented bounding boxes.
+     * intersection between two oriented bounding boxes. This is for when the two
+     * boxes do not share the same orientation.
      */
-    private static final class SATAxisIterator extends VertexPoints.PointIterator {
+    private static final class SATAxisIteratorMisaligned extends VertexPoints.PointIterator {
         private final Vector box1Right, box1Up, box1Forward, box2Right, box2Up, box2Forward;
-        private final AxisProducer[] producers;
         private int producerIdx = 0;
 
-        private static final AxisProducer[] PRODUCER_SAME_ORIENTATIONS = new AxisProducer[] {
-                /* The three axis of the first box */
-                iter -> { iter.load(iter.box1Right); return true; },
-                iter -> { iter.load(iter.box1Up); return true; },
-                iter -> { iter.load(iter.box1Forward); return true; },
-
-                /* Cross products of the different axis */
-                iter -> iter.loadCross(iter.box1Right, iter.box2Up),
-                iter -> iter.loadCross(iter.box1Right, iter.box2Forward),
-                iter -> iter.loadCross(iter.box1Up, iter.box2Forward),
-                iter -> iter.loadCross(iter.box1Up, iter.box2Right),
-                iter -> iter.loadCross(iter.box1Forward, iter.box2Up),
-                iter -> iter.loadCross(iter.box1Forward, iter.box2Right),
-        };
-
-        private static final AxisProducer[] PRODUCER_DIFFERENT_ORIENTATIONS = new AxisProducer[] {
-                /* The three axis of the first box */
-                iter -> { iter.load(iter.box1Right); return true; },
-                iter -> { iter.load(iter.box1Up); return true; },
-                iter -> { iter.load(iter.box1Forward); return true; },
-
-                /* The three axis of the second box */
-                iter -> { iter.load(iter.box2Right); return true; },
-                iter -> { iter.load(iter.box2Up); return true; },
-                iter -> { iter.load(iter.box2Forward); return true; },
-
-                /* The three cross-products produced by comparing the axis of the different boxes */
-                iter -> iter.loadCross(iter.box1Right, iter.box2Right),
-                iter -> iter.loadCross(iter.box1Up, iter.box2Up),
-                iter -> iter.loadCross(iter.box1Forward, iter.box2Forward),
-
-                /* Cross products of the different axis */
-                iter -> iter.loadCross(iter.box1Right, iter.box2Up),
-                iter -> iter.loadCross(iter.box1Right, iter.box2Forward),
-                iter -> iter.loadCross(iter.box1Up, iter.box2Forward),
-                iter -> iter.loadCross(iter.box1Up, iter.box2Right),
-                iter -> iter.loadCross(iter.box1Forward, iter.box2Up),
-                iter -> iter.loadCross(iter.box1Forward, iter.box2Right),
-        };
-
-        public SATAxisIterator(Quaternion box1Ori, Quaternion box2Ori) {
+        public SATAxisIteratorMisaligned(Quaternion box1Ori, Quaternion box2Ori) {
             box1Right = box1Ori.rightVector();
             box1Up = box1Ori.upVector();
             box1Forward = box1Ori.forwardVector();
-            if (box1Ori.equals(box2Ori)) {
-                box2Right = box1Right;
-                box2Up = box1Up;
-                box2Forward = box1Forward;
-                producers = PRODUCER_SAME_ORIENTATIONS;
-            } else {
-                box2Right = box2Ori.rightVector();
-                box2Up = box2Ori.upVector();
-                box2Forward = box2Ori.forwardVector();
-                producers = PRODUCER_DIFFERENT_ORIENTATIONS;
-            }
+            box2Right = box2Ori.rightVector();
+            box2Up = box2Ori.upVector();
+            box2Forward = box2Ori.forwardVector();
         }
 
         @Override
         public boolean next() {
-            AxisProducer[] producers = this.producers;
-            int producerIdx = this.producerIdx;
-            while (producerIdx < producers.length) {
-                if (producers[producerIdx++].load(this)) {
-                    this.producerIdx = producerIdx;
-                    ++this.index;
-                    return true;
-                }
-            }
-            this.producerIdx = producerIdx;
-            return false;
-        }
+            while (producerIdx < 15) {
+                switch (producerIdx++) {
+                    // Box 1 axes
+                    case 0: load(box1Right); break;
+                    case 1: load(box1Up); break;
+                    case 2: load(box1Forward); break;
 
-        protected boolean loadCross(Vector a, Vector b) {
-            Vector axis = a.clone().crossProduct(b);
-            double lengthSquared = axis.lengthSquared();
-            if (lengthSquared < 1e-6) {
-                return false; // Axes are parallel, no need to test
-            } else {
-                axis.multiply(MathUtil.getNormalizationFactorLS(lengthSquared));
-                load(axis);
+                    // Box 2 axes
+                    case 3: load(box2Right); break;
+                    case 4: load(box2Up); break;
+                    case 5: load(box2Forward); break;
+
+                    // Same-axis cross products
+                    case 6: if (!tryLoadNormalizedCrossProduct(box1Right, box2Right)) continue; break;
+                    case 7: if (!tryLoadNormalizedCrossProduct(box1Up, box2Up)) continue; break;
+                    case 8: if (!tryLoadNormalizedCrossProduct(box1Forward, box2Forward)) continue; break;
+
+                    // Mixed cross products
+                    case 9:  if (!tryLoadNormalizedCrossProduct(box1Right, box2Up)) continue; break;
+                    case 10: if (!tryLoadNormalizedCrossProduct(box1Right, box2Forward)) continue; break;
+                    case 11: if (!tryLoadNormalizedCrossProduct(box1Up, box2Forward)) continue; break;
+                    case 12: if (!tryLoadNormalizedCrossProduct(box1Up, box2Right)) continue; break;
+                    case 13: if (!tryLoadNormalizedCrossProduct(box1Forward, box2Up)) continue; break;
+                    case 14: if (!tryLoadNormalizedCrossProduct(box1Forward, box2Right)) continue; break;
+                }
+
+                index++;
                 return true;
             }
+
+            return false;
+        }
+    }
+
+    /**
+     * Generates all the axis vectors required for SAT. This is used for testing
+     * intersection between two oriented bounding boxes. This is for when the two
+     * boxes do share the same orientation.
+     */
+    private static final class SATAxisIteratorAligned extends VertexPoints.PointIterator {
+        private final Vector right, up, forward;
+        private int producerIdx = 0;
+
+        public SATAxisIteratorAligned(Quaternion ori) {
+            right = ori.rightVector();
+            up = ori.upVector();
+            forward = ori.forwardVector();
         }
 
-        @FunctionalInterface
-        private interface AxisProducer {
-            boolean load(SATAxisIterator iter);
+        @Override
+        public boolean next() {
+            while (producerIdx < 9) {
+                switch (producerIdx++) {
+                    // Box 1 axes
+                    case 0: load(right); break;
+                    case 1: load(up); break;
+                    case 2: load(forward); break;
+
+                    // Mixed cross products
+                    case 3: if (!tryLoadNormalizedCrossProduct(right, up)) continue; break;
+                    case 4: if (!tryLoadNormalizedCrossProduct(right, forward)) continue; break;
+                    case 5: if (!tryLoadNormalizedCrossProduct(up, forward)) continue; break;
+                    case 6: if (!tryLoadNormalizedCrossProduct(up, right)) continue; break;
+                    case 7: if (!tryLoadNormalizedCrossProduct(forward, up)) continue; break;
+                    case 8: if (!tryLoadNormalizedCrossProduct(forward, right)) continue; break;
+                }
+
+                index++;
+                return true;
+            }
+
+            return false;
         }
     }
 
