@@ -1,6 +1,7 @@
 plugins {
     id("java-library")
     id("maven-publish")
+    id("com.bergerkiller.simd") version "1.0.0" /* https://github.com/bergerhealer/gradle-simd-plugin */
     alias(libs.plugins.mountiplex)
     alias(libs.plugins.shadow)
 }
@@ -123,6 +124,10 @@ dependencies {
     testImplementation(libs.junit)
 }
 
+simd {
+    sourceDir.set(layout.projectDirectory.dir("src/simd/java"));
+}
+
 java {
     withJavadocJar()
     withSourcesJar()
@@ -176,7 +181,7 @@ tasks {
         systemProperty("main.classes.dir", sourceSets["main"].output.classesDirs.asPath)
 
         // Uncomment to enable SIMD optimizations, to test performance of color conversion
-        //jvmArgs("--add-modules", "jdk.incubator.vector");
+        // jvmArgs("--add-modules", "jdk.incubator.vector");
     }
 
     // This keeps calling testPreloadTemplatesDeadlock in new instances until it fails
