@@ -5,18 +5,31 @@ import jdk.incubator.vector.VectorOperators;
 import jdk.incubator.vector.VectorSpecies;
 import org.bukkit.util.Vector;
 
-import java.util.Collection;
-
 /**
- * Implementation of 8-vertex count VertexPoints optimized for 256 bit SIMD
+ * Implementation of 8-size VectorList optimized for 256 bit SIMD
  */
-final class VertexPointsSIMD256Impl implements VertexPoints {
+final class VectorListOctoSIMD256Impl implements VectorList {
     private static final VectorSpecies<Double> SPECIES = DoubleVector.SPECIES_256;
+    public static final Factory FACTORY = new Factory() {
+        @Override
+        public VectorList copyOf(VectorList vectorValues) {
+            if (vectorValues instanceof VectorListOctoSIMD256Impl) {
+                return vectorValues; // Immutable
+            } else {
+                return new VectorListOctoSIMD256Impl(vectorValues.size(), vectorValues.vectorIterator());
+            }
+        }
+
+        @Override
+        public VectorList createWith(int size, VectorIterator iterator) {
+            return new VectorListOctoSIMD256Impl(size, iterator);
+        }
+    };
 
     private final DoubleVector x0, x1, y0, y1, z0, z1;
 
-    public VertexPointsSIMD256Impl(Collection<Vector> points) {
-        if (points.size() != 8) {
+    private VectorListOctoSIMD256Impl(int size, VectorIterator iterator) {
+        if (size != 8) {
             throw new IllegalArgumentException("This SIMD256 implementation requires exactly 8 points");
         }
 
@@ -25,11 +38,11 @@ final class VertexPointsSIMD256Impl implements VertexPoints {
         double[] zArr = new double[8];
 
         int i = 0;
-        for (Vector v : points) {
-            xArr[i] = v.getX();
-            yArr[i] = v.getY();
-            zArr[i] = v.getZ();
-            i++;
+        while (iterator.advance() && i < 8) {
+            xArr[i] = iterator.x();
+            yArr[i] = iterator.y();
+            zArr[i] = iterator.z();
+            ++i;
         }
 
         this.x0 = DoubleVector.fromArray(SPECIES, xArr, 0);
@@ -64,10 +77,25 @@ final class VertexPointsSIMD256Impl implements VertexPoints {
     }
 
     @Override
-    public PointIterator pointIterator() {
-        return new PointIterator() {
+    public Vector get(int index, Vector into) {
+        if (index < 4) {
+            into.setX(x0.lane(index));
+            into.setX(y0.lane(index));
+            into.setX(z0.lane(index));
+        } else {
+            int i = index - 4;
+            into.setX(x0.lane(i));
+            into.setX(y0.lane(i));
+            into.setX(z0.lane(i));
+        }
+        return into;
+    }
+
+    @Override
+    public VectorIterator vectorIterator() {
+        return new VectorIterator() {
             @Override
-            public boolean next() {
+            public boolean advance() {
                 int nextIndex = index + 1;
                 if (nextIndex >= 8) return false;
 
@@ -108,10 +136,8 @@ final class VertexPointsSIMD256Impl implements VertexPoints {
         return new Projection(min, max);
     }
 
-    public static class BoxBuilder extends VertexPointsBasicImpl.BoxBuilder {
-        @Override
-        public VertexPoints build() {
-            return new VertexPointsSIMD256Impl(points);
-        }
+    @Override
+    public String toString() {
+        return VectorListBasicImpl.genericToString(this);
     }
 }

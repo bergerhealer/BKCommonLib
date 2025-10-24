@@ -17,7 +17,7 @@ public class OrientedBoundingBox {
     private final Vector radius = new Vector();
     private final Quaternion orientation = new Quaternion();
     private boolean is_orientation_set = false;
-    private VertexPoints cachedVertexPoints = null;
+    private VectorList cachedVertices = null;
 
     /**
      * Default constructor with position {0,0,0}, size {0,0,0} and orientation
@@ -96,7 +96,7 @@ public class OrientedBoundingBox {
      */
     public void setPosition(Vector pos) {
         MathUtil.setVector(position, pos);
-        cachedVertexPoints = null;
+        cachedVertices = null;
     }
 
     /**
@@ -108,7 +108,7 @@ public class OrientedBoundingBox {
      */
     public void setPosition(double x, double y, double z) {
         MathUtil.setVector(position, x, y, z);
-        cachedVertexPoints = null;
+        cachedVertices = null;
     }
 
     /**
@@ -129,7 +129,7 @@ public class OrientedBoundingBox {
      */
     public void setSize(double sx, double sy, double sz) {
         MathUtil.setVector(this.radius, 0.5*sx, 0.5*sy, 0.5*sz);
-        cachedVertexPoints = null;
+        cachedVertices = null;
     }
 
     /**
@@ -146,7 +146,7 @@ public class OrientedBoundingBox {
             this.is_orientation_set = true;
             this.orientation.setTo(orientation);
         }
-        cachedVertexPoints = null;
+        cachedVertices = null;
     }
 
     /**
@@ -470,7 +470,7 @@ public class OrientedBoundingBox {
      * @return True if the boxes overlap, false otherwise
      */
     public boolean hasOverlap(OrientedBoundingBox other) {
-        return VertexPoints.areVerticesOverlapping(this.getVertices(), other.getVertices(),
+        return VectorList.areVerticesOverlapping(this.getVertices(), other.getVertices(),
                 createSeparatingAxisIterator(this.getOrientation(), other.getOrientation()));
     }
 
@@ -482,8 +482,8 @@ public class OrientedBoundingBox {
      * @return True if the specified OBB is completely inside this one, false otherwise
      */
     public boolean isInside(OrientedBoundingBox other) {
-        VertexPoints.PointIterator iter = other.getVertices().pointIterator();
-        while (iter.next()) {
+        VectorList.VectorIterator iter = other.getVertices().vectorIterator();
+        while (iter.advance()) {
             if (!this.isInside(iter.x(), iter.y(), iter.z())) {
                 return false;
             }
@@ -496,15 +496,15 @@ public class OrientedBoundingBox {
      *
      * @return An array of 8 vertices
      */
-    public VertexPoints getVertices() {
-        VertexPoints cached = cachedVertexPoints;
+    public VectorList getVertices() {
+        VectorList cached = cachedVertices;
         if (cached == null) {
-            VertexPoints.BoxBuilder boxBuilder = VertexPoints.boxBuilder()
-                    .halfSize(radius);
+            VectorListMutable box = VectorListMutable.createBoxVerticesWithHalfSize(radius);
             if (is_orientation_set) {
-                boxBuilder = boxBuilder.rotate(orientation);
+                box.rotate(orientation);
             }
-            cachedVertexPoints = cached = boxBuilder.translate(position).build();
+            box.translate(position);
+            cachedVertices = cached = box.immutable();
         }
         return cached;
     }
@@ -516,9 +516,9 @@ public class OrientedBoundingBox {
      * @param box1Ori Orientation of box 1
      * @param box2Ori Orientation of box 2
      * @return PointIterator
-     * @see VertexPoints#areVerticesOverlapping(VertexPoints, VertexPoints, VertexPoints.PointIterator) 
+     * @see VectorList#areVerticesOverlapping(VectorList, VectorList, VectorList.VectorIterator)
      */
-    public static VertexPoints.PointIterator createSeparatingAxisIterator(Quaternion box1Ori, Quaternion box2Ori) {
+    public static VectorList.VectorIterator createSeparatingAxisIterator(Quaternion box1Ori, Quaternion box2Ori) {
         return box1Ori.equals(box2Ori) ? new SATAxisIteratorAligned(box1Ori)
                                        : new SATAxisIteratorMisaligned(box1Ori, box2Ori);
     }
@@ -528,7 +528,7 @@ public class OrientedBoundingBox {
      * intersection between two oriented bounding boxes. This is for when the two
      * boxes do not share the same orientation.
      */
-    private static final class SATAxisIteratorMisaligned extends VertexPoints.PointIterator {
+    private static final class SATAxisIteratorMisaligned extends VectorList.VectorIterator {
         private final Vector box1Right, box1Up, box1Forward, box2Right, box2Up, box2Forward;
         private int producerIdx = 0;
 
@@ -542,7 +542,7 @@ public class OrientedBoundingBox {
         }
 
         @Override
-        public boolean next() {
+        public boolean advance() {
             while (producerIdx < 15) {
                 switch (producerIdx++) {
                     // Box 1 axes
@@ -582,7 +582,7 @@ public class OrientedBoundingBox {
      * intersection between two oriented bounding boxes. This is for when the two
      * boxes do share the same orientation.
      */
-    private static final class SATAxisIteratorAligned extends VertexPoints.PointIterator {
+    private static final class SATAxisIteratorAligned extends VectorList.VectorIterator {
         private final Vector right, up, forward;
         private int producerIdx = 0;
 
@@ -593,7 +593,7 @@ public class OrientedBoundingBox {
         }
 
         @Override
-        public boolean next() {
+        public boolean advance() {
             while (producerIdx < 9) {
                 switch (producerIdx++) {
                     // Box 1 axes

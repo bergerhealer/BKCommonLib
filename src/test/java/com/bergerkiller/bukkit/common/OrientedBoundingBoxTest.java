@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import com.bergerkiller.bukkit.common.math.OrientedBoundingBox;
 import com.bergerkiller.bukkit.common.math.Quaternion;
-import com.bergerkiller.bukkit.common.math.VertexPoints;
+import com.bergerkiller.bukkit.common.math.VectorList;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import org.bukkit.util.Vector;
 import org.junit.Ignore;
@@ -20,10 +20,10 @@ public class OrientedBoundingBoxTest {
                 Quaternion.fromYawPitchRoll(45.0, 45.0, 45.0));
 
         // Current:
-        //   VertexPointsBasicImpl: 8.8s
-        //   VertexPointsSIMD256Impl: 5.8s
+        //   VectorListBasicImpl: 8.8s
+        //   VectorListOctoSIMD256Impl: 5.8s
         for (long l = 0; l < 10000000; l++) {
-            assertTrue(VertexPoints.areVerticesOverlapping(box_a.getVertices(), box_b.getVertices(),
+            assertTrue(VectorList.areVerticesOverlapping(box_a.getVertices(), box_b.getVertices(),
                     OrientedBoundingBox.createSeparatingAxisIterator(box_a.getOrientation(), box_b.getOrientation())));
         }
     }
