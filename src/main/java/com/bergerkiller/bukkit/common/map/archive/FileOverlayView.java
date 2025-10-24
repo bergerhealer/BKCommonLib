@@ -170,11 +170,8 @@ class FileOverlayView {
         for (String directoryPath : overlayDirectories) {
             DirectoryEntry directory = root.findDirectory(directoryPath);
             if (directory == null) {
-                System.out.println("NOT FOUND: " + directoryPath);
                 continue;
             }
-
-            System.out.println("APPLY OVERLAY: " + directoryPath);
 
             // Merge the contents of this directory into the root entry
             // Replace existing File Entries that share the same name (later overrides older)
