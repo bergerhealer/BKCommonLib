@@ -462,27 +462,24 @@ public interface VectorList extends Iterable<Vector> {
         }
 
         private static final class FilledVectorIterator extends VectorIterator {
-            private final int limit;
+            private final int lastIndex;
 
             public FilledVectorIterator(double x, double y, double z, int limit) {
                 this.x = x;
                 this.y = y;
                 this.z = z;
-                this.limit = limit;
+                this.lastIndex = (limit - 1);
             }
 
             @Override
             public boolean advance() {
-                final int limit = this.limit;
-                if (limit != -1) {
-                    int nextIndex = index + 1;
-                    if (nextIndex >= limit) {
-                        return false;
-                    }
+                final int lastIndex = this.lastIndex;
+                if (lastIndex != -2 && index >= lastIndex) {
+                    return false;
+                } else {
+                    ++index;
+                    return true;
                 }
-
-                ++index;
-                return true;
             }
         }
     }
