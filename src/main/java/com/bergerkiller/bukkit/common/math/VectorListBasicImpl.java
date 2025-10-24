@@ -35,7 +35,8 @@ class VectorListBasicImpl implements VectorList {
     private void load(VectorList.VectorIterator iter) {
         int pos = 0;
         final double[] points = this.points;
-        while (iter.advance()) {
+        final int end_pos = 3 * this.size;
+        while (pos < end_pos && iter.advance()) {
             points[pos++] = iter.x();
             points[pos++] = iter.y();
             points[pos++] = iter.z();
