@@ -11,7 +11,7 @@ import com.bergerkiller.bukkit.common.utils.MathUtil;
  * A quaternion for performing rotations in 3D space.
  * The quaternion is automatically normalized.
  */
-public class Quaternion implements Cloneable {
+public class Quaternion implements Rotatable, Cloneable {
     private double x, y, z, w;
 
     public Quaternion() {
@@ -165,68 +165,54 @@ public class Quaternion implements Cloneable {
      * @param quat to multiply with
      */
     public void multiply(Quaternion quat) {
-        double x = this.w * quat.x + this.x * quat.w + this.y * quat.z - this.z * quat.y;
-        double y = this.w * quat.y + this.y * quat.w + this.z * quat.x - this.x * quat.z;
-        double z = this.w * quat.z + this.z * quat.w + this.x * quat.y - this.y * quat.x;
-        double w = this.w * quat.w - this.x * quat.x - this.y * quat.y - this.z * quat.z;
+        rotateByQuaternion(quat.x, quat.y, quat.z, quat.w);
+    }
+
+    /**
+     * Multiplies this quaternion with another quaternion. The result is stored in this quaternion.
+     * Equivalent to {@link #multiply(Quaternion)}
+     *
+     * @param quat Quaternion to rotate with
+     * @see #multiply(Quaternion)
+     */
+    @Override
+    public void rotate(Quaternion quat) {
+        rotateByQuaternion(quat.getX(), quat.getY(), quat.getZ(), quat.getW());
+    }
+
+    @Override
+    public void rotateByQuaternion(double qx, double qy, double qz, double qw) {
+        double x = this.w * qx + this.x * qw + this.y * qz - this.z * qy;
+        double y = this.w * qy + this.y * qw + this.z * qx - this.x * qz;
+        double z = this.w * qz + this.z * qw + this.x * qy - this.y * qx;
+        double w = this.w * qw - this.x * qx - this.y * qy - this.z * qz;
         this.x = x; this.y = y; this.z = z; this.w = w;
         this.normalize();
     }
 
-    /**
-     * Multiplies this Quaternion with a rotation around an axis
-     * 
-     * @param axis vector
-     * @param angleDegrees to rotate in degrees
-     */
+    @Override
     public final void rotateAxis(Vector axis, double angleDegrees) {
-        rotateAxis(axis.getX(), axis.getY(), axis.getZ(), angleDegrees);
+        Rotatable.super.rotateAxis(axis, angleDegrees);
     }
 
-    /**
-     * Multiplies this Quaternion with a rotation around an axis
-     * 
-     * @param axisX vector coordinate
-     * @param axisY vector coordinate
-     * @param axisZ vector coordinate
-     * @param angleDegrees to rotate in degrees
-     */
+    @Override
     public final void rotateAxis(double axisX, double axisY, double axisZ, double angleDegrees) {
-        this.multiply(Quaternion.fromAxisAngles(axisX, axisY, axisZ, angleDegrees));
+        Rotatable.super.rotateAxis(axisX, axisY, axisZ, angleDegrees);
     }
 
-    /**
-     * Multiplies this quaternion with a rotation transformation in yaw/pitch/roll, based on the Minecraft
-     * coordinate system. This will differ slightly from the standard rotateX/Y/Z functions.
-     * 
-     * @param rotation (x=pitch, y=yaw, z=roll)
-     */
+    @Override
     public final void rotateYawPitchRoll(Vector3 rotation) {
-        rotateYawPitchRoll(rotation.x, rotation.y, rotation.z);
+        Rotatable.super.rotateYawPitchRoll(rotation);
     }
 
-    /**
-     * Multiplies this quaternion with a rotation transformation in yaw/pitch/roll, based on the Minecraft
-     * coordinate system. This will differ slightly from the standard rotateX/Y/Z functions.
-     * 
-     * @param rotation (x=pitch, y=yaw, z=roll)
-     */
+    @Override
     public final void rotateYawPitchRoll(Vector rotation) {
-        rotateYawPitchRoll(rotation.getX(), rotation.getY(), rotation.getZ());
+        Rotatable.super.rotateYawPitchRoll(rotation);
     }
 
-    /**
-     * Multiplies this quaternion with a rotation transformation in yaw/pitch/roll, based on the Minecraft
-     * coordinate system. This will differ slightly from the standard rotateX/Y/Z functions.
-     * 
-     * @param pitch rotation (X)
-     * @param yaw rotation (Y)
-     * @param roll rotation (Z)
-     */
+    @Override
     public final void rotateYawPitchRoll(double pitch, double yaw, double roll) {
-        this.rotateY(-yaw);
-        this.rotateX(pitch);
-        this.rotateZ(roll);
+        Rotatable.super.rotateYawPitchRoll(pitch, yaw, roll);
     }
 
     /**
@@ -353,9 +339,7 @@ public class Quaternion implements Cloneable {
         }
     }
 
-    /**
-     * Rotates the Quaternion 180 degrees around the x-axis
-     */
+    @Override
     public final void rotateXFlip() {
         // rotateX_unsafe(0.0, 1.0);
         double x = this.x, y = this.y, z = this.z, w = this.w;
@@ -365,11 +349,7 @@ public class Quaternion implements Cloneable {
         this.w = -x;
     }
 
-    /**
-     * Rotates the Quaternion an angle around the x-axis
-     * 
-     * @param angleDegrees to rotate
-     */
+    @Override
     public final void rotateX(double angleDegrees) {
         if (angleDegrees != 0.0) {
             double r = 0.5 * Math.toRadians(angleDegrees);
@@ -379,7 +359,7 @@ public class Quaternion implements Cloneable {
 
     /**
      * Rotates the Quaternion an angle around the X-axis, the angle defined by the y/z vector.
-     * This is equivalent to calling {@link #rotateX(angleDegrees)} using {@link Math#atan2(z,y)}.
+     * This is equivalent to calling {@link #rotateX(double)} using {@link Math#atan2(double, double)}.
      * 
      * @param y
      * @param z
@@ -398,9 +378,7 @@ public class Quaternion implements Cloneable {
         this.normalize();
     }
 
-    /**
-     * Rotates the Quaternion 180 degrees around the y-axis
-     */
+    @Override
     public final void rotateYFlip() {
         // rotateY_unsafe(0.0, 1.0);
         double x = this.x, y = this.y, z = this.z, w = this.w;
@@ -410,11 +388,7 @@ public class Quaternion implements Cloneable {
         this.w = -y;
     }
 
-    /**
-     * Rotates the Quaternion an angle around the y-axis
-     * 
-     * @param angleDegrees to rotate
-     */
+    @Override
     public final void rotateY(double angleDegrees) {
         if (angleDegrees != 0.0) {
             double r = 0.5 * Math.toRadians(angleDegrees);
@@ -424,7 +398,7 @@ public class Quaternion implements Cloneable {
 
     /**
      * Rotates the Quaternion an angle around the y-axis, the angle defined by the x/z vector.
-     * This is equivalent to calling {@link #rotateY(angleDegrees)} using {@link Math#atan2(z,x)}.
+     * This is equivalent to calling {@link #rotateY(double)} using {@link Math#atan2(double, double)}.
      * 
      * @param x
      * @param z
@@ -443,9 +417,7 @@ public class Quaternion implements Cloneable {
         this.normalize();
     }
 
-    /**
-     * Rotates the Quaternion 180 degrees around the z-axis
-     */
+    @Override
     public final void rotateZFlip() {
         // rotateZ_unsafe(0.0, 1.0);
         double x = this.x, y = this.y, z = this.z, w = this.w;
@@ -455,11 +427,7 @@ public class Quaternion implements Cloneable {
         this.w = -z;
     }
 
-    /**
-     * Rotates the Quaternion an angle around the z-axis
-     * 
-     * @param angleDegrees to rotate
-     */
+    @Override
     public final void rotateZ(double angleDegrees) {
         if (angleDegrees != 0.0) {
             double r = 0.5 * Math.toRadians(angleDegrees);
@@ -469,7 +437,7 @@ public class Quaternion implements Cloneable {
 
     /**
      * Rotates the Quaternion an angle around the z-axis, the angle defined by the x/y vector.
-     * This is equivalent to calling {@link #rotateZ(angleDegrees)} using {@link Math#atan2(y,x)}.
+     * This is equivalent to calling {@link #rotateZ(double)} using {@link Math#atan2(double, double)}.
      * 
      * @param x
      * @param y
@@ -740,7 +708,7 @@ public class Quaternion implements Cloneable {
     /**
      * Creates a quaternion that transforms a forward vector (0, 0, 1) into the output vector (v).
      * The vector does not have to be a unit vector for this function to work.
-     * If the 'up' axis is important, use {@link #fromLookDirection(dir, up)} instead.
+     * If the 'up' axis is important, use {@link #fromLookDirection(Vector, Vector)} instead.
      * 
      * @param dir Expected output forward vector (to)
      * @return quaternion that rotates (0,0,1) to become v
@@ -786,7 +754,7 @@ public class Quaternion implements Cloneable {
     /**
      * Performs a linear interpolation between two quaternions.
      * Separate theta values can be specified to set how much of each quaternion to keep
-     * For smoother interpolation, {@link #slerp(q0, q1, theta)} can be used instead.
+     * For smoother interpolation, {@link #slerp(Quaternion, Quaternion, double)} can be used instead.
      * 
      * @param q0 quaternion at theta=0
      * @param q1 quaternion at theta=1
@@ -803,7 +771,7 @@ public class Quaternion implements Cloneable {
 
     /**
      * Performs a linear interpolation between two quaternions.
-     * For smoother interpolation, {@link #slerp(q0, q1, theta)} can be used instead.
+     * For smoother interpolation, {@link #slerp(Quaternion, Quaternion, double)} can be used instead.
      * 
      * @param q0 quaternion at theta=0
      * @param q1 quaternion at theta=1

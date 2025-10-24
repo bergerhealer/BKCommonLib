@@ -8,7 +8,7 @@ import com.bergerkiller.bukkit.common.map.util.MatrixMath;
 import com.bergerkiller.bukkit.common.map.util.Quad;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
-public class Matrix4x4 implements Cloneable {
+public class Matrix4x4 implements Rotatable, Cloneable {
     public double m00, m01, m02, m03;
     public double m10, m11, m12, m13;
     public double m20, m21, m22, m23;
@@ -180,26 +180,22 @@ public class Matrix4x4 implements Cloneable {
         return true;
     }
 
-    /**
-     * Multiplies this matrix with a rotation transformation defined in a Quaternion
-     * 
-     * @param quat to rotate with
-     */
-    public final void rotate(Quaternion quat) {
-        double x = quat.getX();
-        double y = quat.getY();
-        double z = quat.getZ();
-        double w = quat.getW();
+    @Override
+    public final void rotate(Quaternion q) {
+        rotateByQuaternion(q.getX(), q.getY(), q.getZ(), q.getW());
+    }
 
-        double q00 = 2.0 * (-y*y + -z*z);
-        double q01 = 2.0 * ( x*y + -z*w);
-        double q02 = 2.0 * ( x*z +  y*w);
-        double q10 = 2.0 * ( x*y +  z*w);
-        double q11 = 2.0 * (-x*x + -z*z);
-        double q12 = 2.0 * ( y*z + -x*w);
-        double q20 = 2.0 * ( x*z + -y*w);
-        double q21 = 2.0 * ( y*z +  x*w);
-        double q22 = 2.0 * (-x*x + -y*y);
+    @Override
+    public final void rotateByQuaternion(double qx, double qy, double qz, double qw) {
+        double q00 = 2.0 * (-qy*qy + -qz*qz);
+        double q01 = 2.0 * ( qx*qy + -qz*qw);
+        double q02 = 2.0 * ( qx*qz +  qy*qw);
+        double q10 = 2.0 * ( qx*qy +  qz*qw);
+        double q11 = 2.0 * (-qx*qx + -qz*qz);
+        double q12 = 2.0 * ( qy*qz + -qx*qw);
+        double q20 = 2.0 * ( qx*qz + -qy*qw);
+        double q21 = 2.0 * ( qy*qz +  qx*qw);
+        double q22 = 2.0 * (-qx*qx + -qy*qy);
 
         double a00, a01, a02;
         double a10, a11, a12;
@@ -228,21 +224,15 @@ public class Matrix4x4 implements Cloneable {
         this.m30 += a30; this.m31 += a31; this.m32 += a32;
     }
 
-    /**
-     * Multiplies this matrix with a rotation transformation about the X-axis
-     * 
-     * @param angle the angle to rotate about the X axis in degrees
-     */
-    public final void rotateX(double angle) {
-        if (angle != 0.0) {
-            double angleRad = Math.toRadians(angle);
+    @Override
+    public final void rotateX(double angleDegrees) {
+        if (angleDegrees != 0.0) {
+            double angleRad = Math.toRadians(angleDegrees);
             rotateX_unsafe(Math.cos(angleRad), Math.sin(angleRad));
         }
     }
 
-    /**
-     * Rotates this matrix 180 degrees around the x-axis
-     */
+    @Override
     public final void rotateXFlip() {
         // rotateX_unsafe(-1.0, 0.0);
 
@@ -291,22 +281,16 @@ public class Matrix4x4 implements Cloneable {
         this.m21 = m21; this.m22 = m22;
         this.m31 = m31; this.m32 = m32;
     }
-    
-    /**
-     * Multiplies this matrix with a rotation transformation about the Y-axis
-     * 
-     * @param angle the angle to rotate about the Y axis in degrees
-     */
-    public final void rotateY(double angle) {
-        if (angle != 0.0) {
-            double angleRad = Math.toRadians(angle);
+
+    @Override
+    public final void rotateY(double angleDegrees) {
+        if (angleDegrees != 0.0) {
+            double angleRad = Math.toRadians(angleDegrees);
             rotateY_unsafe(Math.cos(angleRad), Math.sin(angleRad));
         }
     }
 
-    /**
-     * Rotates this matrix 180 degrees around the y-axis
-     */
+    @Override
     public final void rotateYFlip() {
         //rotateY_unsafe(-1.0, 0.0);
 
@@ -355,15 +339,11 @@ public class Matrix4x4 implements Cloneable {
         this.m20 = m20; this.m22 = m22;
         this.m30 = m30; this.m32 = m32;
     }
-    
-    /**
-     * Multiplies this matrix with a rotation transformation about the Z-axis
-     * 
-     * @param angle the angle to rotate about the Z axis in degrees
-     */
-    public final void rotateZ(double angle) {
-        if (angle != 0.0) {
-            double angleRad = Math.toRadians(angle);
+
+    @Override
+    public final void rotateZ(double angleDegrees) {
+        if (angleDegrees != 0.0) {
+            double angleRad = Math.toRadians(angleDegrees);
             rotateZ_unsafe(Math.cos(angleRad), Math.sin(angleRad));
         }
     }
@@ -380,9 +360,7 @@ public class Matrix4x4 implements Cloneable {
         rotateZ_unsafe(x * f, y * f);
     }
 
-    /**
-     * Rotates this matrix 180 degrees around the z-axis
-     */
+    @Override
     public final void rotateZFlip() {
         // rotateZ_unsafe(-1.0, 0.0);
 
@@ -420,52 +398,24 @@ public class Matrix4x4 implements Cloneable {
         this.m30 = m30; this.m31 = m31;
     }
 
-    /**
-     * Multiplies this matrix with a rotation transformation in yaw/pitch/roll, based on the Minecraft
-     * coordinate system. This will differ slightly from the standard rotateX/Y/Z functions.
-     * 
-     * @param rotation (x=pitch, y=yaw, z=roll)
-     */
+    @Override
     public final void rotateYawPitchRoll(Vector3 rotation) {
-        rotateYawPitchRoll(rotation.x, rotation.y, rotation.z);
+        Rotatable.super.rotateYawPitchRoll(rotation);
     }
 
-    /**
-     * Multiplies this matrix with a rotation transformation in yaw/pitch/roll, based on the Minecraft
-     * coordinate system. This will differ slightly from the standard rotateX/Y/Z functions.
-     * 
-     * @param rotation (x=pitch, y=yaw, z=roll)
-     */
+    @Override
     public final void rotateYawPitchRoll(Vector rotation) {
-        rotateYawPitchRoll(rotation.getX(), rotation.getY(), rotation.getZ());
+        Rotatable.super.rotateYawPitchRoll(rotation);
     }
 
-    /**
-     * Multiplies this matrix with a rotation transformation in yaw/pitch/roll, based on the Minecraft
-     * coordinate system. This will differ slightly from the standard rotateX/Y/Z functions.
-     * 
-     * @param pitch rotation (X)
-     * @param yaw rotation (Y)
-     * @param roll rotation (Z)
-     */
+    @Override
     public final void rotateYawPitchRoll(double pitch, double yaw, double roll) {
-        this.rotateY(-yaw);
-        this.rotateX(pitch);
-        this.rotateZ(roll);
+        Rotatable.super.rotateYawPitchRoll(pitch, yaw, roll);
     }
 
-    /**
-     * Multiplies this matrix with a rotation transformation in yaw/pitch/roll, based on the Minecraft
-     * coordinate system. This will differ slightly from the standard rotateX/Y/Z functions.
-     * 
-     * @param pitch rotation (X)
-     * @param yaw rotation (Y)
-     * @param roll rotation (Z)
-     */
+    @Override
     public final void rotateYawPitchRoll(float pitch, float yaw, float roll) {
-        this.rotateY(-yaw);
-        this.rotateX(pitch);
-        this.rotateZ(roll);
+        Rotatable.super.rotateYawPitchRoll(pitch, yaw, roll);
     }
 
     /**
