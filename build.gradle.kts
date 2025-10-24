@@ -2,7 +2,7 @@ plugins {
     id("java-library")
     id("maven-publish")
     /* https://github.com/bergerhealer/gradle-simd-plugin */
-    id("com.bergerkiller.gradle.simd") version "1.0.0"
+    id("com.bergerkiller.gradle.simd") version "1.0.1"
     alias(libs.plugins.mountiplex)
     alias(libs.plugins.shadow)
 }
