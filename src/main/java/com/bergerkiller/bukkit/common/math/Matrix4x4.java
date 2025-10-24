@@ -8,7 +8,7 @@ import com.bergerkiller.bukkit.common.map.util.MatrixMath;
 import com.bergerkiller.bukkit.common.map.util.Quad;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
-public class Matrix4x4 implements Rotatable, Cloneable {
+public class Matrix4x4 implements Rotatable, Translatable, Cloneable {
     public double m00, m01, m02, m03;
     public double m10, m11, m12, m13;
     public double m20, m21, m22, m23;
@@ -532,31 +532,17 @@ public class Matrix4x4 implements Rotatable, Cloneable {
         return Quaternion.getYawPitchRoll(x, y, z, w);
     }
 
-    /**
-     * Multiplies this matrix with a translation transformation
-     * 
-     * @param translation
-     */
-    public final void translate(Vector3 translation) {
-        this.translate(translation.x, translation.y, translation.z);
+    @Override
+    public final void translate(Vector3 delta) {
+        this.translate(delta.x, delta.y, delta.z);
     }
 
-    /**
-     * Multiplies this matrix with a translation transformation.
-     * 
-     * @param translation
-     */
-    public final void translate(Vector translation) {
-        this.translate(translation.getX(), translation.getY(), translation.getZ());
+    @Override
+    public final void translate(Vector delta) {
+        this.translate(delta.getX(), delta.getY(), delta.getZ());
     }
 
-    /**
-     * Multiplies this matrix with a translation transformation
-     * 
-     * @param dx translation
-     * @param dy translation
-     * @param dz translation
-     */
+    @Override
     public final void translate(double dx, double dy, double dz) {
         this.m03 += this.m00*dx + this.m01*dy + this.m02*dz;
         this.m13 += this.m10*dx + this.m11*dy + this.m12*dz;
