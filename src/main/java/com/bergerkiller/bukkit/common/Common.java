@@ -75,7 +75,9 @@ public class Common {
             "Common:JSONSerializer:NullItemStack",
             "Common:Yaml:ListOfListFix",
             "Common:Cloud:QuotedArgumentParserFromParser",
-            "Minecraft:GameProfile:Immutable"
+            "Minecraft:GameProfile:Immutable",
+            "Common:Math:OrientedBoundingBox:HasOverlapTest",
+            "Common:Math:VectorList"
     ).collect(Collectors.toSet());
 
     /**
