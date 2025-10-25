@@ -37,12 +37,10 @@ final class VectorListOctoSIMD512Impl implements VectorList {
         double[] yArr = new double[8];
         double[] zArr = new double[8];
 
-        int i = 0;
-        while (i < 8 && iterator.advance()) {
+        for (int i = 0; i < 8 && iterator.advance(); i++) {
             xArr[i] = iterator.x();
             yArr[i] = iterator.y();
             zArr[i] = iterator.z();
-            ++i;
         }
 
         this.xVec = DoubleVector.fromArray(SPECIES, xArr, 0);

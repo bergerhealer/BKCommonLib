@@ -5,6 +5,8 @@ import jdk.incubator.vector.VectorOperators;
 import jdk.incubator.vector.VectorSpecies;
 import org.bukkit.util.Vector;
 
+import java.util.Arrays;
+
 /**
  * Implementation of 8-size VectorList optimized for 256 bit SIMD
  */
@@ -33,24 +35,31 @@ final class VectorListOctoSIMD256Impl implements VectorList {
             throw new IllegalArgumentException("This SIMD256 implementation requires exactly 8 points");
         }
 
-        double[] xArr = new double[8];
-        double[] yArr = new double[8];
-        double[] zArr = new double[8];
+        double[] tmp = new double[12];
 
-        int i = 0;
-        while (i < 8 && iterator.advance()) {
-            xArr[i] = iterator.x();
-            yArr[i] = iterator.y();
-            zArr[i] = iterator.z();
-            ++i;
+        for (int i = 0; i < 4 && iterator.advance(); i++) {
+            tmp[i] = iterator.x();
+            tmp[i + 4] = iterator.y();
+            tmp[i + 8] = iterator.z();
         }
+        this.x0 = DoubleVector.fromArray(SPECIES, tmp, 0);
+        this.y0 = DoubleVector.fromArray(SPECIES, tmp, 4);
+        this.z0 = DoubleVector.fromArray(SPECIES, tmp, 8);
 
-        this.x0 = DoubleVector.fromArray(SPECIES, xArr, 0);
-        this.x1 = DoubleVector.fromArray(SPECIES, xArr, 4);
-        this.y0 = DoubleVector.fromArray(SPECIES, yArr, 0);
-        this.y1 = DoubleVector.fromArray(SPECIES, yArr, 4);
-        this.z0 = DoubleVector.fromArray(SPECIES, zArr, 0);
-        this.z1 = DoubleVector.fromArray(SPECIES, zArr, 4);
+        for (int i = 0; i < 4; i++) {
+            if (iterator.advance()) {
+                tmp[i] = iterator.x();
+                tmp[i + 4] = iterator.y();
+                tmp[i + 8] = iterator.z();
+            } else {
+                tmp[i] = 0.0;
+                tmp[i + 4] = 0.0;
+                tmp[i + 8] = 0.0;
+            }
+        }
+        this.x1 = DoubleVector.fromArray(SPECIES, tmp, 0);
+        this.y1 = DoubleVector.fromArray(SPECIES, tmp, 4);
+        this.z1 = DoubleVector.fromArray(SPECIES, tmp, 8);
     }
 
     @Override
@@ -80,13 +89,13 @@ final class VectorListOctoSIMD256Impl implements VectorList {
     public Vector get(int index, Vector into) {
         if (index < 4) {
             into.setX(x0.lane(index));
-            into.setX(y0.lane(index));
-            into.setX(z0.lane(index));
+            into.setY(y0.lane(index));
+            into.setZ(z0.lane(index));
         } else {
             int i = index - 4;
-            into.setX(x0.lane(i));
-            into.setX(y0.lane(i));
-            into.setX(z0.lane(i));
+            into.setX(x1.lane(i));
+            into.setY(y1.lane(i));
+            into.setZ(z1.lane(i));
         }
         return into;
     }

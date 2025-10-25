@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.math.VectorList;
 import com.bergerkiller.bukkit.common.math.VectorListMutable;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import org.bukkit.util.Vector;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -62,5 +63,17 @@ public class VectorListTest {
         VectorList.Projection projection = list.projectAxis(1.0, 0.0, 0.0);
         assertEquals(-2.0 * MathUtil.HALFROOTOFTWO, projection.min, 1e-8);
         assertEquals(2.0 * MathUtil.HALFROOTOFTWO, projection.max, 1e-8);
+    }
+
+    @Test
+    @Ignore
+    public void benchmarkOctoSimdInit() {
+        VectorListMutable box = VectorListMutable.createBoxVertices(2.0, 2.0, 2.0);
+        box.rotateY(45.0);
+        box.translate(20.0, 60.0, 70);
+
+        for (long l = 0; l < 10000000L; l++) {
+            box.immutable();
+        }
     }
 }
