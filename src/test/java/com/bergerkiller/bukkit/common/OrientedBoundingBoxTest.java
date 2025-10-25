@@ -21,7 +21,7 @@ public class OrientedBoundingBoxTest {
 
         // Current:
         //   VectorListBasicImpl: 8.8s
-        //   VectorListOctoSIMD256Impl: 5.8s
+        //   VectorListSIMD256DoubledImpl: 4.8s
         for (long l = 0; l < 10000000; l++) {
             assertTrue(VectorList.areVerticesOverlapping(box_a.getVertices(), box_b.getVertices(),
                     OrientedBoundingBox.createSeparatingAxisIterator(box_a.getOrientation(), box_b.getOrientation())));

@@ -91,6 +91,28 @@ class VectorListBasicImpl implements VectorList {
     }
 
     @Override
+    public VectorIterator vectorIterator(final int offset, final int length) {
+        return new VectorIterator() {
+            @Override
+            public boolean advance() {
+                int nextIndex = index + 1;
+                if (nextIndex >= length) {
+                    return false;
+                }
+
+                index = nextIndex;
+
+                int pos = 3 * (nextIndex + offset);
+                final double[] points = VectorListBasicImpl.this.points;
+                x = points[pos++];
+                y = points[pos++];
+                z = points[pos];
+                return true;
+            }
+        };
+    }
+
+    @Override
     public String toString() {
         return genericToString(this);
     }

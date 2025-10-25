@@ -112,16 +112,6 @@ public interface VectorListMutable extends VectorList, Rotatable, Translatable {
     }
 
     /**
-     * Sets a single vector using a Bukkit Vector
-     *
-     * @param index Vector index
-     * @param value Vector value
-     */
-    default void set(int index, Vector value) {
-        set(index, value.getX(), value.getY(), value.getZ());
-    }
-
-    /**
      * Sets a single vector
      *
      * @param index Vector index
@@ -133,11 +123,35 @@ public interface VectorListMutable extends VectorList, Rotatable, Translatable {
 
     /**
      * Returns a new MutableVectorIterator. Use this to efficiently iterate
+     * and mutate a subset of this list of vectors
+     *
+     * @param offset Offset vector count
+     * @param length Number of vectors to iterate, -1 for no length limit.
+     * @return New MutableVectorIterator
+     */
+    @Override
+    MutableVectorIterator vectorIterator(int offset, int length);
+
+    /**
+     * Sets a single vector using a Bukkit Vector
+     *
+     * @param index Vector index
+     * @param value Vector value
+     */
+    default void set(int index, Vector value) {
+        set(index, value.getX(), value.getY(), value.getZ());
+    }
+
+    /**
+     * Returns a new MutableVectorIterator. Use this to efficiently iterate
      * and mutate this list of vectors
      *
      * @return New MutableVectorIterator
      */
-    MutableVectorIterator vectorIterator();
+    @Override
+    default MutableVectorIterator vectorIterator() {
+        return vectorIterator(0, size());
+    }
 
     /**
      * Creates a copy of this mutable vector list
@@ -177,7 +191,7 @@ public interface VectorListMutable extends VectorList, Rotatable, Translatable {
      * A more performant vector iterator that avoids the allocation of Vector
      * objects. Is mutable so also allows updating the values being iterated over.
      */
-    abstract class MutableVectorIterator extends VectorIterator implements Rotatable, Translatable {
+    abstract class MutableVectorIterator extends VectorIterator implements Rotatable, Translatable, VectorConsumer {
 
         /**
          * Sets a new x/y/z value for the Vector at the current index
@@ -187,6 +201,44 @@ public interface VectorListMutable extends VectorList, Rotatable, Translatable {
          * @param z New Z-value
          */
         public abstract void set(double x, double y, double z);
+
+        /**
+         * Calls {@link #advance()} followed by {@link #set(double, double, double)}
+         * to set the value. This allows this method to be used as a vector sink,
+         * "adding" the value to a mutable vector list.
+         *
+         * @param x New X-value
+         * @param y New Y-value
+         * @param z New Z-value
+         * @return True if the advance() succeeded and the value was stored
+         */
+        @Override
+        public boolean acceptVector(double x, double y, double z) {
+            if (advance()) {
+                set(x, y, z);
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        /**
+         * Calls {@link #advance()} followed by {@link #set(Vector)}
+         * to set the value. This allows this method to be used as a vector sink,
+         * "adding" the value to a mutable vector list.
+         *
+         * @param value New Vector value
+         * @return True if the advance() succeeded and the value was stored
+         */
+        @Override
+        public boolean acceptVector(Vector value) {
+            if (advance()) {
+                set(value);
+                return true;
+            } else {
+                return false;
+            }
+        }
 
         /**
          * Multiplies the value of the Vector with a multiplier
@@ -272,6 +324,46 @@ public interface VectorListMutable extends VectorList, Rotatable, Translatable {
                     this.x = x;
                     this.y = y;
                     this.z = z;
+                }
+            };
+        }
+
+        /**
+         * Joins two mutable vector iterators, first iterating the first and then the second.
+         * Set operations will update the iterator last iterated over.
+         *
+         * @param first First MutableVectorIterator
+         * @param second Second MutableVectorIterator
+         * @return Joined MutableVectorIterator
+         */
+        public static MutableVectorIterator join(final MutableVectorIterator first, final MutableVectorIterator second) {
+            return new MutableVectorIterator() {
+                MutableVectorIterator curr = first;
+
+                @Override
+                public void set(double x, double y, double z) {
+                    curr.set(x, y, z);
+                }
+
+                @Override
+                public boolean advance() {
+                    MutableVectorIterator curr = this.curr;
+                    if (!curr.advance()) {
+                        if (curr == second) {
+                            return false;
+                        } else {
+                            this.curr = curr = second;
+                            if (!curr.advance()) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    this.x = curr.x();
+                    this.y = curr.y();
+                    this.z = curr.z();
+                    ++this.index;
+                    return true;
                 }
             };
         }

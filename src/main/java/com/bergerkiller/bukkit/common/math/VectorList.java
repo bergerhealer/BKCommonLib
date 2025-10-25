@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.math;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import org.bukkit.util.Vector;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -42,6 +43,16 @@ public interface VectorList extends Iterable<Vector> {
     }
 
     /**
+     * Creates a new immutable copy of an array of vectors
+     *
+     * @param vectorValues List of vector values
+     * @return
+     */
+    static VectorList copyOf(Vector... vectorValues) {
+        return FACTORY.copyOf(vectorValues);
+    }
+
+    /**
      * Creates a new immutable vector list, initialized with the values from
      * the iterator specified. The size must be known up-front.
      *
@@ -52,6 +63,19 @@ public interface VectorList extends Iterable<Vector> {
      */
     static VectorList createWith(int size, VectorList.VectorIterator iterator) {
         return FACTORY.createWith(size, iterator);
+    }
+
+    /**
+     * Creates a view on two VectorLists, first containing the elements of the first
+     * list, and then the second. Use copyOf of this joined list if it should be
+     * optimized into a single backing buffer.
+     *
+     * @param first First VectorList
+     * @param second Second VectorList
+     * @return Joined VectorList View
+     */
+    static VectorList join(VectorList first, VectorList second) {
+        return new VectorListJoinedImpl(first, second);
     }
 
     /**
@@ -80,11 +104,23 @@ public interface VectorList extends Iterable<Vector> {
 
     /**
      * Gets a more performant vector iterator that avoids the allocation of Vector
+     * objects, for a subset of this list.
+     *
+     * @param offset Offset vector count
+     * @param length Number of vectors to iterate
+     * @return VectorIterator
+     */
+    VectorIterator vectorIterator(int offset, int length);
+
+    /**
+     * Gets a more performant vector iterator that avoids the allocation of Vector
      * objects.
      *
      * @return VectorIterator
      */
-    VectorIterator vectorIterator();
+    default VectorIterator vectorIterator() {
+        return vectorIterator(0, size());
+    }
 
     @Override
     default Iterator<Vector> iterator() {
@@ -127,12 +163,16 @@ public interface VectorList extends Iterable<Vector> {
     }
 
     /**
-     * Calls the callback function with all the vectors of this vector list
+     * Calls the callback function with all the vectors of this vector list.
+     * Returns true if the consumer accepted all values, or false if
+     * it signalled false.
      *
      * @param consumer Callback
+     * @return True if all values have been consumed, false if the consumer
+     *         aborted iteration.
      */
-    default void forEach(VectorConsumer consumer) {
-        vectorIterator().forEachRemaining(consumer);
+    default boolean forEach(VectorConsumer consumer) {
+        return vectorIterator().forEachRemaining(consumer);
     }
 
     /**
@@ -163,6 +203,72 @@ public interface VectorList extends Iterable<Vector> {
             max = Math.max(max, projection);
         }
         return new Projection(min, max);
+    }
+
+    /**
+     * Performs a cross product between all the vectors of this list (left-hand) and the
+     * specified vectors (right-hand)
+     *
+     * @param right Right-hand side of the cross product. Must be the same size.
+     * @return New VectorList with the cross product result
+     * @throws IllegalArgumentException If this vector list size differs from the right
+     * @see VectorIterator#performCrossProduct
+     */
+    default VectorList crossProduct(VectorList right) {
+        VectorListMutable result = VectorListMutable.create(this.size());
+        this.crossProduct(right, result);
+        return result;
+    }
+
+    /**
+     * Performs a cross product between all the vectors of this list (left-hand) and the
+     * specified vectors (right-hand), and stores it into the mutable vector list result.
+     *
+     * @param right Right-hand side of the cross product. Must be the same size.
+     * @param result Mutable VectorList to write the cross product results into.
+     *               Must be able to at least store the results.
+     * @throws IllegalArgumentException If this vector list size differs from the right, or the
+     *                                  mutable result vector list can't store the full result.
+     * @see VectorIterator#performCrossProduct
+     */
+    default void crossProduct(VectorList right, VectorListMutable result) {
+        try {
+            crossProduct(right, result.vectorIterator());
+        } catch (IllegalArgumentException ex) {
+            if (result.size() < this.size()) {
+                throw new IllegalArgumentException("Result mutable vector list (size=" + result.size() +
+                        ") can't store the cross product results (size=" + this.size() + ")");
+            } else {
+                throw ex;
+            }
+        }
+    }
+
+    /**
+     * Performs a cross product between all the vectors of this list (left-hand) and the
+     * specified vectors (right-hand)<br>
+     * <br>
+     * Implementations should use
+     * {@link VectorListMutable.MutableVectorIterator#acceptVector(double, double, double)}
+     * to store the results.
+     *
+     * @param right Right-hand side of the cross product. Must be the same size.
+     * @param consumer Consumer to write the cross product results into.
+     * @throws IllegalArgumentException If this vector list size differs from the right, or the
+     *                                  consumer can't store the full result.
+     * @see VectorIterator#performCrossProduct
+     */
+    default void crossProduct(VectorList right, VectorConsumer consumer) {
+        try {
+            VectorIterator.performCrossProduct(this.vectorIterator(), right.vectorIterator(), consumer);
+        } catch (IllegalArgumentException ex) {
+            if (this.size() != right.size()) {
+                throw new IllegalArgumentException("Left list (size=" + this.size() +
+                        ") has a different size than the right size (size=" + right.size() + ")");
+            } else {
+                throw ex;
+            }
+        }
     }
 
     /**
@@ -242,7 +348,10 @@ public interface VectorList extends Iterable<Vector> {
         /**
          * Gets the index of the current vector. This counts how many iterations
          * have elapsed. Before {@link #advance()} is called, this returns -1
-         * to indicate iteration hasn't started yet.
+         * to indicate iteration hasn't started yet.<br>
+         * <br>
+         * When using the vector iterator with an offset, this index will still be 0
+         * for the first element.
          *
          * @return Index
          */
@@ -321,14 +430,19 @@ public interface VectorList extends Iterable<Vector> {
 
         /**
          * Calls {@link #advance()} until the end is reached and then calls the consumer
-         * callback with all the vector information.
+         * callback with all the vector information. Aborts iteration if the
+         * consumer signals it cannot accept more values, in which case
+         * this method returns false.
          *
          * @param consumer Vector Consumer
          */
-        public void forEachRemaining(VectorConsumer consumer) {
+        public boolean forEachRemaining(VectorConsumer consumer) {
             while (advance()) {
-                consumer.accept(index, x, y, z);
+                if (!consumer.acceptVector(x, y, z)) {
+                    return false;
+                }
             }
+            return true;
         }
 
         /**
@@ -379,6 +493,39 @@ public interface VectorList extends Iterable<Vector> {
                 this.y = y * normFactor;
                 this.z = z * normFactor;
                 return true;
+            }
+        }
+
+        /**
+         * Iterates both the left and right vector iterator in parallel and computes the cross product
+         * for all the vectors found. Result are written to the consumer.
+         * Consumer must be capable of storing all the results, or an error is thrown.
+         *
+         * @param leftIter Iterator for the cross product left-hand side vectors
+         * @param rightIter Iterator for the cross product right-hand side vectors
+         * @param consumer VectorConsumer to write the cross product result vectors into
+         * @throws IllegalArgumentException If the iterators advance in incompatible ways.
+         */
+        public static void performCrossProduct(VectorIterator leftIter, VectorIterator rightIter, VectorConsumer consumer) {
+            while (true) {
+                if (!leftIter.advance()) {
+                    if (!rightIter.advance()) {
+                        break;
+                    } else {
+                        throw new IllegalArgumentException("Cross-product right iterator advanced beyond the left iterator");
+                    }
+                } else if (!rightIter.advance()) {
+                    throw new IllegalArgumentException("Cross-product left iterator advanced beyond the right iterator");
+                }
+
+                boolean accepted = consumer.acceptVector(
+                        leftIter.y() * rightIter.z() - rightIter.y() * leftIter.z(),
+                        leftIter.z() * rightIter.x() - rightIter.z() * leftIter.x(),
+                        leftIter.x() * rightIter.y() - rightIter.x() * leftIter.y()
+                );
+                if (!accepted) {
+                    throw new IllegalArgumentException("Vector consumer could not accept all of the cross-product results");
+                }
             }
         }
 
@@ -461,6 +608,40 @@ public interface VectorList extends Iterable<Vector> {
             return new FilledVectorIterator(x, y, z, limit);
         }
 
+        /**
+         * Joins two vector iterators, first iterating the first and then the second.
+         *
+         * @param first First VectorIterator
+         * @param second Second VectorIterator
+         * @return Joined VectorIterator
+         */
+        public static VectorIterator join(final VectorIterator first, final VectorIterator second) {
+            return new VectorIterator() {
+                VectorIterator curr = first;
+
+                @Override
+                public boolean advance() {
+                    VectorIterator curr = this.curr;
+                    if (!curr.advance()) {
+                        if (curr == second) {
+                            return false;
+                        } else {
+                            this.curr = curr = second;
+                            if (!curr.advance()) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    this.x = curr.x();
+                    this.y = curr.y();
+                    this.z = curr.z();
+                    ++this.index;
+                    return true;
+                }
+            };
+        }
+
         private static final class FilledVectorIterator extends VectorIterator {
             private final int lastIndex;
 
@@ -510,6 +691,27 @@ public interface VectorList extends Iterable<Vector> {
      */
     interface Factory {
         /**
+         * Gets the required vector list size that this factory supports. Other
+         * sizes will throw errors. A value of -1 indicates any size is supported.
+         *
+         * @return Required size for creating vectors, or -1 if any is supported
+         */
+        default int getRequiredSize() {
+            return -1;
+        }
+
+        /**
+         * Gets whether a particular vector list size has special SIMD optimizations
+         * available to it.
+         *
+         * @param size Size
+         * @return True if optimized
+         */
+        default boolean isOptimizedSize(int size) {
+            return false;
+        }
+
+        /**
          * Creates a new immutable copy of an existing vector list
          *
          * @param vectorValues List of vector values
@@ -529,6 +731,16 @@ public interface VectorList extends Iterable<Vector> {
         VectorList createWith(int size, VectorList.VectorIterator iterator);
 
         /**
+         * Creates a new immutable copy of an array of vectors
+         *
+         * @param vectorValues List of vector values
+         * @return
+         */
+        default VectorList copyOf(Vector... vectorValues) {
+            return copyOf(Arrays.asList(vectorValues));
+        }
+
+        /**
          * Creates a new immutable copy of an existing vector list
          *
          * @param vectorValues List of vector values
@@ -540,10 +752,34 @@ public interface VectorList extends Iterable<Vector> {
     }
 
     /**
-     * Simple 3D vector consumer
+     * Consumes vector values. Acts as a sink for vectors.
      */
     @FunctionalInterface
     interface VectorConsumer {
-        void accept(int index, double x, double y, double z);
+        /**
+         * Advances internally and stores the value specified. If there was no room
+         * to store the new value, false is returned.
+         *
+         * @param x New X-value
+         * @param y New Y-value
+         * @param z New Z-value
+         * @return True if the value was accepted and more values can be received.
+         *         False if the consumer can no longer accept new values, and
+         *         iteration should abort.
+         */
+        boolean acceptVector(double x, double y, double z);
+
+        /**
+         * Advances internally and stores the value specified. If there was no room
+         * to store the new value, false is returned.
+         *
+         * @param value New Vector value
+         * @return True if the value was accepted and more values can be received.
+         *         False if the consumer can no longer accept new values, and
+         *         iteration should abort.
+         */
+        default boolean acceptVector(Vector value) {
+            return acceptVector(value.getX(), value.getY(), value.getZ());
+        }
     }
 }

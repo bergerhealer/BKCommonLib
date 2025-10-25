@@ -1,11 +1,14 @@
 package com.bergerkiller.bukkit.common;
 
+import com.bergerkiller.bukkit.common.math.Quaternion;
 import com.bergerkiller.bukkit.common.math.VectorList;
 import com.bergerkiller.bukkit.common.math.VectorListMutable;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import org.bukkit.util.Vector;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.Random;
 
 import static org.junit.Assert.*;
 
@@ -63,6 +66,35 @@ public class VectorListTest {
         VectorList.Projection projection = list.projectAxis(1.0, 0.0, 0.0);
         assertEquals(-2.0 * MathUtil.HALFROOTOFTWO, projection.min, 1e-8);
         assertEquals(2.0 * MathUtil.HALFROOTOFTWO, projection.max, 1e-8);
+    }
+
+    @Test
+    @Ignore
+    public void benchmarkCrossProduct() {
+        Random r = new Random();
+        VectorList a = VectorList.copyOf(
+                Quaternion.random(r).forwardVector(),
+                Quaternion.random(r).forwardVector(),
+                Quaternion.random(r).forwardVector(),
+                Quaternion.random(r).forwardVector()
+        );
+        VectorList b = VectorList.copyOf(
+                Quaternion.random(r).forwardVector(),
+                Quaternion.random(r).forwardVector(),
+                Quaternion.random(r).forwardVector(),
+                Quaternion.random(r).forwardVector()
+        );
+
+        // Unoptimized:
+        //   size 4: 2.9s
+        //   size 8: 4.3s
+        // SIMD:
+        //   size 4: 1.7s
+        //   size 8: 3.7s
+        VectorListMutable m = VectorListMutable.create(a.size());
+        for (long l = 0; l < 100000000L; l++) {
+            a.crossProduct(b, m);
+        }
     }
 
     @Test

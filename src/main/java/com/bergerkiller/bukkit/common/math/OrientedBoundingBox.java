@@ -519,102 +519,59 @@ public class OrientedBoundingBox {
      * @see VectorList#areVerticesOverlapping(VectorList, VectorList, VectorList.VectorIterator)
      */
     public static VectorList.VectorIterator createSeparatingAxisIterator(Quaternion box1Ori, Quaternion box2Ori) {
-        return box1Ori.equals(box2Ori) ? new SATAxisIteratorAligned(box1Ori)
-                                       : new SATAxisIteratorMisaligned(box1Ori, box2Ori);
-    }
+        boolean isMisaligned = !box1Ori.equals(box2Ori);
 
-    /**
-     * Generates all the axis vectors required for SAT. This is used for testing
-     * intersection between two oriented bounding boxes. This is for when the two
-     * boxes do not share the same orientation.
-     */
-    private static final class SATAxisIteratorMisaligned extends VectorList.VectorIterator {
-        private final Vector box1Right, box1Up, box1Forward, box2Right, box2Up, box2Forward;
-        private int producerIdx = 0;
+        final VectorListMutable all = VectorListMutable.create(isMisaligned ? 15 : 9);
+        final VectorListMutable.MutableVectorIterator consumer = all.vectorIterator();
 
-        public SATAxisIteratorMisaligned(Quaternion box1Ori, Quaternion box2Ori) {
-            box1Right = box1Ori.rightVector();
-            box1Up = box1Ori.upVector();
-            box1Forward = box1Ori.forwardVector();
+        // These are used to fill up the buffer
+        final Vector box1Right = box1Ori.rightVector();
+        final Vector box1Up = box1Ori.upVector();
+        final Vector box1Forward = box1Ori.forwardVector();
+        final Vector box2Right, box2Up, box2Forward;
+        if (isMisaligned) {
             box2Right = box2Ori.rightVector();
             box2Up = box2Ori.upVector();
             box2Forward = box2Ori.forwardVector();
+        } else {
+            box2Right = box1Right;
+            box2Up = box1Up;
+            box2Forward = box1Forward;
         }
 
-        @Override
-        public boolean advance() {
-            while (producerIdx < 15) {
-                switch (producerIdx++) {
-                    // Box 1 axes
-                    case 0: load(box1Right); break;
-                    case 1: load(box1Up); break;
-                    case 2: load(box1Forward); break;
+        // Populate all using the mutable iterator
+        consumer.acceptVector(box1Right);
+        consumer.acceptVector(box1Up);
+        consumer.acceptVector(box1Forward);
 
-                    // Box 2 axes
-                    case 3: load(box2Right); break;
-                    case 4: load(box2Up); break;
-                    case 5: load(box2Forward); break;
+        if (isMisaligned) {
+            consumer.acceptVector(box2Right);
+            consumer.acceptVector(box2Up);
+            consumer.acceptVector(box2Forward);
 
-                    // Same-axis cross products
-                    case 6: if (!tryLoadNormalizedCrossProduct(box1Right, box2Right)) continue; break;
-                    case 7: if (!tryLoadNormalizedCrossProduct(box1Up, box2Up)) continue; break;
-                    case 8: if (!tryLoadNormalizedCrossProduct(box1Forward, box2Forward)) continue; break;
-
-                    // Mixed cross products
-                    case 9:  if (!tryLoadNormalizedCrossProduct(box1Right, box2Up)) continue; break;
-                    case 10: if (!tryLoadNormalizedCrossProduct(box1Right, box2Forward)) continue; break;
-                    case 11: if (!tryLoadNormalizedCrossProduct(box1Up, box2Forward)) continue; break;
-                    case 12: if (!tryLoadNormalizedCrossProduct(box1Up, box2Right)) continue; break;
-                    case 13: if (!tryLoadNormalizedCrossProduct(box1Forward, box2Up)) continue; break;
-                    case 14: if (!tryLoadNormalizedCrossProduct(box1Forward, box2Right)) continue; break;
-                }
-
-                index++;
-                return true;
-            }
-
-            return false;
+            tryCrossProduct(box1Right, box2Right, consumer);
+            tryCrossProduct(box1Up, box2Up, consumer);
+            tryCrossProduct(box1Forward, box2Forward, consumer);
         }
+
+        tryCrossProduct(box1Right, box2Up, consumer);
+        tryCrossProduct(box1Right, box2Forward, consumer);
+        tryCrossProduct(box1Up, box2Forward, consumer);
+        tryCrossProduct(box1Up, box2Right, consumer);
+        tryCrossProduct(box1Forward, box2Up, consumer);
+        tryCrossProduct(box1Forward, box2Right, consumer);
+
+        return all.vectorIterator(0, consumer.index() + 1);
     }
 
-    /**
-     * Generates all the axis vectors required for SAT. This is used for testing
-     * intersection between two oriented bounding boxes. This is for when the two
-     * boxes do share the same orientation.
-     */
-    private static final class SATAxisIteratorAligned extends VectorList.VectorIterator {
-        private final Vector right, up, forward;
-        private int producerIdx = 0;
-
-        public SATAxisIteratorAligned(Quaternion ori) {
-            right = ori.rightVector();
-            up = ori.upVector();
-            forward = ori.forwardVector();
-        }
-
-        @Override
-        public boolean advance() {
-            while (producerIdx < 9) {
-                switch (producerIdx++) {
-                    // Box 1 axes
-                    case 0: load(right); break;
-                    case 1: load(up); break;
-                    case 2: load(forward); break;
-
-                    // Mixed cross products
-                    case 3: if (!tryLoadNormalizedCrossProduct(right, up)) continue; break;
-                    case 4: if (!tryLoadNormalizedCrossProduct(right, forward)) continue; break;
-                    case 5: if (!tryLoadNormalizedCrossProduct(up, forward)) continue; break;
-                    case 6: if (!tryLoadNormalizedCrossProduct(up, right)) continue; break;
-                    case 7: if (!tryLoadNormalizedCrossProduct(forward, up)) continue; break;
-                    case 8: if (!tryLoadNormalizedCrossProduct(forward, right)) continue; break;
-                }
-
-                index++;
-                return true;
-            }
-
-            return false;
+    private static void tryCrossProduct(Vector left, Vector right, VectorList.VectorConsumer consumer) {
+        double x = left.getY() * right.getZ() - right.getY() * left.getZ();
+        double y = left.getZ() * right.getX() - right.getZ() * left.getX();
+        double z = left.getX() * right.getY() - right.getX() * left.getY();
+        double lengthSquared = (x*x) + (y*y) + (z*z);
+        if (lengthSquared >= 1e-6) {
+            double normFactor = MathUtil.getNormalizationFactorLS(lengthSquared);
+            consumer.acceptVector(x * normFactor, y * normFactor, z * normFactor);
         }
     }
 

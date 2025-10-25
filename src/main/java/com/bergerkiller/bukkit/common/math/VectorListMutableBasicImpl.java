@@ -52,4 +52,39 @@ class VectorListMutableBasicImpl extends VectorListBasicImpl implements VectorLi
             }
         };
     }
+
+    @Override
+    public MutableVectorIterator vectorIterator(final int offset, final int length) {
+        return new MutableVectorIterator() {
+            int position = -1;
+
+            @Override
+            public void set(double x, double y, double z) {
+                final double[] points = VectorListMutableBasicImpl.this.points;
+                int pos = this.position;
+                points[pos++] = x;
+                points[pos++] = y;
+                points[pos] = z;
+            }
+
+            @Override
+            public boolean advance() {
+                final int nextIndex = index + 1;
+                if (nextIndex >= length) {
+                    return false;
+                }
+
+                index = nextIndex;
+
+                int position = 3 * (nextIndex + offset);
+                this.position = position;
+
+                final double[] points = VectorListMutableBasicImpl.this.points;
+                x = points[position++];
+                y = points[position++];
+                z = points[position];
+                return true;
+            }
+        };
+    }
 }
