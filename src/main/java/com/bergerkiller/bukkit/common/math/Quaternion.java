@@ -1,6 +1,8 @@
 package com.bergerkiller.bukkit.common.math;
 
 import java.util.Iterator;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.util.Vector;
 
@@ -814,6 +816,42 @@ public class Quaternion implements Rotatable, Cloneable {
         double q0f = qd * Math.sin(angle*(1.0-theta));
         double qsf = qd * Math.sin(angle*theta);
         return lerp(q0, qs, q0f, qsf);
+    }
+
+    /**
+     * Creates a random Quaternion. Is spherically uniform
+     * in randomness.
+     *
+     * @return New Quaternion
+     */
+    public static Quaternion random() {
+        return random(ThreadLocalRandom.current());
+    }
+
+    /**
+     * Creates a random Quaternion. Is spherically uniform
+     * in randomness.
+     *
+     * @param random Random source
+     * @return New Quaternion
+     */
+    public static Quaternion random(Random random) {
+        double u1 = random.nextDouble(); // E [0, 1)
+        double u2 = random.nextDouble(); // E [0, 1)
+        double u3 = random.nextDouble(); // E [0, 1)
+
+        double sqrt1MinusU1 = Math.sqrt(1 - u1);
+        double sqrtU1 = Math.sqrt(u1);
+
+        double theta1 = 2 * Math.PI * u2;
+        double theta2 = 2 * Math.PI * u3;
+
+        double x = Math.sin(theta1) * sqrt1MinusU1;
+        double y = Math.cos(theta1) * sqrt1MinusU1;
+        double z = Math.sin(theta2) * sqrtU1;
+        double w = Math.cos(theta2) * sqrtU1;
+
+        return new Quaternion(x, y, z, w);
     }
 
     /**
