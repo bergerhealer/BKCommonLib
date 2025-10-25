@@ -9,6 +9,7 @@ import net.minecraft.nbt.DynamicOpsNBT;
 import net.minecraft.world.effect.MobEffectList;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityEquipment;
+import net.minecraft.world.entity.EnumItemSlot;
 import net.minecraft.world.entity.ai.attributes.AttributeBase;
 import net.minecraft.world.entity.ai.attributes.AttributeDefaults;
 import net.minecraft.world.entity.ai.attributes.AttributeMapBase;
@@ -133,6 +134,40 @@ class EntityLiving extends Entity {
     public static final Key<IntVector3> DATA_BEDPOSITION = Key.Type.BLOCK_POSITION.createKey(T.DATA_BEDPOSITION, -1);
     </code>
 
+    // Used in multiple places to refresh equipment changes on older server versions
+#if version < 1.17
+  #if version >= 1.16.2
+    #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> handItems:bn;
+    #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> armorItems:bo;
+  #elseif version >= 1.15
+    #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> handItems:bu;
+    #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> armorItems:bv;
+  #elseif version >= 1.14
+    #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> handItems:bw;
+    #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> armorItems:bx;
+  #elseif version >= 1.13
+    #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> handItems:bB;
+    #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> armorItems:bC;
+  #elseif version >= 1.12
+    #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> handItems:bv;
+    #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> armorItems:bw;
+  #elseif version >= 1.11
+    #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> handItems:bu;
+    #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> armorItems:bv;
+  #elseif version >= 1.10.2
+    #require net.minecraft.world.entity.EntityLiving private final ItemStack[] handItems:bu;
+    #require net.minecraft.world.entity.EntityLiving private final ItemStack[] armorItems:bv;
+  #elseif version >= 1.9.4
+    #require net.minecraft.world.entity.EntityLiving private final ItemStack[] handItems:bt;
+    #require net.minecraft.world.entity.EntityLiving private final ItemStack[] armorItems:bu;
+  #elseif version >= 1.9
+    #require net.minecraft.world.entity.EntityLiving private final ItemStack[] handItems:bs;
+    #require net.minecraft.world.entity.EntityLiving private final ItemStack[] armorItems:bt;
+  #else
+    #require net.minecraft.world.entity.EntityLiving private final ItemStack[] equipmentItems:h;
+  #endif
+#endif
+
     public void resetAttributes() {
 #if version >= 1.17
         // Is only set in constructor, so we'll have to force it
@@ -228,6 +263,157 @@ class EntityLiving extends Entity {
     // Paper yay!
     #require EntityLiving protected EntityEquipment equipment;
   #endif
+#endif
+
+#if exists net.minecraft.world.entity.EntityLiving public void detectEquipmentUpdatesPublic();
+    // Spigot does it different I guess
+    public void detectEquipmentChanges:detectEquipmentUpdatesPublic();
+#elseif version >= 1.16
+  #select version >=
+  #case 1.18:     private void detectEquipmentChanges:detectEquipmentUpdates();
+  #case 1.17:     private void detectEquipmentChanges:updateEquipment();
+  #case 1.16.2:   private void detectEquipmentChanges:p();
+  #case else:     private void detectEquipmentChanges:q();
+  #endselect
+#elseif version >= 1.11
+    // Unfortunately, on these old versions this logic is coded directly into tick()
+    // I've had to re-implement it outside of it to make this work
+    public void detectEquipmentChanges() {
+        EnumItemSlot[] aenumitemslot = EnumItemSlot.values();
+        int k = aenumitemslot.length;
+
+        NonNullList handItems = instance#handItems;
+        NonNullList armorItems = instance#armorItems;
+
+        for (int l = 0; l < k; ++l) {
+            EnumItemSlot enumitemslot = aenumitemslot[l];
+            ItemStack itemstack;
+
+            switch (enumitemslot.a().ordinal()) {
+                case 0: // HAND
+                    itemstack = (ItemStack) handItems.get(enumitemslot.b());
+                    break;
+                case 1: // ARMOR
+                    itemstack = (ItemStack) armorItems.get(enumitemslot.b());
+                    break;
+                default:
+                    continue;
+            }
+
+            ItemStack itemstack1 = instance.getEquipment(enumitemslot);
+
+            if (!ItemStack.matches(itemstack1, itemstack)) {
+  #if version >= 1.14
+                ((net.minecraft.server.level.WorldServer) instance.world).getChunkProvider().broadcast((Entity) instance,
+                    new net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment(instance.getId(), enumitemslot, itemstack1));
+  #else
+                ((net.minecraft.server.level.WorldServer) instance.world).getTracker().a((Entity) instance,
+                    new net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment(instance.getId(), enumitemslot, itemstack1));
+  #endif
+
+                if (!itemstack.isEmpty()) {
+                    instance.getAttributeMap().a(itemstack.a(enumitemslot));
+                }
+
+                if (!itemstack1.isEmpty()) {
+                    instance.getAttributeMap().b(itemstack1.a(enumitemslot));
+                }
+
+  #if version >= 1.15
+                switch (enumitemslot.a().ordinal()) {
+                    case 0: // HAND
+                        handItems.set(enumitemslot.b(), itemstack1.cloneItemStack());
+                        break;
+                    case 1: // ARMOR
+                        armorItems.set(enumitemslot.b(), itemstack1.cloneItemStack());
+                        break;
+                }
+  #else
+                switch (enumitemslot.a().ordinal()) {
+                    case 0: // HAND
+                        handItems.set(enumitemslot.b(), itemstack1.isEmpty() ? ItemStack.a : itemstack1.cloneItemStack());
+                        break;
+                    case 1: // ARMOR
+                        armorItems.set(enumitemslot.b(), itemstack1.isEmpty() ? ItemStack.a : itemstack1.cloneItemStack());
+                        break;
+                }
+  #endif
+            }
+        }
+    }
+#elseif version >= 1.9
+    // Unfortunately, on these old versions this logic is coded directly into tick()
+    // I've had to re-implement it outside of it to make this work
+    public void detectEquipmentChanges() {
+        EnumItemSlot[] aenumitemslot = EnumItemSlot.values();
+        int k = aenumitemslot.length;
+
+        ItemStack[] handItems = instance#handItems;
+        ItemStack[] armorItems = instance#armorItems;
+
+        for (int l = 0; l < k; ++l) {
+            EnumItemSlot enumitemslot = aenumitemslot[l];
+            ItemStack itemstack;
+
+            switch (enumitemslot.a().ordinal()) {
+                case 0: // HAND
+                    itemstack = (ItemStack) handItems[enumitemslot.b()];
+                    break;
+                case 1: // ARMOR
+                    itemstack = (ItemStack) armorItems[enumitemslot.b()];
+                    break;
+                default:
+                    continue;
+            }
+
+            ItemStack itemstack1 = instance.getEquipment(enumitemslot);
+
+            if (!ItemStack.matches(itemstack1, itemstack)) {
+                ((net.minecraft.server.level.WorldServer) instance.world).getTracker().a((Entity) instance,
+                    new net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment(instance.getId(), enumitemslot, itemstack1));
+
+                if (itemstack != null) {
+                    instance.getAttributeMap().a(itemstack.a(enumitemslot));
+                }
+
+                if (itemstack1 != null) {
+                    instance.getAttributeMap().b(itemstack1.a(enumitemslot));
+                }
+
+                switch (enumitemslot.a().ordinal()) {
+                    case 0: // HAND
+                        handItems[enumitemslot.b()] = itemstack1 == null ? (ItemStack) null : itemstack1.cloneItemStack();
+                        break;
+                    case 1: // ARMOR
+                        armorItems[enumitemslot.b()] = itemstack1 == null ? (ItemStack) null : itemstack1.cloneItemStack();
+                        break;
+                }
+            }
+        }
+    }
+#else
+    // No dual wielding on 1.8. Really old shit.
+    public void detectEquipmentChanges() {
+        ItemStack[] equipmentItems = instance#equipmentItems;
+
+        for (int j = 0; j < 5; ++j) {
+            ItemStack itemstack = equipmentItems[j];
+            ItemStack itemstack1 = instance.getEquipment(j);
+
+            if (!ItemStack.matches(itemstack1, itemstack)) {
+                ((net.minecraft.server.level.WorldServer) instance.world).getTracker().a((Entity) instance,
+                    (net.minecraft.network.protocol.Packet) (new PacketPlayOutEntityEquipment(instance.getId(), j, itemstack1)));
+                if (itemstack != null) {
+                    instance.getAttributeMap().a(itemstack.B());
+                }
+                if (itemstack1 != null) {
+                    instance.getAttributeMap().b(itemstack1.B());
+                }
+
+                equipmentItems[j] = itemstack1 == null ? null : itemstack1.cloneItemStack();
+            }
+        }
+    }
 #endif
 
     public void loadEquipment((CommonTagCompound) NBTTagCompound data) {

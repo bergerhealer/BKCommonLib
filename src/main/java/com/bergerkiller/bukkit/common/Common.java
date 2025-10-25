@@ -76,6 +76,7 @@ public class Common {
             "Common:Yaml:ListOfListFix",
             "Common:Cloud:QuotedArgumentParserFromParser",
             "Minecraft:GameProfile:Immutable",
+            "Common:EntityUtil:detectEquipmentChanges",
             "Common:Math:OrientedBoundingBox:HasOverlapTest",
             "Common:Math:VectorList"
     ).collect(Collectors.toSet());

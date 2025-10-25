@@ -185,6 +185,20 @@ public class EntityUtil extends EntityPropertyUtil {
     }
 
     /**
+     * Detects and applies changes to the equipment of an Entity. This sends equipment
+     * packets to nearby viewers (or player itself) and properly applies attribute
+     * changes the equipment causes (armor slots, bonus health, etc.).<br>
+     * <br>
+     * Normally occurs automatically every tick. Call this to apply it earlier, for example,
+     * to refresh the max health property so that health updates work properly.
+     *
+     * @param livingEntity Living Entity to detect equipment changes for
+     */
+    public static void detectEquipmentChanges(LivingEntity livingEntity) {
+        EntityLivingHandle.fromBukkit(livingEntity).detectEquipmentChanges();
+    }
+
+    /**
      * Gets the Item inside a given equipment slot of a HumanEntity/Player Inventory
      *
      * @param humanEntity Entity

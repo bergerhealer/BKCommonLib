@@ -34,6 +34,7 @@ public abstract class EntityLivingHandle extends EntityHandle {
     /* ============================================================================== */
 
     public abstract void resetAttributes();
+    public abstract void detectEquipmentChanges();
     public abstract void loadEquipment(CommonTagCompound data);
     public abstract CommonTagCompound saveEquipment();
     public abstract AttributeMapBaseHandle getAttributeMap();
@@ -89,6 +90,7 @@ public abstract class EntityLivingHandle extends EntityHandle {
         public final Template.Field.Boolean updateEffects = new Template.Field.Boolean();
 
         public final Template.Method<Void> resetAttributes = new Template.Method<Void>();
+        public final Template.Method<Void> detectEquipmentChanges = new Template.Method<Void>();
         public final Template.Method.Converted<Void> loadEquipment = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<CommonTagCompound> saveEquipment = new Template.Method.Converted<CommonTagCompound>();
         public final Template.Method.Converted<AttributeMapBaseHandle> getAttributeMap = new Template.Method.Converted<AttributeMapBaseHandle>();
