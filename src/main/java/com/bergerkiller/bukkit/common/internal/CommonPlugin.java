@@ -767,7 +767,9 @@ public class CommonPlugin extends PluginBase {
 
             // Log a message if java's experimental incubator vector api is used for loading images into map colors
             if (RGBColorToIntConversion.ABGR.isUsingSIMD()) {
-                getLogger().log(Level.INFO, "JDK17+ incubator vector maths are enabled. Will use it for loading MapDisplay textures.");
+                getLogger().log(Level.INFO, "JDK17+ incubator vector maths are enabled " +
+                        "(" + getPreferredSIMDBits() + " bits)." +
+                        " Will use it for loading MapDisplay textures.");
             }
         }
 
@@ -1064,6 +1066,13 @@ public class CommonPlugin extends PluginBase {
         } catch (Throwable t) {
             return file.getAbsolutePath();
         }
+    }
+
+    private static int getPreferredSIMDBits() {
+        try {
+            return jdk.incubator.vector.ByteVector.SPECIES_PREFERRED.length() * 8;
+        } catch (Throwable t) {}
+        return -1;
     }
 
     private static class EntityRemovalHandler extends Task {
