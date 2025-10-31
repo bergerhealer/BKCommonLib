@@ -27,8 +27,6 @@ import net.minecraft.world.EnumHand;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectList;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.PositionMoveRotation;
-import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.BiomeManager;
@@ -55,7 +53,6 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
-import com.bergerkiller.bukkit.common.wrappers.RelativeFlags;
 import com.bergerkiller.bukkit.common.resources.BlockStateType;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.wrappers.WindowType;
@@ -75,8 +72,6 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityMetadataHandle
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockDigHandle.EnumPlayerDigTypeHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutOpenWindowHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPositionHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSteerVehicleHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSetCreativeSlotHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutUpdateAttributesHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTitleHandle;
@@ -1918,81 +1913,6 @@ class PacketPlayOutCustomSoundEffect extends Packet {
 #endif
 }
 
-class PacketPlayInSteerVehicle extends Packet {
-#if version >= 1.21.2
-    public static (PacketPlayInSteerVehicleHandle) PacketPlayInSteerVehicle createNew(boolean isLeft, boolean isRight, boolean isForward, boolean isBackward, boolean isJump, boolean isUnmount, boolean isSprint) {
-        return new PacketPlayInSteerVehicle(new net.minecraft.world.entity.player.Input(
-            isForward, isBackward, isLeft, isRight, isJump, isUnmount, isSprint));
-    }
-
-    public boolean isLeft() { return instance.input().left(); }
-    public boolean isRight() { return instance.input().right(); }
-    public boolean isForward() { return instance.input().forward(); }
-    public boolean isBackward() { return instance.input().backward(); }
-
-    public float getSideways() {
-        net.minecraft.world.entity.player.Input input = instance.input();
-        if (input.left() != input.right()) {
-            return input.left() ? 0.98f : -0.98f;
-        } else {
-            return 0.0f;
-        }
-    }
-
-    public float getForwards() {
-        net.minecraft.world.entity.player.Input input = instance.input();
-        if (input.forward() != input.backward()) {
-            return input.forward() ? 0.98f : -0.98f;
-        } else {
-            return 0.0f;
-        }
-    }
-
-    public boolean isJump() { return instance.input().jump(); }
-    public boolean isUnmount() { return instance.input().shift(); }
-    public boolean isSprint() { return instance.input().sprint(); }
-
-#else
-  #if version >= 1.17
-    #require PacketPlayInSteerVehicle private final float sideways:xxa;
-    #require PacketPlayInSteerVehicle private final float forwards:zza;
-    #require PacketPlayInSteerVehicle private final boolean jump:isJumping;
-    #require PacketPlayInSteerVehicle private final boolean unmount:isShiftKeyDown;
-  #else
-    #require PacketPlayInSteerVehicle private float sideways:a;
-    #require PacketPlayInSteerVehicle private float forwards:b;
-    #require PacketPlayInSteerVehicle private boolean jump:c;
-    #require PacketPlayInSteerVehicle private boolean unmount:d;
-  #endif
-
-    public static (PacketPlayInSteerVehicleHandle) PacketPlayInSteerVehicle createNew(boolean isLeft, boolean isRight, boolean isForward, boolean isBackward, boolean isJump, boolean isUnmount, boolean isSprint) {
-       float sideways = (isLeft == isRight) ? 0.0f : (isLeft ? 0.98f : -0.98f);
-       float forwards = (isForward == isBackward) ? 0.0f : (isForward ? 0.98f : -0.98f);
-  #if version >= 1.17
-       return new PacketPlayInSteerVehicle(sideways, forwards, isJump, isUnmount);
-  #else
-       PacketPlayInSteerVehicle packet = new PacketPlayInSteerVehicle();
-       packet#sideways = sideways;
-       packet#forwards = forwards;
-       packet#jump = isJump;
-       packet#unmount = isUnmount;
-       return packet;
-  #endif
-    }
-
-    public boolean isLeft() { return instance#sideways > 0.0f; }
-    public boolean isRight() { return instance#sideways < 0.0f; }
-    public boolean isForward() { return instance#forwards > 0.0f; }
-    public boolean isBackward() { return instance#forwards < 0.0f; }
-
-    public float getSideways() { return instance#sideways; }
-    public float getForwards() { return instance#forwards; }
-    public boolean isJump() { return instance#jump; }
-    public boolean isUnmount() { return instance#unmount; }
-    public boolean isSprint() { return false; }
-#endif
-}
-
 // Note: this packet is PacketPlayOutCustomPayload on 1.8 - 1.12.2 where it sends an "MC|StopSound" message
 class PacketPlayOutStopSound extends Packet {
 #if version >= 1.9
@@ -2018,95 +1938,6 @@ class PacketPlayOutStopSound extends Packet {
         return new PacketPlayOutStopSound("MC|StopSound", packetdataserializer);
     }
 #endif
-}
-
-class PacketPlayOutPosition extends Packet {
-#if version >= 1.21.2
-    public double getX() { return instance.change().position().x; }
-    public double getY() { return instance.change().position().y; }
-    public double getZ() { return instance.change().position().z; }
-    public float getYaw() { return instance.change().yRot(); }
-    public float getPitch() { return instance.change().xRot(); }
-    public (RelativeFlags) Set<RelativeMovement> getRelativeFlags:relatives();
-    public int getTeleportWaitTimer:id();
-#elseif version >= 1.18
-    public double getX();
-    public double getY();
-    public double getZ();
-    public float getYaw:getYRot();
-    public float getPitch:getXRot();
-    public (RelativeFlags) Set<RelativeMovement> getRelativeFlags:getRelativeArguments();
-    public int getTeleportWaitTimer:getId();
-#elseif version >= 1.17
-    public double getX:b();
-    public double getY:c();
-    public double getZ:d();
-    public float getYaw:e();
-    public float getPitch:f();
-    public (RelativeFlags) Set<RelativeMovement> getRelativeFlags:i();
-    public int getTeleportWaitTimer:g();
-#else
-    #require PacketPlayOutPosition private double x:a;
-    #require PacketPlayOutPosition private double y:b;
-    #require PacketPlayOutPosition private double z:c;
-    #require PacketPlayOutPosition private float yaw:d;
-    #require PacketPlayOutPosition private float pitch:e;
-    #require PacketPlayOutPosition private Set<RelativeMovement> relativeArguments:f;
-
-    public double getX() { return instance#x; }
-    public double getY() { return instance#y; }
-    public double getZ() { return instance#z; }
-    public float getYaw() { return instance#yaw; }
-    public float getPitch() { return instance#pitch; }
-    public (RelativeFlags) Set<RelativeMovement> getRelativeFlags() { return instance#relativeArguments; }
-
-    public int getTeleportWaitTimer() {
-  #if version >= 1.9
-        #require PacketPlayOutPosition private int teleportWaitTimer:g;
-        return instance#teleportWaitTimer;
-  #else
-        return 0;
-  #endif
-    }
-#endif
-
-    public static (PacketPlayOutPositionHandle) PacketPlayOutPosition createNew(double x, double y, double z, float yaw, float pitch, double deltaX, double deltaY, double deltaZ, (RelativeFlags) Set<RelativeMovement> relativeFlags, int teleportWaitTimer) {
-#if version >= 1.21.2
-        return PacketPlayOutPosition.of(teleportWaitTimer, new PositionMoveRotation(
-            new Vec3D(x, y, z), new Vec3D(deltaX, deltaY, deltaZ), yaw, pitch
-        ), relativeFlags);
-#elseif version >= 1.19.4
-        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer);
-#elseif version >= 1.17
-        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer, false);
-#elseif version >= 1.9
-        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer);
-#else
-        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags);
-#endif
-    }
-
-    <code>
-    public static PacketPlayOutPositionHandle createNew(double x, double y, double z, float yaw, float pitch, double deltaX, double deltaY, double deltaZ, RelativeFlags relativeFlags) {
-        return createNew(x, y, z, yaw, pitch, deltaX, deltaY, deltaZ, relativeFlags, 0);
-    }
-
-    public static PacketPlayOutPositionHandle createNew(double x, double y, double z, float yaw, float pitch, RelativeFlags relativeFlags) {
-        return createNew(x, y, z, yaw, pitch, 0.0, 0.0, 0.0, relativeFlags, 0);
-    }
-
-    public static PacketPlayOutPositionHandle createRelative(double dx, double dy, double dz, float dyaw, float dpitch) {
-        return createNew(dx, dy, dz, dyaw, dpitch, RelativeFlags.RELATIVE_POSITION_ROTATION);
-    }
-
-    public static PacketPlayOutPositionHandle createAbsolute(org.bukkit.Location location) {
-        return createAbsolute(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
-    }
-
-    public static PacketPlayOutPositionHandle createAbsolute(double x, double y, double z, float yaw, float pitch) {
-        return createNew(x, y, z, yaw, pitch, RelativeFlags.ABSOLUTE_POSITION);
-    }
-    </code>
 }
 
 // Available >= MC 1.9
