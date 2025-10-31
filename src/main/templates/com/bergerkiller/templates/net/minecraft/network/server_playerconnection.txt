@@ -147,16 +147,20 @@ class PlayerConnection {
   #endif
     }
 
-    public void resetAwaitTeleport() {
 #if version >= 1.9
   #if version >= 1.17
-        #require PlayerConnection private net.minecraft.world.phys.Vec3D awaitingPositionFromClient;
-        #require PlayerConnection private int awaitingTeleport;
+    #require PlayerConnection private net.minecraft.world.phys.Vec3D awaitingPositionFromClient;
+    #require PlayerConnection private int awaitingTeleport;
   #else
-        #require PlayerConnection private net.minecraft.world.phys.Vec3D awaitingPositionFromClient:teleportPos;
-        #require PlayerConnection private int awaitingTeleport:teleportAwait;
+    #require PlayerConnection private net.minecraft.world.phys.Vec3D awaitingPositionFromClient:teleportPos;
+    #require PlayerConnection private int awaitingTeleport:teleportAwait;
   #endif
 
+    public int getAwaitingTeleportId() {
+        return instance#awaitingTeleport;
+    }
+
+    public void resetAwaitTeleport() {
         net.minecraft.world.phys.Vec3D curr = instance#awaitingPositionFromClient;
         if (curr == null) {
             return;
@@ -168,6 +172,13 @@ class PlayerConnection {
         }
         instance#awaitingTeleport = counter;
         instance#awaitingPositionFromClient = null;
-#endif
     }
+#else
+    public int getAwaitingTeleportId() {
+        return 0;
+    }
+
+    public void resetAwaitTeleport() {
+    }
+#endif
 }

@@ -79,7 +79,8 @@ public class Common {
             "Common:EntityUtil:detectEquipmentChanges",
             "Common:Math:OrientedBoundingBox:HasOverlapTest",
             "Common:Math:VectorList",
-            "Common:Packet:PlayerRotationPacket"
+            "Common:Packet:PlayerRotationPacket",
+            "Common:PlayerConnection:AwaitingTeleportId"
     ).collect(Collectors.toSet());
 
     /**
