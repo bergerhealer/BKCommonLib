@@ -814,6 +814,10 @@ public class CommonBootstrap {
 
             // Borked.
             remappings.put("net.minecraft.world.entity.vehicle.NewMinecartBehavior$LerpStep", "net.minecraft.world.entity.vehicle.NewMinecartBehavior$a");
+        } else {
+            // Before this version the client rotation packet doesn't exist
+            // It is emulated with the out-position packet instead (with x/y/z 0.0 relative)
+            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerRotationPacket", "net.minecraft.network.protocol.game.PacketPlayOutPosition");
         }
 
         // 1.21.5 mappings

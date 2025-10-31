@@ -74,6 +74,7 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSClientboundPlayerInfoUpdatePacket OUT_PLAYER_INFO_UPDATE = new NMSClientboundPlayerInfoUpdatePacket();
     public static final NMSClientboundPlayerInfoRemovePacket OUT_PLAYER_INFO_REMOVE = new NMSClientboundPlayerInfoRemovePacket();
     public static final NMSPacketPlayOutPosition OUT_POSITION = new NMSPacketPlayOutPosition();
+    public static final NMSClientboundPlayerRotationPacket OUT_ROTATION = new NMSClientboundPlayerRotationPacket();
     public static final NMSPacketPlayOutRespawn OUT_RESPAWN = new NMSPacketPlayOutRespawn();
     public static final NMSPacketPlayOutSpawnPosition OUT_SPAWN_POSITION = new NMSPacketPlayOutSpawnPosition();
     public static final NMSPacketPlayOutStatistic OUT_STATISTIC = new NMSPacketPlayOutStatistic();

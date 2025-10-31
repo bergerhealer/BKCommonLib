@@ -78,7 +78,8 @@ public class Common {
             "Minecraft:GameProfile:Immutable",
             "Common:EntityUtil:detectEquipmentChanges",
             "Common:Math:OrientedBoundingBox:HasOverlapTest",
-            "Common:Math:VectorList"
+            "Common:Math:VectorList",
+            "Common:Packet:PlayerRotationPacket"
     ).collect(Collectors.toSet());
 
     /**

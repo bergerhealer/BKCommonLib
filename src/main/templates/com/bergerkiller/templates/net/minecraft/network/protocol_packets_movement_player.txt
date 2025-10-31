@@ -9,6 +9,7 @@ import com.bergerkiller.bukkit.common.wrappers.RelativeFlags;
 
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPositionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSteerVehicleHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerRotationPacketHandle;
 
 class PacketPlayOutPosition extends Packet {
 #if version >= 1.21.2
@@ -95,6 +96,97 @@ class PacketPlayOutPosition extends Packet {
 
     public static PacketPlayOutPositionHandle createAbsolute(double x, double y, double z, float yaw, float pitch) {
         return createNew(x, y, z, yaw, pitch, RelativeFlags.ABSOLUTE_POSITION);
+    }
+    </code>
+}
+
+// Since Minecraft 1.21.2
+// Falls back to the PacketPlayOutPosition on Minecraft versions before 1.21.2,
+// making use of a relative position of 0 0 0 so only rotation is updated.
+class ClientboundPlayerRotationPacket extends Packet {
+#if version >= 1.21.2
+    public float getYaw:yRot();
+    public boolean isYawRelative:relativeY();
+    public float getPitch:xRot();
+    public boolean isPitchRelative:relativeX();
+
+#elseif version >= 1.18
+    public float getYaw:getYRot();
+    public float getPitch:getXRot();
+
+    public boolean isYawRelative() {
+        return instance.getRelativeArguments().contains((Object) RelativeMovement.Y_ROT);
+    }
+    public boolean isPitchRelative() {
+        return instance.getRelativeArguments().contains((Object) RelativeMovement.X_ROT);
+    }
+
+#elseif version >= 1.17
+    public float getYaw:e();
+    public float getPitch:f();
+
+    public boolean isYawRelative() {
+        return instance.i().contains((Object) RelativeMovement.Y_ROT);
+    }
+    public boolean isPitchRelative() {
+        return instance.i().contains((Object) RelativeMovement.X_ROT);
+    }
+
+#else
+    #require PacketPlayOutPosition private float yaw:d;
+    #require PacketPlayOutPosition private float pitch:e;
+    #require PacketPlayOutPosition private Set<RelativeMovement> relativeArguments:f;
+
+    public float getYaw() { return instance#yaw; }
+    public float getPitch() { return instance#pitch; }
+
+    public boolean isYawRelative() {
+        java.util.Set relativeFlags = instance#relativeArguments;
+        return relativeFlags.contains((Object) RelativeMovement.Y_ROT);
+    }
+    public boolean isPitchRelative() {
+        java.util.Set relativeFlags = instance#relativeArguments;
+        return relativeFlags.contains((Object) RelativeMovement.X_ROT);
+    }
+#endif
+
+    public static (ClientboundPlayerRotationPacketHandle) ClientboundPlayerRotationPacket createNew(float yaw, boolean isYawRelative, float pitch, boolean isPitchRelative) {
+#if version >= 1.21.2
+        return new ClientboundPlayerRotationPacket(yaw, isYawRelative, pitch, isPitchRelative);
+#else
+        double x = 0.0;
+        double y = 0.0;
+        double z = 0.0;
+        int teleportWaitTimer = 0;
+        java.util.Set relativeFlags = new java.util.LinkedHashSet();
+        relativeFlags.add((Object) RelativeMovement.X);
+        relativeFlags.add((Object) RelativeMovement.Y);
+        relativeFlags.add((Object) RelativeMovement.Z);
+        if (isYawRelative) {
+            relativeFlags.add((Object) RelativeMovement.Y_ROT);
+        }
+        if (isPitchRelative) {
+            relativeFlags.add((Object) RelativeMovement.X_ROT);
+        }
+  #if version >= 1.19.4
+        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer);
+  #elseif version >= 1.17
+        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer, false);
+  #elseif version >= 1.9
+        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer);
+  #else
+        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags);
+  #endif
+#endif
+    }
+
+    <code>
+    public static ClientboundPlayerRotationPacketHandle createAbsolute(float yaw, float pitch) {
+        return createNew(yaw, false, pitch, false);
+    }
+
+    public static ClientboundPlayerRotationPacketHandle createRelative(float yaw, float pitch) {
+        return createNew(yaw, true, pitch, true);
     }
     </code>
 }

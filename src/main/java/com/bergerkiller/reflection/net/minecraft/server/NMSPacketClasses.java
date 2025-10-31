@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
@@ -129,7 +130,7 @@ public class NMSPacketClasses {
 
         /**
          * Sets the hand that is animated
-         * 
+         *
          * @param packet to write to
          * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
          * @param humanHand to set to
@@ -142,7 +143,7 @@ public class NMSPacketClasses {
 
         /**
          * Gets the hand that is animated
-         * 
+         *
          * @param packet to read from
          * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
          * @return humanHand
@@ -190,7 +191,7 @@ public class NMSPacketClasses {
 
         /**
          * Sets the hand that placed the block
-         * 
+         *
          * @param packet to write to
          * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
          * @param humanHand to set to
@@ -203,7 +204,7 @@ public class NMSPacketClasses {
 
         /**
          * Gets the hand that placed the block
-         * 
+         *
          * @param packet to read from
          * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
          * @return humanHand
@@ -244,8 +245,8 @@ public class NMSPacketClasses {
                 return true;
             }
         };
-        
-        
+
+
         public final FieldAccessor<Float> deltaX = new SafeDirectField<Float>() {
             @Override
             public Float get(Object instance) {
@@ -295,7 +296,7 @@ public class NMSPacketClasses {
 
         /**
          * Sets the hand that used the item
-         * 
+         *
          * @param packet to write to
          * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
          * @param humanHand to set to
@@ -306,7 +307,7 @@ public class NMSPacketClasses {
 
         /**
          * Gets the hand that used the item
-         * 
+         *
          * @param packet to read from
          * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
          * @return humanHand
@@ -317,7 +318,7 @@ public class NMSPacketClasses {
     }
 
     public static class NMSPacketPlayInBoatMove extends NMSPacket {
-        
+
         public final FieldAccessor<Boolean> leftPaddle = PacketPlayInBoatMoveHandle.T.leftPaddle.toFieldAccessor();
         public final FieldAccessor<Boolean> rightPaddle = PacketPlayInBoatMoveHandle.T.rightPaddle.toFieldAccessor();
     }
@@ -598,7 +599,7 @@ public class NMSPacketClasses {
 
         /**
          * Sets the hand that interacted with the entity
-         * 
+         *
          * @param packet to write to
          * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
          * @param humanHand to set to
@@ -608,7 +609,7 @@ public class NMSPacketClasses {
 
         /**
          * Gets the hand that interacted with the entity
-         * 
+         *
          * @param packet to read from
          * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
          * @return humanHand
@@ -812,7 +813,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> collectedItemId = PacketPlayOutCollectHandle.T.collectedItemId.toFieldAccessor();
         public final FieldAccessor<Integer> collectorEntityId = PacketPlayOutCollectHandle.T.collectorEntityId.toFieldAccessor();
         public final FieldAccessor<Integer> amount;
-        
+
         public NMSPacketPlayOutCollect() {
             if (PacketPlayOutCollectHandle.T.amount.isAvailable()) {
                 this.amount = PacketPlayOutCollectHandle.T.amount.toFieldAccessor();
@@ -1117,7 +1118,7 @@ public class NMSPacketClasses {
          * <br>
          * Creates a new instance with the entity Ids specified.
          * Note: input Collection will be copied.
-         * 
+         *
          * @param entityIds
          * @return packet
          */
@@ -1397,7 +1398,7 @@ public class NMSPacketClasses {
         }
          */
     }
-    
+
     public static class NMSPacketPlayOutGameStateChange extends NMSPacket {
         //TODO: What does it all mean???
     }
@@ -1488,7 +1489,7 @@ public class NMSPacketClasses {
             }
         };
     }
-    
+
     public static class NMSPacketPlayOutMount extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = PacketPlayOutMountHandle.T.entityId.toFieldAccessor();
@@ -1525,7 +1526,7 @@ public class NMSPacketClasses {
             public final ClassTemplate<?> T;
             public final FieldAccessor<Short> typeId;
             public final FieldAccessor<Object> data;
-            
+
             protected ChangeInfo(Class<?> clazz) {
                 T = ClassTemplate.create(clazz);
                 typeId = T.nextField("private final short b");
@@ -1760,6 +1761,60 @@ public class NMSPacketClasses {
         };
     }
 
+    public static class NMSClientboundPlayerRotationPacket extends NMSPacket {
+        private static final boolean IS_SEPARATE_PACKET = CommonBootstrap.evaluateMCVersion(">=", "1.21.2");
+
+        public final FieldAccessor<Float> yaw = new FieldAccessor<Float>() {
+            @Override
+            public Float get(Object instance) {
+                return ClientboundPlayerRotationPacketHandle.T.getYaw.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Float value) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Float> pitch = new FieldAccessor<Float>() {
+            @Override
+            public Float get(Object instance) {
+                return ClientboundPlayerRotationPacketHandle.T.getPitch.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Float value) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Boolean> isYawRelative = new FieldAccessor<Boolean>() {
+            @Override
+            public Boolean get(Object instance) {
+                return ClientboundPlayerRotationPacketHandle.T.isYawRelative.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Boolean value) {
+                return false;
+            }
+        };
+        public final FieldAccessor<Boolean> isPitchRelative = new FieldAccessor<Boolean>() {
+            @Override
+            public Boolean get(Object instance) {
+                return ClientboundPlayerRotationPacketHandle.T.isPitchRelative.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Boolean value) {
+                return false;
+            }
+        };
+
+        @Override
+        protected boolean matchPacket(Object packetHandle) {
+            return IS_SEPARATE_PACKET;
+        }
+    }
+
     public static class NMSPacketPlayOutRemoveEntityEffect extends NMSPacket {
 
         public CommonPacket newInstance(int entityId, PotionEffectType effectType) {
@@ -1883,7 +1938,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<ChatColor> color = FieldAccessor.wrapMethods(PacketPlayOutScoreboardTeamHandle.T.getColor, PacketPlayOutScoreboardTeamHandle.T.setColor);
         public final FieldAccessor<Collection<String>> players = PacketPlayOutScoreboardTeamHandle.T.players.toFieldAccessor();
         public final FieldAccessor<Integer> teamOptionFlags = FieldAccessor.wrapMethods(PacketPlayOutScoreboardTeamHandle.T.getTeamOptionFlags, PacketPlayOutScoreboardTeamHandle.T.setTeamOptionFlags);
-    
+
         @Override
         public CommonPacket newInstance() {
             return PacketPlayOutScoreboardTeamHandle.createNew().toCommonPacket();
@@ -1891,7 +1946,7 @@ public class NMSPacketClasses {
     }
 
     public static class NMSPacketPlayOutServerDifficulty extends NMSPacket {
-        
+
         public final FieldAccessor<Difficulty> difficulty = PacketPlayOutServerDifficultyHandle.T.difficulty.toFieldAccessor();
         public final FieldAccessor<Boolean> hardcore = PacketPlayOutServerDifficultyHandle.T.hardcore.toFieldAccessor();
     }
@@ -1948,7 +2003,7 @@ public class NMSPacketClasses {
                 return true;
             }
         };
-        
+
         public final FieldAccessor<Double> motX = new SafeDirectField<Double>() {
             @Override
             public Double get(Object instance) {
@@ -2296,7 +2351,7 @@ public class NMSPacketClasses {
 
         // Changed to Object2IntMap<Statistic> on MC 1.13
         // public final FieldAccessor<Map<Object, Integer>> statsMap = nextField("private Map<Statistic, Integer> a");
-    }    
+    }
 
     public static class NMSPacketPlayOutTabComplete extends NMSPacket {
 
