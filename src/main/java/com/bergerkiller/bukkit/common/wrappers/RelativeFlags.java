@@ -172,6 +172,22 @@ public final class RelativeFlags {
         return fromFlags(flags & ~(FLAG_YAW | FLAG_PITCH));
     }
 
+    public RelativeFlags withRelativeYaw() {
+        return fromFlags(flags | FLAG_YAW);
+    }
+
+    public RelativeFlags withAbsoluteYaw() {
+        return fromFlags(flags & ~FLAG_YAW);
+    }
+
+    public RelativeFlags withRelativePitch() {
+        return fromFlags(flags | FLAG_PITCH);
+    }
+
+    public RelativeFlags withAbsolutePitch() {
+        return fromFlags(flags & ~FLAG_PITCH);
+    }
+
     public RelativeFlags withRelativeDelta() {
         return fromFlags(flags | (FLAG_DELTA_X | FLAG_DELTA_Y | FLAG_DELTA_Z | FLAG_DELTA_ROTATION));
     }
