@@ -224,7 +224,14 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         if (this.isSendSilentPacketBroken) {
             // ProtocolLib had a linkage error while sending the packet before, or some other known bug
             // Instead we now use our own 'silent' packet queue to deal with this
-            connection.sendPacket(packet);
+            try {
+                connection.sendPacket(packet);
+            } catch (Throwable t) {
+                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Encountered an error during sendPacket()", t);
+                try {
+                    Logging.LOGGER_NETWORK.log(Level.SEVERE, "Packet: " + packet);
+                } catch (Throwable printErr) { /* Ignore */ }
+            }
 
         } else {
             // Silent - do not send it through listeners, only through monitors

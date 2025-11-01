@@ -97,11 +97,12 @@ class NetworkManager {
         // Uses ReentrantReadWriteLock
         #require net.minecraft.network.NetworkManager private final java.util.concurrent.locks.ReentrantReadWriteLock packetQueueRWLock:j;
         java.util.concurrent.locks.ReentrantReadWriteLock lock = networkManager#packetQueueRWLock;
-        lock.writeLock().lock();
+        java.util.concurrent.locks.ReentrantReadWriteLock$WriteLock writeLock = lock.writeLock();
+        writeLock.lock();
         try {
             queue.add(queuedPacket);
         } finally {
-            lock.writeLock().unlock();
+            writeLock.unlock();
         }
   #else
         // No lock at all (relies on concurrent queue logic)

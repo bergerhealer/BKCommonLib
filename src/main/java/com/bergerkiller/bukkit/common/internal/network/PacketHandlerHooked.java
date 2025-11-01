@@ -128,7 +128,14 @@ public abstract class PacketHandlerHooked implements PacketHandler {
             this.silentQueue.add(player, packet);
         }
 
-        connection.sendPacket(packet);
+        try {
+            connection.sendPacket(packet);
+        } catch (Throwable t) {
+            Logging.LOGGER_NETWORK.log(Level.SEVERE, "Encountered an error during sendPacket()", t);
+            try {
+                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Packet: " + packet);
+            } catch (Throwable printErr) { /* Ignore */ }
+        }
     }
 
     @Override
