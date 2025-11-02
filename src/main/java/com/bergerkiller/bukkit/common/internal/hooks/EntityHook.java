@@ -505,6 +505,17 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
+    // Ensures the RootVehicle vanilla tag works properly when multiple players are inside
+    @HookMethodCondition("version >= 1.13")
+    @HookMethod("public boolean hasExactlyOnePlayerPassenger()")
+    public boolean hasExactlyOnePlayerPassenger() {
+        if (controller != null && !controller.isPlayerTakeable() && controller.getEntity().getPassengers().size() >= 2) {
+            return true;
+        } else {
+            return base.hasExactlyOnePlayerPassenger();
+        }
+    }
+
     @HookMethod("public String getStringUUID:???()")
     public String getStringUUID() {
         try {

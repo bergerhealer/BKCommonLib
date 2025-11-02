@@ -860,15 +860,48 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
     /**
      * Clears possible network or Entity controllers from the Entity. This
      * should be called when a specific Entity should default back to all
-     * default behaviours.
+     * default behaviours.<br>
+     * <br>
+     * If {@link EntityController#isPlayerTakeable()} is overridden and set to
+     * return false, will eject players from the vehicle before clearing the
+     * controller.
      *
      * @param entity to clear the controllers of
      */
     public static void clearControllers(org.bukkit.entity.Entity entity) {
+        clearControllers(entity, true);
+    }
+
+    /**
+     * Clears possible network or Entity controllers from the Entity. This
+     * should be called when a specific Entity should default back to all
+     * default behaviours.<br>
+     * <br>
+     * If {@link EntityController#isPlayerTakeable()} is overridden and set to
+     * return false and isShutdownClear is true (default), will eject players
+     * from the vehicle before clearing the controller.
+     *
+     * @param entity to clear the controllers of
+     * @param isShutdownClear Whether this clearing is done as part of plugin/server
+     *                        shutdown logic. If true (default), will eject players
+     *                        if player takeable is false.
+     */
+    public static void clearControllers(org.bukkit.entity.Entity entity, boolean isShutdownClear) {
         CommonEntity<?> commonEntity = get(entity);
 
         Object oldInstance = commonEntity.getHandle();
         EntityHook oldHook = EntityHook.get(oldInstance, EntityHook.class);
+
+        // Eject those that have players inside
+        // This makes sure that the default save function doesn't overwrite it
+        if (isShutdownClear) {
+            EntityController<?> controller = commonEntity.getController();
+            if (controller != null && !(controller instanceof DefaultEntityController) && !controller.isPlayerTakeable()) {
+                for (Player player : commonEntity.getPlayerPassengers()) {
+                    commonEntity.removePassenger(player);
+                }
+            }
+        }
 
         // Unhook network controller
         {

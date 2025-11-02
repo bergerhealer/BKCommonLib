@@ -8,6 +8,9 @@ import com.bergerkiller.bukkit.common.block.SignLineAccessor;
 import com.bergerkiller.bukkit.common.block.SignSide;
 import com.bergerkiller.bukkit.common.block.SignSideLineAccessor;
 import com.bergerkiller.bukkit.common.collections.ImmutableCachedSet;
+import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
+import com.bergerkiller.bukkit.common.controller.EntityController;
+import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.events.SignEditTextEvent;
 import com.bergerkiller.bukkit.common.internal.hooks.AdvancementDataPlayerHook;
 import com.bergerkiller.bukkit.common.internal.logic.CreaturePreSpawnHandler;
@@ -166,6 +169,16 @@ public class CommonListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     protected void onPlayerQuit(PlayerQuitEvent event) {
+        // If inside a vehicle that uses an entity controller that disables player-taking, eject
+        // the player from that vehicle before the save occurs
+        for (Entity vehicle = event.getPlayer().getVehicle(); vehicle != null; vehicle = vehicle.getVehicle()) {
+            CommonEntity<?> vehicleCommonEntity = CommonEntity.get(vehicle);
+            EntityController<?> controller = vehicleCommonEntity.getController();
+            if (controller != null && !(controller instanceof DefaultEntityController) && !controller.isPlayerTakeable()) {
+                CommonEntity.get(event.getPlayer().getVehicle()).removePassenger(event.getPlayer());
+            }
+        }
+
         editedSignBlocks.remove(event.getPlayer());
         CommonScoreboard.removePlayer(event.getPlayer());
         CommonPlugin.getInstance().getVehicleMountManager().remove(event.getPlayer());

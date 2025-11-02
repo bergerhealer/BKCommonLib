@@ -80,7 +80,8 @@ public class Common {
             "Common:Math:OrientedBoundingBox:HasOverlapTest",
             "Common:Math:VectorList",
             "Common:Packet:PlayerRotationPacket",
-            "Common:PlayerConnection:AwaitingTeleportId"
+            "Common:PlayerConnection:AwaitingTeleportId",
+            "Common:EntityController:isPlayerTakeable"
     ).collect(Collectors.toSet());
 
     /**

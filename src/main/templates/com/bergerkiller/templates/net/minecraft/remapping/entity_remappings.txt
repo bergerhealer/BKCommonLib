@@ -132,6 +132,12 @@ import net.minecraft.world.level.storage.ValueOutput;
 #case else:  #remap net.minecraft.world.entity.Entity public int getFireImmuneTicks:L();
 #endselect
 
+#select version >=
+#case 1.18:  #remap net.minecraft.world.entity.Entity public boolean hasExactlyOnePlayerPassenger();
+#case 1.14:  #remap net.minecraft.world.entity.Entity public boolean hasExactlyOnePlayerPassenger:hasSinglePlayerPassenger();
+#case 1.13:  #remap net.minecraft.world.entity.Entity public boolean hasExactlyOnePlayerPassenger:bR();
+#endselect
+
 #if version >= 1.21
     #remap net.minecraft.world.entity.Entity public final void igniteForSeconds(float seconds);
   #if forge && exists net.minecraft.world.entity.Entity public void setSecondsOnFire(float seconds, boolean callEvent);

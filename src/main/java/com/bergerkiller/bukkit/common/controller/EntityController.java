@@ -193,6 +193,20 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
     }
 
     /**
+     * Gets whether the Player "take vehicle with" is enabled or not for this Entity. If enabled,
+     * when players that are a passenger log off they will be saved along with this vehicle
+     * (if they are the sole passenger). If not, then they will be ejected first.<br>
+     * <br>
+     * When disabled (false), this will also make the Vanilla RootVehicle tag work when multiple
+     * players are inside this vehicle.
+     *
+     * @return True if this vehicle can be taken by players when they log off
+     */
+    public boolean isPlayerTakeable() {
+        return true;
+    }
+
+    /**
      * Sets whether block collisions are handled during movement of the entity.
      * Disabling block collisions causes entities to fall through the floor, but may
      * result in a significant boost in performance.
