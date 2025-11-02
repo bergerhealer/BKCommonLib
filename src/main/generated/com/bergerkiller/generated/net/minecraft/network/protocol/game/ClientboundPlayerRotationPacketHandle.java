@@ -20,6 +20,10 @@ public abstract class ClientboundPlayerRotationPacketHandle extends PacketHandle
 
     /* ============================================================================== */
 
+    public static boolean isRelativeSupported() {
+        return T.isRelativeSupported.invoker.invoke(null);
+    }
+
     public static ClientboundPlayerRotationPacketHandle createNew(float yaw, boolean isYawRelative, float pitch, boolean isPitchRelative) {
         return T.createNew.invoke(yaw, isYawRelative, pitch, isPitchRelative);
     }
@@ -40,6 +44,7 @@ public abstract class ClientboundPlayerRotationPacketHandle extends PacketHandle
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ClientboundPlayerRotationPacketClass extends Template.Class<ClientboundPlayerRotationPacketHandle> {
+        public final Template.StaticMethod<Boolean> isRelativeSupported = new Template.StaticMethod<Boolean>();
         public final Template.StaticMethod.Converted<ClientboundPlayerRotationPacketHandle> createNew = new Template.StaticMethod.Converted<ClientboundPlayerRotationPacketHandle>();
 
         public final Template.Method<Float> getYaw = new Template.Method<Float>();

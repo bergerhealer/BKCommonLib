@@ -104,11 +104,17 @@ class PacketPlayOutPosition extends Packet {
 // Falls back to the PacketPlayOutPosition on Minecraft versions before 1.21.2,
 // making use of a relative position of 0 0 0 so only rotation is updated.
 class ClientboundPlayerRotationPacket extends Packet {
-#if version >= 1.21.2
+#if version >= 1.21.9
     public float getYaw:yRot();
     public boolean isYawRelative:relativeY();
     public float getPitch:xRot();
     public boolean isPitchRelative:relativeX();
+
+#elseif version >= 1.21.2
+    public float getYaw:yRot();
+    public boolean isYawRelative() { return false; }
+    public float getPitch:xRot();
+    public boolean isPitchRelative() { return false; }
 
 #elseif version >= 1.18
     public float getYaw:getYRot();
@@ -150,9 +156,22 @@ class ClientboundPlayerRotationPacket extends Packet {
     }
 #endif
 
+    public static boolean isRelativeSupported() {
+#if version < 1.21.2 || version >= 1.21.9
+        return true;
+#else
+        return false;
+#endif
+    }
+
     public static (ClientboundPlayerRotationPacketHandle) ClientboundPlayerRotationPacket createNew(float yaw, boolean isYawRelative, float pitch, boolean isPitchRelative) {
-#if version >= 1.21.2
+#if version >= 1.21.9
         return new ClientboundPlayerRotationPacket(yaw, isYawRelative, pitch, isPitchRelative);
+#elseif version >= 1.21.2
+        if (isYawRelative || isPitchRelative) {
+            throw new UnsupportedOperationException("Relative yaw/pitch is not supported on this version of Minecraft");
+        }
+        return new ClientboundPlayerRotationPacket(yaw, pitch);
 #else
         double x = 0.0;
         double y = 0.0;
