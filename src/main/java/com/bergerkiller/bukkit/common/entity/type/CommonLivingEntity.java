@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
+import com.bergerkiller.bukkit.common.block.BlockRayTrace;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -9,7 +10,6 @@ import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
-import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.GenericAttributesHandle;
 
@@ -60,9 +60,11 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      * this Living Entity.
      *
      * @return the first Block hit, or null if none was found (AIR)
+     * @see com.bergerkiller.bukkit.common.block.BlockRayTrace
      */
     public Block getTargetBlock() {
-        return getTargetBlock(5.0);
+        BlockRayTrace.HitResult hit = BlockRayTrace.fromEyeOf(getEntity()).rayTrace();
+        return hit == null ? null : hit.getHitBlock();
     }
 
     /**
@@ -74,7 +76,8 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      * @return the first Block hit, or null if none was found (AIR)
      */
     public Block getTargetBlock(double maxDistance) {
-        return WorldUtil.rayTraceBlock(getEyeLocation(), maxDistance);
+        BlockRayTrace.HitResult hit = BlockRayTrace.fromEye(getEyeLocation(), maxDistance).rayTrace();
+        return hit == null ? null : hit.getHitBlock();
     }
 
     /**

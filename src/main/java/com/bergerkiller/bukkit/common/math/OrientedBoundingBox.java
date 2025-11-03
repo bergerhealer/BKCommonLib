@@ -1,6 +1,8 @@
 package com.bergerkiller.bukkit.common.math;
 
+import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
 
@@ -60,6 +62,58 @@ public class OrientedBoundingBox {
     }
 
     /**
+     * Turns an axis-aligned bounding box into a (natural orientation) OrientedBoundingBox.
+     * Can then be used for hit-testing.
+     *
+     * @param block Absolute block the AABB is of
+     * @param aabb AxisAlignedBBHandle
+     * @return OrientedBoundingBox
+     */
+    public static OrientedBoundingBox fromAABB(Block block, AxisAlignedBBHandle aabb) {
+        OrientedBoundingBox box = fromAABB(aabb);
+        box.addPosition(block.getX(), block.getY(), block.getZ());
+        return box;
+    }
+
+    /**
+     * Turns an axis-aligned bounding box into a (natural orientation) OrientedBoundingBox.
+     * Can then be used for hit-testing.
+     *
+     * @param position Absolute position of the AABB
+     * @param aabb AxisAlignedBBHandle
+     * @return OrientedBoundingBox
+     */
+    public static OrientedBoundingBox fromAABB(Vector position, AxisAlignedBBHandle aabb) {
+        OrientedBoundingBox box = fromAABB(aabb);
+        box.addPosition(position.getX(), position.getY(), position.getZ());
+        return box;
+    }
+
+    /**
+     * Turns an axis-aligned bounding box into a (natural orientation) OrientedBoundingBox.
+     * Can then be used for hit-testing. AABB's are typically relative to the block or
+     * entity they belong to, which means this bounding box is similarly relatively
+     * positioned.
+     *
+     * @param aabb AxisAlignedBBHandle
+     * @return OrientedBoundingBox
+     */
+    public static OrientedBoundingBox fromAABB(AxisAlignedBBHandle aabb) {
+        OrientedBoundingBox box = new OrientedBoundingBox();
+        box.setPosition(
+                0.5 * (aabb.getMinX() + aabb.getMaxX()),
+                0.5 * (aabb.getMinY() + aabb.getMaxY()),
+                0.5 * (aabb.getMinZ() + aabb.getMaxZ())
+        );
+        box.setSize(
+                aabb.getMaxX() - aabb.getMinX(),
+                aabb.getMaxY() - aabb.getMinY(),
+                aabb.getMaxZ() - aabb.getMinZ()
+        );
+        return box;
+    }
+
+    /**
      * Gets the middle position of this oriented bounding box.
      * The returned value is a copy and can be modified.
      *
@@ -108,6 +162,19 @@ public class OrientedBoundingBox {
      */
     public void setPosition(double x, double y, double z) {
         MathUtil.setVector(position, x, y, z);
+        cachedVertices = null;
+    }
+
+    /**
+     * Translates this bounding box by a certain amount. Can be used to make
+     * this box absolutely positioned if it was relative before.
+     *
+     * @param dx Translation X amount
+     * @param dy Translation Y amount
+     * @param dz Translation Z amount
+     */
+    public void addPosition(double dx, double dy, double dz) {
+        MathUtil.addToVector(position, dx, dy, dz);
         cachedVertices = null;
     }
 

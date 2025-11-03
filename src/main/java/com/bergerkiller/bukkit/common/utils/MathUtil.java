@@ -222,6 +222,45 @@ public class MathUtil {
     }
 
     /**
+     * Updates a position vector an infinitely small amount forwards into the direction of
+     * motion. Useful when positions are at block borders to resolve the correct
+     * block moving into.
+     *
+     * @param position Position vector that is updated
+     * @param motion Motion vector
+     */
+    public static void nextForward(Vector position, Vector motion) {
+        nextForward(position, motion, 1e-6);
+    }
+
+    /**
+     * Updates a position vector an infinitely small amount forwards into the direction of
+     * motion. Useful when positions are at block borders to resolve the correct
+     * block moving into.
+     *
+     * @param position Position vector that is updated
+     * @param motion Motion vector
+     * @param epsilon Minimal amount of motion to move the position into that direction
+     */
+    public static void nextForward(Vector position, Vector motion, double epsilon) {
+        if (motion.getX() > epsilon) {
+            position.setX(Math.nextUp(position.getX()));
+        } else if (motion.getX() < -epsilon) {
+            position.setX(Math.nextDown(position.getX()));
+        }
+        if (motion.getY() > epsilon) {
+            position.setY(Math.nextUp(position.getY()));
+        } else if (motion.getY() < -epsilon) {
+            position.setY(Math.nextDown(position.getY()));
+        }
+        if (motion.getZ() > epsilon) {
+            position.setZ(Math.nextUp(position.getZ()));
+        } else if (motion.getZ() < -epsilon) {
+            position.setZ(Math.nextDown(position.getZ()));
+        }
+    }
+
+    /**
      * Gets the inverse tangent of the value in degrees
      *
      * @param value

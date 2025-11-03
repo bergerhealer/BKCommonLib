@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntCuboid;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.block.BlockRayTrace;
 import com.bergerkiller.bukkit.common.collections.WorldBlockStateCollection;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
@@ -30,7 +31,6 @@ import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.MovingObjectPositionHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
@@ -926,7 +926,7 @@ public class WorldUtil extends ChunkUtil {
 
     /**
      * Performs a ray tracing operation from one point to the other, and obtains
-     * the (first) block hit
+     * the (first) block hit.
      *
      * @param world to ray trace in
      * @param startX to start ray tracing from
@@ -936,15 +936,16 @@ public class WorldUtil extends ChunkUtil {
      * @param endY to stop ray tracing (outer limit)
      * @param endZ to stop ray tracing (outer limit)
      * @return the hit Block, or null if none was found (AIR)
+     * @deprecated Please use {@link BlockRayTrace} API instead
      */
+    @Deprecated
     public static Block rayTraceBlock(org.bukkit.World world, double startX, double startY, double startZ, double endX, double endY, double endZ) {
-        MovingObjectPositionHandle mop = WorldHandle.fromBukkit(world).rayTrace(new Vector(startX, startY, startZ), new Vector(endX, endY, endZ));
-        if (mop == null) {
-            return null;
-        } else {
-            Vector pos = mop.getPos();
-            return world.getBlockAt(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
-        }
+        BlockRayTrace.HitResult hit = BlockRayTrace.between(
+                world,
+                new Vector(startX, startY, startZ),
+                new Vector(endX, endY, endZ)
+        ).rayTrace();
+        return hit == null ? null : hit.getHitBlock();
     }
 
     /**
@@ -952,18 +953,17 @@ public class WorldUtil extends ChunkUtil {
      * the (first) block hit
      *
      * @param startLocation to start ray tracing from
-     * @param direction to which to ray trace
+     * @param direction Direction vector to which to ray trace (normalized)
      * @param maxLength limit of ray tracing
      * @return the hit Block, or null if none was found (AIR)
+     * @deprecated Please use {@link BlockRayTrace} API instead
      */
+    @Deprecated
     public static Block rayTraceBlock(Location startLocation, Vector direction, double maxLength) {
-        final double startX = startLocation.getX();
-        final double startY = startLocation.getY();
-        final double startZ = startLocation.getZ();
-        final double endX = startX + direction.getX() * maxLength;
-        final double endY = startY + direction.getY() * maxLength;
-        final double endZ = startZ + direction.getZ() * maxLength;
-        return rayTraceBlock(startLocation.getWorld(), startX, startY, startZ, endX, endY, endZ);
+        BlockRayTrace.HitResult hit = BlockRayTrace.fromInto(startLocation.getWorld(),
+                startLocation.toVector(),
+                direction, maxLength).rayTrace();
+        return hit == null ? null : hit.getHitBlock();
     }
 
     /**
@@ -974,9 +974,12 @@ public class WorldUtil extends ChunkUtil {
      * is used
      * @param maxLength limit of ray tracing
      * @return the hit Block, or null if none was found (AIR)
+     * @deprecated Please use {@link BlockRayTrace} API instead
      */
+    @Deprecated
     public static Block rayTraceBlock(Location startLocation, double maxLength) {
-        return rayTraceBlock(startLocation, startLocation.getDirection(), maxLength);
+        BlockRayTrace.HitResult hit = BlockRayTrace.fromEye(startLocation, maxLength).rayTrace();
+        return hit == null ? null : hit.getHitBlock();
     }
 
     /**
