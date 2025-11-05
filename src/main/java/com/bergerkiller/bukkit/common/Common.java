@@ -82,7 +82,8 @@ public class Common {
             "Common:Packet:PlayerRotationPacket",
             "Common:PlayerConnection:AwaitingTeleportId",
             "Common:EntityController:isPlayerTakeable",
-            "Common:Block:RayTraceUtilImprovements"
+            "Common:Block:RayTraceUtilImprovements",
+            "Common:BlockData:GetInteractableBox"
     ).collect(Collectors.toSet());
 
     /**

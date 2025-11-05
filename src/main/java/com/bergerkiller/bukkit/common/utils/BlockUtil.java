@@ -38,13 +38,26 @@ import com.bergerkiller.generated.org.bukkit.event.block.BlockCanBuildEventHandl
 public class BlockUtil extends MaterialUtil {
 
     /**
-     * Gets the bounding box of a block
+     * Gets the bounding box of a block<br>
+     * <br>
+     * This shape is what is used for entity collision behavior. So blocks that do not
+     * have collision will return null.
      * 
-     * @param block
-     * @return bounding box, relative to block coordinates
+     * @param block Block
+     * @return bounding box, relative to block coordinates. Can be null!
      */
     public static AxisAlignedBBHandle getBoundingBox(Block block) {
         return WorldUtil.getBlockData(block).getBoundingBox(block);
+    }
+
+    /**
+     * Gets the player-interactable bounding box of a block
+     *
+     * @param block Block
+     * @return interactable bounding box, relative to block coordinates. Can be null (air)!
+     */
+    public static AxisAlignedBBHandle getInteractableBox(Block block) {
+        return WorldUtil.getBlockData(block).getInteractableBox(block);
     }
 
     /**

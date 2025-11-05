@@ -561,15 +561,30 @@ public abstract class BlockData extends BlockDataRegistry {
 
     /**
      * Gets the bounding box of a block of this Block Data type.
-     * For convenience it is better to use
+     * For convenience, it is better to use
      * {@link com.bergerkiller.bukkit.common.utils.BlockUtil#getBoundingBox(Block)
+     *        BlockUtil.getBoundingBox(Block)}
+     * instead.<br>
+     * <br>
+     * This shape is what is used for entity collision behavior. So blocks that do not
+     * have collision will return null.
+     *
+     * @param block Block
+     * @return bounding box of the block (relative to block coordinates). Can be null!
+     */
+    public abstract AxisAlignedBBHandle getBoundingBox(Block block);
+
+    /**
+     * Gets the player-interactable bounding box of this Block Data type.
+     * For convenience, it is better to use
+     * {@link com.bergerkiller.bukkit.common.utils.BlockUtil#getInteractableBox(Block)
      *        BlockUtil.getBoundingBox(Block)}
      * instead.
      *
-     * @param block
-     * @return bounding box of the block (relative to block coordinates)
+     * @param block Block
+     * @return interactable box of the block (relative to block coordinates). Can be null (air)!
      */
-    public abstract AxisAlignedBBHandle getBoundingBox(Block block);
+    public abstract AxisAlignedBBHandle getInteractableBox(Block block);
 
     /**
      * Causes the block to drop items as if it was broken naturally

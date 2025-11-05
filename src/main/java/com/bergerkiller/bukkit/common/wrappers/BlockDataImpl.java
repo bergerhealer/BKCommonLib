@@ -596,6 +596,11 @@ class BlockDataImpl extends BlockData {
     }
 
     @Override
+    public AxisAlignedBBHandle getInteractableBox(Block block) {
+        return this.data.getInteractableBox(WorldHandle.fromBukkit(block.getWorld()), new IntVector3(block));
+    }
+
+    @Override
     public final float getDamageResilience() {
         return this.block.getDamageResillience();
     }

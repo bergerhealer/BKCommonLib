@@ -33,6 +33,7 @@ public abstract class IBlockDataHandle extends Template.Handle {
     public abstract boolean isPowerSource();
     public abstract SoundEffectTypeHandle getSoundType();
     public abstract boolean isSolid();
+    public abstract AxisAlignedBBHandle getInteractableBox(IBlockAccessHandle iblockaccess, IntVector3 blockposition);
     public abstract AxisAlignedBBHandle getBoundingBox(IBlockAccessHandle iblockaccess, IntVector3 blockposition);
     public abstract Object get(IBlockStateHandle state);
     public abstract IBlockDataHandle set(IBlockStateHandle state, Object value);
@@ -74,6 +75,7 @@ public abstract class IBlockDataHandle extends Template.Handle {
         public final Template.Method<Boolean> isPowerSource = new Template.Method<Boolean>();
         public final Template.Method.Converted<SoundEffectTypeHandle> getSoundType = new Template.Method.Converted<SoundEffectTypeHandle>();
         public final Template.Method<Boolean> isSolid = new Template.Method<Boolean>();
+        public final Template.Method.Converted<AxisAlignedBBHandle> getInteractableBox = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<AxisAlignedBBHandle> getBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<Object> get = new Template.Method.Converted<Object>();
         public final Template.Method.Converted<IBlockDataHandle> set = new Template.Method.Converted<IBlockDataHandle>();

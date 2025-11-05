@@ -276,16 +276,70 @@ interface IBlockData {
 #endif
     }
 
+    // ========================================== INTERACTABLE BOX ===========================================
+
+    public (AxisAlignedBBHandle) AxisAlignedBB getInteractableBox((IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition) {
 #if version >= 1.13
-    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox((IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition) {
   #if version >= 1.18
-        VoxelShape shape = instance.getVisualShape(iblockaccess, blockposition, VoxelShapeCollision.empty());
+        VoxelShape shape = instance.getShape(iblockaccess, blockposition);
   #elseif version >= 1.16
         VoxelShape shape = instance.getShape(iblockaccess, blockposition);
   #elseif version >= 1.14
-        VoxelShape shape = instance.getBlock().a(instance, iblockaccess, blockposition, VoxelShapeCollision.a());
+        VoxelShape shape = instance.a(iblockaccess, blockposition, VoxelShapeCollision.a());
   #else
-        VoxelShape shape = instance.getBlock().a(instance, iblockaccess, blockposition);
+        VoxelShape shape = instance.getShape(iblockaccess, blockposition);
+  #endif
+  #if version >= 1.13.2
+        if (shape == null || shape.isEmpty()) {
+  #else
+        if (shape == null || shape.b()) {
+  #endif
+            return null;
+        } else {
+  #if version >= 1.18
+            return shape.bounds();
+  #elseif methodexists net.minecraft.world.phys.shapes.VoxelShape public net.minecraft.world.phys.AxisAlignedBB getBoundingBox();
+            return shape.getBoundingBox();
+  #else
+            return shape.a();
+  #endif
+        }
+    }
+#else
+        // Before 1.13 it did not return null for air, so manually patch that
+        net.minecraft.world.level.block.Block block = instance.getBlock();
+        if (block == net.minecraft.world.level.block.Blocks.AIR) {
+            return null;
+        }
+
+  #if version >= 1.12
+        return instance.e(iblockaccess, blockposition);
+  #elseif version >= 1.11
+        return instance.d(iblockaccess, blockposition);
+  #elseif version >= 1.9
+        return instance.c((net.minecraft.world.level.World) iblockaccess, blockposition);
+  #elseif version >= 1.8.3
+        block.updateShape(iblockaccess, blockposition);
+        return new AxisAlignedBB(block.B(), block.D(), block.F(), block.C(), block.E(), block.G());
+  #else
+        block.updateShape(iblockaccess, blockposition);
+        return new AxisAlignedBB(block.z(), block.B(), block.D(), block.A(), block.C(), block.E());
+  #endif
+#endif
+    }
+
+    // ========================================== BOUNDING BOX ===========================================
+
+#if version >= 1.13
+    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox((IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition) {
+  #if version >= 1.18
+        VoxelShape shape = instance.getCollisionShape(iblockaccess, blockposition, VoxelShapeCollision.empty());
+  #elseif version >= 1.16
+        VoxelShape shape = instance.getCollisionShape(iblockaccess, blockposition);
+  #elseif version >= 1.14
+        VoxelShape shape = instance.getCollisionShape(iblockaccess, blockposition);
+  #else
+        VoxelShape shape = instance.getCollisionShape(iblockaccess, blockposition);
   #endif
   #if version >= 1.13.2
         if (shape == null || shape.isEmpty()) {
@@ -325,6 +379,8 @@ interface IBlockData {
         }
     }
 #endif
+
+    // ==========================================================================================================
 
     public Object get((IBlockStateHandle) IBlockState state) {
         if (state != null) {
