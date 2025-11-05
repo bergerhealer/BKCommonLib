@@ -304,7 +304,6 @@ interface IBlockData {
             return shape.a();
   #endif
         }
-    }
 #else
         // Before 1.13 it did not return null for air, so manually patch that
         net.minecraft.world.level.block.Block block = instance.getBlock();
