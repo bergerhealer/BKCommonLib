@@ -36,6 +36,11 @@ public abstract class DisplayHandle extends EntityHandle {
     public static final Key<Float> DATA_WIDTH = Key.Type.FLOAT.createKey(T.DATA_WIDTH_ID, -1);
     public static final Key<Float> DATA_HEIGHT = Key.Type.FLOAT.createKey(T.DATA_HEIGHT_ID, -1);
     public static final Key<Integer> DATA_GLOW_COLOR_OVERRIDE = Key.Type.INTEGER.createKey(T.DATA_GLOW_COLOR_OVERRIDE_ID, -1);
+
+    public static final byte BILLBOARD_RENDER_FIXED = 0;
+    public static final byte BILLBOARD_RENDER_VERTICAL = 1;
+    public static final byte BILLBOARD_RENDER_HORIZONTAL = 2;
+    public static final byte BILLBOARD_RENDER_CENTER = 3;
     /**
      * Stores class members for <b>net.minecraft.world.entity.Display</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
