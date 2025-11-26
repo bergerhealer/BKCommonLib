@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.math.Quaternion;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.EntityPose;
 import com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode;
 import com.bergerkiller.generated.net.minecraft.world.entity.DisplayHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityItemFrameHandle;
@@ -28,6 +29,17 @@ import com.bergerkiller.generated.net.minecraft.world.entity.item.EntityItemHand
 import com.bergerkiller.generated.net.minecraft.world.entity.monster.EntityShulkerHandle;
 
 public class DataWatcherTest {
+
+    @Test
+    public void testEntityPose() {
+        if (!CommonBootstrap.evaluateMCVersion(">=", "1.14")) {
+            return; // Not available
+        }
+
+        DataWatcher dataWatcher = new DataWatcher();
+        dataWatcher.set(EntityHandle.DATA_POSE, EntityPose.CROUCHING);
+        assertEquals(EntityPose.CROUCHING, dataWatcher.get(EntityHandle.DATA_POSE));
+    }
 
     @Test
     public void testRepeatedClientDefault() {

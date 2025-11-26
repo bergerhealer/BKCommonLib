@@ -40,17 +40,17 @@ public class EntityPoseConversion {
             // For all unknown constants (including UNKNOWN), default to STANDING
             Object nmsStanding = toHandle.get(EntityPose.STANDING);
             for (EntityPose pose : EntityPose.values()) {
-                toHandle.put(pose, nmsStanding);
+                toHandle.putIfAbsent(pose, nmsStanding);
             }
         }
     }
 
-    @ConverterMethod(output="net.minecraft.world.entity.EnumItemSlot")
+    @ConverterMethod(output="net.minecraft.world.entity.EntityPose")
     public static Object getEnumEntityPose(EntityPose pose) {
         return toHandle.get(pose);
     }
 
-    @ConverterMethod(input="net.minecraft.world.entity.EnumItemSlot")
+    @ConverterMethod(input="net.minecraft.world.entity.EntityPose")
     public static EntityPose getEntityPose(Object enumEntityPose) {
         return toWrapper.get(enumEntityPose);
     }
