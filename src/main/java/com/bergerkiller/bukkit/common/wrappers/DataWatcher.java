@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
+import com.bergerkiller.bukkit.common.conversion.type.EntityPoseConversion;
 import com.bergerkiller.bukkit.common.conversion.type.JOMLConversion;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
@@ -989,6 +990,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                     ? new Type<>(JOMLConversion.JOML_VECTOR3F_TYPE, Vector.class) : missing();
             public static final Type<Quaternion> JOML_QUATERNIONF = CommonBootstrap.evaluateMCVersion(">=", "1.19.4")
                     ? new Type<>(JOMLConversion.JOML_QUATERNIONF_TYPE, Quaternion.class) : missing();
+            public static final Type<EntityPose> ENTITY_POSE = CommonBootstrap.evaluateMCVersion(">=", "1.14")
+                    ? new Type<>(EntityPoseConversion.NMS_ENTITY_POSE_TYPE, EntityPose.class) : missing();
             public static final Type<IntVector3> BLOCK_POSITION = getForType(IntVector3.class);
             public static final Type<ChatText> CHAT_TEXT = getForType(ChatText.class);
             public static final Type<ItemStack> ITEMSTACK = getForType(ItemStack.class);

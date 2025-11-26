@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -1607,5 +1608,21 @@ public class LogicUtil {
             result.addAll(b);
             return Collections.unmodifiableList(result);
         }
+    }
+
+    /**
+     * Creates an EnumMap for a key type not known at compile-time.
+     *
+     * @param enumClass Unknown enum class. Must be an enum class or an error is thrown.
+     * @return New EnumMap
+     * @param <K> Inferred Key type
+     * @param <V> Inferred Value type
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public static <K, V> Map<K, V> createRawEnumMap(Class<?> enumClass) {
+        if (!Enum.class.isAssignableFrom(enumClass)) {
+            throw new IllegalArgumentException("Not an enum class: " + enumClass);
+        }
+        return new EnumMap(enumClass);
     }
 }

@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import com.bergerkiller.bukkit.common.conversion.type.EntityPoseConversion;
 import com.bergerkiller.bukkit.common.conversion.type.JOMLConversion;
 import com.bergerkiller.bukkit.common.conversion.type.MapConversion;
 import com.bergerkiller.bukkit.common.conversion.type.ScoreboardDisplaySlotConversion;
@@ -952,6 +953,9 @@ public class CommonBootstrap {
         }
         if (evaluateMCVersion("<", "1.9")) {
             Conversion.registerConverters(MC1_8_8_Conversion.class);
+        }
+        if (evaluateMCVersion(">=", "1.14")) {
+            Conversion.registerConverters(EntityPoseConversion.class);
         }
         if (evaluateMCVersion(">=", "1.17")) {
             MC1_17_Conversion.init();

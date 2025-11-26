@@ -174,6 +174,7 @@ public abstract class EntityHandle extends Template.Handle {
     public static final DataWatcher.Key<Boolean> DATA_CUSTOM_NAME_VISIBLE = DataWatcher.Key.Type.BOOLEAN.createKey(T.DATA_CUSTOM_NAME_VISIBLE, 3);
     public static final DataWatcher.Key<Boolean> DATA_SILENT = DataWatcher.Key.Type.BOOLEAN.createKey(T.DATA_SILENT, 4);
     public static final DataWatcher.Key<Boolean> DATA_NO_GRAVITY = DataWatcher.Key.Type.BOOLEAN.createKey(T.DATA_NO_GRAVITY, -1);
+    public static final DataWatcher.Key<com.bergerkiller.bukkit.common.wrappers.EntityPose> DATA_POSE = DataWatcher.Key.Type.ENTITY_POSE.createKey(T.DATA_POSE, -1);
 
     public static final int DATA_FLAG_ON_FIRE = (1 << 0);
     public static final int DATA_FLAG_SNEAKING = (1 << 1);
@@ -268,6 +269,8 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.StaticField.Converted<Key<Boolean>> DATA_SILENT = new Template.StaticField.Converted<Key<Boolean>>();
         @Template.Optional
         public final Template.StaticField.Converted<Key<Boolean>> DATA_NO_GRAVITY = new Template.StaticField.Converted<Key<Boolean>>();
+        @Template.Optional
+        public final Template.StaticField.Converted<Key<?>> DATA_POSE = new Template.StaticField.Converted<Key<?>>();
 
         public final Template.Field.Converted<Entity> bukkitEntityField = new Template.Field.Converted<Entity>();
         public final Template.Field.Integer idField = new Template.Field.Integer();

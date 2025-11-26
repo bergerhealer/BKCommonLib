@@ -24,6 +24,7 @@ import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.phys.Vec3D;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.entity.EntityPose;
 
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
@@ -1090,6 +1091,7 @@ class Entity {
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY;
+    protected static optional final (DataWatcher.Key<?>) DataWatcherObject<EntityPose> DATA_POSE;
 
 #elseif version >= 1.16.2
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:S;
@@ -1098,6 +1100,7 @@ class Entity {
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:ar;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:as;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:at;
+    protected static optional final (DataWatcher.Key<?>) DataWatcherObject<EntityPose> DATA_POSE:POSE;
 
 #elseif version >= 1.16
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:T;
@@ -1106,6 +1109,7 @@ class Entity {
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:ay;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:az;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aA;
+    protected static optional final (DataWatcher.Key<?>) DataWatcherObject<EntityPose> DATA_POSE:POSE;
 
 #elseif version >= 1.14
   #if version >= 1.15
@@ -1118,9 +1122,11 @@ class Entity {
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aA;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aB;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aC;
-
-    // TODO: New Pose datawatcher entry since 1.14
-    // protected static final DataWatcherObject<EntityPose> X = DataWatcher.a(Entity.class, DataWatcherRegistry.s);
+  #if version >= 1.14.1
+    protected static optional final (DataWatcher.Key<?>) DataWatcherObject<EntityPose> DATA_POSE:POSE;
+  #else
+    protected static optional final (DataWatcher.Key<?>) DataWatcherObject<EntityPose> DATA_POSE:X;
+  #endif
 
 #elseif version >= 1.9
     /* === MC 1.9 and onwards has constants like these for datawatcher keys === */
@@ -1162,6 +1168,8 @@ class Entity {
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aB;
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:###;
     #endif
+
+    protected static optional final (DataWatcher.Key<?>) DataWatcherObject<EntityPose> DATA_POSE:###;
 #else
     /* === MC 1.8.9: These constants do not exist == */
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:###;
@@ -1170,6 +1178,7 @@ class Entity {
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:###;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:###;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:###;
+    protected static optional final (DataWatcher.Key<?>) DataWatcherObject<EntityPose> DATA_POSE:###;
 #endif
     <code>
     public static final DataWatcher.Key<Byte> DATA_FLAGS = DataWatcher.Key.Type.BYTE.createKey(T.DATA_FLAGS, 0);
@@ -1185,6 +1194,7 @@ class Entity {
     public static final DataWatcher.Key<Boolean> DATA_CUSTOM_NAME_VISIBLE = DataWatcher.Key.Type.BOOLEAN.createKey(T.DATA_CUSTOM_NAME_VISIBLE, 3);
     public static final DataWatcher.Key<Boolean> DATA_SILENT = DataWatcher.Key.Type.BOOLEAN.createKey(T.DATA_SILENT, 4);
     public static final DataWatcher.Key<Boolean> DATA_NO_GRAVITY = DataWatcher.Key.Type.BOOLEAN.createKey(T.DATA_NO_GRAVITY, -1);
+    public static final DataWatcher.Key<com.bergerkiller.bukkit.common.wrappers.EntityPose> DATA_POSE = DataWatcher.Key.Type.ENTITY_POSE.createKey(T.DATA_POSE, -1);
 
     public static final int DATA_FLAG_ON_FIRE = (1 << 0);
     public static final int DATA_FLAG_SNEAKING = (1 << 1);
