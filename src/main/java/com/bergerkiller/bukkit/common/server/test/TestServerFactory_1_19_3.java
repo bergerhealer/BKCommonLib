@@ -31,7 +31,7 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         // We don't need that trash during the tests we run - it slows it down by way too much
         // This is done by temporarily hacking the bootstrapExecutor to never run tasks - this allows
         // the build() method to return instantly.
-        try (BackgroundWorkerDefuser defuser = BackgroundWorkerDefuser.start(Class.forName("net.minecraft.SystemUtils"))) {
+        try (BackgroundWorkerDefuser defuser = BackgroundWorkerDefuser.start(Class.forName(env.systemUtilsClassName))) {
             Class.forName("net.minecraft.util.datafix.DataConverterRegistry");
         }
 
@@ -110,7 +110,7 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         // this.executorService = SystemUtils.e();
         {
             setField(mc_server, "executor", createFromCode(env.mc_server_type,
-                    "return net.minecraft.SystemUtils.backgroundExecutor();"));
+                    "return " + env.systemUtilsClassName + ".backgroundExecutor();"));
         }
 
         // ResourcePack initialization (makes recipes available)
@@ -274,7 +274,47 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
             Executor executor2 = newThreadExecutor();
             Class<?> dataPackResourcesType = Class.forName("net.minecraft.server.DataPackResources");
 
-            if (CommonBootstrap.evaluateMCVersion(">=", "1.21.2")) {
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.21.11")) {
+                /*
+                 * public static CompletableFuture<DataPackResources> loadResources(
+                 *         IResourceManager iresourcemanager,
+                 *         LayeredRegistryAccess<RegistryLayer> layeredregistryaccess,
+                 *         List<IRegistry.a<?>> list,
+                 *         FeatureFlagSet featureflagset,
+                 *         CommandDispatcher.ServerType commanddispatcher_servertype,
+                 *         PermissionSet permissionset,
+                 *         Executor executor,
+                 *         Executor executor1) {
+                 */
+
+                // We need a PermissionSet instance
+                Class<?> permissionSetType = Class.forName("net.minecraft.server.permissions.PermissionSet");
+                Object allPermissions = createFromCode(permissionSetType, "return PermissionSet.ALL_PERMISSIONS;");
+
+                // Pass the registries object instead of the customdimension object
+                // It calls the same getAccessForLoading internally
+                Method startLoadingMethod = Resolver.resolveAndGetDeclaredMethod(dataPackResourcesType, "loadResources",
+                        Class.forName("net.minecraft.server.packs.resources.IResourceManager"),
+                        Class.forName("net.minecraft.core.LayeredRegistryAccess"),
+                        java.util.List.class, // tagDataPackRegistries List
+                        Class.forName("net.minecraft.world.flag.FeatureFlagSet"),
+                        serverTypeType,
+                        permissionSetType,
+                        Executor.class,
+                        Executor.class);
+                futureDPLoaded = (CompletableFuture<Object>) startLoadingMethod.invoke(null,
+                        env.resourceManager, registries, env.tagDataPackRegistries, env.featureFlagSet, serverType, allPermissions, executor1, executor2);
+
+                // Retrieve it, using get(). May throw if problems occur.
+                datapackresources = futureDPLoaded.get();
+
+                // Call updateStaticRegistryTags() on the result - which calls bind() on the tags
+                {
+                    Class<?> datapackresourceType = Class.forName("net.minecraft.server.DataPackResources");
+                    Resolver.resolveAndGetDeclaredMethod(datapackresourceType, "updateStaticRegistryTags")
+                            .invoke(datapackresources);
+                }
+            } else if (CommonBootstrap.evaluateMCVersion(">=", "1.21.2")) {
                 /*
                  * public static CompletableFuture<DataPackResources> loadResources(
                  *         IResourceManager iresourcemanager,

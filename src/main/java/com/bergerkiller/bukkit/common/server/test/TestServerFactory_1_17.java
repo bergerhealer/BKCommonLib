@@ -87,7 +87,7 @@ class TestServerFactory_1_17 extends TestServerFactory {
         // this.executorService = SystemUtils.e();
         {
             setField(mc_server, "executor", createFromCode(minecraftServerType,
-                    "return net.minecraft.SystemUtils.e();"));
+                    "return " + env.systemUtilsClassName + ".e();"));
         }
 
         // this.dataPackResources = DataPackResources (passed through constructor)
@@ -194,7 +194,7 @@ class TestServerFactory_1_17 extends TestServerFactory {
                 Class<?> serverTypeType = Class.forName("net.minecraft.commands.CommandDispatcher$ServerType");
                 Object serverType = getStaticField(serverTypeType, "DEDICATED");
                 int functionPermissionLevel = 2;
-                Executor executor1 = (Executor) Class.forName("net.minecraft.SystemUtils").getMethod("f").invoke(null);
+                Executor executor1 = (Executor) Class.forName(env.systemUtilsClassName).getMethod("f").invoke(null);
                 Executor executor2 = newThreadExecutor();
                 Method startLoadingMethod = Class.forName("net.minecraft.server.DataPackResources").getDeclaredMethod("a",
                         List.class,
