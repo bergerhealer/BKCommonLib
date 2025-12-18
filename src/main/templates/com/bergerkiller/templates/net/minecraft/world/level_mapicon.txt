@@ -209,8 +209,11 @@ class MapDecorationType {
     }
 #endif
 
-    public org.bukkit.map.MapCursor.Type toBukkit() {
-#if version >= 1.20.5
+    #require MapDecorationType public org.bukkit.map.MapCursor.Type toBukkitImpl() {
+#if version >= 1.21.10 && exists org.bukkit.craftbukkit.CraftRegistry public static org.bukkit.Keyed minecraftToBukkit(Object minecraft, net.minecraft.resources.ResourceKey registryKey);
+        // Paper
+        return org.bukkit.craftbukkit.CraftRegistry.minecraftToBukkit(instance, net.minecraft.core.registries.Registries.MAP_DECORATION_TYPE);
+#elseif version >= 1.20.5
         return org.bukkit.craftbukkit.map.CraftMapCursor$CraftType.minecraftToBukkit(instance);
 #elseif version >= 1.18
         return org.bukkit.map.MapCursor$Type.byValue(instance.getIcon());
@@ -219,12 +222,16 @@ class MapDecorationType {
 #endif
     }
 
+    public org.bukkit.map.MapCursor.Type toBukkit() {
+        return instance#toBukkitImpl();
+    }
+
 #if version >= 1.20.5
     // On this version no internal id exists anymore, and it's all done by cursor name
     // However, there's still a deprecated Bukkit API with an id, so we can use that instead.
     // This is very unlikely to actually be called by anyone.
     public byte getId() {
-        org.bukkit.map.MapCursor$Type bukkitType = org.bukkit.craftbukkit.map.CraftMapCursor$CraftType.minecraftToBukkit(instance);
+        org.bukkit.map.MapCursor$Type bukkitType = instance#toBukkitImpl();
         return bukkitType.getValue();
     }
 #elseif version >= 1.18
