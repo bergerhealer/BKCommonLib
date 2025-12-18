@@ -175,7 +175,13 @@ public class AdvancementDataPlayerHook extends ClassHook<AdvancementDataPlayerHo
         }
 
         private void registerCritereonField(String criterionClassName, String fieldName) throws Throwable {
-            String fullCriterionClassName = "net.minecraft.advancements.critereon." + criterionClassName;
+
+            String fullCriterionClassName;
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.21.11")) {
+                fullCriterionClassName = "net.minecraft.advancements.criterion." + criterionClassName;
+            } else {
+                fullCriterionClassName = "net.minecraft.advancements.critereon." + criterionClassName;
+            }
             Class<?> type = CommonUtil.getClass(fullCriterionClassName);
             if (type == null) {
                 throw new IllegalStateException("Failed to find criterion: " + criterionClassName);
@@ -261,7 +267,6 @@ public class AdvancementDataPlayerHook extends ClassHook<AdvancementDataPlayerHo
     @Template.Optional
     @Template.InstanceType("net.minecraft.server.AdvancementDataPlayer")
     @Template.Import("net.minecraft.server.level.EntityPlayer")
-    @Template.Import("net.minecraft.advancements.critereon.CriterionTriggerAbstract")
     /*
      * <PLAYER_ADVANCEMENTS_FIELD>
      * #select version >=
