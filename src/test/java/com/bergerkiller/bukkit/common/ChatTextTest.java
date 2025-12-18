@@ -111,6 +111,10 @@ public class ChatTextTest {
 
         Set<String> allowed = new HashSet<String>();
         if (Common.evaluateMCVersion(">=", "1.20.3")) {
+            // Yay mojang keeps on changing this. Why??
+            allowed.add("{\"text\":\"\",\"extra\":[\"Hello, \",{\"text\":\"World!\",\"color\":\"red\",\"bold\":false,\"italic\":false,\"underlined\":false,\"strikethrough\":false,\"obfuscated\":false}]}");
+        }
+        if (Common.evaluateMCVersion(">=", "1.20.3")) {
             // I dont know what the fuck is going on here, but this is all spigots doing
             // That text: "" really shouldn't be there. Also now literal "Hello, " is without {text:}
             allowed.add("{\"text\":\"\",\"extra\":[\"Hello, \",{\"text\":\"World!\",\"obfuscated\":false,\"italic\":false,\"underlined\":false,\"strikethrough\":false,\"color\":\"red\",\"bold\":false}]}");
@@ -165,7 +169,11 @@ public class ChatTextTest {
 
         Set<String> allowed = new HashSet<String>();
         allowed.add("{\"extra\":[{\"color\":\"red\",\"text\":\"\"}],\"text\":\"\"}");
-        if (Common.evaluateMCVersion(">=", " 1.20.3")) {
+        if (Common.evaluateMCVersion(">=", "1.21.11")) {
+            // Bleh!
+            allowed.add("{\"text\":\"\",\"extra\":[{\"text\":\"\",\"color\":\"red\"}],\"color\":\"red\",\"bold\":false,\"italic\":false,\"underlined\":false,\"strikethrough\":false,\"obfuscated\":false}");
+        }
+        if (Common.evaluateMCVersion(">=", "1.20.3")) {
             // IDK wtf
             allowed.add("{\"text\":\"\",\"extra\":[{\"text\":\"\",\"obfuscated\":false,\"italic\":false,\"underlined\":false,\"strikethrough\":false,\"color\":\"red\",\"bold\":false},{\"text\":\"\",\"color\":\"red\"}]}");
         }
