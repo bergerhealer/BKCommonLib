@@ -95,7 +95,14 @@ class SoundEffect {
     public static optional Object rawSoundEffectResourceKeyToHolder(Object resourceKey) {
         net.minecraft.resources.ResourceKey resourceKeyCasted = (net.minecraft.resources.ResourceKey) resourceKey;
         RegistryMaterials registry = (RegistryMaterials) net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT;
-  #if version >= 1.19.3
+  #if version >= 1.21.11
+        java.util.Optional holderOpt = registry.get(resourceKeyCasted);
+        if (holderOpt.isPresent()) {
+            return holderOpt.get();
+        } else {
+            return net.minecraft.core.Holder.direct(net.minecraft.sounds.SoundEffect.createVariableRangeEvent(resourceKeyCasted.identifier()));
+        }
+  #elseif version >= 1.19.3
     #if version >= 1.21.2
         java.util.Optional holderOpt = registry.get(resourceKeyCasted);
     #else

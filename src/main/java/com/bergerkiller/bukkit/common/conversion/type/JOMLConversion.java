@@ -11,8 +11,16 @@ import org.bukkit.util.Vector;
  * Only used on version 1.17 and later when JOML was introduced.
  */
 public class JOMLConversion {
+    /** Class type for a mutable Vector3f */
     public static final Class<?> JOML_VECTOR3F_TYPE = LogicUtil.tryMake(() -> Class.forName("org.joml.Vector3f"), null);
+    /** Interface for a read-only (constant) Vector3f. Used after 1.21.11 to store vectors in data watchers. */
+    public static final Class<?> JOML_VECTOR3F_CONSTANT_TYPE = LogicUtil.tryMake(() -> Class.forName("org.joml.Vector3fc"), null);
+
+    /** Class type for a mutable Quaternion3f */
     public static final Class<?> JOML_QUATERNIONF_TYPE = LogicUtil.tryMake(() -> Class.forName("org.joml.Quaternionf"), null);
+    /** Class type for a read-only (constant) Quaternion3f. Used after 1.21.11 to store quaternions in data watchers. */
+    public static final Class<?> JOML_QUATERNIONF_CONSTANT_TYPE = LogicUtil.tryMake(() -> Class.forName("org.joml.Quaternionfc"), null);
+
     private static final ConversionLogic LOGIC = (JOML_VECTOR3F_TYPE != null && JOML_QUATERNIONF_TYPE != null)
             ? Template.Class.create(ConversionLogic.class) : null;
 
@@ -26,7 +34,7 @@ public class JOMLConversion {
         }
     }
 
-    @ConverterMethod(input="org.joml.Vector3f")
+    @ConverterMethod(input="org.joml.Vector3fc")
     public static Vector toVector(Object vector3f) {
         return LOGIC.decodeVector3f(vector3f);
     }
@@ -36,7 +44,7 @@ public class JOMLConversion {
         return LOGIC.encodeVector3f(vector);
     }
 
-    @ConverterMethod(input="org.joml.Quaternionf")
+    @ConverterMethod(input="org.joml.Quaternionfc")
     public static Quaternion toQuaternion(Object quaternionf) {
         return LOGIC.decodeQuaternionf(quaternionf);
     }
@@ -47,7 +55,9 @@ public class JOMLConversion {
     }
 
     @Template.Import("org.joml.Vector3f")
+    @Template.Import("org.joml.Vector3fc")
     @Template.Import("org.joml.Quaternionf")
+    @Template.Import("org.joml.Quaternionfc")
     @Template.Import("org.bukkit.util.Vector")
     @Template.Import("com.bergerkiller.bukkit.common.math.Quaternion")
     public static abstract class ConversionLogic extends Template.Class<Template.Handle> {
@@ -71,7 +81,7 @@ public class JOMLConversion {
 
         /*
          * <DECODE_VECTOR3F>
-         * public static Vector decode(Vector3f v) {
+         * public static Vector decode(Vector3fc v) {
          *     return new Vector((double) v.x(), (double) v.y(), (double) v.z());
          * }
          */
@@ -89,7 +99,7 @@ public class JOMLConversion {
 
         /*
          * <DECODE_QUATERNIONF>
-         * public static Quaternion decode(Quaternionf q) {
+         * public static Quaternion decode(Quaternionfc q) {
          *     return new Quaternion((double) q.x(), (double) q.y(), (double) q.z(), (double) q.w());
          * }
          */

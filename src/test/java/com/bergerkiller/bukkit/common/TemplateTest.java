@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 
 import com.bergerkiller.bukkit.common.utils.DebugUtil;
 import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartRideableHandle;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.junit.Ignore;
@@ -41,7 +42,6 @@ import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandl
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityArmorStandHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartRideableHandle;
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;

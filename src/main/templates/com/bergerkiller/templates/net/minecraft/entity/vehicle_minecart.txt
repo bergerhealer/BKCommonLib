@@ -1,4 +1,4 @@
-package net.minecraft.world.entity.vehicle;
+package net.minecraft.world.entity.vehicle.minecart;
 
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.phys.Vec3D;
@@ -6,34 +6,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.syncher.DataWatcherObject;
 
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.NewMinecartBehaviorHandle.LerpStepHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.NewMinecartBehaviorHandle.LerpStepHandle;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
-
-class EntityBoat extends Entity {
-#if version >= 1.17
-    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_WOOD_TYPE:DATA_ID_TYPE;
-#elseif version >= 1.14
-    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_WOOD_TYPE:e;
-#elseif version >= 1.9
-    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_WOOD_TYPE:d;
-#else
-    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_WOOD_TYPE:###;
-#endif
-
-    <code>
-    public static final Key<com.bergerkiller.bukkit.common.wrappers.BoatWoodType> DATA_WOOD_TYPE = Key.Type.BOAT_WOOD_TYPE.createKey(T.DATA_WOOD_TYPE, -1);
-    </code>
-}
-
-// Since 1.20.3. Same data watcher fields as EntityMinecartAbstract.
-optional class VehicleEntity extends Entity {
-    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:DATA_ID_HURT;
-    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:DATA_ID_HURTDIR;
-    private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:DATA_ID_DAMAGE;
-}
 
 class EntityMinecartAbstract extends Entity {
 #if version >= 1.21.5
@@ -99,10 +76,10 @@ class EntityMinecartAbstract extends Entity {
     public static final Key<Boolean> DATA_BLOCK_VISIBLE;
 
     static {
-        if (VehicleEntityHandle.T.isAvailable()) {
-            DATA_SHAKING_FACTOR = Key.Type.INTEGER.createKey(VehicleEntityHandle.T.DATA_SHAKING_FACTOR, -1);
-            DATA_SHAKING_DIRECTION = Key.Type.INTEGER.createKey(VehicleEntityHandle.T.DATA_SHAKING_DIRECTION, -1);
-            DATA_SHAKING_DAMAGE = Key.Type.FLOAT.createKey(VehicleEntityHandle.T.DATA_SHAKING_DAMAGE, -1);
+        if (com.bergerkiller.generated.net.minecraft.world.entity.vehicle.VehicleEntityHandle.T.isAvailable()) {
+            DATA_SHAKING_FACTOR = Key.Type.INTEGER.createKey(com.bergerkiller.generated.net.minecraft.world.entity.vehicle.VehicleEntityHandle.T.DATA_SHAKING_FACTOR, -1);
+            DATA_SHAKING_DIRECTION = Key.Type.INTEGER.createKey(com.bergerkiller.generated.net.minecraft.world.entity.vehicle.VehicleEntityHandle.T.DATA_SHAKING_DIRECTION, -1);
+            DATA_SHAKING_DAMAGE = Key.Type.FLOAT.createKey(com.bergerkiller.generated.net.minecraft.world.entity.vehicle.VehicleEntityHandle.T.DATA_SHAKING_DAMAGE, -1);
         } else {
             DATA_SHAKING_FACTOR = Key.Type.INTEGER.createKey(T.DATA_SHAKING_FACTOR, 17);
             DATA_SHAKING_DIRECTION = Key.Type.INTEGER.createKey(T.DATA_SHAKING_DIRECTION, 18);
@@ -124,12 +101,22 @@ class EntityMinecartAbstract extends Entity {
     public float getDamage();
     public void setDamage(float damage);
 
+#if version >= 1.21.11
+    public void activateMinecart((org.bukkit.World) net.minecraft.server.level.WorldServer world, int x, int y, int z, boolean active);
+#else
+    public void activateMinecart((org.bukkit.World) net.minecraft.server.level.WorldServer world, int x, int y, int z, boolean active) {
+  #if version >= 1.18
+        instance.activateMinecart(x, y, z, active);
+  #else
+        instance.a(x, y, z, active);
+  #endif
+    }
+#endif
+
 #if version >= 1.18
     public int getHurtTime();
-    public void activate:activateMinecart(int x, int y, int z, boolean active);
 #else
     public int getHurtTime:getType();
-    public void activate:a(int x, int y, int z, boolean active);
 #endif
 }
 

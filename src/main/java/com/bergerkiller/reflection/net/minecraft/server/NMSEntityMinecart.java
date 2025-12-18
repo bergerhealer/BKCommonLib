@@ -2,13 +2,13 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartAbstractHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartCommandBlockHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartFurnaceHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartHopperHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartMobSpawnerHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartRideableHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartTNTHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstractHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartCommandBlockHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartFurnaceHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartHopperHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartMobSpawnerHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartRideableHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartTNTHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
@@ -21,8 +21,6 @@ public class NMSEntityMinecart {
     public static DataWatcher.Key<Integer> DATA_SHAKING_DIRECTION = EntityMinecartAbstractHandle.DATA_SHAKING_DIRECTION;
     public static DataWatcher.Key<Float> DATA_SHAKING_DAMAGE = EntityMinecartAbstractHandle.DATA_SHAKING_DAMAGE;
     public static DataWatcher.Key<Integer> DATA_BLOCK_OFFSET = EntityMinecartAbstractHandle.DATA_BLOCK_OFFSET;
-
-    public static final MethodAccessor<Void> activate = EntityMinecartAbstractHandle.T.activate.toMethodAccessor();
 
     public static class Rideable {
         public static final ClassTemplate<?> T = ClassTemplate.create(EntityMinecartRideableHandle.T.getType());

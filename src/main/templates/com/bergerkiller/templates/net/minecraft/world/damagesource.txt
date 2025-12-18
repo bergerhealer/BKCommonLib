@@ -3,7 +3,7 @@ package net.minecraft.world.damagesource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityLiving;
 import net.minecraft.world.entity.player.EntityHuman;
-import net.minecraft.world.entity.projectile.EntityArrow;
+import net.minecraft.world.entity.projectile.arrow.EntityArrow;
 import net.minecraft.world.entity.projectile.EntityFireball;
 
 import net.minecraft.resources.ResourceKey;
@@ -96,7 +96,11 @@ class DamageSource {
         Object[] constants = com.bergerkiller.bukkit.common.utils.CommonUtil.getClassConstants(DamageTypes.class);
         for (int i = 0; i < constants.length; i++) {
             ResourceKey key = (ResourceKey) constants[i];
+  #if version >= 1.21.11
+            lookup.put(key.identifier().getPath(), key);
+  #else
             lookup.put(key.location().getPath(), key);
+  #endif
         }
     }
 

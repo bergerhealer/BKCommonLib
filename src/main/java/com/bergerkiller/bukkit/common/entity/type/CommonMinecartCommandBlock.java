@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartCommandBlockHandle;
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.CommandMinecart;
 import org.bukkit.inventory.ItemStack;
@@ -7,7 +8,6 @@ import org.bukkit.inventory.ItemStack;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartCommandBlockHandle;
 
 import java.util.Arrays;
 import java.util.List;

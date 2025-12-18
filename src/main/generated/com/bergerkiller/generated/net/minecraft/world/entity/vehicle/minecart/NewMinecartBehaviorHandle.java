@@ -1,15 +1,15 @@
-package com.bergerkiller.generated.net.minecraft.world.entity.vehicle;
+package com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.util.Vector;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.world.entity.vehicle.NewMinecartBehavior</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-@Template.InstanceType("net.minecraft.world.entity.vehicle.NewMinecartBehavior")
+@Template.InstanceType("net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior")
 public abstract class NewMinecartBehaviorHandle extends Template.Handle {
     /** @see NewMinecartBehaviorClass */
     public static final NewMinecartBehaviorClass T = Template.Class.create(NewMinecartBehaviorClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -22,7 +22,7 @@ public abstract class NewMinecartBehaviorHandle extends Template.Handle {
     /* ============================================================================== */
 
     /**
-     * Stores class members for <b>net.minecraft.world.entity.vehicle.NewMinecartBehavior</b>.
+     * Stores class members for <b>net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class NewMinecartBehaviorClass extends Template.Class<NewMinecartBehaviorHandle> {
@@ -30,12 +30,12 @@ public abstract class NewMinecartBehaviorHandle extends Template.Handle {
 
 
     /**
-     * Instance wrapper handle for type <b>net.minecraft.world.entity.vehicle.NewMinecartBehavior.LerpStep</b>.
+     * Instance wrapper handle for type <b>net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior.LerpStep</b>.
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
     @Template.Optional
-    @Template.InstanceType("net.minecraft.world.entity.vehicle.NewMinecartBehavior.LerpStep")
+    @Template.InstanceType("net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior.LerpStep")
     public abstract static class LerpStepHandle extends Template.Handle {
         /** @see LerpStepClass */
         public static final LerpStepClass T = Template.Class.create(LerpStepClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -57,7 +57,7 @@ public abstract class NewMinecartBehaviorHandle extends Template.Handle {
         public abstract float getPitch();
         public abstract float getWeight();
         /**
-         * Stores class members for <b>net.minecraft.world.entity.vehicle.NewMinecartBehavior.LerpStep</b>.
+         * Stores class members for <b>net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior.LerpStep</b>.
          * Methods, fields, and constructors can be used without using Handle Objects.
          */
         public static final class LerpStepClass extends Template.Class<LerpStepHandle> {

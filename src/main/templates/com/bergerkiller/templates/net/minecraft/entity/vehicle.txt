@@ -1,0 +1,14 @@
+package net.minecraft.world.entity.vehicle;
+
+import net.minecraft.world.entity.Entity;
+import net.minecraft.network.syncher.DataWatcherObject;
+
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+
+// Since 1.20.3. Same data watcher fields as EntityMinecartAbstract.
+optional class VehicleEntity extends Entity {
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:DATA_ID_HURT;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:DATA_ID_HURTDIR;
+    private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:DATA_ID_DAMAGE;
+}

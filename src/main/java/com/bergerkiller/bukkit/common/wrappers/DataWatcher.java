@@ -986,10 +986,16 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             public static final Type<Float> FLOAT = getForType(Float.class);
             public static final Type<String> STRING = getForType(String.class);
             public static final Type<Vector> ROTATION_VECTOR = new Type<>(Vector3fHandle.T.getType(), Vector.class);
-            public static final Type<Vector> JOML_VECTOR3F = CommonBootstrap.evaluateMCVersion(">=", "1.19.4")
-                    ? new Type<>(JOMLConversion.JOML_VECTOR3F_TYPE, Vector.class) : missing();
-            public static final Type<Quaternion> JOML_QUATERNIONF = CommonBootstrap.evaluateMCVersion(">=", "1.19.4")
-                    ? new Type<>(JOMLConversion.JOML_QUATERNIONF_TYPE, Quaternion.class) : missing();
+            public static final Type<Vector> JOML_VECTOR3F = CommonBootstrap.evaluateMCVersion(">=", "1.21.11")
+                    ? new Type<>(JOMLConversion.JOML_VECTOR3F_CONSTANT_TYPE, Vector.class)
+                    : (CommonBootstrap.evaluateMCVersion(">=", "1.19.4")
+                        ? new Type<>(JOMLConversion.JOML_VECTOR3F_TYPE, Vector.class)
+                        : missing());
+            public static final Type<Quaternion> JOML_QUATERNIONF = CommonBootstrap.evaluateMCVersion(">=", "1.21.11")
+                    ? new Type<>(JOMLConversion.JOML_QUATERNIONF_CONSTANT_TYPE, Quaternion.class)
+                    : (CommonBootstrap.evaluateMCVersion(">=", "1.19.4")
+                        ? new Type<>(JOMLConversion.JOML_QUATERNIONF_TYPE, Quaternion.class)
+                        : missing());
             public static final Type<EntityPose> ENTITY_POSE = CommonBootstrap.evaluateMCVersion(">=", "1.14")
                     ? new Type<>(EntityPoseConversion.NMS_ENTITY_POSE_TYPE, EntityPose.class) : missing();
             public static final Type<IntVector3> BLOCK_POSITION = getForType(IntVector3.class);

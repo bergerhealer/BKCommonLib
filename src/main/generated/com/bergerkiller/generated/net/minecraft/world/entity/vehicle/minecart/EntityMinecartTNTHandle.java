@@ -1,13 +1,13 @@
-package com.bergerkiller.generated.net.minecraft.world.entity.vehicle;
+package com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.world.entity.vehicle.EntityMinecartTNT</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.entity.vehicle.minecart.EntityMinecartTNT</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.world.entity.vehicle.EntityMinecartTNT")
+@Template.InstanceType("net.minecraft.world.entity.vehicle.minecart.EntityMinecartTNT")
 public abstract class EntityMinecartTNTHandle extends EntityMinecartAbstractHandle {
     /** @see EntityMinecartTNTClass */
     public static final EntityMinecartTNTClass T = Template.Class.create(EntityMinecartTNTClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -24,7 +24,7 @@ public abstract class EntityMinecartTNTHandle extends EntityMinecartAbstractHand
     public abstract int getFuse();
     public abstract void setFuse(int value);
     /**
-     * Stores class members for <b>net.minecraft.world.entity.vehicle.EntityMinecartTNT</b>.
+     * Stores class members for <b>net.minecraft.world.entity.vehicle.minecart.EntityMinecartTNT</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityMinecartTNTClass extends Template.Class<EntityMinecartTNTHandle> {

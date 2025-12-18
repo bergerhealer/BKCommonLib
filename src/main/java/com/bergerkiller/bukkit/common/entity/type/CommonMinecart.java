@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.List;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstractHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartRideableHandle;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Minecart;
@@ -13,8 +15,6 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartAbstractHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartRideableHandle;
 
 /**
  * An abstract implementation for all Minecarts
@@ -207,7 +207,7 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
      * @param activated state of the activator rail
      */
     public void activate(Block activatorBlock, boolean activated) {
-        EntityMinecartAbstractHandle.T.activate.invoke(getHandle(),
-                activatorBlock.getX(), activatorBlock.getY(), activatorBlock.getZ(), activated);
+        EntityMinecartAbstractHandle.T.activateMinecart.invoke(getHandle(),
+                activatorBlock.getWorld(), activatorBlock.getX(), activatorBlock.getY(), activatorBlock.getZ(), activated);
     }
 }

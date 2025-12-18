@@ -59,7 +59,9 @@
 #include /net/minecraft/entity/player_inventory.txt
 #include /net/minecraft/entity/shulker.txt
 #include /net/minecraft/entity/entity_types.txt
-#include /net/minecraft/entity/vehicles.txt
+#include /net/minecraft/entity/vehicle.txt
+#include /net/minecraft/entity/vehicle_boat.txt
+#include /net/minecraft/entity/vehicle_minecart.txt
 #include /net/minecraft/entity/entity.txt
 #include /net/minecraft/entity/ageable.txt
 #include /net/minecraft/entity/slime.txt

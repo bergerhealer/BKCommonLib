@@ -2,7 +2,7 @@ package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.NewMinecartBehaviorHandle.LerpStepHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.NewMinecartBehaviorHandle.LerpStepHandle;
 import java.util.List;
 
 /**

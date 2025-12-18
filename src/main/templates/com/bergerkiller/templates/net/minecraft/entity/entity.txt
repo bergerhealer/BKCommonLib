@@ -311,11 +311,11 @@ class Entity {
 
         // MinecartBehavior instance
 #if version >= 1.21.2
-        if (instance instanceof net.minecraft.world.entity.vehicle.EntityMinecartAbstract) {
-            net.minecraft.world.entity.vehicle.MinecartBehavior behavior;
-            behavior = ((net.minecraft.world.entity.vehicle.EntityMinecartAbstract) instance).getBehavior();
-            #require net.minecraft.world.entity.vehicle.MinecartBehavior protected final net.minecraft.world.entity.vehicle.EntityMinecartAbstract minecart;
-            behavior#minecart = (net.minecraft.world.entity.vehicle.EntityMinecartAbstract)instance;
+        if (instance instanceof net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstract) {
+            net.minecraft.world.entity.vehicle.minecart.MinecartBehavior behavior;
+            behavior = ((net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstract) instance).getBehavior();
+            #require net.minecraft.world.entity.vehicle.minecart.MinecartBehavior protected final net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstract minecart;
+            behavior#minecart = (net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstract)instance;
         }
 #endif
 

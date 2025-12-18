@@ -1,10 +1,9 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartHopperHandle;
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.inventory.ItemStack;
-
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartHopperHandle;
 
 import java.util.Arrays;
 import java.util.List;

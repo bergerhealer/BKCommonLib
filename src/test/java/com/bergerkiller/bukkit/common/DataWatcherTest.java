@@ -11,7 +11,7 @@ import com.bergerkiller.bukkit.common.wrappers.EntityPose;
 import com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode;
 import com.bergerkiller.generated.net.minecraft.world.entity.DisplayHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityItemFrameHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartAbstractHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstractHandle;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

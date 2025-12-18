@@ -14,7 +14,7 @@ import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartAbstractHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstractHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;

@@ -814,7 +814,7 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport", "net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket");
 
             // Borked.
-            remappings.put("net.minecraft.world.entity.vehicle.NewMinecartBehavior$LerpStep", "net.minecraft.world.entity.vehicle.NewMinecartBehavior$a");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior$LerpStep", "net.minecraft.world.entity.vehicle.NewMinecartBehavior$a");
         } else {
             // Before this version the client rotation packet doesn't exist
             // It is emulated with the out-position packet instead (with x/y/z 0.0 relative)
@@ -855,11 +855,34 @@ public class CommonBootstrap {
         // 1.21.11 mappings
         if (evaluateMCVersion(">=", "1.21.11")) {
             // Moved. We keep the old package path so API's don't break needlessly.
-            remappings.put("net.minecraft.world.entity.vehicle.NewMinecartBehavior", "net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior");
-            remappings.put("net.minecraft.world.entity.vehicle.NewMinecartBehavior$LerpStep", "net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior$a");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior$LerpStep", "net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior$a");
         } else {
-            // Moved (old path)
+            // A lot of classes were moved to new packages. These remap it back to the old path for older versions.
+
+            // Painting
             remappings.put("net.minecraft.world.entity.decoration.painting.PaintingVariant", "net.minecraft.world.entity.decoration.PaintingVariant");
+
+            // Arrow
+            remappings.put("net.minecraft.world.entity.projectile.arrow.EntityArrow", "net.minecraft.world.entity.projectile.EntityArrow");
+
+            // Boat
+            remappings.put("net.minecraft.world.entity.vehicle.boat.EntityBoat", "net.minecraft.world.entity.vehicle.EntityBoat");
+
+            // Minecart
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.MinecartBehavior", "net.minecraft.world.entity.vehicle.MinecartBehavior");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior", "net.minecraft.world.entity.vehicle.NewMinecartBehavior");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior$LerpStep", "net.minecraft.world.entity.vehicle.NewMinecartBehavior$a");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.OldMinecartBehavior", "net.minecraft.world.entity.vehicle.OldMinecartBehavior");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.MinecartBehavior", "net.minecraft.world.entity.vehicle.MinecartBehavior");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstract", "net.minecraft.world.entity.vehicle.EntityMinecartAbstract");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.EntityMinecartContainer", "net.minecraft.world.entity.vehicle.EntityMinecartContainer");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.EntityMinecartTNT", "net.minecraft.world.entity.vehicle.EntityMinecartTNT");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.EntityMinecartCommandBlock", "net.minecraft.world.entity.vehicle.EntityMinecartCommandBlock");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.EntityMinecartRideable", "net.minecraft.world.entity.vehicle.EntityMinecartRideable");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.EntityMinecartMobSpawner", "net.minecraft.world.entity.vehicle.EntityMinecartMobSpawner");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.EntityMinecartHopper", "net.minecraft.world.entity.vehicle.EntityMinecartHopper");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.EntityMinecartFurnace", "net.minecraft.world.entity.vehicle.EntityMinecartFurnace");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.EntityMinecartChest", "net.minecraft.world.entity.vehicle.EntityMinecartChest");
         }
 
         // There have been various locations where starlight was installed

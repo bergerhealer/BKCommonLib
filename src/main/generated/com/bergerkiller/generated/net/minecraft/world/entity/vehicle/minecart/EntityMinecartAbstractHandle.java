@@ -1,16 +1,17 @@
-package com.bergerkiller.generated.net.minecraft.world.entity.vehicle;
+package com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import org.bukkit.World;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.world.entity.vehicle.EntityMinecartAbstract</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstract</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.world.entity.vehicle.EntityMinecartAbstract")
+@Template.InstanceType("net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstract")
 public abstract class EntityMinecartAbstractHandle extends EntityHandle {
     /** @see EntityMinecartAbstractClass */
     public static final EntityMinecartAbstractClass T = Template.Class.create(EntityMinecartAbstractClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -24,8 +25,8 @@ public abstract class EntityMinecartAbstractHandle extends EntityHandle {
 
     public abstract float getDamage();
     public abstract void setDamage(float damage);
+    public abstract void activateMinecart(World world, int x, int y, int z, boolean active);
     public abstract int getHurtTime();
-    public abstract void activate(int x, int y, int z, boolean active);
     public static final Key<Integer> DATA_SHAKING_FACTOR;
     public static final Key<Integer> DATA_SHAKING_DIRECTION;
     public static final Key<Float> DATA_SHAKING_DAMAGE;
@@ -35,10 +36,10 @@ public abstract class EntityMinecartAbstractHandle extends EntityHandle {
     public static final Key<Boolean> DATA_BLOCK_VISIBLE;
 
     static {
-        if (VehicleEntityHandle.T.isAvailable()) {
-            DATA_SHAKING_FACTOR = Key.Type.INTEGER.createKey(VehicleEntityHandle.T.DATA_SHAKING_FACTOR, -1);
-            DATA_SHAKING_DIRECTION = Key.Type.INTEGER.createKey(VehicleEntityHandle.T.DATA_SHAKING_DIRECTION, -1);
-            DATA_SHAKING_DAMAGE = Key.Type.FLOAT.createKey(VehicleEntityHandle.T.DATA_SHAKING_DAMAGE, -1);
+        if (com.bergerkiller.generated.net.minecraft.world.entity.vehicle.VehicleEntityHandle.T.isAvailable()) {
+            DATA_SHAKING_FACTOR = Key.Type.INTEGER.createKey(com.bergerkiller.generated.net.minecraft.world.entity.vehicle.VehicleEntityHandle.T.DATA_SHAKING_FACTOR, -1);
+            DATA_SHAKING_DIRECTION = Key.Type.INTEGER.createKey(com.bergerkiller.generated.net.minecraft.world.entity.vehicle.VehicleEntityHandle.T.DATA_SHAKING_DIRECTION, -1);
+            DATA_SHAKING_DAMAGE = Key.Type.FLOAT.createKey(com.bergerkiller.generated.net.minecraft.world.entity.vehicle.VehicleEntityHandle.T.DATA_SHAKING_DAMAGE, -1);
         } else {
             DATA_SHAKING_FACTOR = Key.Type.INTEGER.createKey(T.DATA_SHAKING_FACTOR, 17);
             DATA_SHAKING_DIRECTION = Key.Type.INTEGER.createKey(T.DATA_SHAKING_DIRECTION, 18);
@@ -56,7 +57,7 @@ public abstract class EntityMinecartAbstractHandle extends EntityHandle {
         }
     }
     /**
-     * Stores class members for <b>net.minecraft.world.entity.vehicle.EntityMinecartAbstract</b>.
+     * Stores class members for <b>net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstract</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityMinecartAbstractClass extends Template.Class<EntityMinecartAbstractHandle> {
@@ -77,8 +78,8 @@ public abstract class EntityMinecartAbstractHandle extends EntityHandle {
 
         public final Template.Method<Float> getDamage = new Template.Method<Float>();
         public final Template.Method<Void> setDamage = new Template.Method<Void>();
+        public final Template.Method.Converted<Void> activateMinecart = new Template.Method.Converted<Void>();
         public final Template.Method<Integer> getHurtTime = new Template.Method<Integer>();
-        public final Template.Method<Void> activate = new Template.Method<Void>();
 
     }
 
