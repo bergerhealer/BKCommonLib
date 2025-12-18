@@ -865,6 +865,9 @@ public class CommonBootstrap {
             // Arrow
             remappings.put("net.minecraft.world.entity.projectile.arrow.EntityArrow", "net.minecraft.world.entity.projectile.EntityArrow");
 
+            // Hurting projectile
+            remappings.put("net.minecraft.world.entity.projectile.hurtingprojectile.EntityLargeFireball", "net.minecraft.world.entity.projectile.EntityLargeFireball");
+
             // Boat
             remappings.put("net.minecraft.world.entity.vehicle.boat.EntityBoat", "net.minecraft.world.entity.vehicle.EntityBoat");
 

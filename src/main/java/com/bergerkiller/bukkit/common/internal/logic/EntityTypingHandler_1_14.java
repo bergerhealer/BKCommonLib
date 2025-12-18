@@ -63,7 +63,7 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
         // Pre-register certain classes that cause events to be fired when constructing
         registerEntityTypes("AREA_EFFECT_CLOUD", "net.minecraft.world.entity.EntityAreaEffectCloud");
         registerEntityTypes("ENDER_DRAGON", "net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon");
-        registerEntityTypes("FIREBALL", "net.minecraft.world.entity.projectile.EntityLargeFireball");
+        registerEntityTypes("FIREBALL", "net.minecraft.world.entity.projectile.hurtingprojectile.EntityLargeFireball");
         registerEntityTypes("FISHING_BOBBER", "net.minecraft.world.entity.projectile.EntityFishingHook");
         registerEntityTypes("LIGHTNING_BOLT", "net.minecraft.world.entity.EntityLightning");
         registerEntityTypes("PLAYER", "net.minecraft.server.level.EntityPlayer");

@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.bergerkiller.bukkit.common.internal.logic.ChunkHandleTracker;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.block.Block;
@@ -469,7 +470,7 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.world.entity.EntityTypes", optional=true)
     public static Object toEntityTypesHandleFromEntityClass(Class<?> entityClass) {
-        return toEntityTypesHandleWrapperFromEntityClass(entityClass).getRaw();
+        return Template.Handle.getRaw(toEntityTypesHandleWrapperFromEntityClass(entityClass));
     }
 
     @ConverterMethod(input="net.minecraft.world.level.block.state.IBlockData", output="org.bukkit.block.data.BlockData", optional=true)
