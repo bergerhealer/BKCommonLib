@@ -195,34 +195,48 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
          * #if assignable RegionFileCache PlayerChunkMap
          *     // On 1.14 and PaperMC this can more trivially be accessed
          *     return (RegionFileCache) pcm;
-         * #elseif exists net.minecraft.world.level.chunk.storage.IChunkLoader private final RegionFileCache storage;
+         * #elseif version >= 1.21.11
+         *     SimpleRegionStorage srs = (SimpleRegionStorage) pcm;
+         *   #if exists net.minecraft.world.level.chunk.storage.SimpleRegionStorage private final RegionFileCache storage;
+         *     #require net.minecraft.world.level.chunk.storage.SimpleRegionStorage private final RegionFileCache storage;
+         *     return srs#storage;
+         *   #else
+         *     #require net.minecraft.world.level.chunk.storage.SimpleRegionStorage private final net.minecraft.world.level.chunk.storage.IOWorker worker;
+         *     net.minecraft.world.level.chunk.storage.IOWorker ioworker = srs#worker;
+         *
+         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final net.minecraft.world.level.chunk.storage.RegionFileCache storage;
+         *     return ioworker#storage;
+         *   #endif
+         * #else
+         *   #if exists net.minecraft.world.level.chunk.storage.IChunkLoader private final RegionFileCache storage;
          *     // Paper 1.21 moved it back to a field
          *     #require net.minecraft.world.level.chunk.storage.IChunkLoader private final RegionFileCache storage;
          *     IChunkLoader icl = (IChunkLoader) pcm;
          *     return icl#storage;
-         * #elseif exists net.minecraft.world.level.chunk.storage.IChunkLoader protected final RegionFileCache regionFileCache;
+         *   #elseif exists net.minecraft.world.level.chunk.storage.IChunkLoader protected final RegionFileCache regionFileCache;
          *     // Paperspigot compatible code
          *     #require net.minecraft.world.level.chunk.storage.IChunkLoader protected final RegionFileCache regionFileCache;
          *     IChunkLoader icl = (IChunkLoader) pcm;
          *     return icl#regionFileCache;
-         * #else
+         *   #else
          *     // Access RegionFileCache inside IOWorker
          *     IChunkLoader icl = (IChunkLoader) pcm;
-         *   #if version >= 1.17
-         *     #require net.minecraft.world.level.chunk.storage.IChunkLoader private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:worker;
-         *   #else
-         *     #require net.minecraft.world.level.chunk.storage.IChunkLoader private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:a;
-         *   #endif
+         *     #if version >= 1.17
+         *       #require net.minecraft.world.level.chunk.storage.IChunkLoader private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:worker;
+         *     #else
+         *       #require net.minecraft.world.level.chunk.storage.IChunkLoader private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:a;
+         *     #endif
          *     IOWorker ioworker = icl#ioworker;
          * 
-         *   #if version >= 1.17
+         *     #if version >= 1.17
          *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:storage;
-         *   #elseif version >= 1.16
+         *     #elseif version >= 1.16
          *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:d;
-         *   #else
+         *     #else
          *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:e;
-         *   #endif
+         *     #endif
          *     return ioworker#cache;
+         *   #endif
          * #endif
          * }
          */
