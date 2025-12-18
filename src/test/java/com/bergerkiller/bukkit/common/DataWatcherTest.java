@@ -343,6 +343,9 @@ public class DataWatcherTest {
         Vector scale = new Vector(1.0, 2.0, 3.0);
         Vector translation = new Vector(0.0, 50.0, 70.0);
 
+        assertFalse(DisplayHandle.DATA_LEFT_ROTATION instanceof DataWatcher.Key.Disabled);
+        assertFalse(DisplayHandle.DATA_RIGHT_ROTATION instanceof DataWatcher.Key.Disabled);
+
         DataWatcher metadata = new DataWatcher();
         metadata.set(DisplayHandle.DATA_LEFT_ROTATION, leftRotation);
         metadata.set(DisplayHandle.DATA_RIGHT_ROTATION, rightRotation);
