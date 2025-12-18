@@ -852,6 +852,16 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.level.storage.WorldData$RespawnData", "net.minecraft.world.level.storage.WorldData$a");
         }
 
+        // 1.21.11 mappings
+        if (evaluateMCVersion(">=", "1.21.11")) {
+            // Moved. We keep the old package path so API's don't break needlessly.
+            remappings.put("net.minecraft.world.entity.vehicle.NewMinecartBehavior", "net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior");
+            remappings.put("net.minecraft.world.entity.vehicle.NewMinecartBehavior$LerpStep", "net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior$a");
+        } else {
+            // Moved (old path)
+            remappings.put("net.minecraft.world.entity.decoration.painting.PaintingVariant", "net.minecraft.world.entity.decoration.PaintingVariant");
+        }
+
         // There have been various locations where starlight was installed
         // This was also part of tuinity at some point, but was then ported into paper
         {

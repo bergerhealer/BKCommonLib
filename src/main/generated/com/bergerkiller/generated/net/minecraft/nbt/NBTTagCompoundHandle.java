@@ -85,7 +85,7 @@ public abstract class NBTTagCompoundHandle extends NBTBaseHandle {
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
         public final Template.Method<Integer> size = new Template.Method<Integer>();
         public final Template.Method<Set<String>> getKeys = new Template.Method<Set<String>>();
-        public final Template.Method<Void> remove = new Template.Method<Void>();
+        public final Template.Method.Converted<Void> remove = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<NBTBaseHandle> put = new Template.Method.Converted<NBTBaseHandle>();
         public final Template.Method.Converted<NBTBaseHandle> get = new Template.Method.Converted<NBTBaseHandle>();
         public final Template.Method<Boolean> containsKey = new Template.Method<Boolean>();

@@ -11,20 +11,28 @@ class ResourceKey {
 
 #if version >= 1.16
     public (MinecraftKeyHandle) MinecraftKey getCategory() {
-  #if version >= 1.17
-        #require net.minecraft.resources.ResourceKey private final MinecraftKey category:location;
+  #if version >= 1.21.11
+        #require net.minecraft.resources.ResourceKey private final MinecraftKey category:registryName;
+  #elseif version >= 1.17
+        #require net.minecraft.resources.ResourceKey private final MinecraftKey category:registryName;
   #else
         #require net.minecraft.resources.ResourceKey private final MinecraftKey category:b;
   #endif
         return instance#category;
     }
 
-  #if version >= 1.18
+  #if version >= 1.21.11
+    public (MinecraftKeyHandle) MinecraftKey getName:identifier();
+  #elseif version >= 1.18
     public (MinecraftKeyHandle) MinecraftKey getName:location();
+  #else
+    public (MinecraftKeyHandle) MinecraftKey getName:a();
+  #endif
+
+  #if version >= 1.18
     public static (ResourceKeyHandle) ResourceKey create((ResourceKeyHandle) ResourceKey category, (MinecraftKeyHandle) MinecraftKey name);
     public static (ResourceKeyHandle) ResourceKey createCategory:createRegistryKey((MinecraftKeyHandle) MinecraftKey categoryName);
   #else
-    public (MinecraftKeyHandle) MinecraftKey getName:a();
     public static (ResourceKeyHandle) ResourceKey create:a((ResourceKeyHandle) ResourceKey category, (MinecraftKeyHandle) MinecraftKey name);
     public static (ResourceKeyHandle) ResourceKey createCategory:a((MinecraftKeyHandle) MinecraftKey categoryName);
   #endif

@@ -637,7 +637,11 @@ class NBTTagCompound extends NBTBase {
     public Set<String> getKeys:c();
 #endif
 
-    public void remove(String key);
+#if version >= 1.21.11
+    public (void) NBTBase remove(String key);
+#else
+    public (void) void remove(String key);
+#endif
 
 #if version >= 1.14
     public (NBTBaseHandle) NBTBase put(String key, (NBTBaseHandle) NBTBase value);

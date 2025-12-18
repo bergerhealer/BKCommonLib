@@ -1206,7 +1206,9 @@ class Entity {
     public static final int DATA_FLAG_FLYING = (1 << 7);
     </code>
 
-#if version >= 1.17
+#if version >= 1.21.11
+    public boolean positionChanged:needsSync;
+#elseif version >= 1.17
     public boolean positionChanged:hasImpulse;
 #elseif version >= 1.9
     public boolean positionChanged:impulse;
