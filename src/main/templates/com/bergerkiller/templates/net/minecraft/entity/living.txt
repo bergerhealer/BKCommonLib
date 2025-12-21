@@ -268,13 +268,15 @@ class EntityLiving extends Entity {
 #if exists net.minecraft.world.entity.EntityLiving public void detectEquipmentUpdatesPublic();
     // Spigot does it different I guess
     public void detectEquipmentChanges:detectEquipmentUpdatesPublic();
+#elseif version >= 1.18
+    private void detectEquipmentChanges:detectEquipmentUpdates();
+#elseif version >= 1.16 && exists net.minecraft.world.entity.EntityPlayer private void updateEquipment();
+    // De-obfuscated by spigot devs
+    private void detectEquipmentChanges:updateEquipment();
+#elseif version >= 1.16.2
+    private void detectEquipmentChanges:p();
 #elseif version >= 1.16
-  #select version >=
-  #case 1.18:     private void detectEquipmentChanges:detectEquipmentUpdates();
-  #case 1.17:     private void detectEquipmentChanges:updateEquipment();
-  #case 1.16.2:   private void detectEquipmentChanges:p();
-  #case else:     private void detectEquipmentChanges:q();
-  #endselect
+    private void detectEquipmentChanges:q();
 #elseif version >= 1.11
     // Unfortunately, on these old versions this logic is coded directly into tick()
     // I've had to re-implement it outside of it to make this work
