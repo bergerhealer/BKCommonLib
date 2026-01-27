@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.map.archive;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 import java.util.jar.JarFile;
@@ -86,15 +85,24 @@ public class MapResourcePackZipArchive implements MapResourcePackArchive {
     }
 
     @Override
-    public InputStream openFileStream(String path) throws IOException {
-        if (this.archive != null) {
-            String absolutePath = overlayView.getAbsoluteFilePath(path);
-            ZipEntry entry = this.archive.getEntry(absolutePath);
-            if (entry != null) {
-                return this.archive.getInputStream(entry);
-            }
+    public ArchiveResource openResource(final String path) {
+        if (this.archive == null) {
+            return null;
         }
-        return null;
+
+        final String absoluteFilePath = overlayView.getAbsoluteFilePath(path);
+        if (!overlayView.hasAbsoluteFile(absoluteFilePath)) {
+            return null;
+        }
+
+        return () -> {
+            ZipEntry entry = archive.getEntry(absoluteFilePath);
+            if (entry == null) {
+                throw new IOException("Unexpected resource not found: " + path);
+            } else {
+                return archive.getInputStream(entry);
+            }
+        };
     }
 
     @Override

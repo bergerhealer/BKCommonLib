@@ -81,26 +81,52 @@ public abstract class BlockRenderProvider {
     /**
      * Retrieves the resource (model json, png texture, etc.) at a particular path.
      * This is called as a fallback when the resource is not found in the resource pack,
-     * while loading a model provided by this render provider.
+     * while loading a model provided by this render provider.<br>
+     * <br>
+     * To read the resource data, call {@link MapResourcePack.Resource#openStream()} on the returned resource.
      * 
      * @param type of resource
      * @param path to get the resource at
-     * @return resource, null or exception if not found
+     * @return resource, null if not found
      */
-    public InputStream openResource(ResourceType type, String path) throws IOException {
+    public MapResourcePack.Resource openResource(ResourceType type, String path) {
         if (type == null) {
             throw new IllegalArgumentException("Input resource type is null");
         }
         if (path == null) {
             throw new IllegalArgumentException("Input path is null");
         }
-        if (!this.resources.isEmpty()) {
-            String resourcePath = this.resources.get(type.makePath(path));
-            if (resourcePath != null) {
-                return this.getClass().getResourceAsStream(resourcePath);
-            }
+
+        if (this.resources.isEmpty()) {
+            return null;
         }
-        return null;
+
+        final String resourcePath = this.resources.get(type.makePath(path));
+        if (resourcePath == null) {
+            return null;
+        }
+
+        return new MapResourcePack.Resource() {
+            @Override
+            public MapResourcePack getPack() {
+                return MapResourcePack.VANILLA;
+            }
+
+            @Override
+            public ResourceType getType() {
+                return type;
+            }
+
+            @Override
+            public String getPath() {
+                return path;
+            }
+
+            @Override
+            public InputStream openStream() throws IOException {
+                return BlockRenderProvider.class.getResourceAsStream(resourcePath);
+            }
+        };
     }
 
     /**

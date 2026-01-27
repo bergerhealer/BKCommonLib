@@ -318,6 +318,11 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
     }
 
     @Override
+    public ArchiveResource openResource(String path) {
+        return (this.archive == null) ? null : this.archive.openResource(path);
+    }
+
+    @Override
     public List<String> listFiles(String folder, boolean deep) throws IOException {
         return (this.archive == null) ? Collections.emptyList() : this.archive.listFiles(folder, deep);
     }

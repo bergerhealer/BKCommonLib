@@ -1165,13 +1165,20 @@ public class MapResourcePack {
     }
 
     /**
-     * Attempts to find a file in the resource pack and open it for reading
-     * 
+     * Attempts to find a file in the resource pack and checks for its existence.
+     * Does not yet open the file for reading (fast), call {@link Resource#openStream()}
+     * to do so.<br>
+     * <br>
+     * Checks this resource pack and its base resource packs. The returned resource
+     * includes {@link Resource#getPack()} to find out which resource pack
+     * contains the actual file, or {@link Resource#isVanilla()} to check if the
+     * resource is a vanilla Minecraft one.
+     *
      * @param type of resource to find
      * @param path of the resource (relative)
-     * @return InputStream to read the file from, null if not found
+     * @return Resource details of the file, null if not found
      */
-    protected InputStream openFileStream(ResourceType type, String path) {
+    public Resource openResource(ResourceType type, String path) {
         if (type == null) {
             throw new IllegalArgumentException("Input resource type is null");
         }
@@ -1187,44 +1194,73 @@ public class MapResourcePack {
             // =null: failed to load resource pack file
             this.handleLoad(true, false);
             if (this.archive != null) {
-                try {
-                    InputStream stream = this.archive.openFileStream(fullPath);
-                    if (stream == null) {
-                        stream = this.archive.openFileStream(fullPath.toLowerCase(Locale.ENGLISH));
-                    }
-                    if (stream != null) {
-                        return stream;
-                    }
-                } catch (IOException ex) {
+                MapResourcePackArchive.ArchiveResource resource = this.archive.openResource(fullPath);
+                if (resource == null) {
+                    resource = this.archive.openResource(fullPath.toLowerCase(Locale.ENGLISH));
+                }
+                if (resource != null) {
+                    return resource.toPackResource(this, type, path);
                 }
             }
 
             // Fallback: try the underlying resource pack (usually Vanilla)
             if (this.baseResourcePack != null) {
-                InputStream stream = this.baseResourcePack.openFileStream(type, path);
-                if (stream != null) {
-                    return stream;
+                Resource resource = this.baseResourcePack.openResource(type, path);
+                if (resource != null) {
+                    return resource;
                 }
             }
 
             // Fallback: ask provider (if available)
             if (this.currProvider != null) {
-                try {
-                    return this.currProvider.openResource(type, path);
-                } catch (IOException ex) {
+                Resource resource = this.currProvider.openResource(type, path);
+                if (resource != null) {
+                    return resource;
                 }
             }
         }
 
         // Fallback: load from BKCommonLib built-in resources
         // This handles many block models such as signs
-        InputStream bkc_stream = Common.class.getResourceAsStream(type.makeBKCPath(path));
-        if (bkc_stream != null) {
-            return bkc_stream;
+        java.net.URL url = Common.class.getResource(type.makeBKCPath(path));
+        if (url != null) {
+            return new Resource() {
+                @Override
+                public MapResourcePack getPack() {
+                    return MapResourcePack.VANILLA;
+                }
+
+                @Override
+                public ResourceType getType() {
+                    return type;
+                }
+
+                @Override
+                public String getPath() {
+                    return path;
+                }
+
+                @Override
+                public InputStream openStream() throws IOException {
+                    return url.openStream();
+                }
+            };
         }
 
-        // FAILED
+        // Not found
         return null;
+    }
+
+    /**
+     * Attempts to find a file in the resource pack and open it for reading
+     * 
+     * @param type of resource to find
+     * @param path of the resource (relative)
+     * @return InputStream to read the file from, null if not found
+     */
+    protected InputStream openFileStream(ResourceType type, String path) {
+        Resource resource = openResource(type, path);
+        return resource == null ? null : resource.tryOpenStream();
     }
 
     /**
@@ -1264,6 +1300,64 @@ public class MapResourcePack {
             deserializer = MapResourcePackDeserializer.create();
         }
         return deserializer.readGsonObject(objectType, inputStream, optPath);
+    }
+
+    /**
+     * Represents a resource stored in a Resource Pack
+     */
+    public interface Resource {
+        /**
+         * Gets the resource pack which contains the actual resource data
+         *
+         * @return MapResourcePack
+         */
+        MapResourcePack getPack();
+
+        /**
+         * Gets whether {@link #getPack()} is the vanilla resource pack
+         *
+         * @return True if this resource is a vanilla resource pack resource
+         */
+        default boolean isVanilla() {
+            return getPack() == MapResourcePack.VANILLA;
+        }
+
+        /**
+         * Gets the type of resource this is
+         *
+         * @return ResourceType
+         */
+        ResourceType getType();
+
+        /**
+         * Gets the original path that lead to this resource
+         *
+         * @return Path, can include namespace: prefix
+         */
+        String getPath();
+
+        /**
+         * Opens an InputStream to read the resource data from.
+         * It's up to the caller to close the stream after use.
+         *
+         * @return New InputStream to read from
+         * @throws IOException if the stream could not be opened
+         */
+        InputStream openStream() throws IOException;
+
+        /**
+         * Tries to open an InputStream to read the resource data from.
+         * It's up to the caller to close the stream after use.
+         *
+         * @return New InputStream to read from, or null if it could not be opened
+         */
+        default InputStream tryOpenStream() {
+            try {
+                return openStream();
+            } catch (IOException ex) {
+                return null;
+            }
+        }
     }
 
     /**

@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Handles the listing of files and directories, supporting Minecraft's overlay
@@ -17,6 +19,8 @@ import java.util.Map;
 class FileOverlayView {
     /** Root entry of the actual file system. Does not include overlay details */
     private DirectoryEntry root = new DirectoryEntry("/");
+    /** All absolute file paths contained inside of this overlay view */
+    private final Set<String> absoluteFilePaths = new HashSet<>();
     /** All directory entries mapped to their absolute (overlay-mapped) folder */
     private final Map<String, DirectoryEntry> directories = new HashMap<>();
     /** Configured overlay directories */
@@ -36,6 +40,17 @@ class FileOverlayView {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    /**
+     * Gets whether an absolute file path returned from {@llink #getAbsoluteFilePath(String)}
+     * exists in this overlay view. If this returns false, the file does not exist.
+     *
+     * @param absoluteFilePath Absolute file path
+     * @return True if the file exists
+     */
+    public boolean hasAbsoluteFile(String absoluteFilePath) {
+        return absoluteFilePaths.contains(absoluteFilePath);
     }
 
     /**
@@ -89,6 +104,7 @@ class FileOverlayView {
     public void clear() {
         root = new DirectoryEntry("/");
         directories.clear();
+        absoluteFilePaths.clear();
     }
 
     /**
@@ -107,6 +123,8 @@ class FileOverlayView {
         // Assign
         this.root = tree.root;
         this.directories.clear(); // Ensure emptied
+        this.absoluteFilePaths.clear(); // Ensure emptied
+        this.absoluteFilePaths.addAll(tree.absoluteFilePaths);
 
         // If overlay rules were already added, apply them to the tree now
         applyOverlays();
@@ -191,6 +209,7 @@ class FileOverlayView {
 
     private static final class DirectoryTreeBuilder {
         public final Map<String, DirectoryEntry> entries = new HashMap<>();
+        public final Set<String> absoluteFilePaths = new HashSet<>();
         public final DirectoryEntry root;
 
         public DirectoryTreeBuilder(DirectoryEntry root) {
@@ -226,8 +245,10 @@ class FileOverlayView {
                 if (directoryIdx == (path.length() - 1)) {
                     add(path);
                 } else if (directoryIdx == -1) {
+                    absoluteFilePaths.add(path);
                     root.addFile("/", path);
                 } else {
+                    absoluteFilePaths.add(path);
                     String directory = path.substring(0, directoryIdx + 1);
                     add(directory).addFile(directory, path.substring(directoryIdx + 1));
                 }

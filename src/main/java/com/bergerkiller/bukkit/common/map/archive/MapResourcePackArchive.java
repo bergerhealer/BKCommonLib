@@ -72,12 +72,27 @@ public interface MapResourcePackArchive {
 
     /**
      * Attempts to find and open an input stream for a file inside the archive
-     * 
+     *
      * @param path of the file (relative)
      * @return input stream of the file, null if not found
      * @throws IOException when an error occurs trying to access the file
      */
-    InputStream openFileStream(String path) throws IOException;
+    default InputStream openFileStream(String path) throws IOException {
+        ArchiveResource resource = openResource(path);
+        if (resource != null) {
+            return resource.openStream();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Attempts to find a resource inside the archive
+     *
+     * @param path Path of the file (relative)
+     * @return ArchiveResource, which includes a method to open a stream. Null if not found.
+     */
+    ArchiveResource openResource(String path);
 
     /**
      * Lists all the files that exist inside a folder of this resource pack archive.
@@ -100,4 +115,41 @@ public interface MapResourcePackArchive {
      * @throws IOException when an error occurs trying to access the archive
      */
     List<String> listFiles(String folder, boolean deep) throws IOException;
+
+    @FunctionalInterface
+    interface ArchiveResource {
+        InputStream openStream() throws IOException;
+
+        /**
+         * Converts this ArchiveResource into a MapResourcePack.Resource
+         *
+         * @param pack Resource pack this resource belongs to
+         * @param type Type of resource this is
+         * @param path Path to the resource
+         * @return Pack Resource
+         */
+        default MapResourcePack.Resource toPackResource(final MapResourcePack pack, final MapResourcePack.ResourceType type, final String path) {
+            return new MapResourcePack.Resource() {
+                @Override
+                public MapResourcePack getPack() {
+                    return pack;
+                }
+
+                @Override
+                public MapResourcePack.ResourceType getType() {
+                    return type;
+                }
+
+                @Override
+                public String getPath() {
+                    return path;
+                }
+
+                @Override
+                public InputStream openStream() throws IOException {
+                    return ArchiveResource.this.openStream();
+                }
+            };
+        }
+    }
 }

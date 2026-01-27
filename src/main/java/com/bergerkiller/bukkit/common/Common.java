@@ -83,7 +83,8 @@ public class Common {
             "Common:PlayerConnection:AwaitingTeleportId",
             "Common:EntityController:isPlayerTakeable",
             "Common:Block:RayTraceUtilImprovements",
-            "Common:BlockData:GetInteractableBox"
+            "Common:BlockData:GetInteractableBox",
+            "Common:MapResourcePack:OpenResource"
     ).collect(Collectors.toSet());
 
     /**

@@ -6,7 +6,6 @@ import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -64,13 +63,20 @@ public class MapResourcePackDirectoryArchive implements MapResourcePackArchive {
     }
 
     @Override
-    public InputStream openFileStream(String path) throws IOException {
-        String absolutePath = overlayView.getAbsoluteFilePath(path);
-        File sub = new File(directory, absolutePath);
-        if (sub.isFile()) {
-            return new FileInputStream(sub);
+    public ArchiveResource openResource(final String path) {
+        final String absoluteFilePath = overlayView.getAbsoluteFilePath(path);
+        if (!overlayView.hasAbsoluteFile(absoluteFilePath)) {
+            return null;
         }
-        return null;
+
+        return () -> {
+            File sub = new File(directory, absoluteFilePath);
+            if (!sub.isFile()) {
+                throw new IOException("Unexpected resource not found: " + path);
+            } else {
+                return new FileInputStream(sub);
+            }
+        };
     }
 
     @Override

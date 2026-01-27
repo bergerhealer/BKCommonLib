@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.map.archive;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -156,14 +155,22 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
     }
 
     @Override
-    public InputStream openFileStream(String path) throws IOException {
-        if (this.archive != null) {
-            ZipEntry entry = this.archive.getEntry(path);
-            if (entry != null) {
-                return this.archive.getInputStream(entry);
-            }
+    public ArchiveResource openResource(final String path) {
+        // Minecraft doesn't use overlays for its resources
+        // final String absoluteFilePath = overlayView.getAbsoluteFilePath(path);
+        final String absoluteFilePath = path;
+        if (!overlayView.hasAbsoluteFile(absoluteFilePath)) {
+            return null;
         }
-        return null;
+
+        return () -> {
+            ZipEntry entry = archive.getEntry(path);
+            if (entry == null) {
+                throw new IOException("Unexpected resource not found: " + path);
+            } else {
+                return archive.getInputStream(entry);
+            }
+        };
     }
 
     @Override
