@@ -36,6 +36,22 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 public class MapResourcePackTest {
 
     @Test
+    @Ignore
+    public void testPackListModels() {
+        String packName = "MyPack.zip";
+        MapResourcePack pack = MapResourcePack.builder().resourcePackPath("./" + packName)
+                .preferredPackVersion(MapResourcePack.PackVersion.byGameVersion("1.21.11"))
+                .build();
+
+        for (String itemName : pack.listOverriddenItemModelNames()) {
+            System.out.println("Overrides of item model: " + itemName);
+            for (ItemModelOverride override : pack.getItemModelConfig(itemName).listAllOverrides()) {
+                System.out.println("  - " + override.getOverrideModels());
+            }
+        }
+    }
+
+    @Test
     public void testPackFormat() {
         assertEquals(MapResourcePack.PackVersion.of(1), MapResourcePack.PackVersion.byGameVersion("1.8"));
         assertEquals(MapResourcePack.PackVersion.of(7), MapResourcePack.PackVersion.byGameVersion("1.17.1"));

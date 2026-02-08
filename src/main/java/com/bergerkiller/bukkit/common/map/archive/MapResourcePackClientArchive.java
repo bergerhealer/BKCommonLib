@@ -62,8 +62,6 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
      */
     @Override
     public void load(boolean lazy) {
-        overlayView.clear();
-
         if (this.archive == null && !this.clientJarFile.exists()) {
             if (lazy) {
                 log.severe("The client for Minecraft " + minecraftVersion + " is presently not installed");
@@ -130,6 +128,8 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
     }
 
     private void loadArchive() {
+        overlayView.clear();
+
         if (!clientJarFile.exists()) {
             return;
         }
@@ -164,7 +164,7 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
         }
 
         return () -> {
-            ZipEntry entry = archive.getEntry(path);
+            ZipEntry entry = archive.getEntry(absoluteFilePath);
             if (entry == null) {
                 throw new IOException("Unexpected resource not found: " + path);
             } else {
