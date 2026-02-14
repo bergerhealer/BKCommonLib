@@ -56,7 +56,7 @@ public abstract class ItemModelProperty implements IndentedStringBuilder.Appenda
             public Optional<CommonItemStack> setExactValue(CommonItemStack item, double value) {
                 int maxDamage = item.getMaxDamage();
                 int newDamage = (int) value;
-                if (newDamage < 0 || newDamage > maxDamage) {
+                if (newDamage < 0 || newDamage > maxDamage || !item.isDamageSupported()) {
                     return Optional.empty();
                 } else {
                     return Optional.of(item.clone().setDamage(newDamage));
