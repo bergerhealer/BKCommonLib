@@ -3,6 +3,7 @@ rootProject.name = "BKCommonLib"
 pluginManagement {
     repositories {
         gradlePluginPortal()
+        mavenCentral()
         maven("https://ci.mg-dev.eu/plugin/repository/everything/")
         mavenLocal {
             content {

@@ -382,7 +382,9 @@ public class CommonBootstrap {
             }
 
             // Display this too during the test
-            Logging.LOGGER.log(Level.INFO, "Test running on " + Common.SERVER.getServerDetails());
+            // Also include the Java version so it's clear what runtime the tests are executed on
+            Logging.LOGGER.log(Level.INFO, "Test running on " + Common.SERVER.getServerDetails()
+                    + " (Java " + System.getProperty("java.version") + ")");
         }
     }
 

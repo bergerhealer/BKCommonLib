@@ -190,9 +190,23 @@ tasks {
     register("testPreloadTemplatesDeadlock") {
         doLast {
             while (true) {
-                exec {
-                    commandLine("./gradlew", "test", "--tests", "com.bergerkiller.bukkit.common.TemplateTest.testPreloadTemplatesDeadlock", "--rerun-tasks")
-                }
+                // Choose the correct wrapper executable for the host OS (Windows uses gradlew.bat)
+                val wrapper = if (System.getProperty("os.name").lowercase().contains("win")) "gradlew.bat" else "./gradlew"
+
+                // Use a plain JVM ProcessBuilder to run the wrapper instead of Gradle's `exec` helper.
+                // This avoids unresolved reference issues caused by receiver/DSL changes in Gradle/Kotlin DSL.
+                val proc = ProcessBuilder(listOf(
+                    wrapper,
+                    "test",
+                    "--tests",
+                    "com.bergerkiller.bukkit.common.TemplateTest.testPreloadTemplatesDeadlock",
+                    "--rerun-tasks"
+                ))
+                    .directory(project.rootDir)
+                    .inheritIO()
+                    .start()
+
+                proc.waitFor()
             }
         }
     }

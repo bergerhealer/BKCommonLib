@@ -22,7 +22,8 @@ adventure = "4.25.0"
 adventure-platform-bukkit = "4.4.2-PR229-fix"
 mockito = "2.22.0"
 junit = "4.13"
-shadow = "8.1.1"
+# Use GradleUp Shadow continuation for Gradle 9+ compatibility
+shadow = "9.3.2"
 
 [libraries]
 spigot = { module = "org.spigotmc:spigot", version.ref = "spigot" }
@@ -52,4 +53,5 @@ junit = { module = "junit:junit", version.ref = "junit" }
 
 [plugins]
 mountiplex = { id = "com.bergerkiller.mountiplex", version.ref = "mountiplex" }
-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+# Use the GradleUp Shadow plugin id
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
