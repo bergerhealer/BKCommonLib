@@ -18,6 +18,7 @@ cloud_core = "2.0.0-rc.2"
 cloud_minecraft = "2.0.0-beta.14"
 commodore = "2.2"
 adventure = "4.25.0"
+brigadier = "1.0.18"
 # Note: https://github.com/KyoriPowered/adventure-platform/pull/229
 adventure-platform-bukkit = "4.4.2-PR229-fix"
 mockito = "2.22.0"
@@ -46,6 +47,7 @@ vault = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
 luckperms = { module = "net.luckperms:api", version.ref = "luckperms" }
 protocollib = { module = "com.comphenix.protocol:ProtocolLib-API", version.ref = "protocollib" }
 commodore = { module = "me.lucko:commodore", version.ref = "commodore" }
+brigadier = { module = "com.mojang:brigadier", version.ref = "brigadier" }
 adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure" }
 adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform-bukkit" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }

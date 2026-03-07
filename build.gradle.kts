@@ -32,13 +32,21 @@ repositories {
 }
 
 // Configuration for shaded dependencies which should not be added to the published Maven .pom
-val internal = configurations.create("internal")
+val shadedImplementation = configurations.create("shadedImplementation")
 configurations {
     compileOnly {
-        extendsFrom(internal)
+        extendsFrom(shadedImplementation)
     }
     testImplementation {
-        extendsFrom(internal)
+        extendsFrom(shadedImplementation)
+    }
+}
+
+// Configuration for shaded dependencies that should also be added to the public Maven .pom (api)
+val shadedApi = configurations.create("shadedApi")
+configurations {
+    api {
+        extendsFrom(shadedApi)
     }
 }
 
@@ -62,30 +70,30 @@ dependencies {
     //
 
     api(platform(project(":BKCommonLib-bom")))
-    internal(platform(project(":BKCommonLib-bom")))
+    shadedImplementation(platform(project(":BKCommonLib-bom")))
 
     //
-    // Dependencies shaded into the library for internal use
+    // Dependencies shaded into the library
     //
 
     // Mountiplex is included in BKCommonLib at the same package
-    api(libs.mountiplex)
+    shadedApi(libs.mountiplex)
     // Region change tracker is included in BKCommonLib for the region block change event
-    api(libs.regionchangetracker)
+    shadedApi(libs.regionchangetracker)
     // Region flag tracker is included in BKCommonLib to allow other plugins to store region flags with WorldGuard
     // We only expose the api to other plugins, but use the full core implementation ourselves for initialization.
-    api(libs.regionflagtracker.api)
-    internal(libs.regionflagtracker.core)
+    shadedApi(libs.regionflagtracker.api)
+    shadedImplementation(libs.regionflagtracker.core)
     // SoftDependency lib is included in BKCommonLib for its handy API
-    api(libs.softdependency)
+    shadedApi(libs.softdependency)
     // Aikar's minecraft timings library, https://github.com/aikar/minecraft-timings
-    internal(libs.timings) {
+    shadedImplementation(libs.timings) {
         isTransitive = false
     }
     // GSON isn't available in spigot versions prior to 1.8.1, shade it in order to keep 1.8 compatibility
-    internal(libs.gson)
+    shadedImplementation(libs.gson)
     // Color conversion helper library, https://github.com/bergerhealer/BKCommonLib-ColorConversionHelper
-    api(libs.colorconversionhelper)
+    shadedApi(libs.colorconversionhelper)
 
     //
     // Optional provided dependencies that BKCommonLib can talk with
@@ -107,14 +115,17 @@ dependencies {
     // Versions are part of BKCommonLib-bom and are made available automatically
     //
 
-    internal("org.incendo:cloud-paper")
-    internal("org.incendo:cloud-annotations")
-    internal("org.incendo:cloud-minecraft-extras")
-    internal(libs.commodore) {
+    // Required for interpreting the annotations that Cloud's implementation uses
+    implementation(libs.brigadier)
+
+    shadedImplementation("org.incendo:cloud-paper")
+    shadedImplementation("org.incendo:cloud-annotations")
+    shadedImplementation("org.incendo:cloud-minecraft-extras")
+    shadedImplementation(libs.commodore) {
         isTransitive = false
     }
-    internal(libs.adventure.api)
-    internal(libs.adventure.platform.bukkit)
+    shadedImplementation(libs.adventure.api)
+    shadedImplementation(libs.adventure.platform.bukkit)
 
     //
     // Test dependencies
@@ -232,6 +243,8 @@ tasks {
     }
 
     shadowJar {
+        configurations = listOf(shadedImplementation, shadedApi)
+
         val prefix = "com.bergerkiller.bukkit.common.dep"
         relocate("co.aikar.timings.lib", "$prefix.timingslib")
         relocate("com.google.gson", "$prefix.gson")
@@ -247,8 +260,6 @@ tasks {
         relocate("org.objectweb.asm", "$mountiplexPrefix.org.objectweb.asm")
         relocate("org.objenesis", "$mountiplexPrefix.org.objenesis")
         relocate("javassist", "$mountiplexPrefix.javassist")
-
-        configurations.add(internal)
 
         dependencies {
             exclude(dependency("org.apiguardian:apiguardian-api"))
