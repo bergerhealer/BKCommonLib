@@ -16,7 +16,6 @@ repositories {
     // Repo for TeamBergerhealer plugins, modules and several of its (soft) dependencies. Also used for:
     // - Milkbowl Vault
     // - Comphenix ProtocolLib
-    // - Aikar minecraft-timings
     // - Myles ViaVersion
     maven("https://ci.mg-dev.eu/plugin/repository/everything/")
 
@@ -86,10 +85,6 @@ dependencies {
     shadedImplementation(libs.regionflagtracker.core)
     // SoftDependency lib is included in BKCommonLib for its handy API
     shadedApi(libs.softdependency)
-    // Aikar's minecraft timings library, https://github.com/aikar/minecraft-timings
-    shadedImplementation(libs.timings) {
-        isTransitive = false
-    }
     // GSON isn't available in spigot versions prior to 1.8.1, shade it in order to keep 1.8 compatibility
     shadedImplementation(libs.gson)
     // Color conversion helper library, https://github.com/bergerhealer/BKCommonLib-ColorConversionHelper
@@ -246,7 +241,6 @@ tasks {
         configurations = listOf(shadedImplementation, shadedApi)
 
         val prefix = "com.bergerkiller.bukkit.common.dep"
-        relocate("co.aikar.timings.lib", "$prefix.timingslib")
         relocate("com.google.gson", "$prefix.gson")
 
         // Cloud command framework and its dependencies

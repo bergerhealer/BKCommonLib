@@ -1,14 +1,6 @@
 package com.bergerkiller.bukkit.common;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bukkit.plugin.Plugin;
-
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
-
-import co.aikar.timings.lib.MCTiming;
 
 /**
  * Thin wrapper around MC Timings by aikar for easily storing and performing timings measurements.
@@ -16,27 +8,16 @@ import co.aikar.timings.lib.MCTiming;
  * <br>
  * Implements AutoCloseable so it can be used with Java7's try with resources statement.
  *
- * @deprecated Timings is being phased out of paper/spigot. This class doesn't do anything anymore.
+ * @deprecated Timings has beeng phased out of paper/spigot. This class doesn't do anything anymore.
  */
 @Deprecated
 public class Timings implements AutoCloseable {
-    private static final Map<TimingsKey, Timings> cachedTimings = new HashMap<TimingsKey, Timings>();
-    private static final boolean hasTimingsV2;
-    private static final MCTiming NOOP_MC_TIMINGS;
-    private static final Timings NOOP;
-
-    private final Plugin plugin;
-    private final MCTiming timing;
+    private static final Timings NOOP = new Timings(null);
 
     public Timings(Plugin plugin) {
-        this.plugin = plugin;
-        this.timing = NOOP_MC_TIMINGS;
     }
 
     public Timings(Plugin plugin, String name) {
-        this.plugin = plugin;
-        this.timing = NOOP_MC_TIMINGS;
-        //this.timing = TimingManager.of(plugin).of(getTimingName(plugin, name));
     }
 
     /**
@@ -46,7 +27,7 @@ public class Timings implements AutoCloseable {
      * @return timing
      */
     public final Timings create(String name) {
-        return new Timings(this.plugin, name);
+        return new Timings(null, name);
     }
 
     /**
@@ -55,7 +36,6 @@ public class Timings implements AutoCloseable {
      * @return this timing
      */
     public final Timings start() {
-        this.timing.startTiming();
         return this;
     }
 
@@ -63,7 +43,6 @@ public class Timings implements AutoCloseable {
      * Stops the timings measurement
      */
     public final void stop() {
-        this.timing.stopTiming();
     }
 
     /**
@@ -106,13 +85,7 @@ public class Timings implements AutoCloseable {
      */
     @Deprecated
     public static Timings start(Class<?> profiledClass, String name) {
-        return cachedTimings.computeIfAbsent(new TimingsKey(profiledClass, name), key -> {
-            Plugin plugin = CommonUtil.getPluginByClass(profiledClass);
-            if (plugin == null) {
-                plugin = CommonPlugin.getInstance();
-            }
-            return new Timings(plugin, profiledClass.getSimpleName() + "::" + name);
-        }).start();
+        return NOOP;
     }
 
     /**
@@ -138,60 +111,5 @@ public class Timings implements AutoCloseable {
      */
     public static Timings noop() {
         return NOOP;
-    }
-
-    private static String getTimingName(Plugin plugin, String name) {
-        if (hasTimingsV2) {
-            return name;
-        } else {
-            // Timings v1 requires this format or it won't work
-            return String.format("Plugin: %s v%s Event: %s", 
-                    plugin.getName(),
-                    plugin.getDescription().getVersion(),
-                    name);
-        }
-    }
-
-    private static final class TimingsKey {
-        public final Class<?> profiledClass;
-        public final String name;
-
-        public TimingsKey(Class<?> profiledClass, String name) {
-            this.profiledClass = profiledClass;
-            this.name = name;
-        }
-
-        @Override
-        public int hashCode() {
-            return 203 + 29 * this.name.hashCode() + this.profiledClass.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            TimingsKey k = (TimingsKey) o;
-            return k.name.equals(this.name) && k.profiledClass.equals(this.profiledClass);
-        }
-    }
-
-    static {
-        boolean tv2 = false;
-        try {
-            Class.forName("co.aikar.timings.Timing").getMethod("startTiming");
-            tv2 = true;
-        } catch (Throwable t) {}
-        hasTimingsV2 = tv2;
-
-        NOOP_MC_TIMINGS = new MCTiming() {
-            @Override
-            public MCTiming startTiming() {
-                return this;
-            }
-
-            @Override
-            public void stopTiming() {
-            }
-        };
-
-        NOOP = new Timings(CommonPlugin.hasInstance() ? CommonPlugin.getInstance() : null);
     }
 }
