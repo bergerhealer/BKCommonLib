@@ -100,7 +100,7 @@ class MinecraftVersionDiscovery {
         // MinecraftServer handle instance and call getVersion() on it. Won't work
         // on 1.18 and later where getVersion() is obfuscated and unsafe to be called.
         if (Bukkit.getServer() != null && getVersionMethod != null) {
-            return detectUsingBukkitServerHandleGetVersion();
+            return cleanupVersion(detectUsingBukkitServerHandleGetVersion());
         }
 
         // If getVersion() does exist, but MinecraftVersion class doesn't, then this is
@@ -133,7 +133,7 @@ class MinecraftVersionDiscovery {
                     Logging.LOGGER.log(Level.WARNING, "An error occurred calling SharedConstants getGameVersion()", t);
                 }
                 if (gameVersion != null) {
-                    return getGameVersionName(gameVersion);
+                    return cleanupVersion(getGameVersionName(gameVersion));
                 }
             } else {
                 Logging.LOGGER.log(Level.WARNING, "Failed to find SharedConstants::getGameVersion()");
@@ -155,7 +155,7 @@ class MinecraftVersionDiscovery {
                     Logging.LOGGER.log(Level.WARNING, "An error occurred calling MinecraftVersion tryDetectVersion()", t);
                 }
                 if (gameVersion != null) {
-                    return getGameVersionName(gameVersion);
+                    return cleanupVersion(getGameVersionName(gameVersion));
                 }
             } else if (typeGameVersion == null) {
                 Logging.LOGGER.log(Level.WARNING, "Failed to find MinecraftVersion::tryDetectVersion()");
@@ -183,7 +183,7 @@ class MinecraftVersionDiscovery {
             ClassTemplate<?> nms_server_tpl = ClassTemplate.create(dedicatedServerClass);
             Object minecraftServerInstance = nms_server_tpl.newInstanceNull();
             try {
-                return (String) getVersionMethod.invoke(minecraftServerInstance);
+                return cleanupVersion((String) getVersionMethod.invoke(minecraftServerInstance));
             } catch (Throwable t) {
                 throw new VersionIdentificationFailureException(t);
             }
@@ -219,11 +219,17 @@ class MinecraftVersionDiscovery {
         // Obtain MinecraftServer instance from CraftServer::getServer()
         // Then call getVersion() on it
         try {
-            Object minecraftServerInstance = getServerMethod.invoke(Bukkit.getServer());
-            return (String) getVersionMethod.invoke(minecraftServerInstance);
+            return (String) getServerMethod.invoke(Bukkit.getServer());
         } catch (Throwable t) {
             throw new VersionIdentificationFailureException(t);
         }
+    }
+
+    private static String cleanupVersion(String version) {
+        if (version != null && version.endsWith("_unobfuscated")) {
+            version = version.substring(0, version.length() - "_unobfuscated".length());
+        }
+        return version;
     }
 
     private Method findStaticGetGameVersionMethod(Class<?> type) {
