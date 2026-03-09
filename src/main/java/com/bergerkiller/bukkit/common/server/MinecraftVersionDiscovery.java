@@ -219,7 +219,8 @@ class MinecraftVersionDiscovery {
         // Obtain MinecraftServer instance from CraftServer::getServer()
         // Then call getVersion() on it
         try {
-            return (String) getServerMethod.invoke(Bukkit.getServer());
+            Object minecraftServerInstance = getServerMethod.invoke(Bukkit.getServer());
+            return (String) getVersionMethod.invoke(minecraftServerInstance);
         } catch (Throwable t) {
             throw new VersionIdentificationFailureException(t);
         }
