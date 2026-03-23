@@ -192,6 +192,19 @@ class EntityLiving extends Entity {
   #if version >= 1.21.5
         #require net.minecraft.world.entity.EntityLiving private final Map<EnumItemSlot, ItemStack> lastEquipmentItems;
         Map lastEquipmentItems = instance#lastEquipmentItems;
+
+    #if exists net.minecraft.world.entity.EnumItemSlot public static final EnumItemSlot[] VALUES;
+        // Universe server uses an array for VALUES, instead of a collection
+        EnumItemSlot[] slotTypes = EnumItemSlot.VALUES;
+        int len = slotTypes.length;
+        for (int i = 0; i < len; i++) {
+            EnumItemSlot slot = slotTypes[i];
+            if (lastEquipmentItems.containsKey(slot)) {
+                lastEquipmentItems.put(slot, ItemStack.EMPTY);
+            }
+        }
+    #else
+        // Spigot / paper normal
         java.util.Iterator slotTypesIter = EnumItemSlot.VALUES.iterator();
         while (slotTypesIter.hasNext()) {
             EnumItemSlot slot = (EnumItemSlot) slotTypesIter.next();
@@ -199,6 +212,7 @@ class EntityLiving extends Entity {
                 lastEquipmentItems.put(slot, ItemStack.EMPTY);
             }
         }
+    #endif
   #else
         #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> lastHandItemStacks;
         #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> lastArmorItemStacks;

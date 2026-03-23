@@ -225,6 +225,7 @@ public class CommonBootstrap {
                 } else {
                     // Autodetect most likely server type
                     List<CommonServer> servers = new ArrayList<>();
+                    servers.add(new UniverseServer());
                     servers.add(new MohistServer());
                     servers.add(new MagmaServer());
                     servers.add(new MagmaServerLegacy());
