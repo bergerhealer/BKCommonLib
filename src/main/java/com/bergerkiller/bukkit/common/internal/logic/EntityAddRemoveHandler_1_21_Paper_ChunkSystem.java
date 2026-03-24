@@ -317,7 +317,8 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *     //return world.areEntitiesLoaded(ChunkCoordIntPair.asLong(cx, cz));
          *
          *     // Just checks that the chunk is loaded, really
-         *     return world.getChunkSource().isChunkLoaded(cx, cz);
+         *     net.minecraft.server.level.ChunkProviderServer cps = (net.minecraft.server.level.ChunkProviderServer) world.getChunkSource();
+         *     return cps.isChunkLoaded(cx, cz);
          * }
          */
         @Template.Generated("%IS_CHUNK_ENTITIES_LOADED%")
