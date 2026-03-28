@@ -40,9 +40,13 @@ class MinecraftVersionDiscovery {
         }
 
         try {
-            typeMinecraftVersion = loadClass("net.minecraft.MinecraftVersion");
-        } catch (ClassNotFoundException ex) {
-            typeMinecraftVersion = tryLoadClass(NMS_ROOT_VERSIONED + ".MinecraftVersion");
+            typeMinecraftVersion = loadClass("net.minecraft.DetectedVersion");
+        } catch (ClassNotFoundException ex1) {
+            try {
+                typeMinecraftVersion = loadClass("net.minecraft.MinecraftVersion");
+            } catch (ClassNotFoundException ex2) {
+                typeMinecraftVersion = tryLoadClass(NMS_ROOT_VERSIONED + ".MinecraftVersion");
+            }
         }
 
         try {
