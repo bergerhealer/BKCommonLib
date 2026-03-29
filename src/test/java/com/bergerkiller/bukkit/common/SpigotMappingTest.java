@@ -4,7 +4,7 @@ import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.cdn.MojangMappings;
 import com.bergerkiller.bukkit.common.internal.cdn.MojangSpigotRemapper;
 import com.bergerkiller.bukkit.common.internal.cdn.SpigotMappings;
-import com.bergerkiller.mountiplex.logic.TextValueSequence;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -16,35 +16,136 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
-import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+/**
+ * Tests and generates the MojangMap <> Spigot class name mappings. These are serialized and included
+ * in the jar resources as class_mappings.dat.<br>
+ * <br>
+ * BKCommonLib in general tries to use the mojang class names of the latest Minecraft version.
+ * The class mappings specifically map these newest mojang class names to the spigot class names for
+ * older versions. Beyond version 1.21.11 (26.1) these mappings are not used.
+ */
 public class SpigotMappingTest {
+    private static final File mappingsFile = new File("src/main/resources/com/bergerkiller/bukkit/common/internal/resources/class_mappings.dat");
+
+    /**
+     * Visualizes the spigot class name for all different Minecraft versions where a unique class
+     * is used.
+     */
     @Test
-    public void testGenerateBukkitClassMapping() {
-        // Since Minecraft 26.1 the server is fully mojang-mapped (no obfuscation) and no spigot class
-        // names are used anymore on Spigot. So we don't have to create any mappings here.
-        if (CommonBootstrap.evaluateMCVersion(">=", "26.1")) {
-            return;
+    @Ignore
+    public void testVisualizeMappingsForMojangClass() {
+        String mojangClassName = "net.minecraft.world.level.saveddata.maps.MapItemSavedData$MapPatch";
+
+        SpigotMappings mappings = loadMappings();
+
+        boolean first = true;
+        String prev = null;
+        String startVersion = null;
+        String endVersion = null;
+        for (String version : mappings.getVersions()) {
+            String spigotName = mappings.get(version).orElse(null).getMojangToSpigot().get(mojangClassName);
+            if (startVersion == null) {
+                startVersion = version;
+                endVersion = version;
+            }
+            if (!first && !LogicUtil.bothNullOrEqual(prev, spigotName)) {
+                System.out.println("[" + startVersion + " - " + endVersion + "] " + mojangClassName + " -> " + prev);
+                startVersion = version;
+                endVersion = version;
+            }
+            endVersion = version;
+            prev = spigotName;
+            first = false;
         }
+        if (startVersion != null) {
+            System.out.println("[" + startVersion + " - " + endVersion + "] " + mojangClassName + " -> " + prev);
+        }
+    }
 
-        CommonBootstrap.initCommonServerAssertCompatibility();
+    /**
+     * Visualizes all of the Mojang-map names that point towards a particular Spigot class name
+     * on different versions of the game.
+     */
+    @Test
+    @Ignore
+    public void testVisualizeMappingsForSpigotClass() {
+        String spigotClassName = "net.minecraft.world.ticks.TickList";
 
-        SpigotMappings mappings = new SpigotMappings();
-        File mappingsFile = new File("src/main/resources/com/bergerkiller/bukkit/common/internal/resources/class_mappings.dat");
-        if (mappingsFile.exists()) {
-            try {
-                try (InputStream input = new FileInputStream(mappingsFile)) {
-                    mappings.read(input);
+        SpigotMappings mappings = loadMappings();
+
+        boolean first = true;
+        Set<String> prev = null;
+        String startVersion = null;
+        String endVersion = null;
+        for (String version : mappings.getVersions()) {
+            Set<String> mojangNames = mappings.get(version).orElse(null).getSpigotToMojang().get(spigotClassName);
+            if (startVersion == null) {
+                startVersion = version;
+                endVersion = version;
+            }
+            if (!first && !LogicUtil.bothNullOrEqual(prev, mojangNames)) {
+                if (prev != null) {
+                    System.out.println("[" + startVersion + " - " + endVersion + "]:");
+                    for (String mojangName : prev) {
+                        System.out.println("  - " + mojangName + " -> " + spigotClassName);
+                    }
+                } else {
+                    System.out.println("[" + startVersion + " - " + endVersion + "]: None");
                 }
-            } catch (IOException ex) {
-                Logging.LOGGER.log(Level.SEVERE, "Failed to read class mappings", ex);
+                startVersion = version;
+                endVersion = version;
+            }
+            endVersion = version;
+            prev = mojangNames;
+            first = false;
+        }
+        if (startVersion != null) {
+            if (prev != null) {
+                System.out.println("[" + startVersion + " - " + endVersion + "]:");
+                for (String mojangName : prev) {
+                    System.out.println("  - " + mojangName + " -> " + spigotClassName);
+                }
+            } else {
+                System.out.println("[" + startVersion + " - " + endVersion + "]: None");
             }
         }
+    }
 
+    /**
+     * Run this test to make changes to the SpigotMappings / class_mappings.dat file.
+     * If a particular remapping on a particular version is needed, run this test with the required modification
+     * between read and write.
+     */
+    @Test
+    @Ignore
+    public void testModifyMojangSpigotClassMapping() {
+        SpigotMappings mappings = loadMappings();
+
+        //mappings.renameKey("old.path.to.Class", "new.path.to.Class");
+
+        mappings.storeAppendForVersionRange("1.8", "1.17.1",
+                "net.minecraft.world.ticks.TickAccess",
+                "net.minecraft.world.level.TickList");
+
+        saveMappings(mappings);
+    }
+
+    @Test
+    @Ignore
+    public void testGenerateBukkitClassMapping() {
+        CommonBootstrap.initCommonServerAssertCompatibility();
+
+        SpigotMappings mappings = loadMappings();
+
+        // Spigot stopped using their own class names with Minecraft 26.1
+        // So this logic really isn't useful anymore...
+        /*
         // Make sure all mappings for versions we need are present
         try {
             if (!mappings.assertMappings(Stream.of(Common.TEMPLATE_RESOLVER.getSupportedVersions())
@@ -56,15 +157,9 @@ public class SpigotMappingTest {
         } catch (IOException ex) {
             throw new RuntimeException("Failed to download some mappings", ex);
         }
+         */
 
-        Logging.LOGGER.warning("Class mappings have changed, writing out new file!");
-        try {
-            try (OutputStream output = new FileOutputStream(mappingsFile)) {
-                mappings.write(output);
-            }
-        } catch (IOException ex) {
-            Logging.LOGGER.log(Level.SEVERE, "Failed to write class mappings", ex);
-        }
+        saveMappings(mappings);
     }
 
     @Test
@@ -205,6 +300,31 @@ public class SpigotMappingTest {
                     }
                 }
             }
+        }
+    }
+
+    private static SpigotMappings loadMappings() {
+        SpigotMappings mappings = new SpigotMappings();
+        if (mappingsFile.exists()) {
+            try {
+                try (InputStream input = new FileInputStream(mappingsFile)) {
+                    mappings.read(input);
+                }
+            } catch (IOException ex) {
+                Logging.LOGGER.log(Level.SEVERE, "Failed to read class mappings", ex);
+            }
+        }
+        return mappings;
+    }
+
+    private static void saveMappings(SpigotMappings mappings) {
+        Logging.LOGGER.warning("Class mappings have changed, writing out new file!");
+        try {
+            try (OutputStream output = new FileOutputStream(mappingsFile)) {
+                mappings.write(output);
+            }
+        } catch (IOException ex) {
+            Logging.LOGGER.log(Level.SEVERE, "Failed to write class mappings", ex);
         }
     }
 }

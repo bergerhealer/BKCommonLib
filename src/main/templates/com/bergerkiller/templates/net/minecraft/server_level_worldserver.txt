@@ -179,19 +179,19 @@ class ServerLevel extends Level {
     }
 
 #if version >= 1.18
-    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getDimensionKey:dimension();
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<Level> getDimensionKey:dimension();
 
-    public static (org.bukkit.World) ServerLevel getByDimensionKey((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> key) {
+    public static (org.bukkit.World) ServerLevel getByDimensionKey((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<Level> key) {
         return MinecraftServer.getServer().getLevel(key);
     }
 #elseif version >= 1.16
-    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getDimensionKey();
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<Level> getDimensionKey();
 
-    public static (org.bukkit.World) ServerLevel getByDimensionKey((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> key) {
+    public static (org.bukkit.World) ServerLevel getByDimensionKey((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<Level> key) {
         return MinecraftServer.getServer().getWorldServer(key);
     }
 #else
-    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getDimensionKey() {
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<Level> getDimensionKey() {
         // If one of the main worlds (world, world_nether, world_the_end), then use the overworld, the_nether or the_end constants
         // Otherwise, create a new resource key using the world name
     #if version >= 1.13.1 && exists net.minecraft.server.level.ServerLevel public final net.minecraft.world.level.dimension.DimensionType dimension;
@@ -216,7 +216,7 @@ class ServerLevel extends Level {
         return ResourceKey.create(ResourceKey.CATEGORY_WORLD_DIMENSION, key);
     }
 
-    public static (org.bukkit.World) ServerLevel getByDimensionKey((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> key) {
+    public static (org.bukkit.World) ServerLevel getByDimensionKey((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<Level> key) {
         String name = (String) com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle.T.getName.invoke(key.name);
         MinecraftServer server = MinecraftServer.getServer();
 

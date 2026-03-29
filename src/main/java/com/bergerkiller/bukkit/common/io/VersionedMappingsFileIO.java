@@ -14,6 +14,7 @@ import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
@@ -85,11 +86,15 @@ public class VersionedMappingsFileIO<T> {
      *         or empty() if no versions apply (too old)
      */
     public Optional<T> getOrOlder(String version) {
+        return getOrOlderMappedVersion(version).map(MappedVersion::data);
+    }
+
+    private Optional<MappedVersion<T>> getOrOlderMappedVersion(String version) {
         Iterator<MappedVersion<T>> iter = byVersion.headMap(version, true)
                 .descendingMap()
                 .values()
                 .iterator();
-        return iter.hasNext() ? Optional.of(iter.next().data()) : Optional.empty();
+        return iter.hasNext() ? Optional.of(iter.next()) : Optional.empty();
     }
 
     /**
@@ -122,17 +127,97 @@ public class VersionedMappingsFileIO<T> {
     }
 
     /**
+     * Stores additional mappings for a particular version. Appends/overwrites the key-values
+     * of the mappings on top of the previous mappings. The values are allowed to be null,
+     * in which case the key on that version is removed (no mapping available).
+     *
+     * @param version Version identifier
+     * @param mappings Additional key-value mappings to append
+     */
+    public void storeAppend(String version, Map<String, String> mappings) {
+        MappedVersion<T> v = byVersion.get(version);
+        if (v == null) {
+            throw new IllegalArgumentException("Version " + version + " does not exist yet, so it cannot be appended to");
+        }
+        v = v.copy();
+        for (Map.Entry<String, String> e : mappings.entrySet()) {
+            if (e.getValue() == null) {
+                v.mappings.remove(e.getKey());
+            } else {
+                v.mappings.put(e.getKey(), e.getValue());
+            }
+        }
+        byVersion.put(version, v);
+    }
+
+    /**
+     * Appends additional mappings for a range of versions. If the from/to version does not yet exist,
+     * it is created based on the closest older previous version.
+     *
+     * @param versionFrom Version from range (inclusive)
+     * @param versionTo Version to range (inclusive)
+     * @param key Key to store for these ranges of versions
+     * @param value Value to store for these ranges of versions, null to remove (unset)
+     */
+    public void storeAppendForVersionRange(String versionFrom, String versionTo, String key, String value) {
+        storeAppendForVersionRange(versionFrom, versionTo, Collections.singletonMap(key, value));
+    }
+
+    /**
+     * Appends additional mappings for a range of versions. If the from/to version does not yet exist,
+     * it is created based on the closest older previous version.
+     *
+     * @param versionFrom Version from range (inclusive)
+     * @param versionTo Version to range (inclusive)
+     * @param mappings Mappings to store for these ranges of versions.The values are allowed to be null,
+     *                 in which case the key on that version is removed (no mapping available).
+     */
+    public void storeAppendForVersionRange(String versionFrom, String versionTo, Map<String, String> mappings) {
+        // Ensure versionFrom / versionTo both exist, clone other mappings if missing.
+        byVersion.computeIfAbsent(versionFrom, v -> getOrOlderMappedVersion(v).map(MappedVersion::copy)
+                .orElseThrow(() -> new IllegalStateException("From-Version " + v + " is too old to be used as a base for new mappings")));
+        byVersion.computeIfAbsent(versionTo, v -> getOrOlderMappedVersion(v).map(MappedVersion::copy)
+                .orElseThrow(() -> new IllegalStateException("To-Version " + v + " is too old to be used as a base for new mappings")));
+
+        for (String version : byVersion.subMap(versionFrom, true, versionTo, true).keySet()) {
+            storeAppend(version, mappings);
+        }
+    }
+
+    /**
+     * Goes by all versions and looks up the value mapped to a particular key, then removes that key,
+     * and stores that existing value under a new key.
+     *
+     * @param oldKey Old key to rename
+     * @param newKey New key to rename it to
+     */
+    public void renameKey(String oldKey, String newKey) {
+        modifyMappings(mapped -> {
+            String value = mapped.mappings.remove(oldKey);
+            if (value != null) {
+                mapped.mappings.put(newKey, value);
+            }
+        });
+    }
+
+    /**
      * Inverts the mapping so key=value becomes value=key. This is useful if multiple keys
      * must point to the same value, but right now the order is opposite of how it should be.
      */
     public void invert() {
-        for (MappedVersion<T> mapped : byVersion.values()) {
+        modifyMappings(mapped -> {
             Map<String, String> inverted = new HashMap<>();
             for (Map.Entry<String, String> e : mapped.mappings.entrySet()) {
                 inverted.put(e.getValue(), e.getKey());
             }
             mapped.mappings.clear();
             mapped.mappings.putAll(inverted);
+        });
+    }
+
+    private void modifyMappings(Consumer<MappedVersion<T>> modifier) {
+        for (MappedVersion<T> mapped : byVersion.values()) {
+            modifier.accept(mapped);
             mapped.cachedValue = null; // Clear cache since the mappings have changed
         }
     }
@@ -229,6 +314,10 @@ public class VersionedMappingsFileIO<T> {
             this.version = version;
             this.mappings = mappings;
             this.loader = loader;
+        }
+
+        public MappedVersion<T> copy() {
+            return new MappedVersion<>(version, new HashMap<>(mappings), loader);
         }
 
         /**

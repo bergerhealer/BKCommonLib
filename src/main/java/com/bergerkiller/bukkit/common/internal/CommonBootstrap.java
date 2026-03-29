@@ -457,8 +457,6 @@ public class CommonBootstrap {
         if (evaluateMCVersion("<", "1.9")) {
             remappings.put("net.minecraft.world.level.MobSpawnerData", "net.minecraft.world.level.MobSpawnerAbstract$a");
             remappings.put("net.minecraft.world.level.block.SoundEffectType", "net.minecraft.world.level.block.Block$StepSound"); // workaround
-            remappings.put("net.minecraft.network.syncher.SynchedEntityData$DataItem", "net.minecraft.network.syncher.DataWatcher$WatchableObject");
-            remappings.put("net.minecraft.network.syncher.SynchedEntityData$DataValue", "net.minecraft.network.syncher.DataWatcher$WatchableObject");
             remappings.put("net.minecraft.server.level.PlayerChunk", "net.minecraft.server.level.PlayerChunkMap$PlayerChunk"); // nested on 1.8.8
 
             // PacketPlayInUseItem and PacketPlayInBlockPlace were merged as one packet on these versions
@@ -474,7 +472,6 @@ public class CommonBootstrap {
             // Converters take care to convert between the Class and Id used internally
             remappings.put("net.minecraft.world.entity.EnumItemSlot", "com.bergerkiller.bukkit.common.internal.proxy.EnumItemSlot");
             remappings.put("net.minecraft.world.level.chunk.DataPaletteBlock", "com.bergerkiller.bukkit.common.internal.proxy.DataPaletteBlock");
-            remappings.put("net.minecraft.network.syncher.DataWatcherObject", "com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject");
             remappings.put("net.minecraft.sounds.SoundEffect", "com.bergerkiller.bukkit.common.internal.proxy.SoundEffect_1_8_8");
             remappings.put("net.minecraft.world.level.dimension.DimensionManager", "com.bergerkiller.bukkit.common.internal.proxy.DimensionManager_1_8_8");
 
@@ -498,9 +495,6 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket$PlayerInfoData", "net.minecraft.network.protocol.game.PlayerInfoData");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayInUseEntity$EnumEntityUseAction", "net.minecraft.network.protocol.game.EnumEntityUseAction");
             remappings.put("net.minecraft.world.level.MobSpawnerData", "net.minecraft.world.level.block.entity.TileEntityMobSpawnerData");
-            remappings.put("net.minecraft.network.syncher.SynchedEntityData$DataItem", "net.minecraft.network.syncher.WatchableObject");
-            remappings.put("net.minecraft.network.syncher.SynchedEntityData$DataValue", "net.minecraft.network.syncher.WatchableObject");
-            remappings.put("net.minecraft.network.syncher.SynchedEntityData$WatchableObject", "net.minecraft.network.syncher.WatchableObject");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore$EnumScoreboardAction", "net.minecraft.network.protocol.game.EnumScoreboardAction");
             remappings.put("net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket$ChunkMap", "net.minecraft.network.protocol.game.ChunkMap");
             remappings.put("net.minecraft.world.entity.RelativeMovement", "net.minecraft.network.protocol.game.EnumPlayerTeleportFlags");
@@ -653,7 +647,6 @@ public class CommonBootstrap {
         if (evaluateMCVersion(">=", "1.17")) {
             remappings.put("net.minecraft.network.protocol.game.PacketPlayInUseEntity$EnumEntityUseAction", "net.minecraft.network.protocol.game.PacketPlayInUseEntity$b");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayInUseEntity$UseType", "net.minecraft.network.protocol.game.PacketPlayInUseEntity$EnumEntityUseAction");
-            remappings.put("net.minecraft.world.level.saveddata.maps.WorldMap$PatchData", "net.minecraft.world.level.saveddata.maps.WorldMap$b");
         }
 
         // 1.18 mappings
@@ -669,17 +662,13 @@ public class CommonBootstrap {
             // To simplify the BKCL API we use the same packet class, since in both cases the buffer, heightmap data
             // and changed block state information is available. We handle the adaptering in template code.
             remappings.put("net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket", "net.minecraft.network.protocol.game.ClientboundLevelChunkPacket");
-
-            // TickListServer was moved, migrate past versions
-            remappings.put("net.minecraft.world.ticks.TickListServer", "net.minecraft.world.level.TickListServer");
-            remappings.put("net.minecraft.world.ticks.TickList", "net.minecraft.world.level.TickList");
         }
 
         // 1.19 mappings
         if (evaluateMCVersion(">=", "1.19")) {
             // Painting / living entity spawn packets were merged into one
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLiving", "net.minecraft.network.protocol.game.PacketPlayOutSpawnEntity");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityPainting", "net.minecraft.network.protocol.game.PacketPlayOutSpawnEntity");
+            remappings.put("net.minecraft.network.protocol.game.ClientboundAddMobPacket", "net.minecraft.network.protocol.game.ClientboundAddEntityPacket");
+            remappings.put("net.minecraft.network.protocol.game.ClientboundAddPaintingPacket", "net.minecraft.network.protocol.game.ClientboundAddEntityPacket");
         } else {
             // Uses a normal java.util.Random on this version
             remappings.put("net.minecraft.util.RandomSource", "java.util.Random");
@@ -687,8 +676,6 @@ public class CommonBootstrap {
 
         // 1.19.3 mappings - some classes were split out into their own places
         if (evaluateMCVersion(">=", "1.19.3")) {
-            // SynchedEntityData$DataValue class lacks naming because spigot is poop
-            remappings.put("net.minecraft.network.syncher.SynchedEntityData$DataValue", "net.minecraft.network.syncher.SynchedEntityData$DataItem");
             // Spigot decided to revert back to mojangs name here for some reason
             remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket");
             remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$a");
@@ -698,8 +685,6 @@ public class CommonBootstrap {
         } else {
             // BuiltInRegistries class does not exist, but all relevant fields are found in IRegistry instead
             remappings.put("net.minecraft.core.registries.BuiltInRegistries", "net.minecraft.core.IRegistry");
-            // PackedItem class same as Item class on older versions. Watch out for double-remapping!
-            remappings.putIfAbsent("net.minecraft.network.syncher.SynchedEntityData$DataValue", "net.minecraft.network.syncher.SynchedEntityData$DataItem");
             // Remap to spigots names. Removing and updating player information was handled by the same packet here.
             remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo");
             remappings.putIfAbsent("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
@@ -809,7 +794,6 @@ public class CommonBootstrap {
         // 1.21.2 mappings
         if (evaluateMCVersion(">=", "1.21.2")) {
             remappings.put("net.minecraft.world.entity.RelativeMovement", "net.minecraft.world.entity.Relative");
-            remappings.put("net.minecraft.world.level.saveddata.maps.WorldMap$PatchData", "net.minecraft.world.level.saveddata.maps.WorldMap$c");
 
             // Spigot uses the wrong one. We need the sync packet for behavior similar to 1.21.1 and before
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport", "net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket");

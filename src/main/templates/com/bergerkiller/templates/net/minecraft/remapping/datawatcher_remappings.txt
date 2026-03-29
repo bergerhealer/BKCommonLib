@@ -18,7 +18,7 @@
   #case 1.18:  #remap net.minecraft.network.syncher.SynchedEntityData private SynchedEntityData.DataItem<T> getItem(EntityDataAccessor<T> key);
   #case 1.13:  #remap net.minecraft.network.syncher.SynchedEntityData private SynchedEntityData.DataItem<T> getItem:b(EntityDataAccessor<T> key);
   #case 1.9:   #remap net.minecraft.network.syncher.SynchedEntityData private SynchedEntityData.DataItem<T> getItem:c(EntityDataAccessor<T> key);
-  #case else:  #remap net.minecraft.network.syncher.SynchedEntityData private SynchedEntityData.WatchableObject getItem:j(int key);
+  #case else:  #remap net.minecraft.network.syncher.SynchedEntityData private SynchedEntityData.DataItem getItem:j(int key);
   #endselect
 #endif
 
@@ -51,12 +51,12 @@
     #remap net.minecraft.network.syncher.SynchedEntityData.DataItem public boolean isDirty:c();
     #remap net.minecraft.network.syncher.SynchedEntityData.DataItem public void setDirty:a(boolean dirty);
 #else
-    #remap net.minecraft.network.syncher.SynchedEntityData.WatchableObject public int getAccessorId:a();
-    #remap net.minecraft.network.syncher.SynchedEntityData.WatchableObject public void setValue:a(Object value);
-    #remap net.minecraft.network.syncher.SynchedEntityData.WatchableObject public Object getValue:b();
-    #remap net.minecraft.network.syncher.SynchedEntityData.WatchableObject public int getValueTypeId:c();
-    #remap net.minecraft.network.syncher.SynchedEntityData.WatchableObject public boolean isDirty:d();
-    #remap net.minecraft.network.syncher.SynchedEntityData.WatchableObject public void setDirty:a(boolean dirty);
+    #remap net.minecraft.network.syncher.SynchedEntityData.DataItem public int getAccessorId:a();
+    #remap net.minecraft.network.syncher.SynchedEntityData.DataItem public void setValue:a(Object value);
+    #remap net.minecraft.network.syncher.SynchedEntityData.DataItem public Object getValue:b();
+    #remap net.minecraft.network.syncher.SynchedEntityData.DataItem public int getValueTypeId:c();
+    #remap net.minecraft.network.syncher.SynchedEntityData.DataItem public boolean isDirty:d();
+    #remap net.minecraft.network.syncher.SynchedEntityData.DataItem public void setDirty:a(boolean dirty);
 #endif
 
     // Note: only filters non-default elements on 1.19.3 and later, as this mechanism was absent prior
@@ -64,5 +64,5 @@
 #case 1.19.3:  #remap net.minecraft.network.syncher.SynchedEntityData public List<SynchedEntityData.DataValue<?>> getNonDefaultValues();
 #case 1.17:    #remap net.minecraft.network.syncher.SynchedEntityData public List<SynchedEntityData.DataValue<?>> getNonDefaultValues:getAll();
 #case 1.9:     #remap net.minecraft.network.syncher.SynchedEntityData public List<SynchedEntityData.DataValue<?>> getNonDefaultValues:c();
-#case else:    #remap net.minecraft.network.syncher.SynchedEntityData public List<SynchedEntityData.WatchableObject> getNonDefaultValues:c();
+#case else:    #remap net.minecraft.network.syncher.SynchedEntityData public List<SynchedEntityData.DataValue> getNonDefaultValues:c();
 #endselect

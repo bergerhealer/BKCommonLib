@@ -3,7 +3,7 @@ package net.minecraft.network.protocol.game;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.level.saveddata.maps.MapDecoration;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
-import net.minecraft.world.level.saveddata.maps.MapItemSavedData$PatchData;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData$MapPatch;
 
 import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapDecorationHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMapItemDataPacketHandle;
@@ -218,8 +218,8 @@ class ClientboundMapItemDataPacket extends Packet {
 #endif
 
 #if version >= 1.20.5
-    #require net.minecraft.network.protocol.game.ClientboundMapItemDataPacket public MapItemSavedData$PatchData getColorPatch() {
-        return (MapItemSavedData$PatchData) instance.colorPatch().orElse(null);
+    #require net.minecraft.network.protocol.game.ClientboundMapItemDataPacket public MapItemSavedData$MapPatch getColorPatch() {
+        return (MapItemSavedData$MapPatch) instance.colorPatch().orElse(null);
     }
 
     public boolean hasCursors() {
@@ -229,32 +229,32 @@ class ClientboundMapItemDataPacket extends Packet {
         return (java.util.List) instance.decorations().orElse(null);
     }
     public int getStartX() {
-        MapItemSavedData$PatchData data = instance#getColorPatch();
+        MapItemSavedData$MapPatch data = instance#getColorPatch();
         return (data == null) ? 0 : data.startX();
     }
     public int getStartY() {
-        MapItemSavedData$PatchData data = instance#getColorPatch();
+        MapItemSavedData$MapPatch data = instance#getColorPatch();
         return (data == null) ? 0 : data.startY();
     }
     public int getWidth() {
-        MapItemSavedData$PatchData data = instance#getColorPatch();
+        MapItemSavedData$MapPatch data = instance#getColorPatch();
         return (data == null) ? 0 : data.width();
     }
     public int getHeight() {
-        MapItemSavedData$PatchData data = instance#getColorPatch();
+        MapItemSavedData$MapPatch data = instance#getColorPatch();
         return (data == null) ? 0 : data.height();
     }
     public boolean hasPixels() {
         return instance.colorPatch().isPresent();
     }
     public byte[] getPixels() {
-        MapItemSavedData$PatchData data = instance#getColorPatch();
+        MapItemSavedData$MapPatch data = instance#getColorPatch();
         return (data == null) ? (byte[]) null : data.mapColors();
     }
 #elseif version >= 1.17
     // Since 1.17 the region coordinates and pixel data are in a separate 'Patch' class
     #require net.minecraft.network.protocol.game.ClientboundMapItemDataPacket private readonly final List<MapDecoration> cursors:decorations;
-    #require net.minecraft.network.protocol.game.ClientboundMapItemDataPacket private final net.minecraft.world.level.saveddata.maps.MapItemSavedData$PatchData colorPatch;
+    #require net.minecraft.network.protocol.game.ClientboundMapItemDataPacket private final net.minecraft.world.level.saveddata.maps.MapItemSavedData$MapPatch colorPatch;
 
     public boolean hasCursors() {
         java.util.List cursors = instance#cursors;
@@ -264,32 +264,32 @@ class ClientboundMapItemDataPacket extends Packet {
         return instance#cursors;
     }
     public int getStartX() {
-        #require net.minecraft.world.level.saveddata.maps.MapItemSavedData$PatchData public final readonly int startX;
-        MapItemSavedData$PatchData colorPatch = instance#colorPatch;
+        #require net.minecraft.world.level.saveddata.maps.MapItemSavedData$MapPatch public final readonly int startX;
+        MapItemSavedData$MapPatch colorPatch = instance#colorPatch;
         return (colorPatch == null) ? 0 : colorPatch#startX;
     }
     public int getStartY() {
-        #require net.minecraft.world.level.saveddata.maps.MapItemSavedData$PatchData public final readonly int startY;
-        MapItemSavedData$PatchData colorPatch = instance#colorPatch;
+        #require net.minecraft.world.level.saveddata.maps.MapItemSavedData$MapPatch public final readonly int startY;
+        MapItemSavedData$MapPatch colorPatch = instance#colorPatch;
         return (colorPatch == null) ? 0 : colorPatch#startY;
     }
     public int getWidth() {
-        #require net.minecraft.world.level.saveddata.maps.MapItemSavedData$PatchData public final readonly int width;
-        MapItemSavedData$PatchData colorPatch = instance#colorPatch;
+        #require net.minecraft.world.level.saveddata.maps.MapItemSavedData$MapPatch public final readonly int width;
+        MapItemSavedData$MapPatch colorPatch = instance#colorPatch;
         return (colorPatch == null) ? 0 : colorPatch#width;
     }
     public int getHeight() {
-        #require net.minecraft.world.level.saveddata.maps.MapItemSavedData$PatchData public final readonly int height;
-        MapItemSavedData$PatchData colorPatch = instance#colorPatch;
+        #require net.minecraft.world.level.saveddata.maps.MapItemSavedData$MapPatch public final readonly int height;
+        MapItemSavedData$MapPatch colorPatch = instance#colorPatch;
         return (colorPatch == null) ? 0 : colorPatch#height;
     }
     public boolean hasPixels() {
-        MapItemSavedData$PatchData colorPatch = instance#colorPatch;
+        MapItemSavedData$MapPatch colorPatch = instance#colorPatch;
         return colorPatch != null;
     }
     public byte[] getPixels() {
-        #require net.minecraft.world.level.saveddata.maps.MapItemSavedData$PatchData public final readonly byte[] mapColors;
-        MapItemSavedData$PatchData colorPatch = instance#colorPatch;
+        #require net.minecraft.world.level.saveddata.maps.MapItemSavedData$MapPatch public final readonly byte[] mapColors;
+        MapItemSavedData$MapPatch colorPatch = instance#colorPatch;
         return (colorPatch == null) ? (byte[]) null : colorPatch#mapColors;
     }
 #else
@@ -364,10 +364,10 @@ class ClientboundMapItemDataPacket extends Packet {
             mapIconsList = null;
         }
 
-        // Pack the pixel data into the PatchData class
-        MapItemSavedData$PatchData patchData;
+        // Pack the pixel data into the MapPatch class
+        MapItemSavedData$MapPatch patchData;
         if (builder.has_data()) {
-            patchData = new MapItemSavedData$PatchData(builder.get_data_startX(), builder.get_data_startY(),
+            patchData = new MapItemSavedData$MapPatch(builder.get_data_startX(), builder.get_data_startY(),
                                                builder.get_data_width(), builder.get_data_height(),
                                                builder.get_data_colors());
         } else {

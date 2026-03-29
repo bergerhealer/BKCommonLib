@@ -5,8 +5,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -170,35 +176,43 @@ public class SpigotMappings extends VersionedMappingsFileIO<SpigotMappings.Class
     }
 
     public static class ClassMappings {
-        private final BiMap<String, String> mojangToSpigot;
-        private final BiMap<String, String> spigotToMojang;
+        private final Map<String, String> mojangToSpigot;
+        private Map<String, Set<String>> cachedSpigotToMojang;
 
         private ClassMappings(VersionedMappingsFileIO.MappedVersion<ClassMappings> mappedVersion) {
             this(mappedVersion.mappings);
         }
 
         public ClassMappings(Map<String, String> mojangToSpigot) {
-            this.mojangToSpigot = HashBiMap.create(mojangToSpigot);
-            this.spigotToMojang = this.mojangToSpigot.inverse();
+            this.mojangToSpigot = mojangToSpigot;
+            this.cachedSpigotToMojang = null; // Lazy-gen
         }
 
-        public BiMap<String, String> getMojangToSpigot() {
+        public Map<String, String> getMojangToSpigot() {
             return mojangToSpigot;
+        }
+
+        public Map<String, Set<String>> getSpigotToMojang() {
+            if (cachedSpigotToMojang == null) {
+                cachedSpigotToMojang = new HashMap<>(mojangToSpigot.size());
+                for (Map.Entry<String, String> entry : mojangToSpigot.entrySet()) {
+                    cachedSpigotToMojang.compute(entry.getValue(), (k, oldValues) -> {
+                        if (oldValues == null) {
+                            return Collections.singleton(entry.getKey());
+                        } else {
+                            Set<String> newValues = (oldValues.size() == 1) ? new HashSet<>(oldValues) : oldValues;
+                            newValues.add(entry.getKey());
+                            return newValues;
+                        }
+                    });
+                }
+            }
+            return cachedSpigotToMojang;
         }
 
         public void put(String mojangClassName, String spigotClassName) {
             this.mojangToSpigot.put(mojangClassName, spigotClassName);
-        }
-
-        /**
-         * Stores a new mapping from a sub-class of a spigot class name, remapping to the same
-         * sub-class name but with mojang mappings instead.
-         *
-         * @param spigotClassName Spigot class name
-         * @param subClassName Sub-class name for under the spigot/mojang class name
-         */
-        public void remapSpigotSubClass(String spigotClassName, String subClassName) {
-            put(toMojang(spigotClassName) + "$" + subClassName, spigotClassName + "$" + subClassName);
+            this.cachedSpigotToMojang = null; // Invalidate cache
         }
 
         /**
@@ -212,12 +226,26 @@ public class SpigotMappings extends VersionedMappingsFileIO<SpigotMappings.Class
             put(mojangClassName + "$" + subClassName, toSpigot(mojangClassName) + "$" + subClassName);
         }
 
-        public String toMojang(String spigotClassName) {
-            return spigotToMojang.getOrDefault(spigotClassName, spigotClassName);
-        }
-
+        /**
+         * Gets the single Spigot class name that a particular Mojang class name points to.
+         * Returns the Mojang class name itself if no mapping is found.
+         *
+         * @param mojangClassName Mojang class name
+         * @return Spigot mapped class name, or the Mojang class name itself if no mapping is found.
+         */
         public String toSpigot(String mojangClassName) {
             return mojangToSpigot.getOrDefault(mojangClassName, mojangClassName);
+        }
+
+        /**
+         * Gets the MojMap known class names that point to a particular Spigot class. Can be more than one
+         * if multiple Mojang classes are remapped to the same Spigot class (older versions can do that).
+         *
+         * @param spigotClassName Spigot class name
+         * @return Set of Mojang class names that point to the Spigot class name. If no mappings, returns a set with the Spigot class name itself.
+         */
+        public Set<String> toMojang(String spigotClassName) {
+            return getSpigotToMojang().getOrDefault(spigotClassName, Collections.singleton(spigotClassName));
         }
     }
 }

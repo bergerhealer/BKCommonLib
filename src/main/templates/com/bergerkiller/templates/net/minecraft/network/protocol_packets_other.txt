@@ -1,5 +1,6 @@
 package net.minecraft.network.protocol.game;
 
+import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleOptions;
@@ -8,7 +9,6 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.CommonPlayerSpawnInfo;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.network.syncher.SynchedEntityData.DataValue;
-import net.minecraft.network.syncher.SynchedEntityData.WatchableObject;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -58,7 +58,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacketHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundInteractPacketHandle.EnumEntityUseActionHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundInteractPacketHandle.Action;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetTitlesPacketHandle.EnumTitleActionHandle
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundRemoveMobEffectPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacketHandle;
@@ -252,23 +252,23 @@ class ServerboundInteractPacket extends Packet {
     private int usedEntityId:a;
 #endif
 
-    // Since 1.17 there is an immutable UseType class storing all the details of the packet
-    // It is incorrectly remapped to EnumEntityUseAction (!)
+    // Since 1.17 the enum is a property of an interface that houses the action (Action -> getType() -> ActionEnum)
+    // ActionEnum is a custom name to handle this situation better
 #if version >= 1.18
-    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.UseType public abstract (Enum) net.minecraft.network.protocol.game.ServerboundInteractPacket.EnumEntityUseAction getType();
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.Action public abstract (Enum) net.minecraft.network.protocol.game.ServerboundInteractPacket.ActionEnum getType();
 #elseif version >= 1.17
-    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.UseType public abstract (Enum) net.minecraft.network.protocol.game.ServerboundInteractPacket.EnumEntityUseAction getType:a();
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.Action public abstract (Enum) net.minecraft.network.protocol.game.ServerboundInteractPacket.ActionEnum getType:a();
 #elseif version >= 1.13
-    #require net.minecraft.network.protocol.game.ServerboundInteractPacket public ServerboundInteractPacket.EnumEntityUseAction getType:b();
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket public ServerboundInteractPacket.ActionEnum getType:b();
 #else
-    #require net.minecraft.network.protocol.game.ServerboundInteractPacket public ServerboundInteractPacket.EnumEntityUseAction getType:a();
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket public ServerboundInteractPacket.ActionEnum getType:a();
 #endif
 
 #if version >= 1.17
     #require net.minecraft.network.protocol.game.ServerboundInteractPacket private final ServerboundInteractPacket.UseType action;
-    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.d private final readonly net.minecraft.world.InteractionHand interactHand:hand;
-    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.e private final readonly net.minecraft.world.InteractionHand interactAtHand:hand;
-    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.e private final readonly net.minecraft.world.phys.Vec3 interactAtLocation:location;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.InteractionAction private final readonly net.minecraft.world.InteractionHand interactHand:hand;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.InteractionAtLocationAction private final readonly net.minecraft.world.InteractionHand interactAtHand:hand;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.InteractionAtLocationAction private final readonly net.minecraft.world.phys.Vec3 interactAtLocation:location;
     #require net.minecraft.network.protocol.game.ServerboundInteractPacket public String getActionName() {
         return instance#action#getType().name();
     }
@@ -310,26 +310,26 @@ class ServerboundInteractPacket extends Packet {
     }
 
     public void setAttack() {
-        #require net.minecraft.network.protocol.game.ServerboundInteractPacket static final ServerboundInteractPacket.UseType ATTACK_ACTION;
+        #require net.minecraft.network.protocol.game.ServerboundInteractPacket static final ServerboundInteractPacket.Action ATTACK_ACTION;
         instance#action = #ATTACK_ACTION;
     }
 
     public void setInteract(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
-        #require net.minecraft.network.protocol.game.ServerboundInteractPacket.d d createUseTypeInteract:<init>(net.minecraft.world.InteractionHand hand);
+        #require net.minecraft.network.protocol.game.ServerboundInteractPacket.InteractionAction ServerboundInteractPacket.InteractionAction createUseTypeInteract:<init>(net.minecraft.world.InteractionHand hand);
         InteractionHand hand = (InteractionHand) com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSEnumHand(humanEntity, hand);
         instance#action = #createUseTypeInteract(hand);
     }
 #else
     public boolean isInteract() {
-        return instance#getType() == ServerboundInteractPacket$EnumEntityUseAction.INTERACT;
+        return instance#getType() == ServerboundInteractPacket$Action.INTERACT;
     }
 
     public boolean isInteractAt() {
-        return instance#getType() == ServerboundInteractPacket$EnumEntityUseAction.INTERACT_AT;
+        return instance#getType() == ServerboundInteractPacket$Action.INTERACT_AT;
     }
 
     public boolean isAttack() {
-        return instance#getType() == ServerboundInteractPacket$EnumEntityUseAction.ATTACK;
+        return instance#getType() == ServerboundInteractPacket$Action.ATTACK;
     }
 
     public com.bergerkiller.bukkit.common.wrappers.HumanHand getInteractHand(org.bukkit.entity.HumanEntity humanEntity) {
@@ -341,8 +341,8 @@ class ServerboundInteractPacket extends Packet {
     #endif
         return com.bergerkiller.bukkit.common.wrappers.HumanHand.fromNMSEnumHand(humanEntity, hand);
   #else
-        ServerboundInteractPacket$EnumEntityUseAction type = instance#getType();
-        if (type == ServerboundInteractPacket$EnumEntityUseAction.INTERACT || type == ServerboundInteractPacket$EnumEntityUseAction.INTERACT_AT) {
+        ServerboundInteractPacket$Action type = instance#getType();
+        if (type == ServerboundInteractPacket$Action.INTERACT || type == ServerboundInteractPacket$Action.INTERACT_AT) {
             return com.bergerkiller.bukkit.common.wrappers.HumanHand.RIGHT;
         } else {
             return null;
@@ -358,14 +358,14 @@ class ServerboundInteractPacket extends Packet {
   #endselect
     }
 
-    #require net.minecraft.network.protocol.game.ServerboundInteractPacket private ServerboundInteractPacket.EnumEntityUseAction action;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket private ServerboundInteractPacket.Action action;
     #require net.minecraft.network.protocol.game.ServerboundInteractPacket private net.minecraft.world.phys.Vec3 offset:c;
   #if version >= 1.9
     #require net.minecraft.network.protocol.game.ServerboundInteractPacket private net.minecraft.world.InteractionHand hand:d;
   #endif
 
     public void setAttack() {
-        instance#action = ServerboundInteractPacket$EnumEntityUseAction.ATTACK;
+        instance#action = ServerboundInteractPacket$Action.ATTACK;
         instance#offset = null;
   #if version >= 1.9
         instance#hand = null;
@@ -373,7 +373,7 @@ class ServerboundInteractPacket extends Packet {
     }
 
     public void setInteract(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
-        instance#action = ServerboundInteractPacket$EnumEntityUseAction.INTERACT;
+        instance#action = ServerboundInteractPacket$Action.INTERACT;
         instance#offset = null;
   #if version >= 1.9
         InteractionHand hand = (InteractionHand) com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSEnumHand(humanEntity, hand);
@@ -508,7 +508,7 @@ class ServerboundUseItemOnPacket extends Packet {
         }
 
         #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.world.phys.BlockHitResult movingObject:blockHit;
-        moving = net.minecraft.world.phys.BlockHitResult.miss(Vec3.ZERO, EnumDirection.DOWN, BlockPos.ZERO);
+        moving = net.minecraft.world.phys.BlockHitResult.miss(Vec3.ZERO, Direction.DOWN, BlockPos.ZERO);
         instance#movingObject = moving;
         return moving;
     }
@@ -529,7 +529,7 @@ class ServerboundUseItemOnPacket extends Packet {
 
         Vec3 origin = Vec3.ZERO;
 
-        moving = net.minecraft.world.phys.BlockHitResult.a(origin, EnumDirection.DOWN, BlockPos.ZERO);
+        moving = net.minecraft.world.phys.BlockHitResult.a(origin, Direction.DOWN, BlockPos.ZERO);
         instance#movingObject = moving; 
         return moving;
     }
@@ -543,28 +543,28 @@ class ServerboundUseItemOnPacket extends Packet {
   #else
     #require net.minecraft.world.phys.BlockHitResult private final net.minecraft.core.Direction direction_face:b;
   #endif
-    public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
+    public (org.bukkit.block.BlockFace) Direction getDirection() {
         BlockHitResult result = instance#getHitResult();
         return (result == null) ? null : result.getDirection();
     }
-    public void setDirection((org.bukkit.block.BlockFace) EnumDirection direction) {
+    public void setDirection((org.bukkit.block.BlockFace) Direction direction) {
         instance#initMovingObject()#direction_face = direction;
     }
 #elseif version >= 1.9
     #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.core.Direction direction_face:b;
-    public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
+    public (org.bukkit.block.BlockFace) Direction getDirection() {
         return instance#direction_face;
     }
-    public void setDirection((org.bukkit.block.BlockFace) EnumDirection direction) {
+    public void setDirection((org.bukkit.block.BlockFace) Direction direction) {
         instance#direction_face = direction;
     }
 #else
     #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private int direction_index:c;
-    public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
+    public (org.bukkit.block.BlockFace) Direction getDirection() {
         int index = instance#direction_index;
-        return EnumDirection.fromType1(index);
+        return Direction.fromType1(index);
     }
-    public void setDirection((org.bukkit.block.BlockFace) EnumDirection direction) {
+    public void setDirection((org.bukkit.block.BlockFace) Direction direction) {
         instance#direction_index = direction.a();
     }
 #endif
@@ -739,11 +739,11 @@ class ServerboundUseItemOnPacket extends Packet {
 class ServerboundPlayerActionPacket extends Packet {
 #if version >= 1.17
     private (IntVector3) BlockPos position:pos;
-    private (org.bukkit.block.BlockFace) EnumDirection direction;
+    private (org.bukkit.block.BlockFace) Direction direction;
     private (EnumPlayerDigTypeHandle) ServerboundPlayerActionPacket.EnumPlayerDigType digType:action;
 #else
     private (IntVector3) BlockPos position:a;
-    private (org.bukkit.block.BlockFace) EnumDirection direction:b;
+    private (org.bukkit.block.BlockFace) Direction direction:b;
     private (EnumPlayerDigTypeHandle) ServerboundPlayerActionPacket.EnumPlayerDigType digType:c;
 #endif
 
@@ -2325,7 +2325,7 @@ class ClientboundSetEntityDataPacket extends Packet {
 #elseif version >= 1.9
     private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<Object>>) List<SynchedEntityData.DataValue<?>> metadataItems:b;
 #else
-    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<Object>>) List<SynchedEntityData.WatchableObject> metadataItems:b;
+    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<Object>>) List<SynchedEntityData.DataValue> metadataItems:b;
 #endif
 
     public static (ClientboundSetEntityDataPacketHandle) ClientboundSetEntityDataPacket createForSpawn(int entityId, (com.bergerkiller.bukkit.common.wrappers.DataWatcher) SynchedEntityData datawatcher) {
