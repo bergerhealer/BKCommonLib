@@ -117,32 +117,32 @@ class PortalHandler_1_9 extends PortalHandler {
     }
 
     @Template.Optional
-    @Template.Import("net.minecraft.core.BlockPosition")
-    @Template.Import("net.minecraft.world.level.dimension.DimensionManager")
-    @Template.Import("net.minecraft.server.level.EntityPlayer")
-    @Template.Import("net.minecraft.server.level.WorldServer")
+    @Template.Import("net.minecraft.core.BlockPos")
+    @Template.Import("net.minecraft.world.level.dimension.DimensionType")
+    @Template.Import("net.minecraft.server.level.ServerPlayer")
+    @Template.Import("net.minecraft.server.level.ServerLevel")
     @Template.Import("net.minecraft.network.protocol.Packet")
-    @Template.Import("net.minecraft.network.protocol.game.PacketPlayOutGameStateChange")
-    @Template.InstanceType("net.minecraft.server.PortalTravelAgent")
+    @Template.Import("net.minecraft.network.protocol.game.ClientboundGameEventPacket")
+    @Template.InstanceType("net.minecraft.world.level.portal.PortalForcer")
     public static abstract class PortalTravelAgentHandle extends Template.Class<Template.Handle> {
 
         /* 
          * <SHOW_END_CREDITS>
          * public static void showEndCredits(Object entityPlayerRaw, boolean seenCredits) {
-         *     EntityPlayer player = (EntityPlayer) entityPlayerRaw;
+         *     ServerPlayer player = (ServerPlayer) entityPlayerRaw;
          * #if version >= 1.10.2
          *     player.worldChangeInvuln = true;
          * #elseif version >= 1.9.4
-         *     #require net.minecraft.server.EntityPlayer protected boolean worldChangeInvuln:ck;
+         *     #require net.minecraft.server.level.ServerPlayer protected boolean worldChangeInvuln:ck;
          *     player#worldChangeInvuln = true;
          * #elseif version >= 1.9
-         *     #require net.minecraft.server.EntityPlayer protected boolean worldChangeInvuln:cj;
+         *     #require net.minecraft.server.level.ServerPlayer protected boolean worldChangeInvuln:cj;
          *     player#worldChangeInvuln = true;
          * #endif
          *     player.world.kill((net.minecraft.world.entity.Entity) player);
          *     if (!player.viewingCredits) {
          *         player.viewingCredits = true;
-         *         player.playerConnection.sendPacket((Packet) new PacketPlayOutGameStateChange(4, seenCredits ? 0.0F : 1.0F));
+         *         player.playerConnection.sendPacket((Packet) new ClientboundGameEventPacket(4, seenCredits ? 0.0F : 1.0F));
          *     }
          * }
          */
@@ -152,9 +152,9 @@ class PortalHandler_1_9 extends PortalHandler {
         /*
          * <IS_MAIN_END_WORLD>
          * public static boolean isMainEndWorld(org.bukkit.World world) {
-         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
+         *     ServerLevel world = (ServerLevel) ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
          * #if version >= 1.13
-         *     return world.dimension == DimensionManager.THE_END;
+         *     return world.dimension == DimensionType.THE_END;
          * #else
          *     return world.dimension == 1;
          * #endif
@@ -166,10 +166,10 @@ class PortalHandler_1_9 extends PortalHandler {
         /*
          * <FIND_NETHER_PORTAL>
          * public static org.bukkit.block.Block findNetherPortal(org.bukkit.block.Block startBlock, int createRadius) {
-         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
-         *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
-         *     PortalTravelAgent agent = new PortalTravelAgent(world);
-         *     BlockPosition result = agent.findPortal((double) startBlock.getX(),
+         *     ServerLevel world = (ServerLevel) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
+         *     BlockPos blockposition = new BlockPos(startBlock.getX(), startBlock.getY(), startBlock.getZ());
+         *     PortalForcer agent = new PortalForcer(world);
+         *     BlockPos result = agent.findPortal((double) startBlock.getX(),
          *                                             (double) startBlock.getY(),
          *                                             (double) startBlock.getZ(),
          *                                             createRadius);
@@ -185,8 +185,8 @@ class PortalHandler_1_9 extends PortalHandler {
         /*
          * <CREATE_NETHER_PORTAL>
          * public static boolean createNetherPortal(org.bukkit.block.Block startBlock, int createRadius) {
-         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
-         *     PortalTravelAgent agent = new PortalTravelAgent(world);
+         *     ServerLevel world = (ServerLevel) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
+         *     PortalForcer agent = new PortalForcer(world);
          *     return agent.createPortal((double) startBlock.getX() + 0.5,
          *                               (double) startBlock.getY(),
          *                               (double) startBlock.getZ() + 0.5,
@@ -199,27 +199,27 @@ class PortalHandler_1_9 extends PortalHandler {
         /*
          * <FIND_OR_CREATE_END_PLATFORM>
          * public static org.bukkit.block.Block findOrCreateEndPlatform(org.bukkit.World bworld, boolean create) {
-         *     #require net.minecraft.server.PortalTravelAgent private BlockPosition findEndPortal(BlockPosition portal);
-         *     #require net.minecraft.server.PortalTravelAgent private BlockPosition createEndPortal(double x, double y, double z);
+         *     #require net.minecraft.world.level.portal.PortalForcer private BlockPos findEndPortal(BlockPos portal);
+         *     #require net.minecraft.world.level.portal.PortalForcer private BlockPos createEndPortal(double x, double y, double z);
          * 
-         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
-         *     PortalTravelAgent agent = new PortalTravelAgent(world);
+         *     ServerLevel world = (ServerLevel) ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
+         *     PortalForcer agent = new PortalForcer(world);
          * 
          * #if version >= 1.13
-         *     BlockPosition platformPos = WorldProviderTheEnd.g;
+         *     BlockPos platformPos = WorldProviderTheEnd.g;
          * #else
          *     World the_end_world = MinecraftServer.getServer().getWorldServer(1);
-         *     BlockPosition platformPos = (the_end_world == null) ? null : the_end_world.worldProvider.h();
+         *     BlockPos platformPos = (the_end_world == null) ? null : the_end_world.worldProvider.h();
          *     if (platformPos == null) {
-         *         platformPos = new BlockPosition(100, 50, 0);
+         *         platformPos = new BlockPos(100, 50, 0);
          *     }
          * #endif
          * 
          *     if (create) {
-         *         BlockPosition position = agent#createEndPortal((double)platformPos.getX(),(double)platformPos.getY(),(double)platformPos.getZ());
+         *         BlockPos position = agent#createEndPortal((double)platformPos.getX(),(double)platformPos.getY(),(double)platformPos.getZ());
          *         return bworld.getBlockAt(platformPos.getX(), platformPos.getY()-2, platformPos.getZ());
          *     } else {
-         *         BlockPosition position = agent#findEndPortal(platformPos);
+         *         BlockPos position = agent#findEndPortal(platformPos);
          *         if (position == null) {
          *             return null;
          *         } else {

@@ -41,7 +41,7 @@ class PlayerFileDataHandler_1_8_to_1_15_2 extends PlayerFileDataHandler {
         {
             MethodDeclaration getPlayerFolderOfWorldMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public java.io.File getPlayerDir() {\n" +
-                    "    return ((net.minecraft.server.WorldNBTStorage) instance.getDataManager()).getPlayerDir();\n" +
+                    "    return ((net.minecraft.world.level.storage.PlayerDataStorage) instance.getDataManager()).getPlayerDir();\n" +
                     "}"));
             getPlayerFolderOfWorld.init(getPlayerFolderOfWorldMethod);  
         }
@@ -130,13 +130,13 @@ class PlayerFileDataHandler_1_8_to_1_15_2 extends PlayerFileDataHandler {
         HOOK, UNHOOK, MOCK, GET
     }
 
-    // hooks WorldNBTStorage
+    // hooks PlayerDataStorage
     @ClassHook.HookPackage("net.minecraft.server")
     @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
     protected static class PlayerFileDataHook extends ClassHook<PlayerFileDataHook> implements PlayerFileDataHandler.Hook {
         public PlayerDataController controller = null;
 
-        @HookMethod("public abstract net.minecraft.nbt.NBTTagCompound load(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
+        @HookMethod("public abstract net.minecraft.nbt.CompoundTag load(net.minecraft.world.entity.player.Player paramEntityHuman)")
         public Object load(Object entityHuman) {
             if (this.controller != null) {
                 Player player = LogicUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);
@@ -153,7 +153,7 @@ class PlayerFileDataHandler_1_8_to_1_15_2 extends PlayerFileDataHandler {
             return base_load_raw(entityHuman).orElse(null);
         }
 
-        @HookMethod("public abstract void save(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
+        @HookMethod("public abstract void save(net.minecraft.world.entity.player.Player paramEntityHuman)")
         public void save(Object entityHuman) {
             if (this.controller != null) {
                 Player player = LogicUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);

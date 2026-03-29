@@ -40,7 +40,7 @@ class PlayerFileDataHandler_1_21_9 extends PlayerFileDataHandler {
 
     public PlayerFileDataHandler_1_21_9() throws Exception {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClassName("net.minecraft.server.level.WorldServer");
+        resolver.setDeclaredClassName("net.minecraft.server.level.ServerLevel");
         resolver.setVariable("version", Common.MC_VERSION);
         if (Common.IS_PAPERSPIGOT_SERVER) {
             resolver.setVariable("paper", "true");
@@ -60,7 +60,7 @@ class PlayerFileDataHandler_1_21_9 extends PlayerFileDataHandler {
         }
 
         String fieldName = "playerIo";
-        Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.WorldNBTStorage");
+        Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.PlayerDataStorage");
         String realFieldName = Resolver.resolveFieldName(PlayerListHandle.T.getType(), fieldName);
         playerListFileDataField = LogicUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), realFieldName, playerFileDataType).getFastField());
 
@@ -154,11 +154,10 @@ class PlayerFileDataHandler_1_21_9 extends PlayerFileDataHandler {
         return hook;
     }
 
-    // hooks WorldNBTStorage
+    // hooks PlayerDataStorage
     @ClassHook.HookPackage("net.minecraft.server")
-    @ClassHook.HookImport("net.minecraft.world.entity.player.EntityHuman")
     @ClassHook.HookImport("net.minecraft.server.players.NameAndId")
-    @ClassHook.HookImport("net.minecraft.nbt.NBTTagCompound")
+    @ClassHook.HookImport("net.minecraft.nbt.CompoundTag")
     @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
     protected static class PlayerFileDataHook extends ClassHook<PlayerFileDataHook> implements Hook {
         public PlayerDataController controller = null;
@@ -169,7 +168,7 @@ class PlayerFileDataHandler_1_21_9 extends PlayerFileDataHandler {
             base.handler = handler;
         }
 
-        @HookMethod("public Optional<NBTTagCompound> load(NameAndId nameandid)")
+        @HookMethod("public Optional<CompoundTag> load(NameAndId nameandid)")
         public java.util.Optional<Object> loadOffline(Object nameAndId) {
             if (this.controller != null) {
                 CommonTagCompound compound = null;
@@ -188,7 +187,7 @@ class PlayerFileDataHandler_1_21_9 extends PlayerFileDataHandler {
             return base.loadOffline(nameAndId);
         }
 
-        @HookMethod("public abstract void save(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
+        @HookMethod("public abstract void save(net.minecraft.world.entity.player.Player paramEntityHuman)")
         public void save(Object entityHuman) {
             if (this.controller != null) {
                 Player player = LogicUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);

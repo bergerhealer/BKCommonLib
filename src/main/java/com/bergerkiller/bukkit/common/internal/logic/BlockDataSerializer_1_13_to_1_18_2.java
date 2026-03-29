@@ -18,28 +18,28 @@ class BlockDataSerializer_1_13_to_1_18_2 extends BlockDataSerializer {
     @Override
     public void enable() {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClassName("net.minecraft.commands.arguments.blocks.ArgumentBlock");
-        resolver.addImport("net.minecraft.world.level.block.state.IBlockData");
+        resolver.setDeclaredClassName("net.minecraft.commands.arguments.blocks.BlockStateParser");
+        resolver.addImport("net.minecraft.world.level.block.state.BlockState");
         resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
         serializeMethod.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(
-                "public static String serialize(IBlockData iblockdata) {\n" +
+                "public static String serialize(BlockState iblockdata) {\n" +
                 "#if version >= 1.18\n" +
-                "    return ArgumentBlock.serialize(iblockdata);\n" +
+                "    return BlockStateParser.serialize(iblockdata);\n" +
                 "#elseif version >= 1.14\n" +
-                "    return ArgumentBlock.a(iblockdata);\n" +
+                "    return BlockStateParser.a(iblockdata);\n" +
                 "#else\n" +
-                "    return ArgumentBlock.a(iblockdata, null);\n" +
+                "    return BlockStateParser.a(iblockdata, null);\n" +
                 "#endif\n" +
                 "}", resolver)));
         deserializeMethod.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(
-                "public static IBlockData deserialize(String text) {\n" +
+                "public static BlockState deserialize(String text) {\n" +
                 "    com.mojang.brigadier.StringReader reader = new com.mojang.brigadier.StringReader(text);\n" +
-                "    ArgumentBlock block;\n" +
+                "    BlockStateParser block;\n" +
                 "    try {\n" +
                 "#if version >= 1.18\n" +
-                "        block = (new ArgumentBlock(reader, false)).parse(true);\n" +
+                "        block = (new BlockStateParser(reader, false)).parse(true);\n" +
                 "#else\n" +
-                "        block = (new ArgumentBlock(reader, false)).a(true);\n" +
+                "        block = (new BlockStateParser(reader, false)).a(true);\n" +
                 "#endif\n" +
                 "    } catch (com.mojang.brigadier.exceptions.CommandSyntaxException ex) {\n" +
                 "        return null;\n" +

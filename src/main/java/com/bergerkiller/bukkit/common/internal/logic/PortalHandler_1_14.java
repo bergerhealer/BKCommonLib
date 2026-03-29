@@ -96,27 +96,29 @@ class PortalHandler_1_14 extends PortalHandler {
     }
 
     @Template.Optional
-    @Template.Import("net.minecraft.core.BlockPosition")
-    @Template.Import("net.minecraft.core.EnumDirection")
-    @Template.Import("net.minecraft.server.level.EntityPlayer")
-    @Template.Import("net.minecraft.server.level.WorldServer")
+    @Template.Import("net.minecraft.core.Vec3")
+    @Template.Import("net.minecraft.core.BlockPos")
+    @Template.Import("net.minecraft.core.BlockPos$MutableBlockPos")
+    @Template.Import("net.minecraft.core.Direction")
+    @Template.Import("net.minecraft.server.level.ServerPlayer")
+    @Template.Import("net.minecraft.server.level.ServerLevel")
     @Template.Import("net.minecraft.network.protocol.Packet")
-    @Template.Import("net.minecraft.network.protocol.game.PacketPlayOutGameStateChange")
+    @Template.Import("net.minecraft.network.protocol.game.ClientboundGameEventPacket")
     @Template.Import("net.minecraft.world.entity.Entity")
-    @Template.Import("net.minecraft.world.level.dimension.DimensionManager")
-    @Template.InstanceType("net.minecraft.server.PortalTravelAgent")
+    @Template.Import("net.minecraft.world.level.dimension.DimensionType")
+    @Template.InstanceType("net.minecraft.world.level.portal.PortalForcer")
     public static abstract class PortalTravelAgentHandle extends Template.Class<Template.Handle> {
 
         /* 
          * <SHOW_END_CREDITS>
          * public static void showEndCredits(Object entityPlayerRaw, boolean seenCredits) {
-         *     EntityPlayer player = (EntityPlayer) entityPlayerRaw;
+         *     ServerPlayer player = (ServerPlayer) entityPlayerRaw;
          *     player.worldChangeInvuln = true;
          *     player.decouple();
          *     player.getWorldServer().removePlayer(player);
          *     if (!player.viewingCredits) {
          *         player.viewingCredits = true;
-         *         player.playerConnection.sendPacket((Packet) new PacketPlayOutGameStateChange(4, seenCredits ? 0.0F : 1.0F));
+         *         player.playerConnection.sendPacket((Packet) new ClientboundGameEventPacket(4, seenCredits ? 0.0F : 1.0F));
          *     }
          * }
          */
@@ -126,8 +128,8 @@ class PortalHandler_1_14 extends PortalHandler {
         /*
          * <IS_MAIN_END_WORLD>
          * public static boolean isMainEndWorld(org.bukkit.World world) {
-         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
-         *     return world.getWorldProvider().getDimensionManager() == DimensionManager.THE_END;
+         *     ServerLevel world = (ServerLevel) ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
+         *     return world.getWorldProvider().getDimensionManager() == DimensionType.THE_END;
          * }
          */
         @Template.Generated("%IS_MAIN_END_WORLD%")
@@ -136,10 +138,10 @@ class PortalHandler_1_14 extends PortalHandler {
         /*
          * <FIND_NETHER_PORTAL>
          * public static org.bukkit.block.Block findNetherPortal(org.bukkit.block.Block startBlock) {
-         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
-         *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
-         *     PortalTravelAgent agent = new PortalTravelAgent(world);
-         *     net.minecraft.world.level.block.state.pattern.ShapeDetector$Shape result = agent.a(blockposition, Vec3D.ZERO, EnumDirection.NORTH, 0.5, 1.0, true);
+         *     ServerLevel world = (ServerLevel) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
+         *     BlockPos blockposition = new BlockPos(startBlock.getX(), startBlock.getY(), startBlock.getZ());
+         *     PortalForcer agent = new PortalForcer(world);
+         *     net.minecraft.world.level.block.state.pattern.BlockPattern$Shape result = agent.a(blockposition, Vec3.ZERO, Direction.NORTH, 0.5, 1.0, true);
          *     if (result == null) {
          *         return null;
          *     }
@@ -154,8 +156,8 @@ class PortalHandler_1_14 extends PortalHandler {
         /*
          * <CREATE_NETHER_PORTAL>
          * public static void createNetherPortal(org.bukkit.block.Block startBlock, Object dummyEntity) {
-         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
-         *     PortalTravelAgent agent = new PortalTravelAgent(world);
+         *     ServerLevel world = (ServerLevel) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
+         *     PortalForcer agent = new PortalForcer(world);
          *     Entity dummy = (Entity) dummyEntity;
          *     dummy.locX = (double) startBlock.getX()+0.5;
          *     dummy.locY = (double) startBlock.getY();
@@ -169,12 +171,12 @@ class PortalHandler_1_14 extends PortalHandler {
         /*
          * <FIND_END_PLATFORM>
          * public static org.bukkit.block.Block findEndPlatform(org.bukkit.World bworld) {
-         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
-         *     BlockPosition platformPos = WorldProviderTheEnd.f;
+         *     ServerLevel world = (ServerLevel) ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
+         *     BlockPos platformPos = WorldProviderTheEnd.f;
          *     int i = platformPos.getX();
          *     int j = platformPos.getY() - 1;
          *     int k = platformPos.getZ();
-         *     BlockPosition$MutableBlockPosition pos = new BlockPosition$MutableBlockPosition();
+         *     BlockPos$MutableBlockPos pos = new BlockPos$MutableBlockPos();
          *     byte b0 = 1;
          *     byte b1 = 0;
          *     for (int l = -2; l <= 2; ++l) {
@@ -200,17 +202,17 @@ class PortalHandler_1_14 extends PortalHandler {
         /*
          * <CREATE_END_PLATFORM>
          * public static org.bukkit.block.Block createEndPlatform(org.bukkit.World bworld) {
-         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
-         *     BlockPosition platformPos = WorldProviderTheEnd.f;
+         *     ServerLevel world = (ServerLevel) ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
+         *     BlockPos platformPos = WorldProviderTheEnd.f;
          * 
-         *     // Code is embedded deep inside EntityPlayer.a(DimensionManager, TeleportCause)
+         *     // Code is embedded deep inside ServerPlayer.a(DimensionType, TeleportCause)
          *     int i = platformPos.getX();
          *     int j = platformPos.getY() - 1;
          *     int k = platformPos.getZ();
          *     boolean flag = true;
          *     boolean flag1 = false;
          *     org.bukkit.craftbukkit.util.BlockStateListPopulator blockList = new org.bukkit.craftbukkit.util.BlockStateListPopulator(world);
-         *     BlockPosition$MutableBlockPosition blockposition = new BlockPosition$MutableBlockPosition();
+         *     BlockPos$MutableBlockPos blockposition = new BlockPos$MutableBlockPos();
          *     for (int l = -2; l <= 2; ++l) {
          *         for (int i1 = -2; i1 <= 2; ++i1) {
          *             for (int j1 = -1; j1 < 3; ++j1) {
@@ -219,7 +221,7 @@ class PortalHandler_1_14 extends PortalHandler {
          *                 int i2 = k + i1 * 0 - l * 1;
          *                 boolean flag2 = j1 < 0;
          *                 blockposition.d(k1, l1, i2);
-         *                 world.setTypeUpdate((BlockPosition) blockposition, flag2 ? Blocks.OBSIDIAN.getBlockData() : Blocks.AIR.getBlockData());
+         *                 world.setTypeUpdate((BlockPos) blockposition, flag2 ? Blocks.OBSIDIAN.getBlockData() : Blocks.AIR.getBlockData());
          *             }
          *         }
          *     }

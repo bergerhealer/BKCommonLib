@@ -60,17 +60,17 @@ class LightingHandler_1_8_to_1_13_2 implements LightingHandler {
     }
 
     @Template.Optional
-    @Template.Import("net.minecraft.world.level.chunk.ChunkSection")
-    @Template.Import("net.minecraft.world.level.chunk.NibbleArray")
-    @Template.InstanceType("net.minecraft.world.level.chunk.Chunk")
+    @Template.Import("net.minecraft.world.level.chunk.LevelChunkSection")
+    @Template.Import("net.minecraft.world.level.chunk.DataLayer")
+    @Template.InstanceType("net.minecraft.world.level.chunk.LevelChunk")
     /*
      * <PREPARE_CHUNK_SECTION>
-     * public ChunkSection prepareChunkSection(int sectionIndex) {
-     *     ChunkSection[] sections = instance.getSections();
+     * public LevelChunkSection prepareChunkSection(int sectionIndex) {
+     *     LevelChunkSection[] sections = instance.getSections();
      *     if (sectionIndex < 0 || sectionIndex >= sections.length) {
      *         return null;
      *     }
-     *     ChunkSection section = sections[sectionIndex];
+     *     LevelChunkSection section = sections[sectionIndex];
      *     if (section == null) {
      * #select version >=
      * #case 1.13:   boolean hasSkyLight = instance.world.worldProvider.g();
@@ -78,21 +78,21 @@ class LightingHandler_1_8_to_1_13_2 implements LightingHandler {
      * #case 1.9:    boolean hasSkyLight = !instance.world.worldProvider.m();
      * #case else:   boolean hasSkyLight = !instance.world.worldProvider.o();
      * #endselect
-     *         sections[sectionIndex] = section = new ChunkSection(sectionIndex << 4, hasSkyLight);
+     *         sections[sectionIndex] = section = new LevelChunkSection(sectionIndex << 4, hasSkyLight);
      *     }
      *     return section;
      * }
      */
-    @Template.Require(declaring="net.minecraft.world.level.chunk.Chunk", value="%PREPARE_CHUNK_SECTION%")
+    @Template.Require(declaring="net.minecraft.world.level.chunk.LevelChunk", value="%PREPARE_CHUNK_SECTION%")
     public static abstract class LightingLogicHandle extends Template.Class<Template.Handle> {
         /*
          * <GET_SECTION_BLOCK_LIGHT>
-         * public static byte[] getSectionBlockLight(Chunk chunk, int sectionIndex) {
-         *     ChunkSection[] sections = chunk.getSections();
+         * public static byte[] getSectionBlockLight(LevelChunk chunk, int sectionIndex) {
+         *     LevelChunkSection[] sections = chunk.getSections();
          *     if (sectionIndex >= 0 && sectionIndex < sections.length) {
-         *         ChunkSection section = sections[sectionIndex];
+         *         LevelChunkSection section = sections[sectionIndex];
          *         if (section != null) {
-         *             NibbleArray array = section.getEmittedLightArray();
+         *             DataLayer array = section.getEmittedLightArray();
          *             if (array != null) {
          * #if version >= 1.9
          *                 return (byte[]) array.asBytes().clone();
@@ -110,12 +110,12 @@ class LightingHandler_1_8_to_1_13_2 implements LightingHandler {
 
         /*
          * <GET_SECTION_SKY_LIGHT>
-         * public static byte[] getSectionSkyLight(Chunk chunk, int sectionIndex) {
-         *     ChunkSection[] sections = chunk.getSections();
+         * public static byte[] getSectionSkyLight(LevelChunk chunk, int sectionIndex) {
+         *     LevelChunkSection[] sections = chunk.getSections();
          *     if (sectionIndex >= 0 && sectionIndex < sections.length) {
-         *         ChunkSection section = sections[sectionIndex];
+         *         LevelChunkSection section = sections[sectionIndex];
          *         if (section != null) {
-         *             NibbleArray array = section.getSkyLightArray();
+         *             DataLayer array = section.getSkyLightArray();
          *             if (array != null) {
          * #if version >= 1.9
          *                 return (byte[]) array.asBytes().clone();
@@ -133,10 +133,10 @@ class LightingHandler_1_8_to_1_13_2 implements LightingHandler {
 
         /*
          * <SET_SECTION_BLOCK_LIGHT>
-         * public static void setSectionBlockLight(Chunk chunk, int sectionIndex, byte[] data) {
-         *     ChunkSection section = chunk#prepareChunkSection(sectionIndex);
+         * public static void setSectionBlockLight(LevelChunk chunk, int sectionIndex, byte[] data) {
+         *     LevelChunkSection section = chunk#prepareChunkSection(sectionIndex);
          *     if (section != null) {
-         *         section.a(new NibbleArray(data));
+         *         section.a(new DataLayer(data));
          *     }
          * }
          */
@@ -145,10 +145,10 @@ class LightingHandler_1_8_to_1_13_2 implements LightingHandler {
 
         /*
          * <SET_SECTION_SKY_LIGHT>
-         * public static void setSectionSkyLight(Chunk chunk, int sectionIndex, byte[] data) {
-         *     ChunkSection section = chunk#prepareChunkSection(sectionIndex);
+         * public static void setSectionSkyLight(LevelChunk chunk, int sectionIndex, byte[] data) {
+         *     LevelChunkSection section = chunk#prepareChunkSection(sectionIndex);
          *     if (section != null) {
-         *         section.b(new NibbleArray(data));
+         *         section.b(new DataLayer(data));
          *     }
          * }
          */

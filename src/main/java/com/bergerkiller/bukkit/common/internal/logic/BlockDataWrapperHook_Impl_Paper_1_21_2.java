@@ -36,7 +36,7 @@ class BlockDataWrapperHook_Impl_Paper_1_21_2 extends BlockDataWrapperHook {
 
         // MapCodec type instance (from mojang serialization)
         mapCodecType = getClassVerify("com.mojang.serialization.MapCodec");
-        Class<?> iBlockDataHolderType = getClassVerify("net.minecraft.world.level.block.state.IBlockDataHolder");
+        Class<?> iBlockDataHolderType = getClassVerify("net.minecraft.world.level.block.state.StateHolder");
         propertiesCodecField = Resolver.resolveAndGetDeclaredField(iBlockDataHolderType, "propertiesCodec");
 
         // Verify that the values field is of type MapCodec and not something else

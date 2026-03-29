@@ -15,7 +15,7 @@ import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryH
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 
-@ClassHook.HookImport("net.minecraft.server.level.EntityPlayer")
+@ClassHook.HookImport("net.minecraft.server.level.ServerPlayer")
 @ClassHook.HookPackage("net.minecraft.server")
 @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
 public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHook_1_14> implements EntityTrackerEntryHook {
@@ -52,7 +52,7 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
         }
     }
 
-    @HookMethod("public void removeViewer:???(EntityPlayer entityplayer)")
+    @HookMethod("public void removeViewer:???(ServerPlayer entityplayer)")
     public void removeViewer(Object entityplayer) {
         try {
             controller.removeViewer(Conversion.toPlayer.convert(entityplayer));
@@ -80,7 +80,7 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
         return hookedTracker;
     }
 
-    @ClassHook.HookImport("net.minecraft.server.level.EntityPlayer")
+    @ClassHook.HookImport("net.minecraft.server.level.ServerPlayer")
     @ClassHook.HookPackage("net.minecraft.server")
     @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
     public class StateHook extends ClassHook<StateHook> {
@@ -96,7 +96,7 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
             }
         }
 
-        @HookMethod("public void removePairing:???(EntityPlayer entityPlayer)")
+        @HookMethod("public void removePairing:???(ServerPlayer entityPlayer)")
         public void removePairing(Object entityplayer) {
             try {
                 Player viewer = (Player) WrapperConversion.toEntity(entityplayer);
@@ -106,7 +106,7 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
             }
         }
 
-        @HookMethod("public void addPairing:???(EntityPlayer entityPlayer)")
+        @HookMethod("public void addPairing:???(ServerPlayer entityPlayer)")
         public void addPairing(Object entityplayer) {
             try {
                 Player viewer = (Player) WrapperConversion.toEntity(entityplayer);

@@ -446,18 +446,15 @@ public abstract class EntityAddRemoveHandler implements LazyInitializedObject, L
         }
 
         @Template.Optional
-        @Template.Import("net.minecraft.server.level.WorldServer")
-        @Template.Import("net.minecraft.server.level.ChunkProviderServer")
         @Template.Import("net.minecraft.world.entity.Entity")
-        @Template.Import("net.minecraft.util.EntitySlice")
-        @Template.InstanceType("net.minecraft.world.level.chunk.Chunk")
+        @Template.InstanceType("net.minecraft.world.level.chunk.LevelChunk")
         public static abstract class HandlerLogic extends Template.Class<Template.Handle> {
 
             /*
              * <REPLACE_IN_CHUNK_SPECIAL>
              * public static void replaceInChunkSpecial(Chunk chunk, Entity oldEntity, Entity newEntity) {
              *     // Paperspigot
-             * #if exists net.minecraft.world.level.chunk.Chunk public final com.destroystokyo.paper.util.maplist.EntityList entities;
+             * #if exists net.minecraft.world.level.chunk.LevelChunk public final com.destroystokyo.paper.util.maplist.EntityList entities;
              *     if (chunk.entities.remove(oldEntity)) {
              *         if (newEntity != null) {
              *             chunk.entities.add(newEntity);
@@ -466,8 +463,8 @@ public abstract class EntityAddRemoveHandler implements LazyInitializedObject, L
              * #endif
              * 
              *     // Tuinity
-             * #if exists net.minecraft.world.level.chunk.Chunk protected final com.tuinity.tuinity.world.ChunkEntitySlices entitySlicesManager;
-             *     #require net.minecraft.world.level.chunk.Chunk protected final com.tuinity.tuinity.world.ChunkEntitySlices entitySlicesManager;
+             * #if exists net.minecraft.world.level.chunk.LevelChunk protected final com.tuinity.tuinity.world.ChunkEntitySlices entitySlicesManager;
+             *     #require net.minecraft.world.level.chunk.LevelChunk protected final com.tuinity.tuinity.world.ChunkEntitySlices entitySlicesManager;
              *     com.tuinity.tuinity.world.ChunkEntitySlices slices = chunk#entitySlicesManager;
              *     synchronized (slices) {
              *         // Locate the old entity inside the "allEntities" slices to figure out if it is stored,

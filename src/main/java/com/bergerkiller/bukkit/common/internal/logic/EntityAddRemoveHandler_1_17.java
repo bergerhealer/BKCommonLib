@@ -436,29 +436,29 @@ class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
     }
 
     @Template.Optional
-    @Template.Import("net.minecraft.server.level.WorldServer")
-    @Template.Import("net.minecraft.world.level.chunk.Chunk")
-    @Template.Import("net.minecraft.server.level.ChunkProviderServer")
+    @Template.Import("net.minecraft.server.level.ServerLevel")
+    @Template.Import("net.minecraft.world.level.chunk.LevelChunk")
     @Template.Import("net.minecraft.world.entity.Entity")
-    @Template.Import("net.minecraft.util.EntitySlice")
-    @Template.Import("net.minecraft.world.level.ChunkCoordIntPair")
+    @Template.Import("net.minecraft.util.ClassInstanceMultiMap")
+    @Template.Import("net.minecraft.world.level.ChunkPos")
+    @Template.Import("net.minecraft.world.level.entity.EntityLookup")
     @Template.InstanceType("net.minecraft.world.level.entity.PersistentEntitySectionManager")
     public static abstract class AddRemoveHandlerLogic extends Template.Class<Template.Handle> {
 
         /*
          * <IS_CHUNK_ENTITIES_LOADED>
-         * public static boolean isChunkEntitiesLoaded(WorldServer world, int cx, int cz) {
+         * public static boolean isChunkEntitiesLoaded(ServerLevel world, int cx, int cz) {
          * #if version >= 1.17.1
-         *     #require net.minecraft.server.level.WorldServer public final net.minecraft.world.level.entity.PersistentEntitySectionManager entityManager;
+         *     #require net.minecraft.server.level.ServerLevel public final net.minecraft.world.level.entity.PersistentEntitySectionManager entityManager;
          * #else
-         *     #require net.minecraft.server.level.WorldServer private final net.minecraft.world.level.entity.PersistentEntitySectionManager entityManager;
+         *     #require net.minecraft.server.level.ServerLevel private final net.minecraft.world.level.entity.PersistentEntitySectionManager entityManager;
          * #endif
          *     PersistentEntitySectionManager manager = world#entityManager;
          * #if version >= 1.18
-         *     long key = ChunkCoordIntPair.asLong(cx, cz);
+         *     long key = ChunkPos.asLong(cx, cz);
          *     return manager.areEntitiesLoaded(key);
          * #else
-         *     long key = ChunkCoordIntPair.pair(cx, cz);
+         *     long key = ChunkPos.pair(cx, cz);
          *     return manager.a(key);
          * #endif
          * }
@@ -468,13 +468,13 @@ class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
 
         /*
          * <REPLACE_IN_WORLD_STORAGE>
-         * public static void replaceInWorldStorage(WorldServer world, Entity oldEntity, Entity newEntity) {
+         * public static void replaceInWorldStorage(ServerLevel world, Entity oldEntity, Entity newEntity) {
          *     #require net.minecraft.world.entity.Entity private int entityId:id;
          *     #require net.minecraft.world.entity.Entity protected UUID entityUUID:uuid;
          *     int entityId = oldEntity#entityId;
          *     UUID entityUUID = oldEntity#entityUUID;
          * 
-         *     #require net.minecraft.server.level.WorldServer private final net.minecraft.world.level.entity.PersistentEntitySectionManager entityManager;
+         *     #require net.minecraft.server.level.ServerLevel private final net.minecraft.world.level.entity.PersistentEntitySectionManager entityManager;
          *     #require net.minecraft.world.level.entity.PersistentEntitySectionManager private final EntityLookup visibleEntityStorage;
          *     PersistentEntitySectionManager entitySectionManager = world#entityManager;
          *     EntityLookup entityLookup = entitySectionManager#visibleEntityStorage;
@@ -499,7 +499,7 @@ class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          *         }
          *     }
          * 
-         *     #require net.minecraft.server.level.WorldServer final net.minecraft.world.level.entity.EntityTickList entityTickList;
+         *     #require net.minecraft.server.level.ServerLevel final net.minecraft.world.level.entity.EntityTickList entityTickList;
          *     EntityTickList tickList = world#entityTickList;
          * 
          * #if exists net.minecraft.world.level.entity.EntityTickList private final io.papermc.paper.util.maplist.IteratorSafeOrderedReferenceSet<Entity> entities;
@@ -543,8 +543,8 @@ class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          * #endif
          * 
          *     // Tuinity, now in paper: entitySliceManager which stores entity lists by region index
-         * #if exists net.minecraft.world.level.World protected final io.papermc.paper.world.EntitySliceManager entitySliceManager;
-         *     #require net.minecraft.world.level.World protected final io.papermc.paper.world.EntitySliceManager entitySliceManager;
+         * #if exists net.minecraft.world.level.Level protected final io.papermc.paper.world.EntitySliceManager entitySliceManager;
+         *     #require net.minecraft.world.level.Level protected final io.papermc.paper.world.EntitySliceManager entitySliceManager;
          *     io.papermc.paper.world.EntitySliceManager entitySliceManager = world#entitySliceManager;
          * 
          *     // Spigot bug: if chunk doesn't exist, error occurs
@@ -571,18 +571,18 @@ class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          * <REPLACE_IN_CHUNK_STORAGE>
          * public static void replaceInChunkStorage(Entity oldEntity, Entity newEntity) {
          *     // Paper: added an entities field to Chunk
-         * #if exists net.minecraft.world.level.chunk.Chunk public final com.destroystokyo.paper.util.maplist.EntityList entities;
+         * #if exists net.minecraft.world.level.chunk.LevelChunk public final com.destroystokyo.paper.util.maplist.EntityList entities;
          *   #if version >= 1.18
-         *     net.minecraft.core.BlockPosition pos = oldEntity.blockPosition();
-         *     net.minecraft.world.level.World world = oldEntity.getLevel();
+         *     net.minecraft.core.BlockPos pos = oldEntity.blockPosition();
+         *     net.minecraft.world.level.Level world = oldEntity.getLevel();
          *   #else
-         *     net.minecraft.core.BlockPosition pos = oldEntity.getChunkCoordinates();
-         *     net.minecraft.world.level.World world = oldEntity.getWorld();
+         *     net.minecraft.core.BlockPos pos = oldEntity.getChunkCoordinates();
+         *     net.minecraft.world.level.Level world = oldEntity.getWorld();
          *   #endif
          *     if (world == null || pos == null) {
          *         return;
          *     }
-         *     Chunk chunk = ((WorldServer)world).getChunkIfLoaded(pos.getX() >> 4, pos.getZ() >> 4);
+         *     LevelChunk chunk = ((ServerLevel)world).getChunkIfLoaded(pos.getX() >> 4, pos.getZ() >> 4);
          *     if (chunk == null) {
          *         return;
          *     }
@@ -610,24 +610,24 @@ class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          *             callback.a(net.minecraft.world.entity.Entity$RemovalReason.DISCARDED);
          * #endif
          *         } else {
-         *             #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private final EntityAccess entity;
+         *             #require net.minecraft.world.level.entity.PersistentEntitySectionManager.Callback private final net.minecraft.world.level.entity.EntityAccess entity;
          *             if ( callback#entity == oldEntity ) {
          *                 callback#entity = newEntity;
          *             }
          *         }
          * 
-         *         #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private EntitySection currentSection;
-         * #if exists net.minecraft.world.level.entity.PersistentEntitySectionManager.a private PersistentEntitySectionManager b;
-         *         #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private PersistentEntitySectionManager callbackPESM:b;
+         *         #require net.minecraft.world.level.entity.PersistentEntitySectionManager.Callback private EntitySection currentSection;
+         * #if exists net.minecraft.world.level.entity.PersistentEntitySectionManager.Callback private PersistentEntitySectionManager b;
+         *         #require net.minecraft.world.level.entity.PersistentEntitySectionManager.Callback private PersistentEntitySectionManager callbackPESM:b;
          * #else
-         *         #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private PersistentEntitySectionManager callbackPESM:this$0;
+         *         #require net.minecraft.world.level.entity.PersistentEntitySectionManager.Callback private PersistentEntitySectionManager callbackPESM:this$0;
          * #endif
-         *         EntitySection section = callback#currentSection;
+         *         net.minecraft.world.level.entity.EntitySection section = callback#currentSection;
          * 
          *         boolean checkStartTickingNewEntity = false;
          * 
-         *         #require net.minecraft.world.level.entity.EntitySection private final net.minecraft.util.EntitySlice storage;
-         *         EntitySlice slice = section#storage;
+         *         #require net.minecraft.world.level.entity.EntitySection private final net.minecraft.util.ClassInstanceMultiMap storage;
+         *         ClassInstanceMultiMap slice = section#storage;
          *         List sliceList = com.bergerkiller.bukkit.common.conversion.type.HandleConversion.cbEntitySliceToList(slice);
          *         java.util.ListIterator iter = sliceList.listIterator();
          *         while (iter.hasNext()) {

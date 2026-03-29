@@ -64,7 +64,7 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
                     "chunkGenerator", CommonUtil.getClass("net.minecraft.world.level.chunk.ChunkGenerator")));
         } else {
             cpsChunkGeneratorField = LogicUtil.unsafeCast(SafeField.create(ServerChunkCacheHandle.T.getType(),
-                    "chunkProvider", CommonUtil.getClass("net.minecraft.world.level.chunk.IChunkProvider")));
+                    "chunkProvider", CommonUtil.getClass("net.minecraft.world.level.chunk.ChunkSource")));
         }
 
         if (CommonBootstrap.evaluateMCVersion(">=", "1.21.5")) {
@@ -178,10 +178,10 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
     @ClassHook.HookPackage("net.minecraft.world.level.chunk")
     @ClassHook.HookImport("net.minecraft.util.random.WeightedList")
     @ClassHook.HookImport("net.minecraft.core.Holder")
-    @ClassHook.HookImport("net.minecraft.world.level.biome.BiomeBase")
+    @ClassHook.HookImport("net.minecraft.world.level.biome.Biome")
     @ClassHook.HookImport("net.minecraft.world.level.StructureManager")
-    @ClassHook.HookImport("net.minecraft.world.entity.EnumCreatureType")
-    @ClassHook.HookImport("net.minecraft.core.BlockPosition")
+    @ClassHook.HookImport("net.minecraft.world.entity.MobCategory")
+    @ClassHook.HookImport("net.minecraft.core.BlockPos")
     public static class ChunkGeneratorHook_1_21_5 extends ClassHook<ChunkGeneratorHook_1_21_5> {
         private static final WeightedListHandle weightedListHandle = Template.Class.create(WeightedListHandle.class, Common.TEMPLATE_RESOLVER);
         private final World world;
@@ -190,7 +190,7 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
             this.world = world;
         }
 
-        @HookMethod("public WeightedList getMobsAt(Holder<BiomeBase> biomeBaseHolder, StructureManager structManager, EnumCreatureType enumcreaturetype, BlockPosition blockposition)")
+        @HookMethod("public WeightedList getMobsAt(Holder<Biome> biomeBaseHolder, StructureManager structManager, MobCategory enumcreaturetype, BlockPos blockposition)")
         public Object getMobsAt_1_18_2(Object biomeBaseHolder, Object structureManager, Object enumcreaturetype, Object blockposition) {
             Object weightedList = base.getMobsAt_1_18_2(biomeBaseHolder, structureManager, enumcreaturetype, blockposition);
             return processWeightedList(weightedList, blockposition);
@@ -245,10 +245,10 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
     @ClassHook.HookPackage("net.minecraft.world.level.chunk")
     @ClassHook.HookImport("net.minecraft.util.random.WeightedRandomList")
     @ClassHook.HookImport("net.minecraft.core.Holder")
-    @ClassHook.HookImport("net.minecraft.world.level.biome.BiomeBase")
+    @ClassHook.HookImport("net.minecraft.world.level.biome.Biome")
     @ClassHook.HookImport("net.minecraft.world.level.StructureManager")
-    @ClassHook.HookImport("net.minecraft.world.entity.EnumCreatureType")
-    @ClassHook.HookImport("net.minecraft.core.BlockPosition")
+    @ClassHook.HookImport("net.minecraft.world.entity.MobCategory")
+    @ClassHook.HookImport("net.minecraft.core.BlockPos")
     public static class ChunkGeneratorHook_1_17 extends ClassHook<ChunkGeneratorHook_1_17> {
         private static final WeightedRandomListHandle weightedRandomListHandle = Template.Class.create(WeightedRandomListHandle.class, Common.TEMPLATE_RESOLVER);
         private final World world;
@@ -258,21 +258,21 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
         }
 
         @HookMethodCondition("version >= 1.18.2")
-        @HookMethod("public WeightedRandomList getMobsAt(Holder<BiomeBase> biomeBaseHolder, StructureManager structManager, EnumCreatureType enumcreaturetype, BlockPosition blockposition)")
+        @HookMethod("public WeightedRandomList getMobsAt(Holder<Biome> biomeBaseHolder, StructureManager structManager, MobCategory enumcreaturetype, BlockPos blockposition)")
         public Object getMobsAt_1_18_2(Object biomeBaseHolder, Object structureManager, Object enumcreaturetype, Object blockposition) {
             Object weightedList = base.getMobsAt_1_18_2(biomeBaseHolder, structureManager, enumcreaturetype, blockposition);
             return processWeightedList(weightedList, blockposition);
         }
 
         @HookMethodCondition("version >= 1.18 && version < 1.18.2")
-        @HookMethod("public WeightedRandomList getMobsAt(BiomeBase biomeBase, StructureManager structManager, EnumCreatureType enumcreaturetype, BlockPosition blockposition)")
+        @HookMethod("public WeightedRandomList getMobsAt(Biome biomeBase, StructureManager structManager, MobCategory enumcreaturetype, BlockPos blockposition)")
         public Object getMobsAt_1_18(Object biomeBase, Object structureManager, Object enumcreaturetype, Object blockposition) {
             Object weightedList = base.getMobsAt_1_18(biomeBase, structureManager, enumcreaturetype, blockposition);
             return processWeightedList(weightedList, blockposition);
         }
 
         @HookMethodCondition("version < 1.18")
-        @HookMethod("public WeightedRandomList getMobsFor(BiomeBase biome, StructureManager structManager, EnumCreatureType enumcreaturetype, BlockPosition blockposition)")
+        @HookMethod("public WeightedRandomList getMobsFor(Biome biome, StructureManager structManager, MobCategory enumcreaturetype, BlockPos blockposition)")
         public Object getMobsFor_1_17(Object biomeBase, Object structureManager, Object enumcreaturetype, Object blockposition) {
             Object weightedList = base.getMobsFor_1_17(biomeBase, structureManager, enumcreaturetype, blockposition);
             return processWeightedList(weightedList, blockposition);
@@ -320,7 +320,10 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
     }
 
     @ClassHook.HookPackage("net.minecraft.server")
-    @ClassHook.HookImport("net.minecraft.world.level.biome.BiomeBase")
+    @ClassHook.HookImport("net.minecraft.world.level.biome.Biome")
+    @ClassHook.HookImport("net.minecraft.world.level.StructureManager")
+    @ClassHook.HookImport("net.minecraft.world.entity.MobCategory")
+    @ClassHook.HookImport("net.minecraft.core.BlockPos")
     public static class ChunkGeneratorHook_1_16 extends ClassHook<ChunkGeneratorHook_1_16> {
         private final World world;
 
@@ -328,7 +331,7 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
             this.world = world;
         }
 
-        @HookMethod("public List getMobsFor(BiomeBase biomeBase, StructureManager structManager, EnumCreatureType enumcreaturetype, BlockPosition blockposition)")
+        @HookMethod("public List getMobsFor(Biome biomeBase, StructureManager structManager, MobCategory enumcreaturetype, BlockPos blockposition)")
         public List<Object> getMobsFor(Object biomeBase, Object structureManager, Object enumcreaturetype, Object blockposition) {
             List<Object> mobs = base.getMobsFor(biomeBase, structureManager, enumcreaturetype, blockposition);
             return handleMobsFor(this.world, blockposition, mobs, spawnClusterHandle::getEntityType);
@@ -336,6 +339,8 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
     }
 
     @ClassHook.HookPackage("net.minecraft.server")
+    @ClassHook.HookImport("net.minecraft.world.entity.MobCategory")
+    @ClassHook.HookImport("net.minecraft.core.BlockPos")
     public static class ChunkGeneratorHook_1_8_to_1_15_2 extends ClassHook<ChunkGeneratorHook_1_8_to_1_15_2> {
         private final World world;
 
@@ -343,17 +348,17 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
             this.world = world;
         }
 
-        @HookMethod("public List getMobsFor(EnumCreatureType enumcreaturetype, BlockPosition blockposition)")
+        @HookMethod("public List getMobsFor(MobCategory enumcreaturetype, BlockPos blockposition)")
         public List<Object> getMobsFor(Object enumcreaturetype, Object blockposition) {
             List<Object> mobs = base.getMobsFor(enumcreaturetype, blockposition);
             return handleMobsFor(this.world, blockposition, mobs, spawnClusterHandle::getEntityType);
         }
     }
 
-    // 1.8 - 1.16.1: net.minecraft.world.level.biome.BiomeBase.BiomeMeta
+    // 1.8 - 1.16.1: net.minecraft.world.level.biome.Biome.BiomeMeta
     // 1.17+: net.minecraft.world.level.biome.BiomeSettingsMobs$c
     @Template.Import("com.bergerkiller.bukkit.common.entity.CommonEntityType")
-    @Template.Import("net.minecraft.world.entity.EntityTypes")
+    @Template.Import("net.minecraft.world.entity.EntityType")
     @Template.InstanceType("net.minecraft.world.level.biome.BiomeSpawnCluster")
     public static abstract class BiomeSpawnClusterHandle extends Template.Class<Template.Handle> {
 
@@ -361,21 +366,21 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
          * <GET_CLUSTER_ENTITY_TYPE>
          * public static CommonEntityType getEntityType(BiomeSpawnCluster biomeSpawnCluster) {
          * #if version >= 1.13
-         *     EntityTypes entityType;
+         *     EntityType entityType;
          *   #if version >= 1.21.5
          *     entityType = biomeSpawnCluster.type();
          *   #else
          *     #select version >=
-         *     #case 1.17: #require net.minecraft.world.level.biome.BiomeSpawnCluster public net.minecraft.world.entity.EntityTypes entityType:type;
-         *     #case 1.16: #require net.minecraft.world.level.biome.BiomeSpawnCluster public net.minecraft.world.entity.EntityTypes entityType:c;
-         *     #case else: #require net.minecraft.world.level.biome.BiomeSpawnCluster public net.minecraft.world.entity.EntityTypes entityType:b;
+         *     #case 1.17: #require net.minecraft.world.level.biome.BiomeSpawnCluster public net.minecraft.world.entity.EntityType entityType:type;
+         *     #case 1.16: #require net.minecraft.world.level.biome.BiomeSpawnCluster public net.minecraft.world.entity.EntityType entityType:c;
+         *     #case else: #require net.minecraft.world.level.biome.BiomeSpawnCluster public net.minecraft.world.entity.EntityType entityType:b;
          *     #endselect
          *     entityType = biomeSpawnCluster#entityType;
          *   #endif
          *
          *     return CommonEntityType.byNMSEntityTypeRaw(entityType);
          * #else
-         *     #require net.minecraft.world.level.biome.BiomeSpawnCluster public java.lang.Class<? extends net.minecraft.world.entity.EntityInsentient> entityClass:b;
+         *     #require net.minecraft.world.level.biome.BiomeSpawnCluster public java.lang.Class<? extends net.minecraft.world.entity.Mob> entityClass:b;
          *     Class entityClass = biomeSpawnCluster#entityClass;
          *     return CommonEntityType.byNMSEntityClass(entityClass);
          * #endif

@@ -11,10 +11,8 @@ import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
-import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
@@ -174,21 +172,8 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
                     TypeDeclaration.createGeneric(Stream.class, VoxelShapeHandle.class)));
 
             // Handles the block collision logic
-            ClassResolver resolver = new ClassResolver();
-            resolver.setVariable("version", Common.MC_VERSION);
-            resolver.addImport("net.minecraft.core.BlockPosition");
-            resolver.addImport("net.minecraft.core.BlockPosition$MutableBlockPosition");
-            resolver.addImport("net.minecraft.core.EnumDirection");
-            resolver.addImport("net.minecraft.core.EnumDirection$EnumAxis");
-            resolver.addImport("net.minecraft.util.MathHelper");
-            resolver.addImport("net.minecraft.world.phys.AxisAlignedBB");
-            resolver.addImport("net.minecraft.world.phys.shapes.OperatorBoolean");
-            resolver.addImport("net.minecraft.world.phys.shapes.VoxelShape");
-            resolver.addImport("net.minecraft.world.phys.shapes.VoxelShapes");
-            resolver.addImport("net.minecraft.world.level.border.WorldBorder");
-            resolver.addImport("net.minecraft.world.level.IBlockAccess");
-            resolver.addImport(MathUtil.class.getName());
-            resolver.setDeclaredClassName("net.minecraft.world.level.World");
+            ClassResolver resolver = createCollisionHandlerClassResolver();
+
             String method_path;
             if (CommonBootstrap.evaluateMCVersion(">=", "1.18")) {
                 method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_18_getBlockCollisions.txt";
@@ -199,6 +184,7 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
             } else {
                 method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_14_getBlockCollisions.txt";
             }
+
             try (InputStream input = EntityMoveHandler_1_14.class.getResourceAsStream(method_path)) {
                 try (Scanner scanner = new Scanner(input, "UTF-8")) {
                     scanner.useDelimiter("\\A");

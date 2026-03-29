@@ -139,16 +139,16 @@ class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
     }
 
     @Template.Optional
-    @Template.Import("net.minecraft.server.level.LightEngineThreaded")
-    @Template.Import("net.minecraft.core.SectionPosition")
-    @Template.Import("net.minecraft.world.level.chunk.Chunk")
-    @Template.Import("net.minecraft.world.level.chunk.NibbleArray")
-    @Template.Import("net.minecraft.world.level.EnumSkyBlock")
-    @Template.Import("net.minecraft.world.level.chunk.ILightAccess")
+    @Template.Import("net.minecraft.server.level.ThreadedLevelLightEngine")
+    @Template.Import("net.minecraft.core.SectionPos")
+    @Template.Import("net.minecraft.world.level.chunk.LevelChunk")
+    @Template.Import("net.minecraft.world.level.chunk.DataLayer")
+    @Template.Import("net.minecraft.world.level.LightLayer")
+    @Template.Import("net.minecraft.world.level.chunk.LightChunkGetter")
     @Template.InstanceType("ca.spottedleaf.moonrise.patches.starlight.light.SWMRNibbleArray")
     /*
      * <GET_HEIGHT_OFFSET>
-     * public static int getHeightOffset(Chunk chunk) {
+     * public static int getHeightOffset(LevelChunk chunk) {
      *     // Note: StarLight uses offset for below-bedrock light buffers, hence + 1
      * #if exists ca.spottedleaf.moonrise.common.util.WorldUtil public static int getMinLightSection(net.minecraft.world.level.LevelHeightAccessor world);
      *     return -ca.spottedleaf.moonrise.common.util.WorldUtil.getMinLightSection(chunk.getLevel());
@@ -159,19 +159,19 @@ class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
      * #endif
      * }
      */
-    @Template.Require(declaring="net.minecraft.world.level.chunk.Chunk", value="%GET_HEIGHT_OFFSET%")
+    @Template.Require(declaring="net.minecraft.world.level.chunk.LevelChunk", value="%GET_HEIGHT_OFFSET%")
     public static abstract class StarLightEngineHandle extends Template.Class<Template.Handle> {
 
         /*
          * <IS_SUPPORTED>
-         * public static boolean isSupported(net.minecraft.server.level.LightEngineThreaded lightEngineThreaded) {
+         * public static boolean isSupported(net.minecraft.server.level.ThreadedLevelLightEngine lightEngineThreaded) {
          * #if version >= 1.21
          *     return true;
          * #else
-         *   #if exists net.minecraft.server.level.LightEngineThreaded protected final ca.spottedleaf.moonrise.patches.starlight.light.StarLightInterface theLightEngine;
-         *     #require net.minecraft.server.level.LightEngineThreaded protected final ca.spottedleaf.moonrise.patches.starlight.light.StarLightInterface theLightEngine;
+         *   #if exists net.minecraft.server.level.ThreadedLevelLightEngine protected final ca.spottedleaf.moonrise.patches.starlight.light.StarLightInterface theLightEngine;
+         *     #require net.minecraft.server.level.ThreadedLevelLightEngine protected final ca.spottedleaf.moonrise.patches.starlight.light.StarLightInterface theLightEngine;
          *   #else
-         *     #require net.minecraft.server.level.LightEngineThreaded protected final ca.spottedleaf.moonrise.patches.starlight.light.ThreadedStarLightEngine theLightEngine;
+         *     #require net.minecraft.server.level.ThreadedLevelLightEngine protected final ca.spottedleaf.moonrise.patches.starlight.light.ThreadedStarLightEngine theLightEngine;
          *   #endif
          *     return lightEngineThreaded#theLightEngine != null;
          * #endif
@@ -182,10 +182,10 @@ class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
 
         /*
          * <GET_SKYLIGHT_DATA>
-         * public static byte[] getSkyLightData(Chunk chunk, int cy) {
+         * public static byte[] getSkyLightData(LevelChunk chunk, int cy) {
          *     cy += #getHeightOffset(chunk);
          *
-         * #if exists net.minecraft.world.level.chunk.Chunk public ca.spottedleaf.moonrise.patches.starlight.light.SWMRNibbleArray[] starlight$getSkyNibbles();
+         * #if exists net.minecraft.world.level.chunk.LevelChunk public ca.spottedleaf.moonrise.patches.starlight.light.SWMRNibbleArray[] starlight$getSkyNibbles();
          *     SWMRNibbleArray[] nibbles = chunk.starlight$getSkyNibbles();
          * #else
          *     SWMRNibbleArray[] nibbles = chunk.getSkyNibbles();
@@ -195,8 +195,8 @@ class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          *         return null;
          *     }
          * 
-         * #if exists ca.spottedleaf.moonrise.patches.starlight.light.SWMRNibbleArray public net.minecraft.world.level.chunk.NibbleArray toVanillaNibble();
-         *     NibbleArray nibble = swmr_nibble.toVanillaNibble();
+         * #if exists ca.spottedleaf.moonrise.patches.starlight.light.SWMRNibbleArray public net.minecraft.world.level.chunk.DataLayer toVanillaNibble();
+         *     DataLayer nibble = swmr_nibble.toVanillaNibble();
          *     if (nibble == null) {
          *         return null;
          *     } else {
@@ -218,10 +218,10 @@ class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
 
         /*
          * <GET_BLOCKLIGHT_DATA>
-         * public static byte[] getBlockLightData(Chunk chunk, int cy) {
+         * public static byte[] getBlockLightData(LevelChunk chunk, int cy) {
          *     cy += #getHeightOffset(chunk);
          *
-         * #if exists net.minecraft.world.level.chunk.Chunk public ca.spottedleaf.moonrise.patches.starlight.light.SWMRNibbleArray[] starlight$getBlockNibbles();
+         * #if exists net.minecraft.world.level.chunk.LevelChunk public ca.spottedleaf.moonrise.patches.starlight.light.SWMRNibbleArray[] starlight$getBlockNibbles();
          *     SWMRNibbleArray[] nibbles = chunk.starlight$getBlockNibbles();
          * #else
          *     SWMRNibbleArray[] nibbles = chunk.getBlockNibbles();
@@ -231,8 +231,8 @@ class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          *         return null;
          *     }
          * 
-         * #if exists ca.spottedleaf.moonrise.patches.starlight.light.SWMRNibbleArray public net.minecraft.world.level.chunk.NibbleArray toVanillaNibble();
-         *     NibbleArray nibble = swmr_nibble.toVanillaNibble();
+         * #if exists ca.spottedleaf.moonrise.patches.starlight.light.SWMRNibbleArray public net.minecraft.world.level.chunk.DataLayer toVanillaNibble();
+         *     DataLayer nibble = swmr_nibble.toVanillaNibble();
          *     if (nibble == null) {
          *         return null;
          *     } else {
@@ -254,10 +254,10 @@ class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
 
         /*
          * <SET_SKYLIGHT_DATA>
-         * public static void setSkyLightData(Chunk chunk, int cx, int cy, int cz, byte[] data) {
+         * public static void setSkyLightData(LevelChunk chunk, int cx, int cy, int cz, byte[] data) {
          *     cy += #getHeightOffset(chunk);
          *
-         * #if exists net.minecraft.world.level.chunk.Chunk public ca.spottedleaf.moonrise.patches.starlight.light.SWMRNibbleArray[] starlight$getSkyNibbles();
+         * #if exists net.minecraft.world.level.chunk.LevelChunk public ca.spottedleaf.moonrise.patches.starlight.light.SWMRNibbleArray[] starlight$getSkyNibbles();
          *     SWMRNibbleArray[] nibbles = chunk.starlight$getSkyNibbles();
          * #else
          *     SWMRNibbleArray[] nibbles = chunk.getSkyNibbles();
@@ -282,16 +282,16 @@ class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          * 
          *     if (nibble.updateVisible()) {
          * #if version >= 1.18
-         *         ILightAccess lightAccess = chunk.getLevel().getChunkSource();
-         *         SectionPosition position = SectionPosition.of(cx, cy-1, cz);
-         *         lightAccess.onLightUpdate(EnumSkyBlock.SKY, position);
+         *         LightChunkGetter lightAccess = chunk.getLevel().getChunkSource();
+         *         SectionPos position = SectionPos.of(cx, cy-1, cz);
+         *         lightAccess.onLightUpdate(LightLayer.SKY, position);
          * #else
-         *         ILightAccess lightAccess = chunk.getWorld().getChunkProvider();
-         *         SectionPosition position = SectionPosition.a(cx, cy-1, cz);
-         *   #if exists net.minecraft.world.level.chunk.ILightAccess public abstract void markLightSectionDirty(net.minecraft.world.level.EnumSkyBlock block, net.minecraft.core.SectionPosition pos);
-         *         lightAccess.markLightSectionDirty(EnumSkyBlock.SKY, position);
+         *         LightChunkGetter lightAccess = chunk.getWorld().getChunkProvider();
+         *         SectionPos position = SectionPos.a(cx, cy-1, cz);
+         *   #if exists net.minecraft.world.level.chunk.LightChunkGetter public abstract void markLightSectionDirty(net.minecraft.world.level.LightLayer block, net.minecraft.core.SectionPos pos);
+         *         lightAccess.markLightSectionDirty(LightLayer.SKY, position);
          *   #else
-         *         lightAccess.a(EnumSkyBlock.SKY, position);
+         *         lightAccess.a(LightLayer.SKY, position);
          *   #endif
          * #endif
          *     }
@@ -302,10 +302,10 @@ class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
 
         /*
          * <SET_BLOCKLIGHT_DATA>
-         * public static void setSkyLightData(Chunk chunk, int cx, int cy, int cz, byte[] data) {
+         * public static void setSkyLightData(LevelChunk chunk, int cx, int cy, int cz, byte[] data) {
          *     cy += #getHeightOffset(chunk);
          *
-         * #if exists net.minecraft.world.level.chunk.Chunk public ca.spottedleaf.moonrise.patches.starlight.light.SWMRNibbleArray[] starlight$getBlockNibbles();
+         * #if exists net.minecraft.world.level.chunk.LevelChunk public ca.spottedleaf.moonrise.patches.starlight.light.SWMRNibbleArray[] starlight$getBlockNibbles();
          *     SWMRNibbleArray[] nibbles = chunk.starlight$getBlockNibbles();
          * #else
          *     SWMRNibbleArray[] nibbles = chunk.getBlockNibbles();
@@ -330,16 +330,16 @@ class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          * 
          *     if (nibble.updateVisible()) {
          * #if version >= 1.18
-         *         ILightAccess lightAccess = chunk.getLevel().getChunkSource();
-         *         SectionPosition position = SectionPosition.of(cx, cy-1, cz);
-         *         lightAccess.onLightUpdate(EnumSkyBlock.BLOCK, position);
+         *         LightChunkGetter lightAccess = chunk.getLevel().getChunkSource();
+         *         SectionPos position = SectionPos.of(cx, cy-1, cz);
+         *         lightAccess.onLightUpdate(LightLayer.BLOCK, position);
          * #else
-         *         ILightAccess lightAccess = chunk.getWorld().getChunkProvider();
-         *         SectionPosition position = SectionPosition.a(cx, cy-1, cz);
-         *   #if exists net.minecraft.world.level.chunk.ILightAccess public abstract void markLightSectionDirty(net.minecraft.world.level.EnumSkyBlock block, net.minecraft.core.SectionPosition pos);
-         *         lightAccess.markLightSectionDirty(EnumSkyBlock.BLOCK, position);
+         *         LightChunkGetter lightAccess = chunk.getWorld().getChunkProvider();
+         *         SectionPos position = SectionPos.a(cx, cy-1, cz);
+         *   #if exists net.minecraft.world.level.chunk.LightChunkGetter public abstract void markLightSectionDirty(net.minecraft.world.level.LightLayer block, net.minecraft.core.SectionPos pos);
+         *         lightAccess.markLightSectionDirty(LightLayer.BLOCK, position);
          *   #else
-         *         lightAccess.a(EnumSkyBlock.BLOCK, position);
+         *         lightAccess.a(LightLayer.BLOCK, position);
          *   #endif
          * #endif
          *     }

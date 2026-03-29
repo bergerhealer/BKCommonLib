@@ -38,7 +38,7 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
 
     public PlayerFileDataHandler_1_21_6() {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClassName("net.minecraft.server.level.WorldServer");
+        resolver.setDeclaredClassName("net.minecraft.server.level.ServerLevel");
         resolver.setVariable("version", Common.MC_VERSION);
         if (Common.IS_PAPERSPIGOT_SERVER) {
             resolver.setVariable("paper", "true");
@@ -59,7 +59,7 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
 
         {
             MethodDeclaration getServerRegistryAccessMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess("" +
-                    "public static net.minecraft.core.IRegistryCustom getServerRegistryAccess() {\n" +
+                    "public static net.minecraft.core.RegistryAccess getServerRegistryAccess() {\n" +
                     "    return org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();\n" +
                     "}", resolver));
             getServerRegistryAccess.init(getServerRegistryAccessMethod);
@@ -67,7 +67,7 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
         }
 
         String fieldName = "playerIo";
-        Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.WorldNBTStorage");
+        Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.PlayerDataStorage");
         String realFieldName = Resolver.resolveFieldName(PlayerListHandle.T.getType(), fieldName);
         playerListFileDataField = LogicUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), realFieldName, playerFileDataType).getFastField());
     }
@@ -152,14 +152,13 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
         return hook;
     }
 
-    // hooks WorldNBTStorage
+    // hooks PlayerDataStorage
     @ClassHook.HookPackage("net.minecraft.server")
     @ClassHook.HookImport("net.minecraft.world.level.storage.ValueInput")
     @ClassHook.HookImport("net.minecraft.world.level.storage.ValueOutput")
-    @ClassHook.HookImport("net.minecraft.world.entity.player.EntityHuman")
     @ClassHook.HookImport("net.minecraft.util.ProblemReporter")
-    @ClassHook.HookImport("net.minecraft.core.IRegistryCustom")
-    @ClassHook.HookImport("net.minecraft.nbt.NBTTagCompound")
+    @ClassHook.HookImport("net.minecraft.core.RegistryAccess")
+    @ClassHook.HookImport("net.minecraft.nbt.CompoundTag")
     @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
     protected static class PlayerFileDataHook extends ClassHook<PlayerFileDataHook> implements Hook {
         public PlayerDataController controller = null;
@@ -172,7 +171,7 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
         }
 
         @HookMethodCondition("paper")
-        @HookMethod("public Optional<NBTTagCompound> load(String name, String uuid, ProblemReporter problemReporter)")
+        @HookMethod("public Optional<CompoundTag> load(String name, String uuid, ProblemReporter problemReporter)")
         public java.util.Optional<Object> loadOfflinePaper(String name, String uuid, Object problemReporter) {
             if (this.controller != null) {
                 CommonTagCompound compound = null;
@@ -192,7 +191,7 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
         }
 
         @HookMethodCondition("!paper")
-        @HookMethod("public Optional<ValueInput> load(String name, String uuid, ProblemReporter problemreporter, IRegistryCustom registryAccess)")
+        @HookMethod("public Optional<ValueInput> load(String name, String uuid, ProblemReporter problemreporter, RegistryAccess registryAccess)")
         public java.util.Optional<Object> loadOfflineSpigot(String name, String uuid, Object problemReporter, Object registryAccess) {
             if (this.controller != null) {
                 CommonTagCompound compound = null;
@@ -212,7 +211,7 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
             return base.loadOfflineSpigot(name, uuid, problemReporter, registryAccess);
         }
 
-        @HookMethod("public java.util.Optional<ValueInput> load(EntityHuman entityhuman, ProblemReporter problemreporter)")
+        @HookMethod("public java.util.Optional<ValueInput> load(net.minecraft.world.entity.player.Player entityhuman, ProblemReporter problemreporter)")
         public java.util.Optional<Object> load(Object entityHuman, Object problemReporter) {
             if (this.controller != null) {
                 Player player = LogicUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);
@@ -235,7 +234,7 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
             return base.load(entityHuman, problemReporter);
         }
 
-        @HookMethod("public abstract void save(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
+        @HookMethod("public abstract void save(net.minecraft.world.entity.player.Player paramEntityHuman)")
         public void save(Object entityHuman) {
             if (this.controller != null) {
                 Player player = LogicUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);

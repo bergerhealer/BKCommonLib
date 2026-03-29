@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 import com.bergerkiller.generated.net.minecraft.core.DirectionHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.player.PlayerHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
+import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Vehicle;
@@ -124,6 +125,34 @@ public abstract class EntityMoveHandler {
                     z + 0.5 * this.customBlockCollisionBounds.getZ());
         }
         return boundingBox;
+    }
+
+    /**
+     * Creates the class resolver used to parse the block collision logic scripts.
+     * Basically declares the imports put on top of that file.
+     *
+     * @return ClassResolver
+     */
+    protected static ClassResolver createCollisionHandlerClassResolver() {
+        ClassResolver resolver = new ClassResolver();
+        resolver.setVariable("version", Common.MC_VERSION);
+        resolver.addImport("net.minecraft.core.BlockPos");
+        resolver.addImport("net.minecraft.core.BlockPos$MutableBlockPos"); // BlockPosition$MutableBlockPosition
+        resolver.addImport("net.minecraft.core.BlockPos$PooledBlockPosition"); // BlockPosition
+        resolver.addImport("net.minecraft.core.Direction"); // EnumDirection
+        resolver.addImport("net.minecraft.core.Direction$Axis"); // EnumDirection$EnumAxis
+        resolver.addImport("net.minecraft.util.Mth"); // MathHelper
+        resolver.addImport("net.minecraft.world.phys.AABB"); // AxisAlignedBB
+        resolver.addImport("net.minecraft.world.phys.shapes.BooleanOp"); // OperatorBoolean
+        resolver.addImport("net.minecraft.world.phys.shapes.VoxelShape");
+        resolver.addImport("net.minecraft.world.phys.shapes.BitSetDiscreteVoxelShape"); // VoxelShapeBitSet
+        resolver.addImport("net.minecraft.world.phys.shapes.VoxelShapeWorldRegion");
+        resolver.addImport("net.minecraft.world.phys.shapes.Shapes"); // VoxelShapes
+        resolver.addImport("net.minecraft.world.level.border.WorldBorder");
+        resolver.addImport("net.minecraft.world.level.BlockGetter"); // IBlockAccess
+        resolver.addImport(MathUtil.class.getName());
+        resolver.setDeclaredClassName("net.minecraft.world.level.World");
+        return resolver;
     }
 
     /**

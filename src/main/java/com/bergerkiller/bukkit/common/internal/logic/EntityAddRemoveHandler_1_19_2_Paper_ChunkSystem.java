@@ -423,14 +423,11 @@ class EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem extends EntityAddRemoveHan
     }
 
     @Template.Optional
-    @Template.Import("net.minecraft.server.level.WorldServer")
-    @Template.Import("net.minecraft.world.level.chunk.Chunk")
-    @Template.Import("net.minecraft.server.level.ChunkProviderServer")
+    @Template.Import("net.minecraft.server.level.ServerLevel")
     @Template.Import("net.minecraft.world.entity.Entity")
     @Template.Import("net.minecraft.world.level.entity.Visibility")
-    @Template.Import("net.minecraft.util.EntitySlice")
-    @Template.Import("net.minecraft.world.level.ChunkCoordIntPair")
-    @Template.Import("net.minecraft.core.BlockPosition")
+    @Template.Import("net.minecraft.world.level.ChunkPos")
+    @Template.Import("net.minecraft.core.BlockPos")
     @Template.Import("net.minecraft.world.entity.Visibility")
     @Template.Import("java.util.concurrent.locks.StampedLock")
     @Template.Import("it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap")
@@ -443,9 +440,9 @@ class EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem extends EntityAddRemoveHan
 
         /*
          * <IS_CHUNK_ENTITIES_LOADED>
-         * public static boolean isChunkEntitiesLoaded(WorldServer world, int cx, int cz) {
+         * public static boolean isChunkEntitiesLoaded(ServerLevel world, int cx, int cz) {
          *     // Just checks that the chunk is loaded, really
-         *     return world.areEntitiesLoaded(ChunkCoordIntPair.asLong(cx, cz));
+         *     return world.areEntitiesLoaded(ChunkPos.asLong(cx, cz));
          * }
          */
         @Template.Generated("%IS_CHUNK_ENTITIES_LOADED%")
@@ -453,7 +450,7 @@ class EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem extends EntityAddRemoveHan
 
         /*
          * <REPLACE_IN_WORLD_STORAGE>
-         * public static void replaceInWorldStorage(WorldServer world, Entity oldEntity, Entity newEntity) {
+         * public static void replaceInWorldStorage(ServerLevel world, Entity oldEntity, Entity newEntity) {
          *     #require net.minecraft.world.entity.Entity private int entityId:id;
          *     #require net.minecraft.world.entity.Entity protected UUID entityUUID:uuid;
          *     int entityId = oldEntity#entityId;
@@ -490,7 +487,7 @@ class EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem extends EntityAddRemoveHan
          *         entityByLock.tryUnlockWrite();
          *     }
          * 
-         *     #require net.minecraft.server.level.WorldServer final net.minecraft.world.level.entity.EntityTickList entityTickList;
+         *     #require net.minecraft.server.level.ServerLevel final net.minecraft.world.level.entity.EntityTickList entityTickList;
          *     net.minecraft.world.level.entity.EntityTickList tickList = world#entityTickList;
          * 
          *     #require net.minecraft.world.level.entity.EntityTickList private final io.papermc.paper.util.maplist.IteratorSafeOrderedReferenceSet<Entity> entities;
@@ -509,9 +506,9 @@ class EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem extends EntityAddRemoveHan
          *     // First check whether the new entity is already stored. If so, no ticking mode changes
          *     boolean isNewEntityStored = false;
          *     if (newEntity != null) {
-         *         final BlockPosition pos = newEntity.blockPosition();
+         *         final BlockPos pos = newEntity.blockPosition();
          *         final int sectionX = pos.getX() >> 4;
-         *         final int sectionY = net.minecraft.util.MathHelper.clamp(pos.getY() >> 4, minSection, maxSection);
+         *         final int sectionY = net.minecraft.util.Mth.clamp(pos.getY() >> 4, minSection, maxSection);
          *         final int sectionZ = pos.getZ() >> 4;
          * 
          *         // Runs just the chunk-adding logic. ID/UUID is done earlier.
@@ -548,9 +545,9 @@ class EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem extends EntityAddRemoveHan
          *     // Note: we cannot call addEntity as this initializes the tracker/other logic/events
          *     ChunkEntitySlices sectionOfEntity = null;
          *     if (newEntity != null) {
-         *         final BlockPosition pos = newEntity.blockPosition();
+         *         final BlockPos pos = newEntity.blockPosition();
          *         final int sectionX = pos.getX() >> 4;
-         *         final int sectionY = net.minecraft.util.MathHelper.clamp(pos.getY() >> 4, minSection, maxSection);
+         *         final int sectionY = net.minecraft.util.Mth.clamp(pos.getY() >> 4, minSection, maxSection);
          *         final int sectionZ = pos.getZ() >> 4;
          * 
          *         // Runs just the chunk-adding logic. ID/UUID is done earlier.

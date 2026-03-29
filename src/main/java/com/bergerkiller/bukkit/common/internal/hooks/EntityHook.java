@@ -34,13 +34,12 @@ import com.bergerkiller.mountiplex.reflection.ClassHook;
 import org.bukkit.util.Vector;
 
 @ClassHook.HookPackage("net.minecraft.server")
-@ClassHook.HookImport("net.minecraft.world.entity.player.EntityHuman")
 @ClassHook.HookImport("net.minecraft.world.entity.Entity")
 @ClassHook.HookImport("net.minecraft.world.entity.Entity.MoveFunction")
-@ClassHook.HookImport("net.minecraft.world.EnumHand")
-@ClassHook.HookImport("net.minecraft.world.EnumInteractionResult")
+@ClassHook.HookImport("net.minecraft.world.InteractionHand")
+@ClassHook.HookImport("net.minecraft.world.InteractionResult")
 @ClassHook.HookImport("net.minecraft.world.item.ItemStack")
-@ClassHook.HookImport("net.minecraft.nbt.NBTTagCompound")
+@ClassHook.HookImport("net.minecraft.nbt.CompoundTag")
 @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
 public class EntityHook extends ClassHook<EntityHook> {
     private EntityController<?> controller = null;
@@ -113,21 +112,21 @@ public class EntityHook extends ClassHook<EntityHook> {
 
     @Deprecated
     @HookMethodCondition("version < 1.9")
-    @HookMethod(value="public boolean onInteractBy_1_8_8:???(EntityHuman entityhuman)")
+    @HookMethod(value="public boolean onInteractBy_1_8_8:???(net.minecraft.world.entity.player.Player entityhuman)")
     public boolean onInteractBy_1_8_8(Object entityHuman) {
         return onInteractBy((HumanEntity) WrapperConversion.toEntity(entityHuman), HumanHand.RIGHT).isTruthy();
     }
 
     @Deprecated
     @HookMethodCondition("version >= 1.9 && version <= 1.11.1")
-    @HookMethod(value="public boolean onInteractBy_1_9:???(EntityHuman entityhuman, ItemStack itemstack, EnumHand enumhand)")
+    @HookMethod(value="public boolean onInteractBy_1_9:???(net.minecraft.world.entity.player.Player entityhuman, ItemStack itemstack, InteractionHand enumhand)")
     public boolean onInteractBy_1_10_2(Object entityHuman, Object itemstack, Object enumHand) {
         return onInteractBy_1_11_2(entityHuman, enumHand);
     }
 
     @Deprecated
     @HookMethodCondition("version >= 1.11.2 && version <= 1.15.2")
-    @HookMethod(value="public boolean onInteractBy_1_11_2:???(EntityHuman entityhuman, EnumHand enumhand)")
+    @HookMethod(value="public boolean onInteractBy_1_11_2:???(net.minecraft.world.entity.player.Player entityhuman, InteractionHand enumhand)")
     public boolean onInteractBy_1_11_2(Object entityHuman, Object enumHand) {
         HumanEntity humanEntity = (HumanEntity) WrapperConversion.toEntity(entityHuman);
         return onInteractBy(humanEntity, HumanHand.fromNMSEnumHand(humanEntity, enumHand)).isTruthy();
@@ -135,7 +134,7 @@ public class EntityHook extends ClassHook<EntityHook> {
 
     @Deprecated
     @HookMethodCondition("version >= 1.16")
-    @HookMethod(value="public EnumInteractionResult onInteractBy_1_16:???(EntityHuman entityhuman, EnumHand enumhand)")
+    @HookMethod(value="public InteractionResult onInteractBy_1_16:???(net.minecraft.world.entity.player.Player entityhuman, InteractionHand enumhand)")
     public Object onInteractBy_1_16(Object entityHuman, Object enumHand) {
         HumanEntity humanEntity = (HumanEntity) WrapperConversion.toEntity(entityHuman);
         return onInteractBy(humanEntity, HumanHand.fromNMSEnumHand(humanEntity, enumHand)).getRawHandle();
@@ -179,7 +178,7 @@ public class EntityHook extends ClassHook<EntityHook> {
     }
 
     @HookMethodCondition("version >= 1.21.2")
-    @HookMethod("public boolean damageEntityWithWorld:hurtServer(net.minecraft.server.level.WorldServer world, net.minecraft.world.damagesource.DamageSource damagesource, float f)")
+    @HookMethod("public boolean damageEntityWithWorld:hurtServer(net.minecraft.server.level.ServerLevel world, net.minecraft.world.damagesource.DamageSource damagesource, float f)")
     public boolean onDamageEntity(Object world, Object damageSource, float damage) {
         try {
             if (checkController()) {
@@ -352,7 +351,7 @@ public class EntityHook extends ClassHook<EntityHook> {
     }
 
     @HookMethodCondition("version >= 1.14")
-    @HookMethod("public void move(net.minecraft.world.entity.EnumMoveType enummovetype, net.minecraft.world.phys.Vec3D vec3d)")
+    @HookMethod("public void move(net.minecraft.world.entity.MoverType enummovetype, net.minecraft.world.phys.Vec3 vec3d)")
     public void onMove_v3(Object enumMoveType, Object vec3d) {
         double dx = Vec3Handle.T.x.getDouble(vec3d);
         double dy = Vec3Handle.T.y.getDouble(vec3d);
@@ -361,7 +360,7 @@ public class EntityHook extends ClassHook<EntityHook> {
     }
 
     @HookMethodCondition("version >= 1.11 && version <= 1.13.2")
-    @HookMethod(value="public void move(net.minecraft.world.entity.EnumMoveType enummovetype, double d0, double d1, double d2)")
+    @HookMethod(value="public void move(net.minecraft.world.entity.MoverType enummovetype, double d0, double d1, double d2)")
     public void onMove_v2(Object enumMoveType, double dx, double dy, double dz) {
         try {
             if (checkController()) {
@@ -611,7 +610,7 @@ public class EntityHook extends ClassHook<EntityHook> {
     // calls getSaveID() - which will cause incorrect data to be saved. On Minecraft 1.13
     // and later, this is no longer needed, because it defers to onEntitySave() instead.
     @HookMethodCondition("version <= 1.12.2")
-    @HookMethod("public boolean saveEntityIfNotPassenger:d(NBTTagCompound nbttagcompound)")
+    @HookMethod("public boolean saveEntityIfNotPassenger:d(CompoundTag nbttagcompound)")
     public boolean saveEntity(Object tag) {
         try {
             Object handle = this.instance();

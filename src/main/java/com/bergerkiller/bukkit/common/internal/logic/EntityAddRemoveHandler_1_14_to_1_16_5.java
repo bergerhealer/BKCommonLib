@@ -63,7 +63,7 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
         // Does some important stuff I guess
         addRemoveHandler = Template.Class.create(AddRemoveHandlerLogic.class, Common.TEMPLATE_RESOLVER);
 
-        //Field 'entitiesById' in class net.minecraft.server.v1_15_R1.WorldServer is of type Int2ObjectLinkedOpenHashMap while we expect type Int2ObjectMap
+        //Field 'entitiesById' in class net.minecraft.server.v1_15_R1.ServerLevel is of type Int2ObjectLinkedOpenHashMap while we expect type Int2ObjectMap
         try {
             String fieldName = Resolver.resolveFieldName(ServerLevelHandle.T.getType(), "entitiesById");
             entitiesByIdField.init(MPLType.getDeclaredField(ServerLevelHandle.T.getType(), fieldName));
@@ -71,7 +71,7 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
                 throw new IllegalStateException("Field not assignable to IntHashmap");
             }
         } catch (Throwable t) {
-            Logging.LOGGER_REFLECTION.log(Level.WARNING, "Failed to initialize WorldServer entitiesById field: " + t.getMessage(), t);
+            Logging.LOGGER_REFLECTION.log(Level.WARNING, "Failed to initialize ServerLevel entitiesById field: " + t.getMessage(), t);
             entitiesByIdField.initUnavailable("entitiesById");
         }
 
@@ -83,7 +83,7 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
                 throw new IllegalStateException("Field not assignable to Map");
             }
         } catch (Throwable t) {
-            Logging.LOGGER_REFLECTION.log(Level.WARNING, "Failed to initialize WorldServer entitiesByUUID field: " + t.getMessage(), t);
+            Logging.LOGGER_REFLECTION.log(Level.WARNING, "Failed to initialize ServerLevel entitiesByUUID field: " + t.getMessage(), t);
             entitiesByUUIDField.initUnavailable("entitiesByUUID");
         }
 
@@ -92,13 +92,13 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
             this.entitiesToAddField = LogicUtil.unsafeCast(SafeField.create(ServerLevelHandle.T.getType(), fieldName, Queue.class));
         }
 
-        // Tuinity support: 'loadedEntities' field of WorldServer
+        // Tuinity support: 'loadedEntities' field of ServerLevel
         try {
             Class<?> entityListType = Class.forName("com.tuinity.tuinity.util.EntityList");
             if (SafeField.contains(ServerLevelHandle.T.getType(), "loadedEntities", entityListType)) {
                 ClassResolver resolver = new ClassResolver();
                 resolver.addImport("net.minecraft.world.entity.Entity");
-                resolver.setDeclaredClassName("net.minecraft.server.level.WorldServer");
+                resolver.setDeclaredClassName("net.minecraft.server.level.ServerLevel");
                 tuinitySwapEntityInWorldEntityListMethod.init(new MethodDeclaration(resolver,
                         "public void swap(Entity oldEntity, Entity newEntity) {\n" +
                         "    if (instance.loadedEntities.remove(oldEntity)) {\n" +
@@ -109,16 +109,16 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
             }
         } catch (ClassNotFoundException ignore) {}
 
-        // Tuinity support: 'entitiesForIteration' field of WorldServer
+        // Tuinity support: 'entitiesForIteration' field of ServerLevel
         try {
             Class<?> entitySetType = Class.forName("com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet");
             if (SafeField.contains(ServerLevelHandle.T.getType(), "entitiesForIteration", entitySetType)) {
                 ClassResolver resolver = new ClassResolver();
                 resolver.addImport("net.minecraft.world.entity.Entity");
-                resolver.setDeclaredClassName("net.minecraft.server.level.WorldServer");
+                resolver.setDeclaredClassName("net.minecraft.server.level.ServerLevel");
                 tuinitySwapEntityInWorldEntityIterationSetMethod.init(new MethodDeclaration(resolver,
                         "public void swap(Entity oldEntity, Entity newEntity) {\n" +
-                        "    #require net.minecraft.server.level.WorldServer final com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet<net.minecraft.world.entity.Entity> entitiesForIteration;\n" +
+                        "    #require net.minecraft.server.level.ServerLevel final com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet<net.minecraft.world.entity.Entity> entitiesForIteration;\n" +
                         "    com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet set = instance#entitiesForIteration;\n" +
                         "    if (set.remove(oldEntity)) {\n" +
                         "        set.add(newEntity);\n" +
@@ -477,15 +477,14 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
     }
 
     @Template.Optional
-    @Template.Import("net.minecraft.world.level.chunk.Chunk")
-    @Template.InstanceType("net.minecraft.server.level.WorldServer")
+    @Template.Import("net.minecraft.world.level.chunk.LevelChunk")
     public static abstract class AddRemoveHandlerLogic extends Template.Class<Template.Handle> {
 
         /*
          * <GET_CHUNK_TRY_HARD>
-         * public static org.bukkit.Chunk getChunkTryHard(net.minecraft.server.level.PlayerChunk playerChunk) {
-         *     #require net.minecraft.server.level.PlayerChunk private static final java.util.List<net.minecraft.world.level.chunk.status.ChunkStatus> CHUNK_STATUSES;
-         *     java.util.List chunk_statuses = PlayerChunk#CHUNK_STATUSES;
+         * public static org.bukkit.Chunk getChunkTryHard(net.minecraft.server.level.ChunkHolder playerChunk) {
+         *     #require net.minecraft.server.level.ChunkHolder private static final java.util.List<net.minecraft.world.level.chunk.status.ChunkStatus> CHUNK_STATUSES;
+         *     java.util.List chunk_statuses = ChunkHolder#CHUNK_STATUSES;
          *     for (int i = chunk_statuses.size() - 1; i >= 0; --i) {
          *         java.util.concurrent.CompletableFuture future;
          * #if version >= 1.14.1
@@ -498,7 +497,7 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
          *             if (either != null) {
          *                 java.util.Optional chunkOpt = either.left();
          *                 if (chunkOpt != null) {
-         *                     Chunk c = (Chunk) chunkOpt.get();
+         *                     LevelChunk c = (LevelChunk) chunkOpt.get();
          *                     return c.getBukkitChunk();
          *                 }
          *             }

@@ -50,7 +50,7 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
         {
             // Create WorldData instance by null-constructing it
             Object nmsWorldData;
-            Class<?> worldDataServerType = CommonUtil.getClass("net.minecraft.world.level.storage.WorldDataServer");
+            Class<?> worldDataServerType = CommonUtil.getClass("net.minecraft.world.level.storage.PrimaryLevelData");
             if (Common.evaluateMCVersion(">=", "1.16")) {
                 nmsWorldData = NullInstantiator.of(worldDataServerType).create();
             } else {
@@ -61,13 +61,13 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
         }
 
         // Pre-register certain classes that cause events to be fired when constructing
-        registerEntityTypes("AREA_EFFECT_CLOUD", "net.minecraft.world.entity.EntityAreaEffectCloud");
-        registerEntityTypes("ENDER_DRAGON", "net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon");
-        registerEntityTypes("FIREBALL", "net.minecraft.world.entity.projectile.hurtingprojectile.EntityLargeFireball");
-        registerEntityTypes("FISHING_BOBBER", "net.minecraft.world.entity.projectile.EntityFishingHook");
-        registerEntityTypes("LIGHTNING_BOLT", "net.minecraft.world.entity.EntityLightning");
-        registerEntityTypes("PLAYER", "net.minecraft.server.level.EntityPlayer");
-        registerEntityTypes("WITHER", "net.minecraft.world.entity.boss.wither.EntityWither"); // scoreboard things
+        registerEntityTypes("AREA_EFFECT_CLOUD", "net.minecraft.world.entity.AreaEffectCloud");
+        registerEntityTypes("ENDER_DRAGON", "net.minecraft.world.entity.boss.enderdragon.EnderDragon");
+        registerEntityTypes("FIREBALL", "net.minecraft.world.entity.projectile.hurtingprojectile.LargeFireball");
+        registerEntityTypes("FISHING_BOBBER", "net.minecraft.world.entity.projectile.FishingHook");
+        registerEntityTypes("LIGHTNING_BOLT", "net.minecraft.world.entity.LightningBolt");
+        registerEntityTypes("PLAYER", "net.minecraft.server.level.ServerPlayer");
+        registerEntityTypes("WITHER", "net.minecraft.world.entity.boss.wither.WitherBoss"); // scoreboard things
 
         // Go by all static fields in the EntityTypes class and decode the generic type information
         // of the fields to figure out what type is represented. This might fail if generics are stripped
@@ -110,7 +110,7 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
         try {
             java.lang.reflect.Field field = MPLType.getDeclaredField(EntityTypeHandle.T.getType(), realName);
             if ((field.getModifiers() & Modifier.STATIC) == 0) {
-                throw new IllegalStateException("EntityTypes field " + s + " is not static");
+                throw new IllegalStateException("EntityType field " + s + " is not static");
             }
 
             Object nmsEntityTypes;
@@ -124,7 +124,7 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
 
             Class<?> type = CommonUtil.getClass(nmsClassName);
             if (type == null) {
-                throw new IllegalStateException("EntityTypes type " + nmsClassName + " not found");
+                throw new IllegalStateException("EntityType type " + nmsClassName + " not found");
             }
 
             this._cache.put(nmsEntityTypes, type);
@@ -165,17 +165,18 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
     }
 
     @Template.Package("net.minecraft.server.level")
-    @Template.Import("net.minecraft.world.entity.EntityTypes")
-    @Template.Import("net.minecraft.world.level.storage.WorldDataServer")
+    @Template.Import("net.minecraft.world.entity.EntityType")
+    @Template.Import("net.minecraft.server.level.ServerLevel")
+    @Template.Import("net.minecraft.world.level.storage.PrimaryLevelData")
     @Template.Import("net.minecraft.world.entity.Entity")
-    @Template.Import("net.minecraft.world.level.World")
+    @Template.Import("net.minecraft.world.level.Level")
     @Template.Import("net.minecraft.core.registries.BuiltInRegistries")
-    @Template.Import("net.minecraft.resources.MinecraftKey")
+    @Template.Import("net.minecraft.resources.Identifier")
     public static abstract class Handler extends Template.Class<Template.Handle> {
 
         /*
          * <CLASS_FROM_ENTITYTYPES>
-         * public static Class<?> findClassFromEntityTypes((Object) EntityTypes entityTypes, (Object) World world) {
+         * public static Class<?> findClassFromEntityTypes((Object) EntityType entityTypes, (Object) Level world) {
          *     Object entity;
          *     try {
          * #if version >= 1.21.2
@@ -188,7 +189,7 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *     } catch (Throwable t) {
          *         // Try to find some descriptive name for this entity type
          *         // This could fail if the type is not registered
-         *         MinecraftKey name = (MinecraftKey) BuiltInRegistries.ENTITY_TYPE.getKey(entityTypes);
+         *         Identifier name = (Identifier) BuiltInRegistries.ENTITY_TYPE.getKey(entityTypes);
          *         if (name == null) {
          *             throw new IllegalStateException("Failed to find entity class of unregistered entity type (" +
          *                     entityTypes.getClass().getName() + ")", t);
@@ -196,7 +197,7 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *
          *         // Look the same entity type object up again by this same key
          *         // If this returns a different object, try with that instead
-         *         EntityTypes entityTypesAlter = (EntityTypes) BuiltInRegistries.ENTITY_TYPE.get(name);
+         *         EntityType entityTypesAlter = (EntityType) BuiltInRegistries.ENTITY_TYPE.get(name);
          *         if (entityTypes == entityTypesAlter || entityTypesAlter == null) {
          *             throw new IllegalStateException("Failed to construct entity of type " + name, t);
          *         }
@@ -228,11 +229,11 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
 
         /*
          * <INIT_WORLD>
-         * public static void initWorldServer((Object) WorldServer worldserver, (Object) WorldDataServer worldData) {
+         * public static void initWorldServer((Object) ServerLevel worldserver, (Object) PrimaryLevelData worldData) {
          *     String dummyWorldName = "zzdummyzz";
          * 
          * // Spigot World configuration
-         * #if fieldexists net.minecraft.world.level.World public final org.spigotmc.SpigotWorldConfig spigotConfig;
+         * #if fieldexists net.minecraft.world.level.Level public final org.spigotmc.SpigotWorldConfig spigotConfig;
          *     org.spigotmc.SpigotWorldConfig spigotConfig;
          * 
          *     // While loading set verbose to false, and later restore, to avoid logging a bunch of crap about this dummy world
@@ -243,7 +244,7 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *     boolean prevVerboseConfigOption = org.spigotmc.SpigotConfig.config.getBoolean(spigotConfigVerboseKey, true);
          *     org.spigotmc.SpigotConfig.config.set(spigotConfigVerboseKey, Boolean.FALSE);
          *     try {
-         *         #require net.minecraft.world.level.World public final org.spigotmc.SpigotWorldConfig spigotConfig;
+         *         #require net.minecraft.world.level.Level public final org.spigotmc.SpigotWorldConfig spigotConfig;
          *         spigotConfig = new org.spigotmc.SpigotWorldConfig(dummyWorldName);
          *         worldserver#spigotConfig = spigotConfig;
          *     } finally {
@@ -262,33 +263,33 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          * #endif
          * 
          * // Paper(Spigot) World configuration
-         * #if fieldexists net.minecraft.world.level.World private final io.papermc.paper.configuration.WorldConfiguration paperConfig;
-         *     #require net.minecraft.world.level.World private final io.papermc.paper.configuration.WorldConfiguration paperConfig;
-         *     #require io.papermc.paper.configuration.WorldConfiguration WorldConfiguration create_paper_wc:<init>(org.spigotmc.SpigotWorldConfig spigotWC, net.minecraft.resources.MinecraftKey worldKey);
+         * #if fieldexists net.minecraft.world.level.Level private final io.papermc.paper.configuration.WorldConfiguration paperConfig;
+         *     #require net.minecraft.world.level.Level private final io.papermc.paper.configuration.WorldConfiguration paperConfig;
+         *     #require io.papermc.paper.configuration.WorldConfiguration WorldConfiguration create_paper_wc:<init>(org.spigotmc.SpigotWorldConfig spigotWC, net.minecraft.resources.Identifier worldKey);
          *   #if version >= 1.21
-         *     net.minecraft.resources.MinecraftKey worldKey = net.minecraft.resources.MinecraftKey.parse(dummyWorldName);
+         *     net.minecraft.resources.Identifier worldKey = net.minecraft.resources.Identifier.parse(dummyWorldName);
          *   #else
-         *     net.minecraft.resources.MinecraftKey worldKey = new net.minecraft.resources.MinecraftKey(dummyWorldName);
+         *     net.minecraft.resources.Identifier worldKey = new net.minecraft.resources.Identifier(dummyWorldName);
          *   #endif
          *     io.papermc.paper.configuration.WorldConfiguration paperWorldConfig = #create_paper_wc(spigotConfig, worldKey);
          *     com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler.initConfigurationPartRecurse(paperWorldConfig);
          *
          *     worldserver#paperConfig = paperWorldConfig;
-         * #elseif fieldexists net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;
-         *     #require net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;
+         * #elseif fieldexists net.minecraft.world.level.Level public final com.destroystokyo.paper.PaperWorldConfig paperConfig;
+         *     #require net.minecraft.world.level.Level public final com.destroystokyo.paper.PaperWorldConfig paperConfig;
          *     com.destroystokyo.paper.PaperWorldConfig paperConfig = new com.destroystokyo.paper.PaperWorldConfig(dummyWorldName, spigotConfig);
          *     worldserver#paperConfig = paperConfig;
-         * #elseif fieldexists net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperSpigotConfig;
-         *     #require net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperSpigotConfig;
+         * #elseif fieldexists net.minecraft.world.level.Level public final com.destroystokyo.paper.PaperWorldConfig paperSpigotConfig;
+         *     #require net.minecraft.world.level.Level public final com.destroystokyo.paper.PaperWorldConfig paperSpigotConfig;
          *     com.destroystokyo.paper.PaperWorldConfig paperConfig = new com.destroystokyo.paper.PaperWorldConfig(dummyWorldName, spigotConfig);
          *     worldserver#paperSpigotConfig = paperConfig;
          * #endif
          * 
          * // Purpur World configuration
-         * #if fieldexists net.minecraft.world.level.World public final org.purpurmc.purpur.PurpurWorldConfig purpurConfig;
-         *     #require net.minecraft.world.level.World public final org.purpurmc.purpur.PurpurWorldConfig purpurConfig;
+         * #if fieldexists net.minecraft.world.level.Level public final org.purpurmc.purpur.PurpurWorldConfig purpurConfig;
+         *     #require net.minecraft.world.level.Level public final org.purpurmc.purpur.PurpurWorldConfig purpurConfig;
          *     org.purpurmc.purpur.PurpurWorldConfig purpurConfig;
-         *   #if exists org.purpurmc.purpur.PurpurWorldConfig public PurpurWorldConfig(net.minecraft.server.level.WorldServer level, String worldName, org.bukkit.World.Environment environment);
+         *   #if exists org.purpurmc.purpur.PurpurWorldConfig public PurpurWorldConfig(net.minecraft.server.level.ServerLevel level, String worldName, org.bukkit.World.Environment environment);
          *     purpurConfig = new org.purpurmc.purpur.PurpurWorldConfig(worldserver, dummyWorldName, org.bukkit.World$Environment.NORMAL);
          *   #elseif exists org.purpurmc.purpur.PurpurWorldConfig public PurpurWorldConfig(String worldName, org.bukkit.World.Environment environment);
          *     purpurConfig = new org.purpurmc.purpur.PurpurWorldConfig(dummyWorldName, org.bukkit.World$Environment.NORMAL);
@@ -301,48 +302,48 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          * #endif
          * 
          * #if version >= 1.17
-         *     // WorldDataMutable field
-         *     #require net.minecraft.world.level.World public final net.minecraft.world.level.storage.WorldDataMutable levelData;
+         *     // WritableLevelData field
+         *     #require net.minecraft.world.level.Level public final net.minecraft.world.level.storage.WritableLevelData levelData;
          *     worldserver#levelData = worldData;
          * 
-         *     // WorldDataServer field (on some servers, it uses the WorldDataMutable field instead)
-         *   #if exists net.minecraft.server.level.WorldServer public final net.minecraft.world.level.storage.WorldDataServer serverLevelData;
-         *     #require net.minecraft.server.level.WorldServer public final net.minecraft.world.level.storage.WorldDataServer serverLevelData;
+         *     // PrimaryLevelData field (on some servers, it uses the WritableLevelData field instead)
+         *   #if exists net.minecraft.server.level.ServerLevel public final net.minecraft.world.level.storage.PrimaryLevelData serverLevelData;
+         *     #require net.minecraft.server.level.ServerLevel public final net.minecraft.world.level.storage.PrimaryLevelData serverLevelData;
          *     worldserver#serverLevelData = worldData;
          *   #endif
          * #elseif version >= 1.16
-         *     // WorldDataMutable field
-         *     #require net.minecraft.world.level.World public final net.minecraft.world.level.storage.WorldDataMutable worldData;
+         *     // WritableLevelData field
+         *     #require net.minecraft.world.level.Level public final net.minecraft.world.level.storage.WritableLevelData worldData;
          *     worldserver#worldData = worldData;
          * 
-         *     // WorldDataServer field (on some servers, it uses the WorldDataMutable field instead)
-         *   #if exists net.minecraft.server.level.WorldServer public final net.minecraft.world.level.storage.WorldDataServer worldDataServer;
-         *     #require net.minecraft.server.level.WorldServer public final net.minecraft.world.level.storage.WorldDataServer worldDataServer;
+         *     // PrimaryLevelData field (on some servers, it uses the WritableLevelData field instead)
+         *   #if exists net.minecraft.server.level.ServerLevel public final net.minecraft.world.level.storage.PrimaryLevelData worldDataServer;
+         *     #require net.minecraft.server.level.ServerLevel public final net.minecraft.world.level.storage.PrimaryLevelData worldDataServer;
          *     worldserver#worldDataServer = worldData;
          *   #endif
          * #else
          *     // worldProvider field
          *     int envId = org.bukkit.World.Environment.NORMAL.getId();
-         *     worldserver.worldProvider = net.minecraft.world.level.dimension.DimensionManager.a(envId).getWorldProvider((World) worldserver);
+         *     worldserver.worldProvider = net.minecraft.world.level.dimension.DimensionType.a(envId).getWorldProvider((Level) worldserver);
          * 
          *     // worldData field
-         *     #require net.minecraft.world.level.World public final net.minecraft.world.level.storage.WorldData worldData;
+         *     #require net.minecraft.world.level.Level public final net.minecraft.world.level.storage.LevelData worldData;
          *     worldserver#worldData = worldData;
          * #endif
          * 
          *     // Random field
          * #if version >= 1.19
-         *     #require net.minecraft.world.level.World public final net.minecraft.util.RandomSource random;
+         *     #require net.minecraft.world.level.Level public final net.minecraft.util.RandomSource random;
          *     net.minecraft.util.RandomSource newRandom = net.minecraft.util.RandomSource.create();
          *     worldserver#random = newRandom;
          * #else
-         *     #require net.minecraft.world.level.World public final java.util.Random random;
+         *     #require net.minecraft.world.level.Level public final java.util.Random random;
          *     java.util.Random newRandom = new java.util.Random();
          *     worldserver#random = newRandom;
          * #endif
          * 
          *     // server field (for enabledFeatures() call on 1.19.3+)
-         *     #require net.minecraft.server.level.WorldServer private final net.minecraft.server.MinecraftServer server;
+         *     #require net.minecraft.server.level.ServerLevel private final net.minecraft.server.MinecraftServer server;
          *     worldserver#server = net.minecraft.server.MinecraftServer.getServer();
          * }
          */
@@ -353,10 +354,10 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          * <CREATE_ENTRY>
          * public static Object createEntry((Object) PlayerChunkMap playerChunkMap, (Object) Entity entity) {
          * #if version >= 1.18
-         *     EntityTypes entitytypes = entity.getType();
+         *     EntityType entitytypes = entity.getType();
          *     int i = entitytypes.clientTrackingRange() * 16;
          * #else
-         *     EntityTypes entitytypes = entity.getEntityType();
+         *     EntityType entitytypes = entity.getEntityType();
          *     int i = entitytypes.getChunkRange() * 16;
          * #endif
          *

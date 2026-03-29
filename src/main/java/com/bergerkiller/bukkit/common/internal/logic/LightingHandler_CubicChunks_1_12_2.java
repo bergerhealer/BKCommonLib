@@ -64,14 +64,14 @@ class LightingHandler_CubicChunks_1_12_2 implements LightingHandler {
     @Template.Import("io.github.opencubicchunks.cubicchunks.api.world.ICube")
     @Template.Import("io.github.opencubicchunks.cubicchunks.api.world.IColumn")
     @Template.Import("io.github.opencubicchunks.cubicchunks.core.world.cube.Cube")
-    @Template.Import("net.minecraft.world.level.chunk.NibbleArray")
-    @Template.Import("net.minecraft.world.level.chunk.ChunkSection")
-    @Template.InstanceType("net.minecraft.world.level.chunk.Chunk")
+    @Template.Import("net.minecraft.world.level.chunk.DataLayer")
+    @Template.Import("net.minecraft.world.level.chunk.LevelChunkSection")
+    @Template.InstanceType("net.minecraft.world.level.chunk.LevelChunk")
     public static abstract class LightingLogicHandle extends Template.Class<Template.Handle> {
 
         /*
          * <IS_SUPPORTED>
-         * public static boolean isSupported(net.minecraft.server.level.WorldServer world) {
+         * public static boolean isSupported(net.minecraft.server.level.ServerLevel world) {
          *     return world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld();
          * }
          */
@@ -82,9 +82,9 @@ class LightingHandler_CubicChunks_1_12_2 implements LightingHandler {
          * <GET_SECTION_BLOCK_LIGHT>
          * public static byte[] getSectionBlockLight(IColumn chunk, int cy) {
          *     ICube cube = chunk.getCube(cy);
-         *     ChunkSection section = cube.getStorage();
+         *     LevelChunkSection section = cube.getStorage();
          *     if (section != null) {
-         *         NibbleArray array = section.getEmittedLightArray();
+         *         DataLayer array = section.getEmittedLightArray();
          *         if (array != null) {
          * #if version >= 1.9
          *             return (byte[]) array.asBytes().clone();
@@ -103,9 +103,9 @@ class LightingHandler_CubicChunks_1_12_2 implements LightingHandler {
          * <GET_SECTION_SKY_LIGHT>
          * public static byte[] getSectionSkyLight(IColumn chunk, int cy) {
          *     ICube cube = chunk.getCube(cy);
-         *     ChunkSection section = cube.getStorage();
+         *     LevelChunkSection section = cube.getStorage();
          *     if (section != null) {
-         *         NibbleArray array = section.getSkyLightArray();
+         *         DataLayer array = section.getSkyLightArray();
          *         if (array != null) {
          * #if version >= 1.9
          *             return (byte[]) array.asBytes().clone();
@@ -124,9 +124,9 @@ class LightingHandler_CubicChunks_1_12_2 implements LightingHandler {
          * <SET_SECTION_BLOCK_LIGHT>
          * public static void setSectionBlockLight(IColumn chunk, int cy, byte[] data) {
          *     ICube cube = chunk.getCube(cy);
-         *     ChunkSection section = cube.getStorage();
+         *     LevelChunkSection section = cube.getStorage();
          *     if (section != null) {
-         *         section.a(new NibbleArray(data));
+         *         section.a(new DataLayer(data));
          *         ((Cube) cube).markDirty();
          *     }
          * }
@@ -138,9 +138,9 @@ class LightingHandler_CubicChunks_1_12_2 implements LightingHandler {
          * <SET_SECTION_SKY_LIGHT>
          * public static void setSectionSkyLight(IColumn chunk, int cy, byte[] data) {
          *     ICube cube = chunk.getCube(cy);
-         *     ChunkSection section = cube.getStorage();
+         *     LevelChunkSection section = cube.getStorage();
          *     if (section != null) {
-         *         section.b(new NibbleArray(data));
+         *         section.b(new DataLayer(data));
          *         ((Cube) cube).markDirty();
          *     }
          * }

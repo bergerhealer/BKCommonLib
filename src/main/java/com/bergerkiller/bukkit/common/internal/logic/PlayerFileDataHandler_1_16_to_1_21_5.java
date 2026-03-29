@@ -37,7 +37,7 @@ class PlayerFileDataHandler_1_16_to_1_21_5 extends PlayerFileDataHandler {
 
     public PlayerFileDataHandler_1_16_to_1_21_5() {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClassName("net.minecraft.server.level.WorldServer");
+        resolver.setDeclaredClassName("net.minecraft.server.level.ServerLevel");
         resolver.setVariable("version", Common.MC_VERSION);
         if (Common.IS_PAPERSPIGOT_SERVER) {
             resolver.setVariable("paper", "true");
@@ -48,7 +48,7 @@ class PlayerFileDataHandler_1_16_to_1_21_5 extends PlayerFileDataHandler {
                     "public java.io.File getPlayerDir() {\n" +
                     "#if version > 1.21.4 && paper\n" +
                     "    return new java.io.File(instance.levelStorageAccess.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
-                    "#elseif version == 1.21.4 && paper && exists net.minecraft.server.level.WorldServer public final net.minecraft.world.level.storage.Convertable.ConversionSession levelStorageAccess;\n" +
+                    "#elseif version == 1.21.4 && paper && exists net.minecraft.server.level.ServerLevel public final net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess levelStorageAccess;\n" +
                     "    return new java.io.File(instance.levelStorageAccess.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
                     "#elseif version >= 1.18\n" +
                     "    return new java.io.File(instance.convertable.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
@@ -59,7 +59,7 @@ class PlayerFileDataHandler_1_16_to_1_21_5 extends PlayerFileDataHandler {
             getPlayerFolderOfWorld.init(getPlayerFolderOfWorldMethod);  
         }
         String fieldName = CommonBootstrap.evaluateMCVersion(">=", "1.17") ? "playerIo" : "playerFileData";
-        Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.WorldNBTStorage");
+        Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.PlayerDataStorage");
         String realFieldName = Resolver.resolveFieldName(PlayerListHandle.T.getType(), fieldName);
         playerListFileDataField = LogicUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), realFieldName, playerFileDataType).getFastField());
     }
@@ -142,7 +142,7 @@ class PlayerFileDataHandler_1_16_to_1_21_5 extends PlayerFileDataHandler {
         return hook;
     }
 
-    // hooks WorldNBTStorage
+    // hooks PlayerDataStorage
     @ClassHook.HookPackage("net.minecraft.server")
     @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
     protected static class PlayerFileDataHook extends ClassHook<PlayerFileDataHook> implements PlayerFileDataHandler.Hook {
@@ -151,7 +151,7 @@ class PlayerFileDataHandler_1_16_to_1_21_5 extends PlayerFileDataHandler {
         public PlayerDataController controller = null;
 
         @HookMethodCondition("version >= 1.20.5")
-        @HookMethod("public java.util.Optional<net.minecraft.nbt.NBTTagCompound> load(String name, String uuid)")
+        @HookMethod("public java.util.Optional<net.minecraft.nbt.CompoundTag> load(String name, String uuid)")
         public java.util.Optional<Object> loadOfflineOpt(String name, String uuid) {
             if (this.controller != null) {
                 CommonTagCompound compound = null;
@@ -167,7 +167,7 @@ class PlayerFileDataHandler_1_16_to_1_21_5 extends PlayerFileDataHandler {
         }
 
         @HookMethodCondition("version >= 1.20.5")
-        @HookMethod("public abstract java.util.Optional<net.minecraft.nbt.NBTTagCompound> load(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
+        @HookMethod("public abstract java.util.Optional<net.minecraft.nbt.CompoundTag> load(net.minecraft.world.entity.player.Player paramEntityHuman)")
         public java.util.Optional<Object> loadOpt(Object entityHuman) {
             if (this.controller != null) {
                 Player player = LogicUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);
@@ -186,12 +186,12 @@ class PlayerFileDataHandler_1_16_to_1_21_5 extends PlayerFileDataHandler {
         }
 
         @HookMethodCondition("version < 1.20.5")
-        @HookMethod("public abstract net.minecraft.nbt.NBTTagCompound load(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
+        @HookMethod("public abstract net.minecraft.nbt.CompoundTag load(net.minecraft.world.entity.player.Player paramEntityHuman)")
         public Object load(Object entityHuman) {
             return this.loadOpt(entityHuman).orElse(null);
         }
 
-        @HookMethod("public abstract void save(net.minecraft.world.entity.player.EntityHuman paramEntityHuman)")
+        @HookMethod("public abstract void save(net.minecraft.world.entity.player.Player paramEntityHuman)")
         public void save(Object entityHuman) {
             if (this.controller != null) {
                 Player player = LogicUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);

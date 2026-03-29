@@ -58,10 +58,10 @@ public class NullPacketDataSerializerInit {
             // Implement 1.20.5 RegistryFriendlyByteBuf if it exists
             Class<?> dataSerializerType = Resolver.loadClass("net.minecraft.network.RegistryFriendlyByteBuf", false);
             if (dataSerializerType == null) {
-                dataSerializerType = Resolver.loadClass("net.minecraft.network.PacketDataSerializer", false);
+                dataSerializerType = Resolver.loadClass("net.minecraft.network.FriendlyByteBuf", false);
             }
             if (dataSerializerType == null) {
-                throw new IllegalStateException("PacketDataSerializer class not found in server");
+                throw new IllegalStateException("FriendlyByteBuf class not found in server");
             }
 
             final ExtendedClassWriter<Object> cw = ExtendedClassWriter.builder(dataSerializerType).setExactName(CLASS_NAME).build();
@@ -77,12 +77,12 @@ public class NullPacketDataSerializerInit {
             // On 1.20.5+ it also may have a method returning the custom registry, where we return the server one
             final Class<?> customRegistryType;
             if (CommonBootstrap.evaluateMCVersion(">=", "1.20.5")) {
-                customRegistryType = CommonUtil.getClass("net.minecraft.core.IRegistryCustom");
+                customRegistryType = CommonUtil.getClass("net.minecraft.core.RegistryAccess");
             } else {
                 customRegistryType = null;
             }
 
-            // Override all non-final non-private member methods of PacketDataSerializer
+            // Override all non-final non-private member methods of FriendlyByteBuf
             ReflectionUtil.getAllMethods(dataSerializerType)
                 .filter(m -> {
                     int modifiers = m.getModifiers();

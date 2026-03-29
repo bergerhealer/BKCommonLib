@@ -117,16 +117,16 @@ public class AdvancementDataPlayerHook extends ClassHook<AdvancementDataPlayerHo
             // Paper made a patch to store this data in the AdvancementDataPlayer class instead
             // Detect presence of this patch and if it exists, don't register these triggers
             try {
-                CommonUtil.getClass("net.minecraft.server.AdvancementDataPlayer").getDeclaredField("criterionData");
+                CommonUtil.getClass("net.minecraft.server.PlayerAdvancements").getDeclaredField("criterionData");
                 return; // Present. Don't bother.
             } catch (Throwable t) { /* ignore */ }
 
             // On modern versions all 'critereons' use a main abstract class to track per-player progress in
             if (CommonBootstrap.evaluateMCVersion(">=", "1.15")) {
                 if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
-                    registerCritereonField("CriterionTriggerAbstract", "players");
+                    registerCritereonField("SimpleCriterionTrigger", "players");
                 } else {
-                    registerCritereonField("CriterionTriggerAbstract", "a");
+                    registerCritereonField("SimpleCriterionTrigger", "a");
                 }
                 return;
             }
@@ -134,42 +134,42 @@ public class AdvancementDataPlayerHook extends ClassHook<AdvancementDataPlayerHo
             // On this old version someone (???) did something horrible involving a map stored in each individual class
             // Such a huge pain in the ass!
             // These are OG 1.12 advancement criterion triggers
-            registerCritereonField("CriterionTriggerBredAnimals", "b");
-            registerCritereonField("CriterionTriggerBrewedPotion", "b");
-            registerCritereonField("CriterionTriggerChangedDimension", "b");
-            registerCritereonField("CriterionTriggerConstructBeacon", "b");
-            registerCritereonField("CriterionTriggerConsumeItem", "b");
-            registerCritereonField("CriterionTriggerCuredZombieVillager", "b");
-            registerCritereonField("CriterionTriggerEffectsChanged", "b");
-            registerCritereonField("CriterionTriggerEnchantedItem", "b");
-            registerCritereonField("CriterionTriggerEnterBlock", "b");
-            registerCritereonField("CriterionTriggerEntityHurtPlayer", "b");
-            registerCritereonField("CriterionTriggerInventoryChanged", "b");
-            registerCritereonField("CriterionTriggerItemDurabilityChanged", "b");
-            registerCritereonField("CriterionTriggerKilled", "a");
-            registerCritereonField("CriterionTriggerLevitation", "b");
+            registerCritereonField("BredAnimalsTrigger", "b");
+            registerCritereonField("BrewedPotionTrigger", "b");
+            registerCritereonField("ChangeDimensionTrigger", "b");
+            registerCritereonField("ConstructBeaconTrigger", "b");
+            registerCritereonField("ConsumeItemTrigger", "b");
+            registerCritereonField("CuredZombieVillagerTrigger", "b");
+            registerCritereonField("EffectsChangedTrigger", "b");
+            registerCritereonField("EnchantedItemTrigger", "b");
+            registerCritereonField("EnterBlockTrigger", "b");
+            registerCritereonField("EntityHurtPlayerTrigger", "b");
+            registerCritereonField("InventoryChangeTrigger", "b");
+            registerCritereonField("ItemDurabilityTrigger", "b");
+            registerCritereonField("KilledTrigger", "a");
+            registerCritereonField("LevitationTrigger", "b");
             registerCritereonField("CriterionTriggerLocation", "b");
             registerCritereonField("CriterionTriggerNetherTravel", "b");
             registerCritereonField("CriterionTriggerPlacedBlock", "b");
-            registerCritereonField("CriterionTriggerPlayerHurtEntity", "b");
-            registerCritereonField("CriterionTriggerRecipeUnlocked", "b");
-            registerCritereonField("CriterionTriggerSummonedEntity", "b");
-            registerCritereonField("CriterionTriggerTamedAnimal", "b");
+            registerCritereonField("PlayerHurtEntityTrigger", "b");
+            registerCritereonField("RecipeUnlockedTrigger", "b");
+            registerCritereonField("SummonedEntityTrigger", "b");
+            registerCritereonField("TameAnimalTrigger", "b");
             registerCritereonField("CriterionTriggerTick", "b");
-            registerCritereonField("CriterionTriggerUsedEnderEye", "b");
-            registerCritereonField("CriterionTriggerUsedTotem", "b");
-            registerCritereonField("CriterionTriggerVillagerTrade", "b");
+            registerCritereonField("UsedEnderEyeTrigger", "b");
+            registerCritereonField("UsedTotemTrigger", "b");
+            registerCritereonField("TradeTrigger", "b");
 
             // 1.13 added ones
             if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
-                registerCritereonField("CriterionTriggerChanneledLightning", "b");
-                registerCritereonField("CriterionTriggerFilledBucket", "b");
-                registerCritereonField("CriterionTriggerFishingRodHooked", "b");
+                registerCritereonField("ChanneledLightningTrigger", "b");
+                registerCritereonField("FilledBucketTrigger", "b");
+                registerCritereonField("FishingRodHookedTrigger", "b");
             }
 
             // 1.14 added ones
             if (CommonBootstrap.evaluateMCVersion(">=", "1.14")) {
-                registerCritereonField("CriterionTriggerShotCrossbow", "b");
+                registerCritereonField("ShotCrossbowTrigger", "b");
                 registerCritereonField("CriterionTriggerKilledByCrossbow", "b");
             }
         }
@@ -200,7 +200,7 @@ public class AdvancementDataPlayerHook extends ClassHook<AdvancementDataPlayerHo
             Class<?> valueClassType = CommonUtil.getClass(fullCriterionClassName + "$a");
             final List<BiConsumer<Object, Object>> criterionPlayerDataModifiers;
             if (valueClassType != null) {
-                final Class<?> adpType = CommonUtil.getClass("net.minecraft.server.AdvancementDataPlayer");
+                final Class<?> adpType = CommonUtil.getClass("net.minecraft.server.PlayerAdvancements");
                 criterionPlayerDataModifiers = Stream.of(valueClassType.getDeclaredFields())
                         .filter(f -> !Modifier.isStatic(f.getModifiers()))
                         .filter(f -> f.getType() == adpType)
@@ -265,27 +265,27 @@ public class AdvancementDataPlayerHook extends ClassHook<AdvancementDataPlayerHo
     }
 
     @Template.Optional
-    @Template.InstanceType("net.minecraft.server.AdvancementDataPlayer")
-    @Template.Import("net.minecraft.server.level.EntityPlayer")
+    @Template.InstanceType("net.minecraft.server.PlayerAdvancements")
+    @Template.Import("net.minecraft.server.level.ServerPlayer")
     /*
      * <PLAYER_ADVANCEMENTS_FIELD>
      * #select version >=
-     * #case 1.17:    private final net.minecraft.server.AdvancementDataPlayer advancements;
-     * #case 1.14:    private final net.minecraft.server.AdvancementDataPlayer advancements:advancementDataPlayer;
-     * #case 1.13.1:  private final net.minecraft.server.AdvancementDataPlayer advancements:cf;
-     * #case 1.13:    private final net.minecraft.server.AdvancementDataPlayer advancements:cg;
-     * #case else:    private final net.minecraft.server.AdvancementDataPlayer advancements:bY;
+     * #case 1.17:    private final net.minecraft.server.PlayerAdvancements advancements;
+     * #case 1.14:    private final net.minecraft.server.PlayerAdvancements advancements:advancementDataPlayer;
+     * #case 1.13.1:  private final net.minecraft.server.PlayerAdvancements advancements:cf;
+     * #case 1.13:    private final net.minecraft.server.PlayerAdvancements advancements:cg;
+     * #case else:    private final net.minecraft.server.PlayerAdvancements advancements:bY;
      * #endselect
      */
-    @Template.Require(declaring="net.minecraft.server.level.EntityPlayer", value="%PLAYER_ADVANCEMENTS_FIELD%")
+    @Template.Require(declaring="net.minecraft.server.level.ServerPlayer", value="%PLAYER_ADVANCEMENTS_FIELD%")
     public static abstract class HandlerLogic extends Template.Class<Template.Handle> {
 
-        @Template.Generated("public static Object getAdvancements(EntityPlayer nmsEntityPlayer) {\n" +
+        @Template.Generated("public static Object getAdvancements(ServerPlayer nmsEntityPlayer) {\n" +
                             "    return nmsEntityPlayer#advancements;\n" +
                             "}")
         public abstract Object getAdvancements(Object nmsEntityPlayer);
 
-        @Template.Generated("public static void setAdvancements(EntityPlayer nmsEntityPlayer, AdvancementDataPlayer newAdvancements) {\n" +
+        @Template.Generated("public static void setAdvancements(ServerPlayer nmsEntityPlayer, PlayerAdvancements newAdvancements) {\n" +
                             "    nmsEntityPlayer#advancements = newAdvancements;\n" +
                             "}")
         public abstract void setAdvancements(Object nmsEntityPlayer, Object newAdvancements);
@@ -296,9 +296,9 @@ public class AdvancementDataPlayerHook extends ClassHook<AdvancementDataPlayerHo
          * #if version >= 1.20.3
          *     return net.minecraft.core.registries.BuiltInRegistries.TRIGGER_TYPES;
          * #elseif version >= 1.18
-         *     return net.minecraft.advancements.CriterionTriggers.all();
+         *     return net.minecraft.advancements.CriteriaTriggers.all();
          * #else
-         *     return net.minecraft.advancements.CriterionTriggers.a();
+         *     return net.minecraft.advancements.CriteriaTriggers.a();
          * #endif
          * }
          */

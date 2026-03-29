@@ -172,68 +172,66 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
     }
 
     @Template.Optional
-    @Template.Import("net.minecraft.world.level.ChunkCoordIntPair")
-    @Template.Import("net.minecraft.server.level.PlayerChunkMap")
-    @Template.Import("net.minecraft.server.level.ChunkProviderServer")
-    @Template.Import("net.minecraft.server.level.WorldServer")
-    @Template.Import("net.minecraft.world.level.chunk.storage.IChunkLoader")
+    @Template.Import("net.minecraft.world.level.ChunkPos")
+    @Template.Import("net.minecraft.server.level.ChunkMap")
+    @Template.Import("net.minecraft.server.level.ServerChunkCache")
+    @Template.Import("net.minecraft.world.level.chunk.storage.ChunkStorage")
     @Template.Import("net.minecraft.world.level.chunk.storage.RegionFile")
-    @Template.Import("net.minecraft.world.level.chunk.storage.RegionFileSection")
+    @Template.Import("net.minecraft.world.level.chunk.storage.SectionStorage")
     @Template.Import("net.minecraft.world.level.chunk.storage.SimpleRegionStorage")
-    @Template.Import("net.minecraft.world.entity.ai.village.poi.VillagePlace")
-    @Template.Import("net.minecraft.world.entity.ai.village.poi.VillagePlaceSection")
+    @Template.Import("net.minecraft.world.entity.ai.village.poi.PoiManager")
     @Template.Import("it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap")
     @Template.Import("it.unimi.dsi.fastutil.longs.Long2ObjectMap")
     @Template.Import("com.bergerkiller.bukkit.common.bases.IntVector3")
     @Template.Import("it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap")
-    @Template.InstanceType("net.minecraft.world.level.chunk.storage.RegionFileCache")
+    @Template.InstanceType("net.minecraft.world.level.chunk.storage.RegionFileStorage")
     public static abstract class RegionHandlerImpl extends Template.Class<Template.Handle> {
 
         /*
          * <FIND_REGION_FILE_CACHE>
-         * public static RegionFileCache findRegionFileCache(PlayerChunkMap pcm) {
-         * #if assignable RegionFileCache PlayerChunkMap
+         * public static RegionFileStorage findRegionFileCache(ChunkMap pcm) {
+         * #if assignable RegionFileStorage ChunkMap
          *     // On 1.14 and PaperMC this can more trivially be accessed
-         *     return (RegionFileCache) pcm;
+         *     return (RegionFileStorage) pcm;
          * #elseif version >= 1.21.11
          *     SimpleRegionStorage srs = (SimpleRegionStorage) pcm;
-         *   #if exists net.minecraft.world.level.chunk.storage.SimpleRegionStorage private final RegionFileCache storage;
-         *     #require net.minecraft.world.level.chunk.storage.SimpleRegionStorage private final RegionFileCache storage;
+         *   #if exists net.minecraft.world.level.chunk.storage.SimpleRegionStorage private final RegionFileStorage storage;
+         *     #require net.minecraft.world.level.chunk.storage.SimpleRegionStorage private final RegionFileStorage storage;
          *     return srs#storage;
          *   #else
          *     #require net.minecraft.world.level.chunk.storage.SimpleRegionStorage private final net.minecraft.world.level.chunk.storage.IOWorker worker;
          *     net.minecraft.world.level.chunk.storage.IOWorker ioworker = srs#worker;
          *
-         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final net.minecraft.world.level.chunk.storage.RegionFileCache storage;
+         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final net.minecraft.world.level.chunk.storage.RegionFileStorage storage;
          *     return ioworker#storage;
          *   #endif
          * #else
-         *   #if exists net.minecraft.world.level.chunk.storage.IChunkLoader private final RegionFileCache storage;
+         *   #if exists net.minecraft.world.level.chunk.storage.ChunkStorage private final RegionFileStorage storage;
          *     // Paper 1.21 moved it back to a field
-         *     #require net.minecraft.world.level.chunk.storage.IChunkLoader private final RegionFileCache storage;
-         *     IChunkLoader icl = (IChunkLoader) pcm;
+         *     #require net.minecraft.world.level.chunk.storage.ChunkStorage private final RegionFileStorage storage;
+         *     ChunkStorage icl = (ChunkStorage) pcm;
          *     return icl#storage;
-         *   #elseif exists net.minecraft.world.level.chunk.storage.IChunkLoader protected final RegionFileCache regionFileCache;
+         *   #elseif exists net.minecraft.world.level.chunk.storage.ChunkStorage protected final RegionFileStorage regionFileCache;
          *     // Paperspigot compatible code
-         *     #require net.minecraft.world.level.chunk.storage.IChunkLoader protected final RegionFileCache regionFileCache;
-         *     IChunkLoader icl = (IChunkLoader) pcm;
+         *     #require net.minecraft.world.level.chunk.storage.ChunkStorage protected final RegionFileStorage regionFileCache;
+         *     ChunkStorage icl = (ChunkStorage) pcm;
          *     return icl#regionFileCache;
          *   #else
-         *     // Access RegionFileCache inside IOWorker
-         *     IChunkLoader icl = (IChunkLoader) pcm;
+         *     // Access RegionFileStorage inside IOWorker
+         *     ChunkStorage icl = (ChunkStorage) pcm;
          *     #if version >= 1.17
-         *       #require net.minecraft.world.level.chunk.storage.IChunkLoader private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:worker;
+         *       #require net.minecraft.world.level.chunk.storage.ChunkStorage private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:worker;
          *     #else
-         *       #require net.minecraft.world.level.chunk.storage.IChunkLoader private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:a;
+         *       #require net.minecraft.world.level.chunk.storage.ChunkStorage private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:a;
          *     #endif
          *     IOWorker ioworker = icl#ioworker;
          * 
          *     #if version >= 1.17
-         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:storage;
+         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileStorage cache:storage;
          *     #elseif version >= 1.16
-         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:d;
+         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileStorage cache:d;
          *     #else
-         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:e;
+         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileStorage cache:e;
          *     #endif
          *     return ioworker#cache;
          *   #endif
@@ -245,44 +243,44 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
 
         /*
          * <FIND_POI_FILE_CACHE>
-         * public static RegionFileCache findPOIFileCache(ChunkProviderServer cps) {
+         * public static RegionFileStorage findPOIFileCache(ServerChunkCache cps) {
          * #if version >= 1.18
-         *     VillagePlace poi = cps.getPoiManager();
+         *     PoiManager poi = cps.getPoiManager();
          * #elseif version >= 1.14.4
-         *     VillagePlace poi = cps.j();
+         *     PoiManager poi = cps.j();
          * #else
-         *     VillagePlace poi = cps.i();
+         *     PoiManager poi = cps.i();
          * #endif
-         *     RegionFileSection rfs = (RegionFileSection) poi;
+         *     SectionStorage rfs = (SectionStorage) poi;
          *
-         * #if exists net.minecraft.world.level.chunk.storage.RegionFileSection public net.minecraft.world.level.chunk.storage.RegionFileCache moonrise$getRegionStorage();
+         * #if exists net.minecraft.world.level.chunk.storage.SectionStorage public net.minecraft.world.level.chunk.storage.RegionFileStorage moonrise$getRegionStorage();
          *     // New paper chunk system mixin getter method
          *     return rfs.moonrise$getRegionStorage();
-         * #elseif assignable RegionFileCache RegionFileSection
+         * #elseif assignable RegionFileStorage SectionStorage
          *     // On 1.14 and PaperMC this can more trivially be accessed
-         *     return (RegionFileCache) rfs;
+         *     return (RegionFileStorage) rfs;
          * #else
          *   #if version >= 1.20.5
-         *     #require RegionFileSection private final SimpleRegionStorage simpleRegionStorage;
+         *     #require SectionStorage private final SimpleRegionStorage simpleRegionStorage;
          *     SimpleRegionStorage srs = rfs#simpleRegionStorage;
          *     #require SimpleRegionStorage private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:worker;
          *     IOWorker ioworker = srs#ioworker;
          *   #else
-         *     // Access RegionFileCache inside IOWorker
+         *     // Access RegionFileStorage inside IOWorker
          *     #if version >= 1.17
-         *         #require RegionFileSection private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:worker;
+         *         #require SectionStorage private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:worker;
          *     #else
-         *         #require RegionFileSection private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:b;
+         *         #require SectionStorage private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:b;
          *     #endif
          *     IOWorker ioworker = rfs#ioworker;
          *   #endif
          *
          *   #if version >= 1.17
-         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:storage;
+         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileStorage cache:storage;
          *   #elseif version >= 1.16
-         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:d;
+         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileStorage cache:d;
          *   #else
-         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:e;
+         *     #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileStorage cache:e;
          *   #endif
          *     return ioworker#cache;
          * #endif
@@ -293,17 +291,17 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
 
         /*
          * <FIND_REGION_FILE_CACHE_STORAGE>
-         * public static Long2ObjectLinkedOpenHashMap findRegionFileCache(RegionFileCache rfc) {
-         * #if exists net.minecraft.world.level.chunk.storage.RegionFileCache public final Long2ObjectLinkedOpenHashMap<org.purpurmc.purpur.region.AbstractRegionFile> regionCache;
+         * public static Long2ObjectLinkedOpenHashMap findRegionFileCache(RegionFileStorage rfc) {
+         * #if exists net.minecraft.world.level.chunk.storage.RegionFileStorage public final Long2ObjectLinkedOpenHashMap<org.purpurmc.purpur.region.AbstractRegionFile> regionCache;
          *     // Used on Leaf server (Purpur) (1.20)
-         *     #require net.minecraft.world.level.chunk.storage.RegionFileCache public final Long2ObjectLinkedOpenHashMap<org.purpurmc.purpur.region.AbstractRegionFile> regionCache;
-         * #elseif exists net.minecraft.world.level.chunk.storage.RegionFileCache public final Long2ObjectLinkedOpenHashMap<org.stupidcraft.linearpaper.region.IRegionFile> regionCache;
+         *     #require net.minecraft.world.level.chunk.storage.RegionFileStorage public final Long2ObjectLinkedOpenHashMap<org.purpurmc.purpur.region.AbstractRegionFile> regionCache;
+         * #elseif exists net.minecraft.world.level.chunk.storage.RegionFileStorage public final Long2ObjectLinkedOpenHashMap<org.stupidcraft.linearpaper.region.IRegionFile> regionCache;
          *     // Used on Leaf server (1.21)
-         *     #require net.minecraft.world.level.chunk.storage.RegionFileCache public final Long2ObjectLinkedOpenHashMap<org.stupidcraft.linearpaper.region.IRegionFile> regionCache;
+         *     #require net.minecraft.world.level.chunk.storage.RegionFileStorage public final Long2ObjectLinkedOpenHashMap<org.stupidcraft.linearpaper.region.IRegionFile> regionCache;
          * #elseif version >= 1.17
-         *     #require net.minecraft.world.level.chunk.storage.RegionFileCache private Long2ObjectLinkedOpenHashMap<RegionFile> regionCache;
+         *     #require net.minecraft.world.level.chunk.storage.RegionFileStorage private Long2ObjectLinkedOpenHashMap<RegionFile> regionCache;
          * #else
-         *     #require net.minecraft.world.level.chunk.storage.RegionFileCache private Long2ObjectLinkedOpenHashMap<RegionFile> regionCache:cache;
+         *     #require net.minecraft.world.level.chunk.storage.RegionFileStorage private Long2ObjectLinkedOpenHashMap<RegionFile> regionCache:cache;
          * #endif
          *     return rfc#regionCache;
          * }
@@ -331,8 +329,8 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
          *     iter = coordSet.iterator();
          *     while (iter.hasNext()) {
          *         long coord = iter.nextLong();
-         *         int coord_x = ChunkCoordIntPair.getX(coord);
-         *         int coord_z = ChunkCoordIntPair.getZ(coord);
+         *         int coord_x = ChunkPos.getX(coord);
+         *         int coord_z = ChunkPos.getZ(coord);
          *         result.add(new com.bergerkiller.bukkit.common.bases.IntVector3(coord_x, 0, coord_z));
          *     }
          *     return result;
@@ -345,9 +343,9 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
          * <FIND_REGION_FILE_AT>
          * public static RegionFile findRegionFileAt(Long2ObjectLinkedOpenHashMap cache, int rx, int rz) {
          * #if version >= 1.18
-         *     long coord = ChunkCoordIntPair.asLong(rx, rz);
+         *     long coord = ChunkPos.asLong(rx, rz);
          * #else
-         *     long coord = ChunkCoordIntPair.pair(rx, rz);
+         *     long coord = ChunkPos.pair(rx, rz);
          * #endif
          *     return (RegionFile) cache.get(coord);
          * }

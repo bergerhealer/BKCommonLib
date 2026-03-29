@@ -54,14 +54,14 @@ class LightingHandler_1_14 implements LightingHandler {
             throw new IllegalStateException("LightEngineLayer class not found");
         }
 
-        Class<?> lightEngineStorageType = CommonUtil.getClass("net.minecraft.world.level.lighting.LightEngineStorage");
+        Class<?> lightEngineStorageType = CommonUtil.getClass("net.minecraft.world.level.lighting.LayerLightSectionStorage");
         if (lightEngineStorageType == null) {
-            throw new IllegalStateException("LightEngineStorage class not found");
+            throw new IllegalStateException("LayerLightSectionStorage class not found");
         }
 
-        Class<?> lightEngineStorageArrayType = CommonUtil.getClass("net.minecraft.world.level.lighting.LightEngineStorageArray");
+        Class<?> lightEngineStorageArrayType = CommonUtil.getClass("net.minecraft.world.level.lighting.DataLayerStorageMap");
         if (lightEngineStorageArrayType == null) {
-            throw new IllegalStateException("LightEngineStorageArray class not found");
+            throw new IllegalStateException("DataLayerStorageMap class not found");
         }
 
         String light_layer_block_name, light_layer_sky_name, light_storage_name, light_storage_array_live_name;
@@ -101,7 +101,7 @@ class LightingHandler_1_14 implements LightingHandler {
         this.light_storage_array_live = MPLType.getDeclaredField(lightEngineStorageType,
                 Resolver.resolveFieldName(lightEngineStorageType, light_storage_array_live_name));
         if (!lightEngineStorageArrayType.isAssignableFrom(this.light_storage_array_live.getType())) {
-            throw new IllegalStateException("LightEngineStorage light_storage_array_live field is not of type LightEngineStorageArray");
+            throw new IllegalStateException("LayerLightSectionStorage light_storage_array_live field is not of type DataLayerStorageMap");
         }
 
         // PlayerChunkMap.GOLDEN_TICKET
@@ -113,7 +113,7 @@ class LightingHandler_1_14 implements LightingHandler {
         }
 
         // Get PRE/POST_UPDATE constants
-        Class<?> updateType = CommonUtil.getClass("net.minecraft.server.level.LightEngineThreaded$Update");
+        Class<?> updateType = CommonUtil.getClass("net.minecraft.server.level.ThreadedLevelLightEngine$TaskType");
         {
             Object preUpdate = null;
             Object postUpdate = null;
@@ -126,10 +126,10 @@ class LightingHandler_1_14 implements LightingHandler {
                 }
             }
             if (preUpdate == null) {
-                throw new IllegalStateException("LightEngineThreaded.Update has no PRE_UPDATE constant");
+                throw new IllegalStateException("ThreadedLevelLightEngine.TaskType has no PRE_UPDATE constant");
             }
             if (postUpdate == null) {
-                throw new IllegalStateException("LightEngineThreaded.Update has no POST_UPDATE constant");
+                throw new IllegalStateException("ThreadedLevelLightEngine.TaskType has no POST_UPDATE constant");
             }
             light_engine_pre_update = preUpdate;
             light_engine_post_update = postUpdate;
@@ -369,9 +369,9 @@ class LightingHandler_1_14 implements LightingHandler {
     @Template.Optional
     @Template.Import("com.destroystokyo.paper.util.map.QueuedChangesMapLong2Object")
     @Template.Import("net.minecraft.server.MCUtil")
-    @Template.Import("net.minecraft.core.SectionPosition")
-    @Template.Import("net.minecraft.world.level.chunk.NibbleArray")
-    @Template.Import("net.minecraft.world.level.EnumSkyBlock")
+    @Template.Import("net.minecraft.core.SectionPos")
+    @Template.Import("net.minecraft.world.level.chunk.DataLayer")
+    @Template.Import("net.minecraft.world.level.LightLayer")
     @Template.InstanceType("net.minecraft.world.level.lighting.LightEngine")
     public static abstract class LightEngineHandle extends Template.Class<Template.Handle> {
 
@@ -382,13 +382,13 @@ class LightingHandler_1_14 implements LightingHandler {
          *        return null;
          *    }
          * #if version >= 1.18
-         *    NibbleArray array = layer.getDataLayerData(SectionPosition.of(cx, cy, cz));
+         *    DataLayer array = layer.getDataLayerData(SectionPos.of(cx, cy, cz));
          *    if (array == null) {
          *        return null;
          *    }
          *    return array.getData();
          * #else
-         *    NibbleArray array = layer.a(SectionPosition.a(cx, cy, cz));
+         *    DataLayer array = layer.a(SectionPos.a(cx, cy, cz));
          *    if (array == null) {
          *        return null;
          *    }
@@ -403,17 +403,17 @@ class LightingHandler_1_14 implements LightingHandler {
          * <STORE_SKY_LIGHT_DATA>
          * public static void storeSkyLightData(LightEngine engine, int cx, int cy, int cz, byte[] data_bytes) {
          * #if version >= 1.18
-         *     final SectionPosition pos = SectionPosition.of(cx, cy, cz);
+         *     final SectionPos pos = SectionPos.of(cx, cy, cz);
          * #else
-         *     final SectionPosition pos = SectionPosition.a(cx, cy, cz);
+         *     final SectionPos pos = SectionPos.a(cx, cy, cz);
          * #endif
          * 
          * #if version >= 1.18
-         *     engine.queueSectionData(EnumSkyBlock.SKY, pos, new NibbleArray(data_bytes), true);
+         *     engine.queueSectionData(LightLayer.SKY, pos, new DataLayer(data_bytes), true);
          * #elseif version >= 1.16
-         *     engine.a(EnumSkyBlock.SKY, pos, new NibbleArray(data_bytes), true);
+         *     engine.a(LightLayer.SKY, pos, new DataLayer(data_bytes), true);
          * #else
-         *     engine.a(EnumSkyBlock.SKY, pos, new NibbleArray(data_bytes));
+         *     engine.a(LightLayer.SKY, pos, new DataLayer(data_bytes));
          * #endif
          * }
          */
@@ -424,17 +424,17 @@ class LightingHandler_1_14 implements LightingHandler {
          * <STORE_BLOCK_LIGHT_DATA>
          * public static void storeBlockLightData(LightEngine engine, int cx, int cy, int cz, byte[] data_bytes) {
          * #if version >= 1.18
-         *     final SectionPosition pos = SectionPosition.of(cx, cy, cz);
+         *     final SectionPos pos = SectionPos.of(cx, cy, cz);
          * #else
-         *     final SectionPosition pos = SectionPosition.a(cx, cy, cz);
+         *     final SectionPos pos = SectionPos.a(cx, cy, cz);
          * #endif
          * 
          * #if version >= 1.18
-         *     engine.queueSectionData(EnumSkyBlock.BLOCK, pos, new NibbleArray(data_bytes), true);
+         *     engine.queueSectionData(LightLayer.BLOCK, pos, new DataLayer(data_bytes), true);
          * #elseif version >= 1.16
-         *     engine.a(EnumSkyBlock.BLOCK, pos, new NibbleArray(data_bytes), true);
+         *     engine.a(LightLayer.BLOCK, pos, new DataLayer(data_bytes), true);
          * #else
-         *     engine.a(EnumSkyBlock.BLOCK, pos, new NibbleArray(data_bytes));
+         *     engine.a(LightLayer.BLOCK, pos, new DataLayer(data_bytes));
          * #endif
          * }
          */
@@ -443,24 +443,24 @@ class LightingHandler_1_14 implements LightingHandler {
 
         /*
          * <SET_LIGHT_DATA_OR_STORE_NEW_OLD>
-         * public static void setLightDataOrStoreNew(LightEngine engine, LightEngineStorage lightEngineStorage, LightEngineStorageArray lightEngineStorageArray, boolean skyLight, int cx, int cy, int cz, byte[] data_bytes) {
-         *     long key = SectionPosition.b(cx, cy, cz);
+         * public static void setLightDataOrStoreNew(LightEngine engine, LayerLightSectionStorage lightEngineStorage, DataLayerStorageMap lightEngineStorageArray, boolean skyLight, int cx, int cy, int cz, byte[] data_bytes) {
+         *     long key = SectionPos.b(cx, cy, cz);
          * 
-         *     NibbleArray dataNibble = lightEngineStorageArray.c(key);
+         *     DataLayer dataNibble = lightEngineStorageArray.c(key);
          *     if (dataNibble == null) {
          *         // Missing, use engine to register and store a new section
-         *         final SectionPosition pos = SectionPosition.a(cx, cy, cz);
-         *         final EnumSkyBlock enumSky = skyLight ? EnumSkyBlock.SKY : EnumSkyBlock.BLOCK;
+         *         final SectionPos pos = SectionPos.a(cx, cy, cz);
+         *         final LightLayer enumSky = skyLight ? LightLayer.SKY : LightLayer.BLOCK;
          * #if version >= 1.16
-         *         engine.a(enumSky, pos, new NibbleArray(data_bytes), true);
+         *         engine.a(enumSky, pos, new DataLayer(data_bytes), true);
          * #else
-         *         engine.a(enumSky, pos, new NibbleArray(data_bytes));
+         *         engine.a(enumSky, pos, new DataLayer(data_bytes));
          * #endif
          *         return;
          *     }
          * 
          *     // Copy new section light data and mark for updating
-         * #if exists net.minecraft.world.level.chunk.NibbleArray public byte[] asBytesPoolSafe();
+         * #if exists net.minecraft.world.level.chunk.DataLayer public byte[] asBytesPoolSafe();
          *     System.arraycopy(data_bytes, 0, dataNibble.asBytesPoolSafe(), 0, 2048);
          * #else
          *     System.arraycopy(data_bytes, 0, dataNibble.asBytes(), 0, 2048);
@@ -469,9 +469,9 @@ class LightingHandler_1_14 implements LightingHandler {
          * 
          *     // Track the nibbles we have pushed in this set
          * #if version >= 1.17
-         *     #require net.minecraft.world.level.lighting.LightEngineStorage protected final it.unimi.dsi.fastutil.longs.LongSet changedSections;
+         *     #require net.minecraft.world.level.lighting.LayerLightSectionStorage protected final it.unimi.dsi.fastutil.longs.LongSet changedSections;
          * #else
-         *     #require net.minecraft.world.level.lighting.LightEngineStorage protected final it.unimi.dsi.fastutil.longs.LongSet changedSections:g;
+         *     #require net.minecraft.world.level.lighting.LayerLightSectionStorage protected final it.unimi.dsi.fastutil.longs.LongSet changedSections:g;
          * #endif
          *     it.unimi.dsi.fastutil.longs.LongSet changedSections = lightEngineStorage#changedSections;
          *     changedSections.add(key);
@@ -480,9 +480,9 @@ class LightingHandler_1_14 implements LightingHandler {
          *     // Otherwise it will send all-15 light levels for sky light mistakingly
          *     // notifyCubePresent(long) implementation is in LightEngineStorageSky
          * #if version >= 1.14.1
-         *     #require net.minecraft.world.level.lighting.LightEngineStorage protected void notifyCubePresent:k(long i);
+         *     #require net.minecraft.world.level.lighting.LayerLightSectionStorage protected void notifyCubePresent:k(long i);
          * #else
-         *     #require net.minecraft.world.level.lighting.LightEngineStorage protected void notifyCubePresent:j(long i);
+         *     #require net.minecraft.world.level.lighting.LayerLightSectionStorage protected void notifyCubePresent:j(long i);
          * #endif
          *     lightEngineStorage#notifyCubePresent(key);
          * }

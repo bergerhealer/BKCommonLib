@@ -558,7 +558,7 @@ public class CommonBootstrap {
 
         // Still obfuscated on these versions of MC
         if (evaluateMCVersion(">=", "1.14") && evaluateMCVersion("<=", "1.14.1")) {
-            remappings.put("net.minecraft.world.level.block.state.pattern.ShapeDetector$Shape", "net.minecraft.world.level.block.state.pattern.ShapeDetector$c");
+            remappings.put("net.minecraft.world.level.block.state.pattern.BlockPattern$Shape", "net.minecraft.world.level.block.state.pattern.ShapeDetector$c");
         }
 
         // EnumScoreboardAction was moved to a ScoreboardServer class during 1.13

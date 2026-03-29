@@ -18,26 +18,26 @@ class BlockDataSerializer_1_19 extends BlockDataSerializer {
     @Override
     public void enable() {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClassName("net.minecraft.commands.arguments.blocks.ArgumentBlock");
-        resolver.addImport("net.minecraft.commands.arguments.blocks.ArgumentBlock.a");
-        resolver.addImport("net.minecraft.world.level.block.state.IBlockData");
+        resolver.setDeclaredClassName("net.minecraft.commands.arguments.blocks.BlockStateParser");
+        resolver.addImport("net.minecraft.commands.arguments.blocks.BlockStateParser.BlockResult");
+        resolver.addImport("net.minecraft.world.level.block.state.BlockState");
         resolver.addImport("net.minecraft.core.registries.BuiltInRegistries");
-        resolver.addImport("net.minecraft.core.IRegistry");
+        resolver.addImport("net.minecraft.core.Registry");
         resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
         serializeMethod.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(
-                "public static String serialize(IBlockData iblockdata) {\n" +
-                "    return ArgumentBlock.serialize(iblockdata);\n" +
+                "public static String serialize(BlockState iblockdata) {\n" +
+                "    return BlockStateParser.serialize(iblockdata);\n" +
                 "}", resolver)));
         deserializeMethod.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(
-                "public static IBlockData deserialize(String text) {\n" +
-                "    ArgumentBlock$a block;\n" +
+                "public static BlockState deserialize(String text) {\n" +
+                "    BlockStateParser$BlockResult block;\n" +
                 "    try {\n" +
                 "#if version >= 1.21.2n\n" +
-                "        block = ArgumentBlock.parseForBlock(BuiltInRegistries.BLOCK, text, true);\n" +
+                "        block = BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK, text, true);\n" +
                 "#elseif version >= 1.19.3\n" +
-                "        block = ArgumentBlock.parseForBlock(BuiltInRegistries.BLOCK.asLookup(), text, true);\n" +
+                "        block = BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK.asLookup(), text, true);\n" +
                 "#else\n" +
-                "        block = ArgumentBlock.parseForBlock((IRegistry) BuiltInRegistries.BLOCK, text, true);\n" +
+                "        block = BlockStateParser.parseForBlock((Registry) BuiltInRegistries.BLOCK, text, true);\n" +
                 "#endif\n" +
                 "    } catch (com.mojang.brigadier.exceptions.CommandSyntaxException ex) {\n" +
                 "        return null;\n" +

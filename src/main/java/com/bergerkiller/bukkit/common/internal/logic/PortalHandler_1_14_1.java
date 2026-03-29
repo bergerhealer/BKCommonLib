@@ -161,45 +161,46 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
     }
 
     @Template.Optional
-    @Template.Import("net.minecraft.core.BlockPosition")
-    @Template.Import("net.minecraft.core.BlockPosition$MutableBlockPosition")
-    @Template.Import("net.minecraft.core.EnumDirection")
-    @Template.Import("net.minecraft.core.EnumDirection$EnumAxis")
+    @Template.Import("net.minecraft.core.Vec3")
+    @Template.Import("net.minecraft.core.BlockPos")
+    @Template.Import("net.minecraft.core.BlockPos$MutableBlockPos")
+    @Template.Import("net.minecraft.core.Direction")
+    @Template.Import("net.minecraft.core.Direction$Axis")
     @Template.Import("net.minecraft.core.registries.BuiltInRegistries")
-    @Template.Import("net.minecraft.server.level.EntityPlayer")
-    @Template.Import("net.minecraft.server.level.WorldServer")
+    @Template.Import("net.minecraft.server.level.ServerPlayer")
+    @Template.Import("net.minecraft.server.level.ServerLevel")
     @Template.Import("net.minecraft.network.protocol.Packet")
-    @Template.Import("net.minecraft.network.protocol.game.PacketPlayOutGameStateChange")
-    @Template.Import("net.minecraft.world.entity.ai.village.poi.VillagePlace")
-    @Template.Import("net.minecraft.world.entity.ai.village.poi.VillagePlaceType")
+    @Template.Import("net.minecraft.network.protocol.game.ClientboundGameEventPacket")
+    @Template.Import("net.minecraft.world.entity.ai.village.poi.PoiManager")
+    @Template.Import("net.minecraft.world.entity.ai.village.poi.PoiType")
     @Template.Import("net.minecraft.world.entity.ai.village.poi.PoiTypes")
     @Template.Import("net.minecraft.world.entity.Entity")
     @Template.Import("net.minecraft.world.entity.Entity$RemovalReason")
     @Template.Import("net.minecraft.world.level.block.Blocks")
-    @Template.Import("net.minecraft.world.level.dimension.DimensionManager")
-    @Template.Import("net.minecraft.world.level.World")
+    @Template.Import("net.minecraft.world.level.dimension.DimensionType")
+    @Template.Import("net.minecraft.world.level.Level")
     @Template.Import("net.minecraft.world.level.border.WorldBorder")
-    @Template.InstanceType("net.minecraft.world.level.portal.PortalTravelAgent")
+    @Template.InstanceType("net.minecraft.world.level.portal.PortalForcer")
     public static abstract class PortalTravelAgentHandle extends Template.Class<Template.Handle> {
         /*
          * <SHOW_END_CREDITS>
          * public static void showEndCredits(Object entityPlayerRaw, boolean seenCredits) {
-         *     EntityPlayer player = (EntityPlayer) entityPlayerRaw;
+         *     ServerPlayer player = (ServerPlayer) entityPlayerRaw;
          * 
          *     // Using require because field is private on forge
          * #if version >= 1.17
-         *     #require EntityPlayer private boolean isChangingDimension;
+         *     #require ServerPlayer private boolean isChangingDimension;
          * #else
-         *     #require EntityPlayer private boolean isChangingDimension:worldChangeInvuln;
+         *     #require ServerPlayer private boolean isChangingDimension:worldChangeInvuln;
          * #endif
          *     player#isChangingDimension = true;
          *
          * #if version >= 1.20
-         *     WorldServer world = (WorldServer) player.level();
+         *     ServerLevel world = (ServerLevel) player.level();
          * #elseif version >= 1.18
-         *     WorldServer world = player.getLevel();
+         *     ServerLevel world = player.getLevel();
          * #else
-         *     WorldServer world = player.getWorldServer();
+         *     ServerLevel world = player.getWorldServer();
          * #endif
          *
          * #if version >= 1.18
@@ -207,14 +208,14 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *     world.removePlayerImmediately(player, Entity$RemovalReason.CHANGED_DIMENSION);
          *     if (!player.wonGame) {
          *         player.wonGame = true;
-         *         player.connection.send(new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.WIN_GAME, seenCredits ? 0.0F : 1.0F));
+         *         player.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.WIN_GAME, seenCredits ? 0.0F : 1.0F));
          *     }
          * #elseif version >= 1.17
          *     player.decouple();
          *     world.a(player, Entity$RemovalReason.CHANGED_DIMENSION);
          *     if (!player.wonGame) {
          *         player.wonGame = true;
-         *         player.connection.sendPacket((Packet) new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.WIN_GAME, seenCredits ? 0.0F : 1.0F));
+         *         player.connection.sendPacket((Packet) new ClientboundGameEventPacket(ClientboundGameEventPacket.WIN_GAME, seenCredits ? 0.0F : 1.0F));
          *     }
          * #else
          *     player.decouple();
@@ -222,9 +223,9 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *     if (!player.viewingCredits) {
          *         player.viewingCredits = true;
          *   #if version >= 1.16
-         *         player.playerConnection.sendPacket((Packet) new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.e, seenCredits ? 0.0F : 1.0F));
+         *         player.playerConnection.sendPacket((Packet) new ClientboundGameEventPacket(ClientboundGameEventPacket.e, seenCredits ? 0.0F : 1.0F));
          *   #else
-         *         player.playerConnection.sendPacket((Packet) new PacketPlayOutGameStateChange(4, seenCredits ? 0.0F : 1.0F));
+         *         player.playerConnection.sendPacket((Packet) new ClientboundGameEventPacket(4, seenCredits ? 0.0F : 1.0F));
          *   #endif
          *     }
          * #endif
@@ -236,7 +237,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
         /*
          * <IS_MAIN_WORLD>
          * public static boolean isMainEndWorld(org.bukkit.World world) {
-         *     World world = (World) ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
+         *     Level world = (World) ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
          * #if version >= 1.18
          *     return world.dimension() == World.END;
          * #elseif version >= 1.17
@@ -244,7 +245,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          * #elseif version >= 1.16
          *     return world.getDimensionKey() == World.THE_END;
          * #else
-         *     return world.getWorldProvider().getDimensionManager().getType() == DimensionManager.THE_END;
+         *     return world.getWorldProvider().getDimensionManager().getType() == DimensionType.THE_END;
          * #endif
          * }
          */
@@ -254,11 +255,11 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
         /*
          * <FIND_NETHER_PORTAL>
          * public static org.bukkit.block.Block findNetherPortal(org.bukkit.block.Block startBlock, int radius) {
-         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
-         *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
-         *     PortalTravelAgent agent = new PortalTravelAgent(world);
+         *     ServerLevel world = (ServerLevel) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
+         *     BlockPos blockposition = new BlockPos(startBlock.getX(), startBlock.getY(), startBlock.getZ());
+         *     PortalForcer agent = new PortalForcer(world);
          * #if version >= 1.21
-         *   #if forge && !exists net.minecraft.world.level.portal.PortalTravelAgent public java.util.Optional<net.minecraft.core.BlockPosition> findClosestPortalPosition(net.minecraft.core.BlockPosition blockposition, net.minecraft.world.level.border.WorldBorder worldborder, int radius);
+         *   #if forge && !exists net.minecraft.world.level.portal.PortalForcer public java.util.Optional<net.minecraft.core.BlockPos> findClosestPortalPosition(net.minecraft.core.BlockPos blockposition, net.minecraft.world.level.border.WorldBorder worldborder, int radius);
          *     // We must use the bool method, the craftbukkit-added radius version doesn't exist
          *     boolean isSmallRadius = (radius <= 16);
          *     java.util.Optional opt_result = agent.findClosestPortalPosition(blockposition, isSmallRadius, world.getWorldBorder());
@@ -268,7 +269,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *     if (!opt_result.isPresent()) {
          *         return null;
          *     }
-         *     net.minecraft.core.BlockPosition position = (net.minecraft.core.BlockPosition) opt_result.get();
+         *     net.minecraft.core.BlockPos position = (net.minecraft.core.BlockPos) opt_result.get();
          *     return startBlock.getWorld().getBlockAt(position.getX(), position.getY(), position.getZ());
          * #elseif version >= 1.16.2
          *   #if version >= 1.18
@@ -279,7 +280,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *     if (!opt_result.isPresent()) {
          *         return null;
          *     }
-         *     net.minecraft.BlockUtil$Rectangle result = (net.minecraft.BlockUtil$Rectangle) opt_result.get();
+         *     net.minecraft.BlockUtil$FoundRectangle result = (net.minecraft.BlockUtil$FoundRectangle) opt_result.get();
          *   #if version >= 1.17
          *     return startBlock.getWorld().getBlockAt(result.minCorner.getX(), result.minCorner.getY(), result.minCorner.getZ());
          *   #else
@@ -287,9 +288,9 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *   #endif
          * #else
          *   #if version >= 1.15.2
-         *     net.minecraft.world.level.block.state.pattern.ShapeDetector$Shape result = agent.findPortal(blockposition, Vec3D.ZERO, EnumDirection.NORTH, 0.5, 1.0, true, radius);
+         *     net.minecraft.world.level.block.state.pattern.BlockPattern$Shape result = agent.findPortal(blockposition, Vec3.ZERO, Direction.NORTH, 0.5, 1.0, true, radius);
          *   #else
-         *     net.minecraft.world.level.block.state.pattern.ShapeDetector$Shape result = agent.a(blockposition, Vec3D.ZERO, EnumDirection.NORTH, 0.5, 1.0, true);
+         *     net.minecraft.world.level.block.state.pattern.BlockPattern$Shape result = agent.a(blockposition, Vec3.ZERO, Direction.NORTH, 0.5, 1.0, true);
          *   #endif
          *     if (result == null) {
          *         return null;
@@ -312,23 +313,23 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
         /*
          * <CREATE_NETHER_PORTAL>
          * public static void createNetherPortal(org.bukkit.block.Block startBlock, org.bukkit.block.BlockFace orientation, Object entityInitiator, Object dummyEntity, int createRadius) {
-         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
-         *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
-         *     PortalTravelAgent agent = new PortalTravelAgent(world);
+         *     ServerLevel world = (ServerLevel) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
+         *     BlockPos blockposition = new BlockPos(startBlock.getX(), startBlock.getY(), startBlock.getZ());
+         *     PortalForcer agent = new PortalForcer(world);
          *     Entity initiator = (Entity) entityInitiator;
          * 
          * #if version >= 1.16.2
          *     // Orientation of the portal, if set, use random if invalid/null/self
-         *     EnumDirection$EnumAxis axis;
+         *     Direction$Axis axis;
          *     if (orientation == org.bukkit.block.BlockFace.NORTH || orientation == org.bukkit.block.BlockFace.SOUTH) {
-         *         axis = EnumDirection$EnumAxis.X;
+         *         axis = Direction$Axis.X;
          *     } else if (orientation == org.bukkit.block.BlockFace.EAST || orientation == org.bukkit.block.BlockFace.WEST) {
-         *         axis = EnumDirection$EnumAxis.Z;
+         *         axis = Direction$Axis.Z;
          *     } else {
-         *         axis = (Math.random() < 0.5) ? EnumDirection$EnumAxis.Z : EnumDirection$EnumAxis.X;
+         *         axis = (Math.random() < 0.5) ? Direction$Axis.Z : Direction$Axis.X;
          *     }
-         *     #require PortalTravelAgent public java.util.Optional<net.minecraft.BlockUtil.Rectangle> createPortal();
-         *   #if forge && !exists net.minecraft.world.level.portal.PortalTravelAgent public java.util.Optional<net.minecraft.BlockUtil.Rectangle> createPortal(net.minecraft.core.BlockPosition blockposition, net.minecraft.core.EnumDirection.EnumAxis enumdirection_enumaxis, net.minecraft.world.entity.Entity entity, int createRadius);
+         *     #require PortalForcer public java.util.Optional<net.minecraft.BlockUtil.FoundRectangle> createPortal();
+         *   #if forge && !exists net.minecraft.world.level.portal.PortalForcer public java.util.Optional<net.minecraft.BlockUtil.Rectangle> createPortal(net.minecraft.core.BlockPos blockposition, net.minecraft.core.Direction.EnumAxis enumdirection_enumaxis, net.minecraft.world.entity.Entity entity, int createRadius);
          *     agent.createPortal(blockposition, axis);
          *   #else
          *     agent.createPortal(blockposition, axis, initiator, createRadius);
@@ -337,9 +338,9 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *     // Use default entity if null, set it up properly
          *     if (initiator == null) {
          *         initiator = (Entity) dummyEntity;
-         *         #require net.minecraft.world.entity.Entity private Vec3D loc;
-         *         #require net.minecraft.world.entity.Entity private BlockPosition locBlock;
-         *         initiator#loc = new Vec3D((double) startBlock.getX()+0.5, (double) startBlock.getY(), (double) startBlock.getZ()+0.5);
+         *         #require net.minecraft.world.entity.Entity private Vec3 loc;
+         *         #require net.minecraft.world.entity.Entity private BlockPos locBlock;
+         *         initiator#loc = new Vec3((double) startBlock.getX()+0.5, (double) startBlock.getY(), (double) startBlock.getZ()+0.5);
          *         initiator#locBlock = blockposition;
          *     }
          *     agent.createPortal(initiator, blockposition, createRadius);
@@ -372,35 +373,35 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
         /*
          * <STORE_NETHER_PORTAL>
          * public static void storeNetherPortal(org.bukkit.block.Block startBlock) {
-         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
-         *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
+         *     ServerLevel world = (ServerLevel) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
+         *     BlockPos blockposition = new BlockPos(startBlock.getX(), startBlock.getY(), startBlock.getZ());
          * #if version >= 1.21.2
-         *     VillagePlace villageplace = world.getPoiManager();
+         *     PoiManager villageplace = world.getPoiManager();
          *     java.util.Optional typeHolderOpt = BuiltInRegistries.POINT_OF_INTEREST_TYPE.get(PoiTypes.NETHER_PORTAL);
          *     if (typeHolderOpt.isPresent()) {
          *         villageplace.add(blockposition, (net.minecraft.core.Holder) typeHolderOpt.get());
          *     }
          * #elseif version >= 1.19
-         *     VillagePlace villageplace = world.getPoiManager();
+         *     PoiManager villageplace = world.getPoiManager();
          *     java.util.Optional typeHolderOpt = BuiltInRegistries.POINT_OF_INTEREST_TYPE.getHolder(PoiTypes.NETHER_PORTAL);
          *     if (typeHolderOpt.isPresent()) {
          *         villageplace.add(blockposition, (net.minecraft.core.Holder) typeHolderOpt.get());
          *     }
          * #elseif version >= 1.18
-         *     VillagePlace villageplace = world.getPoiManager();
-         *     villageplace.add(blockposition, VillagePlaceType.NETHER_PORTAL);
+         *     PoiManager villageplace = world.getPoiManager();
+         *     villageplace.add(blockposition, PoiType.NETHER_PORTAL);
          * #elseif version >= 1.17
-         *     VillagePlace villageplace = world.A();
-         *     villageplace.a(blockposition, VillagePlaceType.NETHER_PORTAL);
+         *     PoiManager villageplace = world.A();
+         *     villageplace.a(blockposition, PoiType.NETHER_PORTAL);
          * #elseif version >= 1.16.2
-         *     VillagePlace villageplace = world.y();
-         *     villageplace.a(blockposition, VillagePlaceType.v);
+         *     PoiManager villageplace = world.y();
+         *     villageplace.a(blockposition, PoiType.v);
          * #elseif version >= 1.16
-         *     VillagePlace villageplace = world.x();
-         *     villageplace.a(blockposition, VillagePlaceType.v);
+         *     PoiManager villageplace = world.x();
+         *     villageplace.a(blockposition, PoiType.v);
          * #elseif version >= 1.15
-         *     VillagePlace villageplace = world.B();
-         *     villageplace.a(blockposition, VillagePlaceType.u);
+         *     PoiManager villageplace = world.B();
+         *     villageplace.a(blockposition, PoiType.u);
          * #endif
          * }
          */
@@ -410,18 +411,18 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
         /*
          * <FIND_END_PLATFORM>
          * public static org.bukkit.block.Block findEndPlatform(org.bukkit.World bworld) {
-         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
+         *     ServerLevel world = (ServerLevel) ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
          * #if version >= 1.17
-         *     BlockPosition platformPos = WorldServer.END_SPAWN_POINT;
+         *     BlockPos platformPos = ServerLevel.END_SPAWN_POINT;
          * #elseif version >= 1.16
-         *     BlockPosition platformPos = WorldServer.a;
+         *     BlockPos platformPos = ServerLevel.a;
          * #else
-         *     BlockPosition platformPos = WorldProviderTheEnd.f;
+         *     BlockPos platformPos = WorldProviderTheEnd.f;
          * #endif
          *     int i = platformPos.getX();
          *     int j = platformPos.getY() - 1;
          *     int k = platformPos.getZ();
-         *     BlockPosition$MutableBlockPosition pos = new BlockPosition$MutableBlockPosition();
+         *     BlockPos$MutableBlockPos pos = new BlockPos$MutableBlockPos();
          *     byte b0 = 1;
          *     byte b1 = 0;
          *     for (int l = -2; l <= 2; ++l) {
@@ -433,10 +434,10 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *                 boolean flag = j1 < 0;
          * #if version >= 1.18
          *                 pos.set(k1, l1, i2);
-         *                 if (world.getBlockState((BlockPosition) pos).getBlock() != (flag ? Blocks.OBSIDIAN : Blocks.AIR)) {
+         *                 if (world.getBlockState((BlockPos) pos).getBlock() != (flag ? Blocks.OBSIDIAN : Blocks.AIR)) {
          * #else
          *                 pos.d(k1, l1, i2);
-         *                 if (world.getType((BlockPosition) pos).getBlock() != (flag ? Blocks.OBSIDIAN : Blocks.AIR)) {
+         *                 if (world.getType((BlockPos) pos).getBlock() != (flag ? Blocks.OBSIDIAN : Blocks.AIR)) {
          * #endif
          *                     return null;
          *                 }
@@ -452,46 +453,46 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
         /*
          * <CREATE_END_PLATFORM>
          * public static org.bukkit.block.Block createEndPlatform(org.bukkit.World bworld, Object entityInitiatorRaw) {
-         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
+         *     ServerLevel world = (ServerLevel) ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
          *     Entity entityInitiator = (Entity) entityInitiatorRaw;
          * 
          * #if version >= 1.17
-         *     BlockPosition platformPos = WorldServer.END_SPAWN_POINT;
+         *     BlockPos platformPos = ServerLevel.END_SPAWN_POINT;
          * #elseif version >= 1.16
-         *     BlockPosition platformPos = WorldServer.a;
+         *     BlockPos platformPos = ServerLevel.a;
          * #endif
          *
          * #if version >= 1.21
-         *     BlockPosition fixedPos = new BlockPosition(
+         *     BlockPos fixedPos = new BlockPos(
          *         platformPos.getX(),
          *         platformPos.getY() - 1,
          *         platformPos.getZ());
          *     net.minecraft.world.level.levelgen.feature.EndPlatformFeature.createEndPlatform(world, fixedPos, true, entityInitiator);
          *
          * #elseif version >= 1.18
-         *   #if exists net.minecraft.server.level.WorldServer public static void makeObsidianPlatform(net.minecraft.server.level.WorldServer worldserver, net.minecraft.world.entity.Entity entity);
-         *     WorldServer.makeObsidianPlatform(world, entityInitiator);
+         *   #if exists net.minecraft.server.level.ServerLevel public static void makeObsidianPlatform(net.minecraft.server.level.ServerLevel worldserver, net.minecraft.world.entity.Entity entity);
+         *     ServerLevel.makeObsidianPlatform(world, entityInitiator);
          *   #else
          *     // No-entity arg version I guess? Meh.
-         *     WorldServer.makeObsidianPlatform(world);
+         *     ServerLevel.makeObsidianPlatform(world);
          *   #endif
-         * #elseif !exists net.minecraft.server.level.WorldServer public static void a(WorldServer world, net.minecraft.world.entity.Entity entity) && exists net.minecraft.server.level.WorldServer public static void a(WorldServer world)
+         * #elseif !exists net.minecraft.server.level.ServerLevel public static void a(ServerLevel world, net.minecraft.world.entity.Entity entity) && exists net.minecraft.server.level.ServerLevel public static void a(ServerLevel world)
          *     // Forge lacks an Entity parameter
-         *     WorldServer.a(world);
+         *     ServerLevel.a(world);
          * #elseif version >= 1.16
-         *     WorldServer.a(world, entityInitiator);
+         *     ServerLevel.a(world, entityInitiator);
          * #else
          *     // Custom code for MC 1.15.2 and before
-         *     BlockPosition platformPos = WorldProviderTheEnd.f;
+         *     BlockPos platformPos = WorldProviderTheEnd.f;
          * 
-         *     // Code is embedded deep inside EntityPlayer.a(DimensionManager, TeleportCause)
+         *     // Code is embedded deep inside ServerPlayer.a(DimensionType, TeleportCause)
          *     int i = platformPos.getX();
          *     int j = platformPos.getY() - 1;
          *     int k = platformPos.getZ();
          *     boolean flag = true;
          *     boolean flag1 = false;
          *     org.bukkit.craftbukkit.util.BlockStateListPopulator blockList = new org.bukkit.craftbukkit.util.BlockStateListPopulator(world);
-         *     BlockPosition$MutableBlockPosition blockposition = new BlockPosition$MutableBlockPosition();
+         *     BlockPos$MutableBlockPos blockposition = new BlockPos$MutableBlockPos();
          *     for (int l = -2; l <= 2; ++l) {
          *         for (int i1 = -2; i1 <= 2; ++i1) {
          *             for (int j1 = -1; j1 < 3; ++j1) {
@@ -500,7 +501,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *                 int i2 = k + i1 * 0 - l * 1;
          *                 boolean flag2 = j1 < 0;
          *                 blockposition.d(k1, l1, i2);
-         *                 blockList.setTypeAndData((BlockPosition) blockposition, flag2 ? Blocks.OBSIDIAN.getBlockData() : Blocks.AIR.getBlockData(), 3);
+         *                 blockList.setTypeAndData((BlockPos) blockposition, flag2 ? Blocks.OBSIDIAN.getBlockData() : Blocks.AIR.getBlockData(), 3);
          *             }
          *         }
          *     }

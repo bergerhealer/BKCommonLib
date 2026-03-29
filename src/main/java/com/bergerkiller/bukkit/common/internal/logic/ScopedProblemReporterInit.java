@@ -48,7 +48,7 @@ public class ScopedProblemReporterInit {
 
         try {
             // Find the ProblemReporter type
-            Class<?> problemReporterBaseType = Resolver.loadClass("net.minecraft.util.ProblemReporter$a", false);
+            Class<?> problemReporterBaseType = Resolver.loadClass("net.minecraft.util.ProblemReporter$Collector", false);
 
             final ExtendedClassWriter<Object> cw = ExtendedClassWriter.builder(problemReporterBaseType)
                     .addInterface(AutoCloseable.class)

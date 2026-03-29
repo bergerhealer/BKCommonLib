@@ -24,7 +24,6 @@ import com.bergerkiller.mountiplex.reflection.ClassHook;
 @ClassHook.HookPackage("net.minecraft.server")
 @ClassHook.HookImport("org.bukkit.craftbukkit.entity.CraftHumanEntity")
 @ClassHook.HookImport("net.minecraft.world.item.ItemStack")
-@ClassHook.HookImport("net.minecraft.world.entity.player.EntityHuman")
 @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
 public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
     private final Inventory inventory;
@@ -141,17 +140,17 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
     public void onClose(Object entity) {
     }
 
-    @HookMethod("public abstract void startOpen:???(EntityHuman paramEntityHuman)")
+    @HookMethod("public abstract void startOpen:???(net.minecraft.world.entity.player.Player paramEntityHuman)")
     public void startOpen(Object entityHuman) {
     }
 
     @HookMethodCondition("version < 1.18")
-    @HookMethod("public abstract void stopOpen:closeContainer(EntityHuman paramEntityHuman)")
+    @HookMethod("public abstract void stopOpen:closeContainer(net.minecraft.world.entity.player.Player paramEntityHuman)")
     public void closeContainerV1(Object entityHuman) {
     }
 
     @HookMethodCondition("version >= 1.18 && version < 1.21.9")
-    @HookMethod("public abstract void stopOpen(EntityHuman paramEntityHuman)")
+    @HookMethod("public abstract void stopOpen(net.minecraft.world.entity.player.Player paramEntityHuman)")
     public void closeContainerV2(Object entityHuman) {
     }
 
@@ -177,7 +176,7 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
         return 0;
     }
 
-    @HookMethod("public abstract boolean canOpen:???(EntityHuman paramEntityHuman)")
+    @HookMethod("public abstract boolean canOpen:???(net.minecraft.world.entity.player.Player paramEntityHuman)")
     public boolean canOpen(Object human) {
         return true;
     }

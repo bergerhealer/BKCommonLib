@@ -24,18 +24,20 @@ class BlockDataSerializer_1_8_to_1_12_2 extends BlockDataSerializer {
     public void enable() {
         ClassResolver resolver = new ClassResolver();
         resolver.setDeclaredClassName("net.minecraft.world.level.block.Block");
+        resolver.addImport("net.minecraft.world.level.block.state.BlockState");
+        resolver.addImport("net.minecraft.world.level.block.state.properties.Property");
         resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
         findBlockByNameMethod.init(new MethodDeclaration(resolver,
-                "public static Object findBlockByName(net.minecraft.resources.MinecraftKey minecraftKey) {\n" +
+                "public static Object findBlockByName(net.minecraft.resources.Identifier minecraftKey) {\n" +
                 "    return Block.REGISTRY.get((Object)minecraftKey);\n" +
                 "}"));
         createLegacyBlockDataMethod.init(new MethodDeclaration(resolver,
-                "public static IBlockData createLegacyBlockData(Block block, int legacyData) {\n" +
+                "public static BlockState createLegacyBlockData(Block block, int legacyData) {\n" +
                 "    return block.fromLegacyData(legacyData);\n" +
                 "}"));
         setBlockDataKeyValueMethod.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(
-                "public static IBlockData setBlockDataKeyValue(IBlockData iblockdata, String keyText, String valueText) {\n" +
-                "    BlockStateList blockstatelist;\n" +
+                "public static BlockState setBlockDataKeyValue(BlockState iblockdata, String keyText, String valueText) {\n" +
+                "    net.minecraft.world.level.block.state.StateDefinition blockstatelist;\n" +
                 "#if version >= 1.11\n" +
                 "    blockstatelist = iblockdata.getBlock().s();\n" +
                 "#elseif version >= 1.9\n" +
@@ -45,7 +47,7 @@ class BlockDataSerializer_1_8_to_1_12_2 extends BlockDataSerializer {
                 "#else\n" +
                 "    blockstatelist = iblockdata.getBlock().O();\n" +
                 "#endif\n" +
-                "    IBlockState iblockstate;\n" +
+                "    Property iblockstate;\n" +
                 "    Comparable value;\n" +
                 "#if version >= 1.10.2\n" +
                 "    if ((iblockstate = blockstatelist.a(keyText)) == null) return null;\n" +
@@ -57,13 +59,13 @@ class BlockDataSerializer_1_8_to_1_12_2 extends BlockDataSerializer {
                 "            if (!state_iter.hasNext()) {\n" +
                 "                return null; //not found\n" +
                 "            }\n" +
-                "            iblockstate = (IBlockState) state_iter.next();\n" +
+                "            iblockstate = (Property) state_iter.next();\n" +
                 "            if (iblockstate.a().equals(keyText)) {\n" +
                 "                break;\n" +
                 "            }\n" +
                 "        }\n" +
                 "    }\n" +
-                "    if (iblockstate instanceof BlockStateBoolean) {\n" +
+                "    if (iblockstate instanceof net.minecraft.world.level.block.state.properties.BooleanProperty) {\n" +
                 "        if (valueText.equals(\"true\")) {\n" +
                 "            value = Boolean.TRUE;\n" +
                 "        } else if (valueText.equals(\"false\")) {\n" +
@@ -71,7 +73,7 @@ class BlockDataSerializer_1_8_to_1_12_2 extends BlockDataSerializer {
                 "        } else {\n" +
                 "            value = null;\n" +
                 "        }\n" +
-                "    } else if (iblockstate instanceof BlockStateInteger) {\n" +
+                "    } else if (iblockstate instanceof net.minecraft.world.level.block.state.properties.IntegerProperty) {\n" +
                 "        try {\n" +
                 "            Integer intValue = Integer.valueOf(Integer.parseInt(valueText));\n" +
                 "            if (iblockstate.c().contains(intValue)) {\n" +
@@ -82,14 +84,14 @@ class BlockDataSerializer_1_8_to_1_12_2 extends BlockDataSerializer {
                 "        } catch (NumberFormatException ex) {\n" +
                 "            value = null;\n" +
                 "        }\n" +
-                "    } else if (iblockstate instanceof BlockStateEnum) {\n" +
+                "    } else if (iblockstate instanceof net.minecraft.world.level.block.state.properties.EnumProperty) {\n" +
                 "        java.util.Iterator iter = iblockstate.c().iterator();\n" +
                 "        while (true) {\n" +
                 "            if (!iter.hasNext()) {\n" +
                 "                value = null; //not found\n" +
                 "                break;\n" +
                 "            }\n" +
-                "            INamable option = (INamable) iter.next();\n" +
+                "            net.minecraft.util.StringRepresentable option = (net.minecraft.util.StringRepresentable) iter.next();\n" +
                 "            if (option.getName().equals(valueText)) {\n" +
                 "                value = (Comparable) option;\n" +
                 "                break;\n" +
@@ -175,7 +177,7 @@ class BlockDataSerializer_1_8_to_1_12_2 extends BlockDataSerializer {
         }
 
         // Create default BlockData from Block
-        Object nmsIBlockData = BlockHandle.T.getBlockData.raw.invoke(nmsBlock);
+        Object nmsBlockState = BlockHandle.T.getBlockData.raw.invoke(nmsBlock);
 
         // Deserialize state text, if specified
         // Split the state text by , and each element by =
@@ -198,7 +200,7 @@ class BlockDataSerializer_1_8_to_1_12_2 extends BlockDataSerializer {
                 }
 
                 // Attempt setting the key-value. If key or value cannot be parsed, returns null.
-                if ((nmsIBlockData = setBlockDataKeyValueMethod.invoke(null, nmsIBlockData, keyText, valueText)) == null) {
+                if ((nmsBlockState = setBlockDataKeyValueMethod.invoke(null, nmsBlockState, keyText, valueText)) == null) {
                     return null; // Could not be parsed
                 }
 
@@ -208,6 +210,6 @@ class BlockDataSerializer_1_8_to_1_12_2 extends BlockDataSerializer {
         }
 
         // To wrapper and done!
-        return BlockData.fromBlockData(nmsIBlockData);
+        return BlockData.fromBlockData(nmsBlockState);
     }
 }

@@ -13,7 +13,6 @@ import org.bukkit.block.BlockFace;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
-import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
@@ -181,20 +180,7 @@ class EntityMoveHandler_1_13 extends EntityMoveHandler {
                     TypeDeclaration.createGeneric(Stream.class, VoxelShapeHandle.class)));
 
             // Initialize block collisions handling method
-            ClassResolver resolver = new ClassResolver();
-            resolver.addImport("net.minecraft.core.BlockPosition");
-            resolver.addImport("net.minecraft.core.BlockPosition$MutableBlockPosition");
-            resolver.addImport("net.minecraft.core.EnumDirection");
-            resolver.addImport("net.minecraft.core.EnumDirection$EnumAxis");
-            resolver.addImport("net.minecraft.util.MathHelper");
-            resolver.addImport("net.minecraft.world.phys.AxisAlignedBB");
-            resolver.addImport("net.minecraft.world.phys.shapes.OperatorBoolean");
-            resolver.addImport("net.minecraft.world.phys.shapes.VoxelShape");
-            resolver.addImport("net.minecraft.world.phys.shapes.VoxelShapes");
-            resolver.addImport("net.minecraft.world.level.border.WorldBorder");
-            resolver.addImport("net.minecraft.world.level.IBlockAccess");
-            resolver.addImport(MathUtil.class.getName());
-            resolver.setDeclaredClassName("net.minecraft.world.level.World");
+            ClassResolver resolver = createCollisionHandlerClassResolver();
             String method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_13_getBlockCollisions.txt";
             try (InputStream input = EntityMoveHandler_1_13.class.getResourceAsStream(method_path)) {
                 try (Scanner scanner = new Scanner(input, "UTF-8")) {
@@ -204,8 +190,6 @@ class EntityMoveHandler_1_13 extends EntityMoveHandler {
 
                     method_body = SourceDeclaration.preprocess(method_body);
                     method_body = method_body.replaceAll("this", "instance");
-                    method_body = method_body.replaceAll("BlockPosition\\.b", "BlockPosition\\$b");
-                    method_body = method_body.replaceAll("BlockPosition\\.PooledBlockPosition", "BlockPosition\\$PooledBlockPosition");
                     method_body = method_body.replace(set_str, ""); // Note: this should be fixed!
                     method_body = method_body.trim();
 

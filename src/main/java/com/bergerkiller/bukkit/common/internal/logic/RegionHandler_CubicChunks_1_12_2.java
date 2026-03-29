@@ -326,12 +326,12 @@ class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
     @Template.Import("cubicchunks.regionlib.impl.SaveCubeColumns")
     @Template.Import("cubicchunks.regionlib.impl.EntryLocation3D")
     @Template.Import("com.bergerkiller.bukkit.common.bases.IntVector3")
-    @Template.InstanceType("net.minecraft.world.level.World")
+    @Template.InstanceType("net.minecraft.world.level.Level")
     public static abstract class CubicChunksHandle extends Template.Class<Template.Handle> {
 
         /*
          * <IS_SUPPORTED>
-         * public static boolean isSupported(net.minecraft.server.level.WorldServer world) {
+         * public static boolean isSupported(net.minecraft.server.level.ServerLevel world) {
          *     return world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld();
          * }
          */
@@ -469,7 +469,7 @@ class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
          *     }
          * 
          *     ICubicStorage storage = ((AsyncBatchingCubeIO) cubeIO).getStorage();
-         *     return storage.columnExists(new net.minecraft.world.level.ChunkCoordIntPair(cx, cz));
+         *     return storage.columnExists(new net.minecraft.world.level.ChunkPos(cx, cz));
          * #endif
          * }
          */

@@ -62,12 +62,12 @@ public class UnsetDataWatcherItemInit {
 
         try {
             // Implement 1.20.5 RegistryFriendlyByteBuf if it exists
-            Class<?> dataWatcherItemType = Resolver.loadClass("net.minecraft.network.syncher.DataWatcher$Item", false);
+            Class<?> dataWatcherItemType = Resolver.loadClass("net.minecraft.network.syncher.SynchedEntityData$Item", false);
             if (dataWatcherItemType == null) {
                 throw new IllegalStateException("DataWatcher.Item class not found in server");
             }
 
-            Class<?> dataWatcherObjectType = Resolver.loadClass("net.minecraft.network.syncher.DataWatcherObject", false);
+            Class<?> dataWatcherObjectType = Resolver.loadClass("net.minecraft.network.syncher.EntityDataAccessor", false);
             if (dataWatcherObjectType == null) {
                 throw new IllegalStateException("DataWatcherObject class not found in server");
             }

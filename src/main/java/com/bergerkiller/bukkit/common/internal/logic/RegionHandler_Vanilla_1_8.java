@@ -36,23 +36,25 @@ import com.bergerkiller.mountiplex.reflection.util.FastMethod;
  * Handles region-based operations from MC 1.8 to MC 1.13.2
  */
 class RegionHandler_Vanilla_1_8 extends RegionHandlerVanilla {
-    private final Class<?> regionFileCacheType = CommonUtil.getClass("net.minecraft.world.level.chunk.storage.RegionFileCache");
+    private final Class<?> regionFileCacheType = CommonUtil.getClass("net.minecraft.world.level.chunk.storage.RegionFileStorage");
     private final FastMethod<Boolean> chunkExists = new FastMethod<Boolean>();
     private final FastField<Map<File, Object>> cacheField = new FastField<Map<File, Object>>();
 
     public RegionHandler_Vanilla_1_8() {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClassName("net.minecraft.server.level.ChunkProviderServer");
+        resolver.setDeclaredClassName("net.minecraft.server.level.ServerChunkCache");
+        resolver.addImport("net.minecraft.world.level.chunk.storage.ChunkStorage");
+        resolver.addImport("net.minecraft.world.level.chunk.storage.ChunkSerializer");
         resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
 
         // chunkExists generated method
         {
             String source = SourceDeclaration.preprocess(
-                    "public static boolean chunkExists(ChunkProviderServer cps, int cx, int cz) {\n" +
-                    "    #require net.minecraft.server.level.ChunkProviderServer private final IChunkLoader chunkLoader;\n" +
-                    "    IChunkLoader loader = cps#chunkLoader;\n" +
-                    "    if (loader instanceof ChunkRegionLoader) {\n" +
-                    "        ChunkRegionLoader crl = (ChunkRegionLoader) loader;\n" +
+                    "public static boolean chunkExists(ServerChunkCache cps, int cx, int cz) {\n" +
+                    "    #require net.minecraft.server.level.ServerChunkCache private final ChunkStorage chunkLoader;\n" +
+                    "    ChunkStorage loader = cps#chunkLoader;\n" +
+                    "    if (loader instanceof ChunkSerializer) {\n" +
+                    "        ChunkSerializer crl = (ChunkSerializer) loader;\n" +
                     "#if version >= 1.12\n" +
                     "        return crl.chunkExists(cx, cz);\n" +
                     "#elseif version >= 1.11.2\n" +
@@ -85,7 +87,7 @@ class RegionHandler_Vanilla_1_8 extends RegionHandlerVanilla {
     private Map<File, Object> getCache() {
         Map<File, Object> cache = this.cacheField.get(null);
         if (cache == null) {
-            throw new IllegalStateException("Failed to find RegionFileCache cache field");
+            throw new IllegalStateException("Failed to find RegionFileStorage cache field");
         }
         return cache;
     }

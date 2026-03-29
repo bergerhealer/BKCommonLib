@@ -23,6 +23,7 @@ import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryS
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 
 @ClassHook.HookPackage("net.minecraft.server")
+@ClassHook.HookImport("net.minecraft.server.level.ServerPlayer")
 public class EntityTrackerEntryHook_1_8_to_1_13_2 extends ClassHook<EntityTrackerEntryHook_1_8_to_1_13_2> implements EntityTrackerEntryHook {
     private EntityNetworkController<?> controller;
     private ViewableLogic viewable;
@@ -36,7 +37,7 @@ public class EntityTrackerEntryHook_1_8_to_1_13_2 extends ClassHook<EntityTracke
         this.viewable = (controller == null) ? null : new ViewableLogic(controller);
     }
 
-    @HookMethod("public void track(List<EntityHuman> list)")
+    @HookMethod("public void track(List<net.minecraft.world.entity.player.Player> list)")
     public void track(List<?> list) {
         EntityTrackerEntryStateHandle handle = EntityTrackerEntryStateHandle.createHandle(instance());
         if (handle.checkTrackNeeded()) {
@@ -73,7 +74,7 @@ public class EntityTrackerEntryHook_1_8_to_1_13_2 extends ClassHook<EntityTracke
         }
     }
 
-    @HookMethod("public void clear(EntityPlayer entityplayer)")
+    @HookMethod("public void clear(ServerPlayer entityplayer)")
     public void clear(Object entityplayer) {
         try {
             controller.removeViewer(Conversion.toPlayer.convert(entityplayer));
@@ -82,7 +83,7 @@ public class EntityTrackerEntryHook_1_8_to_1_13_2 extends ClassHook<EntityTracke
         }
     }
 
-    @HookMethod("public void removeViewer:???(EntityPlayer entityplayer)")
+    @HookMethod("public void removeViewer:???(ServerPlayer entityplayer)")
     public void removeViewer(Object entityplayer) {
         try {
             controller.removeViewer(Conversion.toPlayer.convert(entityplayer));
@@ -91,7 +92,7 @@ public class EntityTrackerEntryHook_1_8_to_1_13_2 extends ClassHook<EntityTracke
         }
     }
 
-    @HookMethod("public void updatePlayer(EntityPlayer entityplayer)")
+    @HookMethod("public void updatePlayer(ServerPlayer entityplayer)")
     public void updatePlayer(Object entityplayer) {
         if (entityplayer != controller.getEntity().getHandle()) {
             try {

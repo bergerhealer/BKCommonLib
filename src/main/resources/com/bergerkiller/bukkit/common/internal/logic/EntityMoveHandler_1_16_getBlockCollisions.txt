@@ -9,19 +9,19 @@
 // flag = always false
 
 public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler handler, VoxelShape voxelshape, VoxelShape voxelshape1, boolean flag) {
-    int i = MathUtil.floor(voxelshape.b(EnumDirection$EnumAxis.X)) - 1;
-    int j = MathUtil.ceil(voxelshape.c(EnumDirection$EnumAxis.X)) + 1;
-    int k = MathUtil.floor(voxelshape.b(EnumDirection$EnumAxis.Y)) - 1;
-    int l = MathUtil.ceil(voxelshape.c(EnumDirection$EnumAxis.Y)) + 1;
-    int i1 = MathUtil.floor(voxelshape.b(EnumDirection$EnumAxis.Z)) - 1;
-    int j1 = MathUtil.ceil(voxelshape.c(EnumDirection$EnumAxis.Z)) + 1;
+    int i = Mth.floor(voxelshape.b(Direction$Axis.X)) - 1;
+    int j = Mth.ceil(voxelshape.c(Direction$Axis.X)) + 1;
+    int k = Mth.floor(voxelshape.b(Direction$Axis.Y)) - 1;
+    int l = Mth.ceil(voxelshape.c(Direction$Axis.Y)) + 1;
+    int i1 = Mth.floor(voxelshape.b(Direction$Axis.Z)) - 1;
+    int j1 = Mth.ceil(voxelshape.c(Direction$Axis.Z)) + 1;
     WorldBorder worldborder = this.getWorldBorder();
-    VoxelShape voxelshape2 = VoxelShapes.a();
+    VoxelShape voxelshape2 = Shapes.a();
 
-    BlockPosition$MutableBlockPosition blockposition_b = new BlockPosition$MutableBlockPosition();
+    BlockPos$MutableBlockPos blockposition_b = new BlockPos$MutableBlockPos();
 
     for (int k1 = i; k1 < j; ++k1) {
-        VoxelShape voxelshape3 = VoxelShapes.a();
+        VoxelShape voxelshape3 = Shapes.a();
 
         for (int l1 = i1; l1 < j1; ++l1) {
             boolean flag2 = k1 == i || k1 == j - 1;
@@ -33,18 +33,18 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
 
             blockposition_b.d(k1, 64, l1);
 
-            if (this.isLoaded((BlockPosition) blockposition_b)) {
-                VoxelShape voxelshape4 = VoxelShapes.a();
+            if (this.isLoaded((BlockPos) blockposition_b)) {
+                VoxelShape voxelshape4 = Shapes.a();
 
                 for (int i2 = k; i2 < l; ++i2) {
                     if (!flag2 && !flag3 || i2 != l - 1) {
                         blockposition_b.d(k1, i2, l1);
                         VoxelShape voxelshape5;
 
-                        if (!worldborder.a((BlockPosition) blockposition_b)) {
-                            voxelshape5 = VoxelShapes.b();
+                        if (!worldborder.a((BlockPos) blockposition_b)) {
+                            voxelshape5 = Shapes.b();
                         } else {
-                            voxelshape5 = this.getType((BlockPosition) blockposition_b).getCollisionShape((IBlockAccess) this, (BlockPosition) blockposition_b);
+                            voxelshape5 = this.getType((BlockPos) blockposition_b).getCollisionShape((BlockGetter) this, (BlockPos) blockposition_b);
                         }
 
                         if (!voxelshape5.isEmpty()) {
@@ -53,7 +53,7 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
 
                             // BKCommonLib start: check actually colliding + Block Collision event handler
                             voxelshape6 = voxelshape5.a((double) k1, (double) i2, (double) l1);
-                            if (!VoxelShapes.c(voxelshape, voxelshape6, OperatorBoolean.AND)) {
+                            if (!Shapes.c(voxelshape, voxelshape6, BooleanOp.AND)) {
                                 continue;
                             }
                             org.bukkit.craftbukkit.block.CraftBlock cb_block = new org.bukkit.craftbukkit.block.CraftBlock(this, blockposition_b.immutableCopy());
@@ -63,23 +63,23 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
                             // BKCommonLib end
 
                             // voxelshape6 = voxelshape5.a((double) k1, (double) i2, (double) l1);
-                            if (!VoxelShapes.c(voxelshape1, voxelshape6, OperatorBoolean.AND) && VoxelShapes.c(voxelshape, voxelshape6, OperatorBoolean.AND)) {
+                            if (!Shapes.c(voxelshape1, voxelshape6, BooleanOp.AND) && Shapes.c(voxelshape, voxelshape6, BooleanOp.AND)) {
                                 if (flag) {
-                                    voxelshape7 = VoxelShapes.b();
+                                    voxelshape7 = Shapes.b();
                                     return voxelshape7;
                                 }
 
-                                voxelshape4 = VoxelShapes.b(voxelshape4, voxelshape6, OperatorBoolean.OR);
+                                voxelshape4 = Shapes.b(voxelshape4, voxelshape6, BooleanOp.OR);
                             }
                         }
                     }
                 }
 
-                voxelshape3 = VoxelShapes.b(voxelshape3, voxelshape4, OperatorBoolean.OR);
+                voxelshape3 = Shapes.b(voxelshape3, voxelshape4, BooleanOp.OR);
             }
         }
 
-        voxelshape2 = VoxelShapes.b(voxelshape2, voxelshape3, OperatorBoolean.OR);
+        voxelshape2 = Shapes.b(voxelshape2, voxelshape3, BooleanOp.OR);
     }
 
     if (flag) {

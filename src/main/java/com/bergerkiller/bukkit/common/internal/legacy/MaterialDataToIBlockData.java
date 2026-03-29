@@ -42,9 +42,9 @@ public class MaterialDataToIBlockData {
             resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
             if (Common.evaluateMCVersion(">=", "1.18")) {
                 craftBukkitgetIBlockData.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(
-                        "public static net.minecraft.world.level.block.state.IBlockData getIBlockData(org.bukkit.material.MaterialData materialdata) {\n" +
+                        "public static net.minecraft.world.level.block.state.BlockState getIBlockData(org.bukkit.material.MaterialData materialdata) {\n" +
                         "    org.bukkit.Material legacy_type = org.bukkit.craftbukkit.legacy.CraftLegacy.toLegacy(materialdata.getItemType());\n" +
-                        "    net.minecraft.world.level.block.state.IBlockData result = org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacyData(legacy_type, materialdata.getData());\n" +
+                        "    net.minecraft.world.level.block.state.BlockState result = org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacyData(legacy_type, materialdata.getData());\n" +
                         "    if (result == net.minecraft.world.level.block.Blocks.AIR.defaultBlockState()) {\n" +
                         "        org.bukkit.Material type = org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacy(materialdata.getItemType());\n" +
                         "        net.minecraft.world.level.block.Block block = CraftMagicNumbers.getBlock(type);\n" +
@@ -57,10 +57,10 @@ public class MaterialDataToIBlockData {
                 )));
             } else if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
                 craftBukkitgetIBlockData.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(
-                        "public static net.minecraft.world.level.block.state.IBlockData getIBlockData(org.bukkit.material.MaterialData materialdata) {\n" +
+                        "public static net.minecraft.world.level.block.state.BlockState getIBlockData(org.bukkit.material.MaterialData materialdata) {\n" +
                         "    org.bukkit.Material legacy_type = org.bukkit.craftbukkit.legacy.CraftLegacy.toLegacy(materialdata.getItemType());\n" +
-                        "#if exists org.bukkit.craftbukkit.legacy.CraftLegacy public static net.minecraft.world.level.block.state.IBlockData fromLegacyData(org.bukkit.Material material, byte data);\n" +
-                        "    net.minecraft.world.level.block.state.IBlockData result = org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacyData(legacy_type, materialdata.getData());\n" +
+                        "#if exists org.bukkit.craftbukkit.legacy.CraftLegacy public static net.minecraft.world.level.block.state.BlockState fromLegacyData(org.bukkit.Material material, byte data);\n" +
+                        "    net.minecraft.world.level.block.state.BlockState result = org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacyData(legacy_type, materialdata.getData());\n" +
                         "    if (result == net.minecraft.world.level.block.Blocks.AIR.getBlockData()) {\n" +
                         "        org.bukkit.Material type = org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacy(materialdata.getItemType());\n" +
                         "        net.minecraft.world.level.block.Block block = CraftMagicNumbers.getBlock(type);\n" +
@@ -81,11 +81,11 @@ public class MaterialDataToIBlockData {
                 )));
             } else {
                 craftBukkitgetIBlockData.init(new MethodDeclaration(resolver, 
-                        "public static net.minecraft.world.level.block.state.IBlockData getIBlockData(org.bukkit.material.MaterialData materialdata) {\n" +
-                        "    #require net.minecraft.world.level.block.Block public net.minecraft.world.level.block.state.IBlockData fromLegacyData(int legacyData);\n" +
-                        "    #require net.minecraft.world.level.block.Block public net.minecraft.world.level.block.state.IBlockData getBlockData();\n" +
+                        "public static net.minecraft.world.level.block.state.BlockState getIBlockData(org.bukkit.material.MaterialData materialdata) {\n" +
+                        "    #require net.minecraft.world.level.block.Block public net.minecraft.world.level.block.state.BlockState fromLegacyData(int legacyData);\n" +
+                        "    #require net.minecraft.world.level.block.Block public net.minecraft.world.level.block.state.BlockState getBlockData();\n" +
                         "    net.minecraft.world.level.block.Block block = CraftMagicNumbers.getBlock(materialdata.getItemType());\n" +
-                        "    net.minecraft.world.level.block.state.IBlockData result;\n" +
+                        "    net.minecraft.world.level.block.state.BlockState result;\n" +
                         "    try {\n" +
                         "        result = block#fromLegacyData((int) materialdata.getData());\n" +
                         "        // Returns null on TacoSpigot when last set() fails\n" +

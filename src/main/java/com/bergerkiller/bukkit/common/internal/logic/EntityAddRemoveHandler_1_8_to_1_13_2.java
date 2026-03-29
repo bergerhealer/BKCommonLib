@@ -291,6 +291,7 @@ class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler {
      * Most of it is ignored and discarded. We need it for Entity Add/Remove event handling.
      */
     @ClassHook.HookPackage("net.minecraft.server")
+    @ClassHook.HookImport("net.minecraft.world.entity.Entity")
     public static class WorldListenerHook extends ClassHook<WorldListenerHook> {
         private final EntityAddRemoveHandler_1_8_to_1_13_2 handler;
         private final World world;

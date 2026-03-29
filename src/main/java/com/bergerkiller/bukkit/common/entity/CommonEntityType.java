@@ -156,11 +156,11 @@ public class CommonEntityType {
 
             // Types without a clear mapping
             if (entityTypeEnumName.equals("PLAYER")) {
-                nmsName = "net.minecraft.server.level.EntityPlayer";
+                nmsName = "net.minecraft.server.level.ServerPlayer";
             } else if (entityTypeEnumName.equals("FISHING_HOOK")) {
-                nmsName = "net.minecraft.world.entity.projectile.EntityFishingHook";
+                nmsName = "net.minecraft.world.entity.projectile.FishingHook";
             } else if (entityTypeEnumName.equals("LIGHTNING")) {
-                nmsName = "net.minecraft.world.entity.EntityLightning";
+                nmsName = "net.minecraft.world.entity.LightningBolt";
             } else if (entityTypeEnumName.equals("WEATHER")) {
                 nmsName = "net.minecraft.world.entity.EntityWeather";
             } else if (entityTypeEnumName.equals("COMPLEX_PART")) {
@@ -169,18 +169,18 @@ public class CommonEntityType {
 
             // <= 1.10.2 (now removed)
             if (entityTypeEnumName.equals("EGG")) {
-                nmsName = "net.minecraft.world.entity.projectile.EntityEgg";
+                nmsName = "net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEgg";
             } else if (entityTypeEnumName.equals("AREA_EFFECT_CLOUD")) {
-                nmsName = "net.minecraft.world.entity.EntityAreaEffectCloud";
+                nmsName = "net.minecraft.world.entity.AreaEffectCloud";
             } else if (entityTypeEnumName.equals("SPLASH_POTION")) {
-                nmsName = "net.minecraft.world.entity.projectile.EntityPotion";
+                nmsName = "net.minecraft.world.entity.projectile.throwableitemprojectile.AbstractThrownPotion";
             }
 
             // Added in >= 1.10.2
             if (entityTypeEnumName.equals("TIPPED_ARROW")) {
-                nmsName = "net.minecraft.world.entity.projectile.EntityTippedArrow";
+                nmsName = "net.minecraft.world.entity.projectile.arrow.EntityTippedArrow";
             } else if (entityTypeEnumName.equals("LINGERING_POTION")) {
-                nmsName = "net.minecraft.world.entity.projectile.EntityPotion";
+                nmsName = "net.minecraft.world.entity.projectile.throwableitemprojectile.AbstractThrownPotion";
             }
 
             // Added in >= 1.19.3
@@ -410,7 +410,7 @@ public class CommonEntityType {
         return LogicUtil.fixNull(byEntityTypeId.get(entityTypeId), UNKNOWN);
     }
 
-    @ConverterMethod(input="net.minecraft.world.entity.EntityTypes")
+    @ConverterMethod(input="net.minecraft.world.entity.EntityType")
     public static CommonEntityType byNMSEntityTypeRaw(Object entityTypesHandleRaw) {
         if (entityTypesHandleRaw != null) {
             CommonEntityType type = byNMSEntityType.get(entityTypesHandleRaw);
@@ -427,7 +427,7 @@ public class CommonEntityType {
         return UNKNOWN;
     }
 
-    @ConverterMethod(output="net.minecraft.world.entity.EntityTypes")
+    @ConverterMethod(output="net.minecraft.world.entity.EntityType")
     public static Object toNMSEntityTypeRaw(CommonEntityType entityType) {
         return entityType.nmsEntityType == null ? null : entityType.nmsEntityType.getRaw();
     }

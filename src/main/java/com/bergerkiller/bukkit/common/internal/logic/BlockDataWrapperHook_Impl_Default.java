@@ -43,15 +43,15 @@ class BlockDataWrapperHook_Impl_Default extends BlockDataWrapperHook {
         if (CommonBootstrap.evaluateMCVersion(">=", "1.20.5")) {
             // Reference2ObjectArrayMap after 1.20.5
             immutableMapType = getClassVerify("it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap");
-            Class<?> iBlockDataHolderType = getClassVerify("net.minecraft.world.level.block.state.IBlockDataHolder");
+            Class<?> iBlockDataHolderType = getClassVerify("net.minecraft.world.level.block.state.StateHolder");
             valuesField = Resolver.resolveAndGetDeclaredField(iBlockDataHolderType, "values");
         } else {
             // ImmutableMap before MC 1.20.5
             // Version-specific field names...
             immutableMapType = getClassVerify("com.google.common.collect.ImmutableMap");
             if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
-                // Since MC 1.16: Field is stored in the IBlockDataHolder class
-                Class<?> iBlockDataHolderType = getClassVerify("net.minecraft.world.level.block.state.IBlockDataHolder");
+                // Since MC 1.16: Field is stored in the StateHolder class
+                Class<?> iBlockDataHolderType = getClassVerify("net.minecraft.world.level.block.state.StateHolder");
                 if (CommonBootstrap.evaluateMCVersion(">=", "1.18")) {
                     valuesField = Resolver.resolveAndGetDeclaredField(iBlockDataHolderType, "values");
                 } else if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
@@ -69,7 +69,7 @@ class BlockDataWrapperHook_Impl_Default extends BlockDataWrapperHook {
                 }
             } else {
                 // MC 1.8 - 1.12.2: Field is stored in the BlockData class
-                Class<?> blockDataType = CommonUtil.getClass("net.minecraft.world.level.block.state.BlockStateList$BlockData");
+                Class<?> blockDataType = CommonUtil.getClass("net.minecraft.world.level.block.state.StateDefinition$BlockData");
                 if (SafeField.contains(blockDataType, "bAsImmutableMap", immutableMapType)) {
                     // Optimization on TacoSpigot / BurritoSpigot
                     valuesField = blockDataType.getDeclaredField("bAsImmutableMap");
