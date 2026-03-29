@@ -115,7 +115,7 @@ public class SpigotMappings extends VersionedMappingsFileIO<SpigotMappings.Class
                 }
             }
             if (bukkitFullName != null) {
-                newMappings.put(bukkitFullName, cl.name);
+                newMappings.put(cl.name, bukkitFullName);
             }
         }
 
@@ -177,13 +177,17 @@ public class SpigotMappings extends VersionedMappingsFileIO<SpigotMappings.Class
             this(mappedVersion.mappings);
         }
 
-        public ClassMappings(Map<String, String> spigotToMojang) {
-            this.spigotToMojang = HashBiMap.create(spigotToMojang);
-            this.mojangToSpigot = this.spigotToMojang.inverse();
+        public ClassMappings(Map<String, String> mojangToSpigot) {
+            this.mojangToSpigot = HashBiMap.create(mojangToSpigot);
+            this.spigotToMojang = this.mojangToSpigot.inverse();
         }
 
-        public void put(String spigotClassName, String mojangClassName) {
-            this.spigotToMojang.put(spigotClassName, mojangClassName);
+        public BiMap<String, String> getMojangToSpigot() {
+            return mojangToSpigot;
+        }
+
+        public void put(String mojangClassName, String spigotClassName) {
+            this.mojangToSpigot.put(mojangClassName, spigotClassName);
         }
 
         /**
@@ -193,8 +197,19 @@ public class SpigotMappings extends VersionedMappingsFileIO<SpigotMappings.Class
          * @param spigotClassName Spigot class name
          * @param subClassName Sub-class name for under the spigot/mojang class name
          */
-        public void remapSubClass(String spigotClassName, String subClassName) {
-            put(spigotClassName + "$" + subClassName, toMojang(spigotClassName) + "$" + subClassName);
+        public void remapSpigotSubClass(String spigotClassName, String subClassName) {
+            put(toMojang(spigotClassName) + "$" + subClassName, spigotClassName + "$" + subClassName);
+        }
+
+        /**
+         * Stores a new mapping from a sub-class of a mojang class name, remapping to the same
+         * sub-class name but with spigot mappings instead.
+         *
+         * @param mojangClassName Mojang class name
+         * @param subClassName Sub-class name for under the spigot/mojang class name
+         */
+        public void remapMojangSubClass(String mojangClassName, String subClassName) {
+            put(mojangClassName + "$" + subClassName, toSpigot(mojangClassName) + "$" + subClassName);
         }
 
         public String toMojang(String spigotClassName) {

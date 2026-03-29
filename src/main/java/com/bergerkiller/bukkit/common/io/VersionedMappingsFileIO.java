@@ -122,6 +122,22 @@ public class VersionedMappingsFileIO<T> {
     }
 
     /**
+     * Inverts the mapping so key=value becomes value=key. This is useful if multiple keys
+     * must point to the same value, but right now the order is opposite of how it should be.
+     */
+    public void invert() {
+        for (MappedVersion<T> mapped : byVersion.values()) {
+            Map<String, String> inverted = new HashMap<>();
+            for (Map.Entry<String, String> e : mapped.mappings.entrySet()) {
+                inverted.put(e.getValue(), e.getKey());
+            }
+            mapped.mappings.clear();
+            mapped.mappings.putAll(inverted);
+            mapped.cachedValue = null; // Clear cache since the mappings have changed
+        }
+    }
+
+    /**
      * Reads all the mappings from an input stream in binary format.
      * Note: closes the input stream.
      *
