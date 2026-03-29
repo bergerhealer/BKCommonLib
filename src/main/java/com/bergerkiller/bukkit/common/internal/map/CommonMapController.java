@@ -20,8 +20,8 @@ import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.entity.PlayerInstancePhase;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSetCreativeSlotHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundSetCreativeModeSlotPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMapItemDataPacketHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -92,20 +92,18 @@ import com.bergerkiller.bukkit.common.utils.ChunkUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSteerVehicleHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSetSlotHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundPlayerInputPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacketHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityItemFrameHandle;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.decoration.ItemFrameHandle;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.OutputTypeMap;
@@ -120,7 +118,7 @@ public final class CommonMapController implements PacketListener, Listener {
     // Whether tiling is supported. Disables findNeighbours() if false.
     private boolean isFrameTilingSupported = true;
     // Stores cached thread-safe lists of item frames by cluster key
-    protected final Map<ItemFrameClusterKey, Set<EntityItemFrameHandle> > itemFrameEntities = new HashMap<>();
+    protected final Map<ItemFrameClusterKey, Set<ItemFrameHandle> > itemFrameEntities = new HashMap<>();
     // Bi-directional mapping between map UUID and Map (durability) Id
     private final IntHashMap<MapUUID> mapUUIDById = new IntHashMap<MapUUID>();
     private final HashMap<MapUUID, Integer> mapIdByUUID = new HashMap<MapUUID, Integer>();
@@ -382,7 +380,7 @@ public final class CommonMapController implements PacketListener, Listener {
                     if (unchanged) {
                         // When unchanged set the item in the metadata without causing a refresh
                         DataWatcher data = EntityHandle.fromBukkit(itemFrameInfo.itemFrame).getDataWatcher();
-                        DataWatcher.Item<ItemStack> dataItem = data.getItem(EntityItemFrameHandle.DATA_ITEM);
+                        DataWatcher.Item<ItemStack> dataItem = data.getItem(ItemFrameHandle.DATA_ITEM);
                         dataItem.setValue(newItem.toBukkit(), dataItem.isChanged());
                     } else {
                         // When changed, set it normally so the item is refreshed
@@ -444,7 +442,7 @@ public final class CommonMapController implements PacketListener, Listener {
         // No actual initialization is done yet, this happens next tick cycle!
         if (this.isFrameDisplaysEnabled) {
             for (World world : Bukkit.getWorlds()) {
-                for (EntityItemFrameHandle itemFrame : initItemFrameSetOfWorld(world)) {
+                for (ItemFrameHandle itemFrame : initItemFrameSetOfWorld(world)) {
                     onAddItemFrame(itemFrame);
                 }
             }
@@ -721,7 +719,7 @@ public final class CommonMapController implements PacketListener, Listener {
     public synchronized void onPacketSend(PacketSendEvent event) {
         // Check if any virtual single maps are attached to this map
         if (event.getType() == PacketType.OUT_MAP) {
-            int itemid = PacketPlayOutMapHandle.createHandle(event.getPacket().getHandle()).getMapId();
+            int itemid = ClientboundMapItemDataPacketHandle.createHandle(event.getPacket().getHandle()).getMapId();
             this.storeStaticMapId(itemid);
 
             // This used to be used to just cancel interfering plugins
@@ -812,7 +810,7 @@ public final class CommonMapController implements PacketListener, Listener {
                         continue;
                     }
 
-                    DataWatcher.PackedItem<ItemStack> item = itemRaw.translate(EntityItemFrameHandle.DATA_ITEM);
+                    DataWatcher.PackedItem<ItemStack> item = itemRaw.translate(ItemFrameHandle.DATA_ITEM);
                     if (item == null) {
                         continue;
                     }
@@ -856,7 +854,7 @@ public final class CommonMapController implements PacketListener, Listener {
                 // Some plugins send garbage that isn't metadata and need to be updated
                 // In that case, a null entry is put (as it cannot be converted)
                 if (dw_item != null) {
-                    DataWatcher.PackedItem<ItemStack> item = dw_item.translate(EntityItemFrameHandle.DATA_ITEM);
+                    DataWatcher.PackedItem<ItemStack> item = dw_item.translate(ItemFrameHandle.DATA_ITEM);
                     if (item != null) {
                         return CommonMapUUIDStore.isMap(item.value());
                     }
@@ -873,7 +871,7 @@ public final class CommonMapController implements PacketListener, Listener {
             Player p = event.getPlayer();
             MapPlayerInput input = playerInputs.get(p);
             if (input != null) {
-                PacketPlayInSteerVehicleHandle packet = PacketPlayInSteerVehicleHandle.createHandle(event.getPacket().getHandle());
+                ServerboundPlayerInputPacketHandle packet = ServerboundPlayerInputPacketHandle.createHandle(event.getPacket().getHandle());
                 int dx = (int) -Math.signum(packet.getSideways());
                 int dy = (int) -Math.signum(packet.getForwards());
                 int dz = 0;
@@ -902,7 +900,7 @@ public final class CommonMapController implements PacketListener, Listener {
         // When in creative mode, players may accidentally set the 'virtual' map Id as the actual Id in their inventory
         // We have to prevent that in here
         if (event.getType() == PacketType.IN_SET_CREATIVE_SLOT) {
-            PacketPlayInSetCreativeSlotHandle packet = PacketPlayInSetCreativeSlotHandle.createHandle(event.getPacket().getHandle());
+            ServerboundSetCreativeModeSlotPacketHandle packet = ServerboundSetCreativeModeSlotPacketHandle.createHandle(event.getPacket().getHandle());
             CommonItemStack item = CommonItemStack.of(packet.getItem());
             UUID mapUUID = CommonMapUUIDStore.getMapUUID(item);
             if (mapUUID != null && CommonMapUUIDStore.getStaticMapId(mapUUID) == -1) {
@@ -940,7 +938,7 @@ public final class CommonMapController implements PacketListener, Listener {
                 // Cancel original packet, we send a replacement (immutable) if changed
                 // Equals check avoids infinite loop
                 if (!item.equals(newItem)) {
-                    event.setPacket(PacketPlayInSetCreativeSlotHandle.createNew(
+                    event.setPacket(ServerboundSetCreativeModeSlotPacketHandle.createNew(
                             packet.getSlotIndex(), newItem.toBukkit()));
                 }
             }
@@ -985,7 +983,7 @@ public final class CommonMapController implements PacketListener, Listener {
                 ItemStack item = player.getInventory().getItem(slot);
                 if (CommonItemStack.of(item).isMapDisplay()) {
                     // Resend the item!
-                    PacketUtil.sendPacket(player, PacketPlayOutSetSlotHandle.createNew(EntityPlayerHandle.fromBukkit(player).getCurrentWindowId(), rawSlot, item));
+                    PacketUtil.sendPacket(player, ClientboundContainerSetSlotPacketHandle.createNew(ServerPlayerHandle.fromBukkit(player).getCurrentWindowId(), rawSlot, item));
                 }
             });
         }
@@ -1030,7 +1028,7 @@ public final class CommonMapController implements PacketListener, Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     protected synchronized void onEntityAdded(EntityAddEvent event) {
         if (this.isFrameDisplaysEnabled && event.getEntity() instanceof ItemFrame) {
-            EntityItemFrameHandle frameHandle = EntityItemFrameHandle.createHandle(HandleConversion.toEntityHandle(event.getEntity()));
+            ItemFrameHandle frameHandle = ItemFrameHandle.createHandle(HandleConversion.toEntityHandle(event.getEntity()));
             getItemFrameEntities(new ItemFrameClusterKey(frameHandle)).add(frameHandle);
             onAddItemFrame(frameHandle);
         }
@@ -1040,7 +1038,7 @@ public final class CommonMapController implements PacketListener, Listener {
     protected synchronized void onEntityRemoved(EntityRemoveEvent event) {
         if (event.getEntity() instanceof ItemFrame) {
             ItemFrame frame = (ItemFrame) event.getEntity();
-            EntityItemFrameHandle frameHandle = EntityItemFrameHandle.fromBukkit(frame);
+            ItemFrameHandle frameHandle = ItemFrameHandle.fromBukkit(frame);
             getItemFrameEntities(new ItemFrameClusterKey(frameHandle)).remove(frameHandle);
             ItemFrameInfo info = itemFrames.get(frame.getEntityId());
             if (info != null) {
@@ -1057,7 +1055,7 @@ public final class CommonMapController implements PacketListener, Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     protected synchronized void onWorldLoad(WorldLoadEvent event) {
         if (this.isFrameDisplaysEnabled) {
-            for (EntityItemFrameHandle frame : initItemFrameSetOfWorld(event.getWorld())) {
+            for (ItemFrameHandle frame : initItemFrameSetOfWorld(event.getWorld())) {
                 onAddItemFrame(frame);
             }
         }
@@ -1096,7 +1094,7 @@ public final class CommonMapController implements PacketListener, Listener {
         }
     }
 
-    private void onAddItemFrame(EntityItemFrameHandle frame) {
+    private void onAddItemFrame(ItemFrameHandle frame) {
         int entityId = frame.getId();
         {
             ItemFrameInfo frameInfo = itemFrames.get(entityId);
@@ -1490,7 +1488,7 @@ public final class CommonMapController implements PacketListener, Listener {
      * 
      * @param itemFrame to get the map UUID from
      */
-    protected MapUUID getItemFrameMapUUID(EntityItemFrameHandle itemFrame) {
+    protected MapUUID getItemFrameMapUUID(ItemFrameHandle itemFrame) {
         if (itemFrame == null) {
             return null;
         } else {
@@ -1520,20 +1518,20 @@ public final class CommonMapController implements PacketListener, Listener {
 
                 // Verify that all item frame entities currently loaded are validly mapped
                 // If some are not, we re-initialize the listing
-                List<EntityItemFrameHandle> itemFramesToAdd = new ArrayList<>();
+                List<ItemFrameHandle> itemFramesToAdd = new ArrayList<>();
                 for (World world : worlds) {
-                    for (Object entityHandle : (Iterable<?>) WorldServerHandle.T.getEntities.raw.invoke(HandleConversion.toWorldHandle(world))) {
-                        if (!EntityItemFrameHandle.T.isAssignableFrom(entityHandle)) {
+                    for (Object entityHandle : (Iterable<?>) ServerLevelHandle.T.getEntities.raw.invoke(HandleConversion.toWorldHandle(world))) {
+                        if (!ItemFrameHandle.T.isAssignableFrom(entityHandle)) {
                             continue;
                         }
                         Integer id = EntityHandle.T.getId.invoker.invoke(entityHandle);
                         if (itemFrames.containsKey(id)) {
                             continue;
                         }
-                        itemFramesToAdd.add(EntityItemFrameHandle.createHandle(entityHandle));
+                        itemFramesToAdd.add(ItemFrameHandle.createHandle(entityHandle));
                     }
                 }
-                for (EntityItemFrameHandle frameHandle : itemFramesToAdd) {
+                for (ItemFrameHandle frameHandle : itemFramesToAdd) {
                     getItemFrameEntities(new ItemFrameClusterKey(frameHandle)).add(frameHandle);
                     onAddItemFrame(frameHandle);
                 }
@@ -1584,7 +1582,7 @@ public final class CommonMapController implements PacketListener, Listener {
      * @return cluster
      */
     public final synchronized ItemFrameCluster findCluster(
-            final EntityItemFrameHandle itemFrame,
+            final ItemFrameHandle itemFrame,
             final IntVector3 itemFramePosition
     ) {
         return findCluster(itemFrame, itemFramePosition, false);
@@ -1599,11 +1597,11 @@ public final class CommonMapController implements PacketListener, Listener {
      * @return cluster
      */
     public final synchronized ItemFrameCluster findCluster(
-            final EntityItemFrameHandle itemFrame,
+            final ItemFrameHandle itemFrame,
             final IntVector3 itemFramePosition,
             final boolean includingEmpty
     ) {
-        final Predicate<EntityItemFrameHandle> itemFrameFilter;
+        final Predicate<ItemFrameHandle> itemFrameFilter;
         if (includingEmpty && ItemUtil.isEmpty(itemFrame.getItem())) {
             // Proceed only filling empty item frames
             itemFrameFilter = e -> ItemUtil.isEmpty(e.getItem());
@@ -1661,7 +1659,7 @@ public final class CommonMapController implements PacketListener, Listener {
             // - Same ItemStack map UUID (or, if includingEmpty, are empty)
 
             ItemFrameClusterKey key = new ItemFrameClusterKey(world, itemFrame.getFacing(), itemFramePosition);
-            for (EntityItemFrameHandle otherFrame : getItemFrameEntities(key)) {
+            for (ItemFrameHandle otherFrame : getItemFrameEntities(key)) {
                 if (otherFrame.getId() != itemFrame.getId() && itemFrameFilter.test(otherFrame)) {
                     cache.put(otherFrame);
                 }
@@ -1735,7 +1733,7 @@ public final class CommonMapController implements PacketListener, Listener {
         }
 
         // Helper
-        public void put(EntityItemFrameHandle itemFrame) {
+        public void put(ItemFrameHandle itemFrame) {
             cache.put(itemFrame.getBlockPosition(), new Frame(itemFrame));
         }
 
@@ -1743,7 +1741,7 @@ public final class CommonMapController implements PacketListener, Listener {
         public static final class Frame {
             public final int rotation;
 
-            public Frame(EntityItemFrameHandle itemFrame) {
+            public Frame(ItemFrameHandle itemFrame) {
                 this.rotation = itemFrame.getRotationOrdinal() & 0x3;
             }
         }
@@ -1767,11 +1765,11 @@ public final class CommonMapController implements PacketListener, Listener {
         }
     }
 
-    private final List<EntityItemFrameHandle> initItemFrameSetOfWorld(World world) {
-        List<EntityItemFrameHandle> itemFrames = new ArrayList<EntityItemFrameHandle>();
-        for (Object entityHandle : (Iterable<?>) WorldServerHandle.T.getEntities.raw.invoke(HandleConversion.toWorldHandle(world))) {
-            if (EntityItemFrameHandle.T.isAssignableFrom(entityHandle)) {
-                EntityItemFrameHandle itemFrame = EntityItemFrameHandle.createHandle(entityHandle);
+    private final List<ItemFrameHandle> initItemFrameSetOfWorld(World world) {
+        List<ItemFrameHandle> itemFrames = new ArrayList<ItemFrameHandle>();
+        for (Object entityHandle : (Iterable<?>) ServerLevelHandle.T.getEntities.raw.invoke(HandleConversion.toWorldHandle(world))) {
+            if (ItemFrameHandle.T.isAssignableFrom(entityHandle)) {
+                ItemFrameHandle itemFrame = ItemFrameHandle.createHandle(entityHandle);
                 getItemFrameEntities(new ItemFrameClusterKey(itemFrame)).add(itemFrame);
                 itemFrames.add(itemFrame);
             }
@@ -1779,10 +1777,10 @@ public final class CommonMapController implements PacketListener, Listener {
         return itemFrames;
     }
 
-    private final Set<EntityItemFrameHandle> getItemFrameEntities(ItemFrameClusterKey key) {
-        Set<EntityItemFrameHandle> set = this.itemFrameEntities.get(key);
+    private final Set<ItemFrameHandle> getItemFrameEntities(ItemFrameClusterKey key) {
+        Set<ItemFrameHandle> set = this.itemFrameEntities.get(key);
         if (set == null) {
-            set = new HashSet<EntityItemFrameHandle>();
+            set = new HashSet<ItemFrameHandle>();
             this.itemFrameEntities.put(key, set);
         }
         return set;
@@ -1796,7 +1794,7 @@ public final class CommonMapController implements PacketListener, Listener {
      * @return item displayed, null if empty
      */
     public static ItemStack getItemFrameItem(ItemFrame itemFrame) {
-        return EntityItemFrameHandle.fromBukkit(itemFrame).getItem();
+        return ItemFrameHandle.fromBukkit(itemFrame).getItem();
     }
 
     /**
@@ -1807,7 +1805,7 @@ public final class CommonMapController implements PacketListener, Listener {
      * @param item to set
      */
     public static void setItemFrameItem(ItemFrame itemFrame, ItemStack item) {
-        EntityItemFrameHandle.fromBukkit(itemFrame).setItem(item);
+        ItemFrameHandle.fromBukkit(itemFrame).setItem(item);
     }
 
     /**

@@ -22,15 +22,15 @@ import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
-import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.core.BlockPosHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ChunkHolderHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
@@ -95,7 +95,7 @@ public class WorldUtil extends ChunkUtil {
      */
     public static boolean isLoaded(World world) {
         Object nmsWorldServerHandle = HandleConversion.toWorldHandle(world);
-        return WorldServerHandle.T.isLoaded.invoker.invoke(nmsWorldServerHandle);
+        return ServerLevelHandle.T.isLoaded.invoker.invoke(nmsWorldServerHandle);
     }
 
     /**
@@ -151,12 +151,12 @@ public class WorldUtil extends ChunkUtil {
      * @return BlockData
      */
     public static BlockData getBlockData(org.bukkit.World world, int x, int y, int z) {
-        return WorldHandle.T.getBlockDataAtCoord.invoker.invoke(HandleConversion.toWorldHandle(world), x, y, z);
+        return LevelHandle.T.getBlockDataAtCoord.invoker.invoke(HandleConversion.toWorldHandle(world), x, y, z);
 
         /*
         Object worldHandleRaw = HandleConversion.toWorldHandle(world);
-        Object blockPos = BlockPositionHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
-        Object iBlockData = WorldHandle.T.getBlockData.raw.invoke(worldHandleRaw, blockPos); 
+        Object blockPos = BlockPosHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
+        Object iBlockData = LevelHandle.T.getBlockData.raw.invoke(worldHandleRaw, blockPos);
         return BlockData.fromBlockData(iBlockData);
         */
     }
@@ -192,8 +192,8 @@ public class WorldUtil extends ChunkUtil {
      */
     public static void setBlockData(org.bukkit.block.Block block, BlockData data) {
         Object worldHandle = HandleConversion.toWorldHandle(block.getWorld());
-        Object blockPosition = BlockPositionHandle.T.fromBukkitBlockRaw.invoke(block);
-        WorldHandle.T.setBlockData.raw.invoke(worldHandle, blockPosition, data.getData(), WorldHandle.UPDATE_DEFAULT);
+        Object blockPosition = BlockPosHandle.T.fromBukkitBlockRaw.invoke(block);
+        LevelHandle.T.setBlockData.raw.invoke(worldHandle, blockPosition, data.getData(), LevelHandle.UPDATE_DEFAULT);
     }
 
     /**
@@ -205,8 +205,8 @@ public class WorldUtil extends ChunkUtil {
      */
     public static void setBlockData(org.bukkit.World world, IntVector3 position, BlockData data) {
         Object worldHandle = HandleConversion.toWorldHandle(world);
-        Object blockPosition = BlockPositionHandle.T.fromIntVector3Raw.invoke(position);
-        WorldHandle.T.setBlockData.raw.invoke(worldHandle, blockPosition, data.getData(), WorldHandle.UPDATE_DEFAULT);
+        Object blockPosition = BlockPosHandle.T.fromIntVector3Raw.invoke(position);
+        LevelHandle.T.setBlockData.raw.invoke(worldHandle, blockPosition, data.getData(), LevelHandle.UPDATE_DEFAULT);
     }
 
     /**
@@ -220,8 +220,8 @@ public class WorldUtil extends ChunkUtil {
      */
     public static void setBlockData(org.bukkit.World world, int x, int y, int z, BlockData data) {
         Object worldHandle = HandleConversion.toWorldHandle(world);
-        Object blockPosition = BlockPositionHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
-        WorldHandle.T.setBlockData.raw.invoke(worldHandle, blockPosition, data.getData(), WorldHandle.UPDATE_DEFAULT);
+        Object blockPosition = BlockPosHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
+        LevelHandle.T.setBlockData.raw.invoke(worldHandle, blockPosition, data.getData(), LevelHandle.UPDATE_DEFAULT);
     }
 
     /**
@@ -384,7 +384,7 @@ public class WorldUtil extends ChunkUtil {
      * @return collection of entities on the world
      */
     public static Iterable<org.bukkit.entity.Entity> getEntities(org.bukkit.World world) {
-        return WorldServerHandle.fromBukkit(world).getEntities();
+        return ServerLevelHandle.fromBukkit(world).getEntities();
     }
 
     /**
@@ -395,7 +395,7 @@ public class WorldUtil extends ChunkUtil {
      * @return collection of players on the world
      */
     public static Collection<Player> getPlayers(org.bukkit.World world) {
-        return DuplexConversion.playerList.convert(WorldServerHandle.T.getPlayers.raw.invoke(HandleConversion.toWorldHandle(world)));
+        return DuplexConversion.playerList.convert(ServerLevelHandle.T.getPlayers.raw.invoke(HandleConversion.toWorldHandle(world)));
     }
 
     /**
@@ -544,7 +544,7 @@ public class WorldUtil extends ChunkUtil {
      * @return Nether portal search radius on this world
      */
     public static int getNetherPortalSearchRadius(World world) {
-        return WorldServerHandle.fromBukkit(world).getNetherPortalSearchRadius();
+        return ServerLevelHandle.fromBukkit(world).getNetherPortalSearchRadius();
     }
 
     /**
@@ -632,7 +632,7 @@ public class WorldUtil extends ChunkUtil {
      * @return world dimension type
      */
     public static DimensionType getDimensionType(org.bukkit.World world) {
-        return WorldHandle.fromBukkit(world).getDimensionType();
+        return LevelHandle.fromBukkit(world).getDimensionType();
     }
 
     /**
@@ -644,7 +644,7 @@ public class WorldUtil extends ChunkUtil {
      * @return dimension key
      */
     public static ResourceKey<org.bukkit.World> getDimensionKey(org.bukkit.World world) {
-        return WorldServerHandle.fromBukkit(world).getDimensionKey();
+        return ServerLevelHandle.fromBukkit(world).getDimensionKey();
     }
 
     /**
@@ -655,7 +655,7 @@ public class WorldUtil extends ChunkUtil {
      * @return world of this dimension key, null if the dimension has no loaded world
      */
     public static org.bukkit.World getWorldByDimensionKey(ResourceKey<org.bukkit.World> dimensionKey) {
-        return WorldServerHandle.getByDimensionKey(dimensionKey);
+        return ServerLevelHandle.getByDimensionKey(dimensionKey);
     }
 
     /**
@@ -665,7 +665,7 @@ public class WorldUtil extends ChunkUtil {
      * @return server
      */
     public static Server getServer(org.bukkit.World world) {
-        return WorldHandle.T.getServer.invoke(HandleConversion.toWorldHandle(world));
+        return LevelHandle.T.getServer.invoke(HandleConversion.toWorldHandle(world));
     }
 
     /**
@@ -675,7 +675,7 @@ public class WorldUtil extends ChunkUtil {
      * @return world Entity Tracker
      */
     public static EntityTracker getTracker(org.bukkit.World world) {
-        return WorldServerHandle.T.getEntityTracker.invoke(HandleConversion.toWorldHandle(world));
+        return ServerLevelHandle.T.getEntityTracker.invoke(HandleConversion.toWorldHandle(world));
     }
 
     /**
@@ -718,8 +718,8 @@ public class WorldUtil extends ChunkUtil {
 
         Object worldHandle = HandleConversion.toWorldHandle(world);
         Object ignoreHandle = (ignore == null) ? null : HandleConversion.toEntityHandle(ignore);
-        Object axisAlignedBB = AxisAlignedBBHandle.T.constr_x1_y1_z1_x2_y2_z2.raw.newInstanceVA(xmin, ymin, zmin, xmax, ymax, zmax);
-        List<?> entityHandles = (List<?>) WorldHandle.T.getNearbyEntities.raw.invoke(worldHandle, ignoreHandle, axisAlignedBB);
+        Object axisAlignedBB = AABBHandle.T.constr_x1_y1_z1_x2_y2_z2.raw.newInstanceVA(xmin, ymin, zmin, xmax, ymax, zmax);
+        List<?> entityHandles = (List<?>) LevelHandle.T.getNearbyEntities.raw.invoke(worldHandle, ignoreHandle, axisAlignedBB);
         return new ConvertingList<org.bukkit.entity.Entity>(entityHandles, DuplexConversion.entity);
     }
 
@@ -740,8 +740,8 @@ public class WorldUtil extends ChunkUtil {
         Object worldHandle = HandleConversion.toWorldHandle(entity.getWorld());
         Object entityHandle = HandleConversion.toEntityHandle(entity);
         Object entityBounds = EntityHandle.T.getBoundingBox.raw.invoke(entityHandle);
-        Object axisAlignedBB = AxisAlignedBBHandle.T.grow.raw.invoke(entityBounds, radX, radY, radZ);
-        List<?> entityHandles = (List<?>) WorldHandle.T.getNearbyEntities.raw.invoke(worldHandle, entityHandle, axisAlignedBB);
+        Object axisAlignedBB = AABBHandle.T.grow.raw.invoke(entityBounds, radX, radY, radZ);
+        List<?> entityHandles = (List<?>) LevelHandle.T.getNearbyEntities.raw.invoke(worldHandle, entityHandle, axisAlignedBB);
         return new ConvertingList<org.bukkit.entity.Entity>(entityHandles, DuplexConversion.entity);
     }
 
@@ -774,7 +774,7 @@ public class WorldUtil extends ChunkUtil {
     //  * @return damage factor
     //  */
     // public static float getExplosionDamageFactor(Location explosionPosition, org.bukkit.entity.Entity entity) {
-    //     final WorldHandle world = CommonNMS.getHandle(explosionPosition.getWorld());
+    //     final LevelHandle world = CommonNMS.getHandle(explosionPosition.getWorld());
     //     return world.getExplosionFactor(explosionPosition.toVector(), CommonNMS.getHandle(entity).getBoundingBox());
     // }
 
@@ -841,7 +841,7 @@ public class WorldUtil extends ChunkUtil {
     }
 
     public static boolean isLoaded(org.bukkit.World world, int chunkX, int chunkZ) {
-        return world != null && WorldServerHandle.T.getChunkIfLoaded.raw.invoke(HandleConversion.toWorldHandle(world), chunkX, chunkZ) != null;
+        return world != null && ServerLevelHandle.T.getChunkIfLoaded.raw.invoke(HandleConversion.toWorldHandle(world), chunkX, chunkZ) != null;
     }
 
     public static boolean areChunksLoaded(org.bukkit.World world, int chunkCenterX, int chunkCenterZ, int chunkDistance) {
@@ -871,8 +871,8 @@ public class WorldUtil extends ChunkUtil {
      * @return True if players were nearby, False if not
      */
     public static boolean queueChunkSendLight(org.bukkit.World world, int chunkX, int chunkZ) {
-        PlayerChunkMapHandle playerChunkMap = CommonNMS.getHandle(world).getPlayerChunkMap();
-        PlayerChunkHandle playerChunk = playerChunkMap.getVisibleChunk(chunkX, chunkZ);
+        ChunkMapHandle playerChunkMap = CommonNMS.getHandle(world).getPlayerChunkMap();
+        ChunkHolderHandle playerChunk = playerChunkMap.getVisibleChunk(chunkX, chunkZ);
         return playerChunk != null && playerChunk.resendAllLighting();
     }
 
@@ -898,8 +898,8 @@ public class WorldUtil extends ChunkUtil {
      * @return True if players were nearby, False if not
      */
     public static boolean queueChunkSend(org.bukkit.World world, int chunkX, int chunkZ) {
-        PlayerChunkMapHandle playerChunkMap = CommonNMS.getHandle(world).getPlayerChunkMap();
-        PlayerChunkHandle playerChunk = playerChunkMap.getVisibleChunk(chunkX, chunkZ);
+        ChunkMapHandle playerChunkMap = CommonNMS.getHandle(world).getPlayerChunkMap();
+        ChunkHolderHandle playerChunk = playerChunkMap.getVisibleChunk(chunkX, chunkZ);
         return playerChunk != null && playerChunk.resendChunk();
     }
 
@@ -921,7 +921,7 @@ public class WorldUtil extends ChunkUtil {
      * @param blockZ of the block
      */
     public static void queueBlockSend(org.bukkit.World world, int blockX, int blockY, int blockZ) {
-        WorldServerHandle.fromBukkit(world).getChunkProviderServer().markBlockDirty(BlockPositionHandle.createNew(blockX, blockY, blockZ));
+        ServerLevelHandle.fromBukkit(world).getChunkProviderServer().markBlockDirty(BlockPosHandle.createNew(blockX, blockY, blockZ));
     }
 
     /**

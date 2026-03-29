@@ -1,0 +1,52 @@
+package com.bergerkiller.generated.net.minecraft.world.inventory;
+
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.ItemStack;
+import java.util.List;
+
+/**
+ * Instance wrapper handle for type <b>net.minecraft.world.inventory.AbstractContainerMenu</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
+@Template.InstanceType("net.minecraft.world.inventory.AbstractContainerMenu")
+public abstract class AbstractContainerMenuHandle extends Template.Handle {
+    /** @see AbstractContainerMenuClass */
+    public static final AbstractContainerMenuClass T = Template.Class.create(AbstractContainerMenuClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
+    /* ============================================================================== */
+
+    public static AbstractContainerMenuHandle createHandle(Object handleInstance) {
+        return T.createHandle(handleInstance);
+    }
+
+    /* ============================================================================== */
+
+    public static AbstractContainerMenuHandle fromBukkit(InventoryView bukkitView) {
+        return T.fromBukkit.invoker.invoke(null,bukkitView);
+    }
+
+    public abstract InventoryView getBukkitView();
+    public abstract List<ItemStack> getOldItems();
+    public abstract void setOldItems(List<ItemStack> value);
+    public abstract List<SlotHandle> getSlots();
+    public abstract void setSlots(List<SlotHandle> value);
+    public abstract int getWindowId();
+    public abstract void setWindowId(int value);
+    /**
+     * Stores class members for <b>net.minecraft.world.inventory.AbstractContainerMenu</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
+    public static final class AbstractContainerMenuClass extends Template.Class<AbstractContainerMenuHandle> {
+        public final Template.Field.Converted<List<ItemStack>> oldItems = new Template.Field.Converted<List<ItemStack>>();
+        public final Template.Field.Converted<List<SlotHandle>> slots = new Template.Field.Converted<List<SlotHandle>>();
+        public final Template.Field.Integer windowId = new Template.Field.Integer();
+
+        public final Template.StaticMethod<AbstractContainerMenuHandle> fromBukkit = new Template.StaticMethod<AbstractContainerMenuHandle>();
+
+        public final Template.Method<InventoryView> getBukkitView = new Template.Method<InventoryView>();
+
+    }
+
+}
+

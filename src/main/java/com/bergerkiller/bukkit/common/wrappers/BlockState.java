@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.IBlockStateHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.PropertyHandle;
 
 import java.util.Collection;
 
@@ -12,7 +12,7 @@ import java.util.Collection;
  * @param <T> Value type
  */
 @Deprecated
-public abstract class BlockState<T extends Comparable<?>> extends BasicWrapper<IBlockStateHandle> {
+public abstract class BlockState<T extends Comparable<?>> extends BasicWrapper<PropertyHandle> {
     /**
      * Name identifying this state
      *

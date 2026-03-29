@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
 import com.bergerkiller.bukkit.common.block.BlockRayTrace;
+import com.bergerkiller.generated.net.minecraft.world.entity.LivingEntityHandle;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -10,8 +11,7 @@ import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityLivingHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.GenericAttributesHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributesHandle;
 
 /**
  * A Common Entity implementation for Living Entities
@@ -95,7 +95,7 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      * @return max health
      */
     public double getMaxHealth() {
-        return handle.cast(EntityLivingHandle.T).getMaxHealth();
+        return handle.cast(LivingEntityHandle.T).getMaxHealth();
     }
 
     /**
@@ -104,7 +104,7 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      * @return health
      */
     public double getHealth() {
-        EntityLivingHandle handle = this.handle.cast(EntityLivingHandle.T);
+        LivingEntityHandle handle = this.handle.cast(LivingEntityHandle.T);
         return MathUtil.clamp(handle.getHealth(), 0, handle.getMaxHealth());
     }
 
@@ -154,7 +154,7 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      * @return Forward movement
      */
     public double getForwardMovement() {
-        return EntityLivingHandle.T.getMoveIntent.invoke(getHandle()).getZ();
+        return LivingEntityHandle.T.getMoveIntent.invoke(getHandle()).getZ();
     }
 
     /**
@@ -163,8 +163,8 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      * @param range of path finding
      */
     public void setPathfindingRange(double range) {
-        EntityLivingHandle nmsEntity = this.handle.cast(EntityLivingHandle.T);
-        nmsEntity.getAttribute(GenericAttributesHandle.FOLLOW_RANGE).setBaseValue(range);
+        LivingEntityHandle nmsEntity = this.handle.cast(LivingEntityHandle.T);
+        nmsEntity.getAttribute(AttributesHandle.FOLLOW_RANGE).setBaseValue(range);
     }
 
     /**
@@ -173,8 +173,8 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      * @return range of path finding
      */
     public double getPathfindingRange() {
-        EntityLivingHandle nmsEntity = this.handle.cast(EntityLivingHandle.T);
-        return nmsEntity.getAttribute(GenericAttributesHandle.FOLLOW_RANGE).getBaseValue();
+        LivingEntityHandle nmsEntity = this.handle.cast(LivingEntityHandle.T);
+        return nmsEntity.getAttribute(AttributesHandle.FOLLOW_RANGE).getBaseValue();
     }
 
 //	/**

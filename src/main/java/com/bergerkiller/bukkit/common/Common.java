@@ -39,7 +39,7 @@ public class Common {
             "Common:ChatText:MultiLineSupport",
             "Common:EntityUtil:PortalWaitDelay",
             "Common:MapDisplay:BoundsChangeViewFix",
-            "Common:EntitySlimeHandle",
+            "Common:SlimeHandle",
             "Common:PlayerGameInfo",
             "Common:Yaml:BetterChangeListeners",
             "Common:DisplayEntity:Brightness",

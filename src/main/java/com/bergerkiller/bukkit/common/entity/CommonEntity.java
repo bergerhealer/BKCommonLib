@@ -24,18 +24,18 @@ import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
-import com.bergerkiller.generated.net.minecraft.network.NetworkManagerHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.network.ConnectionHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ChunkMapHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
-import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
-import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ChunkHolderHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
+import com.bergerkiller.generated.net.minecraft.server.network.ServerGamePacketListenerImplHandle;
+import com.bergerkiller.generated.net.minecraft.world.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
@@ -66,19 +66,19 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
             // Entity controller / replacement / physics logic
             EntityHandle.T.forceInitialization();
-            PlayerChunkHandle.T.forceInitialization();
-            PlayerChunkMapHandle.T.forceInitialization();
+            ChunkHolderHandle.T.forceInitialization();
+            ChunkMapHandle.T.forceInitialization();
             EntityMoveHandler.assertInitialized();
 
             // Vehicle mount handler tracks the dimension player is on - cinit
             DimensionType.OVERWORLD.getClass();
 
             // Network controller logic - packets, etc.
-            EntityPlayerHandle.T.createHandle(null, true);
-            WorldServerHandle.T.createHandle(null, true);
-            PlayerChunkMapHandle.T.createHandle(null, true);
-            PlayerConnectionHandle.T.forceInitialization();
-            NetworkManagerHandle.T.forceInitialization();
+            ServerPlayerHandle.T.createHandle(null, true);
+            ServerLevelHandle.T.createHandle(null, true);
+            ChunkMapHandle.T.createHandle(null, true);
+            ServerGamePacketListenerImplHandle.T.forceInitialization();
+            ConnectionHandle.T.forceInitialization();
             EntityTrackerHandle.T.forceInitialization();
             EntityTrackerEntryHandle.T.forceInitialization();
             EntityTrackerEntryStateHandle.T.forceInitialization();
@@ -445,8 +445,8 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             Inventory inv = ((InventoryHolder) entity).getInventory();
             if (CraftInventoryHandle.T.isAssignableFrom(inv)) {
                 CraftInventoryHandle cInv = CraftInventoryHandle.createHandle(inv);
-                if (IInventoryHandle.T.isAssignableFrom(newInstance.getRaw())) {
-                    IInventoryHandle iinvHandle = IInventoryHandle.createHandle(newInstance.getRaw());
+                if (ContainerHandle.T.isAssignableFrom(newInstance.getRaw())) {
+                    ContainerHandle iinvHandle = ContainerHandle.createHandle(newInstance.getRaw());
                     cInv.setHandleField(iinvHandle);
                 }
             }
@@ -559,7 +559,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         // Preparations prior to teleportation
         final Location oldLocation = entity.getLocation();
         final List<org.bukkit.entity.Entity> passengers = getPassengers();
-        final WorldHandle newworld = WorldHandle.fromBukkit(location.getWorld());
+        final LevelHandle newworld = LevelHandle.fromBukkit(location.getWorld());
         final boolean isWorldChange = !this.handle.getWorld().equals(newworld);
         final EntityNetworkController<?> oldNetworkController = getNetworkController();
         final boolean hasNetworkController = !(oldNetworkController instanceof DefaultEntityNetworkController);
@@ -936,11 +936,11 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
      * Hooks the world's EntityTracker temporarily for the sole purpose of blocking calls to track()
      */
     private static EntityTrackerHook hookWorldEntityTracker(Object nmsWorldHandle) {
-        Object nmsEntityTrackerHandle = WorldServerHandle.T.getEntityTrackerHandle.invoke(nmsWorldHandle);
+        Object nmsEntityTrackerHandle = ServerLevelHandle.T.getEntityTrackerHandle.invoke(nmsWorldHandle);
         EntityTrackerHook hook = EntityTrackerHook.get(nmsEntityTrackerHandle, EntityTrackerHook.class);
         if (hook == null) {
             hook = new EntityTrackerHook(nmsEntityTrackerHandle);
-            WorldServerHandle.T.setEntityTrackerHandle.invoke(nmsWorldHandle, hook.hook(nmsEntityTrackerHandle));
+            ServerLevelHandle.T.setEntityTrackerHandle.invoke(nmsWorldHandle, hook.hook(nmsEntityTrackerHandle));
         }
         return hook;
     }
@@ -950,7 +950,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
      */
     private static void unhookWorldEntityTracker(Object nmsWorldHandle, EntityTrackerHook hook) {
         if (hook.ignoredEntities.isEmpty()) {
-            WorldServerHandle.T.setEntityTrackerHandle.invoke(nmsWorldHandle, hook.original);
+            ServerLevelHandle.T.setEntityTrackerHandle.invoke(nmsWorldHandle, hook.original);
 
             // For Minecraft 1.14 and later:
             // EntityTracker is the PlayerChunkMap on this version of Minecraft.

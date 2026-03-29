@@ -1,59 +1,59 @@
 package net.minecraft.server.level;
 
-import net.minecraft.server.network.PlayerConnection;
-import net.minecraft.network.protocol.game.PacketPlayOutLightUpdate;
-import net.minecraft.network.protocol.game.PacketPlayOutMapChunk;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.network.protocol.game.ClientboundLightUpdatePacket;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.chunk.Chunk;
-import net.minecraft.world.level.ChunkCoordIntPair;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.lighting.LightEngine;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ChunkMapHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ChunkHolderHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 
 import io.github.opencubicchunks.cubicchunks.api.world.ICubicWorld;
 import io.github.opencubicchunks.cubicchunks.api.world.IColumn;
 import io.github.opencubicchunks.cubicchunks.api.world.ICube;
 import io.github.opencubicchunks.cubicchunks.api.world.ICubeWatcher;
 
-class PlayerChunk {
+class ChunkHolder {
 #if version >= 1.17
-    #require net.minecraft.server.level.EntityPlayer public net.minecraft.server.network.PlayerConnection playerConnection:connection;
+    #require net.minecraft.server.level.ServerPlayer public net.minecraft.server.network.ServerGamePacketListenerImpl playerConnection:connection;
 #else
-    #require net.minecraft.server.level.EntityPlayer public net.minecraft.server.network.PlayerConnection playerConnection;
+    #require net.minecraft.server.level.ServerPlayer public net.minecraft.server.network.ServerGamePacketListenerImpl playerConnection;
 #endif
 
-    public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
+    public (ChunkMapHandle) ChunkMap getPlayerChunkMap() {
 #if version >= 1.17
-        return (PlayerChunkMap) instance.playerProvider;
+        return (ChunkMap) instance.playerProvider;
 #elseif version >= 1.14
-        return (PlayerChunkMap) instance.players;
-#elseif exists net.minecraft.server.level.PlayerChunk private final PlayerChunkMap playerChunkMap;
-        #require net.minecraft.server.level.PlayerChunk private final PlayerChunkMap playerChunkMap;
+        return (ChunkMap) instance.players;
+#elseif exists net.minecraft.server.level.ChunkHolder private final ChunkMap playerChunkMap;
+        #require net.minecraft.server.level.ChunkHolder private final ChunkMap playerChunkMap;
         return instance#playerChunkMap;
-#elseif exists net.minecraft.server.level.PlayerChunk private final PlayerChunkMap this$0;
-        #require net.minecraft.server.level.PlayerChunk private final PlayerChunkMap playerChunkMap:this$0;
+#elseif exists net.minecraft.server.level.ChunkHolder private final ChunkMap this$0;
+        #require net.minecraft.server.level.ChunkHolder private final ChunkMap playerChunkMap:this$0;
         return instance#playerChunkMap;
 #else
-        #require net.minecraft.server.level.PlayerChunk final PlayerChunkMap playerChunkMap;
+        #require net.minecraft.server.level.ChunkHolder final ChunkMap playerChunkMap;
         return instance#playerChunkMap;
 #endif
     }
 
 #if version >= 1.20
-    #require net.minecraft.server.level.PlayerChunk private final net.minecraft.world.level.lighting.LevelLightEngine lightEngineField:lightEngine;
+    #require net.minecraft.server.level.ChunkHolder private final net.minecraft.world.level.lighting.LevelLightEngine lightEngineField:lightEngine;
 #elseif version >= 1.16
-    #require net.minecraft.server.level.PlayerChunk private final net.minecraft.world.level.lighting.LightEngine lightEngineField:lightEngine;
+    #require net.minecraft.server.level.ChunkHolder private final net.minecraft.world.level.lighting.LightEngine lightEngineField:lightEngine;
 #endif
 
     public boolean resendChunk() {
-        Chunk chunk = (Chunk) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) PlayerChunkHandle.T.getChunkIfLoaded.raw).invoke(instance);
+        LevelChunk chunk = (LevelChunk) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) ChunkHolderHandle.T.getChunkIfLoaded.raw).invoke(instance);
         if (chunk == null) {
             return false;
         }
@@ -62,7 +62,7 @@ class PlayerChunk {
 #if exists io.github.opencubicchunks.cubicchunks.api.world.ICube
         if (chunk.getWorld() instanceof ICubicWorld && ((ICubicWorld) chunk.getWorld()).isCubicWorld()) {
             // Retrieve cube map
-            PlayerChunkMap playerChunkMap = (PlayerChunkMap) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) PlayerChunkHandle.T.getPlayerChunkMap.raw).invoke(instance);
+            ChunkMap playerChunkMap = (ChunkMap) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) ChunkHolderHandle.T.getPlayerChunkMap.raw).invoke(instance);
             io.github.opencubicchunks.cubicchunks.core.server.PlayerCubeMap playerCubeMap;
             playerCubeMap = (io.github.opencubicchunks.cubicchunks.core.server.PlayerCubeMap) playerChunkMap;
 
@@ -80,7 +80,7 @@ class PlayerChunk {
                 }
 
                 // Gather list of players to send this cube to using reflection (there's no getter)
-                #require io.github.opencubicchunks.cubicchunks.core.server.CubeWatcher private final readonly it.unimi.dsi.fastutil.objects.ObjectArrayList<net.minecraft.server.level.EntityPlayer> players;
+                #require io.github.opencubicchunks.cubicchunks.core.server.CubeWatcher private final readonly it.unimi.dsi.fastutil.objects.ObjectArrayList<net.minecraft.server.level.ServerPlayer> players;
                 it.unimi.dsi.fastutil.objects.ObjectArrayList obj_players = cubeWatcher#players;
                 Object[] arr_players = obj_players.elements();
 
@@ -88,7 +88,7 @@ class PlayerChunk {
                 int num_players = arr_players.length;
                 for (int i = 0; i < num_players; i++) {
                     sentChanges = true;
-                    EntityPlayer player = (EntityPlayer) arr_players[i];
+                    ServerPlayer player = (ServerPlayer) arr_players[i];
                     if (player != null) {
                         playerCubeMap.scheduleSendCubeToPlayer((io.github.opencubicchunks.cubicchunks.core.world.cube.Cube) cube, player);
                     }
@@ -100,7 +100,7 @@ class PlayerChunk {
         }
 #endif
 
-        Collection players = (Collection) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) PlayerChunkHandle.T.getPlayers.raw).invoke(instance);
+        Collection players = (Collection) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) ChunkHolderHandle.T.getPlayers.raw).invoke(instance);
         if (players.isEmpty()) {
             return false;
         }
@@ -109,27 +109,27 @@ class PlayerChunk {
 #if version >= 1.20
         // Note: is now ClientboundLevelChunkWithLightPacket
         LevelLightEngine lightengine = instance#lightEngineField;
-        PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(chunk, lightengine, null, null);
+        ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(chunk, lightengine, null, null);
 #elseif version >= 1.18
         // Note: is now ClientboundLevelChunkWithLightPacket
         LightEngine lightengine = instance#lightEngineField;
-        PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(chunk, lightengine, null, null, true);
+        ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(chunk, lightengine, null, null, true);
 #elseif version >= 1.17
-        PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(chunk);
+        ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(chunk);
 #elseif version >= 1.16 && version <= 1.16.1
-        PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(chunk, 0x1FFFF, true);
-#elseif exists net.minecraft.network.protocol.game.PacketPlayOutMapChunk public PacketPlayOutMapChunk(net.minecraft.world.level.chunk.Chunk chunk, int sectionsMask);
-        PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(chunk, 0x1FFFF);
+        ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(chunk, 0x1FFFF, true);
+#elseif exists net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket public ClientboundLevelChunkWithLightPacket(net.minecraft.world.level.chunk.LevelChunk chunk, int sectionsMask);
+        ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(chunk, 0x1FFFF);
 #else
         boolean flag = !WorldHandle.createHandle(chunk.getWorld()).getDimensionType().hasSkyLight();
-        PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(chunk, flag, 0x1FFFF);
+        ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(chunk, flag, 0x1FFFF);
 #endif
 
         // Send to all players that see this chunk
         java.util.Iterator iter = players.iterator();
         while (iter.hasNext()) {
-            EntityPlayer player = (EntityPlayer) iter.next();
-            PlayerConnection connection = player#playerConnection;
+            ServerPlayer player = (ServerPlayer) iter.next();
+            ServerGamePacketListenerImpl connection = player#playerConnection;
             if (connection != null) {
 #if version >= 1.18
                 connection.send((net.minecraft.network.protocol.Packet) packet);
@@ -142,7 +142,7 @@ class PlayerChunk {
         // Resend lighting information afterwards between 1.14 and 1.17.1
         // After 1.18 light and chunk data are in one packet again, so no need
 #if version >= 1.14 && version <= 1.17.1
-        PlayerChunkHandle.T.resendAllLighting.invoke(instance);
+        ChunkHolderHandle.T.resendAllLighting.invoke(instance);
 #endif
 
         return true;
@@ -153,37 +153,37 @@ class PlayerChunk {
     // We must send the light update packet ourselves
     public boolean resendAllLighting() {
   #if version >= 1.20.5
-        Chunk chunk = instance.getFullChunkNow();
+        LevelChunk chunk = instance.getFullChunkNow();
   #elseif version >= 1.18
-        Chunk chunk = instance.getFullChunk();
+        LevelChunk chunk = instance.getFullChunk();
   #else
-        Chunk chunk = instance.getChunk();
+        LevelChunk chunk = instance.getChunk();
   #endif
         if (chunk == null) {
             return false;
         }
 
         // Check there are players to receive data at all
-        Collection players = (Collection) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) PlayerChunkHandle.T.getPlayers.raw).invoke(instance);
+        Collection players = (Collection) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) ChunkHolderHandle.T.getPlayers.raw).invoke(instance);
         if (players.isEmpty()) {
             return false;
         }
 
         // Reset dirty mask so it does not send twice
   #if version >= 1.17
-        #require net.minecraft.server.level.PlayerChunk private final BitSet blockChangedLightSectionFilter;
-        #require net.minecraft.server.level.PlayerChunk private final BitSet skyChangedLightSectionFilter;
+        #require net.minecraft.server.level.ChunkHolder private final BitSet blockChangedLightSectionFilter;
+        #require net.minecraft.server.level.ChunkHolder private final BitSet skyChangedLightSectionFilter;
         BitSet blockFilter = instance#blockChangedLightSectionFilter;
         BitSet skyFilter = instance#skyChangedLightSectionFilter;
         blockFilter.clear();
         skyFilter.clear();
   #else
     #if version >= 1.16.2
-        #require net.minecraft.server.level.PlayerChunk private int pc_dirtyBlockLightMask:r;
-        #require net.minecraft.server.level.PlayerChunk private int pc_dirtySkyLightMask:s;
+        #require net.minecraft.server.level.ChunkHolder private int pc_dirtyBlockLightMask:r;
+        #require net.minecraft.server.level.ChunkHolder private int pc_dirtySkyLightMask:s;
     #else
-        #require net.minecraft.server.level.PlayerChunk private int pc_dirtyBlockLightMask:s;
-        #require net.minecraft.server.level.PlayerChunk private int pc_dirtySkyLightMask:t;
+        #require net.minecraft.server.level.ChunkHolder private int pc_dirtyBlockLightMask:s;
+        #require net.minecraft.server.level.ChunkHolder private int pc_dirtySkyLightMask:t;
     #endif
         instance#pc_dirtyBlockLightMask = 0;
         instance#pc_dirtySkyLightMask = 0;
@@ -196,20 +196,20 @@ class PlayerChunk {
         LightEngine lightEngine = instance#lightEngineField;
   #endif
 
-        // Create a lighting update packet, similar to how it is done in PlayerChunk
+        // Create a lighting update packet, similar to how it is done in ChunkHolder
   #if version >= 1.20
-        PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunk.getPos(), lightEngine, null, null);
+        ClientboundLightUpdatePacket packet = new ClientboundLightUpdatePacket(chunk.getPos(), lightEngine, null, null);
   #elseif version >= 1.17
-        PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunk.getPos(), lightEngine, null, null, false);
+        ClientboundLightUpdatePacket packet = new ClientboundLightUpdatePacket(chunk.getPos(), lightEngine, null, null, false);
   #else
-        PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunk.getPos(), lightEngine, 0x3FFFF, 0x3FFFF, false);
+        ClientboundLightUpdatePacket packet = new ClientboundLightUpdatePacket(chunk.getPos(), lightEngine, 0x3FFFF, 0x3FFFF, false);
   #endif
 
         // Send the packet to all players that can see this player chunk
         java.util.Iterator players_iter = players.iterator();
         while (players_iter.hasNext()) {
-            EntityPlayer player = (EntityPlayer) players_iter.next();
-            PlayerConnection connection = player#playerConnection;
+            ServerPlayer player = (ServerPlayer) players_iter.next();
+            ServerGamePacketListenerImpl connection = player#playerConnection;
             if (connection != null) {
   #if version >= 1.18
                 connection.send((net.minecraft.network.protocol.Packet) packet);
@@ -223,25 +223,25 @@ class PlayerChunk {
     }
 #elseif version >= 1.14
     public boolean resendAllLighting() {
-        Chunk chunk = instance.getChunk();
+        LevelChunk chunk = instance.getChunk();
         if (chunk == null) {
             return false;
         }
 
         // Check there are players to receive data at all
-        Collection players = (Collection) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) PlayerChunkHandle.T.getPlayers.raw).invoke(instance);
+        Collection players = (Collection) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) ChunkHolderHandle.T.getPlayers.raw).invoke(instance);
         if (players.isEmpty()) {
             return false;
         }
 
   #if version >= 1.14.1
-        #require net.minecraft.server.level.PlayerChunk private int pc_layerLightMask:s;
-        #require net.minecraft.server.level.PlayerChunk private int pc_dirtyBlockLightMask:t;
-        #require net.minecraft.server.level.PlayerChunk private int pc_dirtySkyLightMask:u;
+        #require net.minecraft.server.level.ChunkHolder private int pc_layerLightMask:s;
+        #require net.minecraft.server.level.ChunkHolder private int pc_dirtyBlockLightMask:t;
+        #require net.minecraft.server.level.ChunkHolder private int pc_dirtySkyLightMask:u;
   #else
-        #require net.minecraft.server.level.PlayerChunk private int pc_layerLightMask:r;
-        #require net.minecraft.server.level.PlayerChunk private int pc_dirtyBlockLightMask:s;
-        #require net.minecraft.server.level.PlayerChunk private int pc_dirtySkyLightMask:t;
+        #require net.minecraft.server.level.ChunkHolder private int pc_layerLightMask:r;
+        #require net.minecraft.server.level.ChunkHolder private int pc_dirtyBlockLightMask:s;
+        #require net.minecraft.server.level.ChunkHolder private int pc_dirtySkyLightMask:t;
   #endif
         // Set all these masks to 'all layers' (18) to refresh them
         instance#pc_layerLightMask = 0x3FFFF;
@@ -255,41 +255,41 @@ class PlayerChunk {
 #else
     public boolean resendAllLighting() {
         // Send entire chunk instead, lighting isn't separate
-        return ((Boolean) PlayerChunkHandle.T.resendChunk.invoke(instance)).booleanValue();
+        return ((Boolean) ChunkHolderHandle.T.resendChunk.invoke(instance)).booleanValue();
     }
 #endif
 
 #if version >= 1.18
-    public (Collection<org.bukkit.entity.Player>) Collection<EntityPlayer> getPlayers() {
+    public (Collection<org.bukkit.entity.Player>) Collection<ServerPlayer> getPlayers() {
         return instance.playerProvider.getPlayers(instance.getPos(), false);
     }
 #elseif version >= 1.17
-    public (Collection<org.bukkit.entity.Player>) Collection<EntityPlayer> getPlayers() {
+    public (Collection<org.bukkit.entity.Player>) Collection<ServerPlayer> getPlayers() {
         return instance.playerProvider.a(instance.i(), false).collect(java.util.stream.Collectors.toList());
     }
 #elseif version >= 1.14.3
-    public (Collection<org.bukkit.entity.Player>) Collection<EntityPlayer> getPlayers() {
+    public (Collection<org.bukkit.entity.Player>) Collection<ServerPlayer> getPlayers() {
         return instance.players.a(instance.i(), false).collect(java.util.stream.Collectors.toList());
     }
 #elseif version >= 1.14
-    public (Collection<org.bukkit.entity.Player>) Collection<EntityPlayer> getPlayers() {
+    public (Collection<org.bukkit.entity.Player>) Collection<ServerPlayer> getPlayers() {
         return instance.players.a(instance.h(), false).collect(java.util.stream.Collectors.toList());
     }
 #else
-    public (Collection<org.bukkit.entity.Player>) Collection<EntityPlayer> getPlayers() {
+    public (Collection<org.bukkit.entity.Player>) Collection<ServerPlayer> getPlayers() {
         // Require the player list field
 #if version >= 1.9
-  #if fieldexists net.minecraft.server.level.PlayerChunk public final List<EntityPlayer> players
-        #require net.minecraft.server.level.PlayerChunk public final List<EntityPlayer> pc_playersField:players;
+  #if fieldexists net.minecraft.server.level.ChunkHolder public final List<ServerPlayer> players
+        #require net.minecraft.server.level.ChunkHolder public final List<ServerPlayer> pc_playersField:players;
   #else
-        #require net.minecraft.server.level.PlayerChunk public final List<EntityPlayer> pc_playersField:c;
+        #require net.minecraft.server.level.ChunkHolder public final List<ServerPlayer> pc_playersField:c;
   #endif
 #else
-  #if fieldexists  net.minecraft.server.level.PlayerChunk private final Set<EntityPlayer> b;
+  #if fieldexists  net.minecraft.server.level.ChunkHolder private final Set<ServerPlayer> b;
         // WineSpigot
-        #require net.minecraft.server.level.PlayerChunk private final Set<EntityPlayer> pc_playersField:b;
+        #require net.minecraft.server.level.ChunkHolder private final Set<ServerPlayer> pc_playersField:b;
   #else
-        #require net.minecraft.server.level.PlayerChunk private final List<EntityPlayer> pc_playersField:b;
+        #require net.minecraft.server.level.ChunkHolder private final List<ServerPlayer> pc_playersField:b;
   #endif
 #endif
         return instance#pc_playersField;
@@ -297,16 +297,16 @@ class PlayerChunk {
 #endif
 
 #if version >= 1.18
-    public (IntVector2) ChunkCoordIntPair getLocation:getPos();
+    public (IntVector2) ChunkPos getLocation:getPos();
 #elseif version >= 1.14.3
-    public (IntVector2) ChunkCoordIntPair getLocation:i();
+    public (IntVector2) ChunkPos getLocation:i();
 #elseif version >= 1.14
-    public (IntVector2) ChunkCoordIntPair getLocation:h();
+    public (IntVector2) ChunkPos getLocation:h();
 #elseif version >= 1.9
-    public (IntVector2) ChunkCoordIntPair getLocation:a();
+    public (IntVector2) ChunkPos getLocation:a();
 #else
-    public (IntVector2) ChunkCoordIntPair getLocation() {
-        #require PlayerChunk private final net.minecraft.world.level.ChunkCoordIntPair location;
+    public (IntVector2) ChunkPos getLocation() {
+        #require ChunkHolder private final net.minecraft.world.level.ChunkPos location;
         return instance#location;
     }
 #endif
@@ -325,42 +325,42 @@ class PlayerChunk {
 #endif
     */
 
-    // Moved to PlayerChunkMap in 1.14
-    //     public void addPlayer:a((org.bukkit.entity.Player) EntityPlayer player);
-    //     public void removePlayer:b((org.bukkit.entity.Player) EntityPlayer player);
+    // Moved to ChunkMap in 1.14
+    //     public void addPlayer:a((org.bukkit.entity.Player) ServerPlayer player);
+    //     public void removePlayer:b((org.bukkit.entity.Player) ServerPlayer player);
 
     // #if version >= 1.9
-    //     public void sendChunk((org.bukkit.entity.Player) EntityPlayer player);
+    //     public void sendChunk((org.bukkit.entity.Player) ServerPlayer player);
     // #else
-    //     public void sendChunk:b((org.bukkit.entity.Player) EntityPlayer player);
+    //     public void sendChunk:b((org.bukkit.entity.Player) ServerPlayer player);
     // #endif
 
 #if version >= 1.20.5
     //TODO: Is this safe? It's not the exact same code. The old one is just gone, and only
     //      checked the full chunk future. The new one does a lot more.
-    public (org.bukkit.Chunk) Chunk getChunkIfLoaded:getFullChunkNow();
+    public (org.bukkit.Chunk) LevelChunk getChunkIfLoaded:getFullChunkNow();
 #elseif version >= 1.18
-    public (org.bukkit.Chunk) Chunk getChunkIfLoaded:getFullChunk();
+    public (org.bukkit.Chunk) LevelChunk getChunkIfLoaded:getFullChunk();
 #elseif version >= 1.14
-    public (org.bukkit.Chunk) Chunk getChunkIfLoaded:getChunk();
+    public (org.bukkit.Chunk) LevelChunk getChunkIfLoaded:getChunk();
 #elseif version >= 1.9
-    public (org.bukkit.Chunk) Chunk getChunkIfLoaded() {
+    public (org.bukkit.Chunk) LevelChunk getChunkIfLoaded() {
         return instance.chunk;
     }
 #elseif version >= 1.8
-    #require net.minecraft.server.level.PlayerChunk private final net.minecraft.world.level.ChunkCoordIntPair location;
-    #require net.minecraft.server.level.PlayerChunk private boolean loaded;
-    #if exists net.minecraft.server.level.PlayerChunk private final PlayerChunkMap this$0;
-        #require net.minecraft.server.level.PlayerChunk private final PlayerChunkMap playerChunkMap:this$0;
+    #require net.minecraft.server.level.ChunkHolder private final net.minecraft.world.level.ChunkPos location;
+    #require net.minecraft.server.level.ChunkHolder private boolean loaded;
+    #if exists net.minecraft.server.level.ChunkHolder private final ChunkMap this$0;
+        #require net.minecraft.server.level.ChunkHolder private final ChunkMap playerChunkMap:this$0;
     #else
-        #require net.minecraft.server.level.PlayerChunk final PlayerChunkMap playerChunkMap;
+        #require net.minecraft.server.level.ChunkHolder final ChunkMap playerChunkMap;
     #endif
 
-    public (org.bukkit.Chunk) Chunk getChunkIfLoaded() {
+    public (org.bukkit.Chunk) LevelChunk getChunkIfLoaded() {
         boolean loaded = instance#loaded;
         if (loaded) {
-            PlayerChunkMap map = instance#playerChunkMap;
-            ChunkCoordIntPair loc = instance#location;
+            ChunkMap map = instance#playerChunkMap;
+            ChunkPos loc = instance#location;
             return map.a().chunkProviderServer.getChunkAt(loc.x, loc.z);
         } else {
             return null;
@@ -370,29 +370,29 @@ class PlayerChunk {
 
 }
 
-class PlayerChunkMap {
-    //    private final (List<org.bukkit.entity.Player>) List<EntityPlayer> managedPlayers;
+class ChunkMap {
+    //    private final (List<org.bukkit.entity.Player>) List<ServerPlayer> managedPlayers;
     //
     //#if version >= 1.9
-    //    private final optional (Queue<PlayerChunkHandle>) Queue<PlayerChunk> updateQueue_1_8_8:###;
-    //    private final unknown Set<PlayerChunk> dirtyBlockChunks:f;
-    //    private final unknown List<PlayerChunk> g;
-    //    private final unknown List<PlayerChunk> h;
-    //    private final unknown List<PlayerChunk> i;
+    //    private final optional (Queue<ChunkHolderHandle>) Queue<ChunkHolder> updateQueue_1_8_8:###;
+    //    private final unknown Set<ChunkHolder> dirtyBlockChunks:f;
+    //    private final unknown List<ChunkHolder> g;
+    //    private final unknown List<ChunkHolder> h;
+    //    private final unknown List<ChunkHolder> i;
     //    private int radius:j;
     //#else
-    //    private final optional (Queue<PlayerChunkHandle>) Queue<PlayerChunk> updateQueue_1_8_8:e;
-    //    private final unknown Queue<PlayerChunk> f;
+    //    private final optional (Queue<ChunkHolderHandle>) Queue<ChunkHolder> updateQueue_1_8_8:e;
+    //    private final unknown Queue<ChunkHolder> f;
     //    private int radius:g;
     //#endif
 
     //#if version >= 1.9
-    //    public optional void markForUpdate_1_10_2:a((PlayerChunkHandle) PlayerChunk playerchunk);
+    //    public optional void markForUpdate_1_10_2:a((ChunkHolderHandle) ChunkHolder playerchunk);
     //#else
-    //    public optional void markForUpdate_1_10_2:###((PlayerChunkHandle) PlayerChunk playerchunk);
+    //    public optional void markForUpdate_1_10_2:###((ChunkHolderHandle) ChunkHolder playerchunk);
     //#endif
     //    <code>
-    //    public void markForUpdate(PlayerChunkHandle playerChunk) {
+    //    public void markForUpdate(ChunkHolderHandle playerChunk) {
     //        if (T.markForUpdate_1_10_2.isAvailable()) {
     //            T.markForUpdate_1_10_2.invoke(getRaw(), playerChunk);
     //        } else {
@@ -405,45 +405,45 @@ class PlayerChunkMap {
 
 #if version >= 1.14
   #if version >= 1.18
-    #require net.minecraft.server.level.PlayerChunkMap protected (Object) PlayerChunk getVisibleChunk_1_14:getVisibleChunkIfPresent(long i);
-    #require net.minecraft.server.level.PlayerChunkMap protected (Object) PlayerChunk getUpdatingChunk_1_14:getUpdatingChunkIfPresent(long i);
+    #require net.minecraft.server.level.ChunkMap protected (Object) ChunkHolder getVisibleChunk_1_14:getVisibleChunkIfPresent(long i);
+    #require net.minecraft.server.level.ChunkMap protected (Object) ChunkHolder getUpdatingChunk_1_14:getUpdatingChunkIfPresent(long i);
 
-    public (PlayerChunkHandle) PlayerChunk getVisibleChunk(int x, int z) {
-        return (PlayerChunk) instance#getVisibleChunk_1_14(ChunkCoordIntPair.asLong(x, z));
+    public (ChunkHolderHandle) ChunkHolder getVisibleChunk(int x, int z) {
+        return (ChunkHolder) instance#getVisibleChunk_1_14(ChunkPos.asLong(x, z));
     }
-    public (PlayerChunkHandle) PlayerChunk getUpdatingChunk(int x, int z) {
-        return (PlayerChunk) instance#getUpdatingChunk_1_14(ChunkCoordIntPair.asLong(x, z));
+    public (ChunkHolderHandle) ChunkHolder getUpdatingChunk(int x, int z) {
+        return (ChunkHolder) instance#getUpdatingChunk_1_14(ChunkPos.asLong(x, z));
     }
   #else
-    #require net.minecraft.server.level.PlayerChunkMap protected (Object) PlayerChunk getVisibleChunk_1_14:getVisibleChunk(long i);
-    #require net.minecraft.server.level.PlayerChunkMap protected (Object) PlayerChunk getUpdatingChunk_1_14:getUpdatingChunk(long i);
+    #require net.minecraft.server.level.ChunkMap protected (Object) ChunkHolder getVisibleChunk_1_14:getVisibleChunk(long i);
+    #require net.minecraft.server.level.ChunkMap protected (Object) ChunkHolder getUpdatingChunk_1_14:getUpdatingChunk(long i);
 
-    public (PlayerChunkHandle) PlayerChunk getVisibleChunk(int x, int z) {
-        return (PlayerChunk) instance#getVisibleChunk_1_14(ChunkCoordIntPair.pair(x, z));
+    public (ChunkHolderHandle) ChunkHolder getVisibleChunk(int x, int z) {
+        return (ChunkHolder) instance#getVisibleChunk_1_14(ChunkPos.pair(x, z));
     }
-    public (PlayerChunkHandle) PlayerChunk getUpdatingChunk(int x, int z) {
-        return (PlayerChunk) instance#getUpdatingChunk_1_14(ChunkCoordIntPair.pair(x, z));
+    public (ChunkHolderHandle) ChunkHolder getUpdatingChunk(int x, int z) {
+        return (ChunkHolder) instance#getUpdatingChunk_1_14(ChunkPos.pair(x, z));
     }
   #endif
 #elseif version >= 1.9.4
-    public (PlayerChunkHandle) PlayerChunk getVisibleChunk:getChunk(int x, int z);
-    public (PlayerChunkHandle) PlayerChunk getUpdatingChunk:getChunk(int x, int z);
+    public (ChunkHolderHandle) ChunkHolder getVisibleChunk:getChunk(int x, int z);
+    public (ChunkHolderHandle) ChunkHolder getUpdatingChunk:getChunk(int x, int z);
 #elseif version >= 1.9
-    public (PlayerChunkHandle) PlayerChunk getVisibleChunk:b(int x, int z);
-    public (PlayerChunkHandle) PlayerChunk getUpdatingChunk:b(int x, int z);
+    public (ChunkHolderHandle) ChunkHolder getVisibleChunk:b(int x, int z);
+    public (ChunkHolderHandle) ChunkHolder getUpdatingChunk:b(int x, int z);
 #else
-    #require net.minecraft.server.level.PlayerChunkMap private PlayerChunk getChunk_1_8_8:a(int x, int z, boolean create);
-    public (PlayerChunkHandle) PlayerChunk getVisibleChunk(int x, int z) {
+    #require net.minecraft.server.level.ChunkMap private ChunkHolder getChunk_1_8_8:a(int x, int z, boolean create);
+    public (ChunkHolderHandle) ChunkHolder getVisibleChunk(int x, int z) {
         return instance#getChunk_1_8_8(x, z, false);
     }
-    public (PlayerChunkHandle) PlayerChunk getUpdatingChunk(int x, int z) {
+    public (ChunkHolderHandle) ChunkHolder getUpdatingChunk(int x, int z) {
         return instance#getChunk_1_8_8(x, z, false);
     }
 #endif
 
 <code>
     public java.util.Collection<org.bukkit.entity.Player> getChunkEnteredPlayers(int chunkX, int chunkZ) {
-        PlayerChunkHandle playerChunk = getVisibleChunk(chunkX, chunkZ);
+        ChunkHolderHandle playerChunk = getVisibleChunk(chunkX, chunkZ);
         if (playerChunk == null || playerChunk.getChunkIfLoaded() == null) {
             return java.util.Collections.emptyList();
         } else {
@@ -453,21 +453,21 @@ class PlayerChunkMap {
 </code>
 
 #if version >= 1.14
-    public boolean isChunkEntered((EntityPlayerHandle) EntityPlayer entityplayer, int chunkX, int chunkZ) {
+    public boolean isChunkEntered((ServerPlayerHandle) ServerPlayer entityplayer, int chunkX, int chunkZ) {
   #if version >= 1.18
-        long key = ChunkCoordIntPair.asLong(chunkX, chunkZ);
+        long key = ChunkPos.asLong(chunkX, chunkZ);
   #else
-        long key = ChunkCoordIntPair.pair(chunkX, chunkZ);
+        long key = ChunkPos.pair(chunkX, chunkZ);
   #endif
 
-  #if exists net.minecraft.server.level.PlayerChunkMap public PlayerChunk getVisibleChunkIfPresent(long key);
-        PlayerChunk chunk = instance.getVisibleChunkIfPresent(key);
-  #elseif exists net.minecraft.server.level.PlayerChunkMap public PlayerChunk getVisibleChunk(long key);
-        PlayerChunk chunk = instance.getVisibleChunk(key);
+  #if exists net.minecraft.server.level.ChunkMap public ChunkHolder getVisibleChunkIfPresent(long key);
+        ChunkHolder chunk = instance.getVisibleChunkIfPresent(key);
+  #elseif exists net.minecraft.server.level.ChunkMap public ChunkHolder getVisibleChunk(long key);
+        ChunkHolder chunk = instance.getVisibleChunk(key);
   #elseif version >= 1.17
-        PlayerChunk chunk = (PlayerChunk) instance.visibleChunkMap.get(key);
+        ChunkHolder chunk = (ChunkHolder) instance.visibleChunkMap.get(key);
   #else
-        PlayerChunk chunk = (PlayerChunk) instance.visibleChunks.get(key);
+        ChunkHolder chunk = (ChunkHolder) instance.visibleChunks.get(key);
   #endif
 
   #if version >= 1.20.5
@@ -481,7 +481,7 @@ class PlayerChunkMap {
         }
 
         // Check Stream contains Player
-        ChunkCoordIntPair chunkCoordinates = new ChunkCoordIntPair(chunkX, chunkZ);
+        ChunkPos chunkCoordinates = new ChunkPos(chunkX, chunkZ);
   #if version >= 1.18
         java.util.List players = chunk.playerProvider.getPlayers(chunkCoordinates, false);
         return players.contains(entityplayer);
@@ -494,11 +494,11 @@ class PlayerChunkMap {
   #endif
     }
 #else
-    public boolean isChunkEntered:a((EntityPlayerHandle) EntityPlayer entityplayer, int chunkX, int chunkZ);
+    public boolean isChunkEntered:a((ServerPlayerHandle) ServerPlayer entityplayer, int chunkX, int chunkZ);
 #endif
 
 // Needed to make sure the EntityTracker hook works
-#if exists net.minecraft.server.level.PlayerChunkMap public void addEntity(net.minecraft.world.entity.Entity);
+#if exists net.minecraft.server.level.ChunkMap public void addEntity(net.minecraft.world.entity.Entity);
     public optional void trackEntity:addEntity((org.bukkit.entity.Entity) Entity entity);
 #elseif version >= 1.14
     protected optional void trackEntity:addEntity((org.bukkit.entity.Entity) Entity entity);

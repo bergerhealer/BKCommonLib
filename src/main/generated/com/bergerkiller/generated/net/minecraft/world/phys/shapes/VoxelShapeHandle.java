@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.world.phys.shapes;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxisHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.core.DirectionHandle.AxisHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
 import java.util.stream.Stream;
 
 /**
@@ -30,7 +30,7 @@ public abstract class VoxelShapeHandle extends Template.Handle {
         return T.createRawFromAABB.invoke(handles);
     }
 
-    public static VoxelShapeHandle fromAABB(AxisAlignedBBHandle aabb) {
+    public static VoxelShapeHandle fromAABB(AABBHandle aabb) {
         return T.fromAABB.invoke(aabb);
     }
 
@@ -42,11 +42,11 @@ public abstract class VoxelShapeHandle extends Template.Handle {
         return T.merge.invoke(a, b);
     }
 
-    public static double traceAxis(EnumAxisHandle axis, AxisAlignedBBHandle boundingBox, Stream<VoxelShapeHandle> voxels, double coordinate) {
+    public static double traceAxis(AxisHandle axis, AABBHandle boundingBox, Stream<VoxelShapeHandle> voxels, double coordinate) {
         return T.traceAxis.invoke(axis, boundingBox, voxels, coordinate);
     }
 
-    public abstract AxisAlignedBBHandle getBoundingBox();
+    public abstract AABBHandle getBoundingBox();
     public abstract boolean isEmpty();
     /**
      * Stores class members for <b>net.minecraft.world.phys.shapes.VoxelShape</b>.
@@ -60,7 +60,7 @@ public abstract class VoxelShapeHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<VoxelShapeHandle> merge = new Template.StaticMethod.Converted<VoxelShapeHandle>();
         public final Template.StaticMethod.Converted<Double> traceAxis = new Template.StaticMethod.Converted<Double>();
 
-        public final Template.Method.Converted<AxisAlignedBBHandle> getBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
+        public final Template.Method.Converted<AABBHandle> getBoundingBox = new Template.Method.Converted<AABBHandle>();
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
 
     }

@@ -23,7 +23,7 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
@@ -87,7 +87,7 @@ class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
         // First try using the ICubicStorage API, if available
         {
             Object worldHandle = HandleConversion.toWorldHandle(world);
-            Object chunkProviderServer = WorldServerHandle.T.getChunkProviderServer.raw.invoke(worldHandle);
+            Object chunkProviderServer = ServerLevelHandle.T.getChunkProviderServer.raw.invoke(worldHandle);
             final Set<IntVector3> regionIndices = new HashSet<>();
             if (handle.forEachCube(chunkProviderServer, wrap(cubeCoordinate -> {
                 IntVector2 regionXZ = new IntVector2(cubeCoordinate.x >> 5, cubeCoordinate.z >> 5);
@@ -126,7 +126,7 @@ class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
         // First try using the ICubicStorage API, if available
         {
             Object worldHandle = HandleConversion.toWorldHandle(world);
-            Object chunkProviderServer = WorldServerHandle.T.getChunkProviderServer.raw.invoke(worldHandle);
+            Object chunkProviderServer = ServerLevelHandle.T.getChunkProviderServer.raw.invoke(worldHandle);
             final Set<IntVector3> regionIndices = new HashSet<>();
             if (handle.forEachCube(chunkProviderServer, wrap(cubeCoordinate -> {
                 regionIndices.add(new IntVector3(cubeCoordinate.x >> 5, cubeCoordinate.y >> 5, cubeCoordinate.z >> 5));
@@ -160,7 +160,7 @@ class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
 
         BitSet chunks = new BitSet();
         Object worldHandle = HandleConversion.toWorldHandle(world);
-        Object chunkProviderServer = WorldServerHandle.T.getChunkProviderServer.raw.invoke(worldHandle);
+        Object chunkProviderServer = ServerLevelHandle.T.getChunkProviderServer.raw.invoke(worldHandle);
         List<Object> regionProviderList = handle.getRegionProviders(chunkProviderServer);
         if (regionProviderList != null) {
             // Region format and we can efficiently query the chunks inside a region
@@ -233,7 +233,7 @@ class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
     @Override
     public boolean isChunkSaved(World world, int cx, int cz) {
         Object worldHandle = HandleConversion.toWorldHandle(world);
-        Object chunkProviderServer = WorldServerHandle.T.getChunkProviderServer.raw.invoke(worldHandle);
+        Object chunkProviderServer = ServerLevelHandle.T.getChunkProviderServer.raw.invoke(worldHandle);
         return handle.columnExists(chunkProviderServer, cx, cz);
     }
 

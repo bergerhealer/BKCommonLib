@@ -8,7 +8,7 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.proxy.TileEntityTypesSerializedIds_1_8_to_1_17_1;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.resources.BlockStateType;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 
 /**
  * Represents the change of a Block State's properties
@@ -129,7 +129,7 @@ public abstract class BlockStateChange {
         public BlockStateType getType() {
             String id = metadata.getValue("id", String.class);
             if (CommonCapabilities.TILE_ENTITY_LEGACY_NAMES) {
-                MinecraftKeyHandle key = TileEntityTypesSerializedIds_1_8_to_1_17_1.toMinecraftKeyFromLegacyName(id);
+                IdentifierHandle key = TileEntityTypesSerializedIds_1_8_to_1_17_1.toMinecraftKeyFromLegacyName(id);
                 return BlockStateType.byKey(key);
             } else {
                 return (id == null) ? null : BlockStateType.byName(id);

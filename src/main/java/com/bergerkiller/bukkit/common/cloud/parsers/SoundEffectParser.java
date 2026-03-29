@@ -5,8 +5,8 @@ import com.bergerkiller.bukkit.common.cloud.captions.BKCommonLibCaptionKeys;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
+import com.bergerkiller.generated.net.minecraft.sounds.SoundEventHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
@@ -57,9 +57,9 @@ public class SoundEffectParser<C> implements ArgumentParser<C, ResourceKey<Sound
 
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(@NonNull CommandContext<C> commandContext, @NonNull CommandInput input) {
-        Collection<MinecraftKeyHandle> keys = SoundEffectHandle.getSoundNames();
+        Collection<IdentifierHandle> keys = SoundEventHandle.getSoundNames();
         List<String> suggestions = new ArrayList<>(keys.size());
-        for (MinecraftKeyHandle key : keys) {
+        for (IdentifierHandle key : keys) {
             suggestions.add(key.toString());
         }
         return suggestions;

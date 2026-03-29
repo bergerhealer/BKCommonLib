@@ -22,7 +22,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.storage.RegionFileHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
@@ -207,7 +207,7 @@ class RegionHandler_Vanilla_1_8 extends RegionHandlerVanilla {
 
     @Override
     public boolean isChunkSaved(World world, int cx, int cz) {
-        Object cps = WorldServerHandle.T.getChunkProviderServer.raw.invoke(HandleConversion.toWorldHandle(world));
+        Object cps = ServerLevelHandle.T.getChunkProviderServer.raw.invoke(HandleConversion.toWorldHandle(world));
         return chunkExists.invoke(null, cps, cx, cz);
     }
 

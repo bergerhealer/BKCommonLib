@@ -7,6 +7,8 @@ import java.util.ListIterator;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
@@ -17,8 +19,6 @@ import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 
 /**
@@ -26,10 +26,10 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
  */
 class EntityMoveHandler_1_8 extends EntityMoveHandler {
     private static boolean loggedEntityCollisionUndoFailure = false;
-    private static final List<AxisAlignedBBHandle> collisions_buffer = new ArrayList<AxisAlignedBBHandle>();
+    private static final List<AABBHandle> collisions_buffer = new ArrayList<AABBHandle>();
 
     public static Supplier<EntityMoveHandler> initialize() throws Throwable {
-        WorldHandle.T.opt_getCubes_1_8.forceInitialization();
+        LevelHandle.T.opt_getCubes_1_8.forceInitialization();
         return EntityMoveHandler_1_8::new;
     }
 
@@ -41,7 +41,7 @@ class EntityMoveHandler_1_8 extends EntityMoveHandler {
         }
 
         // Use legacy logic on 1.12.2 and earlier
-        List<AxisAlignedBBHandle> cubes = world_getCubes(entity, mx, my, mz);
+        List<AABBHandle> cubes = world_getCubes(entity, mx, my, mz);
         if (cubes.isEmpty()) {
             return Stream.empty();
         } else {
@@ -62,8 +62,8 @@ class EntityMoveHandler_1_8 extends EntityMoveHandler {
      * @param cubes result list
      * @return True if cubes were found
      */
-    protected boolean world_getBlockCubes(EntityHandle entity, AxisAlignedBBHandle movedBounds, List<AxisAlignedBBHandle> cubes) {
-        List<AxisAlignedBBHandle> foundBounds = WorldHandle.T.opt_getCubes_1_8.invoke(entity.getWorld().getRaw(), entity, movedBounds);
+    protected boolean world_getBlockCubes(EntityHandle entity, AABBHandle movedBounds, List<AABBHandle> cubes) {
+        List<AABBHandle> foundBounds = LevelHandle.T.opt_getCubes_1_8.invoke(entity.getWorld().getRaw(), entity, movedBounds);
         if (foundBounds.isEmpty()) {
             return false;
         }
@@ -76,13 +76,13 @@ class EntityMoveHandler_1_8 extends EntityMoveHandler {
             if (CommonCapabilities.VEHICLES_COLLIDE_WITH_PASSENGERS || !entity.isInSameVehicle(entity1)) {
                 // BKCommonLib start: block collision event handler
                 if (entity.canCollideWith(entity1)) {
-                    AxisAlignedBBHandle axisalignedbb1 = entity1.getBoundingBox();
+                    AABBHandle axisalignedbb1 = entity1.getBoundingBox();
                     if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(movedBounds)) {
                         removeFromList(foundBounds, axisalignedbb1);
                     }
                 }
 
-                AxisAlignedBBHandle axisalignedbb2 = entity.getEntityBoundingBox(entity1);
+                AABBHandle axisalignedbb2 = entity.getEntityBoundingBox(entity1);
                 if (axisalignedbb2 != null && axisalignedbb2.bbTransformA(movedBounds)) {
                     removeFromList(foundBounds, axisalignedbb2);
                 }
@@ -105,7 +105,7 @@ class EntityMoveHandler_1_8 extends EntityMoveHandler {
         return true;
     }
 
-    private void world_addEntityCubes(EntityHandle entity, AxisAlignedBBHandle axisalignedbb) {
+    private void world_addEntityCubes(EntityHandle entity, AABBHandle axisalignedbb) {
         if (entity != null && this.entityCollisionEnabled) {
             List<EntityHandle> list = entity.getWorld().getNearbyEntities(entity, axisalignedbb.growUniform(0.25D));
 
@@ -116,7 +116,7 @@ class EntityMoveHandler_1_8 extends EntityMoveHandler {
 
                 // BKCommonLib start: block collision event handler
                 if (entity.canCollideWith(entity1)) {
-                    AxisAlignedBBHandle axisalignedbb1 = entity1.getBoundingBox();
+                    AABBHandle axisalignedbb1 = entity1.getBoundingBox();
                     if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(axisalignedbb)
                             && controller.onEntityCollision(entity1.getBukkitEntity())) {
 
@@ -124,7 +124,7 @@ class EntityMoveHandler_1_8 extends EntityMoveHandler {
                     }
                 }
 
-                AxisAlignedBBHandle axisalignedbb2 = entity.getEntityBoundingBox(entity1);
+                AABBHandle axisalignedbb2 = entity.getEntityBoundingBox(entity1);
                 if (axisalignedbb2 != null && axisalignedbb2.bbTransformA(axisalignedbb)
                         && controller.onEntityCollision(entity1.getBukkitEntity())) {
 
@@ -146,14 +146,14 @@ class EntityMoveHandler_1_8 extends EntityMoveHandler {
         }
     }
 
-    private List<AxisAlignedBBHandle> world_getCubes(EntityHandle entity, double mx, double my, double mz) {
-        AxisAlignedBBHandle axisalignedbb_old = entity.getBoundingBox();
+    private List<AABBHandle> world_getCubes(EntityHandle entity, double mx, double my, double mz) {
+        AABBHandle axisalignedbb_old = entity.getBoundingBox();
 
         collisions_buffer.clear(); // BKCommonLib edit: use cached list
 
         // BKCommonLib start: replace world_getBlockCollisions call; use cached list instead + allow configurable bounds
         //world.a(entity, axisalignedbb, false, arraylist);
-        AxisAlignedBBHandle entityBlockAABB = this.getBlockBoundingBox(entity);
+        AABBHandle entityBlockAABB = this.getBlockBoundingBox(entity);
         entity.setBoundingBoxField(entityBlockAABB);
         world_getBlockCollisions(entity, entityBlockAABB, entityBlockAABB.transformB(mx, my, mz));
         entity.setBoundingBoxField(axisalignedbb_old);
@@ -164,7 +164,7 @@ class EntityMoveHandler_1_8 extends EntityMoveHandler {
         return collisions_buffer;
     }
 
-    private boolean world_getBlockCollisions(EntityHandle entity, AxisAlignedBBHandle entityBounds, AxisAlignedBBHandle movedBounds) {
+    private boolean world_getBlockCollisions(EntityHandle entity, AABBHandle entityBounds, AABBHandle movedBounds) {
         // When disabled, return right away and don't add any bounding boxes
         if (!this.blockCollisionEnabled) {
             return true;
@@ -179,8 +179,8 @@ class EntityMoveHandler_1_8 extends EntityMoveHandler {
         // Send all found bounds in the list through a filter calling onBlockCollision
         // Handle block collisions
         BlockFace hitFace;
-        Iterator<AxisAlignedBBHandle> iter = collisions_buffer.iterator();
-        AxisAlignedBBHandle blockBounds;
+        Iterator<AABBHandle> iter = collisions_buffer.iterator();
+        AABBHandle blockBounds;
         double dx, dz;
         while (iter.hasNext()) {
             blockBounds = iter.next();
@@ -207,10 +207,10 @@ class EntityMoveHandler_1_8 extends EntityMoveHandler {
         return true;
     }
 
-    private void removeFromList(List<AxisAlignedBBHandle> bounds, AxisAlignedBBHandle toRemove) {
-        ListIterator<AxisAlignedBBHandle> iter = bounds.listIterator(bounds.size());
+    private void removeFromList(List<AABBHandle> bounds, AABBHandle toRemove) {
+        ListIterator<AABBHandle> iter = bounds.listIterator(bounds.size());
         while (iter.hasPrevious()) {
-            AxisAlignedBBHandle b = iter.previous();
+            AABBHandle b = iter.previous();
             if (b.getMinX() == toRemove.getMinX() && b.getMinY() == toRemove.getMinY() && b.getMinZ() == toRemove.getMinZ() &&
                     b.getMaxX() == toRemove.getMaxX() && b.getMaxY() == toRemove.getMaxY() && b.getMaxZ() == toRemove.getMaxZ())
             {

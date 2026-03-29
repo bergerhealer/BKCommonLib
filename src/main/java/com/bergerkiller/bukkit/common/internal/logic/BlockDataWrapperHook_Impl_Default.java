@@ -6,6 +6,7 @@ import java.lang.reflect.Modifier;
 
 import static org.objectweb.asm.Opcodes.*;
 
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.BlockStateHandle;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -13,7 +14,6 @@ import org.objectweb.asm.MethodVisitor;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
 import com.bergerkiller.mountiplex.reflection.ReflectionUtil;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
@@ -89,7 +89,7 @@ class BlockDataWrapperHook_Impl_Default extends BlockDataWrapperHook {
         values.forceInitialization();
 
         // Initialize IBlockData getValues() method, we already refer to it in templates
-        Method getValuesMethod = IBlockDataHandle.T.getStates.raw.toJavaMethod();
+        Method getValuesMethod = BlockStateHandle.T.getStates.raw.toJavaMethod();
         getValues.init(getValuesMethod);
         getValues.forceInitialization();
 

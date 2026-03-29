@@ -13,9 +13,9 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstractHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypeHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.AbstractMinecartHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 
@@ -51,7 +51,7 @@ public class CommonEntityType {
     private static final Map<Integer, CommonEntityType> byObjectTypeId = new HashMap<>();
     private static final Map<Integer, CommonEntityType> byEntityTypeId = new HashMap<>();
     private static final Map<Object, CommonEntityType> byNMSEntityType = new HashMap<>();
-    private static final Map<Class<?>, EntityTypesHandle> entityTypesByClass = new HashMap<>();
+    private static final Map<Class<?>, EntityTypeHandle> entityTypesByClass = new HashMap<>();
 
     // Remappings between some Bukkit entity types and Common entity types
     // Order is important, the first pair that can be used is selected
@@ -98,7 +98,7 @@ public class CommonEntityType {
     public final int objectTypeId;
     public final int objectExtraData;
     public final int moveTicks;
-    public final EntityTypesHandle nmsEntityType;
+    public final EntityTypeHandle nmsEntityType;
 
     private CommonEntityType(EntityType entityType, boolean nullInitialize) {
         // Properties first
@@ -146,7 +146,7 @@ public class CommonEntityType {
             entityTypeName = null; // Internal lookup fails!
         }
         if (entityTypeName != null) {
-            nmsType = EntityTypesHandle.getEntityClass(entityTypeName);
+            nmsType = EntityTypeHandle.getEntityClass(entityTypeName);
         }
 
         // Fallbacks for when nmsType cannot be resolved from EntityTypes by name
@@ -240,12 +240,12 @@ public class CommonEntityType {
         this.commonType = ClassTemplate.create(commonType);
         this.commonConstructor = commonConstructor;
 
-        this.entityTypeId = EntityTypesHandle.getEntityTypeId(nmsType);
+        this.entityTypeId = EntityTypeHandle.getEntityTypeId(nmsType);
         if (this.entityTypeId != -1) {
             byEntityTypeId.put(this.entityTypeId, this);
         }
 
-        if (EntityTypesHandle.T.fromEntityClass.isAvailable() && nmsType != null) {
+        if (EntityTypeHandle.T.fromEntityClass.isAvailable() && nmsType != null) {
             this.nmsEntityType = getNMSEntityTypeByEntityClass(nmsType);
             if (this.nmsEntityType != null) {
                 byNMSEntityType.put(this.nmsEntityType.getRaw(), this);
@@ -266,9 +266,9 @@ public class CommonEntityType {
             this.hasWorldCoordConstructor = false;
         }
 
-        if (EntityTypesHandle.T.getTypeId.isAvailable()) {
+        if (EntityTypeHandle.T.getTypeId.isAvailable()) {
             if (this.nmsEntityType != null) {
-                this.objectTypeId = EntityTypesHandle.T.getTypeId.invoke(this.nmsEntityType.getRaw());
+                this.objectTypeId = EntityTypeHandle.T.getTypeId.invoke(this.nmsEntityType.getRaw());
                 this.objectExtraData = 0;
             } else {
                 this.objectTypeId = -1;
@@ -291,7 +291,7 @@ public class CommonEntityType {
         }
 
         //TODO: Can this be read from somewhere?
-        if (this.nmsType.getType() != null && EntityMinecartAbstractHandle.T.isAssignableFrom(this.nmsType.getType())) {
+        if (this.nmsType.getType() != null && AbstractMinecartHandle.T.isAssignableFrom(this.nmsType.getType())) {
             this.moveTicks = 5;
         } else {
             this.moveTicks = 3;
@@ -334,18 +334,18 @@ public class CommonEntityType {
         Object handle;
         if (this.hasWorldCoordConstructor) {
             handle = hook.constructInstance(this.nmsType.getType(),
-                    new Class<?>[] {WorldHandle.T.getType(), double.class, double.class, double.class},
+                    new Class<?>[] {LevelHandle.T.getType(), double.class, double.class, double.class},
                     new Object[] { Conversion.toWorldHandle.convert(world), x, y, z });
         } else if (CommonCapabilities.ENTITY_USES_ENTITYTYPES_IN_CONSTRUCTOR) {
             if (this.nmsEntityType == null) {
                 throw new IllegalStateException("Type " + this.toString() + " cannot be constructed");
             }
             handle = hook.constructInstance(this.nmsType.getType(),
-                    new Class<?>[] {EntityTypesHandle.T.getType(), WorldHandle.T.getType()},
+                    new Class<?>[] {EntityTypeHandle.T.getType(), LevelHandle.T.getType()},
                     new Object[] { this.nmsEntityType.getRaw(), Conversion.toWorldHandle.convert(world) });
         } else {
             handle = hook.constructInstance(this.nmsType.getType(),
-                    new Class<?>[] {WorldHandle.T.getType()},
+                    new Class<?>[] {LevelHandle.T.getType()},
                     new Object[] { Conversion.toWorldHandle.convert(world) });
         }
 
@@ -419,8 +419,8 @@ public class CommonEntityType {
             }
 
             // Try by class instead
-            if (EntityTypesHandle.T.getEntityClassInst.isAvailable()) {
-                Class<?> nmsType = EntityTypesHandle.T.getEntityClassInst.invoke(entityTypesHandleRaw);
+            if (EntityTypeHandle.T.getEntityClassInst.isAvailable()) {
+                Class<?> nmsType = EntityTypeHandle.T.getEntityClassInst.invoke(entityTypesHandleRaw);
                 return byNMSEntityClass(nmsType);
             }
         }
@@ -469,15 +469,15 @@ public class CommonEntityType {
         return result == null ? null : result.entityType;
     }
 
-    public static CommonEntityType byNMSEntityType(EntityTypesHandle handle) {
+    public static CommonEntityType byNMSEntityType(EntityTypeHandle handle) {
         return (handle == null) ? UNKNOWN : byNMSEntityTypeRaw(handle.getRaw());
     }
 
-    public static EntityTypesHandle getNMSEntityTypeByEntityClass(Class<?> entityClass) {
+    public static EntityTypeHandle getNMSEntityTypeByEntityClass(Class<?> entityClass) {
         // Look up from cache using a quick read lock
         long stamp = lock.readLock();
         try {
-            EntityTypesHandle entityTypes = entityTypesByClass.get(entityClass);
+            EntityTypeHandle entityTypes = entityTypesByClass.get(entityClass);
             if (entityTypes != null) {
                 return entityTypes;
             }
@@ -488,7 +488,7 @@ public class CommonEntityType {
         // Query it and cache it, requiring exclusive write access
         stamp = lock.writeLock();
         try {
-            EntityTypesHandle entityTypes = EntityTypesHandle.T.fromEntityClass.invoke(entityClass);
+            EntityTypeHandle entityTypes = EntityTypeHandle.T.fromEntityClass.invoke(entityClass);
             entityTypesByClass.put(entityClass, entityTypes);
             return entityTypes;
         } finally {

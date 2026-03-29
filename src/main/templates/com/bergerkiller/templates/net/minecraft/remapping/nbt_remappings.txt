@@ -1,121 +1,121 @@
 
 #select version >=
-#case 1.21.5:  #remap net.minecraft.nbt.NBTTagLong public long getAsLong:value();
-#case 1.18:    #remap net.minecraft.nbt.NBTTagLong public long getAsLong();
-#case 1.13.2:  #remap net.minecraft.nbt.NBTTagLong public long getAsLong:asLong();
-#case 1.10.2:  #remap net.minecraft.nbt.NBTTagLong public long getAsLong:d();
-#case else:    #remap net.minecraft.nbt.NBTTagLong public long getAsLong:c();
+#case 1.21.5:  #remap net.minecraft.nbt.LongTag public long getAsLong:value();
+#case 1.18:    #remap net.minecraft.nbt.LongTag public long getAsLong();
+#case 1.13.2:  #remap net.minecraft.nbt.LongTag public long getAsLong:asLong();
+#case 1.10.2:  #remap net.minecraft.nbt.LongTag public long getAsLong:d();
+#case else:    #remap net.minecraft.nbt.LongTag public long getAsLong:c();
 #endselect
 
 #select version >=
-#case 1.21.5:  #remap net.minecraft.nbt.NBTTagInt public int getAsInt:value();
-#case 1.18:    #remap net.minecraft.nbt.NBTTagInt public int getAsInt();
-#case 1.13.2:  #remap net.minecraft.nbt.NBTTagInt public int getAsInt:asInt();
-#case 1.10.2:  #remap net.minecraft.nbt.NBTTagInt public int getAsInt:e();
-#case else:    #remap net.minecraft.nbt.NBTTagInt public int getAsInt:d();
+#case 1.21.5:  #remap net.minecraft.nbt.IntTag public int getAsInt:value();
+#case 1.18:    #remap net.minecraft.nbt.IntTag public int getAsInt();
+#case 1.13.2:  #remap net.minecraft.nbt.IntTag public int getAsInt:asInt();
+#case 1.10.2:  #remap net.minecraft.nbt.IntTag public int getAsInt:e();
+#case else:    #remap net.minecraft.nbt.IntTag public int getAsInt:d();
 #endselect
 
 #select version >=
-#case 1.21.5:  #remap net.minecraft.nbt.NBTTagShort public short getAsShort:value();
-#case 1.18:    #remap net.minecraft.nbt.NBTTagShort public short getAsShort();
-#case 1.13.2:  #remap net.minecraft.nbt.NBTTagShort public short getAsShort:asShort();
-#case 1.10.2:  #remap net.minecraft.nbt.NBTTagShort public short getAsShort:f();
-#case else:    #remap net.minecraft.nbt.NBTTagShort public short getAsShort:e();
+#case 1.21.5:  #remap net.minecraft.nbt.ShortTag public short getAsShort:value();
+#case 1.18:    #remap net.minecraft.nbt.ShortTag public short getAsShort();
+#case 1.13.2:  #remap net.minecraft.nbt.ShortTag public short getAsShort:asShort();
+#case 1.10.2:  #remap net.minecraft.nbt.ShortTag public short getAsShort:f();
+#case else:    #remap net.minecraft.nbt.ShortTag public short getAsShort:e();
 #endselect
 
 #select version >=
-#case 1.21.5:  #remap net.minecraft.nbt.NBTTagByte public byte getAsByte:value();
-#case 1.18:    #remap net.minecraft.nbt.NBTTagByte public byte getAsByte();
-#case 1.13.2:  #remap net.minecraft.nbt.NBTTagByte public byte getAsByte:asByte();
-#case 1.10.2:  #remap net.minecraft.nbt.NBTTagByte public byte getAsByte:g();
-#case else:    #remap net.minecraft.nbt.NBTTagByte public byte getAsByte:f();
+#case 1.21.5:  #remap net.minecraft.nbt.ByteTag public byte getAsByte:value();
+#case 1.18:    #remap net.minecraft.nbt.ByteTag public byte getAsByte();
+#case 1.13.2:  #remap net.minecraft.nbt.ByteTag public byte getAsByte:asByte();
+#case 1.10.2:  #remap net.minecraft.nbt.ByteTag public byte getAsByte:g();
+#case else:    #remap net.minecraft.nbt.ByteTag public byte getAsByte:f();
 #endselect
 
 #select version >=
-#case 1.21.5:  #remap net.minecraft.nbt.NBTTagString public String getAsString:value();
-#case 1.18:    #remap net.minecraft.nbt.NBTTagString public String getAsString();
-#case 1.13.2:  #remap net.minecraft.nbt.NBTTagString public String getAsString:asString();
-#case 1.13:    #remap net.minecraft.nbt.NBTTagString public String getAsString:b_();
-#case 1.10.2:  #remap net.minecraft.nbt.NBTTagString public String getAsString:c_();
-#case else:    #remap net.minecraft.nbt.NBTTagString public String getAsString:a_();
+#case 1.21.5:  #remap net.minecraft.nbt.StringTag public String getAsString:value();
+#case 1.18:    #remap net.minecraft.nbt.StringTag public String getAsString();
+#case 1.13.2:  #remap net.minecraft.nbt.StringTag public String getAsString:asString();
+#case 1.13:    #remap net.minecraft.nbt.StringTag public String getAsString:b_();
+#case 1.10.2:  #remap net.minecraft.nbt.StringTag public String getAsString:c_();
+#case else:    #remap net.minecraft.nbt.StringTag public String getAsString:a_();
 #endselect
 
 #select version >=
-#case 1.21.5:  #remap net.minecraft.nbt.NBTTagFloat public float getAsFloat:value();
-#case 1.18:    #remap net.minecraft.nbt.NBTTagFloat public float getAsFloat();
-#case 1.13.2:  #remap net.minecraft.nbt.NBTTagFloat public float getAsFloat:asFloat();
-#case 1.10.2:  #remap net.minecraft.nbt.NBTTagFloat public float getAsFloat:i();
-#case else:    #remap net.minecraft.nbt.NBTTagFloat public float getAsFloat:h();
+#case 1.21.5:  #remap net.minecraft.nbt.FloatTag public float getAsFloat:value();
+#case 1.18:    #remap net.minecraft.nbt.FloatTag public float getAsFloat();
+#case 1.13.2:  #remap net.minecraft.nbt.FloatTag public float getAsFloat:asFloat();
+#case 1.10.2:  #remap net.minecraft.nbt.FloatTag public float getAsFloat:i();
+#case else:    #remap net.minecraft.nbt.FloatTag public float getAsFloat:h();
 #endselect
 
 #if version < 1.18 && forge_nms_obfuscated
-    #remap net.minecraft.nbt.NBTTagDouble public double getAsDouble:h();
+    #remap net.minecraft.nbt.DoubleTag public double getAsDouble:h();
 #else
   #select version >=
-  #case 1.21.5:  #remap net.minecraft.nbt.NBTTagDouble public double getAsDouble:value();
-  #case 1.18:    #remap net.minecraft.nbt.NBTTagDouble public double getAsDouble();
-  #case 1.11:    #remap net.minecraft.nbt.NBTTagDouble public double getAsDouble:asDouble();
-  #case 1.10.2:  #remap net.minecraft.nbt.NBTTagDouble public double getAsDouble:h();
-  #case else:    #remap net.minecraft.nbt.NBTTagDouble public double getAsDouble:g();
+  #case 1.21.5:  #remap net.minecraft.nbt.DoubleTag public double getAsDouble:value();
+  #case 1.18:    #remap net.minecraft.nbt.DoubleTag public double getAsDouble();
+  #case 1.11:    #remap net.minecraft.nbt.DoubleTag public double getAsDouble:asDouble();
+  #case 1.10.2:  #remap net.minecraft.nbt.DoubleTag public double getAsDouble:h();
+  #case else:    #remap net.minecraft.nbt.DoubleTag public double getAsDouble:g();
   #endselect
 #endif
 
 #select version >=
-#case 1.18:    #remap net.minecraft.nbt.NBTTagCompound public net.minecraft.nbt.NBTBase put(String name, net.minecraft.nbt.NBTBase value);
-#case 1.14:    #remap net.minecraft.nbt.NBTTagCompound public net.minecraft.nbt.NBTBase put:set(String name, net.minecraft.nbt.NBTBase value);
-#case else:    #remap net.minecraft.nbt.NBTTagCompound public void put:set(String name, net.minecraft.nbt.NBTBase value);
+#case 1.18:    #remap net.minecraft.nbt.CompoundTag public net.minecraft.nbt.Tag put(String name, net.minecraft.nbt.Tag value);
+#case 1.14:    #remap net.minecraft.nbt.CompoundTag public net.minecraft.nbt.Tag put:set(String name, net.minecraft.nbt.Tag value);
+#case else:    #remap net.minecraft.nbt.CompoundTag public void put:set(String name, net.minecraft.nbt.Tag value);
 #endselect
 
 #if version >= 1.18
-    #remap net.minecraft.nbt.NBTTagCompound public void putInt(String name, int value);
-    #remap net.minecraft.nbt.NBTTagCompound public void putBoolean(String name, boolean value);
-    #remap net.minecraft.nbt.NBTTagCompound public void putByte(String name, byte value);
-    #remap net.minecraft.nbt.NBTTagCompound public void putString(String name, String value);
+    #remap net.minecraft.nbt.CompoundTag public void putInt(String name, int value);
+    #remap net.minecraft.nbt.CompoundTag public void putBoolean(String name, boolean value);
+    #remap net.minecraft.nbt.CompoundTag public void putByte(String name, byte value);
+    #remap net.minecraft.nbt.CompoundTag public void putString(String name, String value);
 #else
-    #remap net.minecraft.nbt.NBTTagCompound public void putInt:setInt(String name, int value);
-    #remap net.minecraft.nbt.NBTTagCompound public void putBoolean:setBoolean(String name, boolean value);
-    #remap net.minecraft.nbt.NBTTagCompound public void putByte:setByte(String name, byte value);
-    #remap net.minecraft.nbt.NBTTagCompound public void putString:setString(String name, String value);
+    #remap net.minecraft.nbt.CompoundTag public void putInt:setInt(String name, int value);
+    #remap net.minecraft.nbt.CompoundTag public void putBoolean:setBoolean(String name, boolean value);
+    #remap net.minecraft.nbt.CompoundTag public void putByte:setByte(String name, byte value);
+    #remap net.minecraft.nbt.CompoundTag public void putString:setString(String name, String value);
 #endif
 
 #if version >= 1.18
-    #remap net.minecraft.nbt.NBTTagCompound public boolean isEmpty();
+    #remap net.minecraft.nbt.CompoundTag public boolean isEmpty();
 #elseif forge_nms_obfuscated
-    #remap net.minecraft.nbt.NBTTagCompound public boolean isEmpty:b_();
+    #remap net.minecraft.nbt.CompoundTag public boolean isEmpty:b_();
 #else
-    #remap net.minecraft.nbt.NBTTagCompound public boolean isEmpty();
+    #remap net.minecraft.nbt.CompoundTag public boolean isEmpty();
 #endif
 
 #if version >= 1.18
-    #remap net.minecraft.nbt.NBTTagList public boolean isEmpty();
+    #remap net.minecraft.nbt.ListTag public boolean isEmpty();
 #elseif forge_nms_obfuscated
-    #remap net.minecraft.nbt.NBTTagList public boolean isEmpty:b_();
+    #remap net.minecraft.nbt.ListTag public boolean isEmpty:b_();
 #else
-    #remap net.minecraft.nbt.NBTTagList public boolean isEmpty();
+    #remap net.minecraft.nbt.ListTag public boolean isEmpty();
 #endif
 
 #if version >= 1.16.5 && forge == mohist
     // Mohist 1.16.5+ remapping bug
-    #remap net.minecraft.nbt.NBTTagList public NBTBase get:k(int index);
+    #remap net.minecraft.nbt.ListTag public Tag get:k(int index);
 #elseif version >= 1.16.5 && forge == magma
     // Magma 1.16.5+ remapping bug
-    #remap net.minecraft.nbt.NBTTagList public NBTBase get:k(int index);
+    #remap net.minecraft.nbt.ListTag public Tag get:k(int index);
 #elseif version >= 1.13
-    #remap net.minecraft.nbt.NBTTagList public NBTBase get(int index);
+    #remap net.minecraft.nbt.ListTag public Tag get(int index);
 #elseif version >= 1.12
-    #remap net.minecraft.nbt.NBTTagList public NBTBase get:i(int index);
+    #remap net.minecraft.nbt.ListTag public Tag get:i(int index);
 #elseif version >= 1.9
-    #remap net.minecraft.nbt.NBTTagList public NBTBase get:h(int index);
+    #remap net.minecraft.nbt.ListTag public Tag get:h(int index);
 #else
-    #remap net.minecraft.nbt.NBTTagList public NBTBase get:g(int index);
+    #remap net.minecraft.nbt.ListTag public Tag get:g(int index);
 #endif
 
 #if version >= 1.15 && version < 1.18
-    #remap net.minecraft.nbt.NBTTagString   public static NBTTagString valueOf:a(String data);
-    #remap net.minecraft.nbt.NBTTagByte     public static NBTTagByte valueOf:a(byte data);
-    #remap net.minecraft.nbt.NBTTagShort    public static NBTTagShort valueOf:a(short data);
-    #remap net.minecraft.nbt.NBTTagInt      public static NBTTagInt valueOf:a(int data);
-    #remap net.minecraft.nbt.NBTTagLong     public static NBTTagLong valueOf:a(long data);
-    #remap net.minecraft.nbt.NBTTagFloat    public static NBTTagFloat valueOf:a(float data);
-    #remap net.minecraft.nbt.NBTTagDouble   public static NBTTagDouble valueOf:a(double data);
+    #remap net.minecraft.nbt.StringTag   public static StringTag valueOf:a(String data);
+    #remap net.minecraft.nbt.ByteTag     public static ByteTag valueOf:a(byte data);
+    #remap net.minecraft.nbt.ShortTag    public static ShortTag valueOf:a(short data);
+    #remap net.minecraft.nbt.IntTag      public static IntTag valueOf:a(int data);
+    #remap net.minecraft.nbt.LongTag     public static LongTag valueOf:a(long data);
+    #remap net.minecraft.nbt.FloatTag    public static FloatTag valueOf:a(float data);
+    #remap net.minecraft.nbt.DoubleTag   public static DoubleTag valueOf:a(double data);
 #else

@@ -4,7 +4,7 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.player.EntityHumanHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.player.PlayerHandle;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -181,7 +181,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      * @return human player abilities
      */
     public static PlayerAbilities getAbilities(HumanEntity human) {
-        return EntityHumanHandle.T.abilities.get(HandleConversion.toEntityHandle(human));
+        return PlayerHandle.T.abilities.get(HandleConversion.toEntityHandle(human));
     }
 
     /**

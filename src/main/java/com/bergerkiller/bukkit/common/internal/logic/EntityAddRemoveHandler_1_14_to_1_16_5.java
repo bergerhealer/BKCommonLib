@@ -13,6 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.generated.net.minecraft.server.level.ChunkHolderHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -26,17 +28,14 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ChunkMapHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.generated.net.minecraft.util.IntHashMapHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
@@ -66,8 +65,8 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
 
         //Field 'entitiesById' in class net.minecraft.server.v1_15_R1.WorldServer is of type Int2ObjectLinkedOpenHashMap while we expect type Int2ObjectMap
         try {
-            String fieldName = Resolver.resolveFieldName(WorldServerHandle.T.getType(), "entitiesById");
-            entitiesByIdField.init(MPLType.getDeclaredField(WorldServerHandle.T.getType(), fieldName));
+            String fieldName = Resolver.resolveFieldName(ServerLevelHandle.T.getType(), "entitiesById");
+            entitiesByIdField.init(MPLType.getDeclaredField(ServerLevelHandle.T.getType(), fieldName));
             if (!IntHashMapHandle.T.isAssignableFrom(entitiesByIdField.getType())) {
                 throw new IllegalStateException("Field not assignable to IntHashmap");
             }
@@ -78,8 +77,8 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
 
         // EntitiesByUUID is a Map on MC 1.16.5 and before
         try {
-            String fieldName = Resolver.resolveFieldName(WorldServerHandle.T.getType(), "entitiesByUUID");
-            entitiesByUUIDField.init(MPLType.getDeclaredField(WorldServerHandle.T.getType(), fieldName));
+            String fieldName = Resolver.resolveFieldName(ServerLevelHandle.T.getType(), "entitiesByUUID");
+            entitiesByUUIDField.init(MPLType.getDeclaredField(ServerLevelHandle.T.getType(), fieldName));
             if (!Map.class.isAssignableFrom(entitiesByUUIDField.getType())) {
                 throw new IllegalStateException("Field not assignable to Map");
             }
@@ -89,14 +88,14 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
         }
 
         {
-            String fieldName = Resolver.resolveFieldName(WorldServerHandle.T.getType(), "entitiesToAdd");
-            this.entitiesToAddField = LogicUtil.unsafeCast(SafeField.create(WorldServerHandle.T.getType(), fieldName, Queue.class));
+            String fieldName = Resolver.resolveFieldName(ServerLevelHandle.T.getType(), "entitiesToAdd");
+            this.entitiesToAddField = LogicUtil.unsafeCast(SafeField.create(ServerLevelHandle.T.getType(), fieldName, Queue.class));
         }
 
         // Tuinity support: 'loadedEntities' field of WorldServer
         try {
             Class<?> entityListType = Class.forName("com.tuinity.tuinity.util.EntityList");
-            if (SafeField.contains(WorldServerHandle.T.getType(), "loadedEntities", entityListType)) {
+            if (SafeField.contains(ServerLevelHandle.T.getType(), "loadedEntities", entityListType)) {
                 ClassResolver resolver = new ClassResolver();
                 resolver.addImport("net.minecraft.world.entity.Entity");
                 resolver.setDeclaredClassName("net.minecraft.server.level.WorldServer");
@@ -113,7 +112,7 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
         // Tuinity support: 'entitiesForIteration' field of WorldServer
         try {
             Class<?> entitySetType = Class.forName("com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet");
-            if (SafeField.contains(WorldServerHandle.T.getType(), "entitiesForIteration", entitySetType)) {
+            if (SafeField.contains(ServerLevelHandle.T.getType(), "entitiesForIteration", entitySetType)) {
                 ClassResolver resolver = new ClassResolver();
                 resolver.addImport("net.minecraft.world.entity.Entity");
                 resolver.setDeclaredClassName("net.minecraft.server.level.WorldServer");
@@ -171,7 +170,7 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
 
     @Override
     protected void hook(World world) {
-        Object nmsWorldHandle = WorldHandle.fromBukkit(world).getRaw();
+        Object nmsWorldHandle = LevelHandle.fromBukkit(world).getRaw();
         Map<UUID, Object> base = this.entitiesByUUIDField.get(nmsWorldHandle);
         if (!(base instanceof EntitiesByUUIDMapHook)) {
             EntitiesByUUIDMapHook hook = new EntitiesByUUIDMapHook(this, world, base);
@@ -182,7 +181,7 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
 
     @Override
     protected void unhook(World world) {
-        Object nmsWorldHandle = WorldHandle.fromBukkit(world).getRaw();
+        Object nmsWorldHandle = LevelHandle.fromBukkit(world).getRaw();
         Map<UUID, Object> value = this.entitiesByUUIDField.get(nmsWorldHandle);
         if (value instanceof EntitiesByUUIDMapHook) {
             this.entitiesByUUIDField.set(nmsWorldHandle, ((EntitiesByUUIDMapHook) value).getBase());
@@ -210,7 +209,7 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
 
     @Override
     public void replace(EntityHandle oldEntity, EntityHandle newEntity) {
-        WorldServerHandle world = oldEntity.getWorldServer();
+        ServerLevelHandle world = oldEntity.getWorldServer();
         if (newEntity == null) {
             if (world != null) {
                 world.removeEntity(oldEntity);
@@ -273,14 +272,14 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
         // *** Entity Current Chunk ***
         final int chunkX = newEntity.getChunkX();
         final int chunkZ = newEntity.getChunkZ();
-        PlayerChunkMapHandle playerChunks = WorldServerHandle.T.getPlayerChunkMap.invoke(worldHandle);
+        ChunkMapHandle playerChunks = ServerLevelHandle.T.getPlayerChunkMap.invoke(worldHandle);
         Chunk loadedChunk = WorldUtil.getChunk(newEntity.getBukkitWorld(), chunkX, chunkZ);
         if (loadedChunk != null) {
             replaceInChunk(loadedChunk, oldEntity, newEntity);
         } else {
             // Chunk isn't loaded at this time. This gets difficult!
             // It might still be in the updating chunks mapping
-            PlayerChunkHandle updatingChunk = playerChunks.getUpdatingChunk(chunkX, chunkZ);
+            ChunkHolderHandle updatingChunk = playerChunks.getUpdatingChunk(chunkX, chunkZ);
             Chunk loadedUpdatingChunk = (updatingChunk == null) ? null : updatingChunk.getChunkIfLoaded();
             if (loadedUpdatingChunk == null && updatingChunk != null) {
                 // Try hard time! This allows any status the chunk is in.

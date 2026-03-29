@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.internal.logic;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
@@ -160,7 +160,7 @@ class BlockDataSerializer_1_8_to_1_12_2 extends BlockDataSerializer {
         }
 
         // Parse Block name to MinecraftKey, and find the Block with this name
-        MinecraftKeyHandle key = MinecraftKeyHandle.createNew(blockName);
+        IdentifierHandle key = IdentifierHandle.createNew(blockName);
         if (key == null) {
             return null; // invalid key name format
         }

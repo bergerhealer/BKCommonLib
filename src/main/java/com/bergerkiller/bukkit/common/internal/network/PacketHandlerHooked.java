@@ -8,7 +8,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
-import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
+import com.bergerkiller.generated.net.minecraft.server.network.ServerGamePacketListenerImplHandle;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
 
 import org.bukkit.entity.Player;
@@ -37,7 +37,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
     public boolean onEnable() {
         // Initialize all receiver methods
         Class<?> packetType = PacketHandle.T.getType();
-        for (Method method : PlayerConnectionHandle.T.getType().getDeclaredMethods()) {
+        for (Method method : ServerGamePacketListenerImplHandle.T.getType().getDeclaredMethods()) {
             if (method.getReturnType() != void.class || method.getParameterTypes().length != 1
                     || !Modifier.isPublic(method.getModifiers())) {
                 continue;
@@ -92,7 +92,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
             return;
         }
 
-        PlayerConnectionHandle connection = PlayerConnectionHandle.forPlayer(player);
+        ServerGamePacketListenerImplHandle connection = ServerGamePacketListenerImplHandle.forPlayer(player);
         if (connection == null) {
             return;
         }
@@ -119,7 +119,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
     @Override
     public void sendPacket(Player player, PacketType type, Object packet, boolean throughListeners) {
         type.preprocess(packet);
-        PlayerConnectionHandle connection = PlayerConnectionHandle.forPlayer(player);
+        ServerGamePacketListenerImplHandle connection = ServerGamePacketListenerImplHandle.forPlayer(player);
         if (connection == null) {
             return;
         }
@@ -141,7 +141,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
     @Override
     public void queuePacket(Player player, PacketType type, Object packet, boolean throughListeners) {
         type.preprocess(packet);
-        PlayerConnectionHandle connection = PlayerConnectionHandle.forPlayer(player);
+        ServerGamePacketListenerImplHandle connection = ServerGamePacketListenerImplHandle.forPlayer(player);
         if (connection == null) {
             return;
         }

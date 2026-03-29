@@ -1,12 +1,12 @@
 package net.minecraft.world.phys.shapes;
 
-import net.minecraft.core.EnumDirection;
-import net.minecraft.core.EnumDirection.EnumAxis;
-import net.minecraft.world.phys.AxisAlignedBB;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.phys.AABB;
 
-import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
-import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxisHandle;
+import com.bergerkiller.generated.net.minecraft.core.DirectionHandle.AxisHandle;
 
 class VoxelShape {
 
@@ -15,14 +15,14 @@ class VoxelShape {
         return VoxelShapes.empty();
     }
 
-    public static (Object) VoxelShape createRawFromAABB((Object) List<AxisAlignedBB> handles) {
+    public static (Object) VoxelShape createRawFromAABB((Object) List<AABB> handles) {
         if (handles.isEmpty()) {
             return VoxelShapes.empty();
         } else {
             VoxelShape shape = null;
             java.util.Iterator iter = handles.iterator();
             while (iter.hasNext()) {
-                AxisAlignedBB aabb = (AxisAlignedBB) iter.next();
+                AABB aabb = (AABB) iter.next();
                 VoxelShape aabb_shape = VoxelShapes.create(aabb);
                 if (shape == null) {
                     shape = aabb_shape;
@@ -34,7 +34,7 @@ class VoxelShape {
         }
     }
 
-    public static (VoxelShapeHandle) VoxelShape fromAABB((AxisAlignedBBHandle) AxisAlignedBB aabb) {
+    public static (VoxelShapeHandle) VoxelShape fromAABB((AABBHandle) AABB aabb) {
         return VoxelShapes.create(aabb);
     }
 
@@ -46,7 +46,7 @@ class VoxelShape {
         return VoxelShapes.or(a, b);
     }
 
-    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox:bounds();
+    public (AABBHandle) AABB getBoundingBox:bounds();
     public boolean isEmpty();
 
 #elseif version >= 1.13
@@ -54,14 +54,14 @@ class VoxelShape {
         return VoxelShapes.a();
     }
 
-    public static (Object) VoxelShape createRawFromAABB((Object) List<AxisAlignedBB> handles) {
+    public static (Object) VoxelShape createRawFromAABB((Object) List<AABB> handles) {
         if (handles.isEmpty()) {
             return VoxelShapes.a();
         } else {
             VoxelShape shape = null;
             java.util.Iterator iter = handles.iterator();
             while (iter.hasNext()) {
-                AxisAlignedBB aabb = (AxisAlignedBB) iter.next();
+                AABB aabb = (AABB) iter.next();
                 VoxelShape aabb_shape = VoxelShapes.a(aabb);
                 if (shape == null) {
                     shape = aabb_shape;
@@ -73,7 +73,7 @@ class VoxelShape {
         }
     }
 
-    public static (VoxelShapeHandle) VoxelShape fromAABB((AxisAlignedBBHandle) AxisAlignedBB aabb) {
+    public static (VoxelShapeHandle) VoxelShape fromAABB((AABBHandle) AABB aabb) {
         return VoxelShapes.a(aabb);
     }
 
@@ -85,10 +85,10 @@ class VoxelShape {
         return VoxelShapes.a(a, b);
     }
 
-  #if methodexists net.minecraft.world.phys.shapes.VoxelShape public net.minecraft.world.phys.AxisAlignedBB getBoundingBox()
-    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox();
+  #if methodexists net.minecraft.world.phys.shapes.VoxelShape public net.minecraft.world.phys.AABB getBoundingBox()
+    public (AABBHandle) AABB getBoundingBox();
   #else
-    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox:a();
+    public (AABBHandle) AABB getBoundingBox:a();
   #endif
 
   #if version >= 1.13.2
@@ -102,11 +102,11 @@ class VoxelShape {
         return com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy.EMPTY;
     }
 
-    public static (Object) VoxelShape createRawFromAABB((Object) List<AxisAlignedBB> handles) {
+    public static (Object) VoxelShape createRawFromAABB((Object) List<AABB> handles) {
         return com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy.fromNMSAABB(handles);
     }
 
-    public static (VoxelShapeHandle) VoxelShape fromAABB(AxisAlignedBBHandle aabb) {
+    public static (VoxelShapeHandle) VoxelShape fromAABB(AABBHandle aabb) {
         java.util.List list = java.util.Collections.singletonList(aabb);
         return com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy.fromAABBHandles(list);
     }
@@ -136,12 +136,12 @@ class VoxelShape {
         return com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy.fromAABBHandles(java.util.Arrays.asList(arr));
     }
 
-    public (AxisAlignedBBHandle) AxisAlignedBBHandle getBoundingBox();
+    public (AABBHandle) AABBHandle getBoundingBox();
 
     public boolean isEmpty();
 #endif
 
-    public static double traceAxis((EnumAxisHandle) EnumDirection.EnumAxis axis, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, (java.util.stream.Stream<VoxelShapeHandle>) java.util.stream.Stream<VoxelShape> voxels, double coordinate) {
+    public static double traceAxis((AxisHandle) Direction.Axis axis, (AABBHandle) AABB boundingBox, (java.util.stream.Stream<VoxelShapeHandle>) java.util.stream.Stream<VoxelShape> voxels, double coordinate) {
 #if version >= 1.18
         // Now uses an Iterable rather than stream - but iterates only once
         // Easiest is to just do the for loop in here
@@ -175,8 +175,8 @@ class VoxelShape {
 
 #else
         // Custom implementation for 1.12.2 and before (fallback)
-        // Our custom proxy type accepts AxisAlignedBBHandle for performance reasons, really
-        AxisAlignedBBHandle boundingBoxHandle = AxisAlignedBBHandle.createHandle(boundingBox);
+        // Our custom proxy type accepts AABBHandle for performance reasons, really
+        AABBHandle boundingBoxHandle = AABBHandle.createHandle(boundingBox);
 
         java.util.Iterator iter = voxels.iterator();
         while (iter.hasNext()) {
@@ -191,11 +191,11 @@ class VoxelShape {
                 coordinate = voxel.traceZAxis(boundingBoxHandle, coordinate);
             }
   #else
-            if (axis == EnumDirection$EnumAxis.X) {
+            if (axis == Direction$Axis.X) {
                 coordinate = voxel.traceXAxis(boundingBoxHandle, coordinate);
-            } else if (axis == EnumDirection$EnumAxis.Y) {
+            } else if (axis == Direction$Axis.Y) {
                 coordinate = voxel.traceYAxis(boundingBoxHandle, coordinate);
-            } else if (axis == EnumDirection$EnumAxis.Z) {
+            } else if (axis == Direction$Axiss.Z) {
                 coordinate = voxel.traceZAxis(boundingBoxHandle, coordinate);
             }
   #endif

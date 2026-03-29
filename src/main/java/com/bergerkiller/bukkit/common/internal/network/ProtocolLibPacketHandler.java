@@ -14,7 +14,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
-import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
+import com.bergerkiller.generated.net.minecraft.server.network.ServerGamePacketListenerImplHandle;
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import com.bergerkiller.mountiplex.reflection.util.fast.InvalidArgumentCountException;
@@ -182,7 +182,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
     @Override
     public void receivePacket(Player player, PacketType type, Object packet) {
-        if (PlayerConnectionHandle.forPlayer(player) == null) {
+        if (ServerGamePacketListenerImplHandle.forPlayer(player) == null) {
             return; // NPC player is not connected
         }
 
@@ -202,7 +202,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
     @Override
     public void sendPacket(Player player, PacketType type, Object packet, boolean throughListeners) {
-        PlayerConnectionHandle connection = PlayerConnectionHandle.forPlayer(player);
+        ServerGamePacketListenerImplHandle connection = ServerGamePacketListenerImplHandle.forPlayer(player);
         if (connection == null) {
             return; // Player is an NPC or isn't connected
         }
@@ -308,7 +308,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         /*
         if (throughListeners || this.useSilentPacketQueue) {
             type.preprocess(packet);
-            PlayerConnectionHandle connection = PlayerConnectionHandle.forPlayer(player);
+            ServerGamePacketListenerImplHandle connection = ServerGamePacketListenerImplHandle.forPlayer(player);
             if (connection == null) {
                 return;
             }

@@ -3,9 +3,9 @@ package com.bergerkiller.reflection.net.minecraft.server;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
+import com.bergerkiller.generated.net.minecraft.core.BlockPosHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.entity.BlockEntityHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
@@ -14,19 +14,19 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 
 /**
- * <b>Deprecated: </b>Use {@link TileEntityHandle} instead
+ * <b>Deprecated: </b>Use {@link BlockEntityHandle} instead
  */
 @Deprecated
 public class NMSTileEntity {
-    public static final ClassTemplate<?> T = ClassTemplate.create(TileEntityHandle.T.getType);
-    public static final TranslatorFieldAccessor<World> world = TileEntityHandle.T.world_field.toFieldAccessor();
-    public static final TranslatorFieldAccessor<IntVector3> position = TileEntityHandle.T.position_field.toFieldAccessor();
+    public static final ClassTemplate<?> T = ClassTemplate.create(BlockEntityHandle.T.getType);
+    public static final TranslatorFieldAccessor<World> world = BlockEntityHandle.T.world_field.toFieldAccessor();
+    public static final TranslatorFieldAccessor<IntVector3> position = BlockEntityHandle.T.position_field.toFieldAccessor();
 
-    public static final MethodAccessor<Void> load = TileEntityHandle.T.load.raw.toMethodAccessor();
-    public static final MethodAccessor<Void> save = TileEntityHandle.T.save.raw.toMethodAccessor();
+    public static final MethodAccessor<Void> load = BlockEntityHandle.T.load.raw.toMethodAccessor();
+    public static final MethodAccessor<Void> save = BlockEntityHandle.T.save.raw.toMethodAccessor();
 
     public static boolean hasWorld(Object tileEntity) {
-        return TileEntityHandle.T.getWorld.invoke(tileEntity) != null;
+        return BlockEntityHandle.T.getWorld.invoke(tileEntity) != null;
     }
 
     public static Object getFromWorld(Block block) {
@@ -34,23 +34,23 @@ public class NMSTileEntity {
     }
 
     public static Object getFromWorld(World world, Object blockPosition) {
-        return WorldHandle.T.getTileEntity.raw.invoke(HandleConversion.toWorldHandle(world), blockPosition);
+        return LevelHandle.T.getTileEntity.raw.invoke(HandleConversion.toWorldHandle(world), blockPosition);
     }
 
     public static Object getFromWorld(World world, int x, int y, int z) {
-        return getFromWorld(world, BlockPositionHandle.createNew(x, y, z).getRaw());
+        return getFromWorld(world, BlockPosHandle.createNew(x, y, z).getRaw());
     }
 
     public static CommonPacket getUpdatePacket(Object tileEntity) {
         if (tileEntity == null) {
             return null;
         }
-        return TileEntityHandle.T.getUpdatePacket.invoke(tileEntity);
+        return BlockEntityHandle.T.getUpdatePacket.invoke(tileEntity);
     }
 
     public static Block getBlock(Object tileEntity) {
-        TileEntityHandle handle = TileEntityHandle.createHandle(tileEntity);
-        BlockPositionHandle pos = handle.getPosition();
+        BlockEntityHandle handle = BlockEntityHandle.createHandle(tileEntity);
+        BlockPosHandle pos = handle.getPosition();
         return handle.getWorld().getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ());
     }
 }

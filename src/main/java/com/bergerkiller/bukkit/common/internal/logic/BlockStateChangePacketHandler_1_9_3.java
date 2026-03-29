@@ -8,8 +8,8 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.resources.BlockStateType;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockStateChange;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapChunkHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTileEntityDataHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacketHandle;
 
 /**
  * Listens for the PacketPlayOutTileEntityData and PacketPlayOutMapChunk
@@ -22,7 +22,7 @@ class BlockStateChangePacketHandler_1_9_3 extends BlockStateChangePacketHandler 
     @Override
     public void enable() {
         register(PacketType.OUT_TILE_ENTITY_DATA, (player, commonPacket, listener) -> {
-            final PacketPlayOutTileEntityDataHandle packet = PacketPlayOutTileEntityDataHandle.createHandle(commonPacket.getHandle());
+            final ClientboundBlockEntityDataPacketHandle packet = ClientboundBlockEntityDataPacketHandle.createHandle(commonPacket.getHandle());
 
             // Parse BlockState type. If unknown/invalid, ignore the packet.
             BlockStateType tileType = packet.getType();
@@ -60,7 +60,7 @@ class BlockStateChangePacketHandler_1_9_3 extends BlockStateChangePacketHandler 
             return true;
         });
         register(PacketType.OUT_MAP_CHUNK, (player, commonPacket, listener) -> {
-            PacketPlayOutMapChunkHandle packet = PacketPlayOutMapChunkHandle.createHandle(commonPacket.getHandle());
+            ClientboundLevelChunkWithLightPacketHandle packet = ClientboundLevelChunkWithLightPacketHandle.createHandle(commonPacket.getHandle());
 
             Iterator<BlockStateChange> iter = packet.getBlockStates().iterator();
             while (iter.hasNext()) {

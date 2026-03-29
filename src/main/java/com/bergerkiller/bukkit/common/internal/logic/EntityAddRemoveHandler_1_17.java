@@ -42,7 +42,7 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.ReflectionUtil;
@@ -80,8 +80,8 @@ class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
             Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to find PersistentEntitySectionManager class");
         }
         try {
-            String fieldName = Resolver.resolveFieldName(WorldServerHandle.T.getType(), "entityManager");
-            entityManagerField.init(WorldServerHandle.T.getType().getDeclaredField(fieldName));
+            String fieldName = Resolver.resolveFieldName(ServerLevelHandle.T.getType(), "entityManager");
+            entityManagerField.init(ServerLevelHandle.T.getType().getDeclaredField(fieldName));
             if (!sectionManagerClass.isAssignableFrom(entityManagerField.getType())) {
                 throw new IllegalStateException("Field not assignable to PersistentEntitySectionManager");
             }
@@ -229,7 +229,7 @@ class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
 
     @Override
     public void replace(EntityHandle oldEntity, EntityHandle newEntity) {
-        WorldServerHandle world = oldEntity.getWorldServer();
+        ServerLevelHandle world = oldEntity.getWorldServer();
         if (newEntity == null) {
             if (world != null) {
                 world.removeEntity(oldEntity);

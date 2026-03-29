@@ -14,10 +14,9 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapDecorationTypeHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
-import org.jetbrains.annotations.Debug;
 
 /**
  * A marker icon displayed on the {@link MapDisplay}
@@ -335,8 +334,8 @@ public final class MapMarker {
 
     // We give a fancy display name and color to marker types. This performs the mapping of the registry name to this one.
     private static class TypeInfo {
-        private static final Map<MinecraftKeyHandle, TypeInfo> byKey = new HashMap<>();
-        public final MinecraftKeyHandle key;
+        private static final Map<IdentifierHandle, TypeInfo> byKey = new HashMap<>();
+        public final IdentifierHandle key;
         public final String name;
         public final String displayName;
         public final Color color;
@@ -376,15 +375,15 @@ public final class MapMarker {
         }
 
         private static void register(String registryName, String name, String displayName, Color color) {
-            MinecraftKeyHandle key = MinecraftKeyHandle.createNew(MinecraftKeyHandle.DEFAULT_NAMESPACE, registryName);
+            IdentifierHandle key = IdentifierHandle.createNew(IdentifierHandle.DEFAULT_NAMESPACE, registryName);
             byKey.put(key, new TypeInfo(key, name, displayName, color));
         }
 
-        public static TypeInfo get(MinecraftKeyHandle key) {
+        public static TypeInfo get(IdentifierHandle key) {
             return LogicUtil.getOrComputeDefault(byKey, key, TypeInfo::new);
         }
 
-        private TypeInfo(MinecraftKeyHandle key, String name, String displayName, Color color) {
+        private TypeInfo(IdentifierHandle key, String name, String displayName, Color color) {
             this.key = key;
             this.name = name;
             this.displayName = displayName;
@@ -392,7 +391,7 @@ public final class MapMarker {
         }
 
         // Fallback for unknown types
-        private TypeInfo(MinecraftKeyHandle key) {
+        private TypeInfo(IdentifierHandle key) {
             this.key = key;
             if (key.getNamespace().equals("minecraft")) {
                 this.name = key.getName().toUpperCase(Locale.ENGLISH);
@@ -416,7 +415,7 @@ public final class MapMarker {
 
         // Registry by Holder. Is by type value on older versions of Minecraft (< 1.20.5)
         private static final Map<Holder<MapDecorationTypeHandle>, Type> typesByHolder = new HashMap<>();
-        private static final Map<MinecraftKeyHandle, Type> existingTypesByKey = new HashMap<>();
+        private static final Map<IdentifierHandle, Type> existingTypesByKey = new HashMap<>();
         private static final Map<Byte, Type> existingTypesByLegacyId = new HashMap<>();
         static {
             for (Holder<MapDecorationTypeHandle> holder : MapDecorationTypeHandle.getValues()) {
@@ -562,14 +561,14 @@ public final class MapMarker {
         }
 
         private static Type getTypeOrFail(String registryName) {
-            return LogicUtil.getOrSupplyDefault(existingTypesByKey, MinecraftKeyHandle.createNew("minecraft", registryName),
+            return LogicUtil.getOrSupplyDefault(existingTypesByKey, IdentifierHandle.createNew("minecraft", registryName),
                     () -> {
                         throw new IllegalStateException("Marker type does not exist: " + registryName);
                     });
         }
 
         private static Type getTypeOrFallback(String registryName, Type fallback) {
-            return LogicUtil.getOrComputeDefault(existingTypesByKey, MinecraftKeyHandle.createNew("minecraft", registryName),
+            return LogicUtil.getOrComputeDefault(existingTypesByKey, IdentifierHandle.createNew("minecraft", registryName),
                     key -> new Type(key, fallback));
         }
 
@@ -581,7 +580,7 @@ public final class MapMarker {
         }
 
         // Used when a particular type does not exist, to use a fallback icon in that case
-        private Type(MinecraftKeyHandle key, Type fallback) {
+        private Type(IdentifierHandle key, Type fallback) {
             this.available = false;
             this.handle = fallback.getHandle();
             this.info = TypeInfo.get(key);

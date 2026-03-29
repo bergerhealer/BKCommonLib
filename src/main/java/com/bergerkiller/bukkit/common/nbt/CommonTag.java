@@ -1,12 +1,10 @@
 package com.bergerkiller.bukkit.common.nbt;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.wrappers.BasicWrapper;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTCompressedStreamToolsHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NbtIoHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingMap;
@@ -23,19 +21,19 @@ import java.util.function.Function;
  * <u>List&lt;CommonTag&gt;, Map&lt;String, CommonTag&gt;, byte, short, int, long, float,
  * double, byte[], int[], String</u>
  */
-public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable {
+public class CommonTag extends BasicWrapper<TagHandle> implements Cloneable {
     // Guards against modifications when a read-only NBT object is requested
     boolean readOnly = false;
 
-    public CommonTag(NBTBaseHandle handle) {
+    public CommonTag(TagHandle handle) {
         setHandle(handle);
     }
 
     public CommonTag(Object data) {
-        if (data instanceof NBTBaseHandle) {
-            setHandle((NBTBaseHandle) data);
+        if (data instanceof TagHandle) {
+            setHandle((TagHandle) data);
         } else {
-            setHandle(NBTBaseHandle.createHandleForData(data));
+            setHandle(TagHandle.createHandleForData(data));
         }
     }
 
@@ -51,7 +49,7 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable 
      * @return Raw data
      */
     protected Object getRawData() {
-        return NBTBaseHandle.getDataForHandle(getRawHandle());
+        return TagHandle.getDataForHandle(getRawHandle());
     }
 
     /**
@@ -111,9 +109,9 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable 
      */
     public void writeToStream(OutputStream out) throws IOException {
     	if (out instanceof DataOutput) {
-    	    NBTCompressedStreamToolsHandle.uncompressed_writeTag(handle, (DataOutput) out);
+    	    NbtIoHandle.uncompressed_writeTag(handle, (DataOutput) out);
     	} else {
-    	    NBTCompressedStreamToolsHandle.uncompressed_writeTag(handle, new DataOutputStream(out));
+    	    NbtIoHandle.uncompressed_writeTag(handle, new DataOutputStream(out));
     	}
     }
 
@@ -126,9 +124,9 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable 
      */
     public static CommonTag readFromStream(InputStream in) throws IOException {
         if (in instanceof DataInput) {
-            return create(NBTCompressedStreamToolsHandle.uncompressed_readTag((DataInput) in));
+            return create(NbtIoHandle.uncompressed_readTag((DataInput) in));
         } else {
-            return create(NBTCompressedStreamToolsHandle.uncompressed_readTag(new DataInputStream(in)));
+            return create(NbtIoHandle.uncompressed_readTag(new DataInputStream(in)));
         }
     }
 
@@ -140,7 +138,7 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable 
      * @return a new CommonTag instance
      */
     public static CommonTag createForData(Object data) {
-        return NBTBaseHandle.createHandleForData(data).toCommonTag();
+        return TagHandle.createHandleForData(data).toCommonTag();
     }
 
     /**
@@ -154,12 +152,12 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable 
         if (handle == null) {
             return null;
         } else {
-            return NBTBaseHandle.createHandleForData(handle).toCommonTag();
+            return TagHandle.createHandleForData(handle).toCommonTag();
         }
     }
 
     protected static Object wrapGetDataForHandle(Object nmsNBTHandle, boolean readOnly) {
-        return wrapRawData(NBTBaseHandle.getDataForHandle(nmsNBTHandle), readOnly);
+        return wrapRawData(TagHandle.getDataForHandle(nmsNBTHandle), readOnly);
     }
 
     /**
@@ -209,14 +207,14 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable 
      */
     public static SNBTResult<? extends CommonTag> fromSNBT(String snbtContent) {
         try {
-            NBTBaseHandle result = NBTCompressedStreamToolsHandle.parseTagFromSNBT(snbtContent);
+            TagHandle result = NbtIoHandle.parseTagFromSNBT(snbtContent);
 
-            // Sadly, it wraps it as NBTBaseHandle, not the derived type more suitable for what is returned
+            // Sadly, it wraps it as TagHandle, not the derived type more suitable for what is returned
             // This is fixed by creating the proper handle using createHandleForData()
-            return SNBTResult.success(NBTBaseHandle.createHandleForData(result.getRaw()).toCommonTag());
+            return SNBTResult.success(TagHandle.createHandleForData(result.getRaw()).toCommonTag());
         } catch (Throwable t) {
             t.printStackTrace();
-            return SNBTResult.error(NBTCompressedStreamToolsHandle.handleSNBTParseError(snbtContent, t));
+            return SNBTResult.error(NbtIoHandle.handleSNBTParseError(snbtContent, t));
         }
     }
 

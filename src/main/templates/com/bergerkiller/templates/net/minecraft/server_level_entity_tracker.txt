@@ -1,6 +1,6 @@
 package net.minecraft.server.level;
 
-import net.minecraft.world.phys.Vec3D;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.VecDeltaCodec;
 import net.minecraft.server.network.ServerPlayerConnection;
@@ -11,26 +11,26 @@ import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryH
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 
-// Same as PlayerChunkMap on MC 1.14 and later
+// Same as ChunkMap on MC 1.14 and later
 class EntityTracker {
 #if version >= 1.14
   #if version >= 1.17
-    #require net.minecraft.server.level.EntityTracker public final net.minecraft.server.level.WorldServer world:level;
+    #require net.minecraft.server.level.EntityTracker public final net.minecraft.server.level.ServerLevel world:level;
   #else
-    #require net.minecraft.server.level.EntityTracker public final net.minecraft.server.level.WorldServer world;
+    #require net.minecraft.server.level.EntityTracker public final net.minecraft.server.level.ServerLevel world;
   #endif
 
-    public (org.bukkit.World) WorldServer getWorld() {
+    public (org.bukkit.World) ServerLevel getWorld() {
         return instance#world;
     }
-    public void setWorld((org.bukkit.World) WorldServer world) {
+    public void setWorld((org.bukkit.World) ServerLevel world) {
         instance#world = world;
     }
 
   #if version >= 1.17
-    #require net.minecraft.server.level.EntityTracker public final it.unimi.dsi.fastutil.ints.Int2ObjectMap<PlayerChunkMap.EntityTracker> trackedEntities:entityMap;
+    #require net.minecraft.server.level.EntityTracker public final it.unimi.dsi.fastutil.ints.Int2ObjectMap<ChunkMap.TrackedEntity> trackedEntities:entityMap;
   #else
-    #require net.minecraft.server.level.EntityTracker public final it.unimi.dsi.fastutil.ints.Int2ObjectMap<PlayerChunkMap.EntityTracker> trackedEntities;
+    #require net.minecraft.server.level.EntityTracker public final it.unimi.dsi.fastutil.ints.Int2ObjectMap<ChunkMap.TrackedEntity> trackedEntities;
   #endif
 
     public (Collection<com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle>) Collection<EntityTrackerEntry> getEntries() {
@@ -38,35 +38,35 @@ class EntityTracker {
     }
 
     public (EntityTrackerEntryHandle) EntityTrackerEntry getEntry(int entityId) {
-        return (PlayerChunkMap$EntityTracker) instance#trackedEntities.get(entityId);
+        return (ChunkMap$TrackedEntity) instance#trackedEntities.get(entityId);
     }
 
     public (EntityTrackerEntryHandle) EntityTrackerEntry putEntry(int entityId, (EntityTrackerEntryHandle) EntityTrackerEntry entry) {
         it.unimi.dsi.fastutil.ints.Int2ObjectMap trackedEntities = instance#trackedEntities;
         if (entry == null) {
-            return (PlayerChunkMap$EntityTracker) trackedEntities.remove(entityId);
+            return (ChunkMap$TrackedEntity) trackedEntities.remove(entityId);
         } else if (trackedEntities.getClass() == it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap.class) {
-            return (PlayerChunkMap$EntityTracker) trackedEntities.put(entityId, entry);
+            return (ChunkMap$TrackedEntity) trackedEntities.put(entityId, entry);
         } else {
             // ProtocolSupport (or other hooks): bypass put() callback handler to guarantee it is put
             trackedEntities.remove(entityId);
-            return (PlayerChunkMap$EntityTracker) trackedEntities.putIfAbsent(entityId, entry);
+            return (ChunkMap$TrackedEntity) trackedEntities.putIfAbsent(entityId, entry);
         }
     }
 
-  #if exists net.minecraft.server.level.PlayerChunkMap.ProtectedVisibleChunksMap
+  #if exists net.minecraft.server.level.ChunkMap.ProtectedVisibleChunksMap
     public optional void setVisibleChunksToUpdatingChunks:###();
-  #elseif exists net.minecraft.server.level.PlayerChunkMap public volatile it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap<net.minecraft.server.level.PlayerChunk> visibleChunksClone;
+  #elseif exists net.minecraft.server.level.ChunkMap public volatile it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap<net.minecraft.server.level.ChunkHolder> visibleChunksClone;
     public optional void setVisibleChunksToUpdatingChunks() {
         // Used on newer builds of paperspigot
         synchronized (instance.visibleChunks) {
             instance.visibleChunksClone = null;
         }
     }
-  #elseif exists net.minecraft.server.level.PlayerChunkMap public volatile it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap<net.minecraft.server.level.PlayerChunk> visibleChunks;
+  #elseif exists net.minecraft.server.level.ChunkMap public volatile it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap<net.minecraft.server.level.ChunkHolder> visibleChunks;
     public optional void setVisibleChunksToUpdatingChunks() {
         // Note: field is private on some server types (Mohist)
-        #require net.minecraft.server.level.PlayerChunkMap private final it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap<net.minecraft.server.level.PlayerChunk> updatingChunks;
+        #require net.minecraft.server.level.ChunkMap private final it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap<net.minecraft.server.level.ChunkHolder> updatingChunks;
         instance.visibleChunks = instance#updatingChunks;
     }
   #else
@@ -88,14 +88,14 @@ class EntityTracker {
   #endif
 
     public (org.bukkit.World) WorldServer getWorld() {
-  #if exists net.minecraft.server.level.EntityTracker private final net.minecraft.server.level.WorldServer world;
-        #require net.minecraft.server.level.EntityTracker private final net.minecraft.server.level.WorldServer world;
+  #if exists net.minecraft.server.level.EntityTracker private final net.minecraft.server.level.ServerLevel world;
+        #require net.minecraft.server.level.EntityTracker private final net.minecraft.server.level.ServerLevel world;
         return instance#world;
   #else
         // WindSpigot removed this field for whatever reason. Must iterate the server worlds to figure this one out.
         java.util.Iterator worlds_iter = net.minecraft.server.MinecraftServer.getServer().worlds.iterator();
         while (worlds_iter.hasNext()) {
-            net.minecraft.server.level.WorldServer world = (net.minecraft.server.level.WorldServer) worlds_iter.next();
+            net.minecraft.server.level.ServerLevel world = (net.minecraft.server.level.ServerLevel) worlds_iter.next();
             if (world.tracker == instance) {
                 return world;
             }
@@ -105,8 +105,8 @@ class EntityTracker {
     }
 
     public void setWorld((org.bukkit.World) WorldServer world) {
-  #if exists net.minecraft.server.level.EntityTracker private final net.minecraft.server.level.WorldServer world;
-        #require net.minecraft.server.level.EntityTracker private final net.minecraft.server.level.WorldServer world;
+  #if exists net.minecraft.server.level.EntityTracker private final net.minecraft.server.level.ServerLevel world;
+        #require net.minecraft.server.level.EntityTracker private final net.minecraft.server.level.ServerLevel world;
         instance#world = world;
   #endif
     }
@@ -168,7 +168,7 @@ class EntityTracker {
 #endif
 
 #if version >= 1.14
-  #if exists net.minecraft.server.level.PlayerChunkMap public void addEntity(net.minecraft.world.entity.Entity);
+  #if exists net.minecraft.server.level.ChunkMap public void addEntity(net.minecraft.world.entity.Entity);
     public void trackEntity:addEntity((org.bukkit.entity.Entity) Entity entity);
   #else
     protected void trackEntity:addEntity((org.bukkit.entity.Entity) Entity entity);
@@ -182,11 +182,11 @@ class EntityTracker {
 
     // Also sends chunk data on 1.14 since the two got merged into one
     // On 1.13.2 and before, it just sends all packets required for spawning the entities in the chunk
-    // public void spawnEntities:a((org.bukkit.entity.Player) EntityPlayer entityplayer, (org.bukkit.Chunk) Chunk chunk);
+    // public void spawnEntities:a((org.bukkit.entity.Player) ServerPlayer entityplayer, (org.bukkit.Chunk) Chunk chunk);
 }
 
 // Same as EntityTrackerEntry on 1.13.2 and before
-// PlayerChunkMap.EntityTracker on 1.14 and later
+// ChunkMap.TrackedEntity on 1.14 and later
 class EntityTrackerEntry {
 #if version >= 1.14
   #if version >= 1.17
@@ -196,19 +196,19 @@ class EntityTrackerEntry {
   #endif
 
     public int getPlayerViewDistance() {
-  #if exists net.minecraft.server.level.EntityTrackerEntry final net.minecraft.server.level.PlayerChunkMap this$0;
-        #require net.minecraft.server.level.EntityTrackerEntry final net.minecraft.server.level.PlayerChunkMap entityTracker:this$0;
+  #if exists net.minecraft.server.level.EntityTrackerEntry final net.minecraft.server.level.ChunkMap this$0;
+        #require net.minecraft.server.level.EntityTrackerEntry final net.minecraft.server.level.ChunkMap entityTracker:this$0;
   #else
-        #require net.minecraft.server.level.EntityTrackerEntry final net.minecraft.server.level.PlayerChunkMap entityTracker:a;
+        #require net.minecraft.server.level.EntityTrackerEntry final net.minecraft.server.level.ChunkMap entityTracker:a;
   #endif
   #if version >= 1.20.2
-        #require net.minecraft.server.level.PlayerChunkMap private int playerViewDistance:serverViewDistance;
+        #require net.minecraft.server.level.ChunkMap private int playerViewDistance:serverViewDistance;
   #elseif version >= 1.14.1
-        #require net.minecraft.server.level.PlayerChunkMap private int playerViewDistance:viewDistance;
+        #require net.minecraft.server.level.ChunkMap private int playerViewDistance:viewDistance;
   #else
-        #require net.minecraft.server.level.PlayerChunkMap private int playerViewDistance:A;
+        #require net.minecraft.server.level.ChunkMap private int playerViewDistance:A;
   #endif
-        net.minecraft.server.level.PlayerChunkMap playerChunkMap = instance#entityTracker;
+        net.minecraft.server.level.ChunkMap playerChunkMap = instance#entityTracker;
         return playerChunkMap#playerViewDistance;
     }
 #elseif version >= 1.9
@@ -227,7 +227,7 @@ class EntityTrackerEntry {
 #endif
 
 #if version >= 1.17
-    // Stores a set of ServerPlayerConnection objects, requires <> EntityPlayer conversion
+    // Stores a set of ServerPlayerConnection objects, requires <> ServerPlayer conversion
 
     public (java.util.Collection<org.bukkit.entity.Player>) Set<ServerPlayerConnection> getViewers() {
         return instance.seenBy;
@@ -257,10 +257,10 @@ class EntityTrackerEntry {
         return instance.seenBy.remove(viewer);
     }
 
-#elseif fieldexists net.minecraft.server.level.EntityTrackerEntry public Map<EntityPlayer, Boolean> trackedPlayerMap;
+#elseif fieldexists net.minecraft.server.level.EntityTrackerEntry public Map<ServerPlayer, Boolean> trackedPlayerMap;
     // Stored as a Map of players (Paperspigot)
 
-    public (java.util.Collection<org.bukkit.entity.Player>) Set<EntityPlayer> getViewers() {
+    public (java.util.Collection<org.bukkit.entity.Player>) Set<ServerPlayer> getViewers() {
         return instance.trackedPlayerMap.keySet();
     }
 
@@ -269,14 +269,14 @@ class EntityTrackerEntry {
     }
 
     public static org.bukkit.entity.Player convertRawViewer(Object viewer) {
-        return (org.bukkit.entity.Player) ((EntityPlayer) viewer).getBukkitEntity();
+        return (org.bukkit.entity.Player) ((ServerPlayer) viewer).getBukkitEntity();
     }
 
     public void clearViewers() {
         instance.trackedPlayerMap.clear();
     }
 
-    public boolean addViewerToSet((org.bukkit.entity.Player) EntityPlayer viewer) {
+    public boolean addViewerToSet((org.bukkit.entity.Player) ServerPlayer viewer) {
         if (instance.trackedPlayerMap.containsKey(viewer)) {
             return false;
         } else {
@@ -285,13 +285,13 @@ class EntityTrackerEntry {
         }
     }
 
-    public boolean removeViewerFromSet((org.bukkit.entity.Player) EntityPlayer viewer) {
+    public boolean removeViewerFromSet((org.bukkit.entity.Player) ServerPlayer viewer) {
         return instance.trackedPlayerMap.remove(viewer) != null;
     }
 #else
     // Stored as a Set of players
 
-    public (java.util.Collection<org.bukkit.entity.Player>) Set<EntityPlayer> getViewers() {
+    public (java.util.Collection<org.bukkit.entity.Player>) Set<ServerPlayer> getViewers() {
         return instance.trackedPlayers;
     }
 
@@ -300,30 +300,30 @@ class EntityTrackerEntry {
     }
 
     public static org.bukkit.entity.Player convertRawViewer(Object viewer) {
-        return (org.bukkit.entity.Player) ((EntityPlayer) viewer).getBukkitEntity();
+        return (org.bukkit.entity.Player) ((ServerPlayer) viewer).getBukkitEntity();
     }
 
     public void clearViewers() {
         instance.trackedPlayers.clear();
     }
 
-    public boolean addViewerToSet((org.bukkit.entity.Player) EntityPlayer viewer) {
+    public boolean addViewerToSet((org.bukkit.entity.Player) ServerPlayer viewer) {
         return instance.trackedPlayers.add(viewer);
     }
 
-    public boolean removeViewerFromSet((org.bukkit.entity.Player) EntityPlayer viewer) {
+    public boolean removeViewerFromSet((org.bukkit.entity.Player) ServerPlayer viewer) {
         return instance.trackedPlayers.remove(viewer);
     }
 #endif
 
 #if version >= 1.14
   #if version >= 1.17
-    #require net.minecraft.server.level.PlayerChunkMap$EntityTracker private final net.minecraft.world.entity.Entity entity;
-    #require net.minecraft.server.level.PlayerChunkMap$EntityTracker private final EntityTrackerEntryState trackerEntry:serverEntity;
+    #require net.minecraft.server.level.ChunkMap$TrackedEntity private final net.minecraft.world.entity.Entity entity;
+    #require net.minecraft.server.level.ChunkMap$TrackedEntity private final EntityTrackerEntryState trackerEntry:serverEntity;
     #require net.minecraft.server.level.EntityTrackerEntryState private final net.minecraft.world.entity.Entity trackerEntryEntity:entity;
   #else
-    #require net.minecraft.server.level.PlayerChunkMap$EntityTracker private final net.minecraft.world.entity.Entity entity:tracker;
-    #require net.minecraft.server.level.PlayerChunkMap$EntityTracker private final EntityTrackerEntryState trackerEntry;
+    #require net.minecraft.server.level.ChunkMap$TrackedEntity private final net.minecraft.world.entity.Entity entity:tracker;
+    #require net.minecraft.server.level.ChunkMap$TrackedEntity private final EntityTrackerEntryState trackerEntry;
     #require net.minecraft.server.level.EntityTrackerEntryState private final net.minecraft.world.entity.Entity trackerEntryEntity:tracker;
   #endif
 
@@ -347,10 +347,10 @@ class EntityTrackerEntry {
 
     public void updateViewers() {
         Entity entity = instance#entity;
-  #if exists net.minecraft.server.level.PlayerChunkMap$EntityTracker final void updatePlayers(com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<net.minecraft.server.level.EntityPlayer> newTrackerCandidates);
+  #if exists net.minecraft.server.level.ChunkMap$TrackedEntity final void updatePlayers(com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<net.minecraft.server.level.ServerPlayer> newTrackerCandidates);
         // Paper after some optimizations were made to tracking
-        #require net.minecraft.server.level.PlayerChunkMap$EntityTracker final void paperUpdatePlayers:updatePlayers(com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<net.minecraft.server.level.EntityPlayer> newTrackerCandidates);
-        #require Entity com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<net.minecraft.server.level.EntityPlayer> getPlayersInTrackRange();
+        #require net.minecraft.server.level.ChunkMap$TrackedEntity final void paperUpdatePlayers:updatePlayers(com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<net.minecraft.server.level.ServerPlayer> newTrackerCandidates);
+        #require Entity com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<net.minecraft.server.level.ServerPlayer> getPlayersInTrackRange();
         com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet players = entity#getPlayersInTrackRange();
         instance#paperUpdatePlayers(players);
   #else
@@ -373,9 +373,9 @@ class EntityTrackerEntry {
     }
 
   #if version >= 1.18
-    public void removeViewer:removePlayer((org.bukkit.entity.Player) EntityPlayer player);
+    public void removeViewer:removePlayer((org.bukkit.entity.Player) ServerPlayer player);
   #else
-    public void removeViewer:clear((org.bukkit.entity.Player) EntityPlayer player);
+    public void removeViewer:clear((org.bukkit.entity.Player) ServerPlayer player);
   #endif
 #else
     #require net.minecraft.server.level.EntityTrackerEntry private final net.minecraft.world.entity.Entity entity:tracker;
@@ -400,24 +400,24 @@ class EntityTrackerEntry {
         // Spigot / old paper
         WorldServer world = (WorldServer) entity.world;
         java.util.List playersOnWorld = world.players;
-  #if exists net.minecraft.server.level.EntityTrackerEntry public void scanPlayers(java.util.List<net.minecraft.server.EntityPlayer> players);
+  #if exists net.minecraft.server.level.EntityTrackerEntry public void scanPlayers(java.util.List<net.minecraft.server.ServerPlayer> players);
         instance.scanPlayers(playersOnWorld);
   #else
         for (int i = 0; i < playersOnWorld.size(); i++) {
-            instance.updatePlayer((EntityPlayer) playersOnWorld.get(i));
+            instance.updatePlayer((ServerPlayer) playersOnWorld.get(i));
         }
   #endif
     }
 
-  #if exists net.minecraft.server.level.EntityTrackerEntry public void clear(net.minecraft.server.EntityPlayer a); && !exists net.minecraft.server.level.EntityTrackerEntry public void a(net.minecraft.server.EntityPlayer a);
+  #if exists net.minecraft.server.level.EntityTrackerEntry public void clear(net.minecraft.server.ServerPlayer a); && !exists net.minecraft.server.level.EntityTrackerEntry public void a(net.minecraft.server.ServerPlayer a);
     // This is used on Azurite / 1.8.x forks. Both methods behave pretty much the same.
-    public void removeViewer:clear((org.bukkit.entity.Player) EntityPlayer player);
+    public void removeViewer:clear((org.bukkit.entity.Player) ServerPlayer player);
   #else
-    public void removeViewer:a((org.bukkit.entity.Player) EntityPlayer player);
+    public void removeViewer:a((org.bukkit.entity.Player) ServerPlayer player);
   #endif
 #endif
 
-    public void updatePlayer((org.bukkit.entity.Player) EntityPlayer player);
+    public void updatePlayer((org.bukkit.entity.Player) ServerPlayer player);
 
 #if version >= 1.18
     public void hideForAll:broadcastRemoved();
@@ -457,7 +457,7 @@ class EntityTrackerEntry {
     </code>
 }
 
-// Alias for EntityTrackerEntry, but because we're using PlayerChunkMap$EntityTracker as
+// Alias for EntityTrackerEntry, but because we're using ChunkMap$TrackedEntity as
 // main handle on 1.14 it is renamed to differentiate the two.
 class EntityTrackerEntryState {
 #if version >= 1.17
@@ -502,45 +502,45 @@ class EntityTrackerEntryState {
 
 #if version >= 1.19
     #require EntityTrackerEntryState private final VecDeltaCodec positionCodec;
-    #require VecDeltaCodec private Vec3D vecDelta_base:base;
-    #require EntityTrackerEntryState public Vec3D getSyncPos() {
+    #require VecDeltaCodec private Vec3 vecDelta_base:base;
+    #require EntityTrackerEntryState public Vec3 getSyncPos() {
         VecDeltaCodec codec = instance#positionCodec;
         return codec#vecDelta_base;
     }
     public org.bukkit.util.Vector getLoc() {
-        Vec3D pos = instance#getSyncPos();
+        Vec3 pos = instance#getSyncPos();
         return new org.bukkit.util.Vector(pos.x, pos.y, pos.z);
     }
     public double getLocX() {
-        Vec3D pos = instance#getSyncPos();
+        Vec3 pos = instance#getSyncPos();
         return pos.x;
     }
     public double getLocY() {
-        Vec3D pos = instance#getSyncPos();
+        Vec3 pos = instance#getSyncPos();
         return pos.y;
     }
     public double getLocZ() {
-        Vec3D pos = instance#getSyncPos();
+        Vec3 pos = instance#getSyncPos();
         return pos.z;
     }
     public void setLoc(double x, double y, double z) {
         VecDeltaCodec codec = instance#positionCodec;
-        codec.setBase(new Vec3D(x, y, z));
+        codec.setBase(new Vec3(x, y, z));
     }
     public void setLocX(double x) {
         VecDeltaCodec codec = instance#positionCodec;
-        Vec3D pos = codec#vecDelta_base;
-        codec.setBase(new Vec3D(x, pos.y, pos.z));
+        Vec3 pos = codec#vecDelta_base;
+        codec.setBase(new Vec3(x, pos.y, pos.z));
     }
     public void setLocY(double y) {
         VecDeltaCodec codec = instance#positionCodec;
-        Vec3D pos = codec#vecDelta_base;
-        codec.setBase(new Vec3D(pos.x, y, pos.z));
+        Vec3 pos = codec#vecDelta_base;
+        codec.setBase(new Vec3(pos.x, y, pos.z));
     }
     public void setLocZ(double z) {
         VecDeltaCodec codec = instance#positionCodec;
-        Vec3D pos = codec#vecDelta_base;
-        codec.setBase(new Vec3D(pos.x, pos.y, z));
+        Vec3 pos = codec#vecDelta_base;
+        codec.setBase(new Vec3(pos.x, pos.y, z));
     }
 #elseif version >= 1.9
   #if version >= 1.17
@@ -620,64 +620,64 @@ class EntityTrackerEntryState {
 #endif
 
 #if version >= 1.14
-    // Velocity is a Vec3D
+    // Velocity is a Vec3
   #if version >= 1.21
-    #require net.minecraft.server.level.EntityTrackerEntryState private Vec3D vel:lastSentMovement;
+    #require net.minecraft.server.level.EntityTrackerEntryState private Vec3 vel:lastSentMovement;
   #elseif version >= 1.17
-    #require net.minecraft.server.level.EntityTrackerEntryState private Vec3D vel:ap;
+    #require net.minecraft.server.level.EntityTrackerEntryState private Vec3 vel:ap;
   #else
-    #require net.minecraft.server.level.EntityTrackerEntryState private Vec3D vel:m;
+    #require net.minecraft.server.level.EntityTrackerEntryState private Vec3 vel:m;
   #endif
 
     public double getXVel() {
         Object velocity = instance#vel;
-        return com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.x.getDouble(velocity);
+        return com.bergerkiller.generated.net.minecraft.world.phys.Vec3Handle.T.x.getDouble(velocity);
     }
 
     public double getYVel() {
         Object velocity = instance#vel;
-        return com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.y.getDouble(velocity);
+        return com.bergerkiller.generated.net.minecraft.world.phys.Vec3Handle.T.y.getDouble(velocity);
     }
 
     public double getZVel() {
         Object velocity = instance#vel;
-        return com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.z.getDouble(velocity);
+        return com.bergerkiller.generated.net.minecraft.world.phys.Vec3Handle.T.z.getDouble(velocity);
     }
 
     public void setXVel(double x) {
         Object velocity = instance#vel;
-        double y = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.y.getDouble(velocity);
-        double z = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.z.getDouble(velocity);
-        Vec3D newVel = new Vec3D(x, y, z);
+        double y = com.bergerkiller.generated.net.minecraft.world.phys.Vec3Handle.T.y.getDouble(velocity);
+        double z = com.bergerkiller.generated.net.minecraft.world.phys.Vec3Handle.T.z.getDouble(velocity);
+        Vec3 newVel = new Vec3(x, y, z);
         instance#vel = newVel;
     }
 
     public void setYVel(double y) {
         Object velocity = instance#vel;
-        double x = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.x.getDouble(velocity);
-        double z = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.z.getDouble(velocity);
-        Vec3D newVel = new Vec3D(x, y, z);
+        double x = com.bergerkiller.generated.net.minecraft.world.phys.Vec3Handle.T.x.getDouble(velocity);
+        double z = com.bergerkiller.generated.net.minecraft.world.phys.Vec3Handle.T.z.getDouble(velocity);
+        Vec3 newVel = new Vec3(x, y, z);
         instance#vel = newVel;
     }
 
     public void setZVel(double z) {
         Object velocity = instance#vel;
-        double x = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.x.getDouble(velocity);
-        double y = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.y.getDouble(velocity);
-        Vec3D newVel = new Vec3D(x, y, z);
+        double x = com.bergerkiller.generated.net.minecraft.world.phys.Vec3Handle.T.x.getDouble(velocity);
+        double y = com.bergerkiller.generated.net.minecraft.world.phys.Vec3Handle.T.y.getDouble(velocity);
+        Vec3 newVel = new Vec3(x, y, z);
         instance#vel = newVel;
     }
 
     public org.bukkit.util.Vector getVelocity() {
         Object velocity = instance#vel;
-        double x = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.x.getDouble(velocity);
-        double y = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.y.getDouble(velocity);
-        double z = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.z.getDouble(velocity);
+        double x = com.bergerkiller.generated.net.minecraft.world.phys.Vec3Handle.T.x.getDouble(velocity);
+        double y = com.bergerkiller.generated.net.minecraft.world.phys.Vec3Handle.T.y.getDouble(velocity);
+        double z = com.bergerkiller.generated.net.minecraft.world.phys.Vec3Handle.T.z.getDouble(velocity);
         return new org.bukkit.util.Vector(x, y, z);
     }
 
     public void setVelocity(double x, double y, double z) {
-        Vec3D velocity = new Vec3D(x, y, z);
+        Vec3 velocity = new Vec3(x, y, z);
         instance#vel = velocity;
     }
 
@@ -743,14 +743,14 @@ class EntityTrackerEntryState {
 
     // These are needed for correct remapping of the state hook
 #if version >= 1.18
-    public optional void removePairing((Object) EntityPlayer viewer);
-    public optional void addPairing((Object) EntityPlayer viewer);
+    public optional void removePairing((Object) ServerPlayer viewer);
+    public optional void addPairing((Object) ServerPlayer viewer);
 #elseif version >= 1.14
-    public optional void removePairing:a((Object) EntityPlayer viewer);
-    public optional void addPairing:b((Object) EntityPlayer viewer);
+    public optional void removePairing:a((Object) ServerPlayer viewer);
+    public optional void addPairing:b((Object) ServerPlayer viewer);
 #else
-    public optional void removePairing:###((Object) EntityPlayer viewer);
-    public optional void addPairing:###((Object) EntityPlayer viewer);
+    public optional void removePairing:###((Object) ServerPlayer viewer);
+    public optional void addPairing:###((Object) ServerPlayer viewer);
 #endif
 
 #if version >= 1.14

@@ -1,16 +1,15 @@
 package net.minecraft.world.level.block.state;
 
-import net.minecraft.core.BlockPosition;
-import net.minecraft.core.EnumDirection;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.BlockCarpet;
-import net.minecraft.world.phys.AxisAlignedBB;
-import net.minecraft.world.level.block.SoundEffectType;
-import net.minecraft.world.level.block.state.properties.IBlockState;
-import net.minecraft.world.level.IBlockAccess;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.BlockGetter;
 
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.phys.shapes.VoxelShapeCollision;
+import net.minecraft.world.phys.shapes.CollisionContext;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -19,24 +18,24 @@ import com.bergerkiller.bukkit.common.collections.BlockFaceSet;
 import com.bergerkiller.bukkit.common.bases.IntVector3
 
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.IBlockAccessHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.SoundEffectTypeHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.IBlockStateHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.BlockGetterHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.SoundTypeHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.BlockStateHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.PropertyHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
 
-interface IBlockData {
+interface BlockState {
     public abstract (BlockHandle) Block getBlock();
 
     <code>
     public void logStates() {
-        for (java.util.Map.Entry<IBlockStateHandle, Comparable<?>> entry : getStates().entrySet()) {
+        for (java.util.Map.Entry<PropertyHandle, Comparable<?>> entry : getStates().entrySet()) {
             com.bergerkiller.bukkit.common.Logging.LOGGER.info(entry.getKey() + " = " + entry.getValue());
         }
     }
 
-    public IBlockStateHandle findState(String key) {
-        for (IBlockStateHandle blockState : getStates().keySet()) {
+    public PropertyHandle findState(String key) {
+        for (PropertyHandle blockState : getStates().keySet()) {
             if (blockState.getKeyToken().equals(key)) {
                 return blockState;
             }
@@ -44,7 +43,7 @@ interface IBlockData {
         return null;
     }
 
-    public IBlockDataHandle set(String key, Object value) {
+    public BlockStateHandle set(String key, Object value) {
         return set(findState(key), value);
     }
 
@@ -52,7 +51,7 @@ interface IBlockData {
         return get(findState(key), type);
     }
 
-    public <T> T get(IBlockStateHandle state, Class<T> type) {
+    public <T> T get(PropertyHandle state, Class<T> type) {
         return com.bergerkiller.bukkit.common.conversion.Conversion.convert(get(state), type, null);
     }
     </code>
@@ -88,7 +87,7 @@ interface IBlockData {
 
         // Some blocks must be overrided to allow light to pass through
         // There doesn't appear to be a property we can use to query this :(
-        if (block instanceof BlockCarpet) {
+        if (block instanceof net.minecraft.world.level.block.WoolCarpetBlock) {
             return com.bergerkiller.bukkit.common.collections.BlockFaceSet.NONE;
         }
 
@@ -100,63 +99,63 @@ interface IBlockData {
 
         // Query all 6 faces and produce a mask
         int mask = 0;
-        IBlockAccess emptyBlockAccess = net.minecraft.world.level.BlockAccessAir.INSTANCE;
+        BlockGetter emptyBlockAccess = net.minecraft.world.level.EmptyBlockGetter.INSTANCE;
   #if version >= 1.18
-        if (instance.isFaceSturdy(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.NORTH)) {
+        if (instance.isFaceSturdy(emptyBlockAccess, BlockPos.ZERO, Direction.NORTH)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_NORTH;
         }
-        if (instance.isFaceSturdy(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.EAST)) {
+        if (instance.isFaceSturdy(emptyBlockAccess, BlockPos.ZERO, Direction.EAST)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_EAST;
         }
-        if (instance.isFaceSturdy(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.SOUTH)) {
+        if (instance.isFaceSturdy(emptyBlockAccess, BlockPos.ZERO, Direction.SOUTH)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_SOUTH;
         }
-        if (instance.isFaceSturdy(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.WEST)) {
+        if (instance.isFaceSturdy(emptyBlockAccess, BlockPos.ZERO, Direction.WEST)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_WEST;
         }
-        if (instance.isFaceSturdy(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.UP)) {
+        if (instance.isFaceSturdy(emptyBlockAccess, BlockPos.ZERO, Direction.UP)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_UP;
         }
-        if (instance.isFaceSturdy(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.DOWN)) {
+        if (instance.isFaceSturdy(emptyBlockAccess, BlockPos.ZERO, Direction.DOWN)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_DOWN;
         }
   #elseif version >= 1.14.4
-        if (instance.d(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.NORTH)) {
+        if (instance.d(emptyBlockAccess, BlockPos.ZERO, Direction.NORTH)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_NORTH;
         }
-        if (instance.d(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.EAST)) {
+        if (instance.d(emptyBlockAccess, BlockPos.ZERO, Direction.EAST)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_EAST;
         }
-        if (instance.d(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.SOUTH)) {
+        if (instance.d(emptyBlockAccess, BlockPos.ZERO, Direction.SOUTH)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_SOUTH;
         }
-        if (instance.d(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.WEST)) {
+        if (instance.d(emptyBlockAccess, BlockPos.ZERO, Direction.WEST)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_WEST;
         }
-        if (instance.d(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.UP)) {
+        if (instance.d(emptyBlockAccess, BlockPos.ZERO, Direction.UP)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_UP;
         }
-        if (instance.d(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.DOWN)) {
+        if (instance.d(emptyBlockAccess, BlockPos.ZERO, Direction.DOWN)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_DOWN;
         }
   #else
         // Awkward! It's not cached yet. Hopefully this works, though.
-        if (Block.d(instance, emptyBlockAccess, BlockPosition.ZERO, EnumDirection.NORTH)) {
+        if (Block.d(instance, emptyBlockAccess, BlockPos.ZERO, Direction.NORTH)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_NORTH;
         }
-        if (Block.d(instance, emptyBlockAccess, BlockPosition.ZERO, EnumDirection.EAST)) {
+        if (Block.d(instance, emptyBlockAccess, BlockPos.ZERO, Direction.EAST)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_EAST;
         }
-        if (Block.d(instance, emptyBlockAccess, BlockPosition.ZERO, EnumDirection.SOUTH)) {
+        if (Block.d(instance, emptyBlockAccess, BlockPos.ZERO, Direction.SOUTH)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_SOUTH;
         }
-        if (Block.d(instance, emptyBlockAccess, BlockPosition.ZERO, EnumDirection.WEST)) {
+        if (Block.d(instance, emptyBlockAccess, BlockPos.ZERO, Direction.WEST)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_WEST;
         }
-        if (Block.d(instance, emptyBlockAccess, BlockPosition.ZERO, EnumDirection.UP)) {
+        if (Block.d(instance, emptyBlockAccess, BlockPos.ZERO, Direction.UP)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_UP;
         }
-        if (Block.d(instance, emptyBlockAccess, BlockPosition.ZERO, EnumDirection.DOWN)) {
+        if (Block.d(instance, emptyBlockAccess, BlockPos.ZERO, Direction.DOWN)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_DOWN;
         }
   #endif
@@ -168,9 +167,9 @@ interface IBlockData {
   #if version >= 1.21.2
             int opacity = instance.getLightBlock();
   #elseif version >= 1.18
-            int opacity = instance.getLightBlock(emptyBlockAccess, BlockPosition.ZERO);
+            int opacity = instance.getLightBlock(emptyBlockAccess, BlockPos.ZERO);
   #else
-            int opacity = instance.b(emptyBlockAccess, BlockPosition.ZERO);
+            int opacity = instance.b(emptyBlockAccess, BlockPos.ZERO);
   #endif
             if (opacity < 15) {
                 mask = 0;
@@ -204,9 +203,9 @@ interface IBlockData {
             return -1;
         } else {
   #if version >= 1.18
-            return instance.getLightBlock((IBlockAccess) net.minecraft.world.level.BlockAccessAir.INSTANCE, BlockPosition.ZERO);
+            return instance.getLightBlock((BlockGetter) net.minecraft.world.level.EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
   #else
-            return instance.b((IBlockAccess) net.minecraft.world.level.BlockAccessAir.INSTANCE, BlockPosition.ZERO);
+            return instance.b((BlockGetter) net.minecraft.world.level.EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
   #endif
         }
     }
@@ -217,7 +216,7 @@ interface IBlockData {
 #elseif version >= 1.9
     public int getCachedOpacity:c();
 #else
-    // IBlockData has no properties, delegate to Block
+    // BlockState has no properties, delegate to Block
     public int getCachedOpacity() {
   #if version >= 1.8.3
         return instance.getBlock().p();
@@ -244,13 +243,13 @@ interface IBlockData {
 #endif
 
 #if version >= 1.18
-    public (SoundEffectTypeHandle) SoundEffectType getSoundType()
+    public (SoundTypeHandle) SoundType getSoundType()
 #elseif version >= 1.16
-    public (SoundEffectTypeHandle) SoundEffectType getSoundType:getStepSound()
+    public (SoundTypeHandle) SoundType getSoundType:getStepSound()
 #elseif version >= 1.14
-    public (SoundEffectTypeHandle) SoundEffectType getSoundType:r()
+    public (SoundTypeHandle) SoundType getSoundType:r()
 #elseif version >= 1.9
-    public (SoundEffectTypeHandle) SoundEffectType getSoundType() {
+    public (SoundTypeHandle) SoundType getSoundType() {
   #if version >= 1.11
         return instance.getBlock().getStepSound();
   #else
@@ -258,7 +257,7 @@ interface IBlockData {
   #endif
     }
 #else
-    public (SoundEffectTypeHandle) net.minecraft.world.level.block.Block.StepSound getSoundType() {
+    public (SoundTypeHandle) net.minecraft.world.level.block.Block.StepSound getSoundType() {
         return instance.getBlock().stepSound;
     }
 #endif
@@ -278,14 +277,14 @@ interface IBlockData {
 
     // ========================================== INTERACTABLE BOX ===========================================
 
-    public (AxisAlignedBBHandle) AxisAlignedBB getInteractableBox((IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition) {
+    public (AABBHandle) AABB getInteractableBox((BlockGetterHandle) BlockGetter iblockaccess, (IntVector3) BlockPos blockposition) {
 #if version >= 1.13
   #if version >= 1.18
         VoxelShape shape = instance.getShape(iblockaccess, blockposition);
   #elseif version >= 1.16
         VoxelShape shape = instance.getShape(iblockaccess, blockposition);
   #elseif version >= 1.14
-        VoxelShape shape = instance.a(iblockaccess, blockposition, VoxelShapeCollision.a());
+        VoxelShape shape = instance.a(iblockaccess, blockposition, CollisionContext.a());
   #else
         VoxelShape shape = instance.getShape(iblockaccess, blockposition);
   #endif
@@ -298,7 +297,7 @@ interface IBlockData {
         } else {
   #if version >= 1.18
             return shape.bounds();
-  #elseif methodexists net.minecraft.world.phys.shapes.VoxelShape public net.minecraft.world.phys.AxisAlignedBB getBoundingBox();
+  #elseif methodexists net.minecraft.world.phys.shapes.VoxelShape public net.minecraft.world.phys.AABB getBoundingBox();
             return shape.getBoundingBox();
   #else
             return shape.a();
@@ -316,13 +315,13 @@ interface IBlockData {
   #elseif version >= 1.11
         return instance.d(iblockaccess, blockposition);
   #elseif version >= 1.9
-        return instance.c((net.minecraft.world.level.World) iblockaccess, blockposition);
+        return instance.c((net.minecraft.world.level.Level) iblockaccess, blockposition);
   #elseif version >= 1.8.3
         block.updateShape(iblockaccess, blockposition);
-        return new AxisAlignedBB(block.B(), block.D(), block.F(), block.C(), block.E(), block.G());
+        return new AABB(block.B(), block.D(), block.F(), block.C(), block.E(), block.G());
   #else
         block.updateShape(iblockaccess, blockposition);
-        return new AxisAlignedBB(block.z(), block.B(), block.D(), block.A(), block.C(), block.E());
+        return new AABB(block.z(), block.B(), block.D(), block.A(), block.C(), block.E());
   #endif
 #endif
     }
@@ -330,9 +329,9 @@ interface IBlockData {
     // ========================================== BOUNDING BOX ===========================================
 
 #if version >= 1.13
-    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox((IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition) {
+    public (AABBHandle) AABB getBoundingBox((BlockGetterHandle) BlockGetter iblockaccess, (IntVector3) BlockPos blockposition) {
   #if version >= 1.18
-        VoxelShape shape = instance.getCollisionShape(iblockaccess, blockposition, VoxelShapeCollision.empty());
+        VoxelShape shape = instance.getCollisionShape(iblockaccess, blockposition, CollisionContext.empty());
   #elseif version >= 1.16
         VoxelShape shape = instance.getCollisionShape(iblockaccess, blockposition);
   #elseif version >= 1.14
@@ -349,7 +348,7 @@ interface IBlockData {
         } else {
   #if version >= 1.18
             return shape.bounds();
-  #elseif methodexists net.minecraft.world.phys.shapes.VoxelShape public net.minecraft.world.phys.AxisAlignedBB getBoundingBox();
+  #elseif methodexists net.minecraft.world.phys.shapes.VoxelShape public net.minecraft.world.phys.AABB getBoundingBox();
             return shape.getBoundingBox();
   #else
             return shape.a();
@@ -358,18 +357,18 @@ interface IBlockData {
     }
 
 #elseif version >= 1.12
-    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox:d((IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition);
+    public (AABBHandle) AABB getBoundingBox:d((BlockGetterHandle) BlockGetter iblockaccess, (IntVector3) BlockPos blockposition);
 #elseif version >= 1.11
-    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox:c((IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition);
+    public (AABBHandle) AABB getBoundingBox:c((BlockGetterHandle) BlockGetter iblockaccess, (IntVector3) BlockPos blockposition);
 #elseif version >= 1.9
-    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox((IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition) {
-        return instance.d((net.minecraft.world.level.World) iblockaccess, blockposition);
+    public (AABBHandle) AABB getBoundingBox((BlockGetterHandle) BlockGetter iblockaccess, (IntVector3) BlockPos blockposition) {
+        return instance.d((net.minecraft.world.level.Level) iblockaccess, blockposition);
     }
 #else
-    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox((IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition) {
+    public (AABBHandle) AABB getBoundingBox((BlockGetterHandle) BlockGetter iblockaccess, (IntVector3) BlockPos blockposition) {
         net.minecraft.world.level.block.Block block = instance.getBlock();
         block.updateShape(iblockaccess, blockposition);
-        AxisAlignedBB bounds_abs = block.a((net.minecraft.world.level.World) iblockaccess, blockposition, instance);
+        AABB bounds_abs = block.a((net.minecraft.world.level.Level) iblockaccess, blockposition, instance);
         if (bounds_abs == null) {
             return null;
         } else {
@@ -381,7 +380,7 @@ interface IBlockData {
 
     // ==========================================================================================================
 
-    public Object get((IBlockStateHandle) IBlockState state) {
+    public Object get((PropertyHandle) Property state) {
         if (state != null) {
 #if version >= 1.18
             return instance.getValue(state);
@@ -393,7 +392,7 @@ interface IBlockData {
         }
     }
 
-    public (IBlockDataHandle) IBlockData set((IBlockStateHandle) IBlockState state, Object value) {
+    public (BlockStateHandle) BlockState set((PropertyHandle) Property state, Object value) {
         if (state != null) {
 #if version >= 1.18
             Class type = state.getValueClass();
@@ -405,9 +404,9 @@ interface IBlockData {
             Object converted = com.bergerkiller.bukkit.common.conversion.Conversion.convert(value, type, null);
             if (converted != null) {
 #if version >= 1.18
-                return (IBlockData) instance.setValue(state, (Comparable) converted);
+                return (BlockState) instance.setValue(state, (Comparable) converted);
 #else
-                return (IBlockData) instance.set(state, (Comparable) converted);
+                return (BlockState) instance.set(state, (Comparable) converted);
 #endif
             }
         }
@@ -415,20 +414,20 @@ interface IBlockData {
     }
 
 #select version >=
-#case 1.20.5: public (Map<IBlockStateHandle, Comparable<?>>) java.util.Map<IBlockState<?>, Comparable<?>> getStates:getValues();
-#case 1.18: public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:getValues();
-#case 1.17: public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:getStateMap();
+#case 1.20.5: public (Map<PropertyHandle, Comparable<?>>) java.util.Map<Property<?>, Comparable<?>> getStates:getValues();
+#case 1.18: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:getValues();
+#case 1.17: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:getStateMap();
 #case 1.13.2
-  #if methodexists net.minecraft.world.level.block.state.IBlockDataHolder public abstract com.google.common.collect.ImmutableMap<IBlockState<?>, Comparable<?>> getStateMap();
-      public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:getStateMap();
+  #if methodexists net.minecraft.world.level.block.state.BlockStateHolder public abstract com.google.common.collect.ImmutableMap<Property<?>, Comparable<?>> getStateMap();
+      public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:getStateMap();
   #else
-      public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:b();
+      public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:b();
   #endif
-#case 1.13: public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:b();
-#case 1.12: public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:t();
-#case 1.11: public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:u();
-#case 1.9:  public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:s();
-#case else: public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState, Comparable> getStates:b();
+#case 1.13: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:b();
+#case 1.12: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:t();
+#case 1.11: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:u();
+#case 1.9:  public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:s();
+#case else: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property, Comparable> getStates:b();
 #endselect
 
 }

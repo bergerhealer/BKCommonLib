@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypeHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
@@ -10,7 +10,7 @@ class EntityTypingHandler_1_13 extends EntityTypingHandler_1_8 {
 
     public EntityTypingHandler_1_13() {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClass(EntityTypesHandle.T.getType());
+        resolver.setDeclaredClass(EntityTypeHandle.T.getType());
         MethodDeclaration m = new MethodDeclaration(resolver, "public Class<? extends T> c();");
         try {
             m.method = resolver.getDeclaredClass().getDeclaredMethod("c");

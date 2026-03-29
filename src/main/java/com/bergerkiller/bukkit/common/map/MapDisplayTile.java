@@ -3,12 +3,12 @@ package com.bergerkiller.bukkit.common.map;
 import java.util.List;
 import java.util.UUID;
 
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMapItemDataPacketHandle;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.map.util.MapUUID;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapHandle;
 
 /**
  * A single 128x128 map display tile. Multiple tiles may be used to make up a single map display.
@@ -106,15 +106,15 @@ public class MapDisplayTile {
      */
     public static final class Update implements Cloneable {
         public final IntVector2 tile;
-        public final PacketPlayOutMapHandle.Builder packet;
+        public final ClientboundMapItemDataPacketHandle.Builder packet;
 
         public Update(IntVector2 tile, int mapId) {
             this.tile = tile;
-            this.packet = PacketPlayOutMapHandle.build();
+            this.packet = ClientboundMapItemDataPacketHandle.build();
             this.packet.mapId(mapId);
         }
 
-        private Update(IntVector2 tile, PacketPlayOutMapHandle.Builder packet) {
+        private Update(IntVector2 tile, ClientboundMapItemDataPacketHandle.Builder packet) {
             this.tile = tile;
             this.packet = packet;
         }

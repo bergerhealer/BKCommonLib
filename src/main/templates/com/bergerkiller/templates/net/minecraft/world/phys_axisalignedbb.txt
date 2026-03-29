@@ -2,11 +2,10 @@ package net.minecraft.world.phys;
 
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
-import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxisHandle;
 
-class AxisAlignedBB {
+class AABB {
 #if version >= 1.13.2
     public final double minX;
     public final double minY;
@@ -23,47 +22,47 @@ class AxisAlignedBB {
     public final double maxZ:f;
 #endif
 
-    public (AxisAlignedBBHandle) AxisAlignedBB(double x1, double y1, double z1, double x2, double y2, double z2);
+    public (AABBHandle) AABB(double x1, double y1, double z1, double x2, double y2, double z2);
 
 #if version >= 1.18
-    public (AxisAlignedBBHandle) AxisAlignedBB grow:inflate(double sx, double sy, double sz);
+    public (AABBHandle) AABB grow:inflate(double sx, double sy, double sz);
 #else
-    public (AxisAlignedBBHandle) AxisAlignedBB grow(double sx, double sy, double sz);
+    public (AABBHandle) AABB grow(double sx, double sy, double sz);
 #endif
 
     <code>
-    public AxisAlignedBBHandle growUniform(double size) {
+    public AABBHandle growUniform(double size) {
         return grow(size, size, size);
     }
 
-    public AxisAlignedBBHandle shrinkUniform(double size) {
+    public AABBHandle shrinkUniform(double size) {
         return growUniform(-size);
     }
     </code>
 
 #if version >= 1.18
-    public (AxisAlignedBBHandle) AxisAlignedBB transformB:expandTowards(double lx, double ly, double lz);
+    public (AABBHandle) AABB transformB:expandTowards(double lx, double ly, double lz);
 
-    public (AxisAlignedBBHandle) AxisAlignedBB translate:move(double dx, double dy, double dz);
+    public (AABBHandle) AABB translate:move(double dx, double dy, double dz);
 
-    public boolean bbTransformA:intersects((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB);
+    public boolean bbTransformA:intersects((AABBHandle) AABB paramAABB);
 #elseif version >= 1.11
-    public (AxisAlignedBBHandle) AxisAlignedBB transformB:b(double lx, double ly, double lz);
+    public (AABBHandle) AABB transformB:b(double lx, double ly, double lz);
 
-    public (AxisAlignedBBHandle) AxisAlignedBB translate:d(double dx, double dy, double dz);
+    public (AABBHandle) AABB translate:d(double dx, double dy, double dz);
 
-    public boolean bbTransformA:c((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB);
+    public boolean bbTransformA:c((AABBHandle) AABB paramAABB);
 #else
-    public (AxisAlignedBBHandle) AxisAlignedBB transformB:a(double lx, double ly, double lz);
+    public (AABBHandle) AABB transformB:a(double lx, double ly, double lz);
 
-    public (AxisAlignedBBHandle) AxisAlignedBB translate:c(double dx, double dy, double dz);
+    public (AABBHandle) AABB translate:c(double dx, double dy, double dz);
 
-    public boolean bbTransformA:b((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB);
+    public boolean bbTransformA:b((AABBHandle) AABB paramAABB);
 #endif
 
 #if version >= 1.13.2
     // These methods were removed in MC 1.13, and min/max x/y/z fields changed names on 1.13.2
-    public double calcSomeX((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0) {
+    public double calcSomeX((AABBHandle) AABB axisalignedbb, double d0) {
         if (axisalignedbb.maxY > instance.minY && axisalignedbb.minY < instance.maxY && axisalignedbb.maxZ > instance.minZ && axisalignedbb.minZ < instance.maxZ) {
             double d1;
 
@@ -84,7 +83,7 @@ class AxisAlignedBB {
             return d0;
         }
     }
-    public double calcSomeY((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0) {
+    public double calcSomeY((AABBHandle) AABB axisalignedbb, double d0) {
         if (axisalignedbb.maxX > instance.minX && axisalignedbb.minX < instance.maxX && axisalignedbb.maxZ > instance.minZ && axisalignedbb.minZ < instance.maxZ) {
             double d1;
 
@@ -105,7 +104,7 @@ class AxisAlignedBB {
             return d0;
         }
     }
-    public double calcSomeZ((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0) {
+    public double calcSomeZ((AABBHandle) AABB axisalignedbb, double d0) {
         if (axisalignedbb.maxX > instance.minX && axisalignedbb.minX < instance.maxX && axisalignedbb.maxY > instance.minY && axisalignedbb.minY < instance.maxY) {
             double d1;
 
@@ -128,7 +127,7 @@ class AxisAlignedBB {
     }
 #elseif version >= 1.13
     // These methods were removed in MC 1.13
-    public double calcSomeX((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0) {
+    public double calcSomeX((AABBHandle) AABB axisalignedbb, double d0) {
         if (axisalignedbb.e > instance.b && axisalignedbb.b < instance.e && axisalignedbb.f > instance.c && axisalignedbb.c < instance.f) {
             double d1;
 
@@ -149,7 +148,7 @@ class AxisAlignedBB {
             return d0;
         }
     }
-    public double calcSomeY((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0) {
+    public double calcSomeY((AABBHandle) AABB axisalignedbb, double d0) {
         if (axisalignedbb.d > instance.a && axisalignedbb.a < instance.d && axisalignedbb.f > instance.c && axisalignedbb.c < instance.f) {
             double d1;
 
@@ -170,7 +169,7 @@ class AxisAlignedBB {
             return d0;
         }
     }
-    public double calcSomeZ((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0) {
+    public double calcSomeZ((AABBHandle) AABB axisalignedbb, double d0) {
         if (axisalignedbb.d > instance.a && axisalignedbb.a < instance.d && axisalignedbb.e > instance.b && axisalignedbb.b < instance.e) {
             double d1;
 
@@ -192,8 +191,8 @@ class AxisAlignedBB {
         }
     }
 #else
-    public double calcSomeX:a((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0);
-    public double calcSomeY:b((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0);
-    public double calcSomeZ:c((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0);
+    public double calcSomeX:a((AABBHandle) AABB axisalignedbb, double d0);
+    public double calcSomeY:b((AABBHandle) AABB axisalignedbb, double d0);
+    public double calcSomeZ:c((AABBHandle) AABB axisalignedbb, double d0);
 #endif
 }

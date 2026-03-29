@@ -1,8 +1,8 @@
-import net.minecraft.world.level.block.state.IBlockData;
-import net.minecraft.core.BlockPosition;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.sounds.SoundEffect;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.storage.ValueOutput;
 
 #if version >= 1.17
@@ -50,25 +50,25 @@ import net.minecraft.world.level.storage.ValueOutput;
 #endif
 
 #select version >=
-#case 1.18:  #remap net.minecraft.world.entity.Entity protected SoundEffect getSwimSound();
-#case 1.14:  #remap net.minecraft.world.entity.Entity protected SoundEffect getSwimSound:getSoundSwim();
-#case 1.13:  #remap net.minecraft.world.entity.Entity protected SoundEffect getSwimSound:ad();
-#case 1.12:  #remap net.minecraft.world.entity.Entity protected SoundEffect getSwimSound:ae();
-#case 1.9:   #remap net.minecraft.world.entity.Entity protected SoundEffect getSwimSound:aa();
+#case 1.18:  #remap net.minecraft.world.entity.Entity protected SoundEvent getSwimSound();
+#case 1.14:  #remap net.minecraft.world.entity.Entity protected SoundEvent getSwimSound:getSoundSwim();
+#case 1.13:  #remap net.minecraft.world.entity.Entity protected SoundEvent getSwimSound:ad();
+#case 1.12:  #remap net.minecraft.world.entity.Entity protected SoundEvent getSwimSound:ae();
+#case 1.9:   #remap net.minecraft.world.entity.Entity protected SoundEvent getSwimSound:aa();
 #case else:  #remap net.minecraft.world.entity.Entity protected String getSwimSound:P();
 #endselect
 
 #select version >=
-#case 1.16:    #remap net.minecraft.world.entity.Entity public void playSound(SoundEffect soundeffect, float volume, float pitch);
-#case 1.9:     #remap net.minecraft.world.entity.Entity public void playSound:a(SoundEffect soundeffect, float volume, float pitch);
+#case 1.16:    #remap net.minecraft.world.entity.Entity public void playSound(SoundEvent soundeffect, float volume, float pitch);
+#case 1.9:     #remap net.minecraft.world.entity.Entity public void playSound:a(SoundEvent soundeffect, float volume, float pitch);
 #case else:    #remap net.minecraft.world.entity.Entity public void playSound:makeSound(String soundeffect, float volume, float pitch);
 #endselect
 
 #select version >=
-#case 1.18:    #remap net.minecraft.world.entity.Entity protected void playStepSound(BlockPosition position, IBlockData blockData);
-#case 1.16.2:  #remap net.minecraft.world.entity.Entity protected void playStepSound:b(BlockPosition position, IBlockData blockData);
-#case 1.13:    #remap net.minecraft.world.entity.Entity protected void playStepSound:a(BlockPosition position, IBlockData blockData);
-#case else:    #remap net.minecraft.world.entity.Entity protected void playStepSound:a(BlockPosition position, Block block);
+#case 1.18:    #remap net.minecraft.world.entity.Entity protected void playStepSound(BlockPos position, BlockState blockData);
+#case 1.16.2:  #remap net.minecraft.world.entity.Entity protected void playStepSound:b(BlockPos position, BlockState blockData);
+#case 1.13:    #remap net.minecraft.world.entity.Entity protected void playStepSound:a(BlockPos position, BlockState blockData);
+#case else:    #remap net.minecraft.world.entity.Entity protected void playStepSound:a(BlockPos position, Block block);
 #endselect
 
 #select version >=
@@ -86,18 +86,18 @@ import net.minecraft.world.level.storage.ValueOutput;
 // Save functions
 #select version >=
 #case 1.21.6:  #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger(ValueOutput valueOutput);
-#case 1.18:    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger(NBTTagCompound nbttagcompound);
-#case 1.17:    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger:d(NBTTagCompound nbttagcompound);
-#case 1.16:    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger:a_(NBTTagCompound nbttagcompound);
-#case else:    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger:c(NBTTagCompound nbttagcompound);
+#case 1.18:    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger(CompoundTag nbttagcompound);
+#case 1.17:    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger:d(CompoundTag nbttagcompound);
+#case 1.16:    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger:a_(CompoundTag nbttagcompound);
+#case else:    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger:c(CompoundTag nbttagcompound);
 #endselect
 
 #select version >=
 #case 1.21.6:  #remap net.minecraft.world.entity.Entity public void saveWithoutId(ValueOutput valueOutput);
-#case 1.18:    #remap net.minecraft.world.entity.Entity public NBTTagCompound saveWithoutId(NBTTagCompound nbttagcompound);
-#case 1.12:    #remap net.minecraft.world.entity.Entity public NBTTagCompound saveWithoutId:save(NBTTagCompound nbttagcompound);
-#case 1.9.4:   #remap net.minecraft.world.entity.Entity public NBTTagCompound saveWithoutId:e(NBTTagCompound nbttagcompound);
-#case else:    #remap net.minecraft.world.entity.Entity public void saveWithoutId:e(NBTTagCompound nbttagcompound);
+#case 1.18:    #remap net.minecraft.world.entity.Entity public CompoundTag saveWithoutId(CompoundTag nbttagcompound);
+#case 1.12:    #remap net.minecraft.world.entity.Entity public CompoundTag saveWithoutId:save(CompoundTag nbttagcompound);
+#case 1.9.4:   #remap net.minecraft.world.entity.Entity public CompoundTag saveWithoutId:e(CompoundTag nbttagcompound);
+#case else:    #remap net.minecraft.world.entity.Entity public void saveWithoutId:e(CompoundTag nbttagcompound);
 #endselect
 
 // CraftBukkit added an includeAll option flag
@@ -111,11 +111,11 @@ import net.minecraft.world.level.storage.ValueOutput;
     #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger(ValueOutput valueOutput, boolean includeAll);
     #remap net.minecraft.world.entity.Entity public void saveWithoutId(ValueOutput valueOutput, boolean includeAll);
 #elseif version >= 1.21.4 && paper
-    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger(NBTTagCompound nbttagcompound, boolean includeAll, boolean includeNonSaveable, boolean forceSerialization);
-    #remap net.minecraft.world.entity.Entity public NBTTagCompound saveWithoutId(NBTTagCompound nbttagcompound, boolean includeAll, boolean includeNonSaveable, boolean forceSerialization);
+    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger(CompoundTag nbttagcompound, boolean includeAll, boolean includeNonSaveable, boolean forceSerialization);
+    #remap net.minecraft.world.entity.Entity public CompoundTag saveWithoutId(CompoundTag nbttagcompound, boolean includeAll, boolean includeNonSaveable, boolean forceSerialization);
 #elseif version >= 1.20.3
-    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger(NBTTagCompound nbttagcompound, boolean includeAll);
-    #remap net.minecraft.world.entity.Entity public NBTTagCompound saveWithoutId(NBTTagCompound nbttagcompound, boolean includeAll);
+    #remap net.minecraft.world.entity.Entity public boolean saveAsPassenger(CompoundTag nbttagcompound, boolean includeAll);
+    #remap net.minecraft.world.entity.Entity public CompoundTag saveWithoutId(CompoundTag nbttagcompound, boolean includeAll);
 #endif
 
 // This function is a nightmare, especially on forge...

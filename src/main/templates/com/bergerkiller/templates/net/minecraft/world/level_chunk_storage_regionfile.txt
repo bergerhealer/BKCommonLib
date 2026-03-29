@@ -1,6 +1,6 @@
 package net.minecraft.world.level.chunk.storage;
 
-import net.minecraft.world.level.ChunkCoordIntPair;
+import net.minecraft.world.level.ChunkPos;
 
 class RegionFile {
 #if version >= 1.15
@@ -24,15 +24,15 @@ class RegionFile {
 
 #if version >= 1.18
     public boolean chunkExists(int cx, int cz) {
-        return instance.hasChunk(new ChunkCoordIntPair(cx, cz));
+        return instance.hasChunk(new ChunkPos(cx, cz));
     }
 #elseif version >= 1.15
     public boolean chunkExists(int cx, int cz) {
-        return instance.chunkExists(new ChunkCoordIntPair(cx, cz));
+        return instance.chunkExists(new ChunkPos(cx, cz));
     }
 #elseif version >= 1.14
     public boolean chunkExists(int cx, int cz) {
-        return instance.d(new ChunkCoordIntPair(cx, cz));
+        return instance.d(new ChunkPos(cx, cz));
     }
 #elseif methodexists net.minecraft.world.level.chunk.storage.RegionFile public boolean chunkExists(int x, int z);
     // WineSpigot

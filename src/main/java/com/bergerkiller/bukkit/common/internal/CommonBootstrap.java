@@ -34,6 +34,8 @@ import com.bergerkiller.bukkit.common.internal.logic.UnsetDataWatcherItemInit;
 import com.bergerkiller.bukkit.common.wrappers.Brightness;
 import com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode;
 import com.bergerkiller.bukkit.common.wrappers.RelativeFlags;
+import com.bergerkiller.generated.net.minecraft.nbt.CompoundTagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.ListTagHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.Bukkit;
 
@@ -55,9 +57,7 @@ import com.bergerkiller.bukkit.common.server.*;
 import com.bergerkiller.bukkit.common.server.CommonServer.PostInitEvent;
 import com.bergerkiller.bukkit.common.server.test.TestServerFactory;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTTagListHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
@@ -429,7 +429,7 @@ public class CommonBootstrap {
         final Map<String, String> remappings = new HashMap<String, String>();
 
         // We renamed EntityTrackerEntry to EntityTrackerEntryState to account for the wrapping EntityTracker on 1.14 and later
-        remappings.put("net.minecraft.server.level.EntityTrackerEntryState", "net.minecraft.server.level.EntityTrackerEntry");
+        remappings.put("net.minecraft.server.level.EntityTrackerEntryState", "net.minecraft.server.level.ServerEntity");
 
         // Instead of CraftBukkit LongHashSet, we use a custom implementation with bugfixes on 1.13.2 and earlier
         // This is now possible since we no longer interface with CraftBukkit LongHashSet anywhere
@@ -438,7 +438,7 @@ public class CommonBootstrap {
 
         // Name was all over the place, internally we refer to this as "BiomeSpawnCluster"
         // This is a record/struct of a mob entity type, min spawn count and max spawn count
-        remappings.put("net.minecraft.world.level.biome.BiomeSpawnCluster", "net.minecraft.world.level.biome.BiomeBase$BiomeMeta");
+        remappings.put("net.minecraft.world.level.biome.BiomeSpawnCluster", "net.minecraft.world.level.biome.Biome$BiomeMeta");
 
         // Obfuscated class name
         remappings.put("net.minecraft.server.level.ChunkProviderServer$MainThreadExecutor", "net.minecraft.server.level.ChunkProviderServer$a");
@@ -464,9 +464,9 @@ public class CommonBootstrap {
             // PacketPlayInUseItem and PacketPlayInBlockPlace were merged as one packet on these versions
             remappings.put("net.minecraft.network.protocol.game.PacketPlayInUseItem", "net.minecraft.network.protocol.game.PacketPlayInBlockPlace");
 
-            // PacketPlayOutCustomSoundEffect does not yet exist on 1.8 - 1.8.8, it is proxied by
-            // the PacketPlayOutNamedSoundEffect packet so it still (mostly) works
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffect", "net.minecraft.network.protocol.game.PacketPlayOutNamedSoundEffect");
+            // ClientboundCustomSoundPacket does not yet exist on 1.8 - 1.8.8, it is proxied by
+            // the ClientboundSoundPacket packet so it still (mostly) works
+            remappings.put("net.minecraft.network.protocol.game.ClientboundCustomSoundPacket", "net.minecraft.network.protocol.game.ClientboundSoundPacket");
 
             // We proxy a bunch of classes, because they don't exist in 1.8.8
             // Writing custom wrappers with switches would be too tiresome
@@ -493,9 +493,8 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.level.block.SoundEffectType", "net.minecraft.world.level.block.StepSound");
             remappings.put("net.minecraft.world.level.block.Block$StepSound", "net.minecraft.world.level.block.StepSound");
             remappings.put("net.minecraft.core.EnumDirection$EnumAxis", "net.minecraft.core.EnumAxis");
-            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.EnumPlayerInfoAction");
+            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$Action", "net.minecraft.network.protocol.game.EnumPlayerInfoAction");
             remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$PlayerInfoData", "net.minecraft.network.protocol.game.PlayerInfoData");
-            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.EnumPlayerInfoAction");
             remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket$PlayerInfoData", "net.minecraft.network.protocol.game.PlayerInfoData");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayInUseEntity$EnumEntityUseAction", "net.minecraft.network.protocol.game.EnumEntityUseAction");
             remappings.put("net.minecraft.world.level.MobSpawnerData", "net.minecraft.world.level.block.entity.TileEntityMobSpawnerData");
@@ -503,12 +502,12 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.network.syncher.DataWatcher$PackedItem", "net.minecraft.network.syncher.WatchableObject");
             remappings.put("net.minecraft.network.syncher.DataWatcher$WatchableObject", "net.minecraft.network.syncher.WatchableObject");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore$EnumScoreboardAction", "net.minecraft.network.protocol.game.EnumScoreboardAction");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutMapChunk$ChunkMap", "net.minecraft.network.protocol.game.ChunkMap");
+            remappings.put("net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket$ChunkMap", "net.minecraft.network.protocol.game.ChunkMap");
             remappings.put("net.minecraft.world.entity.RelativeMovement", "net.minecraft.network.protocol.game.EnumPlayerTeleportFlags");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutTitle$EnumTitleAction", "net.minecraft.network.protocol.game.EnumTitleAction");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutCombatEvent$EnumCombatEventType", "net.minecraft.network.protocol.game.EnumCombatEventType");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutWorldBorder$EnumWorldBorderAction", "net.minecraft.network.protocol.game.EnumWorldBorderAction");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayInResourcePackStatus$EnumResourcePackStatus", "net.minecraft.network.protocol.game.EnumResourcePackStatus");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayInResourcePackStatus$Action", "net.minecraft.network.protocol.game.EnumResourcePackStatus");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayInBlockDig$EnumPlayerDigType", "net.minecraft.network.protocol.game.EnumPlayerDigType");
             remappings.put("net.minecraft.world.entity.player.EnumChatVisibility", "net.minecraft.world.entity.player.EnumChatVisibility");
             remappings.put("net.minecraft.server.level.PlayerChunk", "net.minecraft.server.level.PlayerChunk");
@@ -521,7 +520,7 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.network.protocol.game.PacketPlayInFlying$PacketPlayInLook", "net.minecraft.network.protocol.game.PacketPlayInLook");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayInFlying$PacketPlayInPosition", "net.minecraft.network.protocol.game.PacketPlayInPosition");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayInFlying$PacketPlayInPositionLook", "net.minecraft.network.protocol.game.PacketPlayInPositionLook");
-            remappings.put("net.minecraft.network.chat.IChatBaseComponent$ChatSerializer", "net.minecraft.network.chat.ChatSerializer");
+            remappings.put("net.minecraft.network.chat.Component$Serializer", "net.minecraft.network.chat.ChatSerializer");
             remappings.put("net.minecraft.network.NetworkManager$QueuedPacket", "net.minecraft.network.QueuedPacket");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutPosition$EnumPlayerTeleportFlags", "net.minecraft.network.protocol.game.EnumPlayerTeleportFlags");
             remappings.put("net.minecraft.network.chat.ChatClickable$EnumClickAction", "net.minecraft.network.chat.EnumClickAction");
@@ -545,7 +544,7 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.phys.shapes.VoxelShape", "com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy");
             remappings.put("net.minecraft.world.level.block.entity.TileEntityTypes", "com.bergerkiller.bukkit.common.internal.proxy.TileEntityTypesProxy_1_8_to_1_12_2");
             // Stop sound works using an MC|StopSound custom message
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutStopSound", "net.minecraft.network.protocol.game.PacketPlayOutCustomPayload");
+            remappings.put("net.minecraft.network.protocol.game.ClientboundStopSoundPacket", "net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket");
         }
 
         // EnumArt has seen many places...
@@ -662,14 +661,15 @@ public class CommonBootstrap {
             // Some class names still obfuscated
             remappings.put("net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData$BlockEntityData", "net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData$a");
 
-            // PacketPlayOutMapChunk was replaced by a different packet which stores light and block data
-            // To simplify the BKCL API we use the same packet class, since in both cases the buffer, heightmap data
-            // and changed block state information is available. We handle the adaptering in template code.
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutMapChunk", "net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket");
-
             // Obfuscated class name changed
             remappings.put("net.minecraft.server.level.ChunkProviderServer$MainThreadExecutor", "net.minecraft.server.level.ChunkProviderServer$b");
         } else {
+            // ClientboundLevelChunkPacket was replaced by a different packet which stores light and block data at 1.18
+            // Before that, we got to map back to the spigot name
+            // To simplify the BKCL API we use the same packet class, since in both cases the buffer, heightmap data
+            // and changed block state information is available. We handle the adaptering in template code.
+            remappings.put("net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket", "net.minecraft.network.protocol.game.ClientboundLevelChunkPacket");
+
             // TickListServer was moved, migrate past versions
             remappings.put("net.minecraft.world.ticks.TickListServer", "net.minecraft.world.level.TickListServer");
             remappings.put("net.minecraft.world.ticks.TickList", "net.minecraft.world.level.TickList");
@@ -693,8 +693,8 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket");
             remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$a");
             remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$PlayerInfoData", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$b");
-            // CustomSoundEffect was removed as of 1.19.3, now fully handled by the unified NamedSoundEffect packet
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffect", "net.minecraft.network.protocol.game.PacketPlayOutNamedSoundEffect");
+            // CustomSoundEffect was removed as of 1.19.3, now fully handled by the unified ClientboundSoundPacket packet
+            remappings.put("net.minecraft.network.protocol.game.ClientboundCustomSoundPacket", "net.minecraft.network.protocol.game.ClientboundSoundPacket");
         } else {
             // BuiltInRegistries class does not exist, but all relevant fields are found in IRegistry instead
             remappings.put("net.minecraft.core.registries.BuiltInRegistries", "net.minecraft.core.IRegistry");
@@ -727,7 +727,7 @@ public class CommonBootstrap {
         // 1.20.2 mappings
         if (evaluateMCVersion(">=", "1.20.2")) {
             // Not de-obfuscated
-            remappings.put("net.minecraft.network.protocol.common.ServerboundResourcePackPacket$EnumResourcePackStatus", "net.minecraft.network.protocol.common.ServerboundResourcePackPacket$a");
+            remappings.put("net.minecraft.network.protocol.common.ServerboundResourcePackPacket$Action", "net.minecraft.network.protocol.common.ServerboundResourcePackPacket$a");
 
             // The Named spawn packet was removed and the normal spawn packet can now be used
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn", "net.minecraft.network.protocol.game.PacketPlayOutSpawnEntity");
@@ -775,7 +775,7 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.network.protocol.common.ServerboundKeepAlivePacket", "net.minecraft.network.protocol.game.PacketPlayInKeepAlive");
             remappings.put("net.minecraft.network.protocol.common.ClientboundKeepAlivePacket", "net.minecraft.network.protocol.game.PacketPlayOutKeepAlive");
             remappings.put("net.minecraft.network.protocol.common.ServerboundResourcePackPacket", "net.minecraft.network.protocol.game.PacketPlayInResourcePackStatus");
-            remappings.put("net.minecraft.network.protocol.common.ServerboundResourcePackPacket$EnumResourcePackStatus", "net.minecraft.network.protocol.game.PacketPlayInResourcePackStatus$EnumResourcePackStatus");
+            remappings.put("net.minecraft.network.protocol.common.ServerboundResourcePackPacket$Action", "net.minecraft.network.protocol.game.PacketPlayInResourcePackStatus$EnumResourcePackStatus");
             remappings.put("net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket", "net.minecraft.network.protocol.game.PacketPlayOutResourcePackSend");
             remappings.put("net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket", "net.minecraft.network.protocol.game.PacketPlayOutCustomPayload");
             remappings.put("net.minecraft.network.protocol.common.ClientboundDisconnectPacket", "net.minecraft.network.protocol.game.PacketPlayOutKickDisconnect");
@@ -1049,20 +1049,20 @@ public class CommonBootstrap {
      * the jar file is closed, load these components.
      */
     public static void preloadCriticalComponents() {
-        NBTBaseHandle.NBTTagByteArrayHandle.T.forceInitialization();
-        NBTBaseHandle.NBTTagByteHandle.T.forceInitialization();
-        NBTBaseHandle.NBTTagDoubleHandle.T.forceInitialization();
-        NBTBaseHandle.NBTTagFloatHandle.T.forceInitialization();
-        NBTBaseHandle.NBTTagIntArrayHandle.T.forceInitialization();
-        NBTBaseHandle.NBTTagIntHandle.T.forceInitialization();
+        TagHandle.ByteArrayTagHandle.T.forceInitialization();
+        TagHandle.ByteTagHandle.T.forceInitialization();
+        TagHandle.DoubleTagHandle.T.forceInitialization();
+        TagHandle.FloatTagHandle.T.forceInitialization();
+        TagHandle.IntArrayTagHandle.T.forceInitialization();
+        TagHandle.IntTagHandle.T.forceInitialization();
         if (evaluateMCVersion(">=", "1.12")) {
-            NBTBaseHandle.NBTTagLongArrayHandle.T.forceInitialization();
+            TagHandle.LongArrayTagHandle.T.forceInitialization();
         }
-        NBTBaseHandle.NBTTagLongHandle.T.forceInitialization();
-        NBTBaseHandle.NBTTagShortHandle.T.forceInitialization();
-        NBTBaseHandle.NBTTagStringHandle.T.forceInitialization();
-        NBTTagCompoundHandle.T.forceInitialization();
-        NBTTagListHandle.T.forceInitialization();
+        TagHandle.LongTagHandle.T.forceInitialization();
+        TagHandle.ShortTagHandle.T.forceInitialization();
+        TagHandle.StringTagHandle.T.forceInitialization();
+        CompoundTagHandle.T.forceInitialization();
+        ListTagHandle.T.forceInitialization();
     }
 
     /**
@@ -1139,8 +1139,6 @@ public class CommonBootstrap {
                 })
                 // Only match Template files in the generated package, that are class files
                 .filter(name -> name.startsWith("com/bergerkiller/generated") && name.endsWith(".class"))
-                // Deprecated temporary fallback
-                .filter(name -> !name.equals("com/bergerkiller/generated/net/minecraft/network/protocol/game/PacketPlayOutCustomPayloadHandle.class"))
                 // Turn into a loadable class name
                 .map(name -> name.substring(0, name.length()-6).replace('/', '.'))
                 // Load all these classes

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.BlockStateHandle;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.material.MaterialData;
@@ -19,7 +20,6 @@ import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlocksHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
@@ -118,7 +118,7 @@ public class MaterialDataToIBlockData {
     // Only called after MC 1.13, before that everything was fine!
     private static void initBuilders() {
         if (getLegacyMaterial("REDSTONE_COMPARATOR_OFF") != null) {
-            iblockdataBuilders.put(getLegacyMaterial("REDSTONE_COMPARATOR_OFF"), (IBlockDataHandle iblockdata, org.bukkit.material.Comparator  comparator) -> {
+            iblockdataBuilders.put(getLegacyMaterial("REDSTONE_COMPARATOR_OFF"), (BlockStateHandle iblockdata, org.bukkit.material.Comparator  comparator) -> {
                 iblockdata = iblockdata.set("powered", false);
                 iblockdata = iblockdata.set("facing", comparator.getFacing());
                 iblockdata = iblockdata.set("mode", comparator.isSubtractionMode() ? "subtract" : "compare");
@@ -126,7 +126,7 @@ public class MaterialDataToIBlockData {
             });
         }
         if (getLegacyMaterial("REDSTONE_COMPARATOR_ON") != null) {
-            iblockdataBuilders.put(getLegacyMaterial("REDSTONE_COMPARATOR_ON"), (IBlockDataHandle iblockdata, org.bukkit.material.Comparator comparator) -> {
+            iblockdataBuilders.put(getLegacyMaterial("REDSTONE_COMPARATOR_ON"), (BlockStateHandle iblockdata, org.bukkit.material.Comparator comparator) -> {
                 iblockdata = iblockdata.set("powered", true);
                 iblockdata = iblockdata.set("facing", comparator.getFacing());
                 iblockdata = iblockdata.set("mode", comparator.isSubtractionMode() ? "subtract" : "compare");
@@ -134,10 +134,10 @@ public class MaterialDataToIBlockData {
             });
         }
 
-        iblockdataBuilders.put(getLegacyMaterial("DOUBLE_STEP"), (IBlockDataHandle iblockdata, org.bukkit.material.Step step) -> iblockdata.set("type", "double"));
+        iblockdataBuilders.put(getLegacyMaterial("DOUBLE_STEP"), (BlockStateHandle iblockdata, org.bukkit.material.Step step) -> iblockdata.set("type", "double"));
 
         iblockdataBuilders.put(getLegacyMaterial("MOB_SPAWNER"), (iblockdata, spawner) -> getBlockDataFromMaterialName("SPAWNER"));
-        iblockdataBuilders.put(getLegacyMaterial("TORCH"), (IBlockDataHandle iblockdata, org.bukkit.material.Torch torch) -> {
+        iblockdataBuilders.put(getLegacyMaterial("TORCH"), (BlockStateHandle iblockdata, org.bukkit.material.Torch torch) -> {
             if (torch.getAttachedFace() == BlockFace.DOWN) {
                 iblockdata = getBlockDataFromMaterialName("TORCH");
                 return iblockdata;
@@ -153,11 +153,11 @@ public class MaterialDataToIBlockData {
         // Signs
         {
             IBlockDataBuilder<org.bukkit.material.Sign> builder = new IBlockDataBuilder<org.bukkit.material.Sign>() {
-                final IBlockDataHandle wall_sign_data = getBlockDataFromMaterialName(CommonCapabilities.HAS_MATERIAL_SIGN_TYPES ? "OAK_WALL_SIGN" : "WALL_SIGN");
-                final IBlockDataHandle sign_post_data = getBlockDataFromMaterialName(CommonCapabilities.HAS_MATERIAL_SIGN_TYPES ? "OAK_SIGN" : "SIGN");
+                final BlockStateHandle wall_sign_data = getBlockDataFromMaterialName(CommonCapabilities.HAS_MATERIAL_SIGN_TYPES ? "OAK_WALL_SIGN" : "WALL_SIGN");
+                final BlockStateHandle sign_post_data = getBlockDataFromMaterialName(CommonCapabilities.HAS_MATERIAL_SIGN_TYPES ? "OAK_SIGN" : "SIGN");
 
                 @Override
-                public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.Sign sign) {
+                public BlockStateHandle create(BlockStateHandle iblockdata, org.bukkit.material.Sign sign) {
                     if (CommonLegacyMaterials.isLegacy(sign.getItemType())) {
                         iblockdata = sign.isWallSign() ? wall_sign_data : sign_post_data;
                     }
@@ -178,14 +178,14 @@ public class MaterialDataToIBlockData {
             String[] modern_names = new String[] {"CHEST", "ENDER_CHEST", "TRAPPED_CHEST"};
             for (int n = 0; n < legacy_types.length; n++) {
                 final Material legacy_type = legacy_types[n];
-                final IBlockDataHandle modern_data = getBlockDataFromMaterialName(modern_names[n]);
-                iblockdataBuilders.put(legacy_type, (IBlockDataHandle iblockdata, org.bukkit.material.DirectionalContainer directional) -> modern_data.set("facing", directional.getFacing()));
+                final BlockStateHandle modern_data = getBlockDataFromMaterialName(modern_names[n]);
+                iblockdataBuilders.put(legacy_type, (BlockStateHandle iblockdata, org.bukkit.material.DirectionalContainer directional) -> modern_data.set("facing", directional.getFacing()));
             }
         }
     }
 
     private static void storeLegacyRemap(String legacy_name, String modern_name) {
-        final IBlockDataHandle modern_data = getBlockDataFromMaterialName(modern_name);
+        final BlockStateHandle modern_data = getBlockDataFromMaterialName(modern_name);
         iblockdataBuilders.put(getLegacyMaterial(legacy_name), (iblockdata, materialData) -> modern_data);
     }
 
@@ -195,7 +195,7 @@ public class MaterialDataToIBlockData {
      * @param materialdata
      * @return IBlockData
      */
-    public static IBlockDataHandle getIBlockData(MaterialData materialdata) {
+    public static BlockStateHandle getIBlockData(MaterialData materialdata) {
         if (materialdata == null) {
             throw new IllegalArgumentException("MaterialData == null");
         }
@@ -206,7 +206,7 @@ public class MaterialDataToIBlockData {
         Material legacyType = IBlockDataToMaterialData.toLegacy(materialdata.getItemType());
         IBlockDataBuilder<MaterialData> builder = LogicUtil.unsafeCast(iblockdataBuilders.get(legacyType));
         try {
-            IBlockDataHandle blockData = IBlockDataHandle.createHandle(craftBukkitgetIBlockData.invoke(null, materialdata));
+            BlockStateHandle blockData = BlockStateHandle.createHandle(craftBukkitgetIBlockData.invoke(null, materialdata));
             if (builder != null) {
                 // Convert using createData to fix up a couple issues with MaterialData Class typing
                 materialdata = IBlockDataToMaterialData.createMaterialData(materialdata.getItemType(), legacyType, materialdata.getData());
@@ -220,6 +220,6 @@ public class MaterialDataToIBlockData {
     }
 
     private static interface IBlockDataBuilder<M extends MaterialData> {
-        IBlockDataHandle create(IBlockDataHandle iblockdata, M materialdata);
+        BlockStateHandle create(BlockStateHandle iblockdata, M materialdata);
     }
 }

@@ -4,7 +4,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
@@ -15,8 +15,8 @@ import com.google.common.collect.HashBiMap;
 public class TileEntityTypesSerializedIds_1_8_to_1_17_1 {
     private static final BiMap<Integer, Object> idsToMinecraftKey = HashBiMap.create(16);
     private static final BiMap<Object, Integer> minecraftKeyToId = idsToMinecraftKey.inverse();
-    private static final BiMap<MinecraftKeyHandle, String> minecraftKeyToLegacyName = HashBiMap.create(32);
-    private static final BiMap<String, MinecraftKeyHandle> legacyNameToMinecraftKey = minecraftKeyToLegacyName.inverse();
+    private static final BiMap<IdentifierHandle, String> minecraftKeyToLegacyName = HashBiMap.create(32);
+    private static final BiMap<String, IdentifierHandle> legacyNameToMinecraftKey = minecraftKeyToLegacyName.inverse();
 
     static {
         register(1, "mob_spawner", "MobSpawner");
@@ -49,7 +49,7 @@ public class TileEntityTypesSerializedIds_1_8_to_1_17_1 {
     }
 
     private static void register(int id, String name, String pre_1_10_2_Name) {
-        MinecraftKeyHandle keyHandle = MinecraftKeyHandle.createNew(name);
+        IdentifierHandle keyHandle = IdentifierHandle.createNew(name);
         Object minecraftKey = keyHandle.getRaw();
         if (id != -1) {
             idsToMinecraftKey.put(id, minecraftKey);
@@ -70,7 +70,7 @@ public class TileEntityTypesSerializedIds_1_8_to_1_17_1 {
     }
 
     // Only for MC 1.10.2 and before
-    public static String getLegacyName(MinecraftKeyHandle minecraftKeyHandle) {
+    public static String getLegacyName(IdentifierHandle minecraftKeyHandle) {
         String name = minecraftKeyToLegacyName.get(minecraftKeyHandle);
         if (name == null && minecraftKeyHandle != null) {
             // Little workaround that just generates some 'probably' names
@@ -91,8 +91,8 @@ public class TileEntityTypesSerializedIds_1_8_to_1_17_1 {
     }
 
     // Only for MC 1.10.2 and before
-    public static MinecraftKeyHandle toMinecraftKeyFromLegacyName(String legacyName) {
-        MinecraftKeyHandle minecraftKey = legacyNameToMinecraftKey.get(legacyName);
+    public static IdentifierHandle toMinecraftKeyFromLegacyName(String legacyName) {
+        IdentifierHandle minecraftKey = legacyNameToMinecraftKey.get(legacyName);
         if (minecraftKey == null && legacyName != null) {
             // Find all uppercase characters, put a _ in front except for first char
             // EnderChest -> ender_chest
@@ -105,7 +105,7 @@ public class TileEntityTypesSerializedIds_1_8_to_1_17_1 {
                 str.append(Character.toLowerCase(c));
             }
             // Convert to a key
-            minecraftKey = MinecraftKeyHandle.createNew(str.toString());
+            minecraftKey = IdentifierHandle.createNew(str.toString());
         }
         return minecraftKey;
     }

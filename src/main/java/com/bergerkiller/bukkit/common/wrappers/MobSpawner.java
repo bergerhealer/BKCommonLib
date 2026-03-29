@@ -1,15 +1,15 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.BaseSpawnerHandle;
 import org.bukkit.block.Block;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.MobSpawnerAbstractHandle;
 
-public class MobSpawner extends BasicWrapper<MobSpawnerAbstractHandle> {
+public class MobSpawner extends BasicWrapper<BaseSpawnerHandle> {
 
     public MobSpawner(Object mobSpawnerHandle) {
-        setHandle(MobSpawnerAbstractHandle.createHandle(mobSpawnerHandle));
+        setHandle(BaseSpawnerHandle.createHandle(mobSpawnerHandle));
     }
 
     /**
@@ -27,7 +27,7 @@ public class MobSpawner extends BasicWrapper<MobSpawnerAbstractHandle> {
      * @param name of mob
      */
     public void setMobName(String name) {
-        handle.setMobName(MinecraftKeyHandle.createNew(name));
+        handle.setMobName(IdentifierHandle.createNew(name));
     }
 
     /**

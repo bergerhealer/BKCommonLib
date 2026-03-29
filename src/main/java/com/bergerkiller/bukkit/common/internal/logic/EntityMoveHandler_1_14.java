@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
@@ -16,8 +17,7 @@ import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.conversion.Converter;
@@ -55,7 +55,7 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
     public boolean onBlockCollided(Block block) {
         // Find out what direction the block is hit
         BlockFace hitFace;
-        AxisAlignedBBHandle entityBounds = this.that.getBoundingBox();
+        AABBHandle entityBounds = this.that.getBoundingBox();
         if (entityBounds.getMaxY() > (block.getY() + 1.0)) {
             hitFace = BlockFace.UP;
         } else if (entityBounds.getMinY() < (double) block.getY()) {
@@ -74,7 +74,7 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
             return Stream.empty();
         }
 
-        AxisAlignedBBHandle entityBounds = this.getBlockBoundingBox(entity);
+        AABBHandle entityBounds = this.getBlockBoundingBox(entity);
 
         final double MIN_MOVE = 1.0E-7D;
         VoxelShapeHandle voxelshapeAABB = VoxelShapeHandle.fromAABB(entityBounds);
@@ -86,7 +86,7 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
         }
 
         // Check and update that the entity is within the world border
-        WorldHandle world = entity.getWorld();
+        LevelHandle world = entity.getWorld();
 
         // Execute generated method and convert to Stream<VoxelShapeHandle>
         return logic.getBlockCollisions(world, this, voxelshapeBounds, voxelshapeAABB);
@@ -97,7 +97,7 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
             return Stream.empty();
         }
 
-        AxisAlignedBBHandle entityBounds = entity.getBoundingBox();
+        AABBHandle entityBounds = entity.getBoundingBox();
 
         final double MIN_MOVE = 1.0E-7D;
         VoxelShapeHandle voxelshapeAABBMoved = VoxelShapeHandle.fromAABB(entityBounds.translate(mx > 0.0D ? -MIN_MOVE : MIN_MOVE, my > 0.0D ? -MIN_MOVE : MIN_MOVE, mz > 0.0D ? -MIN_MOVE : MIN_MOVE));
@@ -108,7 +108,7 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
         }
 
         // default VoxelShape IWorldReader::a(@Nullable Entity entity, VoxelShape voxelshape, boolean flag, Set<Entity> set)
-        AxisAlignedBBHandle axisalignedbb = voxelshapeBounds.getBoundingBox();
+        AABBHandle axisalignedbb = voxelshapeBounds.getBoundingBox();
         VoxelShapeHandle shape = VoxelShapeHandle.empty();
 
         if (this.entityCollisionEnabled) {
@@ -121,7 +121,7 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
 
                 // BKCommonLib start: block collision event handler
                 if (entity.canCollideWith(entity1)) {
-                    AxisAlignedBBHandle axisalignedbb1 = entity1.getBoundingBox();
+                    AABBHandle axisalignedbb1 = entity1.getBoundingBox();
                     if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(axisalignedbb)
                             && controller.onEntityCollision(entity1.getBukkitEntity())) {
 
@@ -129,7 +129,7 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
                     }
                 }
 
-                AxisAlignedBBHandle axisalignedbb2 = entity.getEntityBoundingBox(entity1);
+                AABBHandle axisalignedbb2 = entity.getEntityBoundingBox(entity1);
                 if (axisalignedbb2 != null && axisalignedbb2.bbTransformA(axisalignedbb)
                         && controller.onEntityCollision(entity1.getBukkitEntity())) {
 
@@ -213,7 +213,7 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
             }
         }
 
-        public Stream<VoxelShapeHandle> getBlockCollisions(WorldHandle world, EntityMoveHandler handler, VoxelShapeHandle voxelshapeBounds, VoxelShapeHandle voxelshapeAABB) {
+        public Stream<VoxelShapeHandle> getBlockCollisions(LevelHandle world, EntityMoveHandler handler, VoxelShapeHandle voxelshapeBounds, VoxelShapeHandle voxelshapeAABB) {
             return streamConverter.convertInput(getBlockCollisions_method.invoke(world.getRaw(), handler, voxelshapeBounds.getRaw(), voxelshapeAABB.getRaw(), false));
         }
 

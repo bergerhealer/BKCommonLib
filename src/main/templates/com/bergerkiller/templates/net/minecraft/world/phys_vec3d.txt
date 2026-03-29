@@ -1,8 +1,8 @@
 package net.minecraft.world.phys;
 
-import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.Vec3Handle;
 
-class Vec3D {
+class Vec3 {
     public final double x;
     public final double y;
     public final double z;
@@ -11,15 +11,15 @@ class Vec3D {
         return new org.bukkit.util.Vector(instance.x, instance.y, instance.z);
     }
 
-    public (Vec3DHandle) Vec3D(double x, double y, double z);
+    public (Vec3Handle) Vec3(double x, double y, double z);
 
     <code>
-    public static Vec3DHandle fromBukkit(org.bukkit.util.Vector vector) {
+    public static Vec3Handle fromBukkit(org.bukkit.util.Vector vector) {
         return createHandle(fromBukkitRaw(vector));
     }
     </code>
 
     public static Object fromBukkitRaw(org.bukkit.util.Vector vector) {
-        return new Vec3D(vector.getX(), vector.getY(), vector.getZ());
+        return new Vec3(vector.getX(), vector.getY(), vector.getZ());
     }
 }

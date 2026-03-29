@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.generated.net.minecraft.world.EnumHandHandle;
+import com.bergerkiller.generated.net.minecraft.world.InteractionHandHandle;
 import com.bergerkiller.generated.org.bukkit.entity.HumanEntityHandle;
 import com.bergerkiller.generated.org.bukkit.inventory.MainHandHandle;
 import com.bergerkiller.generated.org.bukkit.inventory.PlayerInventoryHandle;
@@ -124,8 +124,8 @@ public enum HumanHand {
      * @return HumanHand
      */
     public static HumanHand fromNMSEnumHand(HumanEntity humanEntity, Object nmsEnumHand) {
-        if (nmsEnumHand != null && EnumHandHandle.T.isAvailable()) {
-            HumanHand hand = (nmsEnumHand == EnumHandHandle.OFF_HAND.getRaw()) ? LEFT : RIGHT;
+        if (nmsEnumHand != null && InteractionHandHandle.T.isAvailable()) {
+            HumanHand hand = (nmsEnumHand == InteractionHandHandle.OFF_HAND.getRaw()) ? LEFT : RIGHT;
             if (getMainHand(humanEntity) == LEFT) {
                 hand = (hand == RIGHT) ? LEFT : RIGHT;
             }
@@ -147,11 +147,11 @@ public enum HumanHand {
      * @return <i>net.minecraft.server.EnumHand</i>
      */
     public static Object toNMSEnumHand(HumanEntity humanEntity, HumanHand humanHand) {
-        if (EnumHandHandle.T.isAvailable()) {
+        if (InteractionHandHandle.T.isAvailable()) {
             if (getMainHand(humanEntity) == humanHand) {
-                return EnumHandHandle.MAIN_HAND.getRaw();
+                return InteractionHandHandle.MAIN_HAND.getRaw();
             } else {
-                return EnumHandHandle.OFF_HAND.getRaw();
+                return InteractionHandHandle.OFF_HAND.getRaw();
             }
         } else {
             return null;

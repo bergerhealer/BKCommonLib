@@ -10,6 +10,8 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.BlockStateHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -35,17 +37,15 @@ import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.core.RegistryBlockIDHandle;
-import com.bergerkiller.generated.net.minecraft.core.RegistryMaterialsHandle;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.util.RegistryIDHandle;
+import com.bergerkiller.generated.net.minecraft.core.BlockPosHandle;
+import com.bergerkiller.generated.net.minecraft.core.IdMapperHandle;
+import com.bergerkiller.generated.net.minecraft.core.MappedRegistryHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
+import com.bergerkiller.generated.net.minecraft.util.CrudeIncrementalIntIdentityHashBiMapHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.IBlockStateHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.PropertyHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingMap;
@@ -54,7 +54,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 @SuppressWarnings("deprecation")
 class BlockDataImpl extends BlockData {
     private BlockHandle block;
-    private IBlockDataHandle data;
+    private BlockStateHandle data;
     private MaterialData materialData;
     private Material type;
     private Material legacyType;
@@ -117,7 +117,7 @@ class BlockDataImpl extends BlockData {
             Arrays.fill(tmp, AIR);
 
             for (Object rawIBlockData : BlockHandle.REGISTRY_ID) {
-                IBlockDataHandle blockData = IBlockDataHandle.createHandle(rawIBlockData);
+                BlockStateHandle blockData = BlockStateHandle.createHandle(rawIBlockData);
                 BlockDataConstant block_const = BY_BLOCK.get(blockData.getBlock().getRaw());
                 if (block_const.getData() != rawIBlockData) {
                     block_const = new BlockDataConstant(blockData);
@@ -193,7 +193,7 @@ class BlockDataImpl extends BlockData {
             for (int data = 0; data < 16; data++) {
                 // Find IBlockData from Material + Data and cache it if needed
                 materialdata.setData((byte) data);
-                IBlockDataHandle blockData = MaterialDataToIBlockData.getIBlockData(materialdata);
+                BlockStateHandle blockData = MaterialDataToIBlockData.getIBlockData(materialdata);
                 BlockDataConstant dataBlockConst = blockConst;
                 if (blockData == null) {
                     Logging.LOGGER_REGISTRY.warning("Obtaining BlockData of MaterialData " + materialdata + " yielded null result!");
@@ -238,7 +238,7 @@ class BlockDataImpl extends BlockData {
         }
     }
 
-    private static BlockDataConstant findConstant(IBlockDataHandle iblockdata) {
+    private static BlockDataConstant findConstant(BlockStateHandle iblockdata) {
         BlockDataConstant dataBlockConst = BY_BLOCK_DATA.get(iblockdata.getRaw());
         if (dataBlockConst == null) {
             return BY_BLOCK_DATA.create(iblockdata);
@@ -256,7 +256,7 @@ class BlockDataImpl extends BlockData {
             super(block);
         }
 
-        public BlockDataConstant(IBlockDataHandle blockData) {
+        public BlockDataConstant(BlockStateHandle blockData) {
             super(blockData);
         }
 
@@ -280,7 +280,7 @@ class BlockDataImpl extends BlockData {
         this(AIR.getBlock());
     }
 
-    public BlockDataImpl(IBlockDataHandle data) {
+    public BlockDataImpl(BlockStateHandle data) {
         this(data.getBlock(), data);
     }
 
@@ -288,7 +288,7 @@ class BlockDataImpl extends BlockData {
         this(block, block.getBlockData());
     }
 
-    public BlockDataImpl(BlockHandle block, IBlockDataHandle data) {
+    public BlockDataImpl(BlockHandle block, BlockStateHandle data) {
         this.block = block;
         this.data = data;
         this.refreshBlock();
@@ -303,7 +303,7 @@ class BlockDataImpl extends BlockData {
 
     @Override
     public void loadBlockData(Object iBlockData) {
-        this.data = IBlockDataHandle.createHandle(iBlockData);
+        this.data = BlockStateHandle.createHandle(iBlockData);
         this.block = this.data.getBlock();
         this.refreshBlock();
     }
@@ -369,19 +369,19 @@ class BlockDataImpl extends BlockData {
 
     @Override
     public final int getCombinedId_1_8_8() {
-        if (RegistryBlockIDHandle.T.isAssignableFrom(BlockHandle.REGISTRY_ID)) {
+        if (IdMapperHandle.T.isAssignableFrom(BlockHandle.REGISTRY_ID)) {
             // >= MC 1.10.2
-            return RegistryBlockIDHandle.T.getId.invoke(BlockHandle.REGISTRY_ID, this.data.getRaw());
+            return IdMapperHandle.T.getId.invoke(BlockHandle.REGISTRY_ID, this.data.getRaw());
         } else {
             // <= MC 1.8.8
-            return RegistryIDHandle.T.getId.invoke(BlockHandle.REGISTRY_ID, this.data.getRaw());
+            return CrudeIncrementalIntIdentityHashBiMapHandle.T.getId.invoke(BlockHandle.REGISTRY_ID, this.data.getRaw());
         }
     }
 
     @Override
     public String getBlockName() {
-        Object minecraftKey = RegistryMaterialsHandle.T.getKey.invoke(BlockHandle.getRegistry(), this.getBlockRaw());
-        return MinecraftKeyHandle.T.getName.invoke(minecraftKey);
+        Object minecraftKey = MappedRegistryHandle.T.getKey.invoke(BlockHandle.getRegistry(), this.getBlockRaw());
+        return IdentifierHandle.T.getName.invoke(minecraftKey);
     }
 
     @Override
@@ -408,7 +408,7 @@ class BlockDataImpl extends BlockData {
                     this.block.getRaw(),
                     this.data.getRaw(),
                     HandleConversion.toWorldHandle(world),
-                    BlockPositionHandle.T.constr_x_y_z.raw.newInstance(x, y, z)
+                    BlockPosHandle.T.constr_x_y_z.raw.newInstance(x, y, z)
             );
         }
 
@@ -419,9 +419,9 @@ class BlockDataImpl extends BlockData {
             options = new BlockRenderOptions(this, new HashMap<String, String>(0));
         } else {
             // Serialize all tokens into String key-value pairs
-            Map<IBlockStateHandle, Comparable<?>> states = IBlockDataHandle.T.getStates.invoke(stateData);
+            Map<PropertyHandle, Comparable<?>> states = BlockStateHandle.T.getStates.invoke(stateData);
             Map<String, String> statesStr = new HashMap<String, String>(states.size());
-            for (Map.Entry<IBlockStateHandle, Comparable<?>> state : states.entrySet()) {
+            for (Map.Entry<PropertyHandle, Comparable<?>> state : states.entrySet()) {
                 String key = state.getKey().getKeyToken();
                 String value = state.getKey().getValueToken(state.getValue());
                 statesStr.put(key, value);
@@ -591,13 +591,13 @@ class BlockDataImpl extends BlockData {
     }
 
     @Override
-    public final AxisAlignedBBHandle getBoundingBox(Block block) {
-        return this.data.getBoundingBox(WorldHandle.fromBukkit(block.getWorld()), new IntVector3(block));
+    public final AABBHandle getBoundingBox(Block block) {
+        return this.data.getBoundingBox(LevelHandle.fromBukkit(block.getWorld()), new IntVector3(block));
     }
 
     @Override
-    public AxisAlignedBBHandle getInteractableBox(Block block) {
-        return this.data.getInteractableBox(WorldHandle.fromBukkit(block.getWorld()), new IntVector3(block));
+    public AABBHandle getInteractableBox(Block block) {
+        return this.data.getInteractableBox(LevelHandle.fromBukkit(block.getWorld()), new IntVector3(block));
     }
 
     @Override
@@ -639,20 +639,20 @@ class BlockDataImpl extends BlockData {
 
     @Override
     public BlockData setState(String key, Object value) {
-        IBlockDataHandle updated_data = this.data.set(key, value);
+        BlockStateHandle updated_data = this.data.set(key, value);
         return BlockDataRegistry.fromBlockData(updated_data.getRaw());
     }
 
     @Override
     public BlockData setState(BlockDataStateKey<?> stateKey, Object value) {
-        IBlockDataHandle updated_data = this.data.set(stateKey.getBackingHandle(), value);
+        BlockStateHandle updated_data = this.data.set(stateKey.getBackingHandle(), value);
         return BlockDataRegistry.fromBlockData(updated_data.getRaw());
     }
 
     @Override
     @Deprecated
     public BlockData setState(BlockState<?> stateKey, Object value) {
-        IBlockDataHandle updated_data = this.data.set(stateKey.getBackingHandle(), value);
+        BlockStateHandle updated_data = this.data.set(stateKey.getBackingHandle(), value);
         return BlockDataRegistry.fromBlockData(updated_data.getRaw());
     }
 
@@ -668,14 +668,14 @@ class BlockDataImpl extends BlockData {
 
     @Override
     public Map<BlockDataStateKey<?>, Comparable<?>> getStates() {
-        DuplexConverter<IBlockStateHandle, BlockDataStateKey<?>> keyConverter = new DuplexConverter<IBlockStateHandle, BlockDataStateKey<?>>(IBlockStateHandle.class, BlockDataStateKey.class) {
+        DuplexConverter<PropertyHandle, BlockDataStateKey<?>> keyConverter = new DuplexConverter<PropertyHandle, BlockDataStateKey<?>>(PropertyHandle.class, BlockDataStateKey.class) {
             @Override
-            public BlockDataStateKey<?> convertInput(IBlockStateHandle value) {
+            public BlockDataStateKey<?> convertInput(PropertyHandle value) {
                 return new BlockDataStateKey<Comparable<?>>(value);
             }
 
             @Override
-            public IBlockStateHandle convertOutput(BlockDataStateKey<?> value) {
+            public PropertyHandle convertOutput(BlockDataStateKey<?> value) {
                 return value.getBackingHandle();
             }
         };
@@ -685,7 +685,7 @@ class BlockDataImpl extends BlockData {
 
     @Override
     public BlockDataStateKey<?> getStateKey(String key) {
-        IBlockStateHandle handle = this.data.findState(key);
+        PropertyHandle handle = this.data.findState(key);
         return (handle == null) ? null : new BlockDataStateKey<>(handle);
     }
 
@@ -725,14 +725,14 @@ class BlockDataImpl extends BlockData {
             }
 
             return this.last = LogicUtil.synchronizeCopyOnWrite(this, l -> cache, rawIBlockData, IdentityHashMap::get,
-                    (map, key) -> createUnsynchronized(IBlockDataHandle.createHandle(key)));
+                    (map, key) -> createUnsynchronized(BlockStateHandle.createHandle(key)));
         }
 
-        public synchronized BlockDataConstant create(IBlockDataHandle iblockdataHandle) {
+        public synchronized BlockDataConstant create(BlockStateHandle iblockdataHandle) {
             return createUnsynchronized(iblockdataHandle);
         }
 
-        private BlockDataConstant createUnsynchronized(IBlockDataHandle iblockdataHandle) {
+        private BlockDataConstant createUnsynchronized(BlockStateHandle iblockdataHandle) {
             BlockDataConstant c = new BlockDataImpl.BlockDataConstant(iblockdataHandle);
             cacheWritable.put(iblockdataHandle.getRaw(), c);
             updateVisible();

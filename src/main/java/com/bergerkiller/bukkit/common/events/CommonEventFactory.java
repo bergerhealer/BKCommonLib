@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.events;
 import com.bergerkiller.bukkit.common.collections.SortedIdentityCache;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 
 import org.bukkit.Location;
@@ -32,8 +32,8 @@ public class CommonEventFactory {
         // Keeps a list of all raw entity handles synchronized with EntityHandle wrappers
         this.entityMoveEntities.sync(consumer -> {
             for (World world : WorldUtil.getWorlds()) {
-                Object worldHandle = WorldServerHandle.fromBukkit(world).getRaw();
-                Iterable<Object> worldEntities = (Iterable<Object>) WorldServerHandle.T.getEntities.raw.invoke(worldHandle);
+                Object worldHandle = ServerLevelHandle.fromBukkit(world).getRaw();
+                Iterable<Object> worldEntities = (Iterable<Object>) ServerLevelHandle.T.getEntities.raw.invoke(worldHandle);
                 worldEntities.forEach(consumer);
             }
         });

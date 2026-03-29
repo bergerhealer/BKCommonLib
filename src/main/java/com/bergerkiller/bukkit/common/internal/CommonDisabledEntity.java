@@ -2,9 +2,9 @@ package com.bergerkiller.bukkit.common.internal;
 
 import java.lang.reflect.Method;
 
-import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherObjectHandle;
+import com.bergerkiller.generated.net.minecraft.network.syncher.EntityDataAccessorHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.item.EntityItemHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.item.ItemEntityHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
 import com.bergerkiller.mountiplex.reflection.util.fast.NullInvoker;
@@ -13,7 +13,7 @@ public class CommonDisabledEntity {
     public static final EntityHandle INSTANCE;
 
     static {
-        Object entity = EntityItemHandle.T.newInstanceNull();
+        Object entity = ItemEntityHandle.T.newInstanceNull();
 
         // Since Minecraft 1.14 the Pose datawatcher item is used to refresh the entity size
         // This adds unwanted overhead, so get rid of it
@@ -23,7 +23,7 @@ public class CommonDisabledEntity {
                 protected Invoker<?> getCallback(Method method) {
                     if (method.getParameterCount() == 1) {
                         Class<?> argType = method.getParameters()[0].getType();
-                        if (DataWatcherObjectHandle.T.isAssignableFrom(argType)) {
+                        if (EntityDataAccessorHandle.T.isAssignableFrom(argType)) {
                             return new NullInvoker<Object>();
                         }
                     }

@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.List;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstractHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartRideableHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.AbstractMinecartHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.MinecartHandle;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Minecart;
@@ -23,10 +23,10 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
  */
 public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
 
-    public final DataWatcher.EntityItem<Integer> metaShakingDirection = getDataItem(EntityMinecartAbstractHandle.DATA_SHAKING_DIRECTION);
-    public final DataWatcher.EntityItem<Float>   metaShakingDamage    = getDataItem(EntityMinecartAbstractHandle.DATA_SHAKING_DAMAGE);
-    public final DataWatcher.EntityItem<Integer> metaShakingFactor    = getDataItem(EntityMinecartAbstractHandle.DATA_SHAKING_FACTOR);
-    public final DataWatcher.EntityItem<Integer> metaBlockOffset      = getDataItem(EntityMinecartAbstractHandle.DATA_BLOCK_OFFSET);
+    public final DataWatcher.EntityItem<Integer> metaShakingDirection = getDataItem(AbstractMinecartHandle.DATA_SHAKING_DIRECTION);
+    public final DataWatcher.EntityItem<Float>   metaShakingDamage    = getDataItem(AbstractMinecartHandle.DATA_SHAKING_DAMAGE);
+    public final DataWatcher.EntityItem<Integer> metaShakingFactor    = getDataItem(AbstractMinecartHandle.DATA_SHAKING_FACTOR);
+    public final DataWatcher.EntityItem<Integer> metaBlockOffset      = getDataItem(AbstractMinecartHandle.DATA_BLOCK_OFFSET);
 
     public CommonMinecart(T base) {
         super(base);
@@ -154,9 +154,9 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
     @SuppressWarnings("deprecation")
     public BlockData getBlock() {
         if (CommonCapabilities.IS_MINECART_BLOCK_COMBINED_KEY) {
-            return getDataWatcher().get(EntityMinecartAbstractHandle.DATA_CUSTOM_DISPLAY_BLOCK);
+            return getDataWatcher().get(AbstractMinecartHandle.DATA_CUSTOM_DISPLAY_BLOCK);
         } else {
-            Integer value = getDataWatcher().get(EntityMinecartAbstractHandle.DATA_BLOCK_TYPE);
+            Integer value = getDataWatcher().get(AbstractMinecartHandle.DATA_BLOCK_TYPE);
             return value == null ? BlockData.AIR : BlockData.fromCombinedId(value);
         }
     }
@@ -180,24 +180,24 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
         DataWatcher meta = getDataWatcher();
         if (CommonCapabilities.IS_MINECART_BLOCK_COMBINED_KEY) {
             if (block.getType() == Material.AIR) {
-                meta.set(EntityMinecartAbstractHandle.DATA_CUSTOM_DISPLAY_BLOCK, null);
+                meta.set(AbstractMinecartHandle.DATA_CUSTOM_DISPLAY_BLOCK, null);
             } else {
-                meta.set(EntityMinecartAbstractHandle.DATA_CUSTOM_DISPLAY_BLOCK, block);
+                meta.set(AbstractMinecartHandle.DATA_CUSTOM_DISPLAY_BLOCK, block);
             }
         } else {
             if (block.getType() == Material.AIR) {
-                meta.set(EntityMinecartAbstractHandle.DATA_BLOCK_TYPE, 0);
-                meta.set(EntityMinecartAbstractHandle.DATA_BLOCK_VISIBLE, false);
+                meta.set(AbstractMinecartHandle.DATA_BLOCK_TYPE, 0);
+                meta.set(AbstractMinecartHandle.DATA_BLOCK_VISIBLE, false);
             } else {
-                meta.set(EntityMinecartAbstractHandle.DATA_BLOCK_TYPE, block.getCombinedId());
-                meta.set(EntityMinecartAbstractHandle.DATA_BLOCK_VISIBLE, true);
+                meta.set(AbstractMinecartHandle.DATA_BLOCK_TYPE, block.getCombinedId());
+                meta.set(AbstractMinecartHandle.DATA_BLOCK_VISIBLE, true);
             }
         }
     }
 
     @Override
     public boolean isVehicle() {
-        return this.handle.isInstanceOf(EntityMinecartRideableHandle.T);
+        return this.handle.isInstanceOf(MinecartHandle.T);
     }
 
     /**
@@ -207,7 +207,7 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
      * @param activated state of the activator rail
      */
     public void activate(Block activatorBlock, boolean activated) {
-        EntityMinecartAbstractHandle.T.activateMinecart.invoke(getHandle(),
+        AbstractMinecartHandle.T.activateMinecart.invoke(getHandle(),
                 activatorBlock.getWorld(), activatorBlock.getX(), activatorBlock.getY(), activatorBlock.getZ(), activated);
     }
 }

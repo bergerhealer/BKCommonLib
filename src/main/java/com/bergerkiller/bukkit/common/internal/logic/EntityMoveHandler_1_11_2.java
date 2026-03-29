@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
 
 /**
  * Logic for MC 1.11.2 - 1.12.2
@@ -13,12 +13,12 @@ import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 class EntityMoveHandler_1_11_2 extends EntityMoveHandler_1_8 {
 
     public static Supplier<EntityMoveHandler> initialize() throws Throwable {
-        WorldHandle.T.getBlockCollisions.forceInitialization();
+        LevelHandle.T.getBlockCollisions.forceInitialization();
         return EntityMoveHandler_1_11_2::new;
     }
 
     @Override
-    protected boolean world_getBlockCubes(EntityHandle entity, AxisAlignedBBHandle movedBounds, List<AxisAlignedBBHandle> cubes) {
-        return WorldHandle.T.getBlockCollisions.invoke(entity.getWorld().getRaw(), entity, movedBounds, false, cubes);
+    protected boolean world_getBlockCubes(EntityHandle entity, AABBHandle movedBounds, List<AABBHandle> cubes) {
+        return LevelHandle.T.getBlockCollisions.invoke(entity.getWorld().getRaw(), entity, movedBounds, false, cubes);
     }
 }

@@ -19,16 +19,16 @@ public abstract class ResourceKeyHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static ResourceKeyHandle create(ResourceKeyHandle category, MinecraftKeyHandle name) {
+    public static ResourceKeyHandle create(ResourceKeyHandle category, IdentifierHandle name) {
         return T.create.invoke(category, name);
     }
 
-    public static ResourceKeyHandle createCategory(MinecraftKeyHandle categoryName) {
+    public static ResourceKeyHandle createCategory(IdentifierHandle categoryName) {
         return T.createCategory.invoke(categoryName);
     }
 
-    public abstract MinecraftKeyHandle getCategory();
-    public abstract MinecraftKeyHandle getName();
+    public abstract IdentifierHandle getCategory();
+    public abstract IdentifierHandle getName();
     /**
      * Stores class members for <b>net.minecraft.resources.ResourceKey</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -37,8 +37,8 @@ public abstract class ResourceKeyHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<ResourceKeyHandle> create = new Template.StaticMethod.Converted<ResourceKeyHandle>();
         public final Template.StaticMethod.Converted<ResourceKeyHandle> createCategory = new Template.StaticMethod.Converted<ResourceKeyHandle>();
 
-        public final Template.Method.Converted<MinecraftKeyHandle> getCategory = new Template.Method.Converted<MinecraftKeyHandle>();
-        public final Template.Method.Converted<MinecraftKeyHandle> getName = new Template.Method.Converted<MinecraftKeyHandle>();
+        public final Template.Method.Converted<IdentifierHandle> getCategory = new Template.Method.Converted<IdentifierHandle>();
+        public final Template.Method.Converted<IdentifierHandle> getName = new Template.Method.Converted<IdentifierHandle>();
 
     }
 

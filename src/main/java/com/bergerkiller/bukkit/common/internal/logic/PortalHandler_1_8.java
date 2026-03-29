@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.internal.logic;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -18,8 +19,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.RunOnceTask;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -53,7 +53,7 @@ class PortalHandler_1_8 extends PortalHandler {
             public void onEntityPortalEnter(EntityPortalEnterEvent event) {
                 if (event.getEntity() instanceof Player) {
                     Player player = (Player) event.getEntity();
-                    if (EntityPlayerHandle.fromBukkit(player).isViewingCredits()) {
+                    if (ServerPlayerHandle.fromBukkit(player).isViewingCredits()) {
                         _ignorePortalEventPlayers.add(player);
                         _ignorePortalEventPlayersCleanup.start();
                     }
@@ -86,7 +86,7 @@ class PortalHandler_1_8 extends PortalHandler {
 
     @Override
     public Block createNetherPortal(Block startBlock, BlockFace orientation, Entity initiator) {
-        int radius = WorldServerHandle.fromBukkit(startBlock.getWorld()).getNetherPortalCreateRadius();
+        int radius = ServerLevelHandle.fromBukkit(startBlock.getWorld()).getNetherPortalCreateRadius();
         if (_pta.createNetherPortal(startBlock, radius)) {
             return _pta.findNetherPortal(startBlock, radius);
         } else {
@@ -118,7 +118,7 @@ class PortalHandler_1_8 extends PortalHandler {
     public void showEndCredits(Player player) {
         _ignorePortalEventPlayers.add(player);
         _ignorePortalEventPlayersCleanup.start();
-        EntityPlayerHandle ep = EntityPlayerHandle.fromBukkit(player);
+        ServerPlayerHandle ep = ServerPlayerHandle.fromBukkit(player);
         _pta.showEndCredits(HandleConversion.toEntityHandle(player), ep.hasSeenCredits());
         ep.setHasSeenCredits(true);
     }

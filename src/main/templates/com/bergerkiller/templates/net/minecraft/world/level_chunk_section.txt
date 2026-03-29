@@ -1,12 +1,12 @@
 package net.minecraft.world.level.chunk;
 
-import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.world.level.block.state.BlockState;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.DataPaletteBlockHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.PalettedContainerHandle;
 
-class ChunkSection {
+class LevelChunkSection {
 #if version >= 1.18
     public boolean isEmpty:hasOnlyAir();
 #elseif version >= 1.14
@@ -16,32 +16,32 @@ class ChunkSection {
 #endif
 
 #if version >= 1.18
-    public (DataPaletteBlockHandle) DataPaletteBlock<IBlockData> getBlockPalette:getStates();
+    public (PalettedContainerHandle) PalettedContainer<BlockState> getBlockPalette:getStates();
 #elseif version >= 1.13
-    public (DataPaletteBlockHandle) DataPaletteBlock<IBlockData> getBlockPalette:getBlocks();
+    public (PalettedContainerHandle) PalettedContainer<BlockState> getBlockPalette:getBlocks();
 #elseif version >= 1.9
-    public (DataPaletteBlockHandle) DataPaletteBlock getBlockPalette:getBlocks();
+    public (PalettedContainerHandle) PalettedContainer getBlockPalette:getBlocks();
 #else
     // For MC 1.8.8 we do some conversion magic to expose the same API
-    // DataPaletteBlock doesn't actually exist, it is emulated by BKCommonLib
-    public (DataPaletteBlockHandle) char[] getBlockPalette:getIdArray();
+    // PalettedContainer doesn't actually exist, it is emulated by BKCommonLib
+    public (PalettedContainerHandle) char[] getBlockPalette:getIdArray();
 #endif
 
 #if version >= 1.18
-    public (BlockData) IBlockData getBlockData:getBlockState(int x, int y, int z);
+    public (BlockData) BlockState getBlockData:getBlockState(int x, int y, int z);
 #else
-    public (BlockData) IBlockData getBlockData:getType(int x, int y, int z);
+    public (BlockData) BlockState getBlockData:getType(int x, int y, int z);
 #endif
 
 #if version >= 1.18
-    public (void) IBlockData setBlockData:setBlockState(int x, int y, int z, (BlockData) IBlockData data);
+    public (void) BlockState setBlockData:setBlockState(int x, int y, int z, (BlockData) BlockState data);
 #elseif version >= 1.14
-    public (void) IBlockData setBlockData:setType(int x, int y, int z, (BlockData) IBlockData data);
+    public (void) BlockState setBlockData:setType(int x, int y, int z, (BlockData) BlockState data);
 #else
-    public void setBlockData:setType(int x, int y, int z, (BlockData) IBlockData data);
+    public void setBlockData:setType(int x, int y, int z, (BlockData) BlockState data);
 #endif
 
-    public void setBlockDataAtBlock(org.bukkit.block.Block block, (BlockData) IBlockData data) {
+    public void setBlockDataAtBlock(org.bukkit.block.Block block, (BlockData) BlockState data) {
 #if version >= 1.18
         instance.setBlockState(block.getX() & 0xf, block.getY() & 0xf, block.getZ() & 0xf, data);
 #else

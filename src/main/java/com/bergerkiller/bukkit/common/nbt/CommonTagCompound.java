@@ -6,11 +6,11 @@ import com.bergerkiller.bukkit.common.config.TempFileOutputStream;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTCompressedStreamToolsHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTTagListHandle;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.CompoundTagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.ListTagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NbtIoHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 
 import java.io.*;
 import java.util.*;
@@ -40,13 +40,13 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
         super(data);
     }
 
-    public CommonTagCompound(NBTTagCompoundHandle handle) {
+    public CommonTagCompound(CompoundTagHandle handle) {
         super(handle);
     }
 
     @Override
-    public NBTTagCompoundHandle getBackingHandle() {
-        return (NBTTagCompoundHandle) handle;
+    public CompoundTagHandle getBackingHandle() {
+        return (CompoundTagHandle) handle;
     }
 
     @Override
@@ -133,11 +133,11 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
             if (x != null && y != null && z != null) {
                 return (T) new IntVector3(x.intValue(), y.intValue(), z.intValue());
             }
-        } else if (type == MinecraftKeyHandle.class) {
-            // == MinecraftKeyHandle ==
-            String v = putGetRemove(op, key, String.class, (value == null) ? null : ((MinecraftKeyHandle) value).toString());
+        } else if (type == IdentifierHandle.class) {
+            // == IdentifierHandle ==
+            String v = putGetRemove(op, key, String.class, (value == null) ? null : ((IdentifierHandle) value).toString());
             if (v != null) {
-                return (T) MinecraftKeyHandle.createNew(v);
+                return (T) IdentifierHandle.createNew(v);
             }
         } else if (type == ChatText.class) {
             // Encoded / decodes NBT data
@@ -153,7 +153,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
             }
         } else if (op == PutGetRemoveOp.GET) {
             // Get other types of values
-            rawNBTResult = NBTTagCompoundHandle.T.get.raw.invoke(getRawHandle(), key);
+            rawNBTResult = CompoundTagHandle.T.get.raw.invoke(getRawHandle(), key);
         } else if (op == PutGetRemoveOp.REMOVE || (op == PutGetRemoveOp.PUT && value == null)) {
             // Remove other types of values
             assertWritable();
@@ -161,8 +161,8 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
         } else if (op == PutGetRemoveOp.PUT) {
             // Put other types of values
             assertWritable();
-            Object putValueNBT = NBTBaseHandle.createRawHandleForData(value);
-            rawNBTResult = NBTTagCompoundHandle.T.put.raw.invoke(getRawHandle(), key, putValueNBT);
+            Object putValueNBT = TagHandle.createRawHandleForData(value);
+            rawNBTResult = CompoundTagHandle.T.put.raw.invoke(getRawHandle(), key, putValueNBT);
         }
 
         // Failure fallback + convert raw NBT tags to their converted values
@@ -170,24 +170,24 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
             return null; // failure or no previous value
         } else if (type == null) {
             return (T) wrapGetDataForHandle(rawNBTResult, readOnly);
-        } else if (NBTBaseHandle.class.isAssignableFrom(type)) {
-            return Conversion.convert(NBTBaseHandle.createHandleForData(rawNBTResult), type, null);
+        } else if (TagHandle.class.isAssignableFrom(type)) {
+            return Conversion.convert(TagHandle.createHandleForData(rawNBTResult), type, null);
         } else if (CommonTag.class.isAssignableFrom(type)) {
-            CommonTag commonTag = NBTBaseHandle.createHandleForData(rawNBTResult).toCommonTag();
+            CommonTag commonTag = TagHandle.createHandleForData(rawNBTResult).toCommonTag();
             commonTag.readOnly = this.readOnly;
             return Conversion.convert(commonTag, type, null);
-        } else if (NBTBaseHandle.T.isAssignableFrom(type)) {
+        } else if (TagHandle.T.isAssignableFrom(type)) {
             return Conversion.convert(rawNBTResult, type, null);
-        } else if (NBTTagCompoundHandle.T.isAssignableFrom(rawNBTResult)) {
+        } else if (CompoundTagHandle.T.isAssignableFrom(rawNBTResult)) {
             return Conversion.convert(
-                    wrapRawData(NBTTagCompoundHandle.T.data.get(rawNBTResult), readOnly),
+                    wrapRawData(CompoundTagHandle.T.data.get(rawNBTResult), readOnly),
                     type, null);
-        } else if (NBTTagListHandle.T.isAssignableFrom(rawNBTResult)) {
+        } else if (ListTagHandle.T.isAssignableFrom(rawNBTResult)) {
             return Conversion.convert(
-                    wrapRawData(NBTTagListHandle.T.data.get(rawNBTResult), readOnly),
+                    wrapRawData(ListTagHandle.T.data.get(rawNBTResult), readOnly),
                     type, null);
         } else {
-            return Conversion.convert(NBTBaseHandle.getDataForHandle(rawNBTResult), type, null);
+            return Conversion.convert(TagHandle.getDataForHandle(rawNBTResult), type, null);
         }
     }
 
@@ -387,8 +387,8 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @param key to read
      * @return value at the key
      */
-    public MinecraftKeyHandle getMinecraftKey(String key) {
-        return getValue(key, MinecraftKeyHandle.class);
+    public IdentifierHandle getMinecraftKey(String key) {
+        return getValue(key, IdentifierHandle.class);
     }
 
     /**
@@ -397,8 +397,8 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @param key to put at
      * @param minecraftKey value to put
      */
-    public void putMinecraftKey(String key, MinecraftKeyHandle minecraftKey) {
-        putValue(key, MinecraftKeyHandle.class, minecraftKey);
+    public void putMinecraftKey(String key, IdentifierHandle minecraftKey) {
+        putValue(key, IdentifierHandle.class, minecraftKey);
     }
 
     /**
@@ -437,8 +437,8 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
             throw new IllegalArgumentException("Can not store elements under null keys");
         }
         Object handle = getRawData().get(key);
-        if (NBTTagCompoundHandle.T.isAssignableFrom(handle)) {
-            CommonTagCompound tag = CommonTagCompound.create(NBTTagCompoundHandle.createHandle(handle));
+        if (CompoundTagHandle.T.isAssignableFrom(handle)) {
+            CommonTagCompound tag = CommonTagCompound.create(CompoundTagHandle.createHandle(handle));
             tag.readOnly = this.readOnly;
             return tag;
         } else {
@@ -476,8 +476,8 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
             throw new IllegalArgumentException("Can not store elements under null keys");
         }
         Object handle = getRawData().get(key);
-        if (NBTTagListHandle.T.isAssignableFrom(handle)) {
-            CommonTagList list = CommonTagList.create(NBTTagListHandle.createHandle(handle));
+        if (ListTagHandle.T.isAssignableFrom(handle)) {
+            CommonTagList list = CommonTagList.create(ListTagHandle.createHandle(handle));
             list.readOnly = this.readOnly;
             return list;
         } else {
@@ -519,7 +519,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
         if (key == null) {
             return null;
         }
-        NBTBaseHandle handle = getBackingHandle().get(key.toString());
+        TagHandle handle = getBackingHandle().get(key.toString());
         return (handle == null) ? null : handle.toCommonTag();
     }
 
@@ -553,18 +553,18 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
     public boolean containsValue(Object value) {
         if (value == null) {
             return false;
-        } else if (value instanceof NBTBaseHandle) {
-            value = ((NBTBaseHandle) value).getRaw();
+        } else if (value instanceof TagHandle) {
+            value = ((TagHandle) value).getRaw();
         } else if (value instanceof CommonTag) {
             value = ((CommonTag) value).getRawHandle();
         }
-        if (NBTBaseHandle.T.isAssignableFrom(value)) {
+        if (TagHandle.T.isAssignableFrom(value)) {
             // Compare NBT elements
             return getHandleValues().contains(value);
         } else {
             // Compare the data of the NBT elements
             for (Object base : getHandleValues()) {
-                if (NBTBaseHandle.getDataForHandle(base).equals(value)) {
+                if (TagHandle.getDataForHandle(base).equals(value)) {
                     return true;
                 }
             }
@@ -609,11 +609,11 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      */
     public void writeToStream(OutputStream out, boolean compressed) throws IOException {
     	if (compressed) {
-    	    NBTCompressedStreamToolsHandle.compressed_writeTagCompound(getBackingHandle(), out);
+    	    NbtIoHandle.compressed_writeTagCompound(getBackingHandle(), out);
     	} else if (out instanceof DataOutput) {
-    	    NBTCompressedStreamToolsHandle.uncompressed_writeTagCompound(getBackingHandle(), (DataOutput) out);
+    	    NbtIoHandle.uncompressed_writeTagCompound(getBackingHandle(), (DataOutput) out);
     	} else {
-            NBTCompressedStreamToolsHandle.uncompressed_writeTagCompound(getBackingHandle(), new DataOutputStream(out));
+            NbtIoHandle.uncompressed_writeTagCompound(getBackingHandle(), new DataOutputStream(out));
     	}
     }
 
@@ -658,13 +658,13 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @throws IOException on failure
      */
     public static CommonTagCompound readFromStream(InputStream in, boolean compressed) throws IOException {
-        NBTTagCompoundHandle handle;
+        CompoundTagHandle handle;
         if (compressed) {
-            handle = NBTCompressedStreamToolsHandle.compressed_readTagCompound(in);
+            handle = NbtIoHandle.compressed_readTagCompound(in);
         } else if (in instanceof DataInput) {
-            handle = NBTCompressedStreamToolsHandle.uncompressed_readTagCompound((DataInput) in);
+            handle = NbtIoHandle.uncompressed_readTagCompound((DataInput) in);
         } else {
-            handle = NBTCompressedStreamToolsHandle.uncompressed_readTagCompound(new DataInputStream(in));
+            handle = NbtIoHandle.uncompressed_readTagCompound(new DataInputStream(in));
         }
         return (handle == null) ? null : new CommonTagCompound(handle);
     }
@@ -730,10 +730,10 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      */
     public static SNBTResult<CommonTagCompound> fromSNBT(String snbtContent) {
         try {
-            NBTTagCompoundHandle result = NBTCompressedStreamToolsHandle.parseTagCompoundFromSNBT(snbtContent);
+            CompoundTagHandle result = NbtIoHandle.parseTagCompoundFromSNBT(snbtContent);
             return SNBTResult.success(result.toCommonTag());
         } catch (Throwable t) {
-            return SNBTResult.error(NBTCompressedStreamToolsHandle.handleSNBTParseError(snbtContent, t));
+            return SNBTResult.error(NbtIoHandle.handleSNBTParseError(snbtContent, t));
         }
     }
 }

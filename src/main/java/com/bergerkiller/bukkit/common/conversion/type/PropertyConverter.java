@@ -9,9 +9,9 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
-import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle;
+import com.bergerkiller.generated.net.minecraft.core.DirectionHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.item.EntityItemHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.item.ItemEntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.mountiplex.conversion.Converter;
@@ -58,8 +58,8 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
         @Override
         public Material convertInput(Object value) {
             // Note: this conversion is a cascade. Order matters!
-            if (EntityItemHandle.T.isAssignableFrom(value)) {
-                value = EntityItemHandle.T.getItemStack.raw.invoke(value);
+            if (ItemEntityHandle.T.isAssignableFrom(value)) {
+                value = ItemEntityHandle.T.getItemStack.raw.invoke(value);
             }
             if (ItemStackHandle.T.isAssignableFrom(value)) {
                 value = ItemStackHandle.T.getItem.invoke(value);
@@ -81,8 +81,8 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
         public Integer convertInput(Object value) {
             if (value instanceof Number) {
                 return ((Number) value).intValue();
-            } else if (EnumDirectionHandle.T.isAssignableFrom(value)) {
-                EnumDirectionHandle face = EnumDirectionHandle.createHandle(value);
+            } else if (DirectionHandle.T.isAssignableFrom(value)) {
+                DirectionHandle face = DirectionHandle.createHandle(value);
                 for (int i = 0; i < PaintingFacingHelper.faces.length; i++) {
                     if (PaintingFacingHelper.faces[i].equals(face)) {
                         return i;
@@ -168,7 +168,7 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
     }
 
     private static class PaintingFacingHelper {
-        private static final EnumDirectionHandle[] faces = {EnumDirectionHandle.DOWN, EnumDirectionHandle.UP, EnumDirectionHandle.NORTH, EnumDirectionHandle.SOUTH, EnumDirectionHandle.WEST, EnumDirectionHandle.EAST};
+        private static final DirectionHandle[] faces = {DirectionHandle.DOWN, DirectionHandle.UP, DirectionHandle.NORTH, DirectionHandle.SOUTH, DirectionHandle.WEST, DirectionHandle.EAST};
     }
 
     // Material -> EntityType for Minecarts

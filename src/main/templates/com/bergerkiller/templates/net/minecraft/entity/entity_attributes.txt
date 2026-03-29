@@ -1,24 +1,24 @@
 package net.minecraft.world.entity.ai.attributes;
 
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.nbt.DynamicOpsNBT;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.ListTag;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeBaseHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeMapBaseHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeMapHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeInstanceHandle;
 
-class AttributeModifiable {
+class AttributeInstance {
 #if version >= 1.20.5
-    public (Holder<AttributeBaseHandle>) net.minecraft.core.Holder<AttributeBase> getAttribute();
+    public (Holder<AttributeHandle>) net.minecraft.core.Holder<Attribute> getAttribute();
 #elseif version >= 1.16
-    public (Holder<AttributeBaseHandle>) AttributeBase getAttribute();
+    public (Holder<AttributeHandle>) Attribute getAttribute();
 #else
-    public (Holder<AttributeBaseHandle>) IAttribute getAttribute();
+    public (Holder<AttributeHandle>) IAttribute getAttribute();
 #endif
 
 #if forge_nms_obfuscated
@@ -60,83 +60,83 @@ class AttributeModifiable {
 #endif
 }
 
-class AttributeMapBase {
+class AttributeMap {
 #if version >= 1.16
-    public (Collection<AttributeModifiableHandle>) Collection<AttributeModifiable> getAllAttributes() {
+    public (Collection<AttributeInstanceHandle>) Collection<AttributeInstance> getAllAttributes() {
   #if version >= 1.20.5
-        #require AttributeMapBase private final java.util.Map<net.minecraft.core.Holder<AttributeBase>, AttributeModifiable> attributesMap:attributes;
+        #require AttributeMap private final java.util.Map<net.minecraft.core.Holder<Attribute>, AttributeInstance> attributesMap:attributes;
   #elseif version >= 1.17
-        #require AttributeMapBase private final java.util.Map<AttributeBase, AttributeModifiable> attributesMap:attributes;
+        #require AttributeMap private final java.util.Map<Attribute, AttributeInstance> attributesMap:attributes;
   #else
-        #require AttributeMapBase private final java.util.Map<AttributeBase, AttributeModifiable> attributesMap:b;
+        #require AttributeMap private final java.util.Map<Attribute, AttributeInstance> attributesMap:b;
   #endif
         java.util.Map attributes = instance#attributesMap;
         return attributes.values();
     }
 #else
-    public (Collection<AttributeModifiableHandle>) Collection<AttributeModifiable> getAllAttributes() {
+    public (Collection<AttributeInstanceHandle>) Collection<AttributeInstance> getAllAttributes() {
         return instance.a();
     }
 #endif
 
 #if version >= 1.21
-    public (Set<AttributeModifiableHandle>) Set<AttributeModifiable> getChangedSynchronizedAttributes:getAttributesToSync();
-    public (Collection<AttributeModifiableHandle>) Collection<AttributeModifiable> getSynchronizedAttributes:getSyncableAttributes();
+    public (Set<AttributeInstanceHandle>) Set<AttributeInstance> getChangedSynchronizedAttributes:getAttributesToSync();
+    public (Collection<AttributeInstanceHandle>) Collection<AttributeInstance> getSynchronizedAttributes:getSyncableAttributes();
 #elseif version >= 1.18
-    public (Set<AttributeModifiableHandle>) Set<AttributeModifiable> getChangedSynchronizedAttributes:getDirtyAttributes();
-    public (Collection<AttributeModifiableHandle>) Collection<AttributeModifiable> getSynchronizedAttributes:getSyncableAttributes();
+    public (Set<AttributeInstanceHandle>) Set<AttributeInstance> getChangedSynchronizedAttributes:getDirtyAttributes();
+    public (Collection<AttributeInstanceHandle>) Collection<AttributeInstance> getSynchronizedAttributes:getSyncableAttributes();
 #elseif version >= 1.16
-    public (Set<AttributeModifiableHandle>) Set<AttributeModifiable> getChangedSynchronizedAttributes:getAttributes();
-    public (Collection<AttributeModifiableHandle>) Collection<AttributeModifiable> getSynchronizedAttributes:b();
+    public (Set<AttributeInstanceHandle>) Set<AttributeInstance> getChangedSynchronizedAttributes:getAttributes();
+    public (Collection<AttributeInstanceHandle>) Collection<AttributeInstance> getSynchronizedAttributes:b();
 #else
-    public (Set<AttributeModifiableHandle>) Set<AttributeModifiable> getChangedSynchronizedAttributes:getAttributes() {
+    public (Set<AttributeInstanceHandle>) Set<AttributeInstance> getChangedSynchronizedAttributes:getAttributes() {
         return ((AttributeMapServer) instance).getAttributes();
     }
 
-    public (Collection<AttributeModifiableHandle>) Collection<AttributeModifiable> getSynchronizedAttributes() {
+    public (Collection<AttributeInstanceHandle>) Collection<AttributeInstance> getSynchronizedAttributes() {
         return ((AttributeMapServer) instance).c();
     }
 #endif
 
 #if version >= 1.21.6
-    public void loadFromNBT((CommonTagList) NBTTagList nbttaglist) {
-        net.minecraft.core.HolderLookup$a holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
-        RegistryOps registryops = holderLookup.createSerializationContext(DynamicOpsNBT.INSTANCE);
+    public void loadFromNBT((CommonTagList) ListTag nbttaglist) {
+        net.minecraft.core.HolderLookup$Provider holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
+        RegistryOps registryops = holderLookup.createSerializationContext(NbtOps.INSTANCE);
 
-        java.util.List packed = (java.util.List) AttributeModifiable$a.LIST_CODEC.parse(registryops, nbttaglist)
-            .resultOrPartial(NBTBaseHandle.createPartialErrorLogger(nbttaglist))
+        java.util.List packed = (java.util.List) AttributeInstance$a.LIST_CODEC.parse(registryops, nbttaglist)
+            .resultOrPartial(TagHandle.createPartialErrorLogger(nbttaglist))
             .orElse(null);
 
         if (packed != null) {
             instance.apply(packed);
         }
     }
-    public (CommonTagList) NBTTagList saveToNBT() {
-        net.minecraft.core.HolderLookup$a holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
-        RegistryOps registryops = holderLookup.createSerializationContext(DynamicOpsNBT.INSTANCE);
+    public (CommonTagList) ListTag saveToNBT() {
+        net.minecraft.core.HolderLookup$Provider holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
+        RegistryOps registryops = holderLookup.createSerializationContext(NbtOps.INSTANCE);
 
         java.util.List packed = instance.pack();
 
-        return (NBTTagList) AttributeModifiable$a.LIST_CODEC.encode(packed, registryops, new NBTTagList());
+        return (ListTag) AttributeInstance$a.LIST_CODEC.encode(packed, registryops, new ListTag());
     }
 #elseif version >= 1.18
-    public void loadFromNBT:load((CommonTagList) NBTTagList nbttaglist);
-    public (CommonTagList) NBTTagList saveToNBT:save();
+    public void loadFromNBT:load((CommonTagList) ListTag nbttaglist);
+    public (CommonTagList) ListTag saveToNBT:save();
 #elseif version >= 1.16
-    public void loadFromNBT:a((CommonTagList) NBTTagList nbttaglist);
-    public (CommonTagList) NBTTagList saveToNBT:c();
+    public void loadFromNBT:a((CommonTagList) ListTag nbttaglist);
+    public (CommonTagList) ListTag saveToNBT:c();
 #else
-    public void loadFromNBT((CommonTagList) NBTTagList nbttaglist) {
-        GenericAttributes.a(instance, nbttaglist);
+    public void loadFromNBT((CommonTagList) ListTag nbttaglist) {
+        Attributes.a(instance, nbttaglist);
     }
-    public (CommonTagList) NBTTagList saveToNBT() {
-        return GenericAttributes.a(instance);
+    public (CommonTagList) ListTag saveToNBT() {
+        return Attributes.a(instance);
     }
 #endif
 }
 
-// Note: on very old versions it also uses IAttribute, but thats always AttributeBase anyway
-class AttributeBase {
+// Note: on very old versions it also uses IAttribute, but thats always Attribute anyway
+class Attribute {
 #if version >= 1.18
     public String getDescriptionId();
 #else
@@ -144,20 +144,20 @@ class AttributeBase {
 #endif
 }
 
-class GenericAttributes {
+class Attributes {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
 #if version >= 1.20.5
-    public static final (Holder<AttributeBaseHandle>) net.minecraft.core.Holder<AttributeBase> FOLLOW_RANGE;
-    public static final (Holder<AttributeBaseHandle>) net.minecraft.core.Holder<AttributeBase> MOVEMENT_SPEED;
+    public static final (Holder<AttributeHandle>) net.minecraft.core.Holder<Attribute> FOLLOW_RANGE;
+    public static final (Holder<AttributeHandle>) net.minecraft.core.Holder<Attribute> MOVEMENT_SPEED;
 #elseif version >= 1.16
-    public static final (Holder<AttributeBaseHandle>) AttributeBase FOLLOW_RANGE;
-    public static final (Holder<AttributeBaseHandle>) AttributeBase MOVEMENT_SPEED;
+    public static final (Holder<AttributeHandle>) Attribute FOLLOW_RANGE;
+    public static final (Holder<AttributeHandle>) Attribute MOVEMENT_SPEED;
 #elseif version >= 1.8.4
-    public static final (Holder<AttributeBaseHandle>) IAttribute FOLLOW_RANGE;
-    public static final (Holder<AttributeBaseHandle>) IAttribute MOVEMENT_SPEED;
+    public static final (Holder<AttributeHandle>) IAttribute FOLLOW_RANGE;
+    public static final (Holder<AttributeHandle>) IAttribute MOVEMENT_SPEED;
 #else
-    public static final (Holder<AttributeBaseHandle>) IAttribute FOLLOW_RANGE:b;
-    public static final (Holder<AttributeBaseHandle>) IAttribute MOVEMENT_SPEED:d;
+    public static final (Holder<AttributeHandle>) IAttribute FOLLOW_RANGE:b;
+    public static final (Holder<AttributeHandle>) IAttribute MOVEMENT_SPEED:d;
 #endif
 }

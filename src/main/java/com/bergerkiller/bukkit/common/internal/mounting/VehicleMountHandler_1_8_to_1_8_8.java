@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAttachEntityHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacketHandle;
 
 /**
  * Used on MC 1.8.8 and before, when only a single passenger per vehicle was possible.
@@ -27,7 +27,7 @@ public class VehicleMountHandler_1_8_to_1_8_8 extends VehicleMountHandler_BaseIm
      * 
      * @param packet
      */
-    private void processAttachEntityPacket(PacketPlayOutAttachEntityHandle packet) {
+    private void processAttachEntityPacket(ClientboundSetEntityLinkPacketHandle packet) {
         SpawnedEntity passenger = getSpawnedEntity(packet.getPassengerId(), false);
         SpawnedEntity vehicle = getSpawnedEntity(packet.getVehicleId(), false);
         if (passenger != null && passenger.vehicleMount != null) {
@@ -75,7 +75,7 @@ public class VehicleMountHandler_1_8_to_1_8_8 extends VehicleMountHandler_BaseIm
     @Override
     protected void onPacketSend(CommonPacket packet) {
         if (packet.getType() == PacketType.OUT_ENTITY_ATTACH) {
-            PacketPlayOutAttachEntityHandle packet_ae = PacketPlayOutAttachEntityHandle.createHandle(packet.getHandle());
+            ClientboundSetEntityLinkPacketHandle packet_ae = ClientboundSetEntityLinkPacketHandle.createHandle(packet.getHandle());
             if (!packet_ae.isLeash()) {
                 processAttachEntityPacket(packet_ae);
             }
@@ -83,7 +83,7 @@ public class VehicleMountHandler_1_8_to_1_8_8 extends VehicleMountHandler_BaseIm
     }
 
     private final void sendAttach(SpawnedEntity vehicle, SpawnedEntity passenger) {
-        queuePacket(PacketPlayOutAttachEntityHandle.createNewMount(
+        queuePacket(ClientboundSetEntityLinkPacketHandle.createNewMount(
                 passenger.id,
                 (vehicle == null) ? -1 : vehicle.id));
     }

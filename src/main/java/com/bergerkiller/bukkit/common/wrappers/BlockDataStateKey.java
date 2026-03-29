@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 import java.util.Collection;
 
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.IBlockStateHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.PropertyHandle;
 
 /**
  * A single state of a block's BlockData. Not to be confused with Bukkit's BlockState,
@@ -12,7 +12,7 @@ import com.bergerkiller.generated.net.minecraft.world.level.block.state.properti
  */
 public class BlockDataStateKey<T extends Comparable<?>> extends BlockState<T> {
 
-    public BlockDataStateKey(IBlockStateHandle handle) {
+    public BlockDataStateKey(PropertyHandle handle) {
         setHandle(handle);
     }
 

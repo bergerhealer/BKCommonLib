@@ -3,20 +3,20 @@ package net.minecraft.network.protocol.game;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.PositionMoveRotation;
-import net.minecraft.world.phys.Vec3D;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior.LerpStep;
 
 import com.bergerkiller.bukkit.common.internal.logic.ProtocolMath;
 
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityTeleportHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotationHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityVelocityHandle
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutVehicleMoveHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInVehicleMoveHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundTeleportEntityPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMoveEntityPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMoveEntityPacketHandle.PosHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMoveEntityPacketHandle.PosRotHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMoveEntityPacketHandle.RotHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundRotateHeadPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacketHandle
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMoveVehiclePacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundMoveVehiclePacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMoveMinecartPacketHandle;
 
 import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.NewMinecartBehaviorHandle.LerpStepHandle;
@@ -24,7 +24,7 @@ import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.Ne
 import com.bergerkiller.bukkit.common.wrappers.RelativeFlags;
 
 // Only >= MC 1.9
-optional class PacketPlayInVehicleMove extends Packet {
+optional class ServerboundMoveVehiclePacket extends Packet {
 #if version >= 1.21.4
     public double getPosX() { return instance.position().x; }
     public double getPosY() { return instance.position().y; }
@@ -33,22 +33,22 @@ optional class PacketPlayInVehicleMove extends Packet {
     public float getPitch:xRot();
     public boolean isOnGround:onGround();
 
-    public static (PacketPlayInVehicleMoveHandle) PacketPlayInVehicleMove createNew(double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
-        return new PacketPlayInVehicleMove(new Vec3D(posX, posY, posZ), yaw, pitch, onGround);
+    public static (ServerboundMoveVehiclePacketHandle) ServerboundMoveVehiclePacket createNew(double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
+        return new ServerboundMoveVehiclePacket(new Vec3(posX, posY, posZ), yaw, pitch, onGround);
     }
 #else
   #if version >= 1.17
-    #require PacketPlayInVehicleMove private double posX:x;
-    #require PacketPlayInVehicleMove private double posY:y;
-    #require PacketPlayInVehicleMove private double posZ:z;
-    #require PacketPlayInVehicleMove private float yaw:yRot;
-    #require PacketPlayInVehicleMove private float pitch:xRot;
+    #require ServerboundMoveVehiclePacket private double posX:x;
+    #require ServerboundMoveVehiclePacket private double posY:y;
+    #require ServerboundMoveVehiclePacket private double posZ:z;
+    #require ServerboundMoveVehiclePacket private float yaw:yRot;
+    #require ServerboundMoveVehiclePacket private float pitch:xRot;
   #elseif version >= 1.9
-    #require PacketPlayInVehicleMove private double posX:a;
-    #require PacketPlayInVehicleMove private double posY:b;
-    #require PacketPlayInVehicleMove private double posZ:c;
-    #require PacketPlayInVehicleMove private float yaw:d;
-    #require PacketPlayInVehicleMove private float pitch:e;
+    #require ServerboundMoveVehiclePacket private double posX:a;
+    #require ServerboundMoveVehiclePacket private double posY:b;
+    #require ServerboundMoveVehiclePacket private double posZ:c;
+    #require ServerboundMoveVehiclePacket private float yaw:d;
+    #require ServerboundMoveVehiclePacket private float pitch:e;
   #endif
 
     public double getPosX() { return instance#posX; }
@@ -58,12 +58,12 @@ optional class PacketPlayInVehicleMove extends Packet {
     public float getPitch() { return instance#pitch; }
     public boolean isOnGround() { return false; /* not supported */ }
 
-    public static (PacketPlayInVehicleMoveHandle) PacketPlayInVehicleMove createNew(double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
+    public static (ServerboundMoveVehiclePacketHandle) ServerboundMoveVehiclePacket createNew(double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
   #if version >= 1.17
-        #require PacketPlayInVehicleMove private PacketPlayInVehicleMove createVehicleMovePacket:<init>(net.minecraft.network.PacketDataSerializer packetdataserializer);
-        PacketPlayInVehicleMove packet = #createVehicleMovePacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+        #require ServerboundMoveVehiclePacket private ServerboundMoveVehiclePacket createVehicleMovePacket:<init>(net.minecraft.network.FriendlyByteBuf packetdataserializer);
+        ServerboundMoveVehiclePacket packet = #createVehicleMovePacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
   #else
-        PacketPlayInVehicleMove packet = new PacketPlayInVehicleMove();
+        ServerboundMoveVehiclePacket packet = new ServerboundMoveVehiclePacket();
   #endif
         packet#posX = posX;
         packet#posY = posY;
@@ -77,7 +77,7 @@ optional class PacketPlayInVehicleMove extends Packet {
 }
 
 // Only >= MC 1.9
-optional class PacketPlayOutVehicleMove extends Packet {
+optional class ClientboundMoveVehiclePacket extends Packet {
 #if version >= 1.21.4
     public double getPosX() { return instance.position().x; }
     public double getPosY() { return instance.position().y; }
@@ -85,22 +85,22 @@ optional class PacketPlayOutVehicleMove extends Packet {
     public float getYaw:yRot();
     public float getPitch:xRot();
 
-    public static (PacketPlayOutVehicleMoveHandle) PacketPlayOutVehicleMove createNew(double posX, double posY, double posZ, float yaw, float pitch) {
-        return new PacketPlayOutVehicleMove(new Vec3D(posX, posY, posZ), yaw, pitch);
+    public static (ClientboundMoveVehiclePacketHandle) ClientboundMoveVehiclePacket createNew(double posX, double posY, double posZ, float yaw, float pitch) {
+        return new ClientboundMoveVehiclePacket(new Vec3(posX, posY, posZ), yaw, pitch);
     }
 #else
   #if version >= 1.17
-    #require PacketPlayOutVehicleMove private double posX:x;
-    #require PacketPlayOutVehicleMove private double posY:y;
-    #require PacketPlayOutVehicleMove private double posZ:z;
-    #require PacketPlayOutVehicleMove private float yaw:yRot;
-    #require PacketPlayOutVehicleMove private float pitch:xRot;
+    #require ClientboundMoveVehiclePacket private double posX:x;
+    #require ClientboundMoveVehiclePacket private double posY:y;
+    #require ClientboundMoveVehiclePacket private double posZ:z;
+    #require ClientboundMoveVehiclePacket private float yaw:yRot;
+    #require ClientboundMoveVehiclePacket private float pitch:xRot;
   #elseif version >= 1.9
-    #require PacketPlayOutVehicleMove private double posX:a;
-    #require PacketPlayOutVehicleMove private double posY:b;
-    #require PacketPlayOutVehicleMove private double posZ:c;
-    #require PacketPlayOutVehicleMove private float yaw:d;
-    #require PacketPlayOutVehicleMove private float pitch:e;
+    #require ClientboundMoveVehiclePacket private double posX:a;
+    #require ClientboundMoveVehiclePacket private double posY:b;
+    #require ClientboundMoveVehiclePacket private double posZ:c;
+    #require ClientboundMoveVehiclePacket private float yaw:d;
+    #require ClientboundMoveVehiclePacket private float pitch:e;
   #endif
 
     public double getPosX() { return instance#posX; }
@@ -109,12 +109,12 @@ optional class PacketPlayOutVehicleMove extends Packet {
     public float getYaw() { return instance#yaw; }
     public float getPitch() { return instance#pitch; }
 
-    public static (PacketPlayOutVehicleMoveHandle) PacketPlayOutVehicleMove createNew(double posX, double posY, double posZ, float yaw, float pitch) {
+    public static (ClientboundMoveVehiclePacketHandle) ClientboundMoveVehiclePacket createNew(double posX, double posY, double posZ, float yaw, float pitch) {
   #if version >= 1.17
-        #require PacketPlayOutVehicleMove private PacketPlayOutVehicleMove createVehicleMovePacket:<init>(net.minecraft.network.PacketDataSerializer packetdataserializer);
-        PacketPlayOutVehicleMove packet = #createVehicleMovePacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+        #require ClientboundMoveVehiclePacket private ClientboundMoveVehiclePacket createVehicleMovePacket:<init>(net.minecraft.network.FriendlyByteBuf packetdataserializer);
+        ClientboundMoveVehiclePacket packet = #createVehicleMovePacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
   #else
-        PacketPlayOutVehicleMove packet = new PacketPlayOutVehicleMove();
+        ClientboundMoveVehiclePacket packet = new ClientboundMoveVehiclePacket();
   #endif
         packet#posX = posX;
         packet#posY = posY;
@@ -126,7 +126,7 @@ optional class PacketPlayOutVehicleMove extends Packet {
 #endif
 }
 
-class PacketPlayOutEntityTeleport extends Packet {
+class ClientboundTeleportEntityPacket extends Packet {
 #if version >= 1.20.5
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 #endif
@@ -135,27 +135,27 @@ class PacketPlayOutEntityTeleport extends Packet {
 #if version >= 1.21.2
     // Record class, no fields need to be set using reflection
 #elseif version >= 1.17
-    #require PacketPlayOutEntityTeleport private final int entityId:id;
-    #require PacketPlayOutEntityTeleport private final double posX:x;
-    #require PacketPlayOutEntityTeleport private final double posY:y;
-    #require PacketPlayOutEntityTeleport private final double posZ:z;
-    #require PacketPlayOutEntityTeleport private final byte encodedYaw:yRot;
-    #require PacketPlayOutEntityTeleport private final byte encodedPitch:xRot;
-    #require PacketPlayOutEntityTeleport private final boolean onGround;
+    #require ClientboundTeleportEntityPacket private final int entityId:id;
+    #require ClientboundTeleportEntityPacket private final double posX:x;
+    #require ClientboundTeleportEntityPacket private final double posY:y;
+    #require ClientboundTeleportEntityPacket private final double posZ:z;
+    #require ClientboundTeleportEntityPacket private final byte encodedYaw:yRot;
+    #require ClientboundTeleportEntityPacket private final byte encodedPitch:xRot;
+    #require ClientboundTeleportEntityPacket private final boolean onGround;
 #else
-    #require PacketPlayOutEntityTeleport private int entityId:a;
+    #require ClientboundTeleportEntityPacket private int entityId:a;
   #if version >= 1.9
-    #require PacketPlayOutEntityTeleport private double posX:b;
-    #require PacketPlayOutEntityTeleport private double posY:c;
-    #require PacketPlayOutEntityTeleport private double posZ:d;
+    #require ClientboundTeleportEntityPacket private double posX:b;
+    #require ClientboundTeleportEntityPacket private double posY:c;
+    #require ClientboundTeleportEntityPacket private double posZ:d;
   #else
-    #require PacketPlayOutEntityTeleport private int encodedPosX:b;
-    #require PacketPlayOutEntityTeleport private int encodedPosY:c;
-    #require PacketPlayOutEntityTeleport private int encodedPosZ:d;
+    #require ClientboundTeleportEntityPacket private int encodedPosX:b;
+    #require ClientboundTeleportEntityPacket private int encodedPosY:c;
+    #require ClientboundTeleportEntityPacket private int encodedPosZ:d;
   #endif
-    #require PacketPlayOutEntityTeleport private byte encodedYaw:e;
-    #require PacketPlayOutEntityTeleport private byte encodedPitch:f;
-    #require PacketPlayOutEntityTeleport private boolean onGround:g;
+    #require ClientboundTeleportEntityPacket private byte encodedYaw:e;
+    #require ClientboundTeleportEntityPacket private byte encodedPitch:f;
+    #require ClientboundTeleportEntityPacket private boolean onGround:g;
 #endif
 
 #if version >= 1.21.2
@@ -279,30 +279,30 @@ class PacketPlayOutEntityTeleport extends Packet {
     public int getEncodedPitch() { return (int) instance#encodedPitch & 0xFF; }
 #endif
 
-    public static (PacketPlayOutEntityTeleportHandle) PacketPlayOutEntityTeleport createNewForEntity((org.bukkit.entity.Entity) Entity entity) {
+    public static (ClientboundTeleportEntityPacketHandle) ClientboundTeleportEntityPacket createNewForEntity((org.bukkit.entity.Entity) Entity entity) {
 #if version >= 1.21.2
         PositionMoveRotation values = PositionMoveRotation.of(entity);
-        return new PacketPlayOutEntityTeleport(entity.getId(), values, entity.onGround());
+        return new ClientboundTeleportEntityPacket(entity.getId(), values, entity.onGround());
 #else
-        return new PacketPlayOutEntityTeleport(entity);
+        return new ClientboundTeleportEntityPacket(entity);
 #endif
     }
 
-    public static (PacketPlayOutEntityTeleportHandle) PacketPlayOutEntityTeleport createNew(int entityId, double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
+    public static (ClientboundTeleportEntityPacketHandle) ClientboundTeleportEntityPacket createNew(int entityId, double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
 #if version >= 1.21.2
-        PositionMoveRotation values = new PositionMoveRotation(new Vec3D(posX, posY, posZ), new Vec3D(0.0, 0.0, 0.0), yaw, pitch);
-        return new PacketPlayOutEntityTeleport(entityId, values, onGround);
+        PositionMoveRotation values = new PositionMoveRotation(new Vec3(posX, posY, posZ), new Vec3(0.0, 0.0, 0.0), yaw, pitch);
+        return new ClientboundTeleportEntityPacket(entityId, values, onGround);
 
 #elseif version >= 1.9
         // Create a new packet and use reflection to set the fields
         // Unfortunately, no nice constructor :(
   #if version >= 1.20.5
-        #require net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport private PacketPlayOutEntityTeleport createTeleportPacket:<init>(net.minecraft.network.PacketDataSerializer serializer);
-        PacketPlayOutEntityTeleport packet = #createTeleportPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+        #require net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket private ClientboundTeleportEntityPacket createTeleportPacket:<init>(net.minecraft.network.FriendlyByteBuf serializer);
+        ClientboundTeleportEntityPacket packet = #createTeleportPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
   #elseif version >= 1.17
-        PacketPlayOutEntityTeleport packet = new PacketPlayOutEntityTeleport(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+        ClientboundTeleportEntityPacket packet = new ClientboundTeleportEntityPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
   #else
-        PacketPlayOutEntityTeleport packet = new PacketPlayOutEntityTeleport();
+        ClientboundTeleportEntityPacket packet = new ClientboundTeleportEntityPacket();
   #endif
 
         byte encodedYaw = (byte) ProtocolMath.serializeRotation(yaw);
@@ -323,7 +323,7 @@ class PacketPlayOutEntityTeleport extends Packet {
         int encodedPosZ = ProtocolMath.serializePosition_1_8_8(posZ);
         byte encodedYaw = (byte) ProtocolMath.serializeRotation(yaw);
         byte encodedPitch = (byte) ProtocolMath.serializeRotation(pitch);
-        return new PacketPlayOutEntityTeleport(entityId, encodedPosX, encodedPosY, encodedPosZ, encodedYaw, encodedPitch, onGround);
+        return new ClientboundTeleportEntityPacket(entityId, encodedPosX, encodedPosY, encodedPosZ, encodedYaw, encodedPitch, onGround);
 #endif
     }
 
@@ -366,15 +366,15 @@ class PacketPlayOutEntityTeleport extends Packet {
         }
         public Builder onGround(boolean onGround) { this.onGround = onGround; return this; }
 
-        public PacketPlayOutEntityTeleportHandle create() {
-            return PacketPlayOutEntityTeleportHandle.createNew(entityId, posX, posY, posZ, yaw, pitch, onGround);
+        public ClientboundTeleportEntityPacketHandle create() {
+            return ClientboundTeleportEntityPacketHandle.createNew(entityId, posX, posY, posZ, yaw, pitch, onGround);
         }
     }
     </code>
 }
 
 // Only >= MC 1.9
-optional class PacketPlayInBoatMove {
+optional class ServerboundPaddleBoatPacket {
 #if version >= 1.17
     private boolean leftPaddle:left;
     private boolean rightPaddle:right;
@@ -384,29 +384,29 @@ optional class PacketPlayInBoatMove {
 #endif
 }
 
-class PacketPlayOutEntityVelocity extends Packet {
+class ClientboundSetEntityMotionPacket extends Packet {
 #if version >= 1.17
     private int entityId:id;
 #else
     private int entityId:a;
 #endif
 
-    public static (PacketPlayOutEntityVelocityHandle) PacketPlayOutEntityVelocity createNew(int entityId, double motX, double motY, double motZ) {
+    public static (ClientboundSetEntityMotionPacketHandle) ClientboundSetEntityMotionPacket createNew(int entityId, double motX, double motY, double motZ) {
 #if version >= 1.14
-        return new PacketPlayOutEntityVelocity(entityId, new Vec3D(motX, motY, motZ));
+        return new ClientboundSetEntityMotionPacket(entityId, new Vec3(motX, motY, motZ));
 #else
-        return new PacketPlayOutEntityVelocity(entityId, motX, motY, motZ);
+        return new ClientboundSetEntityMotionPacket(entityId, motX, motY, motZ);
 #endif
     }
 
-    public (PacketPlayOutEntityVelocityHandle) PacketPlayOutEntityVelocity((org.bukkit.entity.Entity) Entity entity);
+    public (ClientboundSetEntityMotionPacketHandle) ClientboundSetEntityMotionPacket((org.bukkit.entity.Entity) Entity entity);
 
 #if version >= 1.21.9
-    #require PacketPlayOutEntityVelocity private final Vec3D movement;
+    #require ClientboundSetEntityMotionPacket private final Vec3 movement;
 
-    public (org.bukkit.util.Vector) Vec3D getMotVector:getMovement();
+    public (org.bukkit.util.Vector) Vec3 getMotVector:getMovement();
 
-    public void setMotVector((org.bukkit.util.Vector) Vec3D movement) {
+    public void setMotVector((org.bukkit.util.Vector) Vec3 movement) {
         instance#movement = movement;
     }
 
@@ -415,41 +415,41 @@ class PacketPlayOutEntityVelocity extends Packet {
     public double getMotZ() { return instance.getMovement().z; }
 
     public void setMotX(double x) {
-        Vec3D movement = instance.getMovement();
-        Vec3D updated = new Vec3D(x, movement.y, movement.z);
+        Vec3 movement = instance.getMovement();
+        Vec3 updated = new Vec3(x, movement.y, movement.z);
         instance#movement = updated;
     }
     public void setMotY(double y) {
-        Vec3D movement = instance.getMovement();
-        Vec3D updated = new Vec3D(movement.x, y, movement.z);
+        Vec3 movement = instance.getMovement();
+        Vec3 updated = new Vec3(movement.x, y, movement.z);
         instance#movement = updated;
     }
     public void setMotZ(double z) {
-        Vec3D movement = instance.getMovement();
-        Vec3D updated = new Vec3D(movement.x, movement.y, z);
+        Vec3 movement = instance.getMovement();
+        Vec3 updated = new Vec3(movement.x, movement.y, z);
         instance#movement = updated;
     }
 #else
   #if version >= 1.17
-    #require PacketPlayOutEntityVelocity private int motX_raw:xa;
-    #require PacketPlayOutEntityVelocity private int motY_raw:ya;
-    #require PacketPlayOutEntityVelocity private int motZ_raw:za;
+    #require ClientboundSetEntityMotionPacket private int motX_raw:xa;
+    #require ClientboundSetEntityMotionPacket private int motY_raw:ya;
+    #require ClientboundSetEntityMotionPacket private int motZ_raw:za;
   #else
-    #require PacketPlayOutEntityVelocity private int motX_raw:b;
-    #require PacketPlayOutEntityVelocity private int motY_raw:c;
-    #require PacketPlayOutEntityVelocity private int motZ_raw:d;
+    #require ClientboundSetEntityMotionPacket private int motX_raw:b;
+    #require ClientboundSetEntityMotionPacket private int motY_raw:c;
+    #require ClientboundSetEntityMotionPacket private int motZ_raw:d;
   #endif
 
-    public (org.bukkit.util.Vector) Vec3D getMotVector:getMovement() {
+    public (org.bukkit.util.Vector) Vec3 getMotVector:getMovement() {
         int motX_raw = instance#motX_raw;
         int motY_raw = instance#motY_raw;
         int motZ_raw = instance#motZ_raw;
-        return new Vec3D( com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motX_raw),
+        return new Vec3( com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motX_raw),
                           com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motY_raw),
                           com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motZ_raw) );
     }
 
-    public void setMotVector((org.bukkit.util.Vector) Vec3D movement) {
+    public void setMotVector((org.bukkit.util.Vector) Vec3 movement) {
         int motX_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(movement.x);
         int motY_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(movement.y);
         int motZ_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(movement.z);
@@ -497,7 +497,7 @@ class PacketPlayOutEntityVelocity extends Packet {
     </code>
 }
 
-class PacketPlayOutEntity extends Packet {
+class ClientboundMoveEntityPacket extends Packet {
 #if version >= 1.17
     protected int entityId;
     protected boolean onGround;
@@ -508,13 +508,13 @@ class PacketPlayOutEntity extends Packet {
 
 #if version >= 1.14
   #if version >= 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected short dx:xa;
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected short dy:ya;
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected short dz:za;
+    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected short dx:xa;
+    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected short dy:ya;
+    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected short dz:za;
   #else
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected short dx:b;
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected short dy:c;
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected short dz:d;
+    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected short dx:b;
+    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected short dy:c;
+    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected short dz:d;
   #endif
 
     public double getDeltaX() {
@@ -541,9 +541,9 @@ class PacketPlayOutEntity extends Packet {
         instance#dz = (short) ProtocolMath.serializePosition_1_10_2(dz);
     }
 #elseif version >= 1.9
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected int dx:b;
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected int dy:c;
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected int dz:d;
+    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected int dx:b;
+    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected int dy:c;
+    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected int dz:d;
 
     public double getDeltaX() {
         return ProtocolMath.deserializePosition_1_10_2(instance#dx);
@@ -569,9 +569,9 @@ class PacketPlayOutEntity extends Packet {
         instance#dz = ProtocolMath.serializePosition_1_10_2(dz);
     }
 #else
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected byte dx:b;
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected byte dy:c;
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected byte dz:d;
+    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected byte dx:b;
+    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected byte dy:c;
+    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected byte dz:d;
 
     public double getDeltaX() {
         return ProtocolMath.deserializePosition_1_8_8(instance#dx);
@@ -599,11 +599,11 @@ class PacketPlayOutEntity extends Packet {
 #endif
 
 #if version >= 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected byte yaw:yRot;
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected byte pitch:xRot;
+    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected byte yaw:yRot;
+    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected byte pitch:xRot;
 #else
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected byte yaw:e;
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected byte pitch:f;
+    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected byte yaw:e;
+    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected byte pitch:f;
 #endif
 
     public float getYaw() {
@@ -656,16 +656,16 @@ class PacketPlayOutEntity extends Packet {
     }
     </code>
 
-    class PacketPlayOutEntity.PacketPlayOutEntityLook extends PacketPlayOutEntity {
-        public static (PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle) PacketPlayOutEntity.PacketPlayOutEntityLook createNew() {
+    class ClientboundMoveEntityPacket.Rot extends ClientboundMoveEntityPacket {
+        public static (ClientboundMoveEntityPacketHandle.RotHandle) ClientboundMoveEntityPacket.Rot createNew() {
 #if version >= 1.20.5
-            return new PacketPlayOutEntity$PacketPlayOutEntityLook(0, (byte) 0, (byte) 0, false);
+            return new ClientboundMoveEntityPacket$Rot(0, (byte) 0, (byte) 0, false);
 #elseif version >= 1.18
-            return PacketPlayOutEntity$PacketPlayOutEntityLook.read(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+            return ClientboundMoveEntityPacket$Rot.read(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #elseif version >= 1.17
-            return PacketPlayOutEntity$PacketPlayOutEntityLook.b(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+            return ClientboundMoveEntityPacket$Rot.b(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
-            return new PacketPlayOutEntity$PacketPlayOutEntityLook();
+            return new ClientboundMoveEntityPacket$Rot();
 #endif
         }
 
@@ -675,8 +675,8 @@ class PacketPlayOutEntity extends Packet {
             return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_LOOK;
         }
 
-        public static PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle createNew(int entityId, float yaw, float pitch, boolean onGround) {
-            PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle handle = createNew();
+        public static ClientboundMoveEntityPacketHandle.RotHandle createNew(int entityId, float yaw, float pitch, boolean onGround) {
+            ClientboundMoveEntityPacketHandle.RotHandle handle = createNew();
             handle.setEntityId(entityId);
             handle.setYaw(yaw);
             handle.setPitch(pitch);
@@ -686,16 +686,16 @@ class PacketPlayOutEntity extends Packet {
         </code>
     }
 
-    class PacketPlayOutEntity.PacketPlayOutRelEntityMove extends PacketPlayOutEntity {
-        public static (PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle) PacketPlayOutEntity.PacketPlayOutRelEntityMove createNew() {
+    class ClientboundMoveEntityPacket.Pos extends ClientboundMoveEntityPacket {
+        public static (ClientboundMoveEntityPacketHandle.PosHandle) ClientboundMoveEntityPacket.Pos createNew() {
 #if version >= 1.20.5
-            return new PacketPlayOutEntity$PacketPlayOutRelEntityMove(0, (short) 0, (short) 0, (short) 0, false);
+            return new ClientboundMoveEntityPacket$Pos(0, (short) 0, (short) 0, (short) 0, false);
 #elseif version >= 1.18
-            return PacketPlayOutEntity$PacketPlayOutRelEntityMove.read(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+            return ClientboundMoveEntityPacket$Pos.read(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #elseif version >= 1.17
-            return PacketPlayOutEntity$PacketPlayOutRelEntityMove.b(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+            return ClientboundMoveEntityPacket$Pos.b(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
-            return new PacketPlayOutEntity$PacketPlayOutRelEntityMove();
+            return new ClientboundMoveEntityPacket$Pos();
 #endif
         }
 
@@ -705,8 +705,8 @@ class PacketPlayOutEntity extends Packet {
             return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_MOVE;
         }
 
-        public static PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle createNew(int entityId, double dx, double dy, double dz, boolean onGround) {
-            PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle handle = createNew();
+        public static ClientboundMoveEntityPacketHandle.PosHandle createNew(int entityId, double dx, double dy, double dz, boolean onGround) {
+            ClientboundMoveEntityPacketHandle.PosHandle handle = createNew();
             handle.setEntityId(entityId);
             handle.setDeltaX(dx);
             handle.setDeltaY(dy);
@@ -717,16 +717,16 @@ class PacketPlayOutEntity extends Packet {
         </code>
     }
 
-    class PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook extends PacketPlayOutEntity {
-        public static (PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle) PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook createNew() {
+    class ClientboundMoveEntityPacket.PosRot extends ClientboundMoveEntityPacket {
+        public static (ClientboundMoveEntityPacketHandle.PosRotHandle) ClientboundMoveEntityPacket.PosRot createNew() {
 #if version >= 1.20.5
-            return new PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook(0, (short) 0, (short) 0, (short) 0, (byte) 0, (byte) 0, false);
+            return new ClientboundMoveEntityPacket$PosRot(0, (short) 0, (short) 0, (short) 0, (byte) 0, (byte) 0, false);
 #elseif version >= 1.18
-            return PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook.read(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+            return ClientboundMoveEntityPacket$PosRot.read(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #elseif version >= 1.17
-            return PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook.b(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+            return ClientboundMoveEntityPacket$PosRot.b(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
-            return new PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook();
+            return new ClientboundMoveEntityPacket$PosRot();
 #endif
         }
 
@@ -736,8 +736,8 @@ class PacketPlayOutEntity extends Packet {
             return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_MOVE_LOOK;
         }
 
-        public static PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle createNew(int entityId, double dx, double dy, double dz, float yaw, float pitch, boolean onGround) {
-            PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle handle = createNew();
+        public static ClientboundMoveEntityPacketHandle.PosRotHandle createNew(int entityId, double dx, double dy, double dz, float yaw, float pitch, boolean onGround) {
+            ClientboundMoveEntityPacketHandle.PosRotHandle handle = createNew();
             handle.setEntityId(entityId);
             handle.setDeltaX(dx);
             handle.setDeltaY(dy);
@@ -751,45 +751,45 @@ class PacketPlayOutEntity extends Packet {
     }
 }
 
-class PacketPlayOutEntityHeadRotation extends Packet {
+class ClientboundRotateHeadPacket extends Packet {
 #if version >= 1.17
     private int entityId:entityId;
 #else
     private int entityId:a;
 #endif
 
-    public static optional (PacketPlayOutEntityHeadRotationHandle) PacketPlayOutEntityHeadRotation createNewEmpty() {
+    public static optional (ClientboundRotateHeadPacketHandle) ClientboundRotateHeadPacket createNewEmpty() {
 #if version >= 1.20.5
-        #require net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotation PacketPlayOutEntityHeadRotation createHeadRotationPacket:<init>(net.minecraft.network.PacketDataSerializer serializer);
+        #require net.minecraft.network.protocol.game.ClientboundRotateHeadPacket ClientboundRotateHeadPacket createHeadRotationPacket:<init>(net.minecraft.network.FriendlyByteBuf serializer);
         return #createHeadRotationPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #elseif version >= 1.17
-        return new PacketPlayOutEntityHeadRotation(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+        return new ClientboundRotateHeadPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
-        return new PacketPlayOutEntityHeadRotation();
+        return new ClientboundRotateHeadPacket();
 #endif
     }
 
     <code>
-    public static PacketPlayOutEntityHeadRotationHandle createNew() {
+    public static ClientboundRotateHeadPacketHandle createNew() {
         return T.createNewEmpty.invoke();
     }
 
-    public static PacketPlayOutEntityHeadRotationHandle createNew(int entityId, float headYaw) {
-        PacketPlayOutEntityHeadRotationHandle packet = createNew();
+    public static ClientboundRotateHeadPacketHandle createNew(int entityId, float headYaw) {
+        ClientboundRotateHeadPacketHandle packet = createNew();
         packet.setEntityId(entityId);
         packet.setHeadYaw(headYaw);
         return packet;
     }
     </code>
 
-    public static (PacketPlayOutEntityHeadRotationHandle) PacketPlayOutEntityHeadRotation createNew((org.bukkit.entity.Entity) Entity entity, float headYaw) {
-        return new PacketPlayOutEntityHeadRotation(entity, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(headYaw * 256.0f / 360.0f));
+    public static (ClientboundRotateHeadPacketHandle) ClientboundRotateHeadPacket createNew((org.bukkit.entity.Entity) Entity entity, float headYaw) {
+        return new ClientboundRotateHeadPacket(entity, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(headYaw * 256.0f / 360.0f));
     }
 
 #if version >= 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotation private byte headYaw:yHeadRot;
+    #require net.minecraft.network.protocol.game.ClientboundRotateHeadPacket private byte headYaw:yHeadRot;
 #else
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotation private byte headYaw:b;
+    #require net.minecraft.network.protocol.game.ClientboundRotateHeadPacket private byte headYaw:b;
 #endif
 
     public float getHeadYaw() {
@@ -801,7 +801,7 @@ class PacketPlayOutEntityHeadRotation extends Packet {
     }
 }
 
-class PacketPlayInFlying extends Packet {
+class ServerboundMovePlayerPacket extends Packet {
     protected double x;
     protected double y;
     protected double z;

@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
@@ -198,7 +198,7 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
 
     @Override
     public void replace(EntityHandle oldEntity, EntityHandle newEntity) {
-        WorldServerHandle world = oldEntity.getWorldServer();
+        ServerLevelHandle world = oldEntity.getWorldServer();
         if (newEntity == null) {
             if (world != null) {
                 world.removeEntity(oldEntity);

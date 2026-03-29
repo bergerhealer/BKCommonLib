@@ -15,8 +15,8 @@ import org.bukkit.World;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.storage.RegionFileHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
@@ -31,13 +31,13 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
     }
 
     private Object findRegionFileCache(World world) {
-        Object pcm = WorldServerHandle.fromBukkit(world).getPlayerChunkMap().getRaw();
+        Object pcm = ServerLevelHandle.fromBukkit(world).getPlayerChunkMap().getRaw();
         Object rfc = this.handler.findRegionFileCache(pcm);
         return this.handler.findRegionFileCacheStorage(rfc);
     }
 
     private Object findPOIFileCache(World world) {
-        Object pcm = WorldServerHandle.fromBukkit(world).getChunkProviderServer().getRaw();
+        Object pcm = ServerLevelHandle.fromBukkit(world).getChunkProviderServer().getRaw();
         Object rfc = this.handler.findPOIFileCache(pcm);
         return this.handler.findRegionFileCacheStorage(rfc);
     }
@@ -71,7 +71,7 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
 
         // Figure out the minimum/maximum region y coordinate
         // Since Minecraft 1.17 there can be more than one region (32 chunks) vertically
-        WorldHandle worldHandle = WorldHandle.fromBukkit(world);
+        LevelHandle worldHandle = LevelHandle.fromBukkit(world);
         int minRegionY = worldHandle.getMinBuildHeight() >> 9;
         int maxRegionY = (worldHandle.getMaxBuildHeight()-1) >> 9;
 

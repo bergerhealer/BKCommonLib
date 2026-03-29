@@ -1,35 +1,35 @@
 package net.minecraft.world.entity;
 
-import net.minecraft.network.syncher.DataWatcherObject;
+import net.minecraft.network.syncher.EntityDataAccessor;
 
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
-class EntityAgeable extends EntityInsentient {
+class AgeableMob extends Mob {
 #if version >= 1.17
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:DATA_BABY_ID;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_IS_BABY:DATA_BABY_ID;
 #elseif version >= 1.16.2
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bo;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_IS_BABY:bo;
 #elseif version >= 1.16
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bv;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_IS_BABY:bv;
 #elseif version >= 1.15
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bw;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_IS_BABY:bw;
 #elseif version >= 1.14
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bz;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_IS_BABY:bz;
 #elseif version >= 1.13
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bC;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_IS_BABY:bC;
 #elseif version >= 1.12
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bx;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_IS_BABY:bx;
 #elseif version >= 1.11
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bw;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_IS_BABY:bw;
 #elseif version >= 1.10.2
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bx;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_IS_BABY:bx;
 #elseif version >= 1.9.4
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bw;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_IS_BABY:bw;
 #elseif version >= 1.9
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bv;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_IS_BABY:bv;
 #else
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:###;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_IS_BABY:###;
 #endif
 
     <code>

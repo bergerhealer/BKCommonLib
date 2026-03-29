@@ -1,44 +1,42 @@
 package net.minecraft.network.protocol.game;
 
-import net.minecraft.core.EnumDirection;
-import net.minecraft.core.BlockPosition;
-import net.minecraft.core.particles.Particle;
-import net.minecraft.core.particles.ParticleParam;
-import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.CommonPlayerSpawnInfo;
-import net.minecraft.network.syncher.DataWatcher;
-import net.minecraft.network.syncher.DataWatcher.PackedItem;
-import net.minecraft.network.syncher.DataWatcher.WatchableObject;
-import net.minecraft.network.PacketDataSerializer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagLongArray;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.network.syncher.SynchedEntityData.PackedItem;
+import net.minecraft.network.syncher.SynchedEntityData.WatchableObject;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.LongArrayTag;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.level.WorldServer;
-import net.minecraft.server.level.EntityPlayer;
-import net.minecraft.server.level.EntityPlayer.RespawnConfig;
-import net.minecraft.sounds.SoundCategory;
-import net.minecraft.world.entity.ai.attributes.AttributeMapBase;
-import net.minecraft.world.entity.ai.attributes.AttributeModifiable;
-import net.minecraft.world.entity.EnumItemSlot;
-import net.minecraft.world.EnumDifficulty;
-import net.minecraft.world.EnumHand;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerPlayer.RespawnConfig;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.ai.attributes.AttributeMap;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectList;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.BiomeManager;
-import net.minecraft.world.level.block.entity.TileEntityTypes;
-import net.minecraft.world.level.block.state.IBlockData;
-import net.minecraft.world.level.levelgen.HeightMap;
-import net.minecraft.world.level.levelgen.HeightMap.Type;
-import net.minecraft.world.level.EnumGamemode;
-import net.minecraft.world.level.dimension.DimensionManager;
-import net.minecraft.world.level.World;
-import net.minecraft.world.phys.MovingObjectPositionBlock;
-import net.minecraft.world.phys.Vec3D;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.Heightmap.Types;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 import org.bukkit.potion.PotionEffectType;
 
@@ -59,48 +57,47 @@ import com.bergerkiller.bukkit.common.wrappers.WindowType;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityDestroyHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInUseEntityHandle.EnumEntityUseActionHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTitleHandle.EnumTitleActionHandle
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutRemoveEntityEffectHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapChunkHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAttachEntityHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCameraHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityEquipmentHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityEquipmentHandle.OwnerType;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMountHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityMetadataHandle
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockDigHandle.EnumPlayerDigTypeHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutOpenWindowHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSetCreativeSlotHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutUpdateAttributesHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTitleHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTileEntityDataHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutExplosionHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityEffectHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAbilitiesHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSpectateHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutWorldParticlesHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockChangeHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSetSlotHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundInteractPacketHandle.EnumEntityUseActionHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetTitlesPacketHandle.EnumTitleActionHandle
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundRemoveMobEffectPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetCameraPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetEquipmentPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetEquipmentPacketHandle.OwnerType;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetPassengersPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetEntityDataPacketHandle
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundPlayerActionPacketHandle.EnumPlayerDigTypeHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundOpenScreenPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundSetCreativeModeSlotPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetTitlesPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundTeleportToEntityPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundLevelParticlesPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundBlockUpdatePacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundBundlePacketHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffectHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutOpenSignEditorHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutStopSoundHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnPositionHandle;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
-import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle.RespawnConfigHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundCustomSoundPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundStopSoundPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetDefaultSpawnPositionPacketHandle;
+import com.bergerkiller.generated.net.minecraft.sounds.SoundSourceHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectInstanceHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeInstanceHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle.RespawnConfigHandle;
 
-class PacketPlayOutEntityDestroy extends Packet {
+class ClientboundRemoveEntitiesPacket extends Packet {
 #if version >= 1.17.1
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy private it.unimi.dsi.fastutil.ints.IntList entityIds;
+    #require net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket private it.unimi.dsi.fastutil.ints.IntList entityIds;
 #elseif version >= 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy private final int entityId;
+    #require net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket private final int entityId;
 #else
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy private int[] entityIds:a;
+    #require net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket private int[] entityIds:a;
 #endif
 
     <code>
@@ -211,44 +208,44 @@ class PacketPlayOutEntityDestroy extends Packet {
 #endif
     }
 
-    public static (PacketPlayOutEntityDestroyHandle) PacketPlayOutEntityDestroy createNewSingle(int entityId) {
+    public static (ClientboundRemoveEntitiesPacketHandle) ClientboundRemoveEntitiesPacket createNewSingle(int entityId) {
 #if version >= 1.17.1
         if (entityId >= 0) {
             int[] ids = new int[1];
             ids[0] = entityId;
-            return new PacketPlayOutEntityDestroy(ids);
+            return new ClientboundRemoveEntitiesPacket(ids);
         } else {
-            return new PacketPlayOutEntityDestroy(new int[0]);
+            return new ClientboundRemoveEntitiesPacket(new int[0]);
         }
 #elseif version >= 1.17
-        return new PacketPlayOutEntityDestroy(entityId);
+        return new ClientboundRemoveEntitiesPacket(entityId);
 #else
         if (entityId >= 0) {
             int[] ids = new int[1];
             ids[0] = entityId;
-            return new PacketPlayOutEntityDestroy(ids);
+            return new ClientboundRemoveEntitiesPacket(ids);
         } else {
-            return new PacketPlayOutEntityDestroy(new int[0]);
+            return new ClientboundRemoveEntitiesPacket(new int[0]);
         }
 #endif
     }
 
-    public static (PacketPlayOutEntityDestroyHandle) PacketPlayOutEntityDestroy createNewMultiple(int[] multipleEntityIds) {
+    public static (ClientboundRemoveEntitiesPacketHandle) ClientboundRemoveEntitiesPacket createNewMultiple(int[] multipleEntityIds) {
 #if version >= 1.17 && version < 1.17.1
         if (multipleEntityIds == null || multipleEntityIds.length == 0) {
-            return new PacketPlayOutEntityDestroy(-1);
+            return new ClientboundRemoveEntitiesPacket(-1);
         } else if (multipleEntityIds.length == 1) {
-            return new PacketPlayOutEntityDestroy(multipleEntityIds[0]);
+            return new ClientboundRemoveEntitiesPacket(multipleEntityIds[0]);
         } else {
             throw new UnsupportedOperationException("Multiple entity id's are not supported on Minecraft 1.17 and later");
         }
 #else
-        return new PacketPlayOutEntityDestroy(multipleEntityIds);
+        return new ClientboundRemoveEntitiesPacket(multipleEntityIds);
 #endif
     }
 }
 
-class PacketPlayInUseEntity extends Packet {
+class ServerboundInteractPacket extends Packet {
 #if version >= 1.17
     private int usedEntityId:entityId;
 #else
@@ -258,21 +255,21 @@ class PacketPlayInUseEntity extends Packet {
     // Since 1.17 there is an immutable UseType class storing all the details of the packet
     // It is incorrectly remapped to EnumEntityUseAction (!)
 #if version >= 1.18
-    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity.UseType public abstract (Enum) net.minecraft.network.protocol.game.PacketPlayInUseEntity.EnumEntityUseAction getType();
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.UseType public abstract (Enum) net.minecraft.network.protocol.game.ServerboundInteractPacket.EnumEntityUseAction getType();
 #elseif version >= 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity.UseType public abstract (Enum) net.minecraft.network.protocol.game.PacketPlayInUseEntity.EnumEntityUseAction getType:a();
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.UseType public abstract (Enum) net.minecraft.network.protocol.game.ServerboundInteractPacket.EnumEntityUseAction getType:a();
 #elseif version >= 1.13
-    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity public PacketPlayInUseEntity.EnumEntityUseAction getType:b();
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket public ServerboundInteractPacket.EnumEntityUseAction getType:b();
 #else
-    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity public PacketPlayInUseEntity.EnumEntityUseAction getType:a();
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket public ServerboundInteractPacket.EnumEntityUseAction getType:a();
 #endif
 
 #if version >= 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity private final PacketPlayInUseEntity.UseType action;
-    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity.d private final readonly net.minecraft.world.EnumHand interactHand:hand;
-    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity.e private final readonly net.minecraft.world.EnumHand interactAtHand:hand;
-    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity.e private final readonly net.minecraft.world.phys.Vec3D interactAtLocation:location;
-    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity public String getActionName() {
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket private final ServerboundInteractPacket.UseType action;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.d private final readonly net.minecraft.world.InteractionHand interactHand:hand;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.e private final readonly net.minecraft.world.InteractionHand interactAtHand:hand;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.e private final readonly net.minecraft.world.phys.Vec3 interactAtLocation:location;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket public String getActionName() {
         return instance#action#getType().name();
     }
 
@@ -289,7 +286,7 @@ class PacketPlayInUseEntity extends Packet {
     }
 
     public com.bergerkiller.bukkit.common.wrappers.HumanHand getInteractHand(org.bukkit.entity.HumanEntity humanEntity) {
-        EnumHand hand;
+        InteractionHand hand;
         Object useAction = instance#action;
         String name = useAction#getType().name();
         if (name.equals("INTERACT")) {
@@ -303,7 +300,7 @@ class PacketPlayInUseEntity extends Packet {
         return com.bergerkiller.bukkit.common.wrappers.HumanHand.fromNMSEnumHand(humanEntity, hand);
     }
 
-    public (org.bukkit.util.Vector) Vec3D getInteractAtPosition() {
+    public (org.bukkit.util.Vector) Vec3 getInteractAtPosition() {
         Object useAction = instance#action;
         if (useAction#getType().name().equals("INTERACT_AT")) {
             return useAction#interactAtLocation;
@@ -313,39 +310,39 @@ class PacketPlayInUseEntity extends Packet {
     }
 
     public void setAttack() {
-        #require net.minecraft.network.protocol.game.PacketPlayInUseEntity static final PacketPlayInUseEntity.UseType ATTACK_ACTION;
+        #require net.minecraft.network.protocol.game.ServerboundInteractPacket static final ServerboundInteractPacket.UseType ATTACK_ACTION;
         instance#action = #ATTACK_ACTION;
     }
 
     public void setInteract(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
-        #require net.minecraft.network.protocol.game.PacketPlayInUseEntity.d d createUseTypeInteract:<init>(net.minecraft.world.EnumHand hand);
-        EnumHand hand = (EnumHand) com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSEnumHand(humanEntity, hand);
+        #require net.minecraft.network.protocol.game.ServerboundInteractPacket.d d createUseTypeInteract:<init>(net.minecraft.world.InteractionHand hand);
+        InteractionHand hand = (InteractionHand) com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSEnumHand(humanEntity, hand);
         instance#action = #createUseTypeInteract(hand);
     }
 #else
     public boolean isInteract() {
-        return instance#getType() == PacketPlayInUseEntity$EnumEntityUseAction.INTERACT;
+        return instance#getType() == ServerboundInteractPacket$EnumEntityUseAction.INTERACT;
     }
 
     public boolean isInteractAt() {
-        return instance#getType() == PacketPlayInUseEntity$EnumEntityUseAction.INTERACT_AT;
+        return instance#getType() == ServerboundInteractPacket$EnumEntityUseAction.INTERACT_AT;
     }
 
     public boolean isAttack() {
-        return instance#getType() == PacketPlayInUseEntity$EnumEntityUseAction.ATTACK;
+        return instance#getType() == ServerboundInteractPacket$EnumEntityUseAction.ATTACK;
     }
 
     public com.bergerkiller.bukkit.common.wrappers.HumanHand getInteractHand(org.bukkit.entity.HumanEntity humanEntity) {
   #if version >= 1.9
     #if version >= 1.13
-        EnumHand hand = instance.c();
+        InteractionHand hand = instance.c();
     #else
-        EnumHand hand = instance.b();
+        InteractionHand hand = instance.b();
     #endif
         return com.bergerkiller.bukkit.common.wrappers.HumanHand.fromNMSEnumHand(humanEntity, hand);
   #else
-        PacketPlayInUseEntity$EnumEntityUseAction type = instance#getType();
-        if (type == PacketPlayInUseEntity$EnumEntityUseAction.INTERACT || type == PacketPlayInUseEntity$EnumEntityUseAction.INTERACT_AT) {
+        ServerboundInteractPacket$EnumEntityUseAction type = instance#getType();
+        if (type == ServerboundInteractPacket$EnumEntityUseAction.INTERACT || type == ServerboundInteractPacket$EnumEntityUseAction.INTERACT_AT) {
             return com.bergerkiller.bukkit.common.wrappers.HumanHand.RIGHT;
         } else {
             return null;
@@ -353,7 +350,7 @@ class PacketPlayInUseEntity extends Packet {
   #endif
     }
 
-    public (org.bukkit.util.Vector) Vec3D getInteractAtPosition() {
+    public (org.bukkit.util.Vector) Vec3 getInteractAtPosition() {
   #select version >=
   #case 1.13: return instance.d();
   #case 1.9:  return instance.c();
@@ -361,14 +358,14 @@ class PacketPlayInUseEntity extends Packet {
   #endselect
     }
 
-    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity private PacketPlayInUseEntity.EnumEntityUseAction action;
-    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity private net.minecraft.world.phys.Vec3D offset:c;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket private ServerboundInteractPacket.EnumEntityUseAction action;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket private net.minecraft.world.phys.Vec3 offset:c;
   #if version >= 1.9
-    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity private net.minecraft.world.EnumHand hand:d;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket private net.minecraft.world.InteractionHand hand:d;
   #endif
 
     public void setAttack() {
-        instance#action = PacketPlayInUseEntity$EnumEntityUseAction.ATTACK;
+        instance#action = ServerboundInteractPacket$EnumEntityUseAction.ATTACK;
         instance#offset = null;
   #if version >= 1.9
         instance#hand = null;
@@ -376,10 +373,10 @@ class PacketPlayInUseEntity extends Packet {
     }
 
     public void setInteract(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
-        instance#action = PacketPlayInUseEntity$EnumEntityUseAction.INTERACT;
+        instance#action = ServerboundInteractPacket$EnumEntityUseAction.INTERACT;
         instance#offset = null;
   #if version >= 1.9
-        EnumHand hand = (EnumHand) com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSEnumHand(humanEntity, hand);
+        InteractionHand hand = (InteractionHand) com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSEnumHand(humanEntity, hand);
         instance#hand = hand;
   #endif
     }
@@ -397,7 +394,7 @@ class PacketPlayInUseEntity extends Packet {
   #endif
 
     public void setUsingSecondaryAction(boolean using) {
-        #require net.minecraft.network.protocol.game.PacketPlayInUseEntity private boolean usingSecondaryAction;
+        #require net.minecraft.network.protocol.game.ServerboundInteractPacket private boolean usingSecondaryAction;
         instance#usingSecondaryAction = using;
     }
 #elseif version >= 1.16
@@ -408,7 +405,7 @@ class PacketPlayInUseEntity extends Packet {
     public boolean isUsingSecondaryAction:e();
 
     public void setUsingSecondaryAction(boolean using) {
-        #require net.minecraft.network.protocol.game.PacketPlayInUseEntity private boolean usingSecondaryOption:e;
+        #require net.minecraft.network.protocol.game.ServerboundInteractPacket private boolean usingSecondaryOption:e;
         instance#usingSecondaryOption = using;
     }
 #else
@@ -425,21 +422,21 @@ class PacketPlayInUseEntity extends Packet {
 #endif
 }
 
-class PacketPlayInBlockPlace extends Packet {
+class ServerboundUseItemPacket extends Packet {
 #if version >= 1.17
-    private optional (Object) EnumHand enumHand:hand;
+    private optional (Object) InteractionHand enumHand:hand;
 #elseif version >= 1.9
-    private optional (Object) EnumHand enumHand:a;
+    private optional (Object) InteractionHand enumHand:a;
 #else
-    private optional (Object) EnumHand enumHand:###;
+    private optional (Object) InteractionHand enumHand:###;
 #endif
 
     // Spigot only
     public optional long timestamp;
 
 #if version >= 1.21
-    #require PacketPlayInBlockPlace private final float yRot;
-    #require PacketPlayInBlockPlace private final float xRot;
+    #require ServerboundUseItemPacket private final float yRot;
+    #require ServerboundUseItemPacket private final float xRot;
 
     public float getYaw() { return instance#yRot; }
     public float getPitch() { return instance#xRot; }
@@ -474,23 +471,23 @@ class PacketPlayInBlockPlace extends Packet {
     </code>
 }
 
-// PacketPlayInBlockPlace on MC 1.8.9 and before when int direction == 255
-class PacketPlayInUseItem extends Packet {
+// ServerboundUseItemPacket on MC 1.8.9 and before when int direction == 255
+class ServerboundUseItemOnPacket extends Packet {
     // Hand since 1.9
 #if version >= 1.9
   #if version >= 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayInUseItem private net.minecraft.world.EnumHand enumHand:hand;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.world.InteractionHand enumHand:hand;
   #elseif version >= 1.14
-    #require net.minecraft.network.protocol.game.PacketPlayInUseItem private net.minecraft.world.EnumHand enumHand:b;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.world.InteractionHand enumHand:b;
   #else
-    #require net.minecraft.network.protocol.game.PacketPlayInUseItem private net.minecraft.world.EnumHand enumHand:c;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.world.InteractionHand enumHand:c;
   #endif
     public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
         return com.bergerkiller.bukkit.common.wrappers.HumanHand.fromNMSEnumHand(humanEntity, instance#enumHand);
     }
 
     public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
-        instance#enumHand = (EnumHand) hand.toNMSEnumHand(humanEntity);
+        instance#enumHand = (InteractionHand) hand.toNMSEnumHand(humanEntity);
     }
 #else
     public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
@@ -503,36 +500,36 @@ class PacketPlayInUseItem extends Packet {
 
     // Initializes the moving object position block field, when required
 #if version >= 1.18
-    #require net.minecraft.network.protocol.game.PacketPlayInUseItem public net.minecraft.world.phys.MovingObjectPositionBlock getHitResult();
-    #require net.minecraft.network.protocol.game.PacketPlayInUseItem public net.minecraft.world.phys.MovingObjectPositionBlock initMovingObject() {
-        net.minecraft.world.phys.MovingObjectPositionBlock moving = instance.getHitResult();
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket public net.minecraft.world.phys.BlockHitResult getHitResult();
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket public net.minecraft.world.phys.BlockHitResult initMovingObject() {
+        net.minecraft.world.phys.BlockHitResult moving = instance.getHitResult();
         if (moving != null) {
             return moving;
         }
 
-        #require net.minecraft.network.protocol.game.PacketPlayInUseItem private net.minecraft.world.phys.MovingObjectPositionBlock movingObject:blockHit;
-        moving = net.minecraft.world.phys.MovingObjectPositionBlock.miss(Vec3D.ZERO, EnumDirection.DOWN, BlockPosition.ZERO);
+        #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.world.phys.BlockHitResult movingObject:blockHit;
+        moving = net.minecraft.world.phys.BlockHitResult.miss(Vec3.ZERO, EnumDirection.DOWN, BlockPos.ZERO);
         instance#movingObject = moving;
         return moving;
     }
 
 #elseif version >= 1.14
-    #require net.minecraft.network.protocol.game.PacketPlayInUseItem public net.minecraft.world.phys.MovingObjectPositionBlock getHitResult:c();
-    #require net.minecraft.network.protocol.game.PacketPlayInUseItem public net.minecraft.world.phys.MovingObjectPositionBlock initMovingObject() {
-        net.minecraft.world.phys.MovingObjectPositionBlock moving = instance.c();
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket public net.minecraft.world.phys.BlockHitResult getHitResult:c();
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket public net.minecraft.world.phys.BlockHitResult initMovingObject() {
+        net.minecraft.world.phys.BlockHitResult moving = instance.c();
         if (moving != null) {
             return moving;
         }
 
   #if version >= 1.17
-        #require net.minecraft.network.protocol.game.PacketPlayInUseItem private net.minecraft.world.phys.MovingObjectPositionBlock movingObject:blockHit;
+        #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.world.phys.BlockHitResult movingObject:blockHit;
   #else
-        #require net.minecraft.network.protocol.game.PacketPlayInUseItem private net.minecraft.world.phys.MovingObjectPositionBlock movingObject:a;
+        #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.world.phys.BlockHitResult movingObject:a;
   #endif
 
-        Vec3D origin = Vec3D.ZERO;
+        Vec3 origin = Vec3.ZERO;
 
-        moving = net.minecraft.world.phys.MovingObjectPositionBlock.a(origin, EnumDirection.DOWN, BlockPosition.ZERO);
+        moving = net.minecraft.world.phys.BlockHitResult.a(origin, EnumDirection.DOWN, BlockPos.ZERO);
         instance#movingObject = moving; 
         return moving;
     }
@@ -542,19 +539,19 @@ class PacketPlayInUseItem extends Packet {
     // Direction
 #if version >= 1.14
   #if version >= 1.17
-    #require net.minecraft.world.phys.MovingObjectPositionBlock private final net.minecraft.core.EnumDirection direction_face:direction;
+    #require net.minecraft.world.phys.BlockHitResult private final net.minecraft.core.Direction direction_face:direction;
   #else
-    #require net.minecraft.world.phys.MovingObjectPositionBlock private final net.minecraft.core.EnumDirection direction_face:b;
+    #require net.minecraft.world.phys.BlockHitResult private final net.minecraft.core.Direction direction_face:b;
   #endif
     public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
-        MovingObjectPositionBlock result = instance#getHitResult();
+        BlockHitResult result = instance#getHitResult();
         return (result == null) ? null : result.getDirection();
     }
     public void setDirection((org.bukkit.block.BlockFace) EnumDirection direction) {
         instance#initMovingObject()#direction_face = direction;
     }
 #elseif version >= 1.9
-    #require net.minecraft.network.protocol.game.PacketPlayInUseItem private net.minecraft.core.EnumDirection direction_face:b;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.core.Direction direction_face:b;
     public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
         return instance#direction_face;
     }
@@ -562,7 +559,7 @@ class PacketPlayInUseItem extends Packet {
         instance#direction_face = direction;
     }
 #else
-    #require net.minecraft.network.protocol.game.PacketPlayInUseItem private int direction_index:c;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private int direction_index:c;
     public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
         int index = instance#direction_index;
         return EnumDirection.fromType1(index);
@@ -591,41 +588,41 @@ class PacketPlayInUseItem extends Packet {
 
 #if version >= 1.14
   #if version >= 1.17
-    #require net.minecraft.world.phys.MovingObjectPosition protected final net.minecraft.world.phys.Vec3D position:location;
-    #require net.minecraft.world.phys.MovingObjectPositionBlock private final net.minecraft.core.BlockPosition blockPosition:blockPos;
+    #require net.minecraft.world.phys.MovingObjectPosition protected final net.minecraft.world.phys.Vec3 position:location;
+    #require net.minecraft.world.phys.BlockHitResult private final net.minecraft.core.BlockPos blockPosition:blockPos;
   #else
-    #require net.minecraft.world.phys.MovingObjectPosition protected final net.minecraft.world.phys.Vec3D position:pos;
-    #require net.minecraft.world.phys.MovingObjectPositionBlock private final net.minecraft.core.BlockPosition blockPosition:c;
+    #require net.minecraft.world.phys.MovingObjectPosition protected final net.minecraft.world.phys.Vec3 position:pos;
+    #require net.minecraft.world.phys.BlockHitResult private final net.minecraft.core.BlockPos blockPosition:c;
   #endif
-    public (IntVector3) BlockPosition getPosition() {
-        MovingObjectPositionBlock result = instance#getHitResult();
+    public (IntVector3) BlockPos getPosition() {
+        BlockHitResult result = instance#getHitResult();
   #if version >= 1.18
         return (result == null) ? null : result.getBlockPos();
   #else
         return (result == null) ? null : result.getBlockPosition();
   #endif
     }
-    public void setPosition((IntVector3) BlockPosition blockPosition) {
-        MovingObjectPositionBlock result = instance#initMovingObject();
+    public void setPosition((IntVector3) BlockPos blockPosition) {
+        BlockHitResult result = instance#initMovingObject();
 
         // Make sure to preserve deltas
   #if version >= 1.18
-        Vec3D position = result.getLocation();
+        Vec3 position = result.getLocation();
         double new_x = position.x - result.getBlockPos().getX() + blockPosition.getX();
         double new_y = position.y - result.getBlockPos().getY() + blockPosition.getY();
         double new_z = position.z - result.getBlockPos().getZ() + blockPosition.getZ();
   #else
-        Vec3D position = result.getPos();
+        Vec3 position = result.getPos();
         double new_x = position.x - result.getBlockPosition().getX() + blockPosition.getX();
         double new_y = position.y - result.getBlockPosition().getY() + blockPosition.getY();
         double new_z = position.z - result.getBlockPosition().getZ() + blockPosition.getZ();
   #endif
-        Vec3D new_pos = new Vec3D(new_x, new_y, new_z);
+        Vec3 new_pos = new Vec3(new_x, new_y, new_z);
         result#position = new_pos;
         result#blockPosition = blockPosition;
     }
     public float getDeltaX() {
-        MovingObjectPositionBlock result = instance#getHitResult();
+        BlockHitResult result = instance#getHitResult();
         if (result == null) return 0.0f;
   #if version >= 1.18
         return (float) (result.getLocation().x - (double) result.getBlockPos().getX());
@@ -634,7 +631,7 @@ class PacketPlayInUseItem extends Packet {
   #endif
     }
     public float getDeltaY() {
-        MovingObjectPositionBlock result = instance#getHitResult();
+        BlockHitResult result = instance#getHitResult();
         if (result == null) return 0.0f;
   #if version >= 1.18
         return (float) (result.getLocation().y - (double) result.getBlockPos().getY());
@@ -643,7 +640,7 @@ class PacketPlayInUseItem extends Packet {
   #endif
     }
     public float getDeltaZ() {
-        MovingObjectPositionBlock result = instance#getHitResult();
+        BlockHitResult result = instance#getHitResult();
         if (result == null) return 0.0f;
   #if version >= 1.18
         return (float) (result.getLocation().z - (double) result.getBlockPos().getZ());
@@ -652,54 +649,54 @@ class PacketPlayInUseItem extends Packet {
   #endif
     }
     public void setDeltaX(float dx) {
-        MovingObjectPositionBlock result = instance#initMovingObject();
+        BlockHitResult result = instance#initMovingObject();
   #if version >= 1.18
-        Vec3D old_position = result.getLocation();
-        Vec3D new_position = new Vec3D((double) dx + result.getBlockPos().getX(), old_position.y, old_position.z);
+        Vec3 old_position = result.getLocation();
+        Vec3 new_position = new Vec3((double) dx + result.getBlockPos().getX(), old_position.y, old_position.z);
   #else
-        Vec3D old_position = result.getPos();
-        Vec3D new_position = new Vec3D((double) dx + result.getBlockPosition().getX(), old_position.y, old_position.z);
+        Vec3 old_position = result.getPos();
+        Vec3 new_position = new Vec3((double) dx + result.getBlockPosition().getX(), old_position.y, old_position.z);
   #endif
         result#position = new_position;
     }
     public void setDeltaY(float dy) {
-        MovingObjectPositionBlock result = instance#initMovingObject();
+        BlockHitResult result = instance#initMovingObject();
   #if version >= 1.18
-        Vec3D old_position = result.getLocation();
-        Vec3D new_position = new Vec3D(old_position.x, (double) dy + result.getBlockPos().getY(), old_position.z);
+        Vec3 old_position = result.getLocation();
+        Vec3 new_position = new Vec3(old_position.x, (double) dy + result.getBlockPos().getY(), old_position.z);
   #else
-        Vec3D old_position = result.getPos();
-        Vec3D new_position = new Vec3D(old_position.x, (double) dy + result.getBlockPosition().getY(), old_position.z);
+        Vec3 old_position = result.getPos();
+        Vec3 new_position = new Vec3(old_position.x, (double) dy + result.getBlockPosition().getY(), old_position.z);
   #endif
         result#position = new_position;
     }
     public void setDeltaZ(float dz) {
-        MovingObjectPositionBlock result = instance#initMovingObject();
+        BlockHitResult result = instance#initMovingObject();
   #if version >= 1.18
-        Vec3D old_position = result.getLocation();
-        Vec3D new_position = new Vec3D(old_position.x, old_position.y, (double) dz + result.getBlockPos().getZ());
+        Vec3 old_position = result.getLocation();
+        Vec3 new_position = new Vec3(old_position.x, old_position.y, (double) dz + result.getBlockPos().getZ());
   #else
-        Vec3D old_position = result.getPos();
-        Vec3D new_position = new Vec3D(old_position.x, old_position.y, (double) dz + result.getBlockPosition().getZ());
+        Vec3 old_position = result.getPos();
+        Vec3 new_position = new Vec3(old_position.x, old_position.y, (double) dz + result.getBlockPosition().getZ());
   #endif
         result#position = new_position;
     }
 #else
   #if version >= 1.9
-    #require net.minecraft.network.protocol.game.PacketPlayInUseItem private net.minecraft.core.BlockPosition position:a;
-    #require net.minecraft.network.protocol.game.PacketPlayInUseItem private float deltaX:d;
-    #require net.minecraft.network.protocol.game.PacketPlayInUseItem private float deltaY:e;
-    #require net.minecraft.network.protocol.game.PacketPlayInUseItem private float deltaZ:f;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.core.BlockPos position:a;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private float deltaX:d;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private float deltaY:e;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private float deltaZ:f;
   #else
-    #require net.minecraft.network.protocol.game.PacketPlayInUseItem private net.minecraft.core.BlockPosition position:b;
-    #require net.minecraft.network.protocol.game.PacketPlayInUseItem private float deltaX:e;
-    #require net.minecraft.network.protocol.game.PacketPlayInUseItem private float deltaY:f;
-    #require net.minecraft.network.protocol.game.PacketPlayInUseItem private float deltaZ:g;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.core.BlockPos position:b;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private float deltaX:e;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private float deltaY:f;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private float deltaZ:g;
   #endif
-    public (IntVector3) BlockPosition getPosition() {
+    public (IntVector3) BlockPos getPosition() {
         return instance#position;
     }
-    public void setPosition((IntVector3) BlockPosition position) {
+    public void setPosition((IntVector3) BlockPos position) {
         instance#position = position;
     }
     public float getDeltaX() {
@@ -739,37 +736,37 @@ class PacketPlayInUseItem extends Packet {
     </code>
 }
 
-class PacketPlayInBlockDig extends Packet {
+class ServerboundPlayerActionPacket extends Packet {
 #if version >= 1.17
-    private (IntVector3) BlockPosition position:pos;
+    private (IntVector3) BlockPos position:pos;
     private (org.bukkit.block.BlockFace) EnumDirection direction;
-    private (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType digType:action;
+    private (EnumPlayerDigTypeHandle) ServerboundPlayerActionPacket.EnumPlayerDigType digType:action;
 #else
-    private (IntVector3) BlockPosition position:a;
+    private (IntVector3) BlockPos position:a;
     private (org.bukkit.block.BlockFace) EnumDirection direction:b;
-    private (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType digType:c;
+    private (EnumPlayerDigTypeHandle) ServerboundPlayerActionPacket.EnumPlayerDigType digType:c;
 #endif
 
-    class PacketPlayInBlockDig.EnumPlayerDigType {
-        enum (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType START_DESTROY_BLOCK;
-        enum (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType ABORT_DESTROY_BLOCK;
-        enum (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType STOP_DESTROY_BLOCK;
-        enum (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType DROP_ALL_ITEMS;
-        enum (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType DROP_ITEM;
-        enum (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType RELEASE_USE_ITEM;
+    class ServerboundPlayerActionPacket.EnumPlayerDigType {
+        enum (EnumPlayerDigTypeHandle) ServerboundPlayerActionPacket.EnumPlayerDigType START_DESTROY_BLOCK;
+        enum (EnumPlayerDigTypeHandle) ServerboundPlayerActionPacket.EnumPlayerDigType ABORT_DESTROY_BLOCK;
+        enum (EnumPlayerDigTypeHandle) ServerboundPlayerActionPacket.EnumPlayerDigType STOP_DESTROY_BLOCK;
+        enum (EnumPlayerDigTypeHandle) ServerboundPlayerActionPacket.EnumPlayerDigType DROP_ALL_ITEMS;
+        enum (EnumPlayerDigTypeHandle) ServerboundPlayerActionPacket.EnumPlayerDigType DROP_ITEM;
+        enum (EnumPlayerDigTypeHandle) ServerboundPlayerActionPacket.EnumPlayerDigType RELEASE_USE_ITEM;
         //TODO: SWAP_ITEM_WITH_OFFHAND?
     }
 }
 
 // Gone since 1.17, we don't use it, it's not worth the time to support this.
 /*
-class PacketPlayOutTitle extends Packet {
-    private (PacketPlayOutTitleHandle.EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction action:a;
-    private (ChatText) IChatBaseComponent title:b;
+class ClientboundSetTitlesPacket extends Packet {
+    private (ClientboundSetTitlesPacketHandle.EnumTitleActionHandle) ClientboundSetTitlesPacket.EnumTitleAction action:a;
+    private (ChatText) Component title:b;
 
     // Introduced in newer 1.16.5 paperspigot builds, replacing the "components" field
     // If this field is set, it overrules the 'title' field
-#if exists net.minecraft.network.protocol.game.PacketPlayOutTitle public net.kyori.adventure.text.Component adventure$text;
+#if exists net.minecraft.network.protocol.game.ClientboundSetTitlesPacket public net.kyori.adventure.text.Component adventure$text;
     public unknown net.kyori.adventure.text.Component adventure$text;
 #endif
 
@@ -781,18 +778,18 @@ class PacketPlayOutTitle extends Packet {
     //       if this field is set, it overrules the 'title' field
     // public net.md_5.bungee.api.chat.BaseComponent[] components;
 
-    class PacketPlayOutTitle.EnumTitleAction {
-        enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction TITLE;
-        enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction SUBTITLE;
-        enum optional (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction ACTIONBAR;
-        enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction TIMES;
-        enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction CLEAR;
-        enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction RESET;
+    class ClientboundSetTitlesPacket.EnumTitleAction {
+        enum (EnumTitleActionHandle) ClientboundSetTitlesPacket.EnumTitleAction TITLE;
+        enum (EnumTitleActionHandle) ClientboundSetTitlesPacket.EnumTitleAction SUBTITLE;
+        enum optional (EnumTitleActionHandle) ClientboundSetTitlesPacket.EnumTitleAction ACTIONBAR;
+        enum (EnumTitleActionHandle) ClientboundSetTitlesPacket.EnumTitleAction TIMES;
+        enum (EnumTitleActionHandle) ClientboundSetTitlesPacket.EnumTitleAction CLEAR;
+        enum (EnumTitleActionHandle) ClientboundSetTitlesPacket.EnumTitleAction RESET;
     }
 }
 */
 
-class PacketPlayOutCollect extends Packet {
+class ClientboundTakeItemEntityPacket extends Packet {
 #if version >= 1.17
     private int collectedItemId:itemId;
     private int collectorEntityId:playerId;
@@ -809,7 +806,7 @@ class PacketPlayOutCollect extends Packet {
 #endif
 }
 
-class PacketPlayOutSetSlot extends Packet {
+class ClientboundContainerSetSlotPacket extends Packet {
 #if version >= 1.17
     private int windowId:containerId;
     private int slot;
@@ -820,7 +817,7 @@ class PacketPlayOutSetSlot extends Packet {
     private (org.bukkit.inventory.ItemStack) ItemStack item:c;
 #endif
 
-    public static (PacketPlayOutSetSlotHandle) PacketPlayOutSetSlot createNew(int containerId, int slot, (org.bukkit.inventory.ItemStack) ItemStack item) {
+    public static (ClientboundContainerSetSlotPacketHandle) ClientboundContainerSetSlotPacket createNew(int containerId, int slot, (org.bukkit.inventory.ItemStack) ItemStack item) {
         // Items can't be null since this version
 #if version >= 1.11
         if (item == null) {
@@ -830,14 +827,14 @@ class PacketPlayOutSetSlot extends Packet {
 
         // Added state parameter since MC 1.17.1, default to 0
 #if version >= 1.17.1
-        return new PacketPlayOutSetSlot(containerId, 0, slot, item);
+        return new ClientboundContainerSetSlotPacket(containerId, 0, slot, item);
 #else
-        return new PacketPlayOutSetSlot(containerId, slot, item);
+        return new ClientboundContainerSetSlotPacket(containerId, slot, item);
 #endif
     }
 }
 
-class PacketPlayOutWindowData extends Packet {
+class ClientboundContainerSetDataPacket extends Packet {
 #if version >= 1.17
     private final int windowId:containerId;
     private final int id;
@@ -849,7 +846,7 @@ class PacketPlayOutWindowData extends Packet {
 #endif
 }
 
-class PacketPlayOutWindowItems extends Packet {
+class ClientboundContainerSetContentPacket extends Packet {
 #if version >= 1.17
     private int windowId:containerId;
 #else
@@ -865,7 +862,7 @@ class PacketPlayOutWindowItems extends Packet {
 #endif
 }
 
-class PacketPlayOutCloseWindow extends Packet {
+class ClientboundContainerClosePacket extends Packet {
 #if version >= 1.17
     private int windowId:containerId;
 #else
@@ -873,27 +870,27 @@ class PacketPlayOutCloseWindow extends Packet {
 #endif
 }
 
-class PacketPlayOutOpenWindow extends Packet {
+class ClientboundOpenScreenPacket extends Packet {
 #if version >= 1.17
     private int windowId:containerId;
-    private (ChatText) IChatBaseComponent windowTitle:title;
+    private (ChatText) Component windowTitle:title;
 #else
     private int windowId:a;
-    private (ChatText) IChatBaseComponent windowTitle:c;
+    private (ChatText) Component windowTitle:c;
 #endif
 
-    public static (PacketPlayOutOpenWindowHandle) PacketPlayOutOpenWindow createNew() {
+    public static (ClientboundOpenScreenPacketHandle) ClientboundOpenScreenPacket createNew() {
 #if version >= 1.20.5
-        return new PacketPlayOutOpenWindow(0, (net.minecraft.world.inventory.Containers) null, (IChatBaseComponent) null);
+        return new ClientboundOpenScreenPacket(0, (net.minecraft.world.inventory.MenuType) null, (Component) null);
 #elseif version >= 1.17
-        return new PacketPlayOutOpenWindow(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+        return new ClientboundOpenScreenPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
-        return new PacketPlayOutOpenWindow();
+        return new ClientboundOpenScreenPacket();
 #endif
     }
 
 #if version >= 1.19
-    #require net.minecraft.network.protocol.game.PacketPlayOutOpenWindow private final net.minecraft.world.inventory.Containers<?> windowType:type;
+    #require net.minecraft.network.protocol.game.ClientboundOpenScreenPacket private final net.minecraft.world.inventory.MenuType<?> windowType:type;
 
     public WindowType getWindowType() {
         return com.bergerkiller.bukkit.common.wrappers.WindowType.fromNMSType(instance#windowType);
@@ -904,13 +901,13 @@ class PacketPlayOutOpenWindow extends Packet {
         if (nmsType == null) {
             throw new IllegalArgumentException("Window type " + windowType.name() + " is not supported");
         }
-        instance#windowType = (net.minecraft.world.inventory.Containers)nmsType;
+        instance#windowType = (net.minecraft.world.inventory.MenuType)nmsType;
     }
 #elseif version >= 1.14
   #if version >= 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayOutOpenWindow private int windowTypeId:type;
+    #require net.minecraft.network.protocol.game.ClientboundOpenScreenPacket private int windowTypeId:type;
   #else
-    #require net.minecraft.network.protocol.game.PacketPlayOutOpenWindow private int windowTypeId:b;
+    #require net.minecraft.network.protocol.game.ClientboundOpenScreenPacket private int windowTypeId:b;
   #endif
 
     public WindowType getWindowType() {
@@ -925,8 +922,8 @@ class PacketPlayOutOpenWindow extends Packet {
         instance#windowTypeId = id;
     }
 #else
-    #require net.minecraft.network.protocol.game.PacketPlayOutOpenWindow private String windowName:b;
-    #require net.minecraft.network.protocol.game.PacketPlayOutOpenWindow private int slotCount:d;
+    #require net.minecraft.network.protocol.game.ClientboundOpenScreenPacket private String windowName:b;
+    #require net.minecraft.network.protocol.game.ClientboundOpenScreenPacket private int slotCount:d;
 
     public WindowType getWindowType() {
         String name = instance#windowName;
@@ -945,13 +942,13 @@ class PacketPlayOutOpenWindow extends Packet {
 #endif
 }
 
-class PacketPlayInArmAnimation extends Packet {
+class ServerboundSwingPacket extends Packet {
 #if version >= 1.17
-    private optional (Object) EnumHand enumHand:hand;
+    private optional (Object) InteractionHand enumHand:hand;
 #elseif version >= 1.9
-    private optional (Object) EnumHand enumHand:a;
+    private optional (Object) InteractionHand enumHand:a;
 #else
-    private optional (Object) EnumHand enumHand:###;
+    private optional (Object) InteractionHand enumHand:###;
 #endif
 
     <code>
@@ -965,7 +962,7 @@ class PacketPlayInArmAnimation extends Packet {
     </code>
 }
 
-class PacketPlayOutEntityEffect extends Packet {
+class ClientboundUpdateMobEffectPacket extends Packet {
     <code>
     public static final int FLAG_AMBIENT = 1;
     public static final int FLAG_VISIBLE = 2;
@@ -983,7 +980,7 @@ class PacketPlayOutEntityEffect extends Packet {
 #endif
 
 #if version >= 1.20.5
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final int effectAmplifier;
+    #require net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket private final int effectAmplifier;
 
     public int getEffectAmplifier() {
         return instance#effectAmplifier;
@@ -994,9 +991,9 @@ class PacketPlayOutEntityEffect extends Packet {
     }
 #else
   #if version >= 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final byte effectAmplifier;
+    #require net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket private final byte effectAmplifier;
   #else
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private byte effectAmplifier:c;
+    #require net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket private byte effectAmplifier:c;
   #endif
 
     public int getEffectAmplifier() {
@@ -1011,35 +1008,35 @@ class PacketPlayOutEntityEffect extends Packet {
 #endif
 
 #if version >= 1.20.5
-    public (Holder<MobEffectListHandle>) net.minecraft.core.Holder<MobEffectList> getEffect();
-    public void setEffect((Holder<MobEffectListHandle>) net.minecraft.core.Holder<MobEffectList> effect) {
-        #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final net.minecraft.core.Holder<MobEffectList> effect;
+    public (Holder<MobEffectHandle>) net.minecraft.core.Holder<MobEffect> getEffect();
+    public void setEffect((Holder<MobEffectHandle>) net.minecraft.core.Holder<MobEffect> effect) {
+        #require net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket private final net.minecraft.core.Holder<MobEffect> effect;
         instance#effect = effect;
     }
 #elseif version >= 1.19
-    public (Holder<MobEffectListHandle>) MobEffectList getEffect();
-    public void setEffect((Holder<MobEffectListHandle>) MobEffectList effect) {
-        #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final MobEffectList effect;
+    public (Holder<MobEffectHandle>) MobEffect getEffect();
+    public void setEffect((Holder<MobEffectHandle>) MobEffect effect) {
+        #require net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket private final MobEffect effect;
         instance#effect = effect;
     }
 #elseif version >= 1.18.2
-    public (Holder<MobEffectListHandle>) int getEffect:getEffectId();
-    public void setEffect((Holder<MobEffectListHandle>) int effect) {
-        #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final int effectId;
+    public (Holder<MobEffectHandle>) int getEffect:getEffectId();
+    public void setEffect((Holder<MobEffectHandle>) int effect) {
+        #require net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket private final int effectId;
         instance#effectId = effect;
     }
 #else
   #if version >= 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final byte effectId;
+    #require net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket private final byte effectId;
   #else
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private byte effectId:b;
+    #require net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket private byte effectId:b;
   #endif
 
-    public (Holder<MobEffectListHandle>) int getEffect() {
+    public (Holder<MobEffectHandle>) int getEffect() {
         return (int) instance#effectId;
     }
 
-    public void setEffect((Holder<MobEffectListHandle>) int effect) {
+    public void setEffect((Holder<MobEffectHandle>) int effect) {
         byte b = (byte) effect;
         instance#effectId = b;
     }
@@ -1047,72 +1044,72 @@ class PacketPlayOutEntityEffect extends Packet {
 
     <code>
     public org.bukkit.potion.PotionEffectType getPotionEffectType() {
-        return MobEffectListHandle.holderToBukkit(getEffect());
+        return MobEffectHandle.holderToBukkit(getEffect());
     }
 
     public void setPotionEffectType(org.bukkit.potion.PotionEffectType effectType) {
-        setEffect(MobEffectListHandle.holderFromBukkit(effectType));
+        setEffect(MobEffectHandle.holderFromBukkit(effectType));
     }
 
-    public static PacketPlayOutEntityEffectHandle createNew(int entityId, org.bukkit.potion.PotionEffect effect) {
+    public static ClientboundUpdateMobEffectPacketHandle createNew(int entityId, org.bukkit.potion.PotionEffect effect) {
         return createNew(entityId, effect, false);
     }
     </code>
 
-    public static (PacketPlayOutEntityEffectHandle) PacketPlayOutEntityEffect createNew(int entityId, (org.bukkit.potion.PotionEffect) MobEffect effect, boolean blend) {
+    public static (ClientboundUpdateMobEffectPacketHandle) ClientboundUpdateMobEffectPacket createNew(int entityId, (org.bukkit.potion.PotionEffect) MobEffectInstance effect, boolean blend) {
 #if version >= 1.20.5
-        return new PacketPlayOutEntityEffect(entityId, effect, blend);
+        return new ClientboundUpdateMobEffectPacket(entityId, effect, blend);
 #else
-        return new PacketPlayOutEntityEffect(entityId, effect);
+        return new ClientboundUpdateMobEffectPacket(entityId, effect);
 #endif
     }
 }
 
-class PacketPlayOutRemoveEntityEffect extends Packet {
+class ClientboundRemoveMobEffectPacket extends Packet {
 #if version >= 1.20.5
     public int getEntityId:entityId();
 #else
     public int getEntityId() {
   #if version >= 1.17
-        #require PacketPlayOutRemoveEntityEffect private int entityId;
+        #require ClientboundRemoveMobEffectPacket private int entityId;
   #else
-        #require PacketPlayOutRemoveEntityEffect private int entityId:a;
+        #require ClientboundRemoveMobEffectPacket private int entityId:a;
   #endif
         return instance#entityId;
     }
 #endif
 
 #if version >= 1.20.5
-    public (Holder<MobEffectListHandle>) net.minecraft.core.Holder<MobEffectList> getEffect:effect();
+    public (Holder<MobEffectHandle>) net.minecraft.core.Holder<MobEffect> getEffect:effect();
 #elseif version >= 1.18
-    public (Holder<MobEffectListHandle>) MobEffectList getEffect();
+    public (Holder<MobEffectHandle>) MobEffect getEffect();
 #elseif version >= 1.17
-    public (Holder<MobEffectListHandle>) MobEffectList getEffect:b();
+    public (Holder<MobEffectHandle>) MobEffect getEffect:b();
 #elseif version >= 1.9
-    public (Holder<MobEffectListHandle>) MobEffectList getEffect() {
-        #require PacketPlayOutRemoveEntityEffect private MobEffectList effect:b;
+    public (Holder<MobEffectHandle>) MobEffect getEffect() {
+        #require ClientboundRemoveMobEffectPacket private MobEffect effect:b;
         return instance#effect;
     }
 #else
-    public (Holder<MobEffectListHandle>) int getEffect() {
-        #require PacketPlayOutRemoveEntityEffect private int effect:b;
+    public (Holder<MobEffectHandle>) int getEffect() {
+        #require ClientboundRemoveMobEffectPacket private int effect:b;
         return instance#effect;
     }
 #endif
 
 #if version >= 1.20.5
-    public static (PacketPlayOutRemoveEntityEffectHandle) PacketPlayOutRemoveEntityEffect createNew(int entityId, (Holder<MobEffectListHandle>) net.minecraft.core.Holder<MobEffectList> effect) {
-        return new PacketPlayOutRemoveEntityEffect(entityId, effect);
+    public static (ClientboundRemoveMobEffectPacketHandle) ClientboundRemoveMobEffectPacket createNew(int entityId, (Holder<MobEffectHandle>) net.minecraft.core.Holder<MobEffect> effect) {
+        return new ClientboundRemoveMobEffectPacket(entityId, effect);
     }
 #elseif version >= 1.9
-    public static (PacketPlayOutRemoveEntityEffectHandle) PacketPlayOutRemoveEntityEffect createNew(int entityId, (Holder<MobEffectListHandle>) MobEffectList effect) {
-        return new PacketPlayOutRemoveEntityEffect(entityId, effect);
+    public static (ClientboundRemoveMobEffectPacketHandle) ClientboundRemoveMobEffectPacket createNew(int entityId, (Holder<MobEffectHandle>) MobEffect effect) {
+        return new ClientboundRemoveMobEffectPacket(entityId, effect);
     }
 #else
-    public static (PacketPlayOutRemoveEntityEffectHandle) PacketPlayOutRemoveEntityEffect createNew(int entityId, (Holder<MobEffectListHandle>) int effect) {
-        PacketPlayOutRemoveEntityEffect packet = new PacketPlayOutRemoveEntityEffect();
-        #require PacketPlayOutRemoveEntityEffect private int entityId:a;
-        #require PacketPlayOutRemoveEntityEffect private int effectId:b;
+    public static (ClientboundRemoveMobEffectPacketHandle) ClientboundRemoveMobEffectPacket createNew(int entityId, (Holder<MobEffectHandle>) int effect) {
+        ClientboundRemoveMobEffectPacket packet = new ClientboundRemoveMobEffectPacket();
+        #require ClientboundRemoveMobEffectPacket private int entityId:a;
+        #require ClientboundRemoveMobEffectPacket private int effectId:b;
         packet#entityId = entityId;
         packet#effectId = effect;
         return packet;
@@ -1121,16 +1118,16 @@ class PacketPlayOutRemoveEntityEffect extends Packet {
 
     <code>
     public org.bukkit.potion.PotionEffectType getPotionEffectType() {
-        return MobEffectListHandle.holderToBukkit(getEffect());
+        return MobEffectHandle.holderToBukkit(getEffect());
     }
 
-    public static PacketPlayOutRemoveEntityEffectHandle createNew(int entityId, org.bukkit.potion.PotionEffectType effectType) {
-        return createNew(entityId, MobEffectListHandle.holderFromBukkit(effectType));
+    public static ClientboundRemoveMobEffectPacketHandle createNew(int entityId, org.bukkit.potion.PotionEffectType effectType) {
+        return createNew(entityId, MobEffectHandle.holderFromBukkit(effectType));
     }
     </code>
 }
 
-class PacketPlayOutLogin extends Packet {
+class ClientboundLoginPacket extends Packet {
 #if version >= 1.19
     public int getPlayerId:playerId();
     public boolean isHardcore:hardcore();
@@ -1141,31 +1138,31 @@ class PacketPlayOutLogin extends Packet {
 #else
     public int getPlayerId() {
   #if version >= 1.17
-        #require PacketPlayOutLogin private readonly int playerId;
+        #require ClientboundLoginPacket private readonly int playerId;
   #else
-        #require PacketPlayOutLogin private readonly int playerId:a;
+        #require ClientboundLoginPacket private readonly int playerId:a;
   #endif
         return instance#playerId;
     }
 
     public boolean isHardcore() {
   #if version >= 1.17
-        #require PacketPlayOutLogin private readonly boolean hardcore;
+        #require ClientboundLoginPacket private readonly boolean hardcore;
   #elseif version >= 1.15
-        #require PacketPlayOutLogin private readonly boolean hardcore:c;
+        #require ClientboundLoginPacket private readonly boolean hardcore:c;
   #else
-        #require PacketPlayOutLogin private readonly boolean hardcore:b;
+        #require ClientboundLoginPacket private readonly boolean hardcore:b;
   #endif
         return instance#hardcore;
     }
 
     public int getMaxPlayers() {
   #select version >=
-  #case 1.17:  #require PacketPlayOutLogin private readonly int maxPlayers;
-  #case 1.16:  #require PacketPlayOutLogin private readonly int maxPlayers:j;
-  #case 1.15:  #require PacketPlayOutLogin private readonly int maxPlayers:f;
-  #case 1.14:  #require PacketPlayOutLogin private readonly int maxPlayers:e;
-  #case else:  #require PacketPlayOutLogin private readonly int maxPlayers:f;
+  #case 1.17:  #require ClientboundLoginPacket private readonly int maxPlayers;
+  #case 1.16:  #require ClientboundLoginPacket private readonly int maxPlayers:j;
+  #case 1.15:  #require ClientboundLoginPacket private readonly int maxPlayers:f;
+  #case 1.14:  #require ClientboundLoginPacket private readonly int maxPlayers:e;
+  #case else:  #require ClientboundLoginPacket private readonly int maxPlayers:f;
   #endselect
         return instance#maxPlayers;
     }
@@ -1173,10 +1170,10 @@ class PacketPlayOutLogin extends Packet {
     public int getViewDistance() {
   #if version >= 1.14
     #select version >=
-    #case 1.17:  #require PacketPlayOutLogin private readonly int chunkRadius;
-    #case 1.16:  #require PacketPlayOutLogin private readonly int chunkRadius:k;
-    #case 1.15:  #require PacketPlayOutLogin private readonly int chunkRadius:h;
-    #case else:  #require PacketPlayOutLogin private readonly int chunkRadius:g;
+    #case 1.17:  #require ClientboundLoginPacket private readonly int chunkRadius;
+    #case 1.16:  #require ClientboundLoginPacket private readonly int chunkRadius:k;
+    #case 1.15:  #require ClientboundLoginPacket private readonly int chunkRadius:h;
+    #case else:  #require ClientboundLoginPacket private readonly int chunkRadius:g;
     #endselect
         return instance#chunkRadius;
   #else
@@ -1186,86 +1183,86 @@ class PacketPlayOutLogin extends Packet {
 
     public boolean isReducedDebugInfo() {
   #select version >=
-  #case 1.17:  #require PacketPlayOutLogin private readonly boolean reducedDebugInfo;
-  #case 1.16:  #require PacketPlayOutLogin private readonly boolean reducedDebugInfo:l;
-  #case 1.15:  #require PacketPlayOutLogin private readonly boolean reducedDebugInfo:i;
-  #case else:  #require PacketPlayOutLogin private readonly boolean reducedDebugInfo:h;
+  #case 1.17:  #require ClientboundLoginPacket private readonly boolean reducedDebugInfo;
+  #case 1.16:  #require ClientboundLoginPacket private readonly boolean reducedDebugInfo:l;
+  #case 1.15:  #require ClientboundLoginPacket private readonly boolean reducedDebugInfo:i;
+  #case else:  #require ClientboundLoginPacket private readonly boolean reducedDebugInfo:h;
   #endselect
         return instance#reducedDebugInfo;
     }
 #endif
 
 #if version >= 1.20.5
-    public (org.bukkit.GameMode) EnumGamemode getGameMode() {
+    public (org.bukkit.GameMode) GameType getGameMode() {
         return instance.commonPlayerSpawnInfo().gameType();
     }
-    public (DimensionType) net.minecraft.core.Holder<DimensionManager> getDimensionType() {
+    public (DimensionType) net.minecraft.core.Holder<net.minecraft.world.level.dimension.DimensionType> getDimensionType() {
         return instance.commonPlayerSpawnInfo().dimensionType();
     }
 #elseif version >= 1.20.2
-    public (org.bukkit.GameMode) EnumGamemode getGameMode() {
+    public (org.bukkit.GameMode) GameType getGameMode() {
         return instance.commonPlayerSpawnInfo().gameType();
     }
-    public (DimensionType) ResourceKey<DimensionManager> getDimensionType() {
+    public (DimensionType) ResourceKey<net.minecraft.world.level.dimension.DimensionType> getDimensionType() {
         return instance.commonPlayerSpawnInfo().dimensionType();
     }
 #else
   #if version >= 1.17
-    #require PacketPlayOutLogin private readonly EnumGamemode gameType;
+    #require ClientboundLoginPacket private readonly GameType gameType;
   #elseif version >= 1.15
-    #require PacketPlayOutLogin private readonly EnumGamemode gameType:d;
+    #require ClientboundLoginPacket private readonly GameType gameType:d;
   #else
-    #require PacketPlayOutLogin private readonly EnumGamemode gameType:c;
+    #require ClientboundLoginPacket private readonly GameType gameType:c;
   #endif
 
     #select version >=
-    #case 1.19:     #require PacketPlayOutLogin private (DimensionType) ResourceKey<DimensionManager> dimensionType;
-    #case 1.18.2:   #require PacketPlayOutLogin private (DimensionType) net.minecraft.core.Holder<DimensionManager> dimensionType;
-    #case 1.17:     #require PacketPlayOutLogin private (DimensionType) DimensionManager dimensionType;
-    #case 1.16.2:   #require PacketPlayOutLogin private (DimensionType) DimensionManager dimensionType:h;
-    #case 1.16:     #require PacketPlayOutLogin private (DimensionType) ResourceKey<DimensionManager> dimensionType:h;
-    #case 1.15:     #require PacketPlayOutLogin private (DimensionType) DimensionManager dimensionType:e;
-    #case 1.13.1:   #require PacketPlayOutLogin private (DimensionType) DimensionManager dimensionType:d;
-    #case else:     #require PacketPlayOutLogin private (DimensionType) int dimensionType:d;
+    #case 1.19:     #require ClientboundLoginPacket private (net.minecraft.world.level.dimension.DimensionType) ResourceKey<net.minecraft.world.level.dimension.DimensionType> dimensionType;
+    #case 1.18.2:   #require ClientboundLoginPacket private (net.minecraft.world.level.dimension.DimensionType) net.minecraft.core.Holder<net.minecraft.world.level.dimension.DimensionType> dimensionType;
+    #case 1.17:     #require ClientboundLoginPacket private (net.minecraft.world.level.dimension.DimensionType) net.minecraft.world.level.dimension.DimensionType dimensionType;
+    #case 1.16.2:   #require ClientboundLoginPacket private (net.minecraft.world.level.dimension.DimensionType) net.minecraft.world.level.dimension.DimensionType dimensionType:h;
+    #case 1.16:     #require ClientboundLoginPacket private (net.minecraft.world.level.dimension.DimensionType) ResourceKey<net.minecraft.world.level.dimension.DimensionType> dimensionType:h;
+    #case 1.15:     #require ClientboundLoginPacket private (net.minecraft.world.level.dimension.DimensionType) net.minecraft.world.level.dimension.DimensionType dimensionType:e;
+    #case 1.13.1:   #require ClientboundLoginPacket private (net.minecraft.world.level.dimension.DimensionType) net.minecraft.world.level.dimension.DimensionType dimensionType:d;
+    #case else:     #require ClientboundLoginPacket private (net.minecraft.world.level.dimension.DimensionType) int dimensionType:d;
     #endselect
 
-    public (org.bukkit.GameMode) EnumGamemode getGameMode() { return instance#gameType; }
-    public (DimensionType) DimensionType getDimensionType() { return instance#dimensionType; }
+    public (org.bukkit.GameMode) GameType getGameMode() { return instance#gameType; }
+    public (DimensionType) net.minecraft.world.level.dimension.DimensionType getDimensionType() { return instance#dimensionType; }
 #endif
 
 #if version >= 1.20.2
-    public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
+    public (org.bukkit.GameMode) GameType getPreviousGameMode() {
         return instance.commonPlayerSpawnInfo().previousGameType();
     }
 #elseif version >= 1.16
     // Since 1.16 the previous game mode of the player is also sent
     // This allows the player to toggle back and forth between modes
   #if version >= 1.17
-    #require PacketPlayOutLogin private net.minecraft.world.level.EnumGamemode previousGameMode:previousGameType;
+    #require ClientboundLoginPacket private net.minecraft.world.level.GameType previousGameMode:previousGameType;
   #else
-    #require PacketPlayOutLogin private net.minecraft.world.level.EnumGamemode previousGameMode:e;
+    #require ClientboundLoginPacket private net.minecraft.world.level.GameType previousGameMode:e;
   #endif
 
-    public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
-        EnumGamemode mode = instance#previousGameMode;
+    public (org.bukkit.GameMode) GameType getPreviousGameMode() {
+        GameType mode = instance#previousGameMode;
   #if version <= 1.16.5
-        if (mode == EnumGamemode.NOT_SET) {
+        if (mode == GameType.NOT_SET) {
             return null;
         }
   #endif
         return mode;
     }
 #else
-    public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
+    public (org.bukkit.GameMode) GameType getPreviousGameMode() {
         return null;
     }
 #endif
 
     // Difficulty field only exists <= 1.13.2
 #if version >= 1.14
-    private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:###;
+    private optional (org.bukkit.Difficulty) Difficulty difficulty:###;
 #else
-    private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:e;
+    private optional (org.bukkit.Difficulty) Difficulty difficulty:e;
 #endif
 
 #if version >= 1.17 && version < 1.20.2
@@ -1282,75 +1279,75 @@ class PacketPlayOutLogin extends Packet {
 
     // Encrypted world seed field was added on MC 1.15
     // It has little meaning, so we just add a method to initialize it
-    //public void setEncryptedWorldSeed((org.bukkit.World) WorldServer world) {
+    //public void setEncryptedWorldSeed((org.bukkit.World) ServerLevel world) {
 #if version >= 1.20.2
     //    #require CommonPlayerSpawnInfo private long encryptedWorldSeed:seed;
     //    instance#encryptedWorldSeed = BiomeManager.obfuscateSeed(world.getSeed());
 #elseif version >= 1.18
-    //    #require net.minecraft.network.protocol.game.PacketPlayOutLogin private long encryptedWorldSeed:seed;
+    //    #require net.minecraft.network.protocol.game.ClientboundLoginPacket private long encryptedWorldSeed:seed;
     //    instance#encryptedWorldSeed = BiomeManager.obfuscateSeed(world.getSeed());
 #elseif version >= 1.17
-    //    #require net.minecraft.network.protocol.game.PacketPlayOutLogin private long encryptedWorldSeed:seed;
+    //    #require net.minecraft.network.protocol.game.ClientboundLoginPacket private long encryptedWorldSeed:seed;
     //    instance#encryptedWorldSeed = BiomeManager.a(world.getSeed());
 #elseif version >= 1.16
-    //    #require net.minecraft.network.protocol.game.PacketPlayOutLogin private long encryptedWorldSeed:b;
+    //    #require net.minecraft.network.protocol.game.ClientboundLoginPacket private long encryptedWorldSeed:b;
     //    instance#encryptedWorldSeed = BiomeManager.a(world.getSeed());
 #elseif version >= 1.15
-    //    #require net.minecraft.network.protocol.game.PacketPlayOutLogin private long encryptedWorldSeed:b;
+    //    #require net.minecraft.network.protocol.game.ClientboundLoginPacket private long encryptedWorldSeed:b;
     //    instance#encryptedWorldSeed = WorldData.c(world.getWorldData().getSeed());
 #endif
     //}
 }
 
-class PacketPlayOutRespawn extends Packet {
+class ClientboundRespawnPacket extends Packet {
 #if version >= 1.20.5
-    public (DimensionType) net.minecraft.core.Holder<DimensionManager> getDimensionType() {
+    public (DimensionType) net.minecraft.core.Holder<net.minecraft.world.level.dimension.DimensionType> getDimensionType() {
         return instance.commonPlayerSpawnInfo().dimensionType();
     }
-    public (org.bukkit.GameMode) EnumGamemode getGamemode() {
+    public (org.bukkit.GameMode) GameType getGamemode() {
         return instance.commonPlayerSpawnInfo().gameType();
     }
-    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getWorldName() {
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<Level> getWorldName() {
         return instance.commonPlayerSpawnInfo().dimension();
     }
 #elseif version >= 1.20.2
-    public (DimensionType) ResourceKey<DimensionManager> getDimensionType() {
+    public (DimensionType) ResourceKey<net.minecraft.world.level.dimension.DimensionType> getDimensionType() {
         return instance.commonPlayerSpawnInfo().dimensionType();
     }
-    public (org.bukkit.GameMode) EnumGamemode getGamemode() {
+    public (org.bukkit.GameMode) GameType getGamemode() {
         return instance.commonPlayerSpawnInfo().gameType();
     }
-    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getWorldName() {
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<Level> getWorldName() {
         return instance.commonPlayerSpawnInfo().dimension();
     }
 #else
     #select version >=
-    #case 1.19:    #require PacketPlayOutRespawn private final (DimensionType) ResourceKey<DimensionManager> dimensionType;
-    #case 1.18.2:  #require PacketPlayOutRespawn private final (DimensionType) net.minecraft.core.Holder<DimensionManager> dimensionType;
-    #case 1.17:    #require PacketPlayOutRespawn private final (DimensionType) DimensionManager dimensionType;
-    #case 1.16.2:  #require PacketPlayOutRespawn private (DimensionType) DimensionManager dimensionType:a;
-    #case 1.16:    #require PacketPlayOutRespawn private (DimensionType) ResourceKey<DimensionManager> dimensionType:a;
-    #case 1.13.1:  #require PacketPlayOutRespawn private (DimensionType) DimensionManager dimensionType:a;
-    #case else:    #require PacketPlayOutRespawn private (DimensionType) int dimensionType:a;
+    #case 1.19:    #require ClientboundRespawnPacket private final (net.minecraft.world.level.dimension.DimensionType) ResourceKey<net.minecraft.world.level.dimension.DimensionType> dimensionType;
+    #case 1.18.2:  #require ClientboundRespawnPacket private final (net.minecraft.world.level.dimension.DimensionType) net.minecraft.core.Holder<net.minecraft.world.level.dimension.DimensionType> dimensionType;
+    #case 1.17:    #require ClientboundRespawnPacket private final (net.minecraft.world.level.dimension.DimensionType) net.minecraft.world.level.dimension.DimensionType dimensionType;
+    #case 1.16.2:  #require ClientboundRespawnPacket private (net.minecraft.world.level.dimension.DimensionType) net.minecraft.world.level.dimension.DimensionType dimensionType:a;
+    #case 1.16:    #require ClientboundRespawnPacket private (net.minecraft.world.level.dimension.DimensionType) ResourceKey<net.minecraft.world.level.dimension.DimensionType> dimensionType:a;
+    #case 1.13.1:  #require ClientboundRespawnPacket private (net.minecraft.world.level.dimension.DimensionType) net.minecraft.world.level.dimension.DimensionType dimensionType:a;
+    #case else:    #require ClientboundRespawnPacket private (net.minecraft.world.level.dimension.DimensionType) int dimensionType:a;
     #endselect
 
     #select version >=
-    #case 1.17:    #require PacketPlayOutRespawn private EnumGamemode gameType:playerGameType;
-    #case 1.16:    #require PacketPlayOutRespawn private EnumGamemode gameType:d;
-    #case 1.15:    #require PacketPlayOutRespawn private EnumGamemode gameType:c;
-    #case 1.14:    #require PacketPlayOutRespawn private EnumGamemode gameType:b;
-    #case else:    #require PacketPlayOutRespawn private EnumGamemode gameType:c;
+    #case 1.17:    #require ClientboundRespawnPacket private GameType gameType:playerGameType;
+    #case 1.16:    #require ClientboundRespawnPacket private GameType gameType:d;
+    #case 1.15:    #require ClientboundRespawnPacket private GameType gameType:c;
+    #case 1.14:    #require ClientboundRespawnPacket private GameType gameType:b;
+    #case else:    #require ClientboundRespawnPacket private GameType gameType:c;
     #endselect
 
   #if version >= 1.17
-    #require PacketPlayOutRespawn private net.minecraft.resources.ResourceKey<net.minecraft.world.level.World> worldName:dimension;
+    #require ClientboundRespawnPacket private net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> worldName:dimension;
   #elseif version >= 1.16
-    #require PacketPlayOutRespawn private net.minecraft.resources.ResourceKey<net.minecraft.world.level.World> worldName:b;
+    #require ClientboundRespawnPacket private net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> worldName:b;
   #endif
 
-    public (DimensionType) DimensionType getDimensionType() { return instance#dimensionType; }
-    public (org.bukkit.GameMode) EnumGamemode getGamemode() { return instance#gameType; }
-    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getWorldName() {
+    public (DimensionType) net.minecraft.world.level.dimension.DimensionType getDimensionType() { return instance#dimensionType; }
+    public (org.bukkit.GameMode) GameType getGamemode() { return instance#gameType; }
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<Level> getWorldName() {
         // Since Minecraft 1.16: World environment has a resource key, too!
   #if version >= 1.16
         return instance#worldName;
@@ -1361,66 +1358,66 @@ class PacketPlayOutRespawn extends Packet {
 #endif
 
     // Dimension and WorldType are now resource keys
-    // private ResourceKey<World> b;
+    // private ResourceKey<Level> b;
 
     // Difficulty field only exists <= 1.13.2
 #if version >= 1.14
-    private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:###;
+    private optional (org.bukkit.Difficulty) Difficulty difficulty:###;
 #else
-    private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:b;
+    private optional (org.bukkit.Difficulty) Difficulty difficulty:b;
 #endif
 
     // Since 1.16 the previous game mode of the player is also sent
     // This allows the player to toggle back and forth between modes
 #if version >= 1.20.2
-    public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
+    public (org.bukkit.GameMode) GameType getPreviousGameMode() {
         return instance.commonPlayerSpawnInfo().previousGameType();
     }
 #elseif version >= 1.16
   #if version >= 1.17
-    #require PacketPlayOutRespawn private net.minecraft.world.level.EnumGamemode previousGameMode:previousPlayerGameType;
+    #require ClientboundRespawnPacket private net.minecraft.world.level.GameType previousGameMode:previousPlayerGameType;
   #else
-    #require PacketPlayOutRespawn private net.minecraft.world.level.EnumGamemode previousGameMode:e;
+    #require ClientboundRespawnPacket private net.minecraft.world.level.GameType previousGameMode:e;
   #endif
 
-    public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
-        EnumGamemode mode = instance#previousGameMode;
+    public (org.bukkit.GameMode) GameType getPreviousGameMode() {
+        GameType mode = instance#previousGameMode;
   #if version <= 1.16.5
-        if (mode == EnumGamemode.NOT_SET) {
+        if (mode == GameType.NOT_SET) {
             return null;
         }
   #endif
         return mode;
     }
 #else
-    public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
+    public (org.bukkit.GameMode) GameType getPreviousGameMode() {
         return null;
     }
 #endif
 
     // Encrypted world seed field was added on MC 1.15
     // It has little meaning, so we just add a method to initialize it
-    //public void setEncryptedWorldSeed((org.bukkit.World) WorldServer world) {
+    //public void setEncryptedWorldSeed((org.bukkit.World) ServerLevel world) {
 #if version >= 1.20.2
     //    #require CommonPlayerSpawnInfo private long encryptedWorldSeed:seed;
     //    instance#common()#encryptedWorldSeed = BiomeManager.obfuscateSeed(world.getSeed());
 #elseif version >= 1.18
-    //    #require net.minecraft.network.protocol.game.PacketPlayOutRespawn private long encryptedWorldSeed:seed;
+    //    #require net.minecraft.network.protocol.game.ClientboundRespawnPacket private long encryptedWorldSeed:seed;
     //    instance#encryptedWorldSeed = BiomeManager.obfuscateSeed(world.getSeed());
 #elseif version >= 1.17
-    //    #require net.minecraft.network.protocol.game.PacketPlayOutRespawn private long encryptedWorldSeed:seed;
+    //    #require net.minecraft.network.protocol.game.ClientboundRespawnPacket private long encryptedWorldSeed:seed;
     //    instance#encryptedWorldSeed = BiomeManager.a(world.getSeed());
 #elseif version >= 1.16
-    //    #require net.minecraft.network.protocol.game.PacketPlayOutRespawn private long encryptedWorldSeed:c;
+    //    #require net.minecraft.network.protocol.game.ClientboundRespawnPacket private long encryptedWorldSeed:c;
     //    instance#encryptedWorldSeed = BiomeManager.a(world.getSeed());
 #elseif version >= 1.15
-    //    #require net.minecraft.network.protocol.game.PacketPlayOutRespawn private long encryptedWorldSeed:b;
+    //    #require net.minecraft.network.protocol.game.ClientboundRespawnPacket private long encryptedWorldSeed:b;
     //    instance#encryptedWorldSeed = WorldData.c(world.getWorldData().getSeed());
 #endif
     //}
 }
 
-class PacketPlayOutUpdateHealth extends Packet {
+class ClientboundSetHealthPacket extends Packet {
 #if version >= 1.17
     private float health;
     private int food;
@@ -1432,7 +1429,7 @@ class PacketPlayOutUpdateHealth extends Packet {
 #endif
 }
 
-class PacketPlayOutExperience extends Packet {
+class ClientboundSetExperiencePacket extends Packet {
 #if version >= 1.17
     private float experienceProgress;
     private int totalExperience;
@@ -1444,7 +1441,7 @@ class PacketPlayOutExperience extends Packet {
 #endif
 }
 
-class PacketPlayOutUpdateTime extends Packet {
+class ClientboundSetTimePacket extends Packet {
 #if version >= 1.17
     private long gameTime;
     private long dayTime;
@@ -1454,35 +1451,36 @@ class PacketPlayOutUpdateTime extends Packet {
 #endif
 }
 
-class PacketPlayOutServerDifficulty extends Packet {
+class ClientboundChangeDifficultyPacket extends Packet {
 #if version >= 1.17
-    private final (org.bukkit.Difficulty) EnumDifficulty difficulty;
+    private final (org.bukkit.Difficulty) Difficulty difficulty;
     private final boolean hardcore:locked;
 #else
-    private final (org.bukkit.Difficulty) EnumDifficulty difficulty:a;
+    private final (org.bukkit.Difficulty) Difficulty difficulty:a;
     private final boolean hardcore:b;
 #endif
 }
 
-class PacketPlayOutPlayerListHeaderFooter extends Packet {
+class ClientboundTabListPacket extends Packet {
 #if version >= 1.13.1
-    private (ChatText) IChatBaseComponent header;
-    private (ChatText) IChatBaseComponent footer;
+    private (ChatText) Component header;
+    private (ChatText) Component footer;
 #else
-    private (ChatText) IChatBaseComponent header:a;
-    private (ChatText) IChatBaseComponent footer:b;
+    private (ChatText) Component header:a;
+    private (ChatText) Component footer:b;
 #endif
 }
 
-// Is 'ClientboundLevelChunkWithLightPacket' on Minecraft 1.18 and later
-// Then all data is stored in Chunk and Light data fields, not individual fields
-// This is actually the ClientboundLevelChunkWithLightPacket
+// Is 'ClientboundLevelChunkWithLightPacket' on Minecraft 1.18+
+//   Then all data is stored in Chunk and Light data fields, not individual fields
+// is 'ClientboundLevelChunkPacket' on Minecraft 1.8 - 1.17
+//   Then light data is sent separately
 //
 //TODO: Shortly a BitSet/int of a mask of sections stored was used
 //      Add it? Same for 'biome storage' and 'has biome data'
 //      On 1.18 and later light data is also stored (also 1.8.9 and before)
 //      I don't use it, so if anyone wants it, PR it.
-class PacketPlayOutMapChunk extends Packet {
+class ClientboundLevelChunkWithLightPacket extends Packet {
 #if version >= 1.17
     private int x;
     private int z;
@@ -1491,28 +1489,28 @@ class PacketPlayOutMapChunk extends Packet {
     private int z:b;
 #endif
 
-    public static (PacketPlayOutMapChunkHandle) PacketPlayOutMapChunk createNew() {
+    public static (ClientboundLevelChunkWithLightPacketHandle) ClientboundLevelChunkWithLightPacket createNew() {
 #if version >= 1.20.5
-        #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private PacketPlayOutMapChunk createMapChunkPacket:<init>(net.minecraft.network.RegistryFriendlyByteBuf buf);
+        #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private ClientboundLevelChunkWithLightPacket createMapChunkPacket:<init>(net.minecraft.network.RegistryFriendlyByteBuf buf);
         return #createMapChunkPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #elseif version >= 1.17
-        return new PacketPlayOutMapChunk(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+        return new ClientboundLevelChunkWithLightPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
-        return new PacketPlayOutMapChunk();
+        return new ClientboundLevelChunkWithLightPacket();
 #endif
     }
 
     // Heightmap data, not available on MC 1.13.2 and before
-    public (CommonTagCompound) NBTTagCompound getHeightmaps() {
+    public (CommonTagCompound) CompoundTag getHeightmaps() {
 #if version >= 1.21.5
-        // Convert Map<HeightMap.Type, long[]> into NBT
-        NBTTagCompound heightmapsNBT = new NBTTagCompound();
+        // Convert Map<Heightmap.Types, long[]> into NBT
+        CompoundTag heightmapsNBT = new CompoundTag();
 
         java.util.Map heightmaps = instance.getChunkData().getHeightmaps();
         java.util.Iterator iter = heightmaps.entrySet().iterator();
         while (iter.hasNext()) {
             java.util.Map$Entry entry = (java.util.Map$Entry) iter.next();
-            net.minecraft.world.level.levelgen.HeightMap$Type heightmapType = (net.minecraft.world.level.levelgen.HeightMap$Type) entry.getKey();
+            net.minecraft.world.level.levelgen.Heightmap$Types heightmapType = (net.minecraft.world.level.levelgen.Heightmap$Types) entry.getKey();
             long[] heightmapData = (long[]) entry.getValue();
             heightmapsNBT.putLongArray(heightmapType.getSerializedName(), heightmapData);
         }
@@ -1524,29 +1522,29 @@ class PacketPlayOutMapChunk extends Packet {
 #elseif version >= 1.17
         return instance.f();
 #elseif version >= 1.14
-        #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private NBTTagCompound heightmapsField:d;
+        #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private CompoundTag heightmapsField:d;
         return instance#heightmapsField;
 #else
         return null; // Not available
 #endif
     }
 
-    public void setHeightmaps((CommonTagCompound) NBTTagCompound heightmapsData) {
+    public void setHeightmaps((CommonTagCompound) CompoundTag heightmapsData) {
 #if version >= 1.21.5
-        // Convert NBT into Map<HeightMap.Type, long[]>
+        // Convert NBT into Map<Heightmap.Types, long[]>
         java.util.Map heightmaps = new java.util.HashMap(heightmapsData.size());
 
-        net.minecraft.world.level.levelgen.HeightMap$Type[] heightmapTypes = net.minecraft.world.level.levelgen.HeightMap$Type.values();
+        net.minecraft.world.level.levelgen.Heightmap$Types[] heightmapTypes = net.minecraft.world.level.levelgen.Heightmap$Types.values();
 
-        //   public Set<Map.Entry<String, NBTBase>> entrySet() {
+        //   public Set<Map.Entry<String, Tag>> entrySet() {
         java.util.Iterator nbtEntryIter = heightmapsData.entrySet().iterator();
         while (nbtEntryIter.hasNext()) {
             java.util.Map$Entry entry = (java.util.Map$Entry) nbtEntryIter.next();
 
-            // Key -> HeightMap.Type
+            // Key -> Heightmap.Types
             // TODO: Use the Codec to avoid a for loop here
             String serializedName = (String) entry.getKey();
-            net.minecraft.world.level.levelgen.HeightMap$Type heightmapType = null;
+            net.minecraft.world.level.levelgen.Heightmap$Types heightmapType = null;
             for (int i = 0; i < heightmapTypes.length; i++) {
                 if (heightmapTypes[i].getSerializedName().equals(serializedName)) {
                     heightmapType = heightmapTypes[i];
@@ -1557,29 +1555,29 @@ class PacketPlayOutMapChunk extends Packet {
                 continue;
             }
 
-            // NBTBase -> long[]
-            NBTBase heightNBT = (NBTBase) entry.getValue();
-            if (!(heightNBT instanceof NBTTagLongArray)) {
+            // Tag -> long[]
+            Tag heightNBT = (Tag) entry.getValue();
+            if (!(heightNBT instanceof LongArrayTag)) {
                 continue;
             }
 
-            long[] heightmapData = ((NBTTagLongArray) heightNBT).getAsLongArray();
+            long[] heightmapData = ((LongArrayTag) heightNBT).getAsLongArray();
 
             heightmaps.put(heightmapType, heightmapData);
         }
 
-        #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData private final Map<HeightMap.Type, long[]> heightmaps;
+        #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData private final Map<Heightmap.Types, long[]> heightmaps;
         instance#heightmaps = heightmaps;
 
 #elseif version >= 1.18
-        #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData private final NBTTagCompound heightmaps;
+        #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData private final CompoundTag heightmaps;
         net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData data = instance.getChunkData();
         data#heightmaps = heightmapsData;
 #elseif version >= 1.17
-        #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private final NBTTagCompound heightmaps;
+        #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private final CompoundTag heightmaps;
         instance#heightmaps = heightmapsData;
 #elseif version >= 1.14
-        #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private NBTTagCompound heightmaps:d;
+        #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private CompoundTag heightmaps:d;
         instance#heightmapsField = heightmapsData;
 #else
         // Not available
@@ -1591,16 +1589,16 @@ class PacketPlayOutMapChunk extends Packet {
 #if version >= 1.18
     #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData private final byte[] chunkDataBuffer:buffer;
 #elseif version >= 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private byte[] chunkDataBuffer:buffer;
+    #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private byte[] chunkDataBuffer:buffer;
 #elseif version >= 1.15
-    #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private byte[] chunkDataBuffer:f;
+    #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private byte[] chunkDataBuffer:f;
 #elseif version >= 1.14
-    #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private byte[] chunkDataBuffer:e;
+    #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private byte[] chunkDataBuffer:e;
 #elseif version >= 1.9
-    #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private byte[] chunkDataBuffer:d;
+    #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private byte[] chunkDataBuffer:d;
 #else
-    #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private PacketPlayOutMapChunk.ChunkMap chunkData:c;
-    #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk.ChunkMap  public byte[] chunkDataBuffer:a;
+    #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private ClientboundLevelChunkWithLightPacket.ChunkMap chunkData:c;
+    #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket.ChunkMap  public byte[] chunkDataBuffer:a;
 #endif
 
     public byte[] getBuffer() {
@@ -1610,7 +1608,7 @@ class PacketPlayOutMapChunk extends Packet {
 #elseif version >= 1.9
         return instance#chunkDataBuffer;
 #else
-        PacketPlayOutMapChunk$ChunkMap data = instance#chunkData;
+        ClientboundLevelChunkWithLightPacket$ChunkMap data = instance#chunkData;
         return data#chunkDataBuffer;
 #endif
     }
@@ -1622,7 +1620,7 @@ class PacketPlayOutMapChunk extends Packet {
 #elseif version >= 1.9
         instance#chunkDataBuffer = buffer;
 #else
-        PacketPlayOutMapChunk$ChunkMap data = instance#chunkData;
+        ClientboundLevelChunkWithLightPacket$ChunkMap data = instance#chunkData;
         data#chunkDataBuffer = buffer;
 #endif
     }
@@ -1637,13 +1635,13 @@ class PacketPlayOutMapChunk extends Packet {
                 data#blockEntitiesData, instance.getX(), instance.getZ());
 #elseif version >= 1.9.4
   #if version >= 1.17
-        #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private (List<BlockStateChange) List<NBTTagCompound> blockEntitiesTags;
+        #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private (List<BlockStateChange) List<CompoundTag> blockEntitiesTags;
   #elseif version >= 1.15
-        #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private (List<BlockStateChange) List<NBTTagCompound> blockEntitiesTags:g;
+        #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private (List<BlockStateChange) List<CompoundTag> blockEntitiesTags:g;
   #elseif version >= 1.14
-        #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private (List<BlockStateChange) List<NBTTagCompound> blockEntitiesTags:f;
+        #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private (List<BlockStateChange) List<CompoundTag> blockEntitiesTags:f;
   #else
-        #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private (List<BlockStateChange) List<NBTTagCompound> blockEntitiesTags:e;
+        #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private (List<BlockStateChange) List<CompoundTag> blockEntitiesTags:e;
   #endif
         return instance#blockEntitiesTags;
 #else
@@ -1674,22 +1672,22 @@ class PacketPlayOutMapChunk extends Packet {
 }
 
 // Only >= MC 1.9 (MC 1.8.9 relies on clients themselves to unload as needed, for some reason)
-optional class PacketPlayOutUnloadChunk extends Packet {
+optional class ClientboundForgetLevelChunkPacket extends Packet {
 #if version >= 1.20.2
     public int getCx() { return instance.pos().x; }
     public int getCz() { return instance.pos().z; }
     public void setChunk(int cx, int cz) {
-        #require PacketPlayOutUnloadChunk private final net.minecraft.world.level.ChunkCoordIntPair pos;
-        net.minecraft.world.level.ChunkCoordIntPair pair = new net.minecraft.world.level.ChunkCoordIntPair(cx, cz);
+        #require ClientboundForgetLevelChunkPacket private final net.minecraft.world.level.ChunkPos pos;
+        net.minecraft.world.level.ChunkPos pair = new net.minecraft.world.level.ChunkPos(cx, cz);
         instance#pos = pair;
     }
 #else
   #if version >= 1.17
-    #require PacketPlayOutUnloadChunk private int cx:x;
-    #require PacketPlayOutUnloadChunk private int cz:z;
+    #require ClientboundForgetLevelChunkPacket private int cx:x;
+    #require ClientboundForgetLevelChunkPacket private int cz:z;
   #elseif version >= 1.9
-    #require PacketPlayOutUnloadChunk private int cx:a;
-    #require PacketPlayOutUnloadChunk private int cz:b;
+    #require ClientboundForgetLevelChunkPacket private int cx:a;
+    #require ClientboundForgetLevelChunkPacket private int cz:b;
   #endif
 
     public int getCx() { return instance#cx; }
@@ -1711,14 +1709,14 @@ optional class PacketPlayOutUnloadChunk extends Packet {
     </code>
 }
 
-class PacketPlayOutNamedSoundEffect extends Packet {
+class ClientboundSoundPacket extends Packet {
 #if version >= 1.17
   #if version >= 1.19.3
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.core.Holder<net.minecraft.sounds.SoundEffect> sound;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.core.Holder<net.minecraft.sounds.SoundEvent> sound;
   #else
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.sounds.SoundEffect sound;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.sounds.SoundEvent sound;
   #endif
-    private optional (String) SoundCategory category_1_10_2:source;
+    private optional (String) SoundSource category_1_10_2:source;
     private int x;
     private int y;
     private int z;
@@ -1726,8 +1724,8 @@ class PacketPlayOutNamedSoundEffect extends Packet {
     private optional int pitch_1_8_8:###;
     private optional float pitch_1_10_2:pitch;
 #elseif version >= 1.9
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.sounds.SoundEffect sound:a;
-    private optional (String) SoundCategory category_1_10_2:b;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.sounds.SoundEvent sound:a;
+    private optional (String) SoundSource category_1_10_2:b;
     private int x:c;
     private int y:d;
     private int z:e;
@@ -1736,7 +1734,7 @@ class PacketPlayOutNamedSoundEffect extends Packet {
     private optional float pitch_1_10_2:g;
 #else
     private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String sound:a;
-    private optional (String) SoundCategory category_1_10_2:###;
+    private optional (String) SoundSource category_1_10_2:###;
     private int x:b;
     private int y:c;
     private int z:d;
@@ -1786,17 +1784,17 @@ class PacketPlayOutNamedSoundEffect extends Packet {
 
 }
 
-// This packet class is handled by PacketPlayOutNamedSoundEffect on MC 1.8 - 1.8.8, where it
+// This packet class is handled by ClientboundSoundPacket on MC 1.8 - 1.8.8, where it
 // can only really play Vanilla sound effects.
-// It is also handled by PacketPlayOutNamedSoundEffect on MC 1.19.3+ where the two packets
+// It is also handled by ClientboundSoundPacket on MC 1.19.3+ where the two packets
 // were merged into one.
-class PacketPlayOutCustomSoundEffect extends Packet {
+class ClientboundCustomSoundPacket extends Packet {
 #if version >= 1.19.3
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.core.Holder<net.minecraft.sounds.SoundEffect> sound;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.core.Holder<net.minecraft.sounds.SoundEvent> sound;
 #elseif version >= 1.17
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.resources.MinecraftKey sound:name;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.resources.Identifier sound:name;
 #elseif version >= 1.13
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.resources.MinecraftKey sound:a;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.resources.Identifier sound:a;
 #else
     private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String sound:a;
 #endif
@@ -1810,26 +1808,26 @@ class PacketPlayOutCustomSoundEffect extends Packet {
 #endif
 
 #if version >= 1.19.3
-    // Note: is PacketPlayOutNamedSoundEffect
-    public static (PacketPlayOutCustomSoundEffectHandle) PacketPlayOutCustomSoundEffect createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.core.Holder<net.minecraft.sounds.SoundEffect> soundEffect, (String) SoundCategory category, double x, double y, double z, float volume, float pitch, long randomSeed) {
-        return new PacketPlayOutCustomSoundEffect(soundEffect, category, x, y, z, volume, pitch, randomSeed);
+    // Note: is ClientboundSoundPacket
+    public static (ClientboundCustomSoundPacketHandle) ClientboundCustomSoundPacket createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.core.Holder<net.minecraft.sounds.SoundEffect> soundEffect, (String) SoundSource category, double x, double y, double z, float volume, float pitch, long randomSeed) {
+        return new ClientboundCustomSoundPacket(soundEffect, category, x, y, z, volume, pitch, randomSeed);
     }
 #elseif version >= 1.13
-    public static (PacketPlayOutCustomSoundEffectHandle) PacketPlayOutCustomSoundEffect createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.resources.MinecraftKey soundEffect, (String) SoundCategory category, double x, double y, double z, float volume, float pitch, long randomSeed) {
+    public static (ClientboundCustomSoundPacketHandle) ClientboundCustomSoundPacket createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.resources.Identifier soundEffect, (String) SoundSource category, double x, double y, double z, float volume, float pitch, long randomSeed) {
   #if version >= 1.19
-        return new PacketPlayOutCustomSoundEffect(soundEffect, category, new Vec3D(x, y, z), volume, pitch, randomSeed);
+        return new ClientboundCustomSoundPacket(soundEffect, category, new Vec3(x, y, z), volume, pitch, randomSeed);
   #else
-        return new PacketPlayOutCustomSoundEffect(soundEffect, category, new Vec3D(x, y, z), volume, pitch);
+        return new ClientboundCustomSoundPacket(soundEffect, category, new Vec3(x, y, z), volume, pitch);
   #endif
     }
 #elseif version >= 1.9
-    public static (PacketPlayOutCustomSoundEffectHandle) PacketPlayOutCustomSoundEffect createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String soundEffect, (String) SoundCategory category, double x, double y, double z, float volume, float pitch, long randomSeed) {
-        return new PacketPlayOutCustomSoundEffect(soundEffect, category, x, y, z, volume, pitch);
+    public static (ClientboundCustomSoundPacketHandle) ClientboundCustomSoundPacket createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String soundEffect, (String) SoundSource category, double x, double y, double z, float volume, float pitch, long randomSeed) {
+        return new ClientboundCustomSoundPacket(soundEffect, category, x, y, z, volume, pitch);
     }
 #else
-    // Note: no sound category supported. Is PacketPlayOutNamedSoundEffect
-    public static (PacketPlayOutCustomSoundEffectHandle) PacketPlayOutCustomSoundEffect createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String soundEffect, (String) String category, double x, double y, double z, float volume, float pitch, long randomSeed) {
-        return new PacketPlayOutCustomSoundEffect(soundEffect, x, y, z, volume, pitch);
+    // Note: no sound category supported. Is ClientboundSoundPacket
+    public static (ClientboundCustomSoundPacketHandle) ClientboundCustomSoundPacket createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String soundEffect, (String) String category, double x, double y, double z, float volume, float pitch, long randomSeed) {
+        return new ClientboundCustomSoundPacket(soundEffect, x, y, z, volume, pitch);
     }
 #endif
 
@@ -1837,49 +1835,49 @@ class PacketPlayOutCustomSoundEffect extends Packet {
     /** Used for the random seed when creating new sound packets. */
     public static final java.util.Random SOUND_RANDOM_SEED_SOURCE = new java.util.Random();
 
-    public static PacketPlayOutCustomSoundEffectHandle createNew(com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect> soundEffect, String category, org.bukkit.Location location, float volume, float pitch) {
+    public static ClientboundCustomSoundPacketHandle createNew(com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect> soundEffect, String category, org.bukkit.Location location, float volume, float pitch) {
         return createNew(soundEffect, category, location.getX(), location.getY(), location.getZ(), volume, pitch);
     }
 
-    public static PacketPlayOutCustomSoundEffectHandle createNew(com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect> soundEffect, String category, double x, double y, double z, float volume, float pitch) {
+    public static ClientboundCustomSoundPacketHandle createNew(com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect> soundEffect, String category, double x, double y, double z, float volume, float pitch) {
         long randomSeed = SOUND_RANDOM_SEED_SOURCE.nextLong();
         return createNew(soundEffect, category, x, y, z, volume, pitch, randomSeed);
     }
 
     /** @deprecated World argument is no longer needed */
     @Deprecated
-    public static PacketPlayOutCustomSoundEffectHandle createNew(com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect> soundEffect, String category, org.bukkit.World world, double x, double y, double z, float volume, float pitch) {
+    public static ClientboundCustomSoundPacketHandle createNew(com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect> soundEffect, String category, org.bukkit.World world, double x, double y, double z, float volume, float pitch) {
         return createNew(soundEffect, category, x, y, z, volume, pitch);
     }
     </code>
 
 #if version >= 1.17
-    #require PacketPlayOutCustomSoundEffect private (String) SoundCategory customSoundCategory:source;
-    #require PacketPlayOutCustomSoundEffect private int customSoundX:x;
-    #require PacketPlayOutCustomSoundEffect private int customSoundY:y;
-    #require PacketPlayOutCustomSoundEffect private int customSoundZ:z;
-    #require PacketPlayOutCustomSoundEffect private float customSoundPitch:pitch;
+    #require ClientboundCustomSoundPacket private (String) SoundSource customSoundSource:source;
+    #require ClientboundCustomSoundPacket private int customSoundX:x;
+    #require ClientboundCustomSoundPacket private int customSoundY:y;
+    #require ClientboundCustomSoundPacket private int customSoundZ:z;
+    #require ClientboundCustomSoundPacket private float customSoundPitch:pitch;
 #elseif version >= 1.9
-    #require PacketPlayOutCustomSoundEffect private (String) SoundCategory customSoundCategory:b;
-    #require PacketPlayOutCustomSoundEffect private int customSoundX:c;
-    #require PacketPlayOutCustomSoundEffect private int customSoundY:d;
-    #require PacketPlayOutCustomSoundEffect private int customSoundZ:e;
+    #require ClientboundCustomSoundPacket private (String) SoundSource customSoundSource:b;
+    #require ClientboundCustomSoundPacket private int customSoundX:c;
+    #require ClientboundCustomSoundPacket private int customSoundY:d;
+    #require ClientboundCustomSoundPacket private int customSoundZ:e;
   #if version >= 1.10.2
-    #require PacketPlayOutCustomSoundEffect private float customSoundPitch:g;
+    #require ClientboundCustomSoundPacket private float customSoundPitch:g;
   #else
-    #require PacketPlayOutCustomSoundEffect private int customSoundPitchInt:g;
+    #require ClientboundCustomSoundPacket private int customSoundPitchInt:g;
   #endif
 #else
-    #require PacketPlayOutCustomSoundEffect private int customSoundX:b;
-    #require PacketPlayOutCustomSoundEffect private int customSoundY:c;
-    #require PacketPlayOutCustomSoundEffect private int customSoundZ:d;
-    #require PacketPlayOutCustomSoundEffect private int customSoundPitchInt:f;
+    #require ClientboundCustomSoundPacket private int customSoundX:b;
+    #require ClientboundCustomSoundPacket private int customSoundY:c;
+    #require ClientboundCustomSoundPacket private int customSoundZ:d;
+    #require ClientboundCustomSoundPacket private int customSoundPitchInt:f;
 #endif
 
     // Category supported since 1.9
 #if version >= 1.9
-    public String getCategory() { return instance#customSoundCategory; }
-    public void setCategory(String category) { instance#customSoundCategory = category; }
+    public String getCategory() { return instance#customSoundSource; }
+    public void setCategory(String category) { instance#customSoundSource = category; }
 #else
     public String getCategory() { return "master"; }
     public void setCategory(String category) { /* No-op */ }
@@ -1904,7 +1902,7 @@ class PacketPlayOutCustomSoundEffect extends Packet {
 
     // New 'seed' field since 1.19
 #if version >= 1.19
-    #require PacketPlayOutCustomSoundEffect private final long customSoundSeed:seed;
+    #require ClientboundCustomSoundPacket private final long customSoundSeed:seed;
     public long getRandomSeed() { return instance#customSoundSeed; }
     public void setRandomSeed(long seed) { instance#customSoundSeed = seed; }
 #else
@@ -1913,29 +1911,29 @@ class PacketPlayOutCustomSoundEffect extends Packet {
 #endif
 }
 
-// Note: this packet is PacketPlayOutCustomPayload on 1.8 - 1.12.2 where it sends an "MC|StopSound" message
-class PacketPlayOutStopSound extends Packet {
+// Note: this packet is ClientboundCustomPayloadPacket on 1.8 - 1.12.2 where it sends an "MC|StopSound" message
+class ClientboundStopSoundPacket extends Packet {
 #if version >= 1.9
-    public static (PacketPlayOutStopSoundHandle) PacketPlayOutStopSound createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.resources.MinecraftKey soundEffect, (String) SoundCategory category) {
+    public static (ClientboundStopSoundPacketHandle) ClientboundStopSoundPacket createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.resources.Identifier soundEffect, (String) SoundSource category) {
   #if version >= 1.13
-        return new PacketPlayOutStopSound(soundEffect, category);
+        return new ClientboundStopSoundPacket(soundEffect, category);
   #else
-        PacketDataSerializer packetdataserializer = new PacketDataSerializer(Unpooled.buffer());
+        FriendlyByteBuf packetdataserializer = new FriendlyByteBuf(Unpooled.buffer());
         packetdataserializer.a(category == null ? "" : category.a());
     #if version >= 1.12
         packetdataserializer.a(soundEffect.getKey());
     #else
         packetdataserializer.a(soundEffect.a());
     #endif
-        return new PacketPlayOutStopSound("MC|StopSound", packetdataserializer);
+        return new ClientboundStopSoundPacket("MC|StopSound", packetdataserializer);
   #endif
     }
 #else
-    public static (PacketPlayOutStopSoundHandle) PacketPlayOutStopSound createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.resources.MinecraftKey soundEffect, String category) {
-        PacketDataSerializer packetdataserializer = new PacketDataSerializer(Unpooled.buffer());
+    public static (ClientboundStopSoundPacketHandle) ClientboundStopSoundPacket createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.resources.Identifier soundEffect, String category) {
+        FriendlyByteBuf packetdataserializer = new FriendlyByteBuf(Unpooled.buffer());
         packetdataserializer.a(category == null ? "" : category);
         packetdataserializer.a(soundEffect.a());
-        return new PacketPlayOutStopSound("MC|StopSound", packetdataserializer);
+        return new ClientboundStopSoundPacket("MC|StopSound", packetdataserializer);
     }
 #endif
 }
@@ -1944,14 +1942,14 @@ class PacketPlayOutStopSound extends Packet {
 // Too complicated since 1.17 to use properly, Im disabling it.
 // And we never added the proper api's/wrapper types for the fields anyway.
 /*
-optional class PacketPlayOutBoss extends Packet {
+optional class ClientboundBossEventPacket extends Packet {
 #if version >= 1.17
     private UUID entityUUID:id;
-    private (Object) PacketPlayOutBoss.Action action:operation;
+    private (Object) ClientboundBossEventPacket.Action action:operation;
 
     //TODO: Moved to Action class!
     // ==================
-    private (Object) IChatBaseComponent chat:MOVED;
+    private (Object) Component chat:MOVED;
     private float progress:MOVED;
     private (Object) BossBattle.BarColor bossBarColor:MOVED;
     private (Object) BossBattle.BarStyle bossBarStyle:MOVED;
@@ -1962,8 +1960,8 @@ optional class PacketPlayOutBoss extends Packet {
     
 #else
     private UUID entityUUID:a;
-    private (Object) PacketPlayOutBoss.Action action:b;
-    private (Object) IChatBaseComponent chat:c;
+    private (Object) ClientboundBossEventPacket.Action action:b;
+    private (Object) Component chat:c;
     private float progress:d;
     private (Object) BossBattle.BarColor bossBarColor:e;
     private (Object) BossBattle.BarStyle bossBarStyle:f;
@@ -1974,7 +1972,7 @@ optional class PacketPlayOutBoss extends Packet {
 }
 */
 
-class PacketPlayOutAttachEntity extends Packet {
+class ClientboundSetEntityLinkPacket extends Packet {
 #if version >= 1.17
     private optional int leashId:###;
     private int passengerId:sourceId;
@@ -1989,12 +1987,12 @@ class PacketPlayOutAttachEntity extends Packet {
     private int vehicleId:c;
 #endif
 
-    public static (PacketPlayOutAttachEntityHandle) PacketPlayOutAttachEntity createNew() {
+    public static (ClientboundSetEntityLinkPacketHandle) ClientboundSetEntityLinkPacket createNew() {
 #if version >= 1.17
-        #require net.minecraft.network.protocol.game.PacketPlayOutAttachEntity private PacketPlayOutAttachEntity createSpawnPacket:<init>(net.minecraft.network.PacketDataSerializer serializer);
+        #require net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket private ClientboundSetEntityLinkPacket createSpawnPacket:<init>(net.minecraft.network.FriendlyByteBuf serializer);
         return #createSpawnPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
-        return new PacketPlayOutAttachEntity();
+        return new ClientboundSetEntityLinkPacket();
 #endif
     }
 
@@ -2006,15 +2004,15 @@ class PacketPlayOutAttachEntity extends Packet {
     public void setIsLeash(boolean isLeash) {
     }
 
-    public static (PacketPlayOutAttachEntityHandle) PacketPlayOutAttachEntity createNewMount((org.bukkit.entity.Entity) Entity passengerEntity, (org.bukkit.entity.Entity) Entity vehicleEntity) {
+    public static (ClientboundSetEntityLinkPacketHandle) ClientboundSetEntityLinkPacket createNewMount((org.bukkit.entity.Entity) Entity passengerEntity, (org.bukkit.entity.Entity) Entity vehicleEntity) {
         throw new UnsupportedOperationException("Not supported >= MC 1.9, use Mount packet instead");
     }
 
-    public static (PacketPlayOutAttachEntityHandle) PacketPlayOutAttachEntity createNewLeash((org.bukkit.entity.Entity) Entity leashedEntity, (org.bukkit.entity.Entity) Entity holderEntity) {
-        return new PacketPlayOutAttachEntity(leashedEntity, holderEntity);
+    public static (ClientboundSetEntityLinkPacketHandle) ClientboundSetEntityLinkPacket createNewLeash((org.bukkit.entity.Entity) Entity leashedEntity, (org.bukkit.entity.Entity) Entity holderEntity) {
+        return new ClientboundSetEntityLinkPacket(leashedEntity, holderEntity);
     }
 #else
-    #require net.minecraft.network.protocol.game.PacketPlayOutAttachEntity private int leashId:a;
+    #require net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket private int leashId:a;
     public boolean isLeash() {
         int leashId = instance#leashId;
         return leashId == 1;
@@ -2025,29 +2023,29 @@ class PacketPlayOutAttachEntity extends Packet {
         instance#leashId = id;
     }
 
-    public static (PacketPlayOutAttachEntityHandle) PacketPlayOutAttachEntity createNewMount((org.bukkit.entity.Entity) Entity passengerEntity, (org.bukkit.entity.Entity) Entity vehicleEntity) {
-        return new PacketPlayOutAttachEntity(0, passengerEntity, vehicleEntity);
+    public static (ClientboundSetEntityLinkPacketHandle) ClientboundSetEntityLinkPacket createNewMount((org.bukkit.entity.Entity) Entity passengerEntity, (org.bukkit.entity.Entity) Entity vehicleEntity) {
+        return new ClientboundSetEntityLinkPacket(0, passengerEntity, vehicleEntity);
     }
 
-    public static (PacketPlayOutAttachEntityHandle) PacketPlayOutAttachEntity createNewLeash((org.bukkit.entity.Entity) Entity leashedEntity, (org.bukkit.entity.Entity) Entity holderEntity) {
-        return new PacketPlayOutAttachEntity(1, leashedEntity, holderEntity);
+    public static (ClientboundSetEntityLinkPacketHandle) ClientboundSetEntityLinkPacket createNewLeash((org.bukkit.entity.Entity) Entity leashedEntity, (org.bukkit.entity.Entity) Entity holderEntity) {
+        return new ClientboundSetEntityLinkPacket(1, leashedEntity, holderEntity);
     }
 #endif
 
     <code>
-    public static PacketPlayOutAttachEntityHandle createNewLeash(int leashedEntityId, int holderEntityId) {
-        PacketPlayOutAttachEntityHandle packet = createNew();
+    public static ClientboundSetEntityLinkPacketHandle createNewLeash(int leashedEntityId, int holderEntityId) {
+        ClientboundSetEntityLinkPacketHandle packet = createNew();
         packet.setVehicleId(holderEntityId);
         packet.setPassengerId(leashedEntityId);
         packet.setIsLeash(true);
         return packet;
     }
 
-    public static PacketPlayOutAttachEntityHandle createNewMount(int passengerEntityId, int vehicleEntityId) {
+    public static ClientboundSetEntityLinkPacketHandle createNewMount(int passengerEntityId, int vehicleEntityId) {
         if (!T.leashId.isAvailable()) {
             throw new UnsupportedOperationException("Not supported >= MC 1.9, use Mount packet instead");
         }
-        PacketPlayOutAttachEntityHandle packet = createNew();
+        ClientboundSetEntityLinkPacketHandle packet = createNew();
         packet.setVehicleId(vehicleEntityId);
         packet.setPassengerId(passengerEntityId);
         packet.setIsLeash(false);
@@ -2056,7 +2054,7 @@ class PacketPlayOutAttachEntity extends Packet {
     </code>
 }
 
-class PacketPlayOutEntityEquipment extends Packet {
+class ClientboundSetEquipmentPacket extends Packet {
 #if version >= 1.17
     private int entityId:entity;
 #else
@@ -2065,9 +2063,9 @@ class PacketPlayOutEntityEquipment extends Packet {
 
 #if version >= 1.16
   #if version >= 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment private final java.util.List<com.mojang.datafixers.util.Pair<net.minecraft.world.entity.EnumItemSlot, net.minecraft.world.item.ItemStack>> slots;
+    #require net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket private final java.util.List<com.mojang.datafixers.util.Pair<net.minecraft.world.entity.EquipmentSlot, net.minecraft.world.item.ItemStack>> slots;
   #else
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment private final java.util.List<com.mojang.datafixers.util.Pair<net.minecraft.world.entity.EnumItemSlot, net.minecraft.world.item.ItemStack>> slots:b;
+    #require net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket private final java.util.List<com.mojang.datafixers.util.Pair<net.minecraft.world.entity.EquipmentSlot, net.minecraft.world.item.ItemStack>> slots:b;
   #endif
 
     // Multiple slots are possible
@@ -2076,19 +2074,19 @@ class PacketPlayOutEntityEquipment extends Packet {
         return slots.size();
     }
 
-    public static (PacketPlayOutEntityEquipmentHandle) PacketPlayOutEntityEquipment createNew(PacketPlayOutEntityEquipmentHandle.OwnerType ownerType, int entityId, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack) {
+    public static (ClientboundSetEquipmentPacketHandle) ClientboundSetEquipmentPacket createNew(ClientboundSetEquipmentPacketHandle.OwnerType ownerType, int entityId, (org.bukkit.inventory.EquipmentSlot) EquipmentSlot slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack) {
         java.util.List slots = com.google.common.collect.Lists.newArrayList();
         slots.add(com.mojang.datafixers.util.Pair.of(slot, itemStack));
-        return new PacketPlayOutEntityEquipment(entityId, slots);
+        return new ClientboundSetEquipmentPacket(entityId, slots);
     }
 
-    public (org.bukkit.inventory.EquipmentSlot) EnumItemSlot getEquipmentSlot(PacketPlayOutEntityEquipmentHandle.OwnerType ownerType, int index) {
+    public (org.bukkit.inventory.EquipmentSlot) EquipmentSlot getEquipmentSlot(ClientboundSetEquipmentPacketHandle.OwnerType ownerType, int index) {
         java.util.List slots = instance#slots;
         com.mojang.datafixers.util.Pair entry = (com.mojang.datafixers.util.Pair) slots.get(index);
-        return (EnumItemSlot) entry.getFirst();
+        return (EquipmentSlot) entry.getFirst();
     }
 
-    public void setEquipmentSlot(PacketPlayOutEntityEquipmentHandle.OwnerType ownerType, int index, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot) {
+    public void setEquipmentSlot(ClientboundSetEquipmentPacketHandle.OwnerType ownerType, int index, (org.bukkit.inventory.EquipmentSlot) EquipmentSlot slot) {
         java.util.List slots = instance#slots;
         com.mojang.datafixers.util.Pair entry = (com.mojang.datafixers.util.Pair) slots.get(index);
         slots.set(index, com.mojang.datafixers.util.Pair.of(slot, entry.getSecond()));
@@ -2111,44 +2109,44 @@ class PacketPlayOutEntityEquipment extends Packet {
         return 1;
     }
 
-    public static (PacketPlayOutEntityEquipmentHandle) PacketPlayOutEntityEquipment createNew(PacketPlayOutEntityEquipmentHandle.OwnerType ownerType, int entityId, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack) {
+    public static (ClientboundSetEquipmentPacketHandle) ClientboundSetEquipmentPacket createNew(ClientboundSetEquipmentPacketHandle.OwnerType ownerType, int entityId, (org.bukkit.inventory.EquipmentSlot) EquipmentSlot slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack) {
   #if version >= 1.9
-        return new PacketPlayOutEntityEquipment(entityId, slot, itemStack);
+        return new ClientboundSetEquipmentPacket(entityId, slot, itemStack);
   #else
-        return new PacketPlayOutEntityEquipment(entityId, ownerType.isPlayer() ? slot.b() : slot.c(), itemStack);
+        return new ClientboundSetEquipmentPacket(entityId, ownerType.isPlayer() ? slot.b() : slot.c(), itemStack);
   #endif
     }
 
   #if version >= 1.9
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment private net.minecraft.world.entity.EnumItemSlot slot:b;
+    #require net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket private net.minecraft.world.entity.EquipmentSlot slot:b;
 
-    public (org.bukkit.inventory.EquipmentSlot) EnumItemSlot getEquipmentSlot(PacketPlayOutEntityEquipmentHandle.OwnerType ownerType, int index) {
+    public (org.bukkit.inventory.EquipmentSlot) EquipmentSlot getEquipmentSlot(ClientboundSetEquipmentPacketHandle.OwnerType ownerType, int index) {
         if (index != 0) { throw new IndexOutOfBoundsException("Index out of range: " + index); }
         return instance#slot;
     }
-    public void setEquipmentSlot(PacketPlayOutEntityEquipmentHandle.OwnerType ownerType, int index, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot) {
+    public void setEquipmentSlot(ClientboundSetEquipmentPacketHandle.OwnerType ownerType, int index, (org.bukkit.inventory.EquipmentSlot) EquipmentSlot slot) {
         if (index != 0) { throw new IndexOutOfBoundsException("Index out of range: " + index); }
         instance#slot = slot;
     }
   #else
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment private int slot:b;
-    public (org.bukkit.inventory.EquipmentSlot) EnumItemSlot getEquipmentSlot(PacketPlayOutEntityEquipmentHandle.OwnerType ownerType, int index) {
+    #require net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket private int slot:b;
+    public (org.bukkit.inventory.EquipmentSlot) EquipmentSlot getEquipmentSlot(ClientboundSetEquipmentPacketHandle.OwnerType ownerType, int index) {
         if (index != 0) { throw new IndexOutOfBoundsException("Index out of range: " + index); }
         int slotIdx = instance#slot;
         if (ownerType.isPlayer()) {
-            return EnumItemSlot.fromPlayerSlotIndex(slotIdx);
+            return EquipmentSlot.fromPlayerSlotIndex(slotIdx);
         } else {
-            return EnumItemSlot.fromNonPlayerSlotIndex(slotIdx);
+            return EquipmentSlot.fromNonPlayerSlotIndex(slotIdx);
         }
     }
-    public void setEquipmentSlot(PacketPlayOutEntityEquipmentHandle.OwnerType ownerType, int index, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot) {
+    public void setEquipmentSlot(ClientboundSetEquipmentPacketHandle.OwnerType ownerType, int index, (org.bukkit.inventory.EquipmentSlot) EquipmentSlot slot) {
         if (index != 0) { throw new IndexOutOfBoundsException("Index out of range: " + index); }
         int slotIdx = ownerType.isPlayer() ? slot.b() : slot.c();
         instance#slot = slotIdx;
     }
   #endif
 
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment private net.minecraft.world.item.ItemStack itemStack:c;
+    #require net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket private net.minecraft.world.item.ItemStack itemStack:c;
     public (org.bukkit.inventory.ItemStack) ItemStack getItemStack(int index) {
         if (index != 0) { throw new IndexOutOfBoundsException("Index out of range: " + index); }
         return instance#itemStack;
@@ -2176,7 +2174,7 @@ class PacketPlayOutEntityEquipment extends Packet {
 
     // Should no longer be used because it could be invalid on Minecraft 1.8 (player vs non-player)
     @Deprecated
-    public static PacketPlayOutEntityEquipmentHandle createNew(int entityId, org.bukkit.inventory.EquipmentSlot slot, org.bukkit.inventory.ItemStack itemStack) {
+    public static ClientboundSetEquipmentPacketHandle createNew(int entityId, org.bukkit.inventory.EquipmentSlot slot, org.bukkit.inventory.ItemStack itemStack) {
         return createNew(OwnerType.NON_PLAYER, entityId, slot, itemStack);
     }
 
@@ -2193,7 +2191,7 @@ class PacketPlayOutEntityEquipment extends Packet {
 }
 
 // Only available >= MC 1.9
-optional class PacketPlayOutMount extends Packet {
+optional class ClientboundSetPassengersPacket extends Packet {
 #if version >= 1.20.5
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 #endif
@@ -2206,14 +2204,14 @@ optional class PacketPlayOutMount extends Packet {
     private int[] mountedEntityIds:b;
 #endif
 
-    public static (PacketPlayOutMountHandle) PacketPlayOutMount createNew() {
+    public static (ClientboundSetPassengersPacketHandle) ClientboundSetPassengersPacket createNew() {
 #if version >= 1.20.5
-        #require net.minecraft.network.protocol.game.PacketPlayOutMount private PacketPlayOutMount createMountPacket:<init>(net.minecraft.network.PacketDataSerializer serializer);
+        #require net.minecraft.network.protocol.game.ClientboundSetPassengersPacket private ClientboundSetPassengersPacket createMountPacket:<init>(net.minecraft.network.FriendlyByteBuf serializer);
         return #createMountPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #elseif version >= 1.17
-        return new PacketPlayOutMount(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+        return new ClientboundSetPassengersPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
-        return new PacketPlayOutMount();
+        return new ClientboundSetPassengersPacket();
 #endif
     }
 
@@ -2232,8 +2230,8 @@ optional class PacketPlayOutMount extends Packet {
         }
     }
 
-    public static PacketPlayOutMountHandle createNew(int entityId, int[] mountedEntityIds) {
-        PacketPlayOutMountHandle handle = createNew();
+    public static ClientboundSetPassengersPacketHandle createNew(int entityId, int[] mountedEntityIds) {
+        ClientboundSetPassengersPacketHandle handle = createNew();
         handle.setEntityId(entityId);
         handle.setMountedEntityIds(mountedEntityIds);
         return handle;
@@ -2243,13 +2241,13 @@ optional class PacketPlayOutMount extends Packet {
 
 // Gone since 1.17, not worth keeping.
 /*
-class PacketPlayOutCombatEvent extends Packet {
-    public (Object) PacketPlayOutCombatEvent.EnumCombatEventType eventType:a;
+class ClientboundPlayerCombatPacket extends Packet {
+    public (Object) ClientboundPlayerCombatPacket.EnumCombatEventType eventType:a;
     public int entityId1:b;
     public int entityId2:c;
     public int tickDuration:d;
 #if version >= 1.9
-    public (ChatText) IChatBaseComponent message:e;
+    public (ChatText) Component message:e;
 #else
     public (ChatText) String message:e;
 #endif
@@ -2257,7 +2255,7 @@ class PacketPlayOutCombatEvent extends Packet {
 */
 
 // Only >= MC 1.9
-optional class PacketPlayOutSetCooldown extends Packet {
+optional class ClientboundCooldownPacket extends Packet {
 #if version >= 1.17
     //private (org.bukkit.Material) Item material:item;
     private int cooldown:duration;
@@ -2268,28 +2266,28 @@ optional class PacketPlayOutSetCooldown extends Packet {
 }
 
 // Changed completely on MC 1.13
-// class PacketPlayInTabComplete extends Packet {
+// class ServerboundCommandSuggestionPacket extends Packet {
 //     private String text:a;
 // #if version >= 1.9
 //     private optional boolean assumeCommand:b;
-//     private (IntVector3) BlockPosition position:c;
+//     private (IntVector3) BlockPos position:c;
 // #else
 //     private optional boolean assumeCommand:###;
-//     private (IntVector3) BlockPosition position:b;
+//     private (IntVector3) BlockPos position:b;
 // #endif
 // }
 
-class PacketPlayInSetCreativeSlot extends Packet {
+class ServerboundSetCreativeModeSlotPacket extends Packet {
 
-    public static (PacketPlayInSetCreativeSlotHandle) PacketPlayInSetCreativeSlot createNew(int slotIndex, (org.bukkit.inventory.ItemStack) ItemStack item) {
+    public static (ServerboundSetCreativeModeSlotPacketHandle) ServerboundSetCreativeModeSlotPacket createNew(int slotIndex, (org.bukkit.inventory.ItemStack) ItemStack item) {
 #if version >= 1.20.5
-        return new PacketPlayInSetCreativeSlot((short) slotIndex, item);
+        return new ServerboundSetCreativeModeSlotPacket((short) slotIndex, item);
 #elseif version >= 1.17
-        return new PacketPlayInSetCreativeSlot(slotIndex, item);
+        return new ServerboundSetCreativeModeSlotPacket(slotIndex, item);
 #else
-        PacketPlayInSetCreativeSlot packet = new PacketPlayInSetCreativeSlot();
-        #require PacketPlayInSetCreativeSlot private int slotIndex:slot;
-        #require PacketPlayInSetCreativeSlot private ItemStack item:b;
+        ServerboundSetCreativeModeSlotPacket packet = new ServerboundSetCreativeModeSlotPacket();
+        #require ServerboundSetCreativeModeSlotPacket private int slotIndex:slot;
+        #require ServerboundSetCreativeModeSlotPacket private ItemStack item:b;
         packet#slotIndex = slotIndex;
         packet#item = item;
         return packet;
@@ -2315,7 +2313,7 @@ class PacketPlayInSetCreativeSlot extends Packet {
 #endif
 }
 
-class PacketPlayOutEntityMetadata extends Packet {
+class ClientboundSetEntityDataPacket extends Packet {
 #if version >= 1.17
     private int entityId:id;
 #else
@@ -2323,14 +2321,14 @@ class PacketPlayOutEntityMetadata extends Packet {
 #endif
 
 #if version >= 1.17
-    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<Object>>) List<DataWatcher.PackedItem<?>> metadataItems:packedItems;
+    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<Object>>) List<SynchedEntityData.PackedItem<?>> metadataItems:packedItems;
 #elseif version >= 1.9
-    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<Object>>) List<DataWatcher.PackedItem<?>> metadataItems:b;
+    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<Object>>) List<SynchedEntityData.PackedItem<?>> metadataItems:b;
 #else
-    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<Object>>) List<DataWatcher.WatchableObject> metadataItems:b;
+    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<Object>>) List<SynchedEntityData.WatchableObject> metadataItems:b;
 #endif
 
-    public static (PacketPlayOutEntityMetadataHandle) PacketPlayOutEntityMetadata createForSpawn(int entityId, (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher datawatcher) {
+    public static (ClientboundSetEntityDataPacketHandle) ClientboundSetEntityDataPacket createForSpawn(int entityId, (com.bergerkiller.bukkit.common.wrappers.DataWatcher) SynchedEntityData datawatcher) {
         // Pack all datawatcher values, and do NOT reset dirty on the datawatcher or the values
         // A spawn shouldn't affect the 'dirty' elements that still need to be synchronized to
         // other players
@@ -2340,41 +2338,41 @@ class PacketPlayOutEntityMetadata extends Packet {
         }
 
 #if version >= 1.19.3
-        return new PacketPlayOutEntityMetadata(entityId, values);
+        return new ClientboundSetEntityDataPacket(entityId, values);
 #else
         // Cannot use the metadata packet constructor, because then it resets dirty on the datawatcher.
         // This would negatively effect other players who have not yet received the changes.
-        //return new PacketPlayOutEntityMetadata(entityId, datawatcher, true);
+        //return new ClientboundSetEntityDataPacket(entityId, datawatcher, true);
 
   #if version >= 1.17
-        PacketPlayOutEntityMetadata packet = (PacketPlayOutEntityMetadata) PacketPlayOutEntityMetadataHandle.T.newInstanceNull();
+        ClientboundSetEntityDataPacket packet = (ClientboundSetEntityDataPacket) ClientboundSetEntityDataPacketHandle.T.newInstanceNull();
   #else
-        PacketPlayOutEntityMetadata packet = new PacketPlayOutEntityMetadata();
+        ClientboundSetEntityDataPacket packet = new ClientboundSetEntityDataPacket();
   #endif
 
         // Assign id and values list
-        PacketPlayOutEntityMetadataHandle.T.entityId.setInteger(packet, entityId);
-        ((com.bergerkiller.mountiplex.reflection.declarations.Template.Field) PacketPlayOutEntityMetadataHandle.T.metadataItems.raw)
+        ClientboundSetEntityDataPacketHandle.T.entityId.setInteger(packet, entityId);
+        ((com.bergerkiller.mountiplex.reflection.declarations.Template.Field) ClientboundSetEntityDataPacketHandle.T.metadataItems.raw)
                 .set(packet, values);
 
         return packet;
 #endif
     }
 
-    public static (PacketPlayOutEntityMetadataHandle) PacketPlayOutEntityMetadata createForChanges(int entityId, (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher datawatcher) {
+    public static (ClientboundSetEntityDataPacketHandle) ClientboundSetEntityDataPacket createForChanges(int entityId, (com.bergerkiller.bukkit.common.wrappers.DataWatcher) SynchedEntityData datawatcher) {
 #if version >= 1.19.3
         java.util.List values = datawatcher.packDirty();
         if (values == null) {
             values = java.util.Collections.emptyList();
         }
-        return new PacketPlayOutEntityMetadata(entityId, values);
+        return new ClientboundSetEntityDataPacket(entityId, values);
 #else
-        return new PacketPlayOutEntityMetadata(entityId, datawatcher, false);
+        return new ClientboundSetEntityDataPacket(entityId, datawatcher, false);
 #endif
     }
 
     <code>
-    public static PacketPlayOutEntityMetadataHandle createNew(int entityId, DataWatcher datawatcher, boolean includeUnchangedData) {
+    public static ClientboundSetEntityDataPacketHandle createNew(int entityId, DataWatcher datawatcher, boolean includeUnchangedData) {
         if (includeUnchangedData) {
             return createForSpawn(entityId, datawatcher);
         } else {
@@ -2392,10 +2390,10 @@ class PacketPlayOutEntityMetadata extends Packet {
 // No longer exists since MC 1.14
 optional class PacketPlayOutBed extends Packet {
     private int entityId:a;
-    private (IntVector3) BlockPosition bedPosition:b;
+    private (IntVector3) BlockPos bedPosition:b;
 }
 
-class PacketPlayOutAnimation extends Packet {
+class ClientboundAnimatePacket extends Packet {
 #if version >= 1.17
     private int entityId:id;
     private int action;
@@ -2405,7 +2403,7 @@ class PacketPlayOutAnimation extends Packet {
 #endif
 }
 
-class PacketPlayOutEntityStatus extends Packet {
+class ClientboundEntityEventPacket extends Packet {
 #if version >= 1.17
     private int entityId;
     private byte eventId;
@@ -2415,31 +2413,31 @@ class PacketPlayOutEntityStatus extends Packet {
 #endif
 }
 
-class PacketPlayOutUpdateAttributes extends Packet {
+class ClientboundUpdateAttributesPacket extends Packet {
 #if version >= 1.17
     private int entityId;
 #else
     private int entityId:a;
 #endif
 
-    public static (PacketPlayOutUpdateAttributesHandle) PacketPlayOutUpdateAttributes createNew(int entityId, (java.util.Collection<AttributeModifiableHandle>) java.util.Collection<AttributeModifiable> attributes) {
-        return new PacketPlayOutUpdateAttributes(entityId, attributes);
+    public static (ClientboundUpdateAttributesPacketHandle) ClientboundUpdateAttributesPacket createNew(int entityId, (java.util.Collection<AttributeInstanceHandle>) java.util.Collection<AttributeInstance> attributes) {
+        return new ClientboundUpdateAttributesPacket(entityId, attributes);
     }
 
-    public static (PacketPlayOutUpdateAttributesHandle) PacketPlayOutUpdateAttributes createZeroMaxHealth(int entityId) {
+    public static (ClientboundUpdateAttributesPacketHandle) ClientboundUpdateAttributesPacket createZeroMaxHealth(int entityId) {
 #if version >= 1.16
         // Internal code uses a Consumer for callbacks, so no need to create a proxy for that
         java.util.function.Consumer callback = com.bergerkiller.bukkit.common.utils.LogicUtil.noopConsumer();
-        AttributeModifiable attribute = new AttributeModifiable(net.minecraft.world.entity.ai.attributes.GenericAttributes.MAX_HEALTH, callback);
+        AttributeInstance attribute = new AttributeInstance(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH, callback);
 #else
         // Internal code calls a callback on this instance, so we need a dummy one to catch that
-        AttributeMapBase attributeMapBase = (AttributeMapBase) com.bergerkiller.bukkit.common.internal.proxy.DummyAttributeMapBase.INSTANCE;
+        AttributeMap attributeMapBase = (AttributeMap) com.bergerkiller.bukkit.common.internal.proxy.DummyAttributeMapBase.INSTANCE;
 
         // Create a modifiable attribute for MAX_HEALTH, and set the value to 0
   #if version >= 1.14
-        AttributeModifiable attribute = new AttributeModifiable(attributeMapBase, GenericAttributes.MAX_HEALTH);
+        AttributeInstance attribute = new AttributeInstance(attributeMapBase, GenericAttributes.MAX_HEALTH);
   #else
-        AttributeModifiable attribute = new AttributeModifiable(attributeMapBase, GenericAttributes.maxHealth);
+        AttributeInstance attribute = new AttributeInstance(attributeMapBase, GenericAttributes.maxHealth);
   #endif
 #endif
 
@@ -2451,23 +2449,23 @@ class PacketPlayOutUpdateAttributes extends Packet {
 
         // Create packet sending just this one attribute
         java.util.Collection attributes = java.util.Collections.singleton(attribute);
-        return new PacketPlayOutUpdateAttributes(entityId, attributes);
+        return new ClientboundUpdateAttributesPacket(entityId, attributes);
     }
 }
 
-class PacketPlayInClientCommand extends Packet {
+class ServerboundClientCommandPacket extends Packet {
 #if version >= 1.17
-    private (Object) PacketPlayInClientCommand.EnumClientCommand action;
+    private (Object) ServerboundClientCommandPacket.EnumClientCommand action;
 #else
-    private (Object) PacketPlayInClientCommand.EnumClientCommand action:a;
+    private (Object) ServerboundClientCommandPacket.EnumClientCommand action:a;
 #endif
 }
 
-class PacketPlayInUpdateSign extends Packet {
+class ServerboundSignUpdatePacket extends Packet {
 #if version >= 1.17
-    private (IntVector3) BlockPosition position:pos;
+    private (IntVector3) BlockPos position:pos;
 #else
-    private (IntVector3) BlockPosition position:a;
+    private (IntVector3) BlockPos position:a;
 #endif
 
 #if version >= 1.17
@@ -2475,11 +2473,11 @@ class PacketPlayInUpdateSign extends Packet {
 #elseif version >= 1.9
     private (ChatText[]) String[] lines:b;
 #else
-    private (ChatText[]) IChatBaseComponent[] lines:b;
+    private (ChatText[]) Component[] lines:b;
 #endif
 }
 
-class PacketPlayInWindowClick extends Packet {
+class ServerboundContainerClickPacket extends Packet {
 #if version >= 1.21.5
     private int windowId:containerId;
     private (short) short slot:slotNum;
@@ -2501,16 +2499,16 @@ class PacketPlayInWindowClick extends Packet {
 #endif
 
 #if version >= 1.17
-    private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) net.minecraft.world.inventory.InventoryClickType mode:clickType;
+    private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) net.minecraft.world.inventory.ClickType mode:clickType;
 #elseif version >= 1.9
-    private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) net.minecraft.world.inventory.InventoryClickType mode:shift;
+    private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) net.minecraft.world.inventory.ClickType mode:shift;
 #else
     private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) int mode:shift;
 #endif
 }
 
 // Since MC 1.9
-optional class PacketPlayInTeleportAccept extends Packet {
+optional class ServerboundAcceptTeleportationPacket extends Packet {
 #if version >= 1.17
     private int teleportId:id;
 #else
@@ -2520,71 +2518,71 @@ optional class PacketPlayInTeleportAccept extends Packet {
 
 // Only <= MC 1.8.9
 optional class PacketPlayOutUpdateSign extends Packet {
-    private (org.bukkit.World) World world:a;
-    private (IntVector3) BlockPosition position:b;
-    private (ChatText[]) IChatBaseComponent[] lines:c;
+    private (org.bukkit.World) Level world:a;
+    private (IntVector3) BlockPos position:b;
+    private (ChatText[]) Component[] lines:c;
 }
 
-class PacketPlayOutWorldParticles extends Packet {
+class ClientboundLevelParticlesPacket extends Packet {
     // TODO: Create a common interface for particle + data
-    // Since 1.13 there is a ParticleParam with many different types
+    // Since 1.13 there is a ParticleOptions with many different types
     // Best option would be coming up with a proxy similar to this for <= 1.12.2
 #if version >= 1.17
-    #require PacketPlayOutWorldParticles private double pos_x:x;
-    #require PacketPlayOutWorldParticles private double pos_y:y;
-    #require PacketPlayOutWorldParticles private double pos_z:z;
+    #require ClientboundLevelParticlesPacket private double pos_x:x;
+    #require ClientboundLevelParticlesPacket private double pos_y:y;
+    #require ClientboundLevelParticlesPacket private double pos_z:z;
     private float randomX:xDist;
     private float randomY:yDist;
     private float randomZ:zDist;
     private float speed:maxSpeed;
     private int count;
     private boolean overrideLimiter;
-    #require PacketPlayOutWorldParticles private ParticleParam particle;
+    #require ClientboundLevelParticlesPacket private ParticleOptions particle;
 #elseif version >= 1.15
-    #require PacketPlayOutWorldParticles private double pos_x:a;
-    #require PacketPlayOutWorldParticles private double pos_y:b;
-    #require PacketPlayOutWorldParticles private double pos_z:c;
+    #require ClientboundLevelParticlesPacket private double pos_x:a;
+    #require ClientboundLevelParticlesPacket private double pos_y:b;
+    #require ClientboundLevelParticlesPacket private double pos_z:c;
     private float randomX:d;
     private float randomY:e;
     private float randomZ:f;
     private float speed:g;
     private int count:h;
     private boolean overrideLimiter:i;
-    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private ParticleParam particle:j;
+    #require net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket private ParticleOptions particle:j;
 #elseif version >= 1.13
-    #require PacketPlayOutWorldParticles private float pos_x:a;
-    #require PacketPlayOutWorldParticles private float pos_y:b;
-    #require PacketPlayOutWorldParticles private float pos_z:c;
+    #require ClientboundLevelParticlesPacket private float pos_x:a;
+    #require ClientboundLevelParticlesPacket private float pos_y:b;
+    #require ClientboundLevelParticlesPacket private float pos_z:c;
     private float randomX:d;
     private float randomY:e;
     private float randomZ:f;
     private float speed:g;
     private int count:h;
     private boolean overrideLimiter:i;
-    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private ParticleParam particle:j;
+    #require net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket private ParticleOptions particle:j;
 #else
-    #require PacketPlayOutWorldParticles private Particle particle:a;
-    #require PacketPlayOutWorldParticles private float pos_x:b;
-    #require PacketPlayOutWorldParticles private float pos_y:c;
-    #require PacketPlayOutWorldParticles private float pos_z:d;
+    #require ClientboundLevelParticlesPacket private ParticleType particle:a;
+    #require ClientboundLevelParticlesPacket private float pos_x:b;
+    #require ClientboundLevelParticlesPacket private float pos_y:c;
+    #require ClientboundLevelParticlesPacket private float pos_z:d;
     private float randomX:e;
     private float randomY:f;
     private float randomZ:g;
     private float speed:h;
     private int count:i;
     private boolean overrideLimiter:j;
-    #require PacketPlayOutWorldParticles private int[] particleOptions:k;
+    #require ClientboundLevelParticlesPacket private int[] particleOptions:k;
 #endif
 
-    public static (PacketPlayOutWorldParticlesHandle) PacketPlayOutWorldParticles createNew() {
+    public static (ClientboundLevelParticlesPacketHandle) ClientboundLevelParticlesPacket createNew() {
 #if version >= 1.21.4
-        return new PacketPlayOutWorldParticles((ParticleParam) null, false, false, 0.0, 0.0, 0.0, 0.0f, 0.0f, 0.0f, 0.0f, 1);
+        return new ClientboundLevelParticlesPacket((ParticleOptions) null, false, false, 0.0, 0.0, 0.0, 0.0f, 0.0f, 0.0f, 0.0f, 1);
 #elseif version >= 1.15
-        return new PacketPlayOutWorldParticles((ParticleParam) null, false, 0.0, 0.0, 0.0, 0.0f, 0.0f, 0.0f, 0.0f, 1);
+        return new ClientboundLevelParticlesPacket((ParticleOptions) null, false, 0.0, 0.0, 0.0, 0.0f, 0.0f, 0.0f, 0.0f, 1);
 #elseif version >= 1.13
-        return new PacketPlayOutWorldParticles((ParticleParam) null, false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1);
+        return new ClientboundLevelParticlesPacket((ParticleOptions) null, false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1);
 #else
-        return new PacketPlayOutWorldParticles((Particle) null, false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, new int[0]);
+        return new ClientboundLevelParticlesPacket((Particle) null, false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, new int[0]);
 #endif
     }
 
@@ -2599,11 +2597,11 @@ class PacketPlayOutWorldParticles extends Packet {
     </code>
 
 #if version >= 1.13
-    // ParticleParam API
+    // ParticleOptions API
     public optional void setParticle(Particle<?> particleType, Object options) {
-        ParticleParam param;
-        if (particleType instanceof ParticleParam) {
-            param = (ParticleParam) particleType;
+        ParticleOptions param;
+        if (particleType instanceof ParticleOptions) {
+            param = (ParticleOptions) particleType;
 
         } else if (particleType == null) {
             throw new IllegalArgumentException("Particle type is not supported");
@@ -2614,13 +2612,13 @@ class PacketPlayOutWorldParticles extends Packet {
             throw new IllegalArgumentException("Particle type " + typeHandle.toString() + " requires extra options, none specified");
 
         } else if (options instanceof com.bergerkiller.bukkit.common.wrappers.BlockData) {
-            param = new net.minecraft.core.particles.ParticleParamBlock(particleType,
-                    (IBlockData) ((com.bergerkiller.bukkit.common.wrappers.BlockData) options).getData());
+            param = new net.minecraft.core.particles.BlockParticleOption(particleType,
+                    (BlockState) ((com.bergerkiller.bukkit.common.wrappers.BlockData) options).getData());
 
         } else if (options instanceof org.bukkit.inventory.ItemStack) {
             net.minecraft.world.item.ItemStack itemstack = (net.minecraft.world.item.ItemStack) com.bergerkiller.bukkit.common.conversion.type.HandleConversion
                     .toItemStackHandle((org.bukkit.inventory.ItemStack) options);
-            param = new net.minecraft.core.particles.ParticleParamItem(particleType, itemstack);
+            param = new net.minecraft.core.particles.ItemParticleOption(particleType, itemstack);
 
   #if version >= 1.19
         } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$SculkChargeOptions) {
@@ -2685,7 +2683,7 @@ class PacketPlayOutWorldParticles extends Packet {
     #if version >= 1.19
             param = new net.minecraft.core.particles.VibrationParticleOption(source, vo.arrivalInTicks);
     #else
-            BlockPosition origin = new BlockPosition(vo.origin.x, vo.origin.y, vo.origin.z);
+            BlockPos origin = new BlockPos(vo.origin.x, vo.origin.y, vo.origin.z);
             net.minecraft.world.level.gameevent.vibrations.VibrationPath path = new net.minecraft.world.level.gameevent.vibrations.VibrationPath(origin, source, vo.arrivalInTicks);
             param = new net.minecraft.core.particles.VibrationParticleOption(path);
     #endif
@@ -2703,17 +2701,17 @@ class PacketPlayOutWorldParticles extends Packet {
             com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions dust = (com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions) options;
 
   #if version >= 1.21.2
-            param = new net.minecraft.core.particles.ParticleParamRedstone(dust.color.asRGB(), dust.scale);
+            param = new net.minecraft.core.particles.DustParticleOptions(dust.color.asRGB(), dust.scale);
   #else
             float r = (float) dust.color.getRed() / 255.0f;
             float g = (float) dust.color.getGreen() / 255.0f;
             float b = (float) dust.color.getBlue() / 255.0f;
     #if version >= 1.19.3
-            param = new net.minecraft.core.particles.ParticleParamRedstone(new org.joml.Vector3f(r,g,b), dust.scale);
+            param = new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(r,g,b), dust.scale);
     #elseif version >= 1.17
-            param = new net.minecraft.core.particles.ParticleParamRedstone(new com.mojang.math.Vector3fa(r,g,b), dust.scale);
+            param = new net.minecraft.core.particles.DustParticleOptions(new com.mojang.math.Vector3fa(r,g,b), dust.scale);
     #else
-            param = new net.minecraft.core.particles.ParticleParamRedstone(r, g, b, dust.scale);
+            param = new net.minecraft.core.particles.DustParticleOptions(r, g, b, dust.scale);
     #endif
   #endif
 
@@ -2732,7 +2730,7 @@ class PacketPlayOutWorldParticles extends Packet {
     }
 
     public (com.bergerkiller.bukkit.common.resources.ParticleType<?>) Particle<?> getParticleType() {
-        ParticleParam param = instance#particle;
+        ParticleOptions param = instance#particle;
         if (param == null) return null;
   #if version >= 1.18
         return param.getType();
@@ -2744,13 +2742,13 @@ class PacketPlayOutWorldParticles extends Packet {
     }
 
 #else
-    // EnumParticle + int[] args
-    public optional void setParticle(Particle particleType, Object options) {
+    // ParticleType + int[] args
+    public optional void setParticle(ParticleType particleType, Object options) {
         int[] data;
         if (options instanceof com.bergerkiller.bukkit.common.wrappers.BlockData) {
             data = new int[1];
             data[0] = net.minecraft.world.level.block.Block.getCombinedId(
-                    (IBlockData) ((com.bergerkiller.bukkit.common.wrappers.BlockData) options).getData());
+                    (BlockState) ((com.bergerkiller.bukkit.common.wrappers.BlockData) options).getData());
 
         } else if (options instanceof org.bukkit.inventory.ItemStack) {
             net.minecraft.world.item.ItemStack itemstack = (net.minecraft.world.item.ItemStack) com.bergerkiller.bukkit.common.conversion.type.HandleConversion
@@ -2765,11 +2763,11 @@ class PacketPlayOutWorldParticles extends Packet {
             float r = -1.0f + (float) dust.color.getRed() / 255.0f;
             float g = (float) dust.color.getGreen() / 255.0f;
             float b = (float) dust.color.getBlue() / 255.0f;
-            #require PacketPlayOutWorldParticles private float randomX:e;
-            #require PacketPlayOutWorldParticles private float randomY:f;
-            #require PacketPlayOutWorldParticles private float randomZ:g;
-            #require PacketPlayOutWorldParticles private float speed:h;
-            #require PacketPlayOutWorldParticles private int count:i;
+            #require ClientboundLevelParticlesPacket private float randomX:e;
+            #require ClientboundLevelParticlesPacket private float randomY:f;
+            #require ClientboundLevelParticlesPacket private float randomZ:g;
+            #require ClientboundLevelParticlesPacket private float speed:h;
+            #require ClientboundLevelParticlesPacket private int count:i;
             instance#randomX = r;
             instance#randomY = g;
             instance#randomZ = b;
@@ -2864,30 +2862,30 @@ class PacketPlayOutWorldParticles extends Packet {
 #endif
 }
 
-class PacketPlayOutBlockChange extends Packet {
+class ClientboundBlockUpdatePacket extends Packet {
 #if version >= 1.17
-    private final (IntVector3) BlockPosition position:pos;
-    public final (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData blockData:blockState;
+    private final (IntVector3) BlockPos position:pos;
+    public final (com.bergerkiller.bukkit.common.wrappers.BlockData) BlockState blockData:blockState;
 #else
-    private (IntVector3) BlockPosition position:a;
-    public (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData blockData:block;
+    private (IntVector3) BlockPos position:a;
+    public (com.bergerkiller.bukkit.common.wrappers.BlockData) BlockState blockData:block;
 #endif
 
-    public static (PacketPlayOutBlockChangeHandle) PacketPlayOutBlockChange createNewNull() {
+    public static (ClientboundBlockUpdatePacketHandle) ClientboundBlockUpdatePacket createNewNull() {
 #if version >= 1.16.2
-        return new PacketPlayOutBlockChange((BlockPosition) null, (IBlockData) null);
+        return new ClientboundBlockUpdatePacket((BlockPos) null, (BlockState) null);
 #else
-        return new PacketPlayOutBlockChange();
+        return new ClientboundBlockUpdatePacket();
 #endif
     }
 
-    public static (PacketPlayOutBlockChangeHandle) PacketPlayOutBlockChange createNew((IntVector3) BlockPosition position, (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData blockData) {
+    public static (ClientboundBlockUpdatePacketHandle) ClientboundBlockUpdatePacket createNew((IntVector3) BlockPos position, (com.bergerkiller.bukkit.common.wrappers.BlockData) BlockState blockData) {
 #if version >= 1.16.2
-        return new PacketPlayOutBlockChange(position, blockData);
+        return new ClientboundBlockUpdatePacket(position, blockData);
 #else
-        PacketPlayOutBlockChange packet = new PacketPlayOutBlockChange();
-        #require PacketPlayOutBlockChange private BlockPosition position:a;
-        #require PacketPlayOutBlockChange public IBlockData blockData:block;
+        ClientboundBlockUpdatePacket packet = new ClientboundBlockUpdatePacket();
+        #require ClientboundBlockUpdatePacket private BlockPos position:a;
+        #require ClientboundBlockUpdatePacket public BlockState blockData:block;
         packet#position = position;
         packet#blockData = blockData;
         return packet;
@@ -2895,33 +2893,33 @@ class PacketPlayOutBlockChange extends Packet {
     }
 }
 
-class PacketPlayOutBlockBreakAnimation extends Packet {
+class ClientboundBlockDestructionPacket extends Packet {
 #if version >= 1.17
     private final int id;
-    private final (IntVector3) BlockPosition position:pos;
+    private final (IntVector3) BlockPos position:pos;
     private final int progress;
 #else
     private int id:a;
-    private (IntVector3) BlockPosition position:b;
+    private (IntVector3) BlockPos position:b;
     private int progress:c;
 #endif
 }
 
-class PacketPlayOutBlockAction extends Packet {
+class ClientboundBlockEventPacket extends Packet {
 #if version >= 1.17
-    private final (IntVector3) BlockPosition position:pos;
+    private final (IntVector3) BlockPos position:pos;
     private final int b0;
     private final int b1;
     private final (org.bukkit.Material) net.minecraft.world.level.block.Block block;
 #else
-    private (IntVector3) BlockPosition position:a;
+    private (IntVector3) BlockPos position:a;
     private int b0:b;
     private int b1:c;
     private (org.bukkit.Material) net.minecraft.world.level.block.Block block:d;
 #endif
 }
 
-class PacketPlayOutCamera extends Packet {
+class ClientboundSetCameraPacket extends Packet {
 #if version >= 1.17
     private final int entityId:cameraId;
 #else
@@ -2929,26 +2927,26 @@ class PacketPlayOutCamera extends Packet {
 #endif
 
     <code>
-    public static PacketPlayOutCameraHandle createNew(int entityId) {
-        PacketPlayOutCameraHandle packet = createNew();
+    public static ClientboundSetCameraPacketHandle createNew(int entityId) {
+        ClientboundSetCameraPacketHandle packet = createNew();
         packet.setEntityId(entityId);
         return packet;
     }
     </code>
 
-    public static (PacketPlayOutCameraHandle) PacketPlayOutCamera createNew() {
+    public static (ClientboundSetCameraPacketHandle) ClientboundSetCameraPacket createNew() {
 #if version >= 1.20.5
-        #require net.minecraft.network.protocol.game.PacketPlayOutCamera private PacketPlayOutCamera createCameraPacket:<init>(net.minecraft.network.PacketDataSerializer serializer);
+        #require net.minecraft.network.protocol.game.ClientboundSetCameraPacket private ClientboundSetCameraPacket createCameraPacket:<init>(net.minecraft.network.FriendlyByteBuf serializer);
         return #createCameraPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #elseif version >= 1.17
-        return new PacketPlayOutCamera(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+        return new ClientboundSetCameraPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
-        return new PacketPlayOutCamera();
+        return new ClientboundSetCameraPacket();
 #endif
     }
 }
 
-class PacketPlayInHeldItemSlot extends Packet {
+class ServerboundSetCarriedItemPacket extends Packet {
 #if version >= 1.17
     private final int itemInHandIndex:slot;
 #else
@@ -2956,7 +2954,7 @@ class PacketPlayInHeldItemSlot extends Packet {
 #endif
 }
 
-class PacketPlayOutHeldItemSlot extends Packet {
+class ClientboundSetHeldSlotPacket extends Packet {
 #if version >= 1.17
     private final int itemInHandIndex:slot;
 #else
@@ -2964,7 +2962,7 @@ class PacketPlayOutHeldItemSlot extends Packet {
 #endif
 }
 
-class PacketPlayInChat extends Packet {
+class ServerboundChatPacket extends Packet {
 #if version >= 1.17
     private final String message;
 #else
@@ -2972,54 +2970,54 @@ class PacketPlayInChat extends Packet {
 #endif
 }
 
-class PacketPlayOutTileEntityData extends Packet {
+class ClientboundBlockEntityDataPacket extends Packet {
 #if version >= 1.18
-    private final (IntVector3) BlockPosition position:pos;
-    private final (BlockStateType) TileEntityTypes<?> type;
-    private final (CommonTagCompound) NBTTagCompound data:tag;
+    private final (IntVector3) BlockPos position:pos;
+    private final (BlockStateType) BlockEntityType<?> type;
+    private final (CommonTagCompound) CompoundTag data:tag;
 #elseif version >= 1.17
-    private final (IntVector3) BlockPosition position:pos;
+    private final (IntVector3) BlockPos position:pos;
     private final (BlockStateType) int type;
-    private final (CommonTagCompound) NBTTagCompound data:tag;
+    private final (CommonTagCompound) CompoundTag data:tag;
 #else
-    private (IntVector3) BlockPosition position:a;
+    private (IntVector3) BlockPos position:a;
     private (BlockStateType) int type:b;
-    private (CommonTagCompound) NBTTagCompound data:c;
+    private (CommonTagCompound) CompoundTag data:c;
 #endif
 
 #if version >= 1.18
-    private (PacketPlayOutTileEntityDataHandle) PacketPlayOutTileEntityData((IntVector3) BlockPosition blockPosition, (BlockStateType) TileEntityTypes<?> type, (CommonTagCompound) NBTTagCompound data);
+    private (ClientboundBlockEntityDataPacketHandle) ClientboundBlockEntityDataPacket((IntVector3) BlockPos blockPosition, (BlockStateType) BlockEntityType<?> type, (CommonTagCompound) CompoundTag data);
 #else
-    public (PacketPlayOutTileEntityDataHandle) PacketPlayOutTileEntityData((IntVector3) BlockPosition blockPosition, (BlockStateType) int type, (CommonTagCompound) NBTTagCompound data);
+    public (ClientboundBlockEntityDataPacketHandle) ClientboundBlockEntityDataPacket((IntVector3) BlockPos blockPosition, (BlockStateType) int type, (CommonTagCompound) CompoundTag data);
 #endif
 }
 
-class PacketPlayOutOpenSignEditor extends Packet {
+class ClientboundOpenSignEditorPacket extends Packet {
 #if version >= 1.17
-    private final (IntVector3) BlockPosition signPosition:pos;
+    private final (IntVector3) BlockPos signPosition:pos;
 #else
-    private (IntVector3) BlockPosition signPosition:a;
+    private (IntVector3) BlockPos signPosition:a;
 #endif
 
     <code>
-    public static PacketPlayOutOpenSignEditorHandle createNew(IntVector3 signPosition) {
+    public static ClientboundOpenSignEditorPacketHandle createNew(IntVector3 signPosition) {
         return createNew(signPosition, true);
     }
     </code>
 
-    public static (PacketPlayOutOpenSignEditorHandle) PacketPlayOutOpenSignEditor createNew((IntVector3) BlockPosition signPosition, boolean isFrontText) {
+    public static (ClientboundOpenSignEditorPacketHandle) ClientboundOpenSignEditorPacket createNew((IntVector3) BlockPos signPosition, boolean isFrontText) {
 #if version >= 1.20
-        return new PacketPlayOutOpenSignEditor(signPosition, isFrontText);
+        return new ClientboundOpenSignEditorPacket(signPosition, isFrontText);
 #else
         if (!isFrontText) {
             throw new UnsupportedOperationException("Back text not supported on this version of Minecraft");
         }
-        return new PacketPlayOutOpenSignEditor(signPosition);
+        return new ClientboundOpenSignEditorPacket(signPosition);
 #endif
     }
 
 #if version >= 1.20
-    #require PacketPlayOutOpenSignEditor private final boolean isFrontText;
+    #require ClientboundOpenSignEditorPacket private final boolean isFrontText;
     public boolean isFrontText() { return instance#isFrontText; }
     public void setFrontText(boolean front) { instance#isFrontText = front; }
 #else
@@ -3035,7 +3033,7 @@ class PacketPlayOutOpenSignEditor extends Packet {
 #endif
 }
 
-class PacketPlayInAbilities extends Packet {
+class ServerboundPlayerAbilitiesPacket extends Packet {
 #if version >= 1.17
     private final boolean isFlying;
 #elseif version >= 1.16
@@ -3045,7 +3043,7 @@ class PacketPlayInAbilities extends Packet {
 #endif
 }
 
-class PacketPlayOutAbilities extends Packet {
+class ClientboundPlayerAbilitiesPacket extends Packet {
 #if version >= 1.17
     private final boolean invulnerable;
     private final boolean isFlying;
@@ -3062,56 +3060,56 @@ class PacketPlayOutAbilities extends Packet {
     private float walkingSpeed:f;
 #endif
 
-    public (PacketPlayOutAbilitiesHandle) PacketPlayOutAbilities((com.bergerkiller.bukkit.common.wrappers.PlayerAbilities) net.minecraft.world.entity.player.PlayerAbilities abilities);
+    public (ClientboundPlayerAbilitiesPacketHandle) ClientboundPlayerAbilitiesPacket((com.bergerkiller.bukkit.common.wrappers.PlayerAbilities) net.minecraft.world.entity.player.Abilities abilities);
 }
 
-class PacketPlayOutWorldEvent extends Packet {
+class ClientboundLevelEventPacket extends Packet {
 #if version >= 1.17
     private final int effectId:type;
-    private final (IntVector3) BlockPosition position:pos;
+    private final (IntVector3) BlockPos position:pos;
     private final int data;
     private final boolean globalEvent;
 #else
     private int effectId:a;
-    private (IntVector3) BlockPosition position:b;
+    private (IntVector3) BlockPos position:b;
     private int data:c;
     private boolean globalEvent:d;
 #endif
 }
 
-class PacketPlayOutSpawnPosition extends Packet {
+class ClientboundSetDefaultSpawnPositionPacket extends Packet {
 #if version >= 1.21.9
-    public static (PacketPlayOutSpawnPositionHandle) PacketPlayOutSpawnPosition createNew((EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig spawnConfig) {
-        return new PacketPlayOutSpawnPosition(spawnConfig.respawnData());
+    public static (ClientboundSetDefaultSpawnPositionPacketHandle) ClientboundSetDefaultSpawnPositionPacket createNew((ServerPlayerHandle.RespawnConfigHandle) ServerPlayer.RespawnConfig spawnConfig) {
+        return new ClientboundSetDefaultSpawnPositionPacket(spawnConfig.respawnData());
     }
 
-    public (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig getSpawn() {
-        return new net.minecraft.server.level.EntityPlayer$RespawnConfig(instance.respawnData(), true);
+    public (ServerPlayerHandle.RespawnConfigHandle) ServerPlayer.RespawnConfig getSpawn() {
+        return new net.minecraft.server.level.ServerPlayer$RespawnConfig(instance.respawnData(), true);
     }
 #else
-    public static (PacketPlayOutSpawnPositionHandle) PacketPlayOutSpawnPosition createNew((EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig spawnConfig) {
-        BlockPosition position = (BlockPosition) spawnConfig.pos();
+    public static (ClientboundSetDefaultSpawnPositionPacketHandle) ClientboundSetDefaultSpawnPositionPacket createNew((ServerPlayerHandle.RespawnConfigHandle) ServerPlayer.RespawnConfig spawnConfig) {
+        BlockPos position = (BlockPos) spawnConfig.pos();
   #if version >= 1.16.2
         float angle = spawnConfig.angle();
-        return new PacketPlayOutSpawnPosition(position, angle);
+        return new ClientboundSetDefaultSpawnPositionPacket(position, angle);
   #else
-        return new PacketPlayOutSpawnPosition(position);
+        return new ClientboundSetDefaultSpawnPositionPacket(position);
   #endif
     }
 
-    public (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig getSpawn() {
+    public (ServerPlayerHandle.RespawnConfigHandle) ServerPlayer.RespawnConfig getSpawn() {
   #if version >= 1.17
-        BlockPosition position = instance.pos;
+        BlockPos position = instance.pos;
   #else
-        BlockPosition position = instance.position;
+        BlockPos position = instance.position;
   #endif
 
         float yaw = 0.0f;
   #if version >= 1.16.2
     #if version >= 1.17
-        #require net.minecraft.network.protocol.game.PacketPlayOutSpawnPosition private final float angle;
+        #require net.minecraft.network.protocol.game.ClientboundSetDefaultSpawnPositionPacket private final float angle;
     #else
-        #require net.minecraft.network.protocol.game.PacketPlayOutSpawnPosition private float angle:b;
+        #require net.minecraft.network.protocol.game.ClientboundSetDefaultSpawnPositionPacket private float angle:b;
     #endif
         yaw = instance#angle;
   #endif
@@ -3119,27 +3117,27 @@ class PacketPlayOutSpawnPosition extends Packet {
         // Pack it into a RespawnConfig object
         // For older versions of Minecraft we use our own proxy class
   #if version >= 1.21.5
-        return new net.minecraft.server.level.EntityPlayer$RespawnConfig(null, position, yaw, true);
+        return new net.minecraft.server.level.ServerPlayer$RespawnConfig(null, position, yaw, true);
   #else
-        return new net.minecraft.server.level.EntityPlayer$RespawnConfig(null, null, position, yaw, true);
+        return new net.minecraft.server.level.ServerPlayer$RespawnConfig(null, null, position, yaw, true);
   #endif
     }
 #endif
 }
 
-class PacketPlayInEntityAction extends Packet {
+class ServerboundPlayerCommandPacket extends Packet {
 #if version >= 1.17
     private final int playerId:id;
-    private final (Object) PacketPlayInEntityAction.EnumPlayerAction action;
+    private final (Object) ServerboundPlayerCommandPacket.EnumPlayerAction action;
     private final int data;
 #else
     private int playerId:a;
-    private (Object) PacketPlayInEntityAction.EnumPlayerAction action:animation;
+    private (Object) ServerboundPlayerCommandPacket.EnumPlayerAction action:animation;
     private int data:c;
 #endif
 }
 
-class PacketPlayInCloseWindow extends Packet {
+class ServerboundContainerClosePacket extends Packet {
 #if version >= 1.17
     private final int windowId:containerId;
 #else
@@ -3147,7 +3145,7 @@ class PacketPlayInCloseWindow extends Packet {
 #endif
 }
 
-class PacketPlayInEnchantItem extends Packet {
+class ServerboundContainerButtonClickPacket extends Packet {
 #if version >= 1.17
     private final int windowId:containerId;
     private final int buttonId;
@@ -3157,18 +3155,18 @@ class PacketPlayInEnchantItem extends Packet {
 #endif
 }
 
-class PacketPlayInSpectate extends Packet {
+class ServerboundTeleportToEntityPacket extends Packet {
 #if version >= 1.17
     private final UUID uuid;
 #else
     private UUID uuid:a;
 #endif
 
-    public (PacketPlayInSpectateHandle) PacketPlayInSpectate(UUID uuid);
+    public (ServerboundTeleportToEntityPacketHandle) ServerboundTeleportToEntityPacket(UUID uuid);
 }
 
 // Since Minecraft 1.12
-optional class PacketPlayOutAdvancements extends Packet {
+optional class ClientboundUpdateAdvancementsPacket extends Packet {
 #if version >= 1.17
     private boolean initial:reset;
 #else

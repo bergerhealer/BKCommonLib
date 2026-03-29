@@ -1,14 +1,14 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightMapHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightmapHandle;
 
 /**
  * Heightmap information of a single chunk. There are different possible heightmap
  * configurations since MC 1.13.
  */
-public class HeightMap extends BasicWrapper<HeightMapHandle> {
+public class HeightMap extends BasicWrapper<HeightmapHandle> {
 
-    public HeightMap(HeightMapHandle handle) {
+    public HeightMap(HeightmapHandle handle) {
         setHandle(handle);
     }
 

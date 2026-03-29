@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.inventory;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.hooks.IInventoryProxyHook;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
-import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
+import com.bergerkiller.generated.net.minecraft.world.ContainerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle;
 import com.bergerkiller.generated.org.bukkit.inventory.InventoryHandle;
 
@@ -52,7 +52,7 @@ public abstract class InventoryBase implements Inventory {
      * This handles things like merging, splitting, etc.
      */
     public InventoryBase() {
-        this.nmsProxy = new IInventoryProxyHook(this).createInstance(IInventoryHandle.T.getType());
+        this.nmsProxy = new IInventoryProxyHook(this).createInstance(ContainerHandle.T.getType());
         this.cbProxy = CraftInventoryHandle.createNew(this.nmsProxy);
         this.maxstacksize = 64;
     }

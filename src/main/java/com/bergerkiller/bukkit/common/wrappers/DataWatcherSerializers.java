@@ -6,12 +6,12 @@ import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle;
-import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
-import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
+import com.bergerkiller.generated.net.minecraft.core.BlockPosHandle;
+import com.bergerkiller.generated.net.minecraft.core.DirectionHandle;
+import com.bergerkiller.generated.net.minecraft.core.RotationsHandle;
+import com.bergerkiller.generated.net.minecraft.network.chat.ComponentHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.BlockStateHandle;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
@@ -76,10 +76,10 @@ class DataWatcherSerializers {
             }
 
             // ChatText -> IChatbaseComponent
-            typeMapping.put(ChatText.class, IChatBaseComponentHandle.T.getType());
+            typeMapping.put(ChatText.class, ComponentHandle.T.getType());
 
             // Bukkit BlockFace -> nms EnumDirection
-            typeMapping.put(BlockFace.class, EnumDirectionHandle.T.getType());
+            typeMapping.put(BlockFace.class, DirectionHandle.T.getType());
         } else {
             // Use our own kind of tokens on MC 1.8.8 and before
             register(Byte.class, 0);
@@ -88,14 +88,14 @@ class DataWatcherSerializers {
             register(Float.class, 3);
             register(String.class, 4);
             register(ItemStackHandle.T.getType(), 5);
-            register(BlockPositionHandle.T.getType(), 6);
-            register(Vector3fHandle.T.getType(), 7);
+            register(BlockPosHandle.T.getType(), 6);
+            register(RotationsHandle.T.getType(), 7);
 
             // Booleans are stored as Byte
             typeMapping.put(Boolean.class, Byte.class);
 
             // IChatBaseComponent -> String
-            typeMapping.put(IChatBaseComponentHandle.T.getType(), String.class);
+            typeMapping.put(ComponentHandle.T.getType(), String.class);
 
             // ChatText -> String
             typeMapping.put(ChatText.class, String.class);
@@ -113,13 +113,13 @@ class DataWatcherSerializers {
         }
 
         // Vector -> Vector3f
-        typeMapping.put(Vector.class, Vector3fHandle.T.getType());
+        typeMapping.put(Vector.class, RotationsHandle.T.getType());
         // IntVector3 -> BlockPosition
-        typeMapping.put(IntVector3.class, BlockPositionHandle.T.getType());
+        typeMapping.put(IntVector3.class, BlockPosHandle.T.getType());
         // Bukkit ItemStack -> nms ItemStack
         typeMapping.put(ItemStack.class, ItemStackHandle.T.getType());
         // BlockData -> nms IBlockData
-        typeMapping.put(BlockData.class, IBlockDataHandle.T.getType());
+        typeMapping.put(BlockData.class, BlockStateHandle.T.getType());
     }
 
     private static void register(Class<?> type, Object token) {

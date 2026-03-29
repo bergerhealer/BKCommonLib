@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.proxy;
 
-import com.bergerkiller.generated.net.minecraft.network.NetworkManagerHandle;
+import com.bergerkiller.generated.net.minecraft.network.ConnectionHandle;
 
 import java.util.function.Consumer;
 
@@ -22,6 +22,6 @@ public class QueuedPacket_1_20_2 implements Consumer<Object> {
 
     @Override
     public void accept(Object networkmanager) {
-        NetworkManagerHandle.T.queue_sendPacketImpl.raw.invoke(networkmanager, packet, packetsendlistener, flush);
+        ConnectionHandle.T.queue_sendPacketImpl.raw.invoke(networkmanager, packet, packetsendlistener, flush);
     }
 }

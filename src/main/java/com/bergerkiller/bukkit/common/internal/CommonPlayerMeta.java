@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
 
 import org.bukkit.entity.Player;
 
@@ -32,8 +32,8 @@ public class CommonPlayerMeta {
 
     protected CommonPlayerMeta(Player player) {
         this.playerRef = new WeakReference<Player>(player);
-        if (EntityPlayerHandle.T.getRemoveQueue.isAvailable()) {
-            removeQueue = EntityPlayerHandle.T.getRemoveQueue.invoke(HandleConversion.toEntityHandle(player));
+        if (ServerPlayerHandle.T.getRemoveQueue.isAvailable()) {
+            removeQueue = ServerPlayerHandle.T.getRemoveQueue.invoke(HandleConversion.toEntityHandle(player));
         } else {
             removeQueue = new ArrayList<Integer>();
         }

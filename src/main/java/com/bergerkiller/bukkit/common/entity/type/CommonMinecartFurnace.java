@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.entity.type;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartFurnaceHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.MinecartFurnaceHandle;
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.inventory.ItemStack;
@@ -25,18 +25,18 @@ public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
      */
     public static final int COAL_FUEL = 3600;
 
-    public final DataWatcher.EntityItem<Boolean> metaSmoking = getDataItem(EntityMinecartFurnaceHandle.DATA_SMOKING);
+    public final DataWatcher.EntityItem<Boolean> metaSmoking = getDataItem(MinecartFurnaceHandle.DATA_SMOKING);
 
     public CommonMinecartFurnace(PoweredMinecart base) {
         super(base);
     }
 
     public int getFuelTicks() {
-        return EntityMinecartFurnaceHandle.T.fuel.getInteger(getHandle());
+        return MinecartFurnaceHandle.T.fuel.getInteger(getHandle());
     }
 
     public void setFuelTicks(int fuelTicks) {
-        EntityMinecartFurnaceHandle.T.fuel.setInteger(getHandle(), fuelTicks);
+        MinecartFurnaceHandle.T.fuel.setInteger(getHandle(), fuelTicks);
     }
 
     public boolean hasFuel() {
@@ -48,11 +48,11 @@ public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
     }
 
     public Vector getPush() {
-        return EntityMinecartFurnaceHandle.T.getPushForce.invoke(getHandle());
+        return MinecartFurnaceHandle.T.getPushForce.invoke(getHandle());
     }
 
     public void setPush(double fx, double fy, double fz) {
-        EntityMinecartFurnaceHandle.createHandle(getHandle()).setPushForce(fx, fy, fz);
+        MinecartFurnaceHandle.createHandle(getHandle()).setPushForce(fx, fy, fz);
     }
 
     public void setPush(Vector push) {
@@ -64,7 +64,7 @@ public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
      */
     @Deprecated
     public double getPushX() {
-        return EntityMinecartFurnaceHandle.createHandle(getHandle()).getPushForceX();
+        return MinecartFurnaceHandle.createHandle(getHandle()).getPushForceX();
     }
 
     /**
@@ -72,7 +72,7 @@ public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
      */
     @Deprecated
     public void setPushX(double pushX) {
-        EntityMinecartFurnaceHandle.createHandle(getHandle()).setPushForceX(pushX);
+        MinecartFurnaceHandle.createHandle(getHandle()).setPushForceX(pushX);
     }
 
     /**
@@ -80,7 +80,7 @@ public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
      */
     @Deprecated
     public double getPushZ() {
-        return EntityMinecartFurnaceHandle.createHandle(getHandle()).getPushForceZ();
+        return MinecartFurnaceHandle.createHandle(getHandle()).getPushForceZ();
     }
 
     /**
@@ -88,7 +88,7 @@ public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
      */
     @Deprecated
     public void setPushZ(double pushZ) {
-        EntityMinecartFurnaceHandle.createHandle(getHandle()).setPushForceX(pushZ);
+        MinecartFurnaceHandle.createHandle(getHandle()).setPushForceX(pushZ);
     }
 
     public boolean isSmoking() {

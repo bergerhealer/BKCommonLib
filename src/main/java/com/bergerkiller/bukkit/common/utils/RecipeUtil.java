@@ -8,11 +8,11 @@ import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
-import com.bergerkiller.generated.net.minecraft.world.item.crafting.CraftingManagerHandle;
-import com.bergerkiller.generated.net.minecraft.world.item.crafting.FurnaceRecipeHandle;
-import com.bergerkiller.generated.net.minecraft.world.item.crafting.IRecipeHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeManagerHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.SmeltingRecipeHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipesFurnaceHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityFurnaceHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntityHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingSet;
@@ -37,7 +37,7 @@ public class RecipeUtil {
                 // Ignore forge errors
                 continue;
             }
-            int fuel = ((Integer) TileEntityFurnaceHandle.T.fuelTime.raw.invoke(item.getRaw())).intValue();
+            int fuel = ((Integer) AbstractFurnaceBlockEntityHandle.T.fuelTime.raw.invoke(item.getRaw())).intValue();
             if (fuel > 0) {
                 fuelTimes.put(material, fuel);
             }
@@ -72,7 +72,7 @@ public class RecipeUtil {
         if (item == null) {
             return 0;
         } else {
-            return item.getAmount() * TileEntityFurnaceHandle.fuelTime(CommonNMS.getHandle(item));
+            return item.getAmount() * AbstractFurnaceBlockEntityHandle.fuelTime(CommonNMS.getHandle(item));
         }
     }
 
@@ -100,9 +100,9 @@ public class RecipeUtil {
     }
 
     public static org.bukkit.inventory.ItemStack getFurnaceResult(org.bukkit.inventory.ItemStack cooked) {
-        if (FurnaceRecipeHandle.T.isAvailable()) {
+        if (SmeltingRecipeHandle.T.isAvailable()) {
             // >= 1.13
-            for (FurnaceRecipeHandle recipe : FurnaceRecipeHandle.getRecipes()) {
+            for (SmeltingRecipeHandle recipe : SmeltingRecipeHandle.getRecipes()) {
                 if (recipe.getIngredient().match(cooked) != null) {
                     return recipe.getOutput();
                 }
@@ -139,7 +139,7 @@ public class RecipeUtil {
      */
     public static CraftRecipe[] getCraftingRequirements(Material type, int data) {
         List<CraftRecipe> poss = new ArrayList<CraftRecipe>(2);
-        for (IRecipeHandle rec : getCraftRecipes()) {
+        for (RecipeHandle rec : getCraftRecipes()) {
             ItemStack item = rec.getOutput();
             if (item != null && (type == null || item.getType() == type) && (data == -1 || MaterialUtil.getRawData(item) == data)) {
                 CraftRecipe crec = CraftRecipe.create(rec);
@@ -183,7 +183,7 @@ public class RecipeUtil {
         }
     }
 
-    private static Iterable<IRecipeHandle> getCraftRecipes() {
-        return CraftingManagerHandle.getRecipes();
+    private static Iterable<RecipeHandle> getCraftRecipes() {
+        return RecipeManagerHandle.getRecipes();
     }
 }

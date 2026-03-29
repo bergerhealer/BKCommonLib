@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.scoreboards;
 
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundResetScorePacketHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardScoreHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetScorePacketHandle;
 
 public class CommonScore {
 
@@ -52,7 +52,7 @@ public class CommonScore {
         if (!this.created) {
             return;
         }
-        PacketUtil.sendPacket(scoreboard.getPlayer(), PacketPlayOutScoreboardScoreHandle.createNew(name, objName, value));
+        PacketUtil.sendPacket(scoreboard.getPlayer(), ClientboundSetScorePacketHandle.createNew(name, objName, value));
     }
 
     /**

@@ -5,7 +5,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 import com.bergerkiller.bukkit.common.wrappers.BasicWrapper;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 import com.bergerkiller.generated.net.minecraft.resources.ResourceKeyHandle;
 
 /**
@@ -35,7 +35,7 @@ public final class ResourceKey<T> extends BasicWrapper<ResourceKeyHandle> {
      * 
      * @return Minecraft key name
      */
-    public MinecraftKeyHandle getName() {
+    public IdentifierHandle getName() {
         return handle.getName();
     }
 
@@ -87,7 +87,7 @@ public final class ResourceKey<T> extends BasicWrapper<ResourceKeyHandle> {
      * @param minecraftKey
      * @return resource key, null if minecraftkey is null
      */
-    public static <T> ResourceKey<T> fromMinecraftKey(ResourceCategory<T> category, MinecraftKeyHandle minecraftKey) {
+    public static <T> ResourceKey<T> fromMinecraftKey(ResourceCategory<T> category, IdentifierHandle minecraftKey) {
         if (minecraftKey != null) {
             Object resourceKeyHandle = ResourceKeyHandle.T.create.raw.invoke(category.getCategoryKey().getRaw(), minecraftKey.getRaw());
             return fromResourceKeyHandle(resourceKeyHandle);
@@ -108,7 +108,7 @@ public final class ResourceKey<T> extends BasicWrapper<ResourceKeyHandle> {
      * @return resource key, null if the key contains invalid characters
      */
     public static <T> ResourceKey<T> fromPath(ResourceCategory<T> category, String key) {
-        return fromMinecraftKey(category, MinecraftKeyHandle.createNew(key));
+        return fromMinecraftKey(category, IdentifierHandle.createNew(key));
     }
 
     /**
@@ -125,6 +125,6 @@ public final class ResourceKey<T> extends BasicWrapper<ResourceKeyHandle> {
      * @return resource key, null if the key contains invalid characters
      */
     public static <T> ResourceKey<T> fromPath(ResourceCategory<T> category, String namespace, String name) {
-        return fromMinecraftKey(category, MinecraftKeyHandle.createNew(namespace, name));
+        return fromMinecraftKey(category, IdentifierHandle.createNew(namespace, name));
     }
 }

@@ -1,20 +1,20 @@
 package org.bukkit.craftbukkit.inventory;
 
-import net.minecraft.world.IInventory;
-import net.minecraft.world.inventory.InventoryMerchant;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.MerchantContainer;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.TypedEntityData;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
-import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
+import com.bergerkiller.generated.net.minecraft.world.ContainerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryMerchantHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle;
 
 class CraftItemStack {
     (Object) net.minecraft.world.item.ItemStack handle;
@@ -38,18 +38,18 @@ class CraftItemStack {
 #endif
 
 #if version >= 1.21.5
-    public static optional org.bukkit.inventory.ItemStack deserializeNBT((CommonTagCompound) NBTTagCompound nbt) {
+    public static optional org.bukkit.inventory.ItemStack deserializeNBT((CommonTagCompound) CompoundTag nbt) {
   #if paper
         // Use Paper UnsafeValues API
-        #require CraftMagicNumbers private org.bukkit.inventory.ItemStack deserializeItem(NBTTagCompound nbt);
+        #require CraftMagicNumbers private org.bukkit.inventory.ItemStack deserializeItem(CompoundTag nbt);
         return CraftMagicNumbers.INSTANCE#deserializeItem(nbt);
   #else
         // Use Spigot/NMS DFU
         final int dataVersion = nbt.getIntOr("DataVersion", 0);
 
-        com.mojang.serialization.Dynamic migratedDynamic = net.minecraft.util.datafix.DataConverterRegistry.getDataFixer().update(
-                net.minecraft.util.datafix.fixes.DataConverterTypes.ITEM_STACK,
-                new com.mojang.serialization.Dynamic(net.minecraft.nbt.DynamicOpsNBT.INSTANCE, nbt),
+        com.mojang.serialization.Dynamic migratedDynamic = net.minecraft.util.datafix.DataFixers.getDataFixer().update(
+                net.minecraft.util.datafix.fixes.References.ITEM_STACK,
+                new com.mojang.serialization.Dynamic(net.minecraft.nbt.NbtOps.INSTANCE, nbt),
                 dataVersion,
                 CraftMagicNumbers.INSTANCE.getDataVersion());
 
@@ -57,14 +57,14 @@ class CraftItemStack {
             throw new IllegalArgumentException("Failed to perform data migration of itemstack");
         }
 
-        net.minecraft.core.HolderLookup$a holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
-        NBTBase migratedNBT = (NBTBase) migratedDynamic.getValue();
+        net.minecraft.core.HolderLookup$Provider holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
+        Tag migratedNBT = (Tag) migratedDynamic.getValue();
     #if version >= 1.21.6
         java.util.Optional itemOpt = net.minecraft.world.item.ItemStack.CODEC.parse(
-                holderLookup.createSerializationContext(net.minecraft.nbt.DynamicOpsNBT.INSTANCE),
+                holderLookup.createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE),
                 migratedNBT
             )
-            .resultOrPartial(NBTBaseHandle.createPartialErrorLogger(migratedNBT));
+            .resultOrPartial(TagHandle.createPartialErrorLogger(migratedNBT));
     #else
         java.util.Optional itemOpt = net.minecraft.world.item.ItemStack.parse(
                 holderLookup,
@@ -79,7 +79,7 @@ class CraftItemStack {
   #endif
     }
 #else
-    public static optional org.bukkit.inventory.ItemStack deserializeNBT:###((CommonTagCompound) NBTTagCompound nbt);
+    public static optional org.bukkit.inventory.ItemStack deserializeNBT:###((CommonTagCompound) CompoundTag nbt);
 #endif
 
     public static boolean isCorruptedEntityTag(org.bukkit.inventory.meta.ItemMeta itemMeta) {
@@ -91,18 +91,18 @@ class CraftItemStack {
 
         org.bukkit.craftbukkit.inventory.CraftMetaEntityTag craftMeta = (org.bukkit.craftbukkit.inventory.CraftMetaEntityTag) itemMeta;
 
-  #if version >= 1.21.9 && exists org.bukkit.craftbukkit.inventory.CraftMetaEntityTag net.minecraft.world.item.component.TypedEntityData<net.minecraft.world.entity.EntityTypes<?>> entityTag;
+  #if version >= 1.21.9 && exists org.bukkit.craftbukkit.inventory.CraftMetaEntityTag net.minecraft.world.item.component.TypedEntityData<net.minecraft.world.entity.EntityType<?>> entityTag;
         // Used on spigot 1.21.9+
-        #require org.bukkit.craftbukkit.inventory.CraftMetaEntityTag TypedEntityData<net.minecraft.world.entity.EntityTypes<?>> entityTag;
+        #require org.bukkit.craftbukkit.inventory.CraftMetaEntityTag TypedEntityData<net.minecraft.world.entity.EntityType<?>> entityTag;
         TypedEntityData entityTag = craftMeta#entityTag;
         return entityTag == null;
   #else
         // Paper and versions before 1.21.9 stored the nbt tag
-        #require org.bukkit.craftbukkit.inventory.CraftMetaEntityTag net.minecraft.nbt.NBTTagCompound entityTag;
-        net.minecraft.nbt.NBTTagCompound entityTag = craftMeta#entityTag;
+        #require org.bukkit.craftbukkit.inventory.CraftMetaEntityTag net.minecraft.nbt.CompoundTag entityTag;
+        net.minecraft.nbt.CompoundTag entityTag = craftMeta#entityTag;
         if (entityTag == null) return false;
-        net.minecraft.nbt.NBTBase idTag = entityTag.get("id");
-        return !(idTag instanceof net.minecraft.nbt.NBTTagString);
+        net.minecraft.nbt.Tag idTag = entityTag.get("id");
+        return !(idTag instanceof net.minecraft.nbt.StringTag);
   #endif
 #else
         return false;
@@ -111,40 +111,40 @@ class CraftItemStack {
 }
 
 class CraftInventory extends org.bukkit.inventory.Inventory {
-    public (org.bukkit.inventory.Inventory) CraftInventory((Object) IInventory nmsIInventory);
+    public (org.bukkit.inventory.Inventory) CraftInventory((Object) Container nmsContainer);
 
-    protected final (IInventoryHandle) IInventory handleField:inventory;
+    protected final (ContainerHandle) Container handleField:inventory;
 
-    public (IInventoryHandle) IInventory getHandle:getInventory();
+    public (ContainerHandle) Container getHandle:getInventory();
 }
 
 class CraftInventoryPlayer {
-    public (org.bukkit.inventory.PlayerInventory) CraftInventoryPlayer((Object) net.minecraft.world.entity.player.PlayerInventory nmsPlayerInventory);
+    public (org.bukkit.inventory.PlayerInventory) CraftInventoryPlayer((Object) net.minecraft.world.entity.player.Inventory nmsPlayerInventory);
 }
 
 class CraftInventoryCrafting {
 #if version >= 1.21
-    public (org.bukkit.inventory.CraftingInventory) CraftInventoryCrafting((Object) net.minecraft.world.inventory.InventoryCrafting nmsInventoryCrafting, (Object) IInventory nmsResultIInventory);
+    public (org.bukkit.inventory.CraftingInventory) CraftInventoryCrafting((Object) net.minecraft.world.inventory.CraftingContainer nmsInventoryCrafting, (Object) Container nmsResultContainer);
 #elseif version >= 1.13
-    public (org.bukkit.inventory.CraftingInventory) CraftInventoryCrafting((Object) IInventory nmsInventoryCrafting, (Object) IInventory nmsResultIInventory);
+    public (org.bukkit.inventory.CraftingInventory) CraftInventoryCrafting((Object) Container nmsInventoryCrafting, (Object) Container nmsResultContainer);
 #else
-    public (org.bukkit.inventory.CraftingInventory) CraftInventoryCrafting((Object) net.minecraft.server.InventoryCrafting nmsInventoryCrafting, (Object) IInventory nmsResultIInventory);
+    public (org.bukkit.inventory.CraftingInventory) CraftInventoryCrafting((Object) net.minecraft.server.InventoryCrafting nmsInventoryCrafting, (Object) Container nmsResultContainer);
 #endif
 }
 
 class CraftInventoryFurnace {
-    public (org.bukkit.inventory.FurnaceInventory) CraftInventoryFurnace((Object) net.minecraft.world.level.block.entity.TileEntityFurnace nmsTileEntityFurnace);
+    public (org.bukkit.inventory.FurnaceInventory) CraftInventoryFurnace((Object) net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity nmsTileEntityFurnace);
 }
 
 class CraftInventoryBrewer {
-    public (org.bukkit.inventory.BrewerInventory) CraftInventoryBrewer((Object) IInventory nmsTileEntityBrewingStand);
+    public (org.bukkit.inventory.BrewerInventory) CraftInventoryBrewer((Object) Container nmsTileEntityBrewingStand);
 }
 
 class CraftInventoryMerchant {
-    public static org.bukkit.inventory.MerchantInventory createNew((Object) InventoryMerchant nmsInventoryMerchant) {
+    public static org.bukkit.inventory.MerchantInventory createNew((Object) MerchantContainer nmsInventoryMerchant) {
 #if version >= 1.14
-        Object merchant = com.bergerkiller.generated.net.minecraft.world.inventory.InventoryMerchantHandle.T.merchant.get(nmsInventoryMerchant);
-        return new CraftInventoryMerchant((net.minecraft.world.item.trading.IMerchant) merchant, nmsInventoryMerchant);
+        Object merchant = com.bergerkiller.generated.net.minecraft.world.inventory.MerchantContainerHandle.T.merchant.get(nmsInventoryMerchant);
+        return new CraftInventoryMerchant((net.minecraft.world.item.trading.Merchant) merchant, nmsInventoryMerchant);
 #else
         return new CraftInventoryMerchant(nmsInventoryMerchant);
 #endif
@@ -153,7 +153,7 @@ class CraftInventoryMerchant {
 
 class CraftInventoryBeacon {
 
-    public static org.bukkit.inventory.BeaconInventory createNew((Object) net.minecraft.world.level.block.entity.TileEntityBeacon nmsTileEntityBeacon) {
+    public static org.bukkit.inventory.BeaconInventory createNew((Object) net.minecraft.world.level.block.entity.BeaconBlockEntity nmsTileEntityBeacon) {
 #if version >= 1.14
         return new com.bergerkiller.bukkit.common.internal.proxy.BeaconInventory_1_14(nmsTileEntityBeacon);
 #else

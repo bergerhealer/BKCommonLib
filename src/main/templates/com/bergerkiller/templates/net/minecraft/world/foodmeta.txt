@@ -1,16 +1,16 @@
 package net.minecraft.world.food;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.TagCompound;
 
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
-class FoodMetaData {
+class FoodData {
 #if version >= 1.21.6
-    public void loadFromNBT((CommonTagCompound) NBTTagCompound compound) {
-        net.minecraft.core.HolderLookup$a holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
+    public void loadFromNBT((CommonTagCompound) TagCompound compound) {
+        net.minecraft.core.HolderLookup$Provider holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
         com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporter reporter = #createScopedProblemReporter();
         try {
             ValueInput input = #createTagValueInput(reporter, holderLookup, compound);
@@ -19,8 +19,8 @@ class FoodMetaData {
             reporter.close();
         }
     }
-    public void saveToNBT((CommonTagCompound) NBTTagCompound compound) {
-        net.minecraft.core.HolderLookup$a holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
+    public void saveToNBT((CommonTagCompound) TagCompound compound) {
+        net.minecraft.core.HolderLookup$Provider holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
         com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporter reporter = #createScopedProblemReporter();
         try {
             ValueOutput output = #createTagValueOutput(reporter, holderLookup, compound);
@@ -30,10 +30,10 @@ class FoodMetaData {
         }
     }
 #elseif version >= 1.18
-    public void loadFromNBT:readAdditionalSaveData((CommonTagCompound) NBTTagCompound compound);
-    public void saveToNBT:addAdditionalSaveData((CommonTagCompound) NBTTagCompound compound);
+    public void loadFromNBT:readAdditionalSaveData((CommonTagCompound) TagCompound compound);
+    public void saveToNBT:addAdditionalSaveData((CommonTagCompound) TagCompound compound);
 #else
-    public void loadFromNBT:a((CommonTagCompound) NBTTagCompound compound);
-    public void saveToNBT:b((CommonTagCompound) NBTTagCompound compound);
+    public void loadFromNBT:a((CommonTagCompound) TagCompound compound);
+    public void saveToNBT:b((CommonTagCompound) TagCompound compound);
 #endif
 }

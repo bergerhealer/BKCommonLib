@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.item.EntityItemHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.item.ItemEntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
@@ -327,8 +327,8 @@ public class ItemUtil {
      */
     public static org.bukkit.entity.Item respawnItem(org.bukkit.entity.Item item) {
         item.remove();
-        EntityItemHandle oldItemHandle = CommonNMS.getHandle(item);
-        EntityItemHandle newItemHandle = EntityItemHandle.createNew(oldItemHandle.getWorld(), oldItemHandle.getLocX(), oldItemHandle.getLocY(), oldItemHandle.getLocZ(), oldItemHandle.getItemStack());
+        ItemEntityHandle oldItemHandle = CommonNMS.getHandle(item);
+        ItemEntityHandle newItemHandle = ItemEntityHandle.createNew(oldItemHandle.getWorld(), oldItemHandle.getLocX(), oldItemHandle.getLocY(), oldItemHandle.getLocZ(), oldItemHandle.getItemStack());
 
         newItemHandle.setFallDistance(oldItemHandle.getFallDistance());
         newItemHandle.setFireTicks(oldItemHandle.getFireTicks());

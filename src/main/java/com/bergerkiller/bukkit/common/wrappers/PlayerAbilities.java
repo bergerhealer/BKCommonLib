@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
-import com.bergerkiller.generated.net.minecraft.world.entity.player.PlayerAbilitiesHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.player.AbilitiesHandle;
 
 import org.bukkit.entity.Player;
 
@@ -11,14 +11,14 @@ import org.bukkit.entity.Player;
  * change these abilities for Players. This wrapper class is intended for human
  * entities or non-player-bound processing.
  */
-public class PlayerAbilities extends BasicWrapper<PlayerAbilitiesHandle> {
+public class PlayerAbilities extends BasicWrapper<AbilitiesHandle> {
 
     public PlayerAbilities() {
-        setHandle(PlayerAbilitiesHandle.createNew());
+        setHandle(AbilitiesHandle.createNew());
     }
 
     public PlayerAbilities(Object handle) {
-        setHandle(PlayerAbilitiesHandle.createHandle(handle));
+        setHandle(AbilitiesHandle.createHandle(handle));
     }
 
     public boolean isInvulnerable() {

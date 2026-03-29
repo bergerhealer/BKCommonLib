@@ -1,27 +1,27 @@
 package net.minecraft.world.level.chunk;
 
-import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.world.level.block.state.BlockState;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
-class DataPaletteBlock {
+class PalettedContainer {
 #if version >= 1.18
-    public (BlockData) IBlockData getBlockData(int x, int y, int z) {
-        return (IBlockData) instance.get(x, y, z);
+    public (BlockData) BlockState getBlockData(int x, int y, int z) {
+        return (BlockState) instance.get(x, y, z);
     }
-    public void setBlockData(int x, int y, int z, (BlockData) IBlockData data) {
+    public void setBlockData(int x, int y, int z, (BlockData) BlockState data) {
         instance.getAndSet(x, y, z, (Object) data);
     }
 #elseif version >= 1.13
-    public (BlockData) IBlockData getBlockData(int x, int y, int z) {
-        return (IBlockData) instance.a(x, y, z);
+    public (BlockData) BlockState getBlockData(int x, int y, int z) {
+        return (BlockState) instance.a(x, y, z);
     }
-    public void setBlockData(int x, int y, int z, (BlockData) IBlockData data) {
+    public void setBlockData(int x, int y, int z, (BlockData) BlockState data) {
         instance.setBlock(x, y, z, (Object) data);
     }
 #elseif version >= 1.9
-    public (BlockData) IBlockData getBlockData:a(int x, int y, int z);
-    public void setBlockData:setBlock(int x, int y, int z, (BlockData) IBlockData data);
+    public (BlockData) BlockState getBlockData:a(int x, int y, int z);
+    public void setBlockData:setBlock(int x, int y, int z, (BlockData) BlockState data);
 #else
     // Emulated on MC 1.8.8
     public (BlockData) BlockData getBlockData(int x, int y, int z);

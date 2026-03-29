@@ -4,7 +4,7 @@ import java.util.AbstractList;
 import java.util.Collection;
 import java.util.List;
 
-import com.bergerkiller.generated.net.minecraft.util.EntitySliceHandle;
+import com.bergerkiller.generated.net.minecraft.util.ClassInstanceMultiMapHandle;
 
 /**
  * This is a special proxy class for CraftBukkit so that a single EntitySlice
@@ -16,16 +16,16 @@ import com.bergerkiller.generated.net.minecraft.util.EntitySliceHandle;
  * @param <E> type of element in the slice/list
  */
 public class EntitySliceProxy_1_8_3<E> extends AbstractList<E> {
-    private final EntitySliceHandle handle;
+    private final ClassInstanceMultiMapHandle handle;
     private final List<E> listValues;
 
     @SuppressWarnings("unchecked")
-    public EntitySliceProxy_1_8_3(EntitySliceHandle handle) {
+    public EntitySliceProxy_1_8_3(ClassInstanceMultiMapHandle handle) {
         this.handle = handle;
-        this.listValues = (List<E>) EntitySliceHandle.T.listValues_1_8_3.get(handle.getRaw());
+        this.listValues = (List<E>) ClassInstanceMultiMapHandle.T.listValues_1_8_3.get(handle.getRaw());
     }
 
-    public EntitySliceHandle getHandle() {
+    public ClassInstanceMultiMapHandle getHandle() {
         return this.handle;
     }
 

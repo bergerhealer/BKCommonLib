@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -17,8 +18,7 @@ import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -42,7 +42,7 @@ class PortalHandler_1_9 extends PortalHandler {
         plugin.register(new Listener() {
             @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
             public void onPortalEvent(PlayerPortalEvent event) {
-                if (EntityPlayerHandle.fromBukkit(event.getPlayer()).isViewingCredits()) {
+                if (ServerPlayerHandle.fromBukkit(event.getPlayer()).isViewingCredits()) {
                     event.setCancelled(true);
                 }
             }
@@ -58,7 +58,7 @@ class PortalHandler_1_9 extends PortalHandler {
 
             @Override
             public void onPacketSend(PacketSendEvent event) {
-                if (EntityPlayerHandle.fromBukkit(event.getPlayer()).isViewingCredits()) {
+                if (ServerPlayerHandle.fromBukkit(event.getPlayer()).isViewingCredits()) {
                     event.setCancelled(true);
                 }
             }
@@ -81,7 +81,7 @@ class PortalHandler_1_9 extends PortalHandler {
 
     @Override
     public Block createNetherPortal(Block startBlock, BlockFace orientation, Entity initiator) {
-        int radius = WorldServerHandle.fromBukkit(startBlock.getWorld()).getNetherPortalCreateRadius();
+        int radius = ServerLevelHandle.fromBukkit(startBlock.getWorld()).getNetherPortalCreateRadius();
         if (_pta.createNetherPortal(startBlock, radius)) {
             return _pta.findNetherPortal(startBlock, radius);
         } else {
@@ -111,7 +111,7 @@ class PortalHandler_1_9 extends PortalHandler {
 
     @Override
     public void showEndCredits(Player player) {
-        EntityPlayerHandle ep = EntityPlayerHandle.fromBukkit(player);
+        ServerPlayerHandle ep = ServerPlayerHandle.fromBukkit(player);
         _pta.showEndCredits(HandleConversion.toEntityHandle(player), ep.hasSeenCredits());
         ep.setHasSeenCredits(true);
     }

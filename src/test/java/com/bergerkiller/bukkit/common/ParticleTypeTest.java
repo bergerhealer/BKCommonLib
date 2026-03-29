@@ -15,7 +15,7 @@ import com.bergerkiller.bukkit.common.resources.ParticleType.EntityByIdPositionO
 import com.bergerkiller.bukkit.common.resources.ParticleType.EntityByUUIDPositionOption;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutWorldParticlesHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundLevelParticlesPacketHandle;
 
 public class ParticleTypeTest {
 
@@ -28,7 +28,7 @@ public class ParticleTypeTest {
 
     @Test
     public void testPacketParticleTypes() {
-        PacketPlayOutWorldParticlesHandle packet = PacketPlayOutWorldParticlesHandle.createNew();
+        ClientboundLevelParticlesPacketHandle packet = ClientboundLevelParticlesPacketHandle.createNew();
         assertEquals(ParticleType.UNKNOWN, packet.getParticleType());
 
         packet.setParticle(ParticleType.AMBIENT_ENTITY_EFFECT, ParticleType.ColorOptions.create(128, 64, 32));

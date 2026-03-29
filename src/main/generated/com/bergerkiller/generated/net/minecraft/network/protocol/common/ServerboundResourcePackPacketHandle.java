@@ -27,8 +27,6 @@ public abstract class ServerboundResourcePackPacketHandle extends PacketHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ServerboundResourcePackPacketClass extends Template.Class<ServerboundResourcePackPacketHandle> {
-        @Template.Optional
-        public final Template.Field<String> message = new Template.Field<String>();
         public final Template.Field.Converted<Object> status = new Template.Field.Converted<Object>();
 
     }

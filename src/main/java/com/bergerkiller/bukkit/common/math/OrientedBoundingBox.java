@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.math;
 
-import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -66,10 +66,10 @@ public class OrientedBoundingBox {
      * Can then be used for hit-testing.
      *
      * @param block Absolute block the AABB is of
-     * @param aabb AxisAlignedBBHandle
+     * @param aabb AABBHandle
      * @return OrientedBoundingBox
      */
-    public static OrientedBoundingBox fromAABB(Block block, AxisAlignedBBHandle aabb) {
+    public static OrientedBoundingBox fromAABB(Block block, AABBHandle aabb) {
         OrientedBoundingBox box = fromAABB(aabb);
         box.addPosition(block.getX(), block.getY(), block.getZ());
         return box;
@@ -80,10 +80,10 @@ public class OrientedBoundingBox {
      * Can then be used for hit-testing.
      *
      * @param position Absolute position of the AABB
-     * @param aabb AxisAlignedBBHandle
+     * @param aabb AABBHandle
      * @return OrientedBoundingBox
      */
-    public static OrientedBoundingBox fromAABB(Vector position, AxisAlignedBBHandle aabb) {
+    public static OrientedBoundingBox fromAABB(Vector position, AABBHandle aabb) {
         OrientedBoundingBox box = fromAABB(aabb);
         box.addPosition(position.getX(), position.getY(), position.getZ());
         return box;
@@ -95,10 +95,10 @@ public class OrientedBoundingBox {
      * entity they belong to, which means this bounding box is similarly relatively
      * positioned.
      *
-     * @param aabb AxisAlignedBBHandle
+     * @param aabb AABBHandle
      * @return OrientedBoundingBox
      */
-    public static OrientedBoundingBox fromAABB(AxisAlignedBBHandle aabb) {
+    public static OrientedBoundingBox fromAABB(AABBHandle aabb) {
         OrientedBoundingBox box = new OrientedBoundingBox();
         box.setPosition(
                 0.5 * (aabb.getMinX() + aabb.getMaxX()),

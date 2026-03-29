@@ -9,7 +9,7 @@ import org.junit.Test;
 import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy_1_8;
 import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy_1_8_3;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.generated.net.minecraft.util.EntitySliceHandle;
+import com.bergerkiller.generated.net.minecraft.util.ClassInstanceMultiMapHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.conversion.Converter;
@@ -21,11 +21,11 @@ public class CBEntitySliceTest {
 
     @Test
     public void testSliceConverter() {
-        if (!EntitySliceHandle.T.isAvailable()) {
+        if (!ClassInstanceMultiMapHandle.T.isAvailable()) {
             return;
         }
 
-        TypeDeclaration typeSlice = TypeDeclaration.createGeneric(EntitySliceHandle.T.getType(), EntityHandle.T.getType());
+        TypeDeclaration typeSlice = TypeDeclaration.createGeneric(ClassInstanceMultiMapHandle.T.getType(), EntityHandle.T.getType());
         TypeDeclaration typeList = TypeDeclaration.createGeneric(List.class, Object.class);
         TypeDeclaration typeSliceArray = TypeDeclaration.createArray(typeSlice);
         TypeDeclaration typeListArray = TypeDeclaration.createArray(typeList);
@@ -39,8 +39,8 @@ public class CBEntitySliceTest {
             fail("Converter << from " + typeList + " to " + typeSlice + " is not our annotated converter!");
         }
 
-        Object[] slices = LogicUtil.createArray(EntitySliceHandle.T.getType(), 1);
-        slices[0] = EntitySliceHandle.createNew(EntityHandle.T.getType()).getRaw();
+        Object[] slices = LogicUtil.createArray(ClassInstanceMultiMapHandle.T.getType(), 1);
+        slices[0] = ClassInstanceMultiMapHandle.createNew(EntityHandle.T.getType()).getRaw();
 
         Converter<Object, Object> conv = Conversion.find(typeSliceArray, typeListArray);
         Object[] result = (Object[]) conv.convert(slices);
@@ -60,6 +60,6 @@ public class CBEntitySliceTest {
         assertNotNull(original);
         assertEquals(1, original.length);
         assertNotNull(original[0]);
-        assertEquals(EntitySliceHandle.T.getType(), original[0].getClass());
+        assertEquals(ClassInstanceMultiMapHandle.T.getType(), original[0].getClass());
     }
 }

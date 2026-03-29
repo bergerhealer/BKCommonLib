@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetCameraPacketHandle;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -25,20 +26,19 @@ import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCameraHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityDestroyHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityTeleportHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMountHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawnHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLivingHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMoveEntityPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundTeleportEntityPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetPassengersPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundAddPlayerPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundAddEntityPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundAddMobPacketHandle;
 
 /**
  * Base implementation for vehicle mount handlers
  */
 public abstract class VehicleMountHandler_BaseImpl implements VehicleMountController {
-    public static boolean SUPPORTS_MULTIPLE_PASSENGERS = PacketPlayOutMountHandle.T.isAvailable();
+    public static boolean SUPPORTS_MULTIPLE_PASSENGERS = ClientboundSetPassengersPacketHandle.T.isAvailable();
     private final Player _player;
     protected final CommonPlugin _plugin;
     protected final SpawnedEntity _playerSpawnedEntity;
@@ -218,7 +218,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
             if (entity.state == SpawnedEntity.State.SPAWNED) {
                 // Currently spawned, despawn it, track while it is spawned
                 entity.state = SpawnedEntity.State.SUPPRESSED_INFLIGHT_BLOCKED;
-                queuePacket(PacketPlayOutEntityDestroyHandle.createNewSingle(entityId));
+                queuePacket(ClientboundRemoveEntitiesPacketHandle.createNewSingle(entityId));
             } else if (entity.state == SpawnedEntity.State.DESPAWNED) {
                 // Was despawned, let's keep it that way
                 entity.state = SpawnedEntity.State.DESPAWNED_BLOCKED;
@@ -299,7 +299,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
 
         // Send a packet to start spectating. Ignore listeners - we don't want to track this as
         // it is not a vanilla 'start spectating' packet.
-        PacketUtil.sendPacket(this._player, PacketPlayOutCameraHandle.createNew(entityId), false);
+        PacketUtil.sendPacket(this._player, ClientboundSetCameraPacketHandle.createNew(entityId), false);
     }
 
     @Override
@@ -307,7 +307,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         // Stop spectating, spectate a previous entity if changed
         int previousSpectatedEntityId = handleStopSpectating(entityId);
         if (previousSpectatedEntityId != -1) {
-            PacketUtil.sendPacket(this._player, PacketPlayOutCameraHandle.createNew(previousSpectatedEntityId), false);
+            PacketUtil.sendPacket(this._player, ClientboundSetCameraPacketHandle.createNew(previousSpectatedEntityId), false);
         }
     }
 
@@ -339,7 +339,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         }
 
         // Send a packet to refresh
-        PacketUtil.sendPacket(this._player, PacketPlayOutCameraHandle.createNew(newEntityId), false);
+        PacketUtil.sendPacket(this._player, ClientboundSetCameraPacketHandle.createNew(newEntityId), false);
     }
 
     // Stops spectating. Returns the next entity id to spectate, or -1 to do nothing.
@@ -403,7 +403,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
             // Handle packets
             PacketType type = packet.getType();
             if (type == PacketType.OUT_ENTITY_DESTROY) {
-                PacketPlayOutEntityDestroyHandle dp = PacketPlayOutEntityDestroyHandle.createHandle(packet.getHandle());
+                ClientboundRemoveEntitiesPacketHandle dp = ClientboundRemoveEntitiesPacketHandle.createHandle(packet.getHandle());
                 if (dp.hasMultipleEntityIds()) {
                     for (int entityId : dp.getEntityIds()) {
                         handleDespawn(entityId);
@@ -437,23 +437,23 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
                 if (this.isPositionTracked()) {
                     // Also decode position
                     if (type == PacketType.OUT_ENTITY_SPAWN) {
-                        PacketPlayOutSpawnEntityHandle handle = PacketPlayOutSpawnEntityHandle.createHandle(packet.getHandle());
+                        ClientboundAddEntityPacketHandle handle = ClientboundAddEntityPacketHandle.createHandle(packet.getHandle());
                         handleSpawn(handle.getEntityId(), handle.getCommonEntityType(), new Vector(handle.getPosX(), handle.getPosY(), handle.getPosZ()));
                     } else if (type == PacketType.OUT_ENTITY_SPAWN_LIVING) {
-                        PacketPlayOutSpawnEntityLivingHandle handle = PacketPlayOutSpawnEntityLivingHandle.createHandle(packet.getHandle());
+                        ClientboundAddMobPacketHandle handle = ClientboundAddMobPacketHandle.createHandle(packet.getHandle());
                         handleSpawn(handle.getEntityId(), handle.getCommonEntityType(), new Vector(handle.getPosX(), handle.getPosY(), handle.getPosZ()));
                     } else if (type == PacketType.OUT_ENTITY_SPAWN_NAMED) {
-                        PacketPlayOutNamedEntitySpawnHandle handle = PacketPlayOutNamedEntitySpawnHandle.createHandle(packet.getHandle());
+                        ClientboundAddPlayerPacketHandle handle = ClientboundAddPlayerPacketHandle.createHandle(packet.getHandle());
                         handleSpawn(handle.getEntityId(), CommonEntityType.PLAYER, new Vector(handle.getPosX(), handle.getPosY(), handle.getPosZ()));
                     } else if (type == PacketType.OUT_ENTITY_TELEPORT) {
-                        PacketPlayOutEntityTeleportHandle handle = PacketPlayOutEntityTeleportHandle.createHandle(packet.getHandle());
+                        ClientboundTeleportEntityPacketHandle handle = ClientboundTeleportEntityPacketHandle.createHandle(packet.getHandle());
                         handleMove(handle.getEntityId(), (position) -> {
                             position.setX(handle.getPosX());
                             position.setY(handle.getPosY());
                             position.setZ(handle.getPosZ());
                         });
                     } else if (type == PacketType.OUT_ENTITY_MOVE || type == PacketType.OUT_ENTITY_MOVE_LOOK) {
-                        PacketPlayOutEntityHandle handle = PacketPlayOutEntityHandle.createHandle(packet.getHandle());
+                        ClientboundMoveEntityPacketHandle handle = ClientboundMoveEntityPacketHandle.createHandle(packet.getHandle());
                         handleMove(handle.getEntityId(), (position) -> {
                             position.setX(position.getX() + handle.getDeltaX());
                             position.setY(position.getY() + handle.getDeltaY());
@@ -463,13 +463,13 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
                 } else {
                     // No decoding/tracking of position
                     if (type == PacketType.OUT_ENTITY_SPAWN) {
-                        PacketPlayOutSpawnEntityHandle handle = PacketPlayOutSpawnEntityHandle.createHandle(packet.getHandle());
+                        ClientboundAddEntityPacketHandle handle = ClientboundAddEntityPacketHandle.createHandle(packet.getHandle());
                         handleSpawn(handle.getEntityId(), handle.getCommonEntityType(), null);
                     } else if (type == PacketType.OUT_ENTITY_SPAWN_LIVING) {
-                        PacketPlayOutSpawnEntityLivingHandle handle = PacketPlayOutSpawnEntityLivingHandle.createHandle(packet.getHandle());
+                        ClientboundAddMobPacketHandle handle = ClientboundAddMobPacketHandle.createHandle(packet.getHandle());
                         handleSpawn(handle.getEntityId(), handle.getCommonEntityType(), null);
                     } else if (type == PacketType.OUT_ENTITY_SPAWN_NAMED) {
-                        PacketPlayOutNamedEntitySpawnHandle handle = PacketPlayOutNamedEntitySpawnHandle.createHandle(packet.getHandle());
+                        ClientboundAddPlayerPacketHandle handle = ClientboundAddPlayerPacketHandle.createHandle(packet.getHandle());
                         handleSpawn(handle.getEntityId(), CommonEntityType.PLAYER, null);
                     }
                 }
@@ -543,7 +543,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
             // use a packet monitor we cannot do that. For a split second the Entity
             // might be visible.
             entity.state = SpawnedEntity.State.SUPPRESSED_INFLIGHT_BLOCKED;
-            queuePacket(PacketPlayOutEntityDestroyHandle.createNewSingle(entityId));
+            queuePacket(ClientboundRemoveEntitiesPacketHandle.createNewSingle(entityId));
         } else {
             // Allow the spawn
             entity.state = SpawnedEntity.State.SPAWNED;
@@ -647,7 +647,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
                     } else {
                         currSpectatedEntity = this._spectatorStack[len - 1];
                     }
-                    PacketUtil.sendPacket(_player, PacketPlayOutCameraHandle.createNew(currSpectatedEntity), false);
+                    PacketUtil.sendPacket(_player, ClientboundSetCameraPacketHandle.createNew(currSpectatedEntity), false);
                 }
             });
         }

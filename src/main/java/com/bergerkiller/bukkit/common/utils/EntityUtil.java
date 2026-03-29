@@ -6,11 +6,11 @@ import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityLivingHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.GenericAttributesHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityHangingHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.LivingEntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributesHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.decoration.HangingEntityHandle;
 import com.bergerkiller.generated.org.bukkit.inventory.PlayerInventoryHandle;
 
 import org.bukkit.Location;
@@ -48,7 +48,7 @@ public class EntityUtil extends EntityPropertyUtil {
      * @return the found Entity, or null if not found
      */
     public static org.bukkit.entity.Entity getEntity(org.bukkit.World world, UUID uuid) {
-        return WorldServerHandle.fromBukkit(world).getEntityByUUID(uuid);
+        return ServerLevelHandle.fromBukkit(world).getEntityByUUID(uuid);
     }
 
     /**
@@ -59,7 +59,7 @@ public class EntityUtil extends EntityPropertyUtil {
     public static void addEntity(org.bukkit.entity.Entity entity) {
         World world = entity.getWorld();
         EntityHandle nmsentity = CommonNMS.getHandle(entity);
-        WorldServerHandle nmsworld = nmsentity.getWorldServer();
+        ServerLevelHandle nmsworld = nmsentity.getWorldServer();
         world.getChunkAt(MathUtil.toChunk(nmsentity.getLocX()), MathUtil.toChunk(nmsentity.getLocZ()));
         nmsentity.setDestroyed(false);
         // Remove an entity tracker for this entity if it was present
@@ -77,8 +77,8 @@ public class EntityUtil extends EntityPropertyUtil {
      * @param speed New entity speed
      */
     public static void setSpeed(LivingEntity entity, double speed) {
-        EntityLivingHandle nmsEntity = CommonNMS.getHandle(entity);
-        nmsEntity.getAttribute(GenericAttributesHandle.MOVEMENT_SPEED).setBaseValue(speed);
+        LivingEntityHandle nmsEntity = CommonNMS.getHandle(entity);
+        nmsEntity.getAttribute(AttributesHandle.MOVEMENT_SPEED).setBaseValue(speed);
     }
 
     /**
@@ -88,8 +88,8 @@ public class EntityUtil extends EntityPropertyUtil {
      * @return entity speed
      */
     public static double getSpeed(LivingEntity entity) {
-        EntityLivingHandle nmsEntity = CommonNMS.getHandle(entity);
-        return nmsEntity.getAttribute(GenericAttributesHandle.MOVEMENT_SPEED).getBaseValue();
+        LivingEntityHandle nmsEntity = CommonNMS.getHandle(entity);
+        return nmsEntity.getAttribute(AttributesHandle.MOVEMENT_SPEED).getBaseValue();
     }
 
     /**
@@ -171,7 +171,7 @@ public class EntityUtil extends EntityPropertyUtil {
      * @return block
      */
     public static Block getHangingBlock(Hanging entityHanging) {
-        IntVector3 pos = EntityHangingHandle.T.getBlockPosition.invoke(HandleConversion.toEntityHandle(entityHanging));
+        IntVector3 pos = HangingEntityHandle.T.getBlockPosition.invoke(HandleConversion.toEntityHandle(entityHanging));
         return pos.toBlock(entityHanging.getWorld());
     }
 
@@ -195,7 +195,7 @@ public class EntityUtil extends EntityPropertyUtil {
      * @param livingEntity Living Entity to detect equipment changes for
      */
     public static void detectEquipmentChanges(LivingEntity livingEntity) {
-        EntityLivingHandle.fromBukkit(livingEntity).detectEquipmentChanges();
+        LivingEntityHandle.fromBukkit(livingEntity).detectEquipmentChanges();
     }
 
     /**

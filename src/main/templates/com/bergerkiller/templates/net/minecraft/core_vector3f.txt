@@ -1,8 +1,8 @@
 package net.minecraft.core;
 
-import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
+import com.bergerkiller.generated.net.minecraft.core.RotationsHandle;
 
-class Vector3f {
+class Rotations {
 #if version >= 1.21.5
     public float getX:x();
     public float getY:y();
@@ -21,31 +21,31 @@ class Vector3f {
 #endif
     }
 
-    public (Vector3fHandle) Vector3f(float x, float y, float z);
+    public (RotationsHandle) Rotations(float x, float y, float z);
 
     <code>
-    public static Vector3fHandle fromBukkit(org.bukkit.util.Vector vector) {
+    public static RotationsHandle fromBukkit(org.bukkit.util.Vector vector) {
         return createHandle(fromBukkitRaw(vector));
     }
     </code>
 
     public static Object fromBukkitRaw(org.bukkit.util.Vector vector) {
-#if exists net.minecraft.core.Vector3f public static Vector3f createWithoutValidityChecks(float x, float y, float z);
+#if exists net.minecraft.core.Rotations public static Rotations createWithoutValidityChecks(float x, float y, float z);
         // paper optimization
-        return net.minecraft.core.Vector3f.createWithoutValidityChecks((float)vector.getX(),
+        return net.minecraft.core.Rotations.createWithoutValidityChecks((float)vector.getX(),
                                                                        (float)vector.getY(),
                                                                        (float)vector.getZ());
 #elseif version >= 1.12 && version < 1.21.5
-        Object v3 = com.bergerkiller.generated.net.minecraft.core.Vector3fHandle.T.newInstanceNull();
-        #require net.minecraft.core.Vector3f protected final float x;
-        #require net.minecraft.core.Vector3f protected final float y;
-        #require net.minecraft.core.Vector3f protected final float z;
+        Object v3 = com.bergerkiller.generated.net.minecraft.core.RotationsHandle.T.newInstanceNull();
+        #require net.minecraft.core.Rotations protected final float x;
+        #require net.minecraft.core.Rotations protected final float y;
+        #require net.minecraft.core.Rotations protected final float z;
         v3#x = (float)vector.getX();
         v3#y = (float)vector.getY();
         v3#z = (float)vector.getZ();
         return v3;
 #else
-        return new Vector3f((float) vector.getX(), (float) vector.getY(), (float) vector.getZ());
+        return new Rotations((float) vector.getX(), (float) vector.getY(), (float) vector.getZ());
 #endif
     }
 }

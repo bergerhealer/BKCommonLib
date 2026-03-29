@@ -1,12 +1,12 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
+import com.bergerkiller.generated.net.minecraft.core.BlockPosHandle;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
@@ -230,7 +230,7 @@ public class NMSEntity {
 
     public static void playStepSound(Object entityHandle, int x, int y, int z, Object blockStepped) {
         if (blockStepped != null) {
-            playStepSound.invoke(entityHandle, BlockPositionHandle.createNew(x, y, z).getRaw(), blockStepped);
+            playStepSound.invoke(entityHandle, BlockPosHandle.createNew(x, y, z).getRaw(), blockStepped);
         }
     }
 

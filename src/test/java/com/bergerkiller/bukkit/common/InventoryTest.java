@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import com.bergerkiller.generated.net.minecraft.world.ContainerHandle;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.junit.Test;
@@ -13,7 +14,6 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
-import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 
 /**
@@ -46,7 +46,7 @@ public class InventoryTest {
         }
 
         // Verify that the IInventory handle returns non-null items (uses EMPTY constant)
-        IInventoryHandle handle = IInventoryHandle.createHandle(HandleConversion.toIInventoryHandle(inventory));
+        ContainerHandle handle = ContainerHandle.createHandle(HandleConversion.toIInventoryHandle(inventory));
         assertEquals(9 * 3, handle.getSize());
         for (int i = 0; i < handle.getSize(); i++) {
             assertTrue(ItemStackHandle.EMPTY_ITEM.equals(handle.getItem(i)));

@@ -1,23 +1,22 @@
 package net.minecraft.world.inventory;
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.world.IInventory;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.entity.player.EntityHuman;
 
 import com.bergerkiller.generated.net.minecraft.world.inventory.SlotHandle;
-import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle;
-import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerAnvilHandle;
+import com.bergerkiller.generated.net.minecraft.world.inventory.AbstractContainerMenuHandle;
+import com.bergerkiller.generated.net.minecraft.world.inventory.AnvilMenuHandle;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 
-class InventoryEnderChest extends IInventory {
+class PlayerEnderChestContainer extends Container {
 #if version >= 1.20.5
-    public void loadFromNBT((CommonTagList) NBTTagList nbttaglist) {
-        #require InventoryEnderChest private final EntityHuman owner;
-        EntityHuman owner = instance#owner;
-        net.minecraft.core.HolderLookup$a holderLookup = owner.registryAccess();
+    public void loadFromNBT((CommonTagList) ListTag nbttaglist) {
+        #require PlayerEnderChestContainer private final net.minecraft.world.entity.player.Player owner;
+        net.minecraft.world.entity.player.Player owner = instance#owner;
+        net.minecraft.core.HolderLookup$Provider holderLookup = owner.registryAccess();
 
   #if version >= 1.21.6
         com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporter reporter = #createScopedProblemReporter();
@@ -33,21 +32,21 @@ class InventoryEnderChest extends IInventory {
     }
 
 #elseif version >= 1.18
-    public void loadFromNBT:fromTag((CommonTagList) NBTTagList nbttaglist)
+    public void loadFromNBT:fromTag((CommonTagList) ListTag nbttaglist)
 #else
-    public void loadFromNBT:a((CommonTagList) NBTTagList nbttaglist)
+    public void loadFromNBT:a((CommonTagList) ListTag nbttaglist)
 #endif
 
 #if version >= 1.20.5
-    public (CommonTagList) NBTTagList saveToNBT() {
-        #require InventoryEnderChest private final EntityHuman owner;
-        EntityHuman owner = instance#owner;
-        net.minecraft.core.HolderLookup$a holderLookup = owner.registryAccess();
+    public (CommonTagList) ListTag saveToNBT() {
+        #require PlayerEnderChestContainer private final net.minecraft.world.entity.player.Player owner;
+        net.minecraft.world.entity.player.Player owner = instance#owner;
+        net.minecraft.core.HolderLookup$Provider holderLookup = owner.registryAccess();
 
   #if version >= 1.21.6
         com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporter reporter = #createScopedProblemReporter();
         try {
-            NBTTagList nbttaglist = new NBTTagList();
+            ListTag nbttaglist = new ListTag();
             net.minecraft.world.level.storage.ValueOutput$TypedOutputList valueList = #createTagListValueOutput(reporter, holderLookup, net.minecraft.world.ItemStackWithSlot.CODEC, nbttaglist);
             instance.storeAsSlots(valueList);
             return nbttaglist;
@@ -60,23 +59,23 @@ class InventoryEnderChest extends IInventory {
     }
 
 #elseif version >= 1.18
-    public (CommonTagList) NBTTagList saveToNBT:createTag()
+    public (CommonTagList) ListTag saveToNBT:createTag()
 #elseif version >= 1.16
-    public (CommonTagList) NBTTagList saveToNBT:g()
+    public (CommonTagList) ListTag saveToNBT:g()
 #elseif version >= 1.14
-    public (CommonTagList) NBTTagList saveToNBT:f()
+    public (CommonTagList) ListTag saveToNBT:f()
 #elseif version >= 1.11
-    public (CommonTagList) NBTTagList saveToNBT:i()
+    public (CommonTagList) ListTag saveToNBT:i()
 #else
-    public (CommonTagList) NBTTagList saveToNBT:h()
+    public (CommonTagList) ListTag saveToNBT:h()
 #endif
 }
 
-class InventoryMerchant extends IInventory {
-    private final (Object) net.minecraft.world.item.trading.IMerchant merchant;
+class MerchantContainer extends Container {
+    private final (Object) net.minecraft.world.item.trading.Merchant merchant;
 }
 
-class Container {
+class AbstractContainerMenu {
 #if version >= 1.17
     public (List<org.bukkit.inventory.ItemStack>) NonNullList<ItemStack> oldItems:lastSlots;
 #elseif version >= 1.12.2
@@ -103,18 +102,18 @@ class Container {
 
     public abstract org.bukkit.inventory.InventoryView getBukkitView();
 
-    public static ContainerHandle fromBukkit(org.bukkit.inventory.InventoryView bukkitView) {
+    public static AbstractContainerMenuHandle fromBukkit(org.bukkit.inventory.InventoryView bukkitView) {
         if (bukkitView instanceof org.bukkit.craftbukkit.inventory.CraftInventoryView) {
-            net.minecraft.world.inventory.Container handle;
+            net.minecraft.world.inventory.AbstractContainerMenu handle;
             handle = ((org.bukkit.craftbukkit.inventory.CraftInventoryView) bukkitView).getHandle();
-            return com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle.createHandle(handle);
+            return com.bergerkiller.generated.net.minecraft.world.inventory.AbstractContainerMenuHandle.createHandle(handle);
         } else {
             return null;
         }
     }
 }
 
-class ContainerAnvil extends Container {
+class AnvilMenu extends AbstractContainerMenu {
 #if version >= 1.17
     public String renameText:itemName;
 #elseif version >= 1.12
@@ -125,11 +124,11 @@ class ContainerAnvil extends Container {
     private String renameText:l;
 #endif
 
-    public static ContainerAnvilHandle fromBukkit(org.bukkit.inventory.InventoryView bukkitView) {
+    public static AnvilMenuHandle fromBukkit(org.bukkit.inventory.InventoryView bukkitView) {
         if (bukkitView instanceof org.bukkit.craftbukkit.inventory.CraftInventoryView) {
-            net.minecraft.world.inventory.Container handle;
+            net.minecraft.world.inventory.AbstractContainerMenu handle;
             handle = ((org.bukkit.craftbukkit.inventory.CraftInventoryView) bukkitView).getHandle();
-            return com.bergerkiller.generated.net.minecraft.world.inventory.ContainerAnvilHandle.createHandle(handle);
+            return com.bergerkiller.generated.net.minecraft.world.inventory.AnvilMenuHandle.createHandle(handle);
         } else {
             return null;
         }

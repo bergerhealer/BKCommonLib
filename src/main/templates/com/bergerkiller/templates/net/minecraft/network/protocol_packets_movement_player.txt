@@ -3,15 +3,15 @@ package net.minecraft.network.protocol.game;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.entity.RelativeMovement;
-import net.minecraft.world.phys.Vec3D;
+import net.minecraft.world.phys.Vec3;
 
 import com.bergerkiller.bukkit.common.wrappers.RelativeFlags;
 
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPositionHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSteerVehicleHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerPositionPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundPlayerInputPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerRotationPacketHandle;
 
-class PacketPlayOutPosition extends Packet {
+class ClientboundPlayerPositionPacket extends Packet {
 #if version >= 1.21.2
     public double getX() { return instance.change().position().x; }
     public double getY() { return instance.change().position().y; }
@@ -37,12 +37,12 @@ class PacketPlayOutPosition extends Packet {
     public (RelativeFlags) Set<RelativeMovement> getRelativeFlags:i();
     public int getTeleportWaitTimer:g();
 #else
-    #require PacketPlayOutPosition private double x:a;
-    #require PacketPlayOutPosition private double y:b;
-    #require PacketPlayOutPosition private double z:c;
-    #require PacketPlayOutPosition private float yaw:d;
-    #require PacketPlayOutPosition private float pitch:e;
-    #require PacketPlayOutPosition private Set<RelativeMovement> relativeArguments:f;
+    #require ClientboundPlayerPositionPacket private double x:a;
+    #require ClientboundPlayerPositionPacket private double y:b;
+    #require ClientboundPlayerPositionPacket private double z:c;
+    #require ClientboundPlayerPositionPacket private float yaw:d;
+    #require ClientboundPlayerPositionPacket private float pitch:e;
+    #require ClientboundPlayerPositionPacket private Set<RelativeMovement> relativeArguments:f;
 
     public double getX() { return instance#x; }
     public double getY() { return instance#y; }
@@ -53,7 +53,7 @@ class PacketPlayOutPosition extends Packet {
 
     public int getTeleportWaitTimer() {
   #if version >= 1.9
-        #require PacketPlayOutPosition private int teleportWaitTimer:g;
+        #require ClientboundPlayerPositionPacket private int teleportWaitTimer:g;
         return instance#teleportWaitTimer;
   #else
         return 0;
@@ -61,47 +61,47 @@ class PacketPlayOutPosition extends Packet {
     }
 #endif
 
-    public static (PacketPlayOutPositionHandle) PacketPlayOutPosition createNew(double x, double y, double z, float yaw, float pitch, double deltaX, double deltaY, double deltaZ, (RelativeFlags) Set<RelativeMovement> relativeFlags, int teleportWaitTimer) {
+    public static (ClientboundPlayerPositionPacketHandle) ClientboundPlayerPositionPacket createNew(double x, double y, double z, float yaw, float pitch, double deltaX, double deltaY, double deltaZ, (RelativeFlags) Set<RelativeMovement> relativeFlags, int teleportWaitTimer) {
 #if version >= 1.21.2
-        return PacketPlayOutPosition.of(teleportWaitTimer, new PositionMoveRotation(
-            new Vec3D(x, y, z), new Vec3D(deltaX, deltaY, deltaZ), yaw, pitch
+        return ClientboundPlayerPositionPacket.of(teleportWaitTimer, new PositionMoveRotation(
+            new Vec3(x, y, z), new Vec3(deltaX, deltaY, deltaZ), yaw, pitch
         ), relativeFlags);
 #elseif version >= 1.19.4
-        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer);
+        return new ClientboundPlayerPositionPacket(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer);
 #elseif version >= 1.17
-        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer, false);
+        return new ClientboundPlayerPositionPacket(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer, false);
 #elseif version >= 1.9
-        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer);
+        return new ClientboundPlayerPositionPacket(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer);
 #else
-        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags);
+        return new ClientboundPlayerPositionPacket(x, y, z, yaw, pitch, relativeFlags);
 #endif
     }
 
     <code>
-    public static PacketPlayOutPositionHandle createNew(double x, double y, double z, float yaw, float pitch, double deltaX, double deltaY, double deltaZ, RelativeFlags relativeFlags) {
+    public static ClientboundPlayerPositionPacketHandle createNew(double x, double y, double z, float yaw, float pitch, double deltaX, double deltaY, double deltaZ, RelativeFlags relativeFlags) {
         return createNew(x, y, z, yaw, pitch, deltaX, deltaY, deltaZ, relativeFlags, 0);
     }
 
-    public static PacketPlayOutPositionHandle createNew(double x, double y, double z, float yaw, float pitch, RelativeFlags relativeFlags) {
+    public static ClientboundPlayerPositionPacketHandle createNew(double x, double y, double z, float yaw, float pitch, RelativeFlags relativeFlags) {
         return createNew(x, y, z, yaw, pitch, 0.0, 0.0, 0.0, relativeFlags, 0);
     }
 
-    public static PacketPlayOutPositionHandle createRelative(double dx, double dy, double dz, float dyaw, float dpitch) {
+    public static ClientboundPlayerPositionPacketHandle createRelative(double dx, double dy, double dz, float dyaw, float dpitch) {
         return createNew(dx, dy, dz, dyaw, dpitch, RelativeFlags.RELATIVE_POSITION_ROTATION);
     }
 
-    public static PacketPlayOutPositionHandle createAbsolute(org.bukkit.Location location) {
+    public static ClientboundPlayerPositionPacketHandle createAbsolute(org.bukkit.Location location) {
         return createAbsolute(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
     }
 
-    public static PacketPlayOutPositionHandle createAbsolute(double x, double y, double z, float yaw, float pitch) {
+    public static ClientboundPlayerPositionPacketHandle createAbsolute(double x, double y, double z, float yaw, float pitch) {
         return createNew(x, y, z, yaw, pitch, RelativeFlags.ABSOLUTE_POSITION);
     }
     </code>
 }
 
 // Since Minecraft 1.21.2
-// Falls back to the PacketPlayOutPosition on Minecraft versions before 1.21.2,
+// Falls back to the ClientboundPlayerPositionPacket on Minecraft versions before 1.21.2,
 // making use of a relative position of 0 0 0 so only rotation is updated.
 class ClientboundPlayerRotationPacket extends Packet {
 #if version >= 1.21.9
@@ -139,9 +139,9 @@ class ClientboundPlayerRotationPacket extends Packet {
     }
 
 #else
-    #require PacketPlayOutPosition private float yaw:d;
-    #require PacketPlayOutPosition private float pitch:e;
-    #require PacketPlayOutPosition private Set<RelativeMovement> relativeArguments:f;
+    #require ClientboundPlayerPositionPacket private float yaw:d;
+    #require ClientboundPlayerPositionPacket private float pitch:e;
+    #require ClientboundPlayerPositionPacket private Set<RelativeMovement> relativeArguments:f;
 
     public float getYaw() { return instance#yaw; }
     public float getPitch() { return instance#pitch; }
@@ -188,13 +188,13 @@ class ClientboundPlayerRotationPacket extends Packet {
             relativeFlags.add((Object) RelativeMovement.X_ROT);
         }
   #if version >= 1.19.4
-        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer);
+        return new ClientboundPlayerPositionPacket(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer);
   #elseif version >= 1.17
-        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer, false);
+        return new ClientboundPlayerPositionPacket(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer, false);
   #elseif version >= 1.9
-        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer);
+        return new ClientboundPlayerPositionPacket(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer);
   #else
-        return new PacketPlayOutPosition(x, y, z, yaw, pitch, relativeFlags);
+        return new ClientboundPlayerPositionPacket(x, y, z, yaw, pitch, relativeFlags);
   #endif
 #endif
     }
@@ -210,10 +210,10 @@ class ClientboundPlayerRotationPacket extends Packet {
     </code>
 }
 
-class PacketPlayInSteerVehicle extends Packet {
+class ServerboundPlayerInputPacket extends Packet {
 #if version >= 1.21.2
-    public static (PacketPlayInSteerVehicleHandle) PacketPlayInSteerVehicle createNew(boolean isLeft, boolean isRight, boolean isForward, boolean isBackward, boolean isJump, boolean isUnmount, boolean isSprint) {
-        return new PacketPlayInSteerVehicle(new net.minecraft.world.entity.player.Input(
+    public static (ServerboundPlayerInputPacketHandle) ServerboundPlayerInputPacket createNew(boolean isLeft, boolean isRight, boolean isForward, boolean isBackward, boolean isJump, boolean isUnmount, boolean isSprint) {
+        return new ServerboundPlayerInputPacket(new net.minecraft.world.entity.player.Input(
             isForward, isBackward, isLeft, isRight, isJump, isUnmount, isSprint));
     }
 
@@ -246,24 +246,24 @@ class PacketPlayInSteerVehicle extends Packet {
 
 #else
   #if version >= 1.17
-    #require PacketPlayInSteerVehicle private final float sideways:xxa;
-    #require PacketPlayInSteerVehicle private final float forwards:zza;
-    #require PacketPlayInSteerVehicle private final boolean jump:isJumping;
-    #require PacketPlayInSteerVehicle private final boolean unmount:isShiftKeyDown;
+    #require ServerboundPlayerInputPacket private final float sideways:xxa;
+    #require ServerboundPlayerInputPacket private final float forwards:zza;
+    #require ServerboundPlayerInputPacket private final boolean jump:isJumping;
+    #require ServerboundPlayerInputPacket private final boolean unmount:isShiftKeyDown;
   #else
-    #require PacketPlayInSteerVehicle private float sideways:a;
-    #require PacketPlayInSteerVehicle private float forwards:b;
-    #require PacketPlayInSteerVehicle private boolean jump:c;
-    #require PacketPlayInSteerVehicle private boolean unmount:d;
+    #require ServerboundPlayerInputPacket private float sideways:a;
+    #require ServerboundPlayerInputPacket private float forwards:b;
+    #require ServerboundPlayerInputPacket private boolean jump:c;
+    #require ServerboundPlayerInputPacket private boolean unmount:d;
   #endif
 
-    public static (PacketPlayInSteerVehicleHandle) PacketPlayInSteerVehicle createNew(boolean isLeft, boolean isRight, boolean isForward, boolean isBackward, boolean isJump, boolean isUnmount, boolean isSprint) {
+    public static (ServerboundPlayerInputPacketHandle) ServerboundPlayerInputPacket createNew(boolean isLeft, boolean isRight, boolean isForward, boolean isBackward, boolean isJump, boolean isUnmount, boolean isSprint) {
        float sideways = (isLeft == isRight) ? 0.0f : (isLeft ? 0.98f : -0.98f);
        float forwards = (isForward == isBackward) ? 0.0f : (isForward ? 0.98f : -0.98f);
   #if version >= 1.17
-       return new PacketPlayInSteerVehicle(sideways, forwards, isJump, isUnmount);
+       return new ServerboundPlayerInputPacket(sideways, forwards, isJump, isUnmount);
   #else
-       PacketPlayInSteerVehicle packet = new PacketPlayInSteerVehicle();
+       ServerboundPlayerInputPacket packet = new ServerboundPlayerInputPacket();
        packet#sideways = sideways;
        packet#forwards = forwards;
        packet#jump = isJump;

@@ -1,8 +1,8 @@
 package net.minecraft;
-import com.bergerkiller.generated.net.minecraft.EnumChatFormatHandle;
+import com.bergerkiller.generated.net.minecraft.ChatFormattingHandle;
 
-class EnumChatFormat {
-    enum (EnumChatFormatHandle) EnumChatFormat RESET;
+class ChatFormatting {
+    enum (ChatFormattingHandle) ChatFormatting RESET;
 
 #if version >= 1.18
     public int getId();
@@ -12,16 +12,16 @@ class EnumChatFormat {
 
     <code>
     public static final Object[] RAW_VALUES = T.getType().getEnumConstants();
-    public static final EnumChatFormatHandle[] VALUES;
+    public static final ChatFormattingHandle[] VALUES;
     static {
-        VALUES = new EnumChatFormatHandle[RAW_VALUES.length];
+        VALUES = new ChatFormattingHandle[RAW_VALUES.length];
         for (int i = 0; i < VALUES.length; i++) {
             VALUES[i] = createHandle(RAW_VALUES[i]);
         }
     }
 
-    public static EnumChatFormatHandle byChar(char c) {
-        for (EnumChatFormatHandle format : VALUES) {
+    public static ChatFormattingHandle byChar(char c) {
+        for (ChatFormattingHandle format : VALUES) {
             String s = format.toString();
             if (s.length() >= 2 && s.charAt(1) == c) {
                 return format;
@@ -30,9 +30,9 @@ class EnumChatFormat {
         return RESET;
     }
 
-    public static EnumChatFormatHandle byId(int id) {
+    public static ChatFormattingHandle byId(int id) {
         if (id >= 0) {
-            for (EnumChatFormatHandle format : VALUES) {
+            for (ChatFormattingHandle format : VALUES) {
                 if (format.getId() == id) {
                     return format;
                 }
@@ -44,42 +44,42 @@ class EnumChatFormat {
 }
 
 package net.minecraft.world;
-import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
-import com.bergerkiller.generated.net.minecraft.world.EnumHandHandle;
+import com.bergerkiller.generated.net.minecraft.world.DifficultyHandle;
+import com.bergerkiller.generated.net.minecraft.world.InteractionHandHandle;
 
-class EnumDifficulty {
+class Difficulty {
 #if version >= 1.18
     public int getId();
-    public static (EnumDifficultyHandle) EnumDifficulty getById:byId(int id);
+    public static (DifficultyHandle) Difficulty getById:byId(int id);
 #else
     public int getId:a();
-    public static (EnumDifficultyHandle) EnumDifficulty getById(int id);
+    public static (DifficultyHandle) Difficulty getById(int id);
 #endif
 }
 
 // Since MC 1.9
-optional class EnumHand {
-    enum (EnumHandHandle) EnumHand MAIN_HAND;
-    enum (EnumHandHandle) EnumHand OFF_HAND;
+optional class InteractionHand {
+    enum (InteractionHandHandle) InteractionHand MAIN_HAND;
+    enum (InteractionHandHandle) InteractionHand OFF_HAND;
 }
 
 package net.minecraft.world.level;
-import com.bergerkiller.generated.net.minecraft.world.level.EnumGamemodeHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.EnumSkyBlockHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.GameTypeHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LightLayerHandle;
 
-class EnumGamemode {
+class GameType {
     public int getId();
 
 #if version >= 1.18
-    public static (EnumGamemodeHandle) EnumGamemode getById:byId(int id);
+    public static (GameTypeHandle) GameType getById:byId(int id);
 #else
-    public static (EnumGamemodeHandle) EnumGamemode getById(int id);
+    public static (GameTypeHandle) GameType getById(int id);
 #endif
 }
 
-class EnumSkyBlock {
-    enum (EnumSkyBlockHandle) EnumSkyBlock SKY;
-    enum (EnumSkyBlockHandle) EnumSkyBlock BLOCK;
+class LightLayer {
+    enum (LightLayerHandle) LightLayer SKY;
+    enum (LightLayerHandle) LightLayer BLOCK;
 
     <code>
     public int ordinal() {
@@ -89,21 +89,21 @@ class EnumSkyBlock {
 }
 
 package net.minecraft.core;
-import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle;
-import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxisHandle;
+import com.bergerkiller.generated.net.minecraft.core.DirectionHandle;
+import com.bergerkiller.generated.net.minecraft.core.DirectionHandle.AxisHandle;
 
-class EnumDirection {
-    enum (EnumDirectionHandle) EnumDirection DOWN;
-    enum (EnumDirectionHandle) EnumDirection UP;
-    enum (EnumDirectionHandle) EnumDirection NORTH;
-    enum (EnumDirectionHandle) EnumDirection SOUTH;
-    enum (EnumDirectionHandle) EnumDirection WEST;
-    enum (EnumDirectionHandle) EnumDirection EAST;
+class Direction {
+    enum (DirectionHandle) Direction DOWN;
+    enum (DirectionHandle) Direction UP;
+    enum (DirectionHandle) Direction NORTH;
+    enum (DirectionHandle) Direction SOUTH;
+    enum (DirectionHandle) Direction WEST;
+    enum (DirectionHandle) Direction EAST;
 
-    class EnumDirection.EnumAxis {
-        enum (EnumAxisHandle) EnumDirection.EnumAxis X;
-        enum (EnumAxisHandle) EnumDirection.EnumAxis Y;
-        enum (EnumAxisHandle) EnumDirection.EnumAxis Z;
+    class Direction.Axis {
+        enum (AxisHandle) Direction.Axis X;
+        enum (AxisHandle) Direction.Axis Y;
+        enum (AxisHandle) Direction.Axis Z;
 
         <code>
         public int ordinal() {

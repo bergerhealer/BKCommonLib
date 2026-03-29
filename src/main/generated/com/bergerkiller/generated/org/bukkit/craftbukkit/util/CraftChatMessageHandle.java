@@ -1,7 +1,7 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.util;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
+import com.bergerkiller.generated.net.minecraft.network.chat.ComponentHandle;
 
 /**
  * Instance wrapper handle for type <b>org.bukkit.craftbukkit.util.CraftChatMessage</b>.
@@ -20,11 +20,11 @@ public abstract class CraftChatMessageHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static String fromComponent(IChatBaseComponentHandle component) {
+    public static String fromComponent(ComponentHandle component) {
         return T.fromComponent.invoke(component);
     }
 
-    public static IChatBaseComponentHandle[] fromString(String message, boolean keepNewlines) {
+    public static ComponentHandle[] fromString(String message, boolean keepNewlines) {
         return T.fromString.invoke(message, keepNewlines);
     }
 
@@ -34,7 +34,7 @@ public abstract class CraftChatMessageHandle extends Template.Handle {
      */
     public static final class CraftChatMessageClass extends Template.Class<CraftChatMessageHandle> {
         public final Template.StaticMethod.Converted<String> fromComponent = new Template.StaticMethod.Converted<String>();
-        public final Template.StaticMethod.Converted<IChatBaseComponentHandle[]> fromString = new Template.StaticMethod.Converted<IChatBaseComponentHandle[]>();
+        public final Template.StaticMethod.Converted<ComponentHandle[]> fromString = new Template.StaticMethod.Converted<ComponentHandle[]>();
 
     }
 

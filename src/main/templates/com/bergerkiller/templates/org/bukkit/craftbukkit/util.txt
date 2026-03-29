@@ -1,8 +1,8 @@
 package org.bukkit.craftbukkit.util;
 
-import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.network.chat.Component;
 
-import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
+import com.bergerkiller.generated.net.minecraft.network.chat.ComponentHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongObjectHashMapHandle;
 
 class LongObjectHashMap {
@@ -133,7 +133,7 @@ class CraftMagicNumbers {
     }
 
     <code>
-    public static com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle getBlockDataFromMaterial(org.bukkit.Material material) {
+    public static com.bergerkiller.generated.net.minecraft.world.level.block.state.BlockStateHandle getBlockDataFromMaterial(org.bukkit.Material material) {
         return com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle.T.getBlockData.invoke(getBlockFromMaterial(material));
     }
     </code>
@@ -151,7 +151,7 @@ class CraftMagicNumbers {
 class CraftChatMessage {
 
     // Original was modified so it does not erase a chat color style prefix character
-    public static String fromComponent((IChatBaseComponentHandle) IChatBaseComponent component) {
+    public static String fromComponent((ComponentHandle) Component component) {
         if (component == null) {
             return "";
         }
@@ -160,18 +160,18 @@ class CraftChatMessage {
         return component#formatAsLegacyString();
     }
 
-    public static (IChatBaseComponentHandle[]) IChatBaseComponent[] fromString(String message, boolean keepNewlines) {
-        IChatBaseComponent[] components = CraftChatMessage.fromString(message, keepNewlines);
+    public static (ComponentHandle[]) Component[] fromString(String message, boolean keepNewlines) {
+        Component[] components = CraftChatMessage.fromString(message, keepNewlines);
 
         // Eliminate a common case of a root empty component with only one sibling inside
         // This is the case for most simple input messages
         if (components.length == 1) {
-            IChatBaseComponent singleComponent = components[0];
+            Component singleComponent = components[0];
             java.util.List siblings = singleComponent.getSiblings();
             if (siblings.size() == 1 && singleComponent.getStyle().isEmpty()) {
                 String text = singleComponent#getComponentText();
                 if (text.isEmpty()) {
-                    components[0] = (IChatBaseComponent) siblings.get(0);
+                    components[0] = (Component) siblings.get(0);
                 }
             }
         }
@@ -179,5 +179,5 @@ class CraftChatMessage {
         return components;
     }
 
-    //public static (IChatBaseComponentHandle[]) IChatBaseComponent[] fromString(String message, boolean keepNewlines);
+    //public static (ComponentHandle[]) Component[] fromString(String message, boolean keepNewlines);
 }

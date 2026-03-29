@@ -1,24 +1,24 @@
 package net.minecraft.world.level.block;
 
-import net.minecraft.sounds.SoundEffect;
+import net.minecraft.sounds.SoundEvent;
 
-import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
+import com.bergerkiller.generated.net.minecraft.sounds.SoundEventHandle;
 
-class SoundEffectType {
+class SoundType {
 #if version >= 1.16.5
-    public (SoundEffectHandle) SoundEffect getStepSound();
-    public (SoundEffectHandle) SoundEffect getPlaceSound();
-    public (SoundEffectHandle) SoundEffect getBreakSound:getFallSound();
-    public (SoundEffectHandle) SoundEffect getFallSound();
+    public (SoundEventHandle) SoundEvent getStepSound();
+    public (SoundEventHandle) SoundEvent getPlaceSound();
+    public (SoundEventHandle) SoundEvent getBreakSound:getFallSound();
+    public (SoundEventHandle) SoundEvent getFallSound();
 #elseif version >= 1.9
-    public (SoundEffectHandle) SoundEffect getStepSound:d();
-    public (SoundEffectHandle) SoundEffect getPlaceSound:e();
-    public (SoundEffectHandle) SoundEffect getBreakSound:g();
-    public (SoundEffectHandle) SoundEffect getFallSound:g();
+    public (SoundEventHandle) SoundEvent getStepSound:d();
+    public (SoundEventHandle) SoundEvent getPlaceSound:e();
+    public (SoundEventHandle) SoundEvent getBreakSound:g();
+    public (SoundEventHandle) SoundEvent getFallSound:g();
 #else
-    public (SoundEffectHandle) String getStepSound();
-    public (SoundEffectHandle) String getPlaceSound();
-    public (SoundEffectHandle) String getBreakSound();
-    public (SoundEffectHandle) String getFallSound:getBreakSound();
+    public (SoundEventHandle) String getStepSound();
+    public (SoundEventHandle) String getPlaceSound();
+    public (SoundEventHandle) String getBreakSound();
+    public (SoundEventHandle) String getFallSound:getBreakSound();
 #endif
 }

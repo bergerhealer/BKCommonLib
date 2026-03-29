@@ -1,27 +1,24 @@
 package net.minecraft.server.level;
 
-import net.minecraft.core.BlockPosition;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.ChatMessage;
-import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.PacketPlayOutOpenWindow;
-import net.minecraft.network.protocol.game.PacketPlayOutOpenSignEditor;
-import net.minecraft.network.syncher.DataWatcherObject;
+import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
+import net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacket;
+import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.network.PlayerConnection;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.WorldServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityLiving;
-import net.minecraft.world.entity.EntityInsentient;
-import net.minecraft.world.entity.player.EntityHuman;
-import net.minecraft.world.entity.player.PlayerInventory;
-import net.minecraft.world.inventory.ContainerAccess;
-import net.minecraft.world.inventory.ContainerAnvil;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.World;
+import net.minecraft.world.level.Level;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
@@ -31,22 +28,19 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle.RespawnConfigHandle;
-import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle.RespawnConfigHandle;
+import com.bergerkiller.generated.net.minecraft.server.network.ServerGamePacketListenerImplHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityItemFrameHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.item.EntityItemHandle;
-import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 
-class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
+class ServerPlayer extends net.minecraft.world.entity.player.Player {
 
 #if version >= 1.17
-    public (PlayerConnectionHandle) PlayerConnection playerConnection:connection;
+    public (ServerGamePacketListenerImplHandle) ServerGamePacketListenerImpl playerConnection:connection;
 #else
-    public (PlayerConnectionHandle) PlayerConnection playerConnection;
+    public (ServerGamePacketListenerImplHandle) ServerGamePacketListenerImpl playerConnection;
 #endif
 
 #if version >= 1.18
@@ -59,57 +53,57 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
     public boolean hasDisconnected:t();
 #else
     public boolean hasDisconnected() {
-        PlayerConnection playerConnection = instance.playerConnection;
+        ServerGamePacketListenerImpl playerConnection = instance.playerConnection;
         return playerConnection != null && playerConnection.isDisconnected();
     }
 #endif
 
 #if version >= 1.21.5
-    public (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig getRespawnConfig();
+    public (ServerPlayerHandle.RespawnConfigHandle) ServerPlayer.RespawnConfig getRespawnConfig();
 
     //TODO: Add an API that also fires the new spawn change event?
     // The "cause" enum would have to be proxied as it doesn't exist pre-1.21.5
-    public void setRespawnConfigSilent((EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig respawnConfig) {
-        #require net.minecraft.server.level.EntityPlayer private EntityPlayer.RespawnConfig respawnConfig;
+    public void setRespawnConfigSilent((ServerPlayerHandle.RespawnConfigHandle) ServerPlayer.RespawnConfig respawnConfig) {
+        #require net.minecraft.server.level.ServerPlayer private ServerPlayer.RespawnConfig respawnConfig;
         instance#respawnConfig = respawnConfig;
     }
 #else
   #if version >= 1.17
-      #require net.minecraft.server.level.EntityPlayer private net.minecraft.core.BlockPosition spawnCoord:respawnPosition;
-      #require net.minecraft.server.level.EntityPlayer private boolean spawnForced:respawnForced;
+      #require net.minecraft.server.level.ServerPlayer private net.minecraft.core.BlockPos spawnCoord:respawnPosition;
+      #require net.minecraft.server.level.ServerPlayer private boolean spawnForced:respawnForced;
   #elseif version >= 1.16
-      #require net.minecraft.server.level.EntityPlayer private net.minecraft.core.BlockPosition spawnCoord:spawn;
-      #require net.minecraft.server.level.EntityPlayer private boolean spawnForced;
+      #require net.minecraft.server.level.ServerPlayer private net.minecraft.core.BlockPos spawnCoord:spawn;
+      #require net.minecraft.server.level.ServerPlayer private boolean spawnForced;
   #elseif version >= 1.15
-      #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:g;
-      #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:bR;
+      #require net.minecraft.world.entity.player.Player private net.minecraft.core.BlockPos spawnCoord:g;
+      #require net.minecraft.world.entity.player.Player private boolean spawnForced:bR;
   #elseif version >= 1.14.4
-      #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:g;
-      #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:bU;
+      #require net.minecraft.world.entity.player.Player private net.minecraft.core.BlockPos spawnCoord:g;
+      #require net.minecraft.world.entity.player.Player private boolean spawnForced:bU;
   #elseif version >= 1.14
-      #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:f;
-      #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:g;
+      #require net.minecraft.world.entity.player.Player private net.minecraft.core.BlockPos spawnCoord:f;
+      #require net.minecraft.world.entity.player.Player private boolean spawnForced:g;
   #elseif version >= 1.13
-      #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:e;
-      #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:f;
+      #require net.minecraft.world.entity.player.Player private net.minecraft.core.BlockPos spawnCoord:e;
+      #require net.minecraft.world.entity.player.Player private boolean spawnForced:f;
   #elseif version >= 1.12
-      #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:d;
-      #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:e;
+      #require net.minecraft.world.entity.player.Player private net.minecraft.core.BlockPos spawnCoord:d;
+      #require net.minecraft.world.entity.player.Player private boolean spawnForced:e;
   #elseif version >= 1.9
-      #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:e;
-      #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:f;
+      #require net.minecraft.world.entity.player.Player private net.minecraft.core.BlockPos spawnCoord:e;
+      #require net.minecraft.world.entity.player.Player private boolean spawnForced:f;
   #else
-      #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:c;
-      #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:d;
+      #require net.minecraft.world.entity.player.Player private net.minecraft.core.BlockPos spawnCoord:c;
+      #require net.minecraft.world.entity.player.Player private boolean spawnForced:d;
   #endif
 
   #if version >= 1.17
-      #require net.minecraft.server.level.EntityPlayer private float spawnAngle:respawnAngle;
+      #require net.minecraft.server.level.ServerPlayer private float spawnAngle:respawnAngle;
   #elseif version >= 1.16.2
-      #require net.minecraft.server.level.EntityPlayer private float spawnAngle;
+      #require net.minecraft.server.level.ServerPlayer private float spawnAngle;
   #endif
 
-    public (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig getRespawnConfig() {
+    public (ServerPlayerHandle.RespawnConfigHandle) ServerPlayer.RespawnConfig getRespawnConfig() {
         // World dimension on 1.16 and later
         // Before
         ResourceKey dimension;
@@ -127,15 +121,15 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         if (instance.spawnWorld != null) {
             org.bukkit.World bukkitSpawnWorld = org.bukkit.Bukkit.getWorld(instance.spawnWorld);
             if (bukkitSpawnWorld != null) {
-                WorldServer spawnWorld = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) bukkitSpawnWorld).getHandle();
-                dimension = (ResourceKey) com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.T.getDimensionKey.raw().invoke(spawnWorld);
+                ServerLevel spawnWorld = (ServerLevel) ((org.bukkit.craftbukkit.CraftWorld) bukkitSpawnWorld).getHandle();
+                dimension = (ResourceKey) com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle.T.getDimensionKey.raw().invoke(spawnWorld);
             }
         }
   #endif
 
         if (dimension == null && worldName == null) return null;
 
-        BlockPosition position = instance#spawnCoord;
+        BlockPos position = instance#spawnCoord;
         if (position == null) return null;
 
   #if version >= 1.16.2
@@ -146,14 +140,14 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 
         boolean forced = instance#spawnForced;
 
-        return new EntityPlayer$RespawnConfig(dimension, worldName, position, angle, forced);
+        return new ServerPlayer$RespawnConfig(dimension, worldName, position, angle, forced);
     }
 
-    public void setRespawnConfigSilent((EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig respawnConfig) {
+    public void setRespawnConfigSilent((ServerPlayerHandle.RespawnConfigHandle) ServerPlayer.RespawnConfig respawnConfig) {
   #if version >= 1.17
-        #require net.minecraft.server.level.EntityPlayer private net.minecraft.resources.ResourceKey<net.minecraft.world.level.World> spawnDimension:respawnDimension;
+        #require net.minecraft.server.level.ServerPlayer private net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> spawnDimension:respawnDimension;
   #elseif version >= 1.16
-        #require net.minecraft.server.level.EntityPlayer private net.minecraft.resources.ResourceKey<net.minecraft.world.level.World> spawnDimension;
+        #require net.minecraft.server.level.ServerPlayer private net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> spawnDimension;
   #endif
 
         boolean hasSpawnConfig;
@@ -169,7 +163,7 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         //TODO: Convert to world name without first looking up the World?
         String spawnWorldName = null;
         if (respawnConfig != null && respawnConfig.dimension() != null) {
-            WorldServer world = (WorldServer) com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.T.getByDimensionKey.raw().invoke(respawnConfig.dimension());
+            ServerLevel world = (ServerLevel) com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle.T.getByDimensionKey.raw().invoke(respawnConfig.dimension());
             if (world != null) {
                 spawnWorldName = world.getWorld().getName();
             }
@@ -198,7 +192,7 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         instance.spawnWorld = spawnWorldName;
   #endif
 
-        instance#spawnCoord = (BlockPosition)respawnConfig.pos();
+        instance#spawnCoord = (BlockPos)respawnConfig.pos();
         instance#spawnForced = respawnConfig.forced();
   #if version >= 1.16.2
         instance#spawnAngle = respawnConfig.angle();
@@ -232,21 +226,21 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 #if version >= 1.12
     // Since Minecraft 1.12 this is just a boolean property of the player
   #if version >= 1.17
-    #require net.minecraft.server.level.EntityPlayer private boolean seenCredits;
+    #require net.minecraft.server.level.ServerPlayer private boolean seenCredits;
   #elseif version >= 1.16.2
-    #require net.minecraft.server.level.EntityPlayer private boolean seenCredits:cd;
+    #require net.minecraft.server.level.ServerPlayer private boolean seenCredits:cd;
   #elseif version >= 1.16.1
-    #require net.minecraft.server.level.EntityPlayer private boolean seenCredits:ck;
+    #require net.minecraft.server.level.ServerPlayer private boolean seenCredits:ck;
   #elseif version >= 1.15
-    #require net.minecraft.server.level.EntityPlayer private boolean seenCredits:cm;
+    #require net.minecraft.server.level.ServerPlayer private boolean seenCredits:cm;
   #elseif version >= 1.14
-    #require net.minecraft.server.level.EntityPlayer private boolean seenCredits:cp;
+    #require net.minecraft.server.level.ServerPlayer private boolean seenCredits:cp;
   #elseif version >= 1.13.1
-    #require net.minecraft.server.level.EntityPlayer private boolean seenCredits:cx;
+    #require net.minecraft.server.level.ServerPlayer private boolean seenCredits:cx;
   #elseif version >= 1.13
-    #require net.minecraft.server.level.EntityPlayer private boolean seenCredits:cy;
+    #require net.minecraft.server.level.ServerPlayer private boolean seenCredits:cy;
   #else
-    #require net.minecraft.server.level.EntityPlayer private boolean seenCredits:cq;
+    #require net.minecraft.server.level.ServerPlayer private boolean seenCredits:cq;
   #endif
 
     public boolean hasSeenCredits() {
@@ -272,34 +266,34 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 #endif
 
 #if forge_nms_obfuscated
-    public void sendMessage:a((ChatText) IChatBaseComponent ichatbasecomponent);
+    public void sendMessage:a((ChatText) Component ichatbasecomponent);
 #elseif version >= 1.19.1
-    public void sendMessage:sendSystemMessage((ChatText) IChatBaseComponent ichatbasecomponent);
+    public void sendMessage:sendSystemMessage((ChatText) Component ichatbasecomponent);
 #elseif version >= 1.19
-    public void sendMessage((ChatText) IChatBaseComponent ichatbasecomponent) {
+    public void sendMessage((ChatText) Component ichatbasecomponent) {
         net.minecraft.network.chat.PlayerChatMessage playerchatmessage = net.minecraft.network.chat.PlayerChatMessage.unsigned(ichatbasecomponent);
-        IChatBaseComponent systemDisplayName = IChatBaseComponent.literal("");
+        Component systemDisplayName = Component.literal("");
         net.minecraft.network.chat.ChatSender chatsender = net.minecraft.network.chat.ChatSender.system(systemDisplayName);
-        net.minecraft.resources.ResourceKey chatMessageType = net.minecraft.network.chat.ChatMessageType.SYSTEM;
+        net.minecraft.resources.ResourceKey chatMessageType = net.minecraft.network.chat.ChatType.SYSTEM;
         instance.sendChatMessage(playerchatmessage, chatsender, chatMessageType);
     }
 #elseif version >= 1.17
-    public void sendMessage((ChatText) IChatBaseComponent ichatbasecomponent) {
-        instance.sendMessage(ichatbasecomponent, net.minecraft.SystemUtils.NIL_UUID);
+    public void sendMessage((ChatText) Component ichatbasecomponent) {
+        instance.sendMessage(ichatbasecomponent, net.minecraft.Util.NIL_UUID);
     }
 #elseif version >= 1.16
-    public void sendMessage((ChatText) IChatBaseComponent ichatbasecomponent) {
-        instance.sendMessage(ichatbasecomponent, SystemUtils.b);
+    public void sendMessage((ChatText) Component ichatbasecomponent) {
+        instance.sendMessage(ichatbasecomponent, net.minecraft.Util.b);
     }
 #else
-    public void sendMessage((ChatText) IChatBaseComponent ichatbasecomponent);
+    public void sendMessage((ChatText) Component ichatbasecomponent);
 #endif
 
-#if exists net.minecraft.server.level.EntityPlayer public final java.util.List<Integer> removeQueue;
+#if exists net.minecraft.server.level.ServerPlayer public final java.util.List<Integer> removeQueue;
     public optional Collection<Integer> getRemoveQueue() {
         return instance.removeQueue;
     }
-#elseif exists net.minecraft.server.level.EntityPlayer public final java.util.Deque<Integer> removeQueue;
+#elseif exists net.minecraft.server.level.ServerPlayer public final java.util.Deque<Integer> removeQueue;
     public optional Collection<Integer> getRemoveQueue() {
         return instance.removeQueue;
     }
@@ -309,67 +303,67 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 
     public int getCurrentWindowId() {
 #if version >= 1.17
-        return ((EntityHuman) instance).containerMenu.containerId;
+        return ((Player) instance).containerMenu.containerId;
 #else
         return instance.activeContainer.windowId;
 #endif
     }
 
     public org.bukkit.inventory.InventoryView openAnvilWindow(ChatText titleText) {
-        IChatBaseComponent title;
+        Component title;
         if (titleText != null) {
-            title = (IChatBaseComponent) titleText.getRawHandle();
+            title = (Component) titleText.getRawHandle();
         } else {
             String titleStr = (String) com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle.T.getTitle.invoke(Blocks.ANVIL);
 #if version >= 1.19
-            title = (IChatBaseComponent) IChatBaseComponent.translatable(titleStr);
+            title = (Component) Component.translatable(titleStr);
 #else
-            title = (IChatBaseComponent) (new ChatMessage(titleStr, new Object[0]));
+            title = (Component) (new ChatMessage(titleStr, new Object[0]));
 #endif
         }
 
 #if version >= 1.17
-        PlayerInventory playerInventory = instance.getInventory();
+        net.minecraft.world.entity.player.Inventory playerInventory = instance.getInventory();
 #else
-        PlayerInventory playerInventory = instance.inventory;
+        net.minecraft.world.entity.player.Inventory playerInventory = instance.inventory;
 #endif
 #if version >= 1.20
-        World world = instance.level();
-        BlockPosition position = instance.blockPosition();
+        Level world = instance.level();
+        BlockPos position = instance.blockPosition();
 #elseif version >= 1.18
-        World world = instance.getLevel();
-        BlockPosition position = instance.blockPosition();
+        Level world = instance.getLevel();
+        BlockPos position = instance.blockPosition();
 #else
-        World world = instance.getWorld();
-        BlockPosition position = instance.getChunkCoordinates();
+        Level world = instance.getWorld();
+        BlockPos position = instance.getChunkCoordinates();
 #endif
 
-#if exists net.minecraft.server.level.EntityPlayer public int nextContainerCounter();
+#if exists net.minecraft.server.level.ServerPlayer public int nextContainerCounter();
         int windowId = instance.nextContainerCounter();
-#elseif exists net.minecraft.server.level.EntityPlayer public int nextContainerCounterInt();
+#elseif exists net.minecraft.server.level.ServerPlayer public int nextContainerCounterInt();
         int windowId = instance.nextContainerCounterInt();
-#elseif exists net.minecraft.server.level.EntityPlayer public void nextContainerCounter();
+#elseif exists net.minecraft.server.level.ServerPlayer public void nextContainerCounter();
         // void on forge, requires field reflection to get the counter value
         instance.nextContainerCounter();
-        #require net.minecraft.server.level.EntityPlayer private int containerCounter;
+        #require net.minecraft.server.level.ServerPlayer private int containerCounter;
         int windowId = instance#containerCounter;
 #else
         // use #require so it logs the methods that do exist
-        #require net.minecraft.server.level.EntityPlayer public int nextContainerCounter();
+        #require net.minecraft.server.level.ServerPlayer public int nextContainerCounter();
         int windowId;
         windowId = instance#nextContainerCounter();
 #endif
 
 #if version >= 1.18
-        ContainerAccess access = ContainerAccess.create(world, position);
-        ContainerAnvil container = new ContainerAnvil(windowId, playerInventory, access);
+        ContainerLevelAccess access = ContainerLevelAccess.create(world, position);
+        AnvilMenu container = new AnvilMenu(windowId, playerInventory, access);
         container.setTitle(title);
 #elseif version >= 1.14
-        ContainerAccess access = ContainerAccess.at(world, position);
-        ContainerAnvil container = new ContainerAnvil(windowId, playerInventory, access);
+        ContainerLevelAccess access = ContainerLevelAccess.at(world, position);
+        AnvilMenu container = new AnvilMenu(windowId, playerInventory, access);
         container.setTitle(title);
 #else
-        ContainerAnvil container = new ContainerAnvil(playerInventory, world, position, (EntityHuman) instance);
+        AnvilMenu container = new AnvilMenu(playerInventory, world, position, (Player) instance);
         container.windowId = windowId;
 #endif
         container.checkReachable = false;
@@ -378,29 +372,29 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 #if version < 1.9
         com.bergerkiller.bukkit.common.internal.hooks.LegacyContainerAnvilHook hook;
         hook = new com.bergerkiller.bukkit.common.internal.hooks.LegacyContainerAnvilHook();
-        container = (ContainerAnvil) hook.hook(container);
+        container = (AnvilMenu) hook.hook(container);
 #endif
 
 #if version >= 1.17
-        ((EntityHuman) instance).containerMenu = container;
+        ((Player) instance).containerMenu = container;
 #else
         instance.activeContainer = container;
 #endif
 
 #if version >= 1.18
-        instance.connection.send((Packet) new PacketPlayOutOpenWindow(windowId, net.minecraft.world.inventory.Containers.ANVIL, title));
+        instance.connection.send((Packet) new ClientboundOpenScreenPacket(windowId, net.minecraft.world.inventory.MenuType.ANVIL, title));
 #elseif version >= 1.17
-        instance.connection.sendPacket((Packet) new PacketPlayOutOpenWindow(windowId, net.minecraft.world.inventory.Containers.ANVIL, title));
+        instance.connection.sendPacket((Packet) new ClientboundOpenScreenPacket(windowId, net.minecraft.world.inventory.MenuType.ANVIL, title));
 #elseif version >= 1.14
-        instance.playerConnection.sendPacket((Packet) new PacketPlayOutOpenWindow(windowId, net.minecraft.world.inventory.Containers.ANVIL, title));
+        instance.playerConnection.sendPacket((Packet) new ClientboundOpenScreenPacket(windowId, net.minecraft.world.inventory.MenuType.ANVIL, title));
 #else
-        instance.playerConnection.sendPacket((Packet) new PacketPlayOutOpenWindow(windowId, "minecraft:anvil", title));
+        instance.playerConnection.sendPacket((Packet) new ClientboundOpenScreenPacket(windowId, "minecraft:anvil", title));
 #endif
 
 #if version >= 1.17
-        instance.initMenu((net.minecraft.world.inventory.Container) container);
+        instance.initMenu((net.minecraft.world.inventory.AbstractContainerMenu) container);
 #else
-        container.addSlotListener((net.minecraft.world.inventory.ICrafting) instance);
+        container.addSlotListener((net.minecraft.world.inventory.ContainerListener) instance);
 #endif
 
         return container.getBukkitView();
@@ -417,39 +411,39 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
     }
     </code>
 
-    public void openSignEditWindow((IntVector3) BlockPosition signPosition, boolean isFrontText) {
+    public void openSignEditWindow((IntVector3) BlockPos signPosition, boolean isFrontText) {
 #if version >= 1.20
-        instance.connection.send((Packet) new PacketPlayOutOpenSignEditor(signPosition, isFrontText));
+        instance.connection.send((Packet) new ClientboundOpenSignEditorPacket(signPosition, isFrontText));
 #else
         if (!isFrontText) {
             throw new UnsupportedOperationException("Back text not supported on this version of Minecraft");
         }
 
   #if version >= 1.18
-        instance.connection.send((Packet) new PacketPlayOutOpenSignEditor(signPosition));
+        instance.connection.send((Packet) new ClientboundOpenSignEditorPacket(signPosition));
   #elseif version >= 1.17
-        instance.connection.sendPacket((Packet) new PacketPlayOutOpenSignEditor(signPosition));
+        instance.connection.sendPacket((Packet) new ClientboundOpenSignEditorPacket(signPosition));
   #else
-        instance.playerConnection.sendPacket((Packet) new PacketPlayOutOpenSignEditor(signPosition));
+        instance.playerConnection.sendPacket((Packet) new ClientboundOpenSignEditorPacket(signPosition));
   #endif
 #endif
     }
 
     <code>
-    public static EntityPlayerHandle fromBukkit(org.bukkit.entity.Player player) {
+    public static ServerPlayerHandle fromBukkit(org.bukkit.entity.Player player) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player));
     }
     </code>
 
     // Since 1.21.5, before it uses a proxy class
-    public class EntityPlayer.RespawnConfig {
+    public class ServerPlayer.RespawnConfig {
 #if version >= 1.21.9
         // Some layers of abstraction were introduced with 1.21.9
 
-        public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension() {
+        public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<Level> dimension() {
             return instance.respawnData().dimension();
         }
-        public (IntVector3) BlockPosition position() {
+        public (IntVector3) BlockPos position() {
             return instance.respawnData().pos();
         }
         public String worldName() {
@@ -464,37 +458,37 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         }
         public boolean forced();
 
-        public static (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig of((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension, String worldName, (IntVector3) BlockPosition position, float yaw, float pitch, boolean forced) {
-            return new EntityPlayer$RespawnConfig(
-                net.minecraft.world.level.storage.WorldData$RespawnData.of(dimension, position, yaw, pitch),
+        public static (ServerPlayerHandle.RespawnConfigHandle) ServerPlayer.RespawnConfig of((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<Level> dimension, String worldName, (IntVector3) BlockPos position, float yaw, float pitch, boolean forced) {
+            return new ServerPlayer$RespawnConfig(
+                net.minecraft.world.level.storage.LevelData$RespawnData.of(dimension, position, yaw, pitch),
                 forced );
         }
 
-        public static (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig codecFromNBT((CommonTagCompound) NBTTagCompound nbt) {
-            return (EntityPlayer$RespawnConfig) nbt.read("respawn", EntityPlayer$RespawnConfig.CODEC).orElse(null);
+        public static (ServerPlayerHandle.RespawnConfigHandle) ServerPlayer.RespawnConfig codecFromNBT((CommonTagCompound) CompoundTag nbt) {
+            return (ServerPlayer$RespawnConfig) nbt.read("respawn", ServerPlayer$RespawnConfig.CODEC).orElse(null);
         }
 
-        public static void codecToNBT((EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig respawnConfig, (CommonTagCompound) NBTTagCompound nbt) {
+        public static void codecToNBT((ServerPlayerHandle.RespawnConfigHandle) ServerPlayer.RespawnConfig respawnConfig, (CommonTagCompound) CompoundTag nbt) {
             if (respawnConfig != null) {
-                nbt.store("respawn", EntityPlayer$RespawnConfig.CODEC, respawnConfig);
+                nbt.store("respawn", ServerPlayer$RespawnConfig.CODEC, respawnConfig);
             } else {
                 nbt.remove("respawn");
             }
         }
 #else
   #if version >= 1.21.5
-        public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension();
-        public (IntVector3) BlockPosition position:pos();
+        public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<Level> dimension();
+        public (IntVector3) BlockPos position:pos();
         public String worldName() {
             return null; // Not available
         }
   #else
-        public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension() {
+        public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<Level> dimension() {
             return (ResourceKey) instance.dimension();
         }
 
-        public (IntVector3) BlockPosition position() {
-            return (BlockPosition) instance.pos();
+        public (IntVector3) BlockPos position() {
+            return (BlockPos) instance.pos();
         }
 
         public String worldName();
@@ -506,26 +500,26 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         }
         public boolean forced();
 
-        public static (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig of((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> dimension, String worldName, (IntVector3) BlockPosition position, float yaw, float pitch, boolean forced) {
+        public static (ServerPlayerHandle.RespawnConfigHandle) ServerPlayer.RespawnConfig of((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<Level> dimension, String worldName, (IntVector3) BlockPos position, float yaw, float pitch, boolean forced) {
   #if version >= 1.21.5
-            return new EntityPlayer$RespawnConfig(dimension, position, yaw, forced);
+            return new ServerPlayer$RespawnConfig(dimension, position, yaw, forced);
   #else
-            return new EntityPlayer$RespawnConfig(dimension, worldName, position, yaw, forced);
+            return new ServerPlayer$RespawnConfig(dimension, worldName, position, yaw, forced);
   #endif
         }
 
-        public static (EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig codecFromNBT((CommonTagCompound) NBTTagCompound nbt) {
+        public static (ServerPlayerHandle.RespawnConfigHandle) ServerPlayer.RespawnConfig codecFromNBT((CommonTagCompound) CompoundTag nbt) {
   #if version >= 1.21.5
-            return (EntityPlayer$RespawnConfig) nbt.read("respawn", EntityPlayer$RespawnConfig.CODEC).orElse(null);
+            return (ServerPlayer$RespawnConfig) nbt.read("respawn", ServerPlayer$RespawnConfig.CODEC).orElse(null);
   #else
             return null;
   #endif
         }
 
-        public static void codecToNBT((EntityPlayerHandle.RespawnConfigHandle) EntityPlayer.RespawnConfig respawnConfig, (CommonTagCompound) NBTTagCompound nbt) {
+        public static void codecToNBT((ServerPlayerHandle.RespawnConfigHandle) ServerPlayer.RespawnConfig respawnConfig, (CommonTagCompound) CompoundTag nbt) {
   #if version >= 1.21.5
             if (respawnConfig != null) {
-                nbt.store("respawn", EntityPlayer$RespawnConfig.CODEC, respawnConfig);
+                nbt.store("respawn", ServerPlayer$RespawnConfig.CODEC, respawnConfig);
             } else {
                 nbt.remove("respawn");
             }
@@ -535,7 +529,7 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 
         <code>
         @Deprecated
-        public static EntityPlayerHandle.RespawnConfigHandle of(com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World> dimension, String worldName, IntVector3 position, float yaw, boolean forced) {
+        public static ServerPlayerHandle.RespawnConfigHandle of(com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World> dimension, String worldName, IntVector3 position, float yaw, boolean forced) {
             return of(dimension, worldName, position, yaw, 0.0f, forced);
         }
 
@@ -543,7 +537,7 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
             return com.bergerkiller.bukkit.common.utils.WorldUtil.getWorldByDimensionKey(this.dimension());
         }
 
-        public static EntityPlayerHandle.RespawnConfigHandle of(org.bukkit.World world, IntVector3 position, float angle, boolean forced) {
+        public static ServerPlayerHandle.RespawnConfigHandle of(org.bukkit.World world, IntVector3 position, float angle, boolean forced) {
             return of(com.bergerkiller.bukkit.common.utils.WorldUtil.getDimensionKey(world), world.getName(), position, angle, forced);
         }
         </code>

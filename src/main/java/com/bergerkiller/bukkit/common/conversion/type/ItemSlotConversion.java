@@ -7,7 +7,7 @@ import java.util.Map;
 import org.bukkit.inventory.EquipmentSlot;
 
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.generated.net.minecraft.world.entity.EnumItemSlotHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EquipmentSlotHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
 /**
@@ -19,7 +19,7 @@ public class ItemSlotConversion {
     private static final Map<EquipmentSlot, Object> slotMap_b = new IdentityHashMap<EquipmentSlot, Object>();
 
     static {
-        Object[] enumItemSlotValues = EnumItemSlotHandle.T.getType().getEnumConstants();
+        Object[] enumItemSlotValues = EquipmentSlotHandle.T.getType().getEnumConstants();
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             String name = slot.name().toLowerCase(Locale.ENGLISH).replace("_", "");
             if (name.equals("hand")) {
@@ -28,7 +28,7 @@ public class ItemSlotConversion {
 
             Object foundItemSlot = null;
             for (Object enumItemSlot : enumItemSlotValues) {
-                if (EnumItemSlotHandle.T.getName.invoke(enumItemSlot).equals(name)) {
+                if (EquipmentSlotHandle.T.getName.invoke(enumItemSlot).equals(name)) {
                     foundItemSlot = enumItemSlot;
                     break;
                 }
@@ -50,7 +50,7 @@ public class ItemSlotConversion {
             }
 
             // Unable to find
-            String name = EnumItemSlotHandle.T.getName.invoke(enumItemSlot);
+            String name = EquipmentSlotHandle.T.getName.invoke(enumItemSlot);
             Logging.LOGGER_REFLECTION.warning("Failed to find matching EquipmentSlot for EnumItemSlot " + name);
         }
     }

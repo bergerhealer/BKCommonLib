@@ -1,13 +1,13 @@
 package org.bukkit.craftbukkit.block;
 
-import net.minecraft.world.level.block.state.IBlockData;
-import net.minecraft.world.level.block.entity.TileEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import org.bukkit.craftbukkit.block.CraftBlockEntityState;
 
 class CraftBlockState {
 #if version >= 1.13
-    protected unknown IBlockData data;
+    protected unknown BlockState data;
 #else
     protected unknown int type;
     protected unknown org.bukkit.material.MaterialData data;
@@ -24,7 +24,7 @@ class CraftBlockState {
     // Fakes the constructor of BlockState or derived types, an a BlockState that is already created on MC 1.13 and later
     // Not supported on earlier versions, instantiation worked differently there
 #if version >= 1.13
-    public optional void init(org.bukkit.block.Block block, org.bukkit.Chunk chunk, IBlockData blockData, TileEntity tileEntity) {
+    public optional void init(org.bukkit.block.Block block, org.bukkit.Chunk chunk, BlockState blockData, BlockEntity tileEntity) {
   #if exists org.bukkit.craftbukkit.block.CraftBlockState private final org.bukkit.craftbukkit.CraftWorld world;
         #require org.bukkit.craftbukkit.block.CraftBlockState private final org.bukkit.craftbukkit.CraftWorld blockState_world:world;
         instance#blockState_world = block.getWorld();
@@ -36,7 +36,7 @@ class CraftBlockState {
   #endif
 
   #if version >= 1.13.2
-        #require org.bukkit.craftbukkit.block.CraftBlockState private final net.minecraft.core.BlockPosition blockState_position:position;
+        #require org.bukkit.craftbukkit.block.CraftBlockState private final net.minecraft.core.BlockPos blockState_position:position;
         instance#blockState_position = ((org.bukkit.craftbukkit.block.CraftBlock) block).getPosition();
   #else
         #require org.bukkit.craftbukkit.block.CraftBlockState private final int blockState_x:x;
@@ -56,23 +56,23 @@ class CraftBlockState {
 
         if (instance instanceof CraftBlockEntityState) {
             CraftBlockEntityState entityState = (CraftBlockEntityState) instance;
-  #if exists org.bukkit.craftbukkit.block.CraftBlockEntityState private final T extends net.minecraft.world.level.block.entity.TileEntity tileEntity;
-            #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final T extends TileEntity blockEntity:tileEntity;
+  #if exists org.bukkit.craftbukkit.block.CraftBlockEntityState private final T extends net.minecraft.world.level.block.entity.BlockEntity tileEntity;
+            #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final T extends BlockEntity blockEntity:tileEntity;
   #else
-            #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final T extends TileEntity blockEntity;
+            #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final T extends BlockEntity blockEntity;
   #endif
-            #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final T extends TileEntity snapshot;
+            #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final T extends BlockEntity snapshot;
             entityState#blockEntity = tileEntity;
             entityState#snapshot = tileEntity;
 
   #if exists org.bukkit.craftbukkit.block.CraftBlockEntityState private final Class<T> tileEntityClass;
-            #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final Class<T extends TileEntity> tileEntityClass;
+            #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final Class<T extends BlockEntity> tileEntityClass;
             entityState#tileEntityClass = tileEntity.getClass();
   #endif
 
   #if version >= 1.20
             if (entityState instanceof org.bukkit.craftbukkit.block.CraftSign) {
-                net.minecraft.world.level.block.entity.TileEntitySign tileEntitySign = (net.minecraft.world.level.block.entity.TileEntitySign) tileEntity;
+                net.minecraft.world.level.block.entity.SignBlockEntity tileEntitySign = (net.minecraft.world.level.block.entity.SignBlockEntity) tileEntity;
                 org.bukkit.craftbukkit.block.sign.CraftSignSide front = new org.bukkit.craftbukkit.block.sign.CraftSignSide(tileEntitySign.getFrontText());
                 org.bukkit.craftbukkit.block.sign.CraftSignSide back = new org.bukkit.craftbukkit.block.sign.CraftSignSide(tileEntitySign.getBackText());
                 #require org.bukkit.craftbukkit.block.CraftSign private final org.bukkit.craftbukkit.block.sign.CraftSignSide front;
@@ -82,44 +82,44 @@ class CraftBlockState {
             }
   #elseif exists org.bukkit.craftbukkit.block.CraftSign private final org.bukkit.craftbukkit.block.sign.CraftSignSide front;
             if (entityState instanceof org.bukkit.craftbukkit.block.CraftSign) {
-                net.minecraft.world.level.block.entity.TileEntitySign tileEntitySign = (net.minecraft.world.level.block.entity.TileEntitySign) tileEntity;
+                net.minecraft.world.level.block.entity.SignBlockEntity tileEntitySign = (net.minecraft.world.level.block.entity.SignBlockEntity) tileEntity;
                 org.bukkit.craftbukkit.block.sign.CraftSignSide front = new org.bukkit.craftbukkit.block.sign.CraftSignSide(tileEntitySign);
                 #require org.bukkit.craftbukkit.block.CraftSign private final org.bukkit.craftbukkit.block.sign.CraftSignSide front;
                 entityState#front = front;
             }
   #endif
 
-            #require org.bukkit.craftbukkit.block.CraftBlockEntityState protected void load(T extends TileEntity tileEntity);
+            #require org.bukkit.craftbukkit.block.CraftBlockEntityState protected void load(T extends BlockEntity tileEntity);
             entityState#load(tileEntity);
         }
     }
 #else
-    public optional void init:###(org.bukkit.block.Block block, org.bukkit.Chunk chunk, IBlockData blockData, TileEntity tileEntity);
+    public optional void init:###(org.bukkit.block.Block block, org.bukkit.Chunk chunk, BlockState blockData, BlockEntity tileEntity);
 #endif
 }
 
 class CraftBlock {
 
 #if version >= 1.13.1
-    public (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData getBlockData:getNMS();
+    public (com.bergerkiller.bukkit.common.wrappers.BlockData) BlockState getBlockData:getNMS();
 #elseif version >= 1.13
-    protected (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData getBlockData:getNMS();
+    protected (com.bergerkiller.bukkit.common.wrappers.BlockData) BlockState getBlockData:getNMS();
 #else
     // 1.8 -> 1.12.2 only, this code is unlikely to change
-    public (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData getBlockData() {
-        net.minecraft.world.level.chunk.Chunk chunk = ((org.bukkit.craftbukkit.CraftChunk) instance.getChunk()).getHandle();
+    public (com.bergerkiller.bukkit.common.wrappers.BlockData) BlockState getBlockData() {
+        net.minecraft.world.level.chunk.LevelChunk chunk = ((org.bukkit.craftbukkit.CraftChunk) instance.getChunk()).getHandle();
 
   #if version >= 1.9
         return chunk.a(instance.getX(), instance.getY(), instance.getZ());
   #else
-        return chunk.getBlockData(new net.minecraft.core.BlockPosition(instance.getX(), instance.getY(), instance.getZ()));
+        return chunk.getBlockData(new net.minecraft.core.BlockPos(instance.getX(), instance.getY(), instance.getZ()));
   #endif
     }
 #endif
 
     public static Object getBlockTileEntity(org.bukkit.block.Block block) {
-        net.minecraft.world.level.World nmsWorld = (net.minecraft.world.level.World) ((org.bukkit.craftbukkit.CraftWorld) block.getWorld()).getHandle();
-        net.minecraft.core.BlockPosition nmsBlockPos;
+        net.minecraft.world.level.Level nmsWorld = (net.minecraft.world.level.Level) ((org.bukkit.craftbukkit.CraftWorld) block.getWorld()).getHandle();
+        net.minecraft.core.BlockPos nmsBlockPos;
 
 #if version >= 1.13.1
         if (block instanceof org.bukkit.craftbukkit.block.CraftBlock) {
@@ -127,7 +127,7 @@ class CraftBlock {
         } else
 #endif
         {
-            nmsBlockPos = new net.minecraft.core.BlockPosition(block.getX(), block.getY(), block.getZ());
+            nmsBlockPos = new net.minecraft.core.BlockPos(block.getX(), block.getY(), block.getZ());
         }
 
 #if version >= 1.18
@@ -144,16 +144,16 @@ class CraftBlock {
         } else
 #endif
         {
-            return new net.minecraft.core.BlockPosition(block.getX(), block.getY(), block.getZ());
+            return new net.minecraft.core.BlockPos(block.getX(), block.getY(), block.getZ());
         }
     }
 
     public static org.bukkit.block.Block createBlockAtTileEntity(Object nmsTileEntity) {
-        TileEntity tileEntity = (TileEntity) nmsTileEntity;
+        BlockEntity tileEntity = (BlockEntity) nmsTileEntity;
 #if version >= 1.18
-        net.minecraft.world.level.World world = tileEntity.getLevel();
+        net.minecraft.world.level.Level world = tileEntity.getLevel();
 #else
-        net.minecraft.world.level.World world = tileEntity.getWorld();
+        net.minecraft.world.level.Level world = tileEntity.getWorld();
 #endif
         if (world == null) {
             throw new IllegalArgumentException("Tile Entity has no world set");
@@ -163,7 +163,7 @@ class CraftBlock {
 #elseif version >= 1.13
         return org.bukkit.craftbukkit.block.CraftBlock.at(world, tileEntity.getPosition());
 #else
-        net.minecraft.core.BlockPosition position = tileEntity.getPosition();
+        net.minecraft.core.BlockPos position = tileEntity.getPosition();
         return world.getWorld().getBlockAt(position.getX(), position.getY(), position.getZ());
 #endif
     }

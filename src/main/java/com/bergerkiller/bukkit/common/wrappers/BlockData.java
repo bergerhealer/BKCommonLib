@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -19,7 +20,6 @@ import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
 
 /**
@@ -572,7 +572,7 @@ public abstract class BlockData extends BlockDataRegistry {
      * @param block Block
      * @return bounding box of the block (relative to block coordinates). Can be null!
      */
-    public abstract AxisAlignedBBHandle getBoundingBox(Block block);
+    public abstract AABBHandle getBoundingBox(Block block);
 
     /**
      * Gets the player-interactable bounding box of this Block Data type.
@@ -584,7 +584,7 @@ public abstract class BlockData extends BlockDataRegistry {
      * @param block Block
      * @return interactable box of the block (relative to block coordinates). Can be null (air)!
      */
-    public abstract AxisAlignedBBHandle getInteractableBox(Block block);
+    public abstract AABBHandle getInteractableBox(Block block);
 
     /**
      * Causes the block to drop items as if it was broken naturally

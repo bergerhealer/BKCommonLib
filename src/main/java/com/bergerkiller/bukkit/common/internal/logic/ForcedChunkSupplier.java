@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.generated.net.minecraft.world.level.ForcedChunkHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.ForcedChunksSavedDataHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 
 /**
@@ -19,7 +19,7 @@ public class ForcedChunkSupplier implements Supplier<Object>, Function<String, O
 
     public ForcedChunkSupplier() {
         Constructor<?> constructor = null;
-        Class<?> type = ForcedChunkHandle.T.getType();
+        Class<?> type = ForcedChunksSavedDataHandle.T.getType();
         if (type != null) {
             try {
                 try {

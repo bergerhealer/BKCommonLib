@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.generated.net.minecraft.core.RegistryMaterialsHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.core.MappedRegistryHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypeHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 
 /**
@@ -97,18 +97,18 @@ public class LookupEntityClassMap<K, V> implements Map<K, V> {
         }
 
         // <= 1.10.2 had a static Map instance
-        if (EntityTypesHandle.T.opt_typeNameMap_1_10_2.isAvailable()) {
-            Map<Class<?>, String> base = (Map<Class<?>, String>) EntityTypesHandle.T.opt_typeNameMap_1_10_2.raw.get();
+        if (EntityTypeHandle.T.opt_typeNameMap_1_10_2.isAvailable()) {
+            Map<Class<?>, String> base = (Map<Class<?>, String>) EntityTypeHandle.T.opt_typeNameMap_1_10_2.raw.get();
             Map<Class<?>, String> repl = new LookupEntityClassMap<Class<?>, String>(base);
-            EntityTypesHandle.T.opt_typeNameMap_1_10_2.raw.set(repl);
+            EntityTypeHandle.T.opt_typeNameMap_1_10_2.raw.set(repl);
             return;
         }
 
         // >= 1.11 uses RegistryMaterials BiMap
-        RegistryMaterialsHandle reg = EntityTypesHandle.T.opt_getRegistry.invoke();
-        Map<?, ?> base = RegistryMaterialsHandle.T.opt_inverseLookupField.get(reg.getRaw());
+        MappedRegistryHandle reg = EntityTypeHandle.T.opt_getRegistry.invoke();
+        Map<?, ?> base = MappedRegistryHandle.T.opt_inverseLookupField.get(reg.getRaw());
         Map<Object, Object> repl = new LookupEntityClassMap<Object, Object>(base);
-        RegistryMaterialsHandle.T.opt_inverseLookupField.set(reg.getRaw(), repl);
+        MappedRegistryHandle.T.opt_inverseLookupField.set(reg.getRaw(), repl);
     }
 
     @SuppressWarnings("unchecked")
@@ -119,21 +119,21 @@ public class LookupEntityClassMap<K, V> implements Map<K, V> {
         }
 
         // <= 1.10.2 had a static Map instance
-        if (EntityTypesHandle.T.opt_typeNameMap_1_10_2.isAvailable()) {
-            Object orig = EntityTypesHandle.T.opt_typeNameMap_1_10_2.raw.get();
+        if (EntityTypeHandle.T.opt_typeNameMap_1_10_2.isAvailable()) {
+            Object orig = EntityTypeHandle.T.opt_typeNameMap_1_10_2.raw.get();
             if (orig instanceof LookupEntityClassMap) {
                 LookupEntityClassMap<Class<?>, String> repl = (LookupEntityClassMap<Class<?>, String>) orig;
-                EntityTypesHandle.T.opt_typeNameMap_1_10_2.raw.set(repl._base);
+                EntityTypeHandle.T.opt_typeNameMap_1_10_2.raw.set(repl._base);
             }
             return;
         }
 
         // >= 1.11 uses RegistryMaterials BiMap
-        RegistryMaterialsHandle reg = EntityTypesHandle.T.opt_getRegistry.invoke();
-        Map<?, ?> orig =  RegistryMaterialsHandle.T.opt_inverseLookupField.get(reg.getRaw());
+        MappedRegistryHandle reg = EntityTypeHandle.T.opt_getRegistry.invoke();
+        Map<?, ?> orig =  MappedRegistryHandle.T.opt_inverseLookupField.get(reg.getRaw());
         if (orig instanceof LookupEntityClassMap) {
             LookupEntityClassMap<Object, Object> repl = (LookupEntityClassMap<Object, Object>) orig;
-            RegistryMaterialsHandle.T.opt_inverseLookupField.set(reg.getRaw(), repl._base);
+            MappedRegistryHandle.T.opt_inverseLookupField.set(reg.getRaw(), repl._base);
         }
     }
 

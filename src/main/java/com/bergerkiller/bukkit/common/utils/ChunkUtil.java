@@ -10,12 +10,10 @@ import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
-import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.EnumSkyBlockHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkSectionHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LightLayerHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.LevelChunkHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.LevelChunkSectionHandle;
 
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -103,7 +101,7 @@ public class ChunkUtil {
      */
     @Deprecated
     public static ChunkSection[] getSections(org.bukkit.Chunk chunk) {
-        return ChunkHandle.T.getSections.invoke(HandleConversion.toChunkHandle(chunk));
+        return LevelChunkHandle.T.getSections.invoke(HandleConversion.toChunkHandle(chunk));
     }
 
     /**
@@ -114,7 +112,7 @@ public class ChunkUtil {
      * @return loaded chunk section coordinates
      */
     public static List<Integer> getLoadedSectionCoordinates(org.bukkit.Chunk chunk) {
-        return ChunkHandle.T.getLoadedSectionCoordinates.invoke(HandleConversion.toChunkHandle(chunk));
+        return LevelChunkHandle.T.getLoadedSectionCoordinates.invoke(HandleConversion.toChunkHandle(chunk));
     }
 
     /**
@@ -126,7 +124,7 @@ public class ChunkUtil {
      *         and no data is stored here.
      */
     public static ChunkSection getSection(org.bukkit.Chunk chunk, int cy) {
-        return ChunkHandle.T.getSection.invoke(HandleConversion.toChunkHandle(chunk), cy);
+        return LevelChunkHandle.T.getSection.invoke(HandleConversion.toChunkHandle(chunk), cy);
     }
 
     /**
@@ -151,7 +149,7 @@ public class ChunkUtil {
      * @return light heightmap
      */
     public static HeightMap getLightHeightMap(org.bukkit.Chunk chunk, boolean initialize) {
-        return ChunkHandle.fromBukkit(chunk).getLightHeightMap(initialize);
+        return LevelChunkHandle.fromBukkit(chunk).getLightHeightMap(initialize);
     }
 
     /**
@@ -169,7 +167,7 @@ public class ChunkUtil {
         } else if (y >= chunk.getWorld().getMaxHeight()) {
             return 0;
         } else {
-            return ChunkHandle.fromBukkit(chunk).getBrightness(EnumSkyBlockHandle.BLOCK,
+            return LevelChunkHandle.fromBukkit(chunk).getBrightness(LightLayerHandle.BLOCK,
                     new IntVector3(x & 0xf, y, z & 0xf));
         }
     }
@@ -189,7 +187,7 @@ public class ChunkUtil {
         } else if (y >= chunk.getWorld().getMaxHeight()) {
             return 15;
         } else {
-            return ChunkHandle.fromBukkit(chunk).getBrightness(EnumSkyBlockHandle.SKY,
+            return LevelChunkHandle.fromBukkit(chunk).getBrightness(LightLayerHandle.SKY,
                     new IntVector3(x & 0xf, y, z & 0xf));
         }
     }
@@ -217,12 +215,12 @@ public class ChunkUtil {
      * @return block data information
      */
     public static BlockData getBlockData(org.bukkit.Chunk chunk, int x, int y, int z) {
-        return ChunkHandle.T.getBlockDataAtCoord.invoke(HandleConversion.toChunkHandle(chunk), x, y, z);
+        return LevelChunkHandle.T.getBlockDataAtCoord.invoke(HandleConversion.toChunkHandle(chunk), x, y, z);
 
         /*
         Object chunkHandleRaw = HandleConversion.toChunkHandle(chunk);
-        Object blockPos = BlockPositionHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
-        Object iBlockData = ChunkHandle.T.getBlockData.raw.invoke(chunkHandleRaw, blockPos);
+        Object blockPos = BlockPosHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
+        Object iBlockData = LevelChunkHandle.T.getBlockData.raw.invoke(chunkHandleRaw, blockPos);
         return BlockData.fromBlockData(iBlockData);
         */
     }
@@ -236,9 +234,9 @@ public class ChunkUtil {
      */
     public static void setBlockFast(org.bukkit.Chunk chunk, Block block, BlockData data) {
         final int secIndex = block.getY() >> 4;
-        Object section = ChunkHandle.T.getSectionRaw.invoke(HandleConversion.toChunkHandle(chunk), secIndex);
+        Object section = LevelChunkHandle.T.getSectionRaw.invoke(HandleConversion.toChunkHandle(chunk), secIndex);
         if (section != null) {
-            ChunkSectionHandle.T.setBlockDataAtBlock.invoke(section, block, data);
+            LevelChunkSectionHandle.T.setBlockDataAtBlock.invoke(section, block, data);
         } else {
             // Slow method, to initialize the empty chunk
             WorldUtil.setBlockData(block, data);
@@ -257,10 +255,10 @@ public class ChunkUtil {
     public static void setBlockFast(org.bukkit.Chunk chunk, int x, int y, int z, BlockData data) {
         final int secIndex = y >> 4;
         Object chunkHandle = HandleConversion.toChunkHandle(chunk);
-        Object section = ChunkHandle.T.getSectionRaw.invoke(chunkHandle, secIndex);
+        Object section = LevelChunkHandle.T.getSectionRaw.invoke(chunkHandle, secIndex);
         if (section != null) {
-            ChunkSectionHandle.T.setBlockData.invoke(section, x & 0xf, y & 0xf, z & 0xf, data);
-            ChunkHandle.T.markDirty.invoker.invoke(chunkHandle);
+            LevelChunkSectionHandle.T.setBlockData.invoke(section, x & 0xf, y & 0xf, z & 0xf, data);
+            LevelChunkHandle.T.markDirty.invoker.invoke(chunkHandle);
         } else {
             // Slow method, to initialize the empty chunk
             WorldUtil.setBlockData(chunk.getWorld(),
@@ -279,7 +277,7 @@ public class ChunkUtil {
      * @return Live collection of entities in the chunk
      */
     public static List<org.bukkit.entity.Entity> getEntities(org.bukkit.Chunk chunk) {
-        return ChunkHandle.fromBukkit(chunk).getEntities();
+        return LevelChunkHandle.fromBukkit(chunk).getEntities();
     }
 
     /**
@@ -303,7 +301,7 @@ public class ChunkUtil {
      * @return Unmodifiable collection of players that view this chunk
      */
     public static Collection<Player> getChunkViewers(org.bukkit.World world, int chunkX, int chunkZ) {
-        return WorldServerHandle.fromBukkit(world).getPlayerChunkMap().getChunkEnteredPlayers(chunkX, chunkZ);
+        return ServerLevelHandle.fromBukkit(world).getPlayerChunkMap().getChunkEnteredPlayers(chunkX, chunkZ);
     }
 
     /**
@@ -360,7 +358,7 @@ public class ChunkUtil {
      * @return The chunk, or null if it is not loaded
      */
     public static org.bukkit.Chunk getChunk(World world, final int x, final int z) {
-        return WorldServerHandle.T.getChunkIfLoaded.invoke(HandleConversion.toWorldHandle(world), x, z);
+        return ServerLevelHandle.T.getChunkIfLoaded.invoke(HandleConversion.toWorldHandle(world), x, z);
     }
 
     /**
@@ -423,7 +421,7 @@ public class ChunkUtil {
      * @return True if it needs to be saved, False if not
      */
     public static boolean needsSaving(org.bukkit.Chunk chunk) {
-        return ChunkHandle.T.checkCanSave.invoke(HandleConversion.toChunkHandle(chunk));
+        return LevelChunkHandle.T.checkCanSave.invoke(HandleConversion.toChunkHandle(chunk));
     }
 
     /**
@@ -433,6 +431,6 @@ public class ChunkUtil {
      * @return collection of Block States (mutable)
      */
     public static Collection<BlockState> getBlockStates(org.bukkit.Chunk chunk) {
-        return ChunkHandle.fromBukkit(chunk).getTileEntities();
+        return LevelChunkHandle.fromBukkit(chunk).getTileEntities();
     }
 }

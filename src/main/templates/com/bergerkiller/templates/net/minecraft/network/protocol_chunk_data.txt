@@ -1,8 +1,8 @@
 package net.minecraft.network.protocol.game;
 
-import net.minecraft.core.SectionPosition;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.level.block.entity.TileEntityTypes;
+import net.minecraft.core.SectionPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
@@ -15,8 +15,8 @@ optional class ClientboundLevelChunkPacketData {
     //       we need the chunk x/z for deserialization purposes.
 
     optional class ClientboundLevelChunkPacketData.BlockEntityData {
-        final (BlockStateType) TileEntityTypes<?> type;
-        final (CommonTagCompound) NBTTagCompound tag;
+        final (BlockStateType) BlockEntityType<?> type;
+        final (CommonTagCompound) CompoundTag tag;
 
         public IntVector3 getPosition(int chunkX, int chunkZ) {
 #if version >= 1.18
@@ -34,9 +34,9 @@ optional class ClientboundLevelChunkPacketData {
             return new IntVector3(x, y, z);
         }
 
-        public static Object encodeRaw(IntVector3 position, (BlockStateType) TileEntityTypes<?> type, (CommonTagCompound) NBTTagCompound tag) {
+        public static Object encodeRaw(IntVector3 position, (BlockStateType) BlockEntityType<?> type, (CommonTagCompound) CompoundTag tag) {
 #if version >= 1.18
-            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityData private ClientboundLevelChunkPacketData.BlockEntityData createData:<init>(int packedXZ, int y, TileEntityTypes<?> type, NBTTagCompound tag);
+            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityData private ClientboundLevelChunkPacketData.BlockEntityData createData:<init>(int packedXZ, int y, BlockEntityType<?> type, CompoundTag tag);
 #endif
 
             // If tag is empty, make null
@@ -44,7 +44,7 @@ optional class ClientboundLevelChunkPacketData {
                 tag = null;
             }
 
-            int packedXZ = (SectionPosition.sectionRelative(position.x) << 4) | SectionPosition.sectionRelative(position.z);
+            int packedXZ = (SectionPos.sectionRelative(position.x) << 4) | SectionPos.sectionRelative(position.z);
             return #createData(packedXZ, position.y, type, tag);
         }
     }

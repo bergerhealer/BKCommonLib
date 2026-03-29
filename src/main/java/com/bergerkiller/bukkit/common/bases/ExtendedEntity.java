@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.generated.net.minecraft.world.entity.MobHandle;
 import org.bukkit.Chunk;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
@@ -31,20 +32,18 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.resources.ResourceCategory;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityInsentientHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftSoundHandle;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 
@@ -395,7 +394,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         if (world == this.getWorld()) {
             return;
         }
-        this.handle.setWorld(WorldHandle.fromBukkit(world));
+        this.handle.setWorld(LevelHandle.fromBukkit(world));
     }
 
     public void setDead(boolean dead) {
@@ -721,7 +720,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 
     public boolean hasPlayerPassenger() {
         for (EntityHandle handle : handle.getPassengers()) {
-            if (EntityPlayerHandle.T.isAssignableFrom(handle.getRaw())) {
+            if (ServerPlayerHandle.T.isAssignableFrom(handle.getRaw())) {
                 return true;
             }
         }
@@ -769,7 +768,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      */
     public boolean isSpawned() {
         if (handle != null) {
-            WorldHandle world = handle.getWorld();
+            LevelHandle world = handle.getWorld();
             if (world != null) {
                 return world.getEntityById(handle.getIdField()) == this.getEntity();
             }
@@ -782,7 +781,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
             return entity.getWorld();
         } catch (Throwable t) {
             // Come on, this really never happens! It is also slower.
-            WorldHandle wHandle = handle.getWorld();
+            LevelHandle wHandle = handle.getWorld();
             return wHandle != null ? wHandle.getWorld() : null;
         }
     }
@@ -831,8 +830,8 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return Leash holder
      */
     public org.bukkit.entity.Entity getLeashHolder() {
-        if (handle.isInstanceOf(EntityInsentientHandle.T)) {
-            EntityInsentientHandle insHandle = EntityInsentientHandle.createHandle(handle.getRaw());
+        if (handle.isInstanceOf(MobHandle.T)) {
+            MobHandle insHandle = MobHandle.createHandle(handle.getRaw());
             EntityHandle holder = insHandle.getLeashHolder();
             if (holder != null) {
                 return holder.getBukkitEntity();

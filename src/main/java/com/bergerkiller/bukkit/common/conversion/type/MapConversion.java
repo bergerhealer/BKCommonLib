@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.conversion.type;
 import com.bergerkiller.bukkit.common.map.MapMarker;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapDecorationTypeHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapIconHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapDecorationHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import org.bukkit.map.MapCursor;
 
@@ -14,12 +14,12 @@ public class MapConversion {
 
     @ConverterMethod(output="net.minecraft.world.level.saveddata.maps.MapIcon")
     public static Object toMapIconHandle(MapCursor cursor) {
-        return MapIconHandle.fromCursor(cursor).getRaw();
+        return MapDecorationHandle.fromCursor(cursor).getRaw();
     }
 
     @ConverterMethod(input="net.minecraft.world.level.saveddata.maps.MapIcon")
     public static MapCursor toMapCursor(Object nmsMapCursorHandle) {
-        return MapIconHandle.createHandle(nmsMapCursorHandle).toCursor();
+        return MapDecorationHandle.createHandle(nmsMapCursorHandle).toCursor();
     }
 
     @ConverterMethod(input="net.minecraft.core.Holder<net.minecraft.world.level.saveddata.maps.MapDecorationType>", optional=true)

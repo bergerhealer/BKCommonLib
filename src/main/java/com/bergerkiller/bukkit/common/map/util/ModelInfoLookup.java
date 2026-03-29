@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.map.util;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import org.bukkit.Material;
@@ -15,8 +16,7 @@ import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 import com.bergerkiller.bukkit.common.wrappers.ItemRenderOptions;
-import com.bergerkiller.generated.net.minecraft.core.RegistryMaterialsHandle;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.core.MappedRegistryHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
 
 import java.util.Arrays;
@@ -31,7 +31,7 @@ import java.util.Optional;
  * This is needed because Minecraft is really stupid sometimes
  */
 public class ModelInfoLookup {
-    private static final MinecraftKeyHandle MISSING_MODEL_NAME = MinecraftKeyHandle.createNew("minecraft", "builtin/missing");
+    private static final IdentifierHandle MISSING_MODEL_NAME = IdentifierHandle.createNew("minecraft", "builtin/missing");
     private static final Map<Material, List<ModelNameEntry>> byMaterial = new EnumMap<>(Material.class);
     private static final Map<String, ModelNameEntry> byItemName = new HashMap<>();
     private static final Map<String, ModelNameEntry> byBlockName = new HashMap<>();
@@ -190,7 +190,7 @@ public class ModelInfoLookup {
 
         // Try to create a dummy ItemStack with the custom_model data component set
         if (CommonCapabilities.HAS_ITEM_MODEL_COMPONENT) {
-            MinecraftKeyHandle key = MinecraftKeyHandle.createNew(itemModelName);
+            IdentifierHandle key = IdentifierHandle.createNew(itemModelName);
             if (key != null) {
                 Material type = CommonPlugin.hasInstance()
                         ? CommonPlugin.getInstance().getFallbackItemModelType()
@@ -238,7 +238,7 @@ public class ModelInfoLookup {
      * @param itemStack CommonItemStack
      * @return Set item model name key
      */
-    public static MinecraftKeyHandle lookupVanillaItemModel(CommonItemStack itemStack) {
+    public static IdentifierHandle lookupVanillaItemModel(CommonItemStack itemStack) {
         return lookupItemModelNameEntry(itemStack).getItemNameKey()
                 .orElse(MISSING_MODEL_NAME);
     }
@@ -272,7 +272,7 @@ public class ModelInfoLookup {
             }
 
             @Override
-            public Optional<MinecraftKeyHandle> getItemNameKey() {
+            public Optional<IdentifierHandle> getItemNameKey() {
                 return Optional.empty();
             }
 
@@ -306,7 +306,7 @@ public class ModelInfoLookup {
          *
          * @return Item model name as MinecraftKey
          */
-        Optional<MinecraftKeyHandle> getItemNameKey();
+        Optional<IdentifierHandle> getItemNameKey();
 
         /**
          * Returns the block name, if this entry has a block
@@ -364,7 +364,7 @@ public class ModelInfoLookup {
         private final Material inkSacMaterial;
         private final int damageValue;
         private final String itemName;
-        private final MinecraftKeyHandle itemNameKey;
+        private final IdentifierHandle itemNameKey;
 
         public static List<ModelNameEntry> createLegacyInkSacMaterials(Material inkSacItemMaterial) {
             return Arrays.asList(
@@ -391,7 +391,7 @@ public class ModelInfoLookup {
             this.inkSacMaterial = inkSacMaterial;
             this.damageValue = damageValue;
             this.itemName = "dye_" + colorName;
-            this.itemNameKey = MinecraftKeyHandle.createNew("minecraft", this.itemName);
+            this.itemNameKey = IdentifierHandle.createNew("minecraft", this.itemName);
         }
 
         @Override
@@ -405,7 +405,7 @@ public class ModelInfoLookup {
         }
 
         @Override
-        public Optional<MinecraftKeyHandle> getItemNameKey() {
+        public Optional<IdentifierHandle> getItemNameKey() {
             return Optional.of(itemNameKey);
         }
 
@@ -433,7 +433,7 @@ public class ModelInfoLookup {
         private final Material fishItemMaterial;
         private final int damageValue;
         private final String itemName;
-        private final MinecraftKeyHandle itemNameKey;
+        private final IdentifierHandle itemNameKey;
 
         public static List<ModelNameEntry> createLegacyFishMaterials(Material fishItemMaterial, boolean cooked) {
             return Arrays.asList(
@@ -448,7 +448,7 @@ public class ModelInfoLookup {
             this.fishItemMaterial = fishItemMaterial;
             this.damageValue = damageValue;
             this.itemName = (cooked ? "cooked_" : "") + fishName;
-            this.itemNameKey = MinecraftKeyHandle.createNew("minecraft", this.itemName);
+            this.itemNameKey = IdentifierHandle.createNew("minecraft", this.itemName);
         }
 
         @Override
@@ -462,7 +462,7 @@ public class ModelInfoLookup {
         }
 
         @Override
-        public Optional<MinecraftKeyHandle> getItemNameKey() {
+        public Optional<IdentifierHandle> getItemNameKey() {
             return Optional.of(itemNameKey);
         }
 
@@ -490,13 +490,13 @@ public class ModelInfoLookup {
     private static class ItemModelNameEntry implements ModelNameEntry {
         public final Material itemMaterial;
         public final String itemName;
-        private final MinecraftKeyHandle itemNameKey;
+        private final IdentifierHandle itemNameKey;
 
         // Note: only for non-block materials!
         public ItemModelNameEntry(Material itemMaterial) {
             this.itemMaterial = itemMaterial;
             this.itemName = lookupItemResourceName(itemMaterial);
-            this.itemNameKey = MinecraftKeyHandle.createNew("minecraft", this.itemName);
+            this.itemNameKey = IdentifierHandle.createNew("minecraft", this.itemName);
         }
 
         @Override
@@ -510,7 +510,7 @@ public class ModelInfoLookup {
         }
 
         @Override
-        public Optional<MinecraftKeyHandle> getItemNameKey() {
+        public Optional<IdentifierHandle> getItemNameKey() {
             return Optional.of(itemNameKey);
         }
 
@@ -528,8 +528,8 @@ public class ModelInfoLookup {
             String itemName;
 
             Object itemHandle = HandleConversion.toItemHandle(itemMaterial);
-            Object minecraftKey = RegistryMaterialsHandle.T.getKey.invoke(ItemHandle.getRegistry(), itemHandle);
-            itemName = MinecraftKeyHandle.T.getName.invoke(minecraftKey);
+            Object minecraftKey = MappedRegistryHandle.T.getKey.invoke(ItemHandle.getRegistry(), itemHandle);
+            itemName = IdentifierHandle.T.getName.invoke(minecraftKey);
 
             // Perform renames needed to get the correct item model name
             String typeName = CommonLegacyMaterials.getMaterialName(itemMaterial);
@@ -555,7 +555,7 @@ public class ModelInfoLookup {
         public final BlockData blockData;
         public final String blockName;
         public final String itemName;
-        public final MinecraftKeyHandle itemNameKey;
+        public final IdentifierHandle itemNameKey;
 
         public BlockDataModelNameEntry(BlockData blockData) {
             this.blockData = blockData;
@@ -571,7 +571,7 @@ public class ModelInfoLookup {
             } else {
                 itemName = blockName;
             }
-            itemNameKey = MinecraftKeyHandle.createNew("minecraft", itemName);
+            itemNameKey = IdentifierHandle.createNew("minecraft", itemName);
         }
 
         @Override
@@ -585,7 +585,7 @@ public class ModelInfoLookup {
         }
 
         @Override
-        public Optional<MinecraftKeyHandle> getItemNameKey() {
+        public Optional<IdentifierHandle> getItemNameKey() {
             return Optional.of(itemNameKey);
         }
 

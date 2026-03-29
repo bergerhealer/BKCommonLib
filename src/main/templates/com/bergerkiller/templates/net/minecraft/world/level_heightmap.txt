@@ -1,34 +1,34 @@
 package net.minecraft.world.level.levelgen;
 
-import net.minecraft.core.BlockPosition;
-import net.minecraft.core.BlockPosition$MutableBlockPosition;
-import net.minecraft.util.DataBits;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockPos$MutableBlockPos;
+import net.minecraft.util.BitStorage;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.IBlockData;
-import net.minecraft.world.level.chunk.Chunk;
-import net.minecraft.world.level.chunk.IChunkAccess;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.ChunkAccess;
 
 import io.github.opencubicchunks.cubicchunks.api.world.ICubicWorld;
 
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.LevelChunkHandle;
 
-class HeightMap {
+class Heightmap {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
 #if version >= 1.17
-    #require net.minecraft.world.level.levelgen.HeightMap private final IChunkAccess chunk;
+    #require net.minecraft.world.level.levelgen.Heightmap private final ChunkAccess chunk;
 #elseif version >= 1.14
-    #require net.minecraft.world.level.levelgen.HeightMap private final IChunkAccess chunk:e;
+    #require net.minecraft.world.level.levelgen.Heightmap private final ChunkAccess chunk:e;
 #elseif version >= 1.13
-    #require net.minecraft.world.level.levelgen.HeightMap private final IChunkAccess chunk:c;
+    #require net.minecraft.world.level.levelgen.Heightmap private final ChunkAccess chunk:c;
 #endif
 
-    public (ChunkHandle) Chunk getChunk() {
+    public (LevelChunkHandle) LevelChunk getChunk() {
 #if version >= 1.13
-        return (Chunk) instance#chunk;
+        return (LevelChunk) instance#chunk;
 #else
-        return (Chunk) instance.chunk;
+        return (LevelChunk) instance.chunk;
 #endif
     }
 
@@ -47,44 +47,44 @@ class HeightMap {
     // Since version 1.14 the heightmap is no longer used for light calculations
     // We have to recalculate one ourselves, with our own rules
     public void initialize() {
-  #if exists net.minecraft.world.level.levelgen.HeightMap private final char[] heightmap;
+  #if exists net.minecraft.world.level.levelgen.Heightmap private final char[] heightmap;
         // Tuinity
-        #require net.minecraft.world.level.levelgen.HeightMap private final char[] databits:heightmap;
+        #require net.minecraft.world.level.levelgen.Heightmap private final char[] databits:heightmap;
         char[] databits = instance#databits;
   #else
         // Standard spigot
     #if version >= 1.17
-        #require net.minecraft.world.level.levelgen.HeightMap private final DataBits databits:data;
+        #require net.minecraft.world.level.levelgen.Heightmap private final BitStorage databits:data;
     #else
-        #require net.minecraft.world.level.levelgen.HeightMap private final DataBits databits:c;
+        #require net.minecraft.world.level.levelgen.Heightmap private final BitStorage databits:c;
     #endif
-        DataBits databits = instance#databits;
+        BitStorage databits = instance#databits;
   #endif
 
-        IChunkAccess ichunkaccess = instance#chunk;
+        ChunkAccess ichunkaccess = instance#chunk;
         int databits_index = 0;
   #if version >= 1.18
-        org.bukkit.World world = ((Chunk) ichunkaccess).getLevel().getWorld();
-        int startX = ((Chunk) ichunkaccess).getPos().x << 4;
+        org.bukkit.World world = ((LevelChunk) ichunkaccess).getLevel().getWorld();
+        int startX = ((LevelChunk) ichunkaccess).getPos().x << 4;
         int startY = ichunkaccess.getHighestSectionPosition() + 15;
-        int startZ = ((Chunk) ichunkaccess).getPos().z << 4;
+        int startZ = ((LevelChunk) ichunkaccess).getPos().z << 4;
   #else
-        org.bukkit.World world = ((Chunk) ichunkaccess).getWorld().getWorld();
-        int startX = ((Chunk) ichunkaccess).getPos().x << 4;
+        org.bukkit.World world = ((LevelChunk) ichunkaccess).getWorld().getWorld();
+        int startX = ((LevelChunk) ichunkaccess).getPos().x << 4;
         int startY = ichunkaccess.b() + 15;
-        int startZ = ((Chunk) ichunkaccess).getPos().z << 4;
+        int startZ = ((LevelChunk) ichunkaccess).getPos().z << 4;
   #endif
-        BlockPosition$MutableBlockPosition blockposition = new BlockPosition$MutableBlockPosition();
+        BlockPos$MutableBlockPos blockposition = new BlockPos$MutableBlockPos();
         for (int z = 0; z < 16; ++z) {
             for (int x = 0; x < 16; ++x) {
                 int y = startY;
                 while (y > 0) {
   #if version >= 1.18
                     blockposition.set(x, y, z);
-                    IBlockData iblockdata = ichunkaccess.getBlockState((BlockPosition) blockposition);
+                    BlockState iblockdata = ichunkaccess.getBlockState((BlockPos) blockposition);
   #else
                     blockposition.d(x, y, z);
-                    IBlockData iblockdata = ichunkaccess.getType((BlockPosition) blockposition);
+                    BlockState iblockdata = ichunkaccess.getType((BlockPos) blockposition);
   #endif
 
                     // Optimization for air blocks
@@ -128,7 +128,7 @@ class HeightMap {
   #endif
 
                 // Store the value
-  #if exists net.minecraft.world.level.levelgen.HeightMap private final char[] heightmap;
+  #if exists net.minecraft.world.level.levelgen.Heightmap private final char[] heightmap;
                 // Tuinity
                 databits[databits_index++] = (char) (y+1);
   #elseif version >= 1.18
@@ -154,17 +154,17 @@ class HeightMap {
         // Do not do this when this is a CubicChunks world (!!!)
   #if exists io.github.opencubicchunks.cubicchunks.api.world.ICube
         {
-            World world = ((Chunk) instance.chunk).getWorld();
+            World world = ((LevelChunk) instance.chunk).getWorld();
             if (world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld()) {
                 return;
             }
         }
   #endif
 
-        com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightMapHandle handle;
-        handle = com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightMapHandle.createHandle(instance);
+        com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightmapHandle handle;
+        handle = com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightmapHandle.createHandle(instance);
 
-        ChunkHandle chunkHandle = handle.getChunk();
+        LevelChunkHandle chunkHandle = handle.getChunk();
         org.bukkit.World world = chunkHandle.getBukkitChunk().getWorld();
         int baseX = chunkHandle.getLocX() << 4;
         int baseZ = chunkHandle.getLocZ() << 4;

@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.BlockStateHandle;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.material.Attachable;
@@ -23,7 +24,6 @@ import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
@@ -145,7 +145,7 @@ public class IBlockDataToMaterialData {
             MaterialData materialdata = new MaterialData(MaterialsByName.getMaterial("LEGACY_DOUBLE_STEP"));
             for (byte data = 0; data < 8; data++) {
                 materialdata.setData(data);
-                IBlockDataHandle iblockdata = MaterialDataToIBlockData.getIBlockData(materialdata);
+                BlockStateHandle iblockdata = MaterialDataToIBlockData.getIBlockData(materialdata);
                 storeMaterialData(iblockdata.set("waterlogged", true), materialdata);
                 storeMaterialData(iblockdata.set("waterlogged", false), materialdata);
             }
@@ -166,7 +166,7 @@ public class IBlockDataToMaterialData {
                 }
 
                 @Override
-                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Button button) {
+                public List<BlockStateHandle> createStates(BlockStateHandle iblockdata, org.bukkit.material.Button button) {
                     iblockdata = iblockdata.set("powered", button.isPowered());
 
                     BlockFace facing = button.getFacing();
@@ -209,7 +209,7 @@ public class IBlockDataToMaterialData {
                 }
 
                 @Override
-                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Lever button) {
+                public List<BlockStateHandle> createStates(BlockStateHandle iblockdata, org.bukkit.material.Lever button) {
                     iblockdata = iblockdata.set("powered", button.isPowered());
 
                     BlockFace attached = button.getAttachedFace();
@@ -250,7 +250,7 @@ public class IBlockDataToMaterialData {
                 }
 
                 @Override
-                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.PressurePlate plate) {
+                public List<BlockStateHandle> createStates(BlockStateHandle iblockdata, org.bukkit.material.PressurePlate plate) {
                     return Arrays.asList(iblockdata.set("powered", plate.isPressed()));
                 }
             }.setTypes("JUNGLE_PRESSURE_PLATE", "SPRUCE_PRESSURE_PLATE", "ACACIA_PRESSURE_PLATE",
@@ -285,7 +285,7 @@ public class IBlockDataToMaterialData {
                 }
 
                 @Override
-                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Furnace furnace) {
+                public List<BlockStateHandle> createStates(BlockStateHandle iblockdata, org.bukkit.material.Furnace furnace) {
                     return Collections.singletonList(iblockdata.set("facing", furnace.getFacing()).set("lit", burning));
                 }
             }.setTypes("FURNACE")
@@ -302,7 +302,7 @@ public class IBlockDataToMaterialData {
                 }
 
                 @Override
-                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Torch torch) {
+                public List<BlockStateHandle> createStates(BlockStateHandle iblockdata, org.bukkit.material.Torch torch) {
                     return Collections.singletonList(iblockdata.set("facing", torch.getFacing()));
                 }
             }.setTypes("WALL_TORCH")
@@ -324,7 +324,7 @@ public class IBlockDataToMaterialData {
                 }
 
                 @Override
-                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.RedstoneTorch torch) {
+                public List<BlockStateHandle> createStates(BlockStateHandle iblockdata, org.bukkit.material.RedstoneTorch torch) {
                     return Collections.singletonList(iblockdata.set("facing", torch.getFacing()).set("lit", lit));
                 }
             }.setTypes("REDSTONE_WALL_TORCH")
@@ -342,9 +342,9 @@ public class IBlockDataToMaterialData {
                 }
 
                 @Override
-                public List<IBlockDataHandle> createStates(IBlockDataHandle wire_data, org.bukkit.material.RedstoneWire wire) {
+                public List<BlockStateHandle> createStates(BlockStateHandle wire_data, org.bukkit.material.RedstoneWire wire) {
                     final String[] SIDE_VALUES = {"up", "side", "none"};
-                    ArrayList<IBlockDataHandle> variants = new ArrayList<IBlockDataHandle>(3*3*3*3);
+                    ArrayList<BlockStateHandle> variants = new ArrayList<BlockStateHandle>(3*3*3*3);
                     wire_data = wire_data.set("power", wire.getData());
                     for (String side_north : SIDE_VALUES) {
                         wire_data = wire_data.set("north", side_north);
@@ -394,7 +394,7 @@ public class IBlockDataToMaterialData {
                     }
 
                     @Override
-                    public List<IBlockDataHandle> createStates(IBlockDataHandle chest_data, org.bukkit.material.DirectionalContainer chest) {
+                    public List<BlockStateHandle> createStates(BlockStateHandle chest_data, org.bukkit.material.DirectionalContainer chest) {
                         chest_data = chest_data.set("facing", chest.getFacing());
                         return Arrays.asList(
                                 chest_data.set("waterlogged", true).set("type", "SINGLE"),
@@ -431,8 +431,8 @@ public class IBlockDataToMaterialData {
                 }
 
                 @Override
-                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Ladder ladder) {
-                    IBlockDataHandle base = iblockdata.set("facing", ladder.getFacing());
+                public List<BlockStateHandle> createStates(BlockStateHandle iblockdata, org.bukkit.material.Ladder ladder) {
+                    BlockStateHandle base = iblockdata.set("facing", ladder.getFacing());
                     return Arrays.asList(base.set("waterlogged", false), base.set("waterlogged", true));
                 }
             }.setTypes("LADDER")
@@ -450,8 +450,8 @@ public class IBlockDataToMaterialData {
                     }
 
                     @Override
-                    public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Sign sign) {
-                        IBlockDataHandle base = iblockdata.set("facing", sign.getFacing());
+                    public List<BlockStateHandle> createStates(BlockStateHandle iblockdata, org.bukkit.material.Sign sign) {
+                        BlockStateHandle base = iblockdata.set("facing", sign.getFacing());
                         return Arrays.asList(base.set("waterlogged", false), base.set("waterlogged", true));
                     }
 
@@ -489,8 +489,8 @@ public class IBlockDataToMaterialData {
                     }
 
                     @Override
-                    public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Sign sign) {
-                        IBlockDataHandle base = iblockdata.set("rotation", sign.getData());
+                    public List<BlockStateHandle> createStates(BlockStateHandle iblockdata, org.bukkit.material.Sign sign) {
+                        BlockStateHandle base = iblockdata.set("rotation", sign.getData());
                         return Arrays.asList(base.set("waterlogged", false), base.set("waterlogged", true));
                     }
 
@@ -528,8 +528,8 @@ public class IBlockDataToMaterialData {
                     }
 
                     @Override
-                    public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Sign sign) {
-                        IBlockDataHandle base = iblockdata.set("facing", sign.getFacing());
+                    public List<BlockStateHandle> createStates(BlockStateHandle iblockdata, org.bukkit.material.Sign sign) {
+                        BlockStateHandle base = iblockdata.set("facing", sign.getFacing());
                         return Arrays.asList(base.set("waterlogged", false), base.set("waterlogged", true));
                     }
                 }.setTypes("WALL_SIGN",
@@ -547,8 +547,8 @@ public class IBlockDataToMaterialData {
                     }
 
                     @Override
-                    public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Sign sign) {
-                        IBlockDataHandle base = iblockdata.set("rotation", sign.getData());
+                    public List<BlockStateHandle> createStates(BlockStateHandle iblockdata, org.bukkit.material.Sign sign) {
+                        BlockStateHandle base = iblockdata.set("rotation", sign.getData());
                         return Arrays.asList(base.set("waterlogged", false), base.set("waterlogged", true));
                     }
                 }.setTypes("SIGN",
@@ -567,7 +567,7 @@ public class IBlockDataToMaterialData {
                 }
 
                 @Override
-                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, CommonTargetDataFix target) {
+                public List<BlockStateHandle> createStates(BlockStateHandle iblockdata, CommonTargetDataFix target) {
                     return Collections.singletonList(iblockdata.set("power", Integer.valueOf(target.getData())));
                 }
             }.setTypes("TARGET")
@@ -593,7 +593,7 @@ public class IBlockDataToMaterialData {
                 }
 
                 @Override
-                protected IBlockDataHandle apply(IBlockDataHandle iblockdata, org.bukkit.material.DetectorRail rails) {
+                protected BlockStateHandle apply(BlockStateHandle iblockdata, org.bukkit.material.DetectorRail rails) {
                     return iblockdata.set("powered", rails.isPressed());
                 }
             }.build();
@@ -604,7 +604,7 @@ public class IBlockDataToMaterialData {
                 }
 
                 @Override
-                protected IBlockDataHandle apply(IBlockDataHandle iblockdata, org.bukkit.material.PoweredRail rails) {
+                protected BlockStateHandle apply(BlockStateHandle iblockdata, org.bukkit.material.PoweredRail rails) {
                     return iblockdata.set("powered", rails.isPowered());
                 }
             }.build();
@@ -615,7 +615,7 @@ public class IBlockDataToMaterialData {
                 }
 
                 @Override
-                protected IBlockDataHandle apply(IBlockDataHandle iblockdata, org.bukkit.material.PoweredRail rails) {
+                protected BlockStateHandle apply(BlockStateHandle iblockdata, org.bukkit.material.PoweredRail rails) {
                     return iblockdata.set("powered", rails.isPowered());
                 }
             }.build();
@@ -630,9 +630,9 @@ public class IBlockDataToMaterialData {
                 }
 
                 @Override
-                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, CommonHangingSignDataFix target) {
-                    List<IBlockDataHandle> states = new ArrayList<>(4);
-                    IBlockDataHandle base = iblockdata.set("rotation", Integer.valueOf(target.getData()));
+                public List<BlockStateHandle> createStates(BlockStateHandle iblockdata, CommonHangingSignDataFix target) {
+                    List<BlockStateHandle> states = new ArrayList<>(4);
+                    BlockStateHandle base = iblockdata.set("rotation", Integer.valueOf(target.getData()));
                     for (boolean waterlogged : new boolean[] {false, true}) {
                         base = base.set("waterlogged", waterlogged);
                         for (boolean attached : new boolean[] {false, true}) {
@@ -665,8 +665,8 @@ public class IBlockDataToMaterialData {
                 }
 
                 @Override
-                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, CommonHangingSignDataFix target) {
-                    IBlockDataHandle base = iblockdata.set("facing", target.getFacing());
+                public List<BlockStateHandle> createStates(BlockStateHandle iblockdata, CommonHangingSignDataFix target) {
+                    BlockStateHandle base = iblockdata.set("facing", target.getFacing());
                     return Arrays.asList(base.set("waterlogged", false),
                                          base.set("waterlogged", true));
                 }
@@ -697,7 +697,7 @@ public class IBlockDataToMaterialData {
         }
     }
 
-    private static void storeMaterialData(IBlockDataHandle iblockdata, MaterialData materialdata) {
+    private static void storeMaterialData(BlockStateHandle iblockdata, MaterialData materialdata) {
         INTERNAL_IBLOCKDATA_TO_MATERIALDATA.put(iblockdata.getRaw(), materialdata.clone());
     }
 
@@ -735,7 +735,7 @@ public class IBlockDataToMaterialData {
      * @param iblockdata
      * @return MaterialData
      */
-    public static MaterialData getMaterialData(IBlockDataHandle iblockdata) {
+    public static MaterialData getMaterialData(BlockStateHandle iblockdata) {
         return craftbukkitGetMaterialdata.invoke(null, iblockdata.getRaw());
     }
 
@@ -792,13 +792,13 @@ public class IBlockDataToMaterialData {
             }
         }
 
-        protected IBlockDataHandle apply(IBlockDataHandle iblockdata, T rails) {
+        protected BlockStateHandle apply(BlockStateHandle iblockdata, T rails) {
             return iblockdata;
         }
 
         @Override
-        public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, T rails) {
-            IBlockDataHandle base;
+        public List<BlockStateHandle> createStates(BlockStateHandle iblockdata, T rails) {
+            BlockStateHandle base;
             BlockFace dir = rails.getDirection();
             if (rails.isOnSlope()) {
                 base = iblockdata.set("shape", "ascending_" + dir.name().toLowerCase(Locale.ENGLISH));
@@ -821,7 +821,7 @@ public class IBlockDataToMaterialData {
         MaterialData create(Material material_type, Material legacy_data_type, byte legacy_data_value);
 
         // Creates IBlockData for the default state of a Material
-        default IBlockDataHandle getIBlockData(Material material) {
+        default BlockStateHandle getIBlockData(Material material) {
             if (CommonLegacyMaterials.isLegacy(material)) {
                 material = fromLegacy(material);
             }
@@ -851,7 +851,7 @@ public class IBlockDataToMaterialData {
          * @param materialdata input state data
          * @return IBlockData state
          */
-        public abstract List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, T materialdata);
+        public abstract List<BlockStateHandle> createStates(BlockStateHandle iblockdata, T materialdata);
 
         /**
          * Sets all possible Material types of this MaterialData
@@ -907,10 +907,10 @@ public class IBlockDataToMaterialData {
             for (Material type : this.types) {
                 materialdata_builders.put(type, this);
                 T materialdata = this.create(type, type, (byte) this.data_values[0]);
-                IBlockDataHandle baseIBlockData = this.getIBlockData(type);
+                BlockStateHandle baseIBlockData = this.getIBlockData(type);
                 for (int data_value : this.data_values) {
                     materialdata.setData((byte) data_value);
-                    for (IBlockDataHandle iBlockData : this.createStates(baseIBlockData, materialdata)) {
+                    for (BlockStateHandle iBlockData : this.createStates(baseIBlockData, materialdata)) {
                         storeMaterialData(iBlockData, materialdata);
                     }
                 }

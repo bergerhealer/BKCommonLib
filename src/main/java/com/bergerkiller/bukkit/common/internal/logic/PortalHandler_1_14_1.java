@@ -19,8 +19,8 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
@@ -58,7 +58,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
                 return null;
             }
         };
-        _dummyEntityInstance = interceptor.createInstance(EntityPlayerHandle.T.getType());
+        _dummyEntityInstance = interceptor.createInstance(ServerPlayerHandle.T.getType());
     }
 
     @Override
@@ -90,7 +90,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
                     orientation,
                     initiator == null ? null : HandleConversion.toEntityHandle(initiator),
                     _dummyEntityInstance,
-                    WorldServerHandle.fromBukkit(startBlock.getWorld()).getNetherPortalCreateRadius());
+                    ServerLevelHandle.fromBukkit(startBlock.getWorld()).getNetherPortalCreateRadius());
 
             return _createdNetherPortalBlock;
         } finally {
@@ -155,7 +155,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
 
     @Override
     public void showEndCredits(Player player) {
-        EntityPlayerHandle ep = EntityPlayerHandle.fromBukkit(player);
+        ServerPlayerHandle ep = ServerPlayerHandle.fromBukkit(player);
         _pta.showEndCredits(HandleConversion.toEntityHandle(player), ep.hasSeenCredits());
         ep.setHasSeenCredits(true);
     }

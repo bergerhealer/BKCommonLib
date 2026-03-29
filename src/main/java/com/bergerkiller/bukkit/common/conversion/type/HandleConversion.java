@@ -4,6 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.bergerkiller.bukkit.common.internal.logic.ChunkHandleTracker;
+import com.bergerkiller.generated.net.minecraft.core.BlockPosHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypeHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
@@ -42,27 +46,23 @@ import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
-import com.bergerkiller.generated.net.minecraft.EnumChatFormatHandle;
-import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.ChatFormattingHandle;
 import com.bergerkiller.generated.net.minecraft.core.NonNullListHandle;
-import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.core.RotationsHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
-import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
-import com.bergerkiller.generated.net.minecraft.util.EntitySliceHandle;
-import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
+import com.bergerkiller.generated.net.minecraft.sounds.SoundSourceHandle;
+import com.bergerkiller.generated.net.minecraft.util.ClassInstanceMultiMapHandle;
+import com.bergerkiller.generated.net.minecraft.world.DifficultyHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectInstanceHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
-import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.EnumMainHandHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.HumanoidArmHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
-import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeItemStackHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.ChunkCoordIntPairHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.EnumGamemodeHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.IngredientHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.ChunkPosHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.GameTypeHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.Vec3Handle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.data.CraftBlockDataHandle;
@@ -157,8 +157,8 @@ public class HandleConversion {
 
     @ConverterMethod(output="T extends net.minecraft.world.level.block.entity.TileEntity")
     public static Object getTileEntityHandle(org.bukkit.block.Block block) {
-        Object blockPosition = BlockPositionHandle.createNew(block.getX(), block.getY(), block.getZ());
-        return WorldHandle.T.getTileEntity.raw.invoke(toWorldHandle(block.getWorld()), blockPosition);
+        Object blockPosition = BlockPosHandle.createNew(block.getX(), block.getY(), block.getZ());
+        return LevelHandle.T.getTileEntity.raw.invoke(toWorldHandle(block.getWorld()), blockPosition);
     }
 
     @ConverterMethod(output="net.minecraft.world.IInventory")
@@ -213,7 +213,7 @@ public class HandleConversion {
     @SuppressWarnings("deprecation")
     @ConverterMethod(output="net.minecraft.world.level.EnumGamemode")
     public static Object toEnumGamemodeHandle(org.bukkit.GameMode gameMode) {
-        return EnumGamemodeHandle.T.getById.raw.invoke(gameMode.getValue());
+        return GameTypeHandle.T.getById.raw.invoke(gameMode.getValue());
     }
 
     @ConverterMethod(input="org.bukkit.inventory.MainHand", output="net.minecraft.world.EnumHand", optional=true)
@@ -234,9 +234,9 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.world.entity.EnumMainHand", optional=true)
     public static Object humanHandToEnumMainHandHandle(HumanHand hand) {
         if (hand == HumanHand.LEFT) {
-            return EnumMainHandHandle.LEFT.getRaw();
+            return HumanoidArmHandle.LEFT.getRaw();
         } else {
-            return EnumMainHandHandle.RIGHT.getRaw();
+            return HumanoidArmHandle.RIGHT.getRaw();
         }
     }
 
@@ -252,27 +252,27 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.world.level.ChunkCoordIntPair")
     public static Object toChunkCoordIntPairHandle(IntVector2 intVector2) {
-        return ChunkCoordIntPairHandle.T.fromIntVector2Raw.invoker.invoke(null, intVector2);
+        return ChunkPosHandle.T.fromIntVector2Raw.invoker.invoke(null, intVector2);
     }
 
     @ConverterMethod(output="net.minecraft.core.BlockPosition")
     public static Object toBlockPositionHandle(IntVector3 intVector3) {
-        return BlockPositionHandle.T.fromIntVector3Raw.invoker.invoke(null, intVector3);
+        return BlockPosHandle.T.fromIntVector3Raw.invoker.invoke(null, intVector3);
     }
 
     @ConverterMethod(output="net.minecraft.core.BlockPosition")
     public static Object toBlockPositionHandle(Block block) {
-        return BlockPositionHandle.T.fromBukkitBlockRaw.invoker.invoke(null, block);
+        return BlockPosHandle.T.fromBukkitBlockRaw.invoker.invoke(null, block);
     }
 
     @ConverterMethod(output="net.minecraft.world.phys.Vec3D")
     public static Object toVec3DHandle(Vector vector) {
-        return Vec3DHandle.T.fromBukkitRaw.invoker.invoke(null, vector);
+        return Vec3Handle.T.fromBukkitRaw.invoker.invoke(null, vector);
     }
 
     @ConverterMethod(output="net.minecraft.core.Vector3f")
     public static Object toVector3fHandle(Vector vector) {
-        return Vector3fHandle.T.fromBukkitRaw.invoker.invoke(null, vector);
+        return RotationsHandle.T.fromBukkitRaw.invoker.invoke(null, vector);
     }
 
     @ConverterMethod(output="net.minecraft.world.entity.player.PlayerAbilities")
@@ -297,13 +297,13 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.world.EnumDifficulty")
     public static Object toEnumDifficultyHandle(Integer difficultyId) {
-        return EnumDifficultyHandle.T.getById.raw.invoke(difficultyId);
+        return DifficultyHandle.T.getById.raw.invoke(difficultyId);
     }
 
     @SuppressWarnings("deprecation")
     @ConverterMethod(output="net.minecraft.world.EnumDifficulty")
     public static Object toEnumDifficultyHandle(Difficulty difficulty) {
-        return EnumDifficultyHandle.T.getById.raw.invoke(difficulty.getValue());
+        return DifficultyHandle.T.getById.raw.invoke(difficulty.getValue());
     }
 
     @ConverterMethod(output="net.minecraft.world.level.chunk.ChunkSection")
@@ -322,12 +322,12 @@ public class HandleConversion {
         @SuppressWarnings("deprecation")
         int id = potionEffectType.getId();
 
-        return MobEffectListHandle.T.fromId.invoke(id);
+        return MobEffectHandle.T.fromId.invoke(id);
     }
 
     @ConverterMethod(output="net.minecraft.world.effect.MobEffect")
     public static Object toMobEffectHandle(PotionEffect potionEffect) {
-        return MobEffectHandle.T.fromBukkit.raw.invoke(potionEffect);
+        return MobEffectInstanceHandle.T.fromBukkit.raw.invoke(potionEffect);
     }
 
     @ConverterMethod(output="net.minecraft.world.level.MobSpawnerAbstract")
@@ -387,12 +387,12 @@ public class HandleConversion {
     // 1.12 =>
     @ConverterMethod(output="net.minecraft.world.item.crafting.RecipeItemStack", optional=true)
     public static Object toRecipeItemStackHandle(CraftInputSlot slot) {
-        return RecipeItemStackHandle.createRawRecipeItemStack(Arrays.asList(slot.getChoices()));
+        return IngredientHandle.createRawRecipeItemStack(Arrays.asList(slot.getChoices()));
     }
 
     @ConverterMethod(output="net.minecraft.resources.MinecraftKey")
     public static Object getMinecraftKeyFromName(String name) {
-        return MinecraftKeyHandle.T.createNew.raw.invoke(name);
+        return IdentifierHandle.T.createNew.raw.invoke(name);
     }
 
     @ConverterMethod(input="net.minecraft.resources.MinecraftKey")
@@ -402,14 +402,14 @@ public class HandleConversion {
 
     @ConverterMethod(input="net.minecraft.sounds.SoundCategory", optional=true)
     public static String getNameFromSoundCategory(Object soundCategoryHandle) {
-        return SoundCategoryHandle.T.getName.invoker.invoke(soundCategoryHandle);
+        return SoundSourceHandle.T.getName.invoker.invoke(soundCategoryHandle);
     }
 
     @ConverterMethod(output="net.minecraft.sounds.SoundCategory", optional=true)
     public static Object getSoundCategoryFromName(String soundCategoryName) {
-        Object result = SoundCategoryHandle.T.byName.raw.invoke(soundCategoryName);
+        Object result = SoundSourceHandle.T.byName.raw.invoke(soundCategoryName);
         if (result == null) {
-            result = SoundCategoryHandle.T.byName.raw.invoke("master");
+            result = SoundSourceHandle.T.byName.raw.invoke("master");
         }
         return result;
     }
@@ -437,9 +437,9 @@ public class HandleConversion {
     @ConverterMethod(input="net.minecraft.util.EntitySlice<?>", optional=true)
     public static List<Object> cbEntitySliceToList(Object nmsEntitySliceHandle) {
         if (CommonCapabilities.REVISED_CHUNK_ENTITY_SLICE) {
-            return new EntitySliceProxy_1_8_3<Object>(EntitySliceHandle.createHandle(nmsEntitySliceHandle));
+            return new EntitySliceProxy_1_8_3<Object>(ClassInstanceMultiMapHandle.createHandle(nmsEntitySliceHandle));
         } else {
-            return new EntitySliceProxy_1_8<Object>(EntitySliceHandle.createHandle(nmsEntitySliceHandle));
+            return new EntitySliceProxy_1_8<Object>(ClassInstanceMultiMapHandle.createHandle(nmsEntitySliceHandle));
         }
     }
 
@@ -451,7 +451,7 @@ public class HandleConversion {
         if (entitySliceList instanceof EntitySliceProxy_1_8) {
             return ((EntitySliceProxy_1_8<?>) entitySliceList).getHandle().getRaw();
         }
-        EntitySliceHandle entitySlice = EntitySliceHandle.createNew(EntityHandle.T.getType());
+        ClassInstanceMultiMapHandle entitySlice = ClassInstanceMultiMapHandle.createNew(EntityHandle.T.getType());
         for (Object value : entitySliceList) {
             entitySlice.add(value);
         }
@@ -464,7 +464,7 @@ public class HandleConversion {
     }
 
     @ConverterMethod
-    public static EntityTypesHandle toEntityTypesHandleWrapperFromEntityClass(Class<?> entityClass) {
+    public static EntityTypeHandle toEntityTypesHandleWrapperFromEntityClass(Class<?> entityClass) {
         return CommonEntityType.getNMSEntityTypeByEntityClass(entityClass);
     }
 
@@ -490,12 +490,12 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.EnumChatFormat")
     public static Object chatColorToEnumChatFormatHandle(ChatColor color) {
-        return EnumChatFormatHandle.byChar(color.getChar()).getRaw();
+        return ChatFormattingHandle.byChar(color.getChar()).getRaw();
     }
 
     @ConverterMethod
     public static int chatColorToEnumChatFormatIndex(ChatColor color) {
-        return EnumChatFormatHandle.byChar(color.getChar()).getId();
+        return ChatFormattingHandle.byChar(color.getChar()).getId();
     }
 
     @ConverterMethod

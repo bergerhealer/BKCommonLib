@@ -10,13 +10,13 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.wrappers.InteractionResult;
-import com.bergerkiller.generated.net.minecraft.CrashReportSystemDetailsHandle;
+import com.bergerkiller.generated.net.minecraft.CrashReportCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.damagesource.DamageSourceHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.storage.ValueOutputHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -114,14 +114,14 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract String getStringUUID();
     public abstract void setPosition(double x, double y, double z);
     public abstract void setSize(float width, float height);
-    public abstract AxisAlignedBBHandle getBoundingBox();
+    public abstract AABBHandle getBoundingBox();
     public abstract void setPositionRotation(double x, double y, double z, float yaw, float pitch);
     public abstract void setLocation(double x, double y, double z, float yaw, float pitch);
-    public abstract void setBoundingBox(AxisAlignedBBHandle axisalignedbb);
+    public abstract void setBoundingBox(AABBHandle axisalignedbb);
     public abstract float getHeadRotation();
     public abstract void setHeadRotation(float angle);
     public abstract boolean canCollideWith(EntityHandle otherEntity);
-    public abstract AxisAlignedBBHandle getEntityBoundingBox(EntityHandle entity);
+    public abstract AABBHandle getEntityBoundingBox(EntityHandle entity);
     public abstract void setPositionFromBoundingBox();
     public abstract void handleFireBlockTick();
     public abstract boolean isBurning();
@@ -135,7 +135,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract UUID getUniqueID();
     public abstract DataWatcher getDataWatcher();
     public abstract boolean isSneaking();
-    public abstract void appendEntityCrashDetails(CrashReportSystemDetailsHandle crashreportsystemdetails);
+    public abstract void appendEntityCrashDetails(CrashReportCategoryHandle crashreportsystemdetails);
     public abstract void onPush(double d0, double d1, double d2);
     public abstract void positionRider(Entity passenger);
     public abstract int getPortalCooldownMaximum();
@@ -149,11 +149,11 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract ChatText getCustomName();
     public abstract void collide(EntityHandle entity);
     public abstract World getBukkitWorld();
-    public abstract WorldHandle getWorld();
-    public abstract void setWorld(WorldHandle world);
+    public abstract LevelHandle getWorld();
+    public abstract void setWorld(LevelHandle world);
     public abstract Entity getBukkitEntity();
-    public com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle getWorldServer() {
-        return com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.createHandle(T.getWorld.raw.invoke(getRaw()));
+    public com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle getWorldServer() {
+        return com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle.createHandle(T.getWorld.raw.invoke(getRaw()));
     }
 
     @Deprecated
@@ -220,8 +220,8 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setLastYaw(float value);
     public abstract float getLastPitch();
     public abstract void setLastPitch(float value);
-    public abstract AxisAlignedBBHandle getBoundingBoxField();
-    public abstract void setBoundingBoxField(AxisAlignedBBHandle value);
+    public abstract AABBHandle getBoundingBoxField();
+    public abstract void setBoundingBoxField(AABBHandle value);
     public abstract boolean isOnGround();
     public abstract void setOnGround(boolean value);
     @Template.Readonly
@@ -283,7 +283,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Float pitch = new Template.Field.Float();
         public final Template.Field.Float lastYaw = new Template.Field.Float();
         public final Template.Field.Float lastPitch = new Template.Field.Float();
-        public final Template.Field.Converted<AxisAlignedBBHandle> boundingBoxField = new Template.Field.Converted<AxisAlignedBBHandle>();
+        public final Template.Field.Converted<AABBHandle> boundingBoxField = new Template.Field.Converted<AABBHandle>();
         public final Template.Field.Boolean onGround = new Template.Field.Boolean();
         @Template.Readonly
         public final Template.Field.Boolean horizontalMovementBlocked = new Template.Field.Boolean();
@@ -379,14 +379,14 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<String> getStringUUID = new Template.Method<String>();
         public final Template.Method<Void> setPosition = new Template.Method<Void>();
         public final Template.Method<Void> setSize = new Template.Method<Void>();
-        public final Template.Method.Converted<AxisAlignedBBHandle> getBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
+        public final Template.Method.Converted<AABBHandle> getBoundingBox = new Template.Method.Converted<AABBHandle>();
         public final Template.Method<Void> setPositionRotation = new Template.Method<Void>();
         public final Template.Method<Void> setLocation = new Template.Method<Void>();
         public final Template.Method.Converted<Void> setBoundingBox = new Template.Method.Converted<Void>();
         public final Template.Method<Float> getHeadRotation = new Template.Method<Float>();
         public final Template.Method<Void> setHeadRotation = new Template.Method<Void>();
         public final Template.Method.Converted<Boolean> canCollideWith = new Template.Method.Converted<Boolean>();
-        public final Template.Method.Converted<AxisAlignedBBHandle> getEntityBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
+        public final Template.Method.Converted<AABBHandle> getEntityBoundingBox = new Template.Method.Converted<AABBHandle>();
         public final Template.Method<Void> setPositionFromBoundingBox = new Template.Method<Void>();
         public final Template.Method<Void> handleFireBlockTick = new Template.Method<Void>();
         public final Template.Method<Boolean> isBurning = new Template.Method<Boolean>();
@@ -428,7 +428,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<ChatText> getCustomName = new Template.Method.Converted<ChatText>();
         public final Template.Method.Converted<Void> collide = new Template.Method.Converted<Void>();
         public final Template.Method<World> getBukkitWorld = new Template.Method<World>();
-        public final Template.Method.Converted<WorldHandle> getWorld = new Template.Method.Converted<WorldHandle>();
+        public final Template.Method.Converted<LevelHandle> getWorld = new Template.Method.Converted<LevelHandle>();
         public final Template.Method.Converted<Void> setWorld = new Template.Method.Converted<Void>();
         public final Template.Method<Entity> getBukkitEntity = new Template.Method<Entity>();
 

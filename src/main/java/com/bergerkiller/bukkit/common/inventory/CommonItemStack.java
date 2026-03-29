@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.CustomModelData;
 import com.bergerkiller.bukkit.common.wrappers.ItemRenderOptions;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
@@ -762,7 +762,7 @@ public final class CommonItemStack implements Cloneable {
      * @return set item model, or <i>null</i> if not set
      * @see ModelInfoLookup#lookupVanillaItemModel(CommonItemStack)
      */
-    public MinecraftKeyHandle getItemModel() {
+    public IdentifierHandle getItemModel() {
         if (CommonCapabilities.HAS_ITEM_MODEL_COMPONENT) {
             return getHandle(true)
                     .map(ItemStackHandle::getItemModel)
@@ -778,7 +778,7 @@ public final class CommonItemStack implements Cloneable {
      *
      * @return set item model, or <i>empty</i> if not set
      */
-    public Optional<MinecraftKeyHandle> getItemModelIfSet() {
+    public Optional<IdentifierHandle> getItemModelIfSet() {
         return getHandle(true)
                 .map(ItemStackHandle::getItemModelIfSet);
     }
@@ -791,22 +791,22 @@ public final class CommonItemStack implements Cloneable {
      *                      name or it will clear the item model. Can be null to clear the item
      *                      model of this item and reset back to vanilla.
      * @return this CommonItemStack
-     * @see MinecraftKeyHandle#isValid(String) 
+     * @see IdentifierHandle#isValid(String)
      */
     public CommonItemStack setItemModel(String itemModelName) {
         return setItemModel(itemModelName != null
-                ? MinecraftKeyHandle.createNew(itemModelName)
-                : (MinecraftKeyHandle) null);
+                ? IdentifierHandle.createNew(itemModelName)
+                : (IdentifierHandle) null);
     }
 
     /**
      * Sets a new item model key on this item.
      *
-     * @param itemModelKey MinecraftKeyHandle representing the item model key.
+     * @param itemModelKey IdentifierHandle representing the item model key.
      *                     Can be null to reset back to the vanilla item model.
      * @return this CommonItemStack
      */
-    public CommonItemStack setItemModel(MinecraftKeyHandle itemModelKey) {
+    public CommonItemStack setItemModel(IdentifierHandle itemModelKey) {
         getHandle()
                 .orElseThrow(() -> new IllegalStateException("Can not set item model on an empty item"))
                 .setItemModel(itemModelKey);
@@ -831,7 +831,7 @@ public final class CommonItemStack implements Cloneable {
      */
     public CommonItemStack mimicAsType(Material type) {
         if (CommonCapabilities.HAS_ITEM_MODEL_COMPONENT) {
-            MinecraftKeyHandle itemModel = this.getItemModel();
+            IdentifierHandle itemModel = this.getItemModel();
             setType(type);
             setItemModel(itemModel);
         }
@@ -840,7 +840,7 @@ public final class CommonItemStack implements Cloneable {
 
     /**
      * Gets whether this version of the server supports setting a custom item model override
-     * on items. If false, then {@link #setItemModel(MinecraftKeyHandle)} is a no-op.
+     * on items. If false, then {@link #setItemModel(IdentifierHandle)} is a no-op.
      *
      * @return True if item models can be set on items
      */

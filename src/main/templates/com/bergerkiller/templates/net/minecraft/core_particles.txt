@@ -1,23 +1,23 @@
 package net.minecraft.core.particles;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.MinecraftKey;
+import net.minecraft.resources.Identifier;
 
-public class Particle {
+public class ParticleType {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
 #if version >= 1.13
-    // Particle API added in MC 1.13
+    // ParticleType API added in MC 1.13
 
     public boolean hasOptions() {
-        return !(instance instanceof ParticleType);
+        return !(instance instanceof SimpleParticleType);
     }
 
     public String getName() {
   #if version >= 1.13.1
-        MinecraftKey key = BuiltInRegistries.PARTICLE_TYPE.getKey((Object) instance);
+        Identifier key = BuiltInRegistries.PARTICLE_TYPE.getKey((Object) instance);
   #else
-        MinecraftKey key = (MinecraftKey) Particle.REGISTRY.b((Object) instance);
+        Identifier key = (Identifier) ParticleType.REGISTRY.b((Object) instance);
   #endif
         if (key == null) return "";
   #if version >= 1.18
@@ -27,17 +27,17 @@ public class Particle {
   #endif
     }
 
-    public static (Object) Particle byName(String name) {
-        MinecraftKey key;
+    public static (Object) ParticleType byName(String name) {
+        Identifier key;
         try {
-            key = #parseMinecraftKey(name);
-        } catch (net.minecraft.ResourceKeyInvalidException ex) {
+            key = #parseIdentifier(name);
+        } catch (net.minecraft.ResourceLocationException ex) {
             return null;
         }
   #if version >= 1.21.2
-        return (Particle) BuiltInRegistries.PARTICLE_TYPE.getValue(key);
+        return (ParticleType) BuiltInRegistries.PARTICLE_TYPE.getValue(key);
   #else
-        return (Particle) BuiltInRegistries.PARTICLE_TYPE.get(key);
+        return (ParticleType) BuiltInRegistries.PARTICLE_TYPE.get(key);
   #endif
     }
 
@@ -52,12 +52,12 @@ public class Particle {
     // ParticleEnum only, hardcoded stuff
 
     public boolean hasOptions() {
-        if (instance == Particles.BLOCK_CRACK) return true;
-        if (instance == Particles.BLOCK_DUST) return true;
-        if (instance == Particles.ITEM_CRACK) return true;
-        if (instance == Particles.REDSTONE) return true;
+        if (instance == ParticleTypes.BLOCK_CRACK) return true;
+        if (instance == ParticleTypes.BLOCK_DUST) return true;
+        if (instance == ParticleTypes.ITEM_CRACK) return true;
+        if (instance == ParticleTypes.REDSTONE) return true;
   #if version >= 1.10
-        if (instance == Particles.FALLING_DUST) return true;
+        if (instance == ParticleTypes.FALLING_DUST) return true;
   #endif
         return false;
     }
@@ -76,13 +76,13 @@ public class Particle {
   #endif
 
   #if version >= 1.9
-    public static (Object) Particle byName:a(String name);
+    public static (Object) ParticleType byName:a(String name);
   #else
-    public static (Object) Particle byName(String name) {
-        Particle[] all_values = Particle.values();
+    public static (Object) ParticleType byName(String name) {
+        ParticleType[] all_values = ParticleType.values();
         int len = all_values.length;
         for (int i = 0; i < len; ++i) {
-            Particle particle = all_values[i];
+            ParticleType particle = all_values[i];
             String n = particle.b();
             int len = n.length();
             if (len > 0 && n.charAt(len-1) == '_') {
@@ -97,7 +97,7 @@ public class Particle {
   #endif
 
     public static java.util.List<?> values() {
-        return java.util.Arrays.asList(Particle.values());
+        return java.util.Arrays.asList(ParticleType.values());
     }
 #endif
 }

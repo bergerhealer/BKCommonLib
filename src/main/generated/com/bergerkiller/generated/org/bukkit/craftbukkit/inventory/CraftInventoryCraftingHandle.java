@@ -18,8 +18,8 @@ public abstract class CraftInventoryCraftingHandle extends Template.Handle {
         return T.createHandle(handleInstance);
     }
 
-    public static final CraftingInventory createNew(Object nmsInventoryCrafting, Object nmsResultIInventory) {
-        return T.constr_nmsInventoryCrafting_nmsResultIInventory.newInstance(nmsInventoryCrafting, nmsResultIInventory);
+    public static final CraftingInventory createNew(Object nmsInventoryCrafting, Object nmsResultContainer) {
+        return T.constr_nmsInventoryCrafting_nmsResultContainer.newInstance(nmsInventoryCrafting, nmsResultContainer);
     }
 
     /* ============================================================================== */
@@ -29,7 +29,7 @@ public abstract class CraftInventoryCraftingHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class CraftInventoryCraftingClass extends Template.Class<CraftInventoryCraftingHandle> {
-        public final Template.Constructor.Converted<CraftingInventory> constr_nmsInventoryCrafting_nmsResultIInventory = new Template.Constructor.Converted<CraftingInventory>();
+        public final Template.Constructor.Converted<CraftingInventory> constr_nmsInventoryCrafting_nmsResultContainer = new Template.Constructor.Converted<CraftingInventory>();
 
     }
 

@@ -4,12 +4,12 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 
 /**
  * Vanilla Minecraft region file behavior
@@ -33,7 +33,7 @@ abstract class RegionHandlerVanilla extends RegionHandler {
     public Set<IntVector3> getRegions3ForXZ(World world, Set<IntVector2> regionXZCoordinates) {
         // Figure out the minimum/maximum region y coordinate
         // Since Minecraft 1.17 there can be more than one region (32 chunks) vertically
-        WorldHandle worldHandle = WorldHandle.fromBukkit(world);
+        LevelHandle worldHandle = LevelHandle.fromBukkit(world);
         int minRegionY = worldHandle.getMinBuildHeight() >> 9;
         int maxRegionY = (worldHandle.getMaxBuildHeight()-1) >> 9;
 

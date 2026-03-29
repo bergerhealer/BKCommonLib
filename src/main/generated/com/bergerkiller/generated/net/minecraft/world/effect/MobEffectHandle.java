@@ -1,9 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.world.effect;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
-import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.world.effect.MobEffect</b>.
@@ -22,40 +21,39 @@ public abstract class MobEffectHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static MobEffectHandle fromNBT(CommonTagCompound compound) {
-        return T.fromNBT.invoke(compound);
+    public static MobEffectHandle fromBukkit(PotionEffectType effectType) {
+        return T.fromBukkit.invoke(effectType);
     }
 
-    public static MobEffectHandle fromBukkit(PotionEffect effect) {
-        return T.fromBukkit.invoke(effect);
+    public static Holder<MobEffectHandle> holderFromBukkit(PotionEffectType effectType) {
+        return T.holderFromBukkit.invoke(effectType);
     }
 
-    public abstract PotionEffect toBukkit();
-    public abstract Holder<MobEffectListHandle> getEffectList();
-    public abstract void setEffectList(Holder<MobEffectListHandle> value);
-    public abstract int getDuration();
-    public abstract void setDuration(int value);
-    public abstract int getAmplifier();
-    public abstract void setAmplifier(int value);
-    public abstract boolean isAmbient();
-    public abstract void setAmbient(boolean value);
-    public abstract boolean isParticles();
-    public abstract void setParticles(boolean value);
+    public static PotionEffectType holderToBukkit(Holder<MobEffectHandle> mobEffectList) {
+        return T.holderToBukkit.invoke(mobEffectList);
+    }
+
+    public static int getId(MobEffectHandle mobeffectlist) {
+        return T.getId.invoke(mobeffectlist);
+    }
+
+    public static MobEffectHandle fromId(int id) {
+        return T.fromId.invoke(id);
+    }
+
+    public abstract PotionEffectType toBukkit();
     /**
      * Stores class members for <b>net.minecraft.world.effect.MobEffect</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class MobEffectClass extends Template.Class<MobEffectHandle> {
-        public final Template.Field.Converted<Holder<MobEffectListHandle>> effectList = new Template.Field.Converted<Holder<MobEffectListHandle>>();
-        public final Template.Field.Integer duration = new Template.Field.Integer();
-        public final Template.Field.Integer amplifier = new Template.Field.Integer();
-        public final Template.Field.Boolean ambient = new Template.Field.Boolean();
-        public final Template.Field.Boolean particles = new Template.Field.Boolean();
-
-        public final Template.StaticMethod.Converted<MobEffectHandle> fromNBT = new Template.StaticMethod.Converted<MobEffectHandle>();
         public final Template.StaticMethod.Converted<MobEffectHandle> fromBukkit = new Template.StaticMethod.Converted<MobEffectHandle>();
+        public final Template.StaticMethod.Converted<Holder<MobEffectHandle>> holderFromBukkit = new Template.StaticMethod.Converted<Holder<MobEffectHandle>>();
+        public final Template.StaticMethod.Converted<PotionEffectType> holderToBukkit = new Template.StaticMethod.Converted<PotionEffectType>();
+        public final Template.StaticMethod.Converted<Integer> getId = new Template.StaticMethod.Converted<Integer>();
+        public final Template.StaticMethod.Converted<MobEffectHandle> fromId = new Template.StaticMethod.Converted<MobEffectHandle>();
 
-        public final Template.Method<PotionEffect> toBukkit = new Template.Method<PotionEffect>();
+        public final Template.Method<PotionEffectType> toBukkit = new Template.Method<PotionEffectType>();
 
     }
 

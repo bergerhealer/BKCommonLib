@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.generated.net.minecraft.server.level.ChunkProviderServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerChunkCacheHandle;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
 
 /**
@@ -12,7 +12,7 @@ import com.bergerkiller.mountiplex.reflection.SafeMethod;
  * instead of a future / consumer system.
  */
 public class ChunkConsumerProxy implements Runnable {
-    private static final SafeMethod<Object> cps_getChunkAt = new SafeMethod<Object>(ChunkProviderServerHandle.T.getType(), "getChunkAt", int.class, int.class);
+    private static final SafeMethod<Object> cps_getChunkAt = new SafeMethod<Object>(ServerChunkCacheHandle.T.getType(), "getChunkAt", int.class, int.class);
     private final Consumer<Object> consumer;
     private final Object cps;
     private final int chunkX;

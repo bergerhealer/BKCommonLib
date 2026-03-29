@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 import java.util.IdentityHashMap;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
-import com.bergerkiller.generated.net.minecraft.core.IRegistryHandle;
+import com.bergerkiller.generated.net.minecraft.core.RegistryHandle;
 
 /**
  * A type of Window (Menu UI) in Minecraft
@@ -44,8 +44,8 @@ public enum WindowType {
         this.name_1_8 = name_1_8;
         this.slotCount = slotCount;
         if (CommonCapabilities.HAS_WINDOW_TYPE_REGISTRY) {
-            this.nmsWindowType_1_14 = IRegistryHandle.getWindowTypeByName(name_1_14);
-            this.id_1_14 = IRegistryHandle.getWindowTypeId(this.nmsWindowType_1_14);
+            this.nmsWindowType_1_14 = RegistryHandle.getWindowTypeByName(name_1_14);
+            this.id_1_14 = RegistryHandle.getWindowTypeId(this.nmsWindowType_1_14);
         } else {
             this.nmsWindowType_1_14 = null;
             this.id_1_14 = this.ordinal();

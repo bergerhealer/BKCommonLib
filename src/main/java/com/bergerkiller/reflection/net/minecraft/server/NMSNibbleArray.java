@@ -1,12 +1,12 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.NibbleArrayHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.DataLayerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 
 public class NMSNibbleArray {
-    public static final ClassTemplate<?> T = ClassTemplate.create(NibbleArrayHandle.T.getType());
-    public static final FieldAccessor<byte[]> array = NibbleArrayHandle.T.dataField.toFieldAccessor();
+    public static final ClassTemplate<?> T = ClassTemplate.create(DataLayerHandle.T.getType());
+    public static final FieldAccessor<byte[]> array = DataLayerHandle.T.dataField.toFieldAccessor();
 
     /**
      * Copies all data contained in the Nibble Array to the byte array specified

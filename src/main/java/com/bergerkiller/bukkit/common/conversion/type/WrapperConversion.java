@@ -8,9 +8,18 @@ import com.bergerkiller.bukkit.common.wrappers.CustomModelData;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPoint;
 import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPointNearBlock;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeBaseHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.CompoundTagHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeHandle;
+import com.bergerkiller.generated.net.minecraft.world.inventory.AbstractContainerMenuHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.component.CustomModelDataHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.GameTypeHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.entity.BlockEntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.LevelChunkHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightmapHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.Vec3Handle;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
@@ -50,31 +59,22 @@ import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
-import com.bergerkiller.generated.net.minecraft.EnumChatFormatHandle;
-import com.bergerkiller.generated.net.minecraft.core.BaseBlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
-import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
-import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
+import com.bergerkiller.generated.net.minecraft.ChatFormattingHandle;
+import com.bergerkiller.generated.net.minecraft.core.Vec3iHandle;
+import com.bergerkiller.generated.net.minecraft.core.BlockPosHandle;
+import com.bergerkiller.generated.net.minecraft.core.RotationsHandle;
+import com.bergerkiller.generated.net.minecraft.network.syncher.SynchedEntityDataHandle;
+import com.bergerkiller.generated.net.minecraft.sounds.SoundEventHandle;
+import com.bergerkiller.generated.net.minecraft.world.DifficultyHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectInstanceHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
-import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.EnumItemSlotHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.EnumMainHandHandle;
-import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypeHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EquipmentSlotHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.HumanoidArmHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
-import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeItemStackHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.ChunkCoordIntPairHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.EnumGamemodeHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightMapHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.IngredientHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.ChunkPosHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.data.CraftBlockDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBeaconHandle;
@@ -95,7 +95,7 @@ public class WrapperConversion {
         if (respawnConfig == null) {
             return PlayerRespawnPoint.NONE;
         } else {
-            return new PlayerRespawnPointNearBlock(EntityPlayerHandle.RespawnConfigHandle.createHandle(respawnConfig));
+            return new PlayerRespawnPointNearBlock(ServerPlayerHandle.RespawnConfigHandle.createHandle(respawnConfig));
         }
     }
 
@@ -125,44 +125,44 @@ public class WrapperConversion {
 
     // Plugs a gap 1.8 - 1.16 where some fields used IAttribute (but were really AttributeBase)
     @ConverterMethod(input="net.minecraft.world.entity.ai.attributes.IAttribute", optional=true)
-    public static Holder<AttributeBaseHandle> iAttributeToHolder(Object nmsIAttribute) {
+    public static Holder<AttributeHandle> iAttributeToHolder(Object nmsIAttribute) {
         return attributeBaseToHolder(nmsIAttribute);
     }
 
     @ConverterMethod(input="net.minecraft.world.entity.ai.attributes.AttributeBase")
-    public static Holder<AttributeBaseHandle> attributeBaseToHolder(Object nmsAttributeBase) {
-        return Holder.directWrap(nmsAttributeBase, AttributeBaseHandle::createHandle);
+    public static Holder<AttributeHandle> attributeBaseToHolder(Object nmsAttributeBase) {
+        return Holder.directWrap(nmsAttributeBase, AttributeHandle::createHandle);
     }
 
     @ConverterMethod(output="net.minecraft.world.entity.ai.attributes.AttributeBase")
-    public static Object holderToAttributeBase(Holder<AttributeBaseHandle> attributeHolder) {
+    public static Object holderToAttributeBase(Holder<AttributeHandle> attributeHolder) {
         return attributeHolder.rawValue();
     }
 
     @ConverterMethod
-    public static Holder<MobEffectListHandle> holderFromBukkit(org.bukkit.potion.PotionEffectType effectType) {
+    public static Holder<MobEffectHandle> holderFromBukkit(org.bukkit.potion.PotionEffectType effectType) {
         return null;
     }
 
     @ConverterMethod
-    public static org.bukkit.potion.PotionEffectType holderToBukkit(Holder<MobEffectListHandle> MobEffectList) {
+    public static org.bukkit.potion.PotionEffectType holderToBukkit(Holder<MobEffectHandle> MobEffectList) {
         return null;
     }
 
     @ConverterMethod(input="net.minecraft.world.effect.MobEffectList")
-    public static Holder<MobEffectListHandle> mobEffectListToHolder(Object nmsMobEffectList) {
-        return Holder.directWrap(nmsMobEffectList, MobEffectListHandle::createHandle);
+    public static Holder<MobEffectHandle> mobEffectListToHolder(Object nmsMobEffectList) {
+        return Holder.directWrap(nmsMobEffectList, MobEffectHandle::createHandle);
     }
 
     @ConverterMethod(output="net.minecraft.world.effect.MobEffectList")
-    public static Object holderToMobEffectList(Holder<MobEffectListHandle> holder) {
+    public static Object holderToMobEffectList(Holder<MobEffectHandle> holder) {
         return holder.rawValue();
     }
 
     @ConverterMethod(input="net.minecraft.nbt.NBTTagCompound")
     public static BlockStateChange deserializeBlockStateChange(Object nmsNBTTagCompoundMetadataHandle) {
         return BlockStateChange.fromMetadataPacked(CommonTagCompound.create(
-                NBTTagCompoundHandle.createHandle(nmsNBTTagCompoundMetadataHandle)));
+                CompoundTagHandle.createHandle(nmsNBTTagCompoundMetadataHandle)));
     }
 
     @ConverterMethod(input="net.minecraft.world.level.block.entity.TileEntityTypes")
@@ -177,7 +177,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.resources.MinecraftKey")
     public static BlockStateType tileEntityTypesKeyToBlockStateType(Object nmsMinecraftKeyHandle) {
-        return BlockStateType.byKey(MinecraftKeyHandle.createHandle(nmsMinecraftKeyHandle));
+        return BlockStateType.byKey(IdentifierHandle.createHandle(nmsMinecraftKeyHandle));
     }
 
     @ConverterMethod(input="net.minecraft.world.entity.Entity", output="T extends org.bukkit.entity.Entity")
@@ -187,7 +187,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.world.level.World")
     public static org.bukkit.World toWorld(Object nmsWorldHandle) {
-        return (org.bukkit.World) WorldHandle.T.getWorld.raw.invoke(nmsWorldHandle);
+        return (org.bukkit.World) LevelHandle.T.getWorld.raw.invoke(nmsWorldHandle);
     }
 
     @ConverterMethod
@@ -212,12 +212,12 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.world.level.block.entity.TileEntity")
     public static org.bukkit.World getWorldFromTileEntity(Object nmsTileEntityHandle) {
-        return toWorld(TileEntityHandle.T.getWorld.raw.invoke(nmsTileEntityHandle));
+        return toWorld(BlockEntityHandle.T.getWorld.raw.invoke(nmsTileEntityHandle));
     }
 
     @ConverterMethod(input="net.minecraft.world.level.chunk.Chunk")
     public static org.bukkit.Chunk toChunk(Object nmsChunkHandle) {
-        return ChunkHandle.T.getBukkitChunk.invoker.invoke(nmsChunkHandle);
+        return LevelChunkHandle.T.getBukkitChunk.invoker.invoke(nmsChunkHandle);
     }
 
     @ConverterMethod
@@ -247,8 +247,8 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.world.level.block.entity.TileEntity")
     public static org.bukkit.block.Block getBlockFromTileEntity(Object nmsTileEntityHandle) {
-        TileEntityHandle handle = TileEntityHandle.createHandle(nmsTileEntityHandle);
-        BlockPositionHandle pos = handle.getPosition();
+        BlockEntityHandle handle = BlockEntityHandle.createHandle(nmsTileEntityHandle);
+        BlockPosHandle pos = handle.getPosition();
         return handle.getWorld().getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ());
     }
 
@@ -345,7 +345,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.world.inventory.Container")
     public static org.bukkit.inventory.InventoryView toInventoryView(Object nmsContainerHandle) {
-        return ContainerHandle.T.getBukkitView.invoker.invoke(nmsContainerHandle);
+        return AbstractContainerMenuHandle.T.getBukkitView.invoker.invoke(nmsContainerHandle);
     }
 
     @ConverterMethod
@@ -356,7 +356,7 @@ public class WrapperConversion {
     @SuppressWarnings("deprecation")
     @ConverterMethod(input="net.minecraft.world.EnumDifficulty")
     public static org.bukkit.Difficulty toDifficulty(Object nmsEnumDifficultyHandle) {
-        Integer id = EnumDifficultyHandle.T.getId.invoker.invoke(nmsEnumDifficultyHandle);
+        Integer id = DifficultyHandle.T.getId.invoker.invoke(nmsEnumDifficultyHandle);
         return Difficulty.getByValue(id.intValue());
     }
 
@@ -379,7 +379,7 @@ public class WrapperConversion {
     @SuppressWarnings("deprecation")
     @ConverterMethod(input="net.minecraft.world.level.EnumGamemode")
     public static org.bukkit.GameMode toGameMode(Object nmsEnumGamemodeHandle) {
-        return org.bukkit.GameMode.getByValue(EnumGamemodeHandle.createHandle(nmsEnumGamemodeHandle).getId());
+        return org.bukkit.GameMode.getByValue(GameTypeHandle.createHandle(nmsEnumGamemodeHandle).getId());
     }
 
     @SuppressWarnings("deprecation")
@@ -410,7 +410,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.world.entity.EnumMainHand", optional=true)
     public static HumanHand humanHandToEnumMainHandHandle(Object nmsEnumMainHandHandle) {
-        if (nmsEnumMainHandHandle == EnumMainHandHandle.LEFT.getRaw()) {
+        if (nmsEnumMainHandHandle == HumanoidArmHandle.LEFT.getRaw()) {
             return HumanHand.LEFT;
         } else {
             return HumanHand.RIGHT;
@@ -424,12 +424,12 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.world.level.ChunkCoordIntPair")
     public static IntVector2 toIntVector2(Object nmsChunkCoordIntPairHandle) {
-        return ChunkCoordIntPairHandle.T.toIntVector2.invoker.invoke(nmsChunkCoordIntPairHandle);
+        return ChunkPosHandle.T.toIntVector2.invoker.invoke(nmsChunkCoordIntPairHandle);
     }
 
     @ConverterMethod(input="net.minecraft.core.BlockPosition")
     public static IntVector3 toIntVector3(Object nmsBlockPositionHandle) {
-        return BaseBlockPositionHandle.T.toIntVector3.invoker.invoke(nmsBlockPositionHandle);
+        return Vec3iHandle.T.toIntVector3.invoker.invoke(nmsBlockPositionHandle);
     }
 
     @ConverterMethod
@@ -439,12 +439,12 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.world.phys.Vec3D")
     public static Vector toVector(Object nmsVec3DHandle) {
-        return Vec3DHandle.T.toBukkit.invoker.invoke(nmsVec3DHandle);
+        return Vec3Handle.T.toBukkit.invoker.invoke(nmsVec3DHandle);
     }
 
     @ConverterMethod(input="net.minecraft.core.Vector3f")
     public static Vector fromVector3fToVector(Object nmsVector3fHandle) {
-        Vector3fHandle handle = Vector3fHandle.createHandle(nmsVector3fHandle);
+        RotationsHandle handle = RotationsHandle.createHandle(nmsVector3fHandle);
         return new Vector(handle.getX(), handle.getY(), handle.getZ());
     }
 
@@ -535,7 +535,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.world.effect.MobEffectList")
     public static PotionEffectType toPotionEffectType(Object nmsMobEffectListHandle) {
-        int id = MobEffectListHandle.T.getId.invoke(nmsMobEffectListHandle);
+        int id = MobEffectHandle.T.getId.invoke(nmsMobEffectListHandle);
 
         @SuppressWarnings("deprecation")
         PotionEffectType type = PotionEffectType.getById(id);
@@ -549,7 +549,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.world.effect.MobEffect")
     public static PotionEffect toPotionEffect(Object nmsMobEffectHandle) {
-        return MobEffectHandle.T.toBukkit.invoke(nmsMobEffectHandle);
+        return MobEffectInstanceHandle.T.toBukkit.invoke(nmsMobEffectHandle);
     }
 
     @ConverterMethod(input="net.minecraft.network.syncher.DataWatcherObject")
@@ -559,7 +559,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.network.syncher.DataWatcher.Item")
     public static <T> com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T> toDataWatcherItem(Object nmsDataWatcherItemHandle) {
-        DataWatcherHandle.ItemHandle handle = DataWatcherHandle.ItemHandle.createHandle(nmsDataWatcherItemHandle);
+        SynchedEntityDataHandle.ItemHandle handle = SynchedEntityDataHandle.ItemHandle.createHandle(nmsDataWatcherItemHandle);
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>(handle);
     }
 
@@ -585,12 +585,12 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.world.entity.EnumItemSlot")
     public static int enumItemSlotToFilterFlag(Object nmsEnumItemSlot) {
-        return EnumItemSlotHandle.T.getFilterFlag.invoker.invoke(nmsEnumItemSlot);
+        return EquipmentSlotHandle.T.getFilterFlag.invoker.invoke(nmsEnumItemSlot);
     }
 
     @ConverterMethod(output="net.minecraft.world.entity.EnumItemSlot")
     public static Object enumItemSlotFromFilterFlag(int legacyEquipmentIndex) {
-        return EnumItemSlotHandle.fromFilterFlagRaw(legacyEquipmentIndex);
+        return EquipmentSlotHandle.fromFilterFlagRaw(legacyEquipmentIndex);
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -610,7 +610,7 @@ public class WrapperConversion {
     // 1.12 =>
     @ConverterMethod(input="net.minecraft.world.item.crafting.RecipeItemStack", optional=true)
     public static CraftInputSlot toCraftInputSlot(Object recipeItemStackHandle) {
-        List<org.bukkit.inventory.ItemStack> choices = RecipeItemStackHandle.T.getChoices.invoke(recipeItemStackHandle);
+        List<org.bukkit.inventory.ItemStack> choices = IngredientHandle.T.getChoices.invoke(recipeItemStackHandle);
         if (choices == null) {
             throw new RuntimeException("Choices result field is null");
         }
@@ -619,15 +619,15 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.sounds.SoundEffect")
     public static ResourceKey<SoundEffect> soundEffectToResourceKey(Object nmsSoundEffectHandle) {
-        return ResourceCategory.sound_effect.createKey(SoundEffectHandle.T.name.get(nmsSoundEffectHandle));
+        return ResourceCategory.sound_effect.createKey(SoundEventHandle.T.name.get(nmsSoundEffectHandle));
     }
 
     @ConverterMethod(output="net.minecraft.sounds.SoundEffect")
     public static Object soundEffectFromResourceKey(ResourceKey<SoundEffect> soundKey) {
         Object mcKey = soundKey.getName().getRaw();
-        Object effect = SoundEffectHandle.T.byKey.raw.invoke(mcKey);
+        Object effect = SoundEventHandle.T.byKey.raw.invoke(mcKey);
         if (effect == null) {
-            effect = SoundEffectHandle.T.createVariableRangeEvent.raw.invoke(mcKey);
+            effect = SoundEventHandle.T.createVariableRangeEvent.raw.invoke(mcKey);
         }
         return effect;
     }
@@ -649,7 +649,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.resources.MinecraftKey")
     public static ResourceKey<SoundEffect> minecraftKeyToSoundEffectResourceKey(Object minecraftKeyHandle) {
-        return ResourceCategory.sound_effect.createKey(MinecraftKeyHandle.createHandle(minecraftKeyHandle));
+        return ResourceCategory.sound_effect.createKey(IdentifierHandle.createHandle(minecraftKeyHandle));
     }
 
     @ConverterMethod(input="net.minecraft.world.level.MobSpawnerAbstract")
@@ -691,12 +691,12 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.world.level.levelgen.HeightMap")
     public static HeightMap heightMapFromHandle(Object handle) {
-        return new HeightMap(HeightMapHandle.createHandle(handle));
+        return new HeightMap(HeightmapHandle.createHandle(handle));
     }
 
     @ConverterMethod(input="net.minecraft.world.entity.EntityTypes", optional=true)
     public static Class<?> entityClassFromEntityTypes(Object nmsEntityTypesHandle) {
-        return EntityTypesHandle.T.getEntityClassInst.invoke(nmsEntityTypesHandle);
+        return EntityTypeHandle.T.getEntityClassInst.invoke(nmsEntityTypesHandle);
     }
 
     @ConverterMethod(input="org.bukkit.block.data.BlockData", optional=true)
@@ -721,7 +721,7 @@ public class WrapperConversion {
 
     @ConverterMethod
     public static ChatColor chatColorFromEnumChatFormatIndex(int nmsEnumChatFormatIndex) {
-        return chatColorFromEnumChatFormatHandle(EnumChatFormatHandle.byId(nmsEnumChatFormatIndex).getRaw());
+        return chatColorFromEnumChatFormatHandle(ChatFormattingHandle.byId(nmsEnumChatFormatIndex).getRaw());
     }
 
     @ConverterMethod

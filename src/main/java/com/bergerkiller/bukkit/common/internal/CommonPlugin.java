@@ -51,8 +51,8 @@ import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.SafeField;
@@ -774,7 +774,7 @@ public class CommonPlugin extends PluginBase {
         }
 
         // Initialize NBT early
-        NBTBaseHandle.T.forceInitialization();
+        TagHandle.T.forceInitialization();
 
         // Initialize entity add/remove tracking handler
         // Note: onWorldEnabled() is called for all the worlds later on
@@ -838,7 +838,7 @@ public class CommonPlugin extends PluginBase {
 
         // Some servers do not have an Entity Remove Queue.
         // For those servers, we handle them using our own system
-        if (!EntityPlayerHandle.T.getRemoveQueue.isAvailable()) {
+        if (!ServerPlayerHandle.T.getRemoveQueue.isAvailable()) {
             startedTasks.add(new EntityRemoveQueueSyncTask(this).start(1, 1));
         }
 

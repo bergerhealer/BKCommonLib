@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.internal.proxy;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 
 /**
  * TileEntityTypes class/registry was added in Minecraft 1.13.
@@ -33,7 +33,7 @@ public class TileEntityTypesProxy_1_8_to_1_12_2 {
     public static TileEntityTypesProxy_1_8_to_1_12_2 byId(int id) {
         TileEntityTypesProxy_1_8_to_1_12_2 value = byId.get(id);
         if (value == null) {
-            Object minecraftKey = MinecraftKeyHandle.createNew("UNKNOWN_TILE_ID_" + id).getRaw();
+            Object minecraftKey = IdentifierHandle.createNew("UNKNOWN_TILE_ID_" + id).getRaw();
             value = new TileEntityTypesProxy_1_8_to_1_12_2(id, minecraftKey);
         }
         return value;

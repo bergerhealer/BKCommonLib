@@ -1,15 +1,15 @@
 package net.minecraft.world.level.chunk;
 
-import net.minecraft.core.BlockPosition;
-import net.minecraft.core.SectionPosition;
-import net.minecraft.server.level.WorldServer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.chunk.ChunkSection;
-import net.minecraft.world.level.EnumSkyBlock;
-import net.minecraft.world.level.block.state.IBlockData;
-import net.minecraft.world.level.levelgen.HeightMap;
-import net.minecraft.world.level.levelgen.HeightMap$Type;
-import net.minecraft.world.level.World;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.Heightmap$Types;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntitySection;
 import net.minecraft.world.level.entity.EntitySectionStorage;
 
@@ -18,23 +18,23 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.collections.List2D;
 
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkSectionHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.EnumSkyBlockHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.LevelChunkHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.LevelChunkSectionHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LightLayerHandle;
 
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 
 import io.github.opencubicchunks.cubicchunks.api.world.ICubicWorld;
 import io.github.opencubicchunks.cubicchunks.api.world.ICube;
 import io.github.opencubicchunks.cubicchunks.api.world.ICubeProviderServer;
 
-class Chunk {
+class LevelChunk {
 #if version >= 1.18
-    #require net.minecraft.world.level.chunk.Chunk public World getChunkWorld:getLevel();
-    public (WorldHandle) World getWorld:getLevel();
+    #require net.minecraft.world.level.chunk.LevelChunk public Level getChunkWorld:getLevel();
+    public (LevelHandle) Level getWorld:getLevel();
 #else
-    #require net.minecraft.world.level.chunk.Chunk public World getChunkWorld:getWorld();
-    public (WorldHandle) World getWorld();
+    #require net.minecraft.world.level.chunk.LevelChunk public Level getChunkWorld:getWorld();
+    public (LevelHandle) Level getWorld();
 #endif
 
 #if version >= 1.14
@@ -57,7 +57,7 @@ class Chunk {
 
     public java.util.List<Integer> getLoadedSectionCoordinates() {
 #if exists io.github.opencubicchunks.cubicchunks.api.world.ICube
-        World world = instance#getChunkWorld();
+        Level world = instance#getChunkWorld();
         if (world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld()) {
             java.util.ArrayList result = new java.util.ArrayList();
             java.util.Iterator cubes_iter = instance.getLoadedCubes().iterator();
@@ -69,9 +69,9 @@ class Chunk {
 #endif
 
         java.util.ArrayList result = new java.util.ArrayList();
-        ChunkSection[] sections = instance.getSections();
+        LevelChunkSection[] sections = instance.getSections();
         for (int i = 0; i < sections.length; i++) {
-            ChunkSection section = sections[i];
+            LevelChunkSection section = sections[i];
             if (section != null) {
 #if version >= 1.20
                 result.add(Integer.valueOf(instance.getSectionYFromSectionIndex(i)));
@@ -85,10 +85,10 @@ class Chunk {
         return result;
     }
 
-    // Converts ChunkSection into bkcl wrapper ChunkSection on <= 1.19.4 where ChunkSection had a field for reading y position
+    // Converts LevelChunkSection into bkcl wrapper ChunkSection on <= 1.19.4 where LevelChunkSection had a field for reading y position
 #if version <= 1.19.4
-    #require net.minecraft.world.level.chunk.ChunkSection public static com.bergerkiller.bukkit.common.wrappers.ChunkSection wrapChunkSection(ChunkSection section) {
-        ChunkSectionHandle sectionHandle = ChunkSectionHandle.createHandle(section);
+    #require net.minecraft.world.level.chunk.LevelChunkSection public static com.bergerkiller.bukkit.common.wrappers.ChunkSection wrapChunkSection(LevelChunkSection section) {
+        LevelChunkSectionHandle sectionHandle = LevelChunkSectionHandle.createHandle(section);
   #if version >= 1.18
         int yPos = section.bottomBlockY();
   #else
@@ -99,12 +99,12 @@ class Chunk {
 #endif
 
     public com.bergerkiller.bukkit.common.wrappers.ChunkSection[] getSections() {
-        ChunkSection[] sections = null;
+        LevelChunkSection[] sections = null;
 
 #if exists io.github.opencubicchunks.cubicchunks.api.world.ICube
-        World world = instance#getChunkWorld();
+        Level world = instance#getChunkWorld();
         if (world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld()) {
-            sections = new ChunkSection[16];
+            sections = new LevelChunkSection[16];
             for (int cy = 0; cy < 16; cy++) {
                 sections[cy] = instance.getCube(cy).getStorage();
             }
@@ -119,15 +119,15 @@ class Chunk {
         wrapped = new com.bergerkiller.bukkit.common.wrappers.ChunkSection[sections.length];
 
         for (int i = 0; i < sections.length; i++) {
-            ChunkSection section = sections[i];
+            LevelChunkSection section = sections[i];
             if (section == null) {
                 continue;
             }
 #if version >= 1.20
             // Got to use the index of the array plus some other information to figure out the base y-position
-            // ChunkSection no longer contains a field to check this
-            int yPos = SectionPosition.sectionToBlockCoord(instance.getSectionYFromSectionIndex(i));
-            ChunkSectionHandle sectionHandle = ChunkSectionHandle.createHandle(section);
+            // LevelChunkSection no longer contains a field to check this
+            int yPos = SectionPos.sectionToBlockCoord(instance.getSectionYFromSectionIndex(i));
+            LevelChunkSectionHandle sectionHandle = LevelChunkSectionHandle.createHandle(section);
             wrapped[i] = new com.bergerkiller.bukkit.common.wrappers.ChunkSection(sectionHandle, yPos);
 #else
             wrapped[i] = #wrapChunkSection(section);
@@ -137,9 +137,9 @@ class Chunk {
         return wrapped;
     }
 
-    #require net.minecraft.world.level.chunk.Chunk public ChunkSection getSectionRawImpl(int cy) {
+    #require net.minecraft.world.level.chunk.LevelChunk public LevelChunkSection getSectionRawImpl(int cy) {
 #if exists io.github.opencubicchunks.cubicchunks.api.world.ICube
-        World world = instance#getChunkWorld();
+        Level world = instance#getChunkWorld();
         if (world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld()) {
             ICubeProviderServer provider = (ICubeProviderServer) ((ICubicWorld) world).getCubeCache();
             ICube cube = provider.getCube(instance.locX, cy, instance.locZ, ICubeProviderServer.Requirement.LOAD);
@@ -151,7 +151,7 @@ class Chunk {
         }
 #endif
 
-        ChunkSection[] sections = instance.getSections();
+        LevelChunkSection[] sections = instance.getSections();
 #if version >= 1.17
         int index = instance.getSectionIndexFromSectionY(cy);
 #else
@@ -169,15 +169,15 @@ class Chunk {
     }
 
     public com.bergerkiller.bukkit.common.wrappers.ChunkSection getSection(int cy) {
-        ChunkSection section = instance#getSectionRawImpl(cy);
+        LevelChunkSection section = instance#getSectionRawImpl(cy);
         if (section == null) {
             return null;
         }
 
 #if version >= 1.20
         // Got to use cy to compute the base block position, as ChunkSection lacks this information
-        int yPos = SectionPosition.sectionToBlockCoord(cy);
-        ChunkSectionHandle sectionHandle = ChunkSectionHandle.createHandle(section);
+        int yPos = SectionPos.sectionToBlockCoord(cy);
+        LevelChunkSectionHandle sectionHandle = LevelChunkSectionHandle.createHandle(section);
         return new com.bergerkiller.bukkit.common.wrappers.ChunkSection(sectionHandle, yPos);
 #else
         return #wrapChunkSection(section);
@@ -204,7 +204,7 @@ class Chunk {
     public (List<org.bukkit.entity.Entity>) List<Entity> getEntities() {
 #if version >= 1.21 && exists ca.spottedleaf.moonrise.patches.chunk_system.level.entity.ChunkEntitySlices
         // New 1.21 Paper chunk system patches system
-        WorldServer world = (WorldServer) instance#getChunkWorld();
+        ServerLevel world = (ServerLevel) instance#getChunkWorld();
         ca.spottedleaf.moonrise.patches.chunk_system.level.entity.EntityLookup entityLookup;
         entityLookup = world.moonrise$getEntityLookup();
         ca.spottedleaf.moonrise.patches.chunk_system.level.entity.ChunkEntitySlices slices;
@@ -230,14 +230,14 @@ class Chunk {
 
 #elseif version >= 1.17 && exists io.papermc.paper.world.ChunkEntitySlices public org.bukkit.entity.Entity[] getChunkEntities();
         // Paper API for storing entities inside chunk slices can be used
-        WorldServer world = (WorldServer) instance#getChunkWorld();
+        ServerLevel world = (ServerLevel) instance#getChunkWorld();
 
     #if exists io.papermc.paper.chunk.system.entity.EntityLookup
         // New Paper Chunk System
         io.papermc.paper.chunk.system.entity.EntityLookup entityLookup = world.getEntityLookup();
         io.papermc.paper.world.ChunkEntitySlices slices = entityLookup.getChunk(instance.getPos().x, instance.getPos().z);
     #else
-        #require net.minecraft.world.level.World protected final io.papermc.paper.world.EntitySliceManager entitySliceManager;
+        #require net.minecraft.world.level.Level protected final io.papermc.paper.world.EntitySliceManager entitySliceManager;
         io.papermc.paper.world.EntitySliceManager manager = world#entitySliceManager;
         io.papermc.paper.world.ChunkEntitySlices slices = manager.getChunk(instance.getPos().x, instance.getPos().z);
     #endif
@@ -263,9 +263,9 @@ class Chunk {
 #elseif version >= 1.17
         // Down here is for Spigot / old Paper
         // Acquire the EntitySectionStorage instance of the world this Chunk is on
-        #require net.minecraft.server.level.WorldServer private final net.minecraft.world.level.entity.PersistentEntitySectionManager entityManager;
+        #require net.minecraft.server.level.ServerLevel private final net.minecraft.world.level.entity.PersistentEntitySectionManager entityManager;
         #require net.minecraft.world.level.entity.PersistentEntitySectionManager private final net.minecraft.world.level.entity.EntitySectionStorage sectionStorage;
-        WorldServer world = (WorldServer) instance#getChunkWorld();
+        ServerLevel world = (ServerLevel) instance#getChunkWorld();
         net.minecraft.world.level.entity.PersistentEntitySectionManager entitySectionManager = world#entityManager;
         EntitySectionStorage storage = entitySectionManager#sectionStorage;
 
@@ -279,11 +279,11 @@ class Chunk {
 
         // Iterate a subset of the sectionIds LongSet to find all vertical slices of this chunk storing entities
   #if version >= 1.18
-        long sectionIdsStart = SectionPosition.asLong(instance.getPos().x, 0, instance.getPos().z);
-        long sectionIdsEnd = SectionPosition.asLong(instance.getPos().x, -1, instance.getPos().z) + 1;
+        long sectionIdsStart = SectionPos.asLong(instance.getPos().x, 0, instance.getPos().z);
+        long sectionIdsEnd = SectionPos.asLong(instance.getPos().x, -1, instance.getPos().z) + 1;
   #else
-        long sectionIdsStart = SectionPosition.b(instance.getPos().x, 0, instance.getPos().z);
-        long sectionIdsEnd = SectionPosition.b(instance.getPos().x, -1, instance.getPos().z) + 1;
+        long sectionIdsStart = SectionPos.b(instance.getPos().x, 0, instance.getPos().z);
+        long sectionIdsEnd = SectionPos.b(instance.getPos().x, -1, instance.getPos().z) + 1;
   #endif
 
         it.unimi.dsi.fastutil.longs.LongBidirectionalIterator iterator = sectionIds.subSet(sectionIdsStart, sectionIdsEnd).iterator();
@@ -297,8 +297,8 @@ class Chunk {
             if (section != null && !section.a()) { // check not null or empty
   #endif
                 // Retrieve the underlying storage
-                #require net.minecraft.world.level.entity.EntitySection private final net.minecraft.util.EntitySlice storage;
-                net.minecraft.util.EntitySlice sectionSlice = section#storage;
+                #require net.minecraft.world.level.entity.EntitySection private final net.minecraft.util.ClassInstanceMultiMap storage;
+                net.minecraft.util.ClassInstanceMultiMap sectionSlice = section#storage;
                 sliceLists.add(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.cbEntitySliceToList(sectionSlice));
             }
         }
@@ -309,8 +309,8 @@ class Chunk {
             return new List2D(sliceLists);
         }
 
-#elseif exists net.minecraft.world.level.chunk.Chunk public final net.minecraft.util.EntitySlice<net.minecraft.world.entity.Entity>[] entitySlices;
-        net.minecraft.util.EntitySlice[] slices = instance.entitySlices;
+#elseif exists net.minecraft.world.level.chunk.LevelChunk public final net.minecraft.util.ClassInstanceMultiMap<net.minecraft.world.entity.Entity>[] entitySlices;
+        net.minecraft.util.ClassInstanceMultiMap[] slices = instance.entitySlices;
         int count = slices.length;
         List[] lists = new List[count];
         for (int i = 0; i < count; i++) {
@@ -323,7 +323,7 @@ class Chunk {
     }
 
     public org.bukkit.Chunk getBukkitChunk() {
-#if version >= 1.19.4 && !exists net.minecraft.world.level.chunk.Chunk public org.bukkit.Chunk bukkitChunk;
+#if version >= 1.19.4 && !exists net.minecraft.world.level.chunk.LevelChunk public org.bukkit.Chunk bukkitChunk;
         return new org.bukkit.craftbukkit.CraftChunk(instance);
 #else
         return instance.bukkitChunk;
@@ -331,43 +331,43 @@ class Chunk {
     }
 
 #if version >= 1.18
-    public (BlockData) IBlockData getBlockData:getBlockState((IntVector3) BlockPosition blockposition);
+    public (BlockData) BlockState getBlockData:getBlockState((IntVector3) BlockPos blockposition);
 #elseif version >= 1.13
-    public (BlockData) IBlockData getBlockData:getType((IntVector3) BlockPosition blockposition);
+    public (BlockData) BlockState getBlockData:getType((IntVector3) BlockPos blockposition);
 #else
-    public (BlockData) IBlockData getBlockData((IntVector3) BlockPosition blockposition);
+    public (BlockData) BlockState getBlockData((IntVector3) BlockPos blockposition);
 #endif
 
 #if version >= 1.18
-    public (BlockData) IBlockData getBlockDataAtCoord(int x, int y, int z) {
-        return instance.getBlockState(new BlockPosition(x, y, z));
+    public (BlockData) BlockState getBlockDataAtCoord(int x, int y, int z) {
+        return instance.getBlockState(new BlockPos(x, y, z));
     }
 #elseif version >= 1.16
-    public (BlockData) IBlockData getBlockDataAtCoord(int x, int y, int z) {
-        return instance.getType(new BlockPosition(x, y, z));
+    public (BlockData) BlockState getBlockDataAtCoord(int x, int y, int z) {
+        return instance.getType(new BlockPos(x, y, z));
     }
 #elseif version >= 1.14
-    public (BlockData) IBlockData getBlockDataAtCoord(int x, int y, int z) {
-        BlockPosition$PooledBlockPosition blockPos = BlockPosition$PooledBlockPosition.f(x, y, z);
+    public (BlockData) BlockState getBlockDataAtCoord(int x, int y, int z) {
+        BlockPos$PooledBlockPosition blockPos = BlockPos$PooledBlockPosition.f(x, y, z);
         try {
-            return instance.getType((BlockPosition) blockPos);
+            return instance.getType((BlockPos) blockPos);
         } finally {
             blockPos.close();
         }
     }
 #elseif version >= 1.13
-    public (BlockData) IBlockData getBlockDataAtCoord:getBlockData(int x, int y, int z);
+    public (BlockData) BlockState getBlockDataAtCoord:getBlockData(int x, int y, int z);
 #elseif version >= 1.9
-    public (BlockData) IBlockData getBlockDataAtCoord:a(int x, int y, int z);
+    public (BlockData) BlockState getBlockDataAtCoord:a(int x, int y, int z);
 #else
     // Fallback on 1.8.8: generated code
-    public (BlockData) IBlockData getBlockDataAtCoord(int x, int y, int z) {
-        return instance.getBlockData(new BlockPosition(x, y, z));
+    public (BlockData) BlockState getBlockDataAtCoord(int x, int y, int z) {
+        return instance.getBlockData(new BlockPos(x, y, z));
     }
 #endif
 
-    // Since MC 1.13 updateFlags are used (See World.java setTypeAndData)
-    public (BlockData) IBlockData setBlockData((IntVector3) BlockPosition blockposition, (BlockData) IBlockData iblockdata, int updateFlags) {
+    // Since MC 1.13 updateFlags are used (See Level.java setTypeAndData)
+    public (BlockData) BlockState setBlockData((IntVector3) BlockPos blockposition, (BlockData) BlockState iblockdata, int updateFlags) {
 #if version >= 1.21.5
         return instance.setBlockState(blockposition, iblockdata, updateFlags);
 #elseif version >= 1.18
@@ -389,37 +389,37 @@ class Chunk {
 #endif
 
 #if version >= 1.14
-    public (com.bergerkiller.bukkit.common.wrappers.HeightMap) HeightMap getLightHeightMap(boolean initialize) {
+    public (com.bergerkiller.bukkit.common.wrappers.HeightMap) Heightmap getLightHeightMap(boolean initialize) {
         // Note: must always initialize, since the server does not store this data
-        HeightMap heightMap = new HeightMap(instance, HeightMap$Type.values()[0]);
-        com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightMapHandle.T.initialize.invoke(heightMap);
+        Heightmap heightMap = new Heightmap(instance, Heightmap$Types.values()[0]);
+        com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightmapHandle.T.initialize.invoke(heightMap);
         return heightMap;
     }
 #elseif version >= 1.13
-    public (com.bergerkiller.bukkit.common.wrappers.HeightMap) HeightMap getLightHeightMap(boolean initialize) {
-        HeightMap heightMap = instance.b(HeightMap$Type.LIGHT_BLOCKING);
+    public (com.bergerkiller.bukkit.common.wrappers.HeightMap) Heightmap getLightHeightMap(boolean initialize) {
+        Heightmap heightMap = instance.b(Heightmap$Types.LIGHT_BLOCKING);
         if (initialize) {
             heightMap.a();
         }
         return heightMap;
     }
 #else
-    public (com.bergerkiller.bukkit.common.wrappers.HeightMap) HeightMap getLightHeightMap(boolean initialize) {
-        HeightMap heightMap = new com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2(instance, instance.heightMap);
+    public (com.bergerkiller.bukkit.common.wrappers.HeightMap) Heightmap getLightHeightMap(boolean initialize) {
+        Heightmap heightMap = new com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2(instance, instance.heightMap);
         if (initialize) {
-             com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightMapHandle.T.initialize.invoke(heightMap);
+             com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightmapHandle.T.initialize.invoke(heightMap);
         }
         return heightMap;
     }
 #endif
 
 #if version >= 1.14
-    public int getBrightness((EnumSkyBlockHandle) EnumSkyBlock enumskyblock, (IntVector3) BlockPosition position) {
-        World world = instance#getChunkWorld();
+    public int getBrightness((LightLayerHandle) LightLayer enumskyblock, (IntVector3) BlockPos position) {
+        Level world = instance#getChunkWorld();
         return world.getBrightness(enumskyblock, position);
     }
 #else
-    public int getBrightness((EnumSkyBlockHandle) EnumSkyBlock enumskyblock, (IntVector3) BlockPosition position);
+    public int getBrightness((LightLayerHandle) LightLayer enumskyblock, (IntVector3) BlockPos position);
 #endif
 
 #if version >= 1.18
@@ -481,7 +481,7 @@ class Chunk {
     }
 
     <code>
-    public static ChunkHandle fromBukkit(org.bukkit.Chunk chunk) {
+    public static LevelChunkHandle fromBukkit(org.bukkit.Chunk chunk) {
         if (chunk != null) {
             return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toChunkHandle(chunk));
         } else {

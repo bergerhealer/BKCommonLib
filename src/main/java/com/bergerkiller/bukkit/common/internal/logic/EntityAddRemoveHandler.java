@@ -9,6 +9,7 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.LevelChunkHandle;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -29,7 +30,6 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
@@ -325,8 +325,8 @@ public abstract class EntityAddRemoveHandler implements LazyInitializedObject, L
             {
                 boolean isLists = false;
                 try {
-                    String fieldName = Resolver.resolveFieldName(ChunkHandle.T.getType(), "entitySlices");
-                    java.lang.reflect.Field entitySlicesField = MPLType.getDeclaredField(ChunkHandle.T.getType(), fieldName);
+                    String fieldName = Resolver.resolveFieldName(LevelChunkHandle.T.getType(), "entitySlices");
+                    java.lang.reflect.Field entitySlicesField = MPLType.getDeclaredField(LevelChunkHandle.T.getType(), fieldName);
                     Class<?> fieldType = entitySlicesField.getType();
                     isLists = (fieldType == List[].class);
                     if (!fieldType.isArray()) {
@@ -431,7 +431,7 @@ public abstract class EntityAddRemoveHandler implements LazyInitializedObject, L
          * @param entity
          */
         public void addToChunk(Chunk chunk, EntityHandle entity) {
-            ChunkHandle.fromBukkit(chunk).addEntity(entity);
+            LevelChunkHandle.fromBukkit(chunk).addEntity(entity);
         }
 
         @SuppressWarnings({"unchecked", "rawtypes"})

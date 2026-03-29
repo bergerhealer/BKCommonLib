@@ -4,7 +4,7 @@ import org.bukkit.entity.Minecart;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
-import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
+import com.bergerkiller.generated.net.minecraft.world.ContainerHandle;
 
 /**
  * Base class for Minecart entities with an Inventory
@@ -22,7 +22,7 @@ public abstract class CommonMinecartInventory<T extends Minecart & InventoryHold
     }
 
     public void update() {
-        this.handle.cast(IInventoryHandle.T).update(); 
+        this.handle.cast(ContainerHandle.T).update();
     }
 
 }

@@ -15,12 +15,12 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.*;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundAddEntityPacketHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
-import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityLivingHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectInstanceHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.LivingEntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeInstanceHandle;
 
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -612,12 +612,6 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_ATTACH.newInstanceLeash(leashHolder, entity.getEntity()));
         }
 
-        // Human entity sleeping action
-        if (entity.getEntity() instanceof HumanEntity && ((HumanEntity) entity.getEntity()).isSleeping()) {
-            PacketUtil.sendPacket(viewer, PacketType.OUT_BED.newInstance((HumanEntity) entity.getEntity(),
-                   entity.loc.block()));
-        }
-
         // Initial entity head rotation
         float headRot = headRotLive.get();
         if (headRot != 0.0f) {
@@ -642,11 +636,11 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         }
         // Living Entity - only data
         Object entityHandle = this.entity.getHandle();
-        if (EntityLivingHandle.T.isAssignableFrom(entityHandle)) {
-            EntityLivingHandle living = EntityLivingHandle.createHandle(entityHandle);
+        if (LivingEntityHandle.T.isAssignableFrom(entityHandle)) {
+            LivingEntityHandle living = LivingEntityHandle.createHandle(entityHandle);
 
             // Entity Attributes
-            Collection<AttributeModifiableHandle> attributes = living.getAttributeMap().getSynchronizedAttributes();
+            Collection<AttributeInstanceHandle> attributes = living.getAttributeMap().getSynchronizedAttributes();
             if (!attributes.isEmpty()) {
                 PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_UPDATE_ATTRIBUTES.newInstance(entity.getEntityId(), attributes));
             }
@@ -662,7 +656,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             }
 
             // Entity Mob Effects
-            for (MobEffectHandle effect : living.getEffects()) {
+            for (MobEffectInstanceHandle effect : living.getEffects()) {
                 PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_EFFECT_ADD.newInstance(entity.getEntityId(), effect));
             }
         }
@@ -851,11 +845,11 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         }
         // Living Entity - only data
         Object entityHandle = this.entity.getHandle();
-        if (EntityLivingHandle.T.isAssignableFrom(entityHandle)) {
-            EntityLivingHandle living = EntityLivingHandle.createHandle(entityHandle);
+        if (LivingEntityHandle.T.isAssignableFrom(entityHandle)) {
+            LivingEntityHandle living = LivingEntityHandle.createHandle(entityHandle);
 
             // Entity Attributes
-            Collection<AttributeModifiableHandle> attributes = living.getAttributeMap().getSynchronizedAttributes();
+            Collection<AttributeInstanceHandle> attributes = living.getAttributeMap().getSynchronizedAttributes();
             if (!attributes.isEmpty()) {
                 this.broadcast(PacketType.OUT_ENTITY_UPDATE_ATTRIBUTES.newInstance(entity.getEntityId(), attributes), true);
             }
@@ -1165,7 +1159,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             // NMS error: They are not using the position, but the live position
             // This has some big issues when new players join...
 
-            PacketPlayOutSpawnEntityHandle handle = PacketPlayOutSpawnEntityHandle.createHandle(packet.getHandle());
+            ClientboundAddEntityPacketHandle handle = ClientboundAddEntityPacketHandle.createHandle(packet.getHandle());
 
             // Motion
             handle.setMotX(velSynched.getX());

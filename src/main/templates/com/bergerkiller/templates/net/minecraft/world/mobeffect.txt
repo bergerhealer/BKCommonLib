@@ -1,27 +1,27 @@
 package net.minecraft.world.effect;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.effect.MobEffectList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.effect.MobEffect;
 
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.craftbukkit.potion.CraftPotionUtil;
 
-import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.CompoundTagHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectInstanceHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
-import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 
-class MobEffect {
+class MobEffectInstance {
 #if version >= 1.20.5
-    private final (Holder<MobEffectListHandle>) net.minecraft.core.Holder<MobEffectList> effectList:effect;
+    private final (Holder<MobEffectHandle>) net.minecraft.core.Holder<MobEffect> effectList:effect;
 #elseif version >= 1.17
-    private final (Holder<MobEffectListHandle>) MobEffectList effectList:effect;
+    private final (Holder<MobEffectHandle>) MobEffect effectList:effect;
 #elseif version >= 1.9
-    private final (Holder<MobEffectListHandle>) MobEffectList effectList:b;
+    private final (Holder<MobEffectHandle>) MobEffect effectList:b;
 #else
-    private (Holder<MobEffectListHandle>) int effectList:effectId;
+    private (Holder<MobEffectHandle>) int effectList:effectId;
 #endif
 
 #if version >= 1.17
@@ -48,31 +48,31 @@ class MobEffect {
     //TODO: hiddenEffect?
 
 #if version >= 1.21.5
-    public static (MobEffectHandle) MobEffect fromNBT((CommonTagCompound) NBTTagCompound compound) {
+    public static (MobEffectInstanceHandle) MobEffectInstance fromNBT((CommonTagCompound) CompoundTag compound) {
         //TODO: Should this use this whole mess or not?
-        // RegistryOps<NBTBase> registryops = this.registryAccess().<NBTBase>createSerializationContext(DynamicOpsNBT.INSTANCE);
-        com.mojang.serialization.DynamicOps dynamicops = net.minecraft.nbt.DynamicOpsNBT.INSTANCE;
-        return (MobEffect) MobEffect.CODEC.parse(dynamicops, compound)
-            .resultOrPartial(NBTTagCompoundHandle.createPartialErrorLogger(compound))
+        // RegistryOps<NBTBase> registryops = this.registryAccess().<NBTBase>createSerializationContext(NbtOps.INSTANCE);
+        com.mojang.serialization.DynamicOps dynamicops = net.minecraft.nbt.NbtOps.INSTANCE;
+        return (MobEffectInstance) MobEffectInstance.CODEC.parse(dynamicops, compound)
+            .resultOrPartial(CompoundTagHandle.createPartialErrorLogger(compound))
             .orElse(null);
     }
 #elseif version >= 1.18
-    public static (MobEffectHandle) MobEffect fromNBT:load((CommonTagCompound) NBTTagCompound compound);
+    public static (MobEffectInstanceHandle) MobEffectInstance fromNBT:load((CommonTagCompound) CompoundTag compound);
 #else
-    public static (MobEffectHandle) MobEffect fromNBT:b((CommonTagCompound) NBTTagCompound compound);
+    public static (MobEffectInstanceHandle) MobEffectInstance fromNBT:b((CommonTagCompound) CompoundTag compound);
 #endif
 
     public PotionEffect toBukkit() {
-#if version >= 1.9 || exists org.bukkit.craftbukkit.potion.CraftPotionUtil public static org.bukkit.potion.PotionEffect toBukkit(net.minecraft.world.effect.MobEffect effect);
+#if version >= 1.9 || exists org.bukkit.craftbukkit.potion.CraftPotionUtil public static org.bukkit.potion.PotionEffect toBukkit(net.minecraft.world.effect.MobEffectInstance effect);
         return CraftPotionUtil.toBukkit(instance);
 #else
         // Fallback for before this method was added
-  #if exists net.minecraft.world.effect.MobEffect public int getEffectId();
+  #if exists net.minecraft.world.effect.MobEffectInstance public int getEffectId();
         PotionEffectType type = PotionEffectType.getById(instance.getEffectId());
   #else
-        MobEffectHandle mobEffectHandle = MobEffectHandle.createHandle(instance); // Weird!
-        MobEffectListHandle mobEffectType = mobEffectHandle.getEffectList();
-        int mobEffectTypeId = MobEffectListHandle.getId(mobEffectType);
+        MobEffectInstanceHandle mobEffectHandle = MobEffectInstanceHandle.createHandle(instance); // Weird!
+        MobEffectHandle mobEffectType = mobEffectHandle.getEffectList();
+        int mobEffectTypeId = MobEffectHandle.getId(mobEffectType);
         PotionEffectType type = PotionEffectType.getById(mobEffectTypeId);
   #endif
         int amp = instance.getAmplifier();
@@ -83,91 +83,91 @@ class MobEffect {
 #endif
     }
 
-    public static (MobEffectHandle) MobEffect fromBukkit(PotionEffect effect) {
-#if version >= 1.9 || exists org.bukkit.craftbukkit.potion.CraftPotionUtil public static net.minecraft.world.effect.MobEffect fromBukkit(org.bukkit.potion.PotionEffect effect);
+    public static (MobEffectInstanceHandle) MobEffectInstance fromBukkit(PotionEffect effect) {
+#if version >= 1.9 || exists org.bukkit.craftbukkit.potion.CraftPotionUtil public static net.minecraft.world.effect.MobEffectInstance fromBukkit(org.bukkit.potion.PotionEffect effect);
         return CraftPotionUtil.fromBukkit(effect);
-#elseif exists net.minecraft.world.effect.MobEffect public MobEffect(int effectId, int duration, int amplification, boolean ambient, boolean particles);
+#elseif exists net.minecraft.world.effect.MobEffectInstance public MobEffectInstance(int effectId, int duration, int amplification, boolean ambient, boolean particles);
         // Fallback for before this method was added
         int effectId = effect.getType().getId();
-        return new MobEffect(effectId, effect.getDuration(), effect.getAmplifier(), effect.isAmbient(), effect.hasParticles());
+        return new MobEffectInstance(effectId, effect.getDuration(), effect.getAmplifier(), effect.isAmbient(), effect.hasParticles());
 #else
         // Fallback for before this method was added (weird edge case)
-        MobEffectList type = MobEffectListHandle.fromId(effect.getType().getId()).getRaw();
-        return new MobEffect(type, effect.getDuration(), effect.getAmplifier(), effect.isAmbient(), effect.hasParticles());
+        MobEffectInstanceList type = MobEffectInstanceListHandle.fromId(effect.getType().getId()).getRaw();
+        return new MobEffectInstance(type, effect.getDuration(), effect.getAmplifier(), effect.isAmbient(), effect.hasParticles());
 #endif
     }
 }
 
-class MobEffectList {
+class MobEffect {
 #if version >= 1.20.5
     public org.bukkit.potion.PotionEffectType toBukkit() {
         return org.bukkit.craftbukkit.potion.CraftPotionEffectType.minecraftToBukkit(instance);
     }
 
-    public static (MobEffectListHandle) MobEffectList fromBukkit(org.bukkit.potion.PotionEffectType effectType) {
-        return (MobEffectList) org.bukkit.craftbukkit.potion.CraftPotionEffectType.bukkitToMinecraft(effectType);
+    public static (MobEffectHandle) MobEffect fromBukkit(org.bukkit.potion.PotionEffectType effectType) {
+        return (MobEffect) org.bukkit.craftbukkit.potion.CraftPotionEffectType.bukkitToMinecraft(effectType);
     }
 
-    public static (Holder<MobEffectListHandle>) net.minecraft.core.Holder<MobEffectList> holderFromBukkit(org.bukkit.potion.PotionEffectType effectType) {
+    public static (Holder<MobEffectHandle>) net.minecraft.core.Holder<MobEffect> holderFromBukkit(org.bukkit.potion.PotionEffectType effectType) {
         return org.bukkit.craftbukkit.potion.CraftPotionEffectType.bukkitToMinecraftHolder(effectType);
     }
 
-    public static org.bukkit.potion.PotionEffectType holderToBukkit((Holder<MobEffectListHandle>) net.minecraft.core.Holder<MobEffectList> mobEffectList) {
+    public static org.bukkit.potion.PotionEffectType holderToBukkit((Holder<MobEffectHandle>) net.minecraft.core.Holder<MobEffect> mobEffectList) {
         return org.bukkit.craftbukkit.potion.CraftPotionEffectType.minecraftHolderToBukkit(mobEffectList);
     }
 #else
     public org.bukkit.potion.PotionEffectType toBukkit() {
         com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod getIdRaw;
-        getIdRaw = (com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod) MobEffectListHandle.T.getId.raw;
+        getIdRaw = (com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod) MobEffectHandle.T.getId.raw;
         return org.bukkit.potion.PotionEffectType.getById(((Integer) getIdRaw.invoke(instance)).intValue());
     }
 
-    public static (MobEffectListHandle) MobEffectList fromBukkit(org.bukkit.potion.PotionEffectType effectType) {
+    public static (MobEffectHandle) MobEffect fromBukkit(org.bukkit.potion.PotionEffectType effectType) {
         com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod fromIdRaw;
-        fromIdRaw = (com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod) MobEffectListHandle.T.fromId.raw;
-        return (MobEffectList) fromIdRaw.invoke(Integer.valueOf(effectType.getId()));
+        fromIdRaw = (com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod) MobEffectHandle.T.fromId.raw;
+        return (MobEffect) fromIdRaw.invoke(Integer.valueOf(effectType.getId()));
     }
 
-    public static (Holder<MobEffectListHandle>) MobEffectList holderFromBukkit(org.bukkit.potion.PotionEffectType effectType) {
+    public static (Holder<MobEffectHandle>) MobEffect holderFromBukkit(org.bukkit.potion.PotionEffectType effectType) {
         com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod fromIdRaw;
-        fromIdRaw = (com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod) MobEffectListHandle.T.fromId.raw;
-        return (MobEffectList) fromIdRaw.invoke(Integer.valueOf(effectType.getId()));
+        fromIdRaw = (com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod) MobEffectHandle.T.fromId.raw;
+        return (MobEffect) fromIdRaw.invoke(Integer.valueOf(effectType.getId()));
     }
 
-    public static org.bukkit.potion.PotionEffectType holderToBukkit((Holder<MobEffectListHandle>) MobEffectList mobEffectList) {
+    public static org.bukkit.potion.PotionEffectType holderToBukkit((Holder<MobEffectHandle>) MobEffect mobEffectList) {
         com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod getIdRaw;
-        getIdRaw = (com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod) MobEffectListHandle.T.getId.raw;
+        getIdRaw = (com.bergerkiller.mountiplex.reflection.declarations.Template$StaticMethod) MobEffectHandle.T.getId.raw;
         return org.bukkit.potion.PotionEffectType.getById(((Integer) getIdRaw.invoke(mobEffectList)).intValue());
     }
 #endif
 
-#if exists MobEffectList public static int getId(MobEffectList mobeffectlist);
-    public static int getId((MobEffectListHandle) MobEffectList mobeffectlist);
+#if exists MobEffect public static int getId(MobEffect mobeffectlist);
+    public static int getId((MobEffectHandle) MobEffect mobeffectlist);
 #elseif version >= 1.18
-    public static int getId((MobEffectListHandle) MobEffectList mobeffectlist) {
+    public static int getId((MobEffectHandle) MobEffect mobeffectlist) {
         return net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.getId((Object) mobeffectlist);
     }
-#elseif version < 1.9 && exists net.minecraft.world.effect.MobEffectList public final int id;
-    public static int getId((MobEffectListHandle) MobEffectList mobeffectlist) {
+#elseif version < 1.9 && exists net.minecraft.world.effect.MobEffect public final int id;
+    public static int getId((MobEffectHandle) MobEffect mobeffectlist) {
         return mobeffectlist.id;
     }
 #else
-    public static int getId((MobEffectListHandle) MobEffectList mobeffectlist);
+    public static int getId((MobEffectHandle) MobEffect mobeffectlist);
 #endif
 
-#if exists MobEffectList public static MobEffectList byId(int id);
-    public static (MobEffectListHandle) MobEffectList fromId:byId(int id);
+#if exists MobEffect public static MobEffect byId(int id);
+    public static (MobEffectHandle) MobEffect fromId:byId(int id);
 #elseif version >= 1.18
-    public static (MobEffectListHandle) MobEffectList fromId(int id) {
-        return (MobEffectList) net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.byId(id);
+    public static (MobEffectHandle) MobEffect fromId(int id) {
+        return (MobEffect) net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.byId(id);
     }
-#elseif version < 1.9 && exists net.minecraft.world.effect.MobEffectList public static final MobEffectList[] byId;
+#elseif version < 1.9 && exists net.minecraft.world.effect.MobEffect public static final MobEffect[] byId;
     // NachoSpigot 1.8.8 has some weird hack thing
-    public static (MobEffectListHandle) MobEffectList fromId(int id) {
-        MobEffectList[] byId = MobEffectList.byId;
+    public static (MobEffectHandle) MobEffect fromId(int id) {
+        MobEffect[] byId = MobEffect.byId;
         return (id >= 0 && id < byId.length) ? byId[id] : null;
     }
 #else
-    public static (MobEffectListHandle) MobEffectList fromId(int id);
+    public static (MobEffectHandle) MobEffect fromId(int id);
 #endif
 }

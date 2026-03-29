@@ -4,19 +4,17 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.generated.net.minecraft.network.NetworkManagerHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
+import com.bergerkiller.generated.net.minecraft.network.ConnectionHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.network.ServerGamePacketListenerImplHandle;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 
@@ -88,12 +86,12 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 
         public static void bind(Player player) {
             Object entityPlayer = HandleConversion.toEntityHandle(player);
-            PlayerConnectionHandle playerConnection = EntityPlayerHandle.T.playerConnection.get(entityPlayer);
+            ServerGamePacketListenerImplHandle playerConnection = ServerPlayerHandle.T.playerConnection.get(entityPlayer);
             if (playerConnection == null) {
                 return; // already disconnected
             }
             Object networkManager = playerConnection.getNetworkManager();
-            Channel channel = NetworkManagerHandle.T.channel.get(networkManager);
+            Channel channel = ConnectionHandle.T.channel.get(networkManager);
             CommonChannelListener listener = new CommonChannelListener(player);
             try {
                 channel.pipeline().addBefore("packet_handler", "bkcommonlib", listener);
@@ -106,12 +104,12 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 
         public static void unbind(Player player) {
             Object entityPlayer = HandleConversion.toEntityHandle(player);
-            PlayerConnectionHandle playerConnection = EntityPlayerHandle.T.playerConnection.get(entityPlayer);
+            ServerGamePacketListenerImplHandle playerConnection = ServerPlayerHandle.T.playerConnection.get(entityPlayer);
             if (playerConnection == null) {
                 return; // already disconnected
             }
             Object networkManager = playerConnection.getNetworkManager();
-            final Channel channel = NetworkManagerHandle.T.channel.get(networkManager);
+            final Channel channel = ConnectionHandle.T.channel.get(networkManager);
             channel.eventLoop().submit(() -> {
                 channel.pipeline().remove("bkcommonlib");
                 return null;

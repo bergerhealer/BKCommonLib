@@ -10,8 +10,9 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.EntityPose;
 import com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode;
 import com.bergerkiller.generated.net.minecraft.world.entity.DisplayHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityItemFrameHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstractHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.decoration.ItemFrameHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.monster.ShulkerHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.AbstractMinecartHandle;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -24,9 +25,8 @@ import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.boss.enderdragon.EntityEnderCrystalHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.item.EntityItemHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.monster.EntityShulkerHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.boss.enderdragon.EndCrystalHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.item.ItemEntityHandle;
 
 public class DataWatcherTest {
 
@@ -226,32 +226,32 @@ public class DataWatcherTest {
 
     @Test
     public void testShulkerPeek() {
-        if (!EntityShulkerHandle.T.isAvailable()) {
+        if (!ShulkerHandle.T.isAvailable()) {
             return;
         }
 
         DataWatcher dataWatcher = new DataWatcher();
 
         // DATA_PEEK
-        dataWatcher.set(EntityShulkerHandle.DATA_PEEK, (byte) 5);
-        assertEquals((byte) 5, dataWatcher.get(EntityShulkerHandle.DATA_PEEK).byteValue());
+        dataWatcher.set(ShulkerHandle.DATA_PEEK, (byte) 5);
+        assertEquals((byte) 5, dataWatcher.get(ShulkerHandle.DATA_PEEK).byteValue());
 
         // DATA_AP (attached point)
-        //dataWatcher.set(EntityShulkerHandle.DATA_AP, new IntVector3(5, 6, 7));
-        //assertEquals(new IntVector3(5, 6, 7), dataWatcher.get(EntityShulkerHandle.DATA_AP));
+        //dataWatcher.set(ShulkerHandle.DATA_AP, new IntVector3(5, 6, 7));
+        //assertEquals(new IntVector3(5, 6, 7), dataWatcher.get(ShulkerHandle.DATA_AP));
     }
 
     @Test
     public void testEnderCrystalBeamTarget() {
-        if (!EntityEnderCrystalHandle.T.isAvailable()) {
+        if (!EndCrystalHandle.T.isAvailable()) {
             return;
         }
 
         DataWatcher dataWatcher = new DataWatcher();
 
         // DATA_BEAM_TARGET
-        dataWatcher.set(EntityEnderCrystalHandle.DATA_BEAM_TARGET, new IntVector3(5, 6, 7));
-        assertEquals(new IntVector3(5, 6, 7), dataWatcher.get(EntityEnderCrystalHandle.DATA_BEAM_TARGET));
+        dataWatcher.set(EndCrystalHandle.DATA_BEAM_TARGET, new IntVector3(5, 6, 7));
+        assertEquals(new IntVector3(5, 6, 7), dataWatcher.get(EndCrystalHandle.DATA_BEAM_TARGET));
     }
     
     private static void checkCustomNameOptional(Object raw) {
@@ -310,8 +310,8 @@ public class DataWatcherTest {
     public void testItemItemStack() {
         Material itemType = MaterialUtil.getFirst("STONE", "LEGACY_STONE");
         DataWatcher metadata = new DataWatcher();
-        metadata.set(EntityItemHandle.DATA_ITEM, new ItemStack(itemType, 1));
-        ItemStack stored = metadata.get(EntityItemHandle.DATA_ITEM);
+        metadata.set(ItemEntityHandle.DATA_ITEM, new ItemStack(itemType, 1));
+        ItemStack stored = metadata.get(ItemEntityHandle.DATA_ITEM);
         assertNotNull(stored);
         assertEquals(itemType, stored.getType());
     }
@@ -324,9 +324,9 @@ public class DataWatcherTest {
                         });
 
         DataWatcher metadata = new DataWatcher();
-        metadata.set(EntityItemFrameHandle.DATA_ITEM, item.toBukkit());
+        metadata.set(ItemFrameHandle.DATA_ITEM, item.toBukkit());
 
-        CommonItemStack read = CommonItemStack.of(metadata.get(EntityItemFrameHandle.DATA_ITEM));
+        CommonItemStack read = CommonItemStack.of(metadata.get(ItemFrameHandle.DATA_ITEM));
         assertEquals(item, read);
         assertEquals(item.toBukkit(), read.toBukkit());
         assertEquals("UniqueValue123", read.getCustomData().getValue("UniqueKey"));
@@ -420,14 +420,14 @@ public class DataWatcherTest {
         BlockData testData = BlockData.fromMaterial(MaterialUtil.getFirst("DIAMOND_BLOCK", "LEGACY_DIAMOND_BLOCK"));
 
         if (CommonCapabilities.IS_MINECART_BLOCK_COMBINED_KEY) {
-            metadata.set(EntityMinecartAbstractHandle.DATA_CUSTOM_DISPLAY_BLOCK, testData);
-            assertEquals(testData, metadata.get(EntityMinecartAbstractHandle.DATA_CUSTOM_DISPLAY_BLOCK));
+            metadata.set(AbstractMinecartHandle.DATA_CUSTOM_DISPLAY_BLOCK, testData);
+            assertEquals(testData, metadata.get(AbstractMinecartHandle.DATA_CUSTOM_DISPLAY_BLOCK));
         } else {
-            metadata.set(EntityMinecartAbstractHandle.DATA_BLOCK_VISIBLE, true);
-            assertEquals(true, metadata.get(EntityMinecartAbstractHandle.DATA_BLOCK_VISIBLE));
+            metadata.set(AbstractMinecartHandle.DATA_BLOCK_VISIBLE, true);
+            assertEquals(true, metadata.get(AbstractMinecartHandle.DATA_BLOCK_VISIBLE));
 
-            metadata.set(EntityMinecartAbstractHandle.DATA_BLOCK_TYPE, testData.getCombinedId());
-            assertEquals(testData, BlockData.fromCombinedId(metadata.get(EntityMinecartAbstractHandle.DATA_BLOCK_TYPE)));
+            metadata.set(AbstractMinecartHandle.DATA_BLOCK_TYPE, testData.getCombinedId());
+            assertEquals(testData, BlockData.fromCombinedId(metadata.get(AbstractMinecartHandle.DATA_BLOCK_TYPE)));
         }
     }
 }

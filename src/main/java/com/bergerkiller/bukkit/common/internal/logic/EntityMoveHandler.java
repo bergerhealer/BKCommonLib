@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import com.bergerkiller.generated.net.minecraft.core.DirectionHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.player.PlayerHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Vehicle;
@@ -22,20 +25,18 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
 import com.bergerkiller.generated.net.minecraft.CrashReportHandle;
-import com.bergerkiller.generated.net.minecraft.CrashReportSystemDetailsHandle;
+import com.bergerkiller.generated.net.minecraft.CrashReportCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.ReportedExceptionHandle;
-import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxisHandle;
+import com.bergerkiller.generated.net.minecraft.core.DirectionHandle.AxisHandle;
 import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.player.EntityHumanHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.BlockCobbleWallHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.BlockFenceGateHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.BlockFenceHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.WallBlockHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.FenceGateBlockHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.FenceBlockHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlocksHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
 
 /**
  * Handles the full Entity move() physics function. It should be kept completely in sync with what is used on the server,
@@ -52,7 +53,7 @@ public abstract class EntityMoveHandler {
                 return EntityMoveHandler_1_14.initialize();
             } else if (CommonCapabilities.HAS_VOXELSHAPE_LOGIC) {
                 return EntityMoveHandler_1_13.initialize();
-            } else if (WorldHandle.T.getBlockCollisions.isAvailable()) {
+            } else if (LevelHandle.T.getBlockCollisions.isAvailable()) {
                 return EntityMoveHandler_1_11_2.initialize();
             } else {
                 return EntityMoveHandler_1_8.initialize();
@@ -108,13 +109,13 @@ public abstract class EntityMoveHandler {
     }
 
     // Gets the AxisAlignedBB bounding box to use for computing Block Collisions
-    protected AxisAlignedBBHandle getBlockBoundingBox(EntityHandle entity) {
-        AxisAlignedBBHandle boundingBox = entity.getBoundingBox();
+    protected AABBHandle getBlockBoundingBox(EntityHandle entity) {
+        AABBHandle boundingBox = entity.getBoundingBox();
         if (this.blockCollisionEnabled && this.customBlockCollisionBounds != null) {
             double x = 0.5 * (boundingBox.getMinX() + boundingBox.getMaxX());
             double y = boundingBox.getMinY();
             double z = 0.5 * (boundingBox.getMinZ() + boundingBox.getMaxZ());
-            return AxisAlignedBBHandle.createNew(
+            return AABBHandle.createNew(
                     x - 0.5 * this.customBlockCollisionBounds.getX(),
                     y,
                     z - 0.5 * this.customBlockCollisionBounds.getZ(),
@@ -179,7 +180,7 @@ public abstract class EntityMoveHandler {
         that = EntityHandle.createHandle(entity.getHandle());
 
         final RandomSourceHandle this_random = that.getRandom();
-        WorldHandle world = that.getWorld();
+        LevelHandle world = that.getWorld();
 
         //org.bukkit.craftbukkit.SpigotTimings.entityMoveTimer.startTiming(); // Spigot
         if (that.isNoclip()) {
@@ -194,7 +195,7 @@ public abstract class EntityMoveHandler {
                 }
             } catch (Throwable throwable) {
                 CrashReportHandle crashreport = CrashReportHandle.create(throwable, "Checking entity block collision");
-                CrashReportSystemDetailsHandle crashreportsystemdetails = crashreport.getSystemDetails("Entity being checked for collision");
+                CrashReportCategoryHandle crashreportsystemdetails = crashreport.getSystemDetails("Entity being checked for collision");
 
                 that.appendEntityCrashDetails(crashreportsystemdetails);
                 throw (RuntimeException) ReportedExceptionHandle.createNew(crashreport).getRaw();
@@ -220,7 +221,7 @@ public abstract class EntityMoveHandler {
                 double d3;
 
                 if (d0 != 0.0D) {
-                    j = EnumAxisHandle.X.ordinal();
+                    j = AxisHandle.X.ordinal();
                     d3 = MathUtil.clamp(d0 + that_aI[j], -0.51D, 0.51D);
                     d0 = d3 - that_aI[j];
                     that_aI[j] = d3;
@@ -228,7 +229,7 @@ public abstract class EntityMoveHandler {
                         return;
                     }
                 } else if (d1 != 0.0D) {
-                    j = EnumAxisHandle.Y.ordinal();
+                    j = AxisHandle.Y.ordinal();
                     d3 = MathUtil.clamp(d1 + that_aI[j], -0.51D, 0.51D);
                     d1 = d3 - that_aI[j];
                     that_aI[j] = d3;
@@ -240,7 +241,7 @@ public abstract class EntityMoveHandler {
                         return;
                     }
 
-                    j = EnumAxisHandle.Z.ordinal();
+                    j = DirectionHandle.AxisHandle.Z.ordinal();
                     d3 = MathUtil.clamp(d2 + that_aI[j], -0.51D, 0.51D);
                     d2 = d3 - that_aI[j];
                     that_aI[j] = d3;
@@ -271,7 +272,7 @@ public abstract class EntityMoveHandler {
             double d8 = d1;
             double d9 = d2;
 
-            if ((movetype == MoveType.SELF || movetype == MoveType.PLAYER) && that.isOnGround() && that.isSneaking() && that.isInstanceOf(EntityHumanHandle.T)) {
+            if ((movetype == MoveType.SELF || movetype == MoveType.PLAYER) && that.isOnGround() && that.isSneaking() && that.isInstanceOf(PlayerHandle.T)) {
                 for (/* double d10 = 0.05D*/; d0 != 0.0D && world.isNotCollidingWithBlocks(that, that.getBoundingBox().translate(d0, (double) (-that.getHeightOffset()), 0.0D)); d7 = d0) {
                     if (d0 < 0.05D && d0 >= -0.05D) {
                         d0 = 0.0D;
@@ -313,7 +314,7 @@ public abstract class EntityMoveHandler {
             }
 
             // Store old bounding box before changes to it are made
-            AxisAlignedBBHandle axisalignedbb = that.getBoundingBox();
+            AABBHandle axisalignedbb = that.getBoundingBox();
 
             if (d0 != 0.0D || d1 != 0.0D || d2 != 0.0D) {
                 // BKCommonLib start
@@ -324,21 +325,21 @@ public abstract class EntityMoveHandler {
                 // BKCommonLib: add isEmpty() optimization
                 if (!shapeAccumulator.isEmpty()) {
                     if (d1 <= -1.0E-7D || d1 >= 1.0E-7D) {
-                        d1 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Y, that.getBoundingBox(), shapeAccumulator.stream(), d1);
+                        d1 = VoxelShapeHandle.traceAxis(DirectionHandle.AxisHandle.Y, that.getBoundingBox(), shapeAccumulator.stream(), d1);
                         if (d1 != 0.0D) {
                             that.setBoundingBox(that.getBoundingBox().translate(0.0D, d1, 0.0D));
                         }
                     }
 
                     if (d0 <= -1.0E-7D || d0 >= 1.0E-7D) {
-                        d0 = VoxelShapeHandle.traceAxis(EnumAxisHandle.X, that.getBoundingBox(), shapeAccumulator.stream(), d0);
+                        d0 = VoxelShapeHandle.traceAxis(AxisHandle.X, that.getBoundingBox(), shapeAccumulator.stream(), d0);
                         if (d0 != 0.0D) {
                             that.setBoundingBox(that.getBoundingBox().translate(d0, 0.0D, 0.0D));
                         }
                     }
 
                     if (d2 <= -1.0E-7D || d2 >= 1.0E-7D) {
-                        d2 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Z, that.getBoundingBox(), shapeAccumulator.stream(), d2);
+                        d2 = VoxelShapeHandle.traceAxis(AxisHandle.Z, that.getBoundingBox(), shapeAccumulator.stream(), d2);
                         if (d2 != 0.0D) {
                             that.setBoundingBox(that.getBoundingBox().translate(0.0D, 0.0D, d2));
                         }
@@ -355,7 +356,7 @@ public abstract class EntityMoveHandler {
                 double d12 = d0;
                 double d13 = d1;
                 double d14 = d2;
-                AxisAlignedBBHandle axisalignedbb1 = that.getBoundingBox();
+                AABBHandle axisalignedbb1 = that.getBoundingBox();
 
                 that.setBoundingBox(axisalignedbb);
                 d1 = (double) that.getHeightOffset();
@@ -365,43 +366,43 @@ public abstract class EntityMoveHandler {
                 shapeAccumulator.open(world_getCollisionShapes(that, d7, d1, d9));
                 // BKCommonLib end
 
-                AxisAlignedBBHandle axisalignedbb2 = that.getBoundingBox();
-                AxisAlignedBBHandle axisalignedbb3 = axisalignedbb2.transformB(d7, 0.0D, d9);
+                AABBHandle axisalignedbb2 = that.getBoundingBox();
+                AABBHandle axisalignedbb3 = axisalignedbb2.transformB(d7, 0.0D, d9);
 
                 double d11 = d1;
-                d11 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Y, axisalignedbb3, shapeAccumulator.stream(), d11);
+                d11 = VoxelShapeHandle.traceAxis(DirectionHandle.AxisHandle.Y, axisalignedbb3, shapeAccumulator.stream(), d11);
                 if (d11 != 0.0D) {
                     axisalignedbb2 = axisalignedbb2.translate(0.0D, d11, 0.0D);
                 }
 
                 double d15 = d7;
-                d15 = VoxelShapeHandle.traceAxis(EnumAxisHandle.X, axisalignedbb2, shapeAccumulator.stream(), d15);
+                d15 = VoxelShapeHandle.traceAxis(DirectionHandle.AxisHandle.X, axisalignedbb2, shapeAccumulator.stream(), d15);
                 if (d15 != 0.0D) {
                     axisalignedbb2 = axisalignedbb2.translate(d15, 0.0D, 0.0D);
                 }
 
                 double d16 = d9;
-                d16 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Z, axisalignedbb2, shapeAccumulator.stream(), d16);
+                d16 = VoxelShapeHandle.traceAxis(AxisHandle.Z, axisalignedbb2, shapeAccumulator.stream(), d16);
                 if (d16 != 0.0D) {
                     axisalignedbb2 = axisalignedbb2.translate(0.0D, 0.0D, d16);
                 }
 
-                AxisAlignedBBHandle axisalignedbb4 = that.getBoundingBox();
+                AABBHandle axisalignedbb4 = that.getBoundingBox();
 
                 double d17 = d1;
-                d17 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Y, axisalignedbb4, shapeAccumulator.stream(), d17);
+                d17 = VoxelShapeHandle.traceAxis(AxisHandle.Y, axisalignedbb4, shapeAccumulator.stream(), d17);
                 if (d17 != 0.0D) {
                     axisalignedbb4 = axisalignedbb4.translate(0.0D, d17, 0.0D);
                 }
 
                 double d18 = d7;
-                d18 = VoxelShapeHandle.traceAxis(EnumAxisHandle.X, axisalignedbb4, shapeAccumulator.stream(), d18);
+                d18 = VoxelShapeHandle.traceAxis(DirectionHandle.AxisHandle.X, axisalignedbb4, shapeAccumulator.stream(), d18);
                 if (d18 != 0.0D) {
                     axisalignedbb4 = axisalignedbb4.translate(d18, 0.0D, 0.0D);
                 }
 
                 double d19 = d9;
-                d19 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Z, axisalignedbb4, shapeAccumulator.stream(), d19);
+                d19 = VoxelShapeHandle.traceAxis(DirectionHandle.AxisHandle.Z, axisalignedbb4, shapeAccumulator.stream(), d19);
                 if (d19 != 0.0D) {
                     axisalignedbb4 = axisalignedbb4.translate(0.0D, 0.0D, d19);
                 }
@@ -421,7 +422,7 @@ public abstract class EntityMoveHandler {
                     that.setBoundingBox(axisalignedbb4);
                 }
 
-                d1 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Y, that.getBoundingBox(), shapeAccumulator.stream(), d1);
+                d1 = VoxelShapeHandle.traceAxis(AxisHandle.Y, that.getBoundingBox(), shapeAccumulator.stream(), d1);
                 if (d1 != 0.0D) {
                     that.setBoundingBox(that.getBoundingBox().translate(0.0D, d1, 0.0D));
                 }
@@ -454,7 +455,7 @@ public abstract class EntityMoveHandler {
                 BlockData iblockdata1 = world.getBlockData(blockposition1);
 
                 BlockHandle block = iblockdata1.getBlock();
-                if (block.isInstanceOf(BlockFenceHandle.T) || block.isInstanceOf(BlockCobbleWallHandle.T) || block.isInstanceOf(BlockFenceGateHandle.T)) {
+                if (block.isInstanceOf(FenceBlockHandle.T) || block.isInstanceOf(WallBlockHandle.T) || block.isInstanceOf(FenceGateBlockHandle.T)) {
                     iblockdata = iblockdata1;
                     blockposition = blockposition1;
                 }
@@ -524,7 +525,7 @@ public abstract class EntityMoveHandler {
             }
             // CraftBukkit end
 
-            if (that.hasMovementSound() && (!that.isOnGround() || !that.isSneaking() || !that.isInstanceOf(EntityHumanHandle.T)) && !that.isPassenger()) {
+            if (that.hasMovementSound() && (!that.isOnGround() || !that.isSneaking() || !that.isInstanceOf(PlayerHandle.T)) && !that.isPassenger()) {
                 double d22 = that.getLocX() - d4;
                 double d23 = that.getLocY() - d5;
                 double d11 = that.getLocZ() - d6;

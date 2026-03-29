@@ -3,23 +3,23 @@ package net.minecraft.world.level.storage;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.HolderLookup.a;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.core.HolderLookup.Provider;
+import net.minecraft.nbt.CompoundTag;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 import com.bergerkiller.generated.net.minecraft.world.level.storage.ValueInputHandle;
 
-// Note: is for NBTTagCompound on 1.21.5 and before
+// Note: is for CompoundTag on 1.21.5 and before
 class ValueOutput {
     public abstract void putString(String key, String value);
 }
 
 class ValueInput {
 
-    public (CommonTagCompound) NBTTagCompound asNBT() {
+    public (CommonTagCompound) CompoundTag asNBT() {
 #if version >= 1.21.6
-        #require TagValueInput private final net.minecraft.nbt.NBTTagCompound input;
+        #require TagValueInput private final net.minecraft.nbt.CompoundTag input;
         if (instance instanceof TagValueInput) {
             TagValueInput tvi = (TagValueInput) instance;
             return tvi#input;
@@ -32,19 +32,19 @@ class ValueInput {
     }
 
 #if version >= 1.21.6
-    public static (ValueInputHandle) ValueInput forNBTOnWorld((Object) ProblemReporter problemreporter, (org.bukkit.World) net.minecraft.world.level.World world, (CommonTagCompound) NBTTagCompound nbttagcompound) {
+    public static (ValueInputHandle) ValueInput forNBTOnWorld((Object) ProblemReporter problemreporter, (org.bukkit.World) net.minecraft.world.level.Level world, (CommonTagCompound) CompoundTag nbttagcompound) {
         return TagValueInput.create(problemreporter, world.registryAccess(), nbttagcompound);
     }
 
-    public static (ValueInputHandle) ValueInput forNBT((Object) ProblemReporter problemreporter, (Object) HolderLookup.a holderLookup, (CommonTagCompound) NBTTagCompound nbttagcompound) {
+    public static (ValueInputHandle) ValueInput forNBT((Object) ProblemReporter problemreporter, (Object) HolderLookup.Provider holderLookup, (CommonTagCompound) CompoundTag nbttagcompound) {
         return TagValueInput.create(problemreporter, holderLookup, nbttagcompound);
     }
 #else
-    public static (ValueInputHandle) ValueInput forNBTOnWorld((Object) Object problemreporter, (org.bukkit.World) Object world, (CommonTagCompound) NBTTagCompound nbttagcompound) {
+    public static (ValueInputHandle) ValueInput forNBTOnWorld((Object) Object problemreporter, (org.bukkit.World) Object world, (CommonTagCompound) CompoundTag nbttagcompound) {
         return nbttagcompound;
     }
 
-    public static (ValueInputHandle) ValueInput forNBT((Object) Object problemreporter, (Object) Object holderLookup, (CommonTagCompound) NBTTagCompound nbttagcompound) {
+    public static (ValueInputHandle) ValueInput forNBT((Object) Object problemreporter, (Object) Object holderLookup, (CommonTagCompound) CompoundTag nbttagcompound) {
         return nbttagcompound;
     }
 #endif

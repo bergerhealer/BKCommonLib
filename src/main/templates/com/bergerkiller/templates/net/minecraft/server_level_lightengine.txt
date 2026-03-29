@@ -1,27 +1,27 @@
 package net.minecraft.server.level;
 
-import com.bergerkiller.generated.net.minecraft.server.level.LightEngineThreadedHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ThreadedLevelLightEngineHandle;
 
 // Since MC 1.14
-optional class LightEngineThreaded {
+optional class ThreadedLevelLightEngine {
 
     public void schedule(Runnable runnable) {
-#if exists net.minecraft.server.level.LightEngineThreaded
-  #if exists net.minecraft.server.level.WorldServer public final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler moonrise$getChunkTaskScheduler();
+#if exists net.minecraft.server.level.ThreadedLevelLightEngine
+  #if exists net.minecraft.server.level.ServerLevel public final ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler moonrise$getChunkTaskScheduler();
         // Paper new chunk system - mixin mode - now stored in WorldServer
-        #require LightEngineThreaded private final net.minecraft.server.level.PlayerChunkMap chunkMap;
-        net.minecraft.server.level.PlayerChunkMap pcm = instance#chunkMap;
-        net.minecraft.server.level.WorldServer world = pcm.level;
+        #require ThreadedLevelLightEngine private final net.minecraft.server.level.ChunkMap chunkMap;
+        net.minecraft.server.level.ChunkMap pcm = instance#chunkMap;
+        net.minecraft.server.level.ServerLevel world = pcm.level;
     #if version >= 1.21.2
         world.moonrise$getChunkTaskScheduler().parallelGenExecutor.queueTask(runnable);
     #else
         world.moonrise$getChunkTaskScheduler().parallelGenExecutor.queueRunnable(runnable);
     #endif
-  #elseif exists net.minecraft.server.level.WorldServer public final io.papermc.paper.chunk.system.scheduling.ChunkTaskScheduler chunkTaskScheduler;
+  #elseif exists net.minecraft.server.level.ServerLevel public final io.papermc.paper.chunk.system.scheduling.ChunkTaskScheduler chunkTaskScheduler;
         // Paper new chunk system - now stored in WorldServer
-        #require LightEngineThreaded private final net.minecraft.server.level.PlayerChunkMap chunkMap;
-        net.minecraft.server.level.PlayerChunkMap pcm = instance#chunkMap;
-        net.minecraft.server.level.WorldServer world = pcm.level;
+        #require ThreadedLevelLightEngine private final net.minecraft.server.level.ChunkMap chunkMap;
+        net.minecraft.server.level.ChunkMap pcm = instance#chunkMap;
+        net.minecraft.server.level.ServerLevel world = pcm.level;
     #if version >= 1.20
         world.chunkTaskScheduler.parallelGenExecutor.queueRunnable(runnable);
     #else
@@ -30,17 +30,17 @@ optional class LightEngineThreaded {
 
   #elseif version >= 1.21.2
         // Spigot/Legacy Paper >= 1.21.2
-        #require net.minecraft.server.level.LightEngineThreaded private final net.minecraft.util.thread.ConsecutiveExecutor consecutiveExecutor;
+        #require net.minecraft.server.level.ThreadedLevelLightEngine private final net.minecraft.util.thread.ConsecutiveExecutor consecutiveExecutor;
         net.minecraft.util.thread.ConsecutiveExecutor executor = instance#consecutiveExecutor;
         executor.schedule(runnable);
   #else
         // Spigot/Legacy Paper < 1.21.2
-    #if exists net.minecraft.server.level.LightEngineThreaded private final net.minecraft.util.thread.ThreadedMailbox<Runnable> taskMailbox;
-        #require net.minecraft.server.level.LightEngineThreaded private final net.minecraft.util.thread.ThreadedMailbox<Runnable> taskMailbox;
+    #if exists net.minecraft.server.level.ThreadedLevelLightEngine private final net.minecraft.util.thread.ProcessorMailbox<Runnable> taskMailbox;
+        #require net.minecraft.server.level.ThreadedLevelLightEngine private final net.minecraft.util.thread.ProcessorMailbox<Runnable> taskMailbox;
     #else
-        #require net.minecraft.server.level.LightEngineThreaded private final net.minecraft.util.thread.ThreadedMailbox<Runnable> taskMailbox:b;
+        #require net.minecraft.server.level.ThreadedLevelLightEngine private final net.minecraft.util.thread.ProcessorMailbox<Runnable> taskMailbox:b;
     #endif
-        net.minecraft.util.thread.ThreadedMailbox mailbox = instance#taskMailbox;
+        net.minecraft.util.thread.ProcessorMailbox mailbox = instance#taskMailbox;
     #if version >= 1.18
         mailbox.tell(runnable);
     #else
@@ -50,12 +50,12 @@ optional class LightEngineThreaded {
 #endif
     }
 
-    public static LightEngineThreadedHandle forWorld((org.bukkit.World) net.minecraft.world.level.World world) {
+    public static ThreadedLevelLightEngineHandle forWorld((org.bukkit.World) net.minecraft.world.level.Level world) {
 #if version >= 1.18
-        LightEngineThreaded engine = ((ChunkProviderServer) world.getChunkSource()).getLightEngine();
+        ThreadedLevelLightEngine engine = ((ServerChunkCache) world.getChunkSource()).getLightEngine();
 #else
-        LightEngineThreaded engine = ((ChunkProviderServer) world.getChunkProvider()).getLightEngine();
+        ThreadedLevelLightEngine engine = ((ServerChunkCache) world.getChunkProvider()).getLightEngine();
 #endif
-        return com.bergerkiller.generated.net.minecraft.server.level.LightEngineThreadedHandle.createHandle(engine);
+        return com.bergerkiller.generated.net.minecraft.server.level.ThreadedLevelLightEngineHandle.createHandle(engine);
     }
 }

@@ -1,55 +1,55 @@
 package net.minecraft.resources;
 
-import net.minecraft.resources.MinecraftKey;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 
 import com.bergerkiller.generated.net.minecraft.resources.ResourceKeyHandle;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 
 class ResourceKey {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
 #if version >= 1.16
-    public (MinecraftKeyHandle) MinecraftKey getCategory() {
+    public (IdentifierHandle) Identifier getCategory() {
   #if version >= 1.21.11
-        #require net.minecraft.resources.ResourceKey private final MinecraftKey category:registryName;
+        #require net.minecraft.resources.ResourceKey private final Identifier category:registryName;
   #elseif version >= 1.17
-        #require net.minecraft.resources.ResourceKey private final MinecraftKey category:registryName;
+        #require net.minecraft.resources.ResourceKey private final Identifier category:registryName;
   #else
-        #require net.minecraft.resources.ResourceKey private final MinecraftKey category:b;
+        #require net.minecraft.resources.ResourceKey private final Identifier category:b;
   #endif
         return instance#category;
     }
 
   #if version >= 1.21.11
-    public (MinecraftKeyHandle) MinecraftKey getName:identifier();
+    public (IdentifierHandle) Identifier getName:identifier();
   #elseif version >= 1.18
-    public (MinecraftKeyHandle) MinecraftKey getName:location();
+    public (IdentifierHandle) Identifier getName:location();
   #else
-    public (MinecraftKeyHandle) MinecraftKey getName:a();
+    public (IdentifierHandle) Identifier getName:a();
   #endif
 
   #if version >= 1.18
-    public static (ResourceKeyHandle) ResourceKey create((ResourceKeyHandle) ResourceKey category, (MinecraftKeyHandle) MinecraftKey name);
-    public static (ResourceKeyHandle) ResourceKey createCategory:createRegistryKey((MinecraftKeyHandle) MinecraftKey categoryName);
+    public static (ResourceKeyHandle) ResourceKey create((ResourceKeyHandle) ResourceKey category, (IdentifierHandle) Identifier name);
+    public static (ResourceKeyHandle) ResourceKey createCategory:createRegistryKey((IdentifierHandle) Identifier categoryName);
   #else
-    public static (ResourceKeyHandle) ResourceKey create:a((ResourceKeyHandle) ResourceKey category, (MinecraftKeyHandle) MinecraftKey name);
-    public static (ResourceKeyHandle) ResourceKey createCategory:a((MinecraftKeyHandle) MinecraftKey categoryName);
+    public static (ResourceKeyHandle) ResourceKey create:a((ResourceKeyHandle) ResourceKey category, (IdentifierHandle) Identifier name);
+    public static (ResourceKeyHandle) ResourceKey createCategory:a((IdentifierHandle) Identifier categoryName);
   #endif
 #else
-    public (MinecraftKeyHandle) MinecraftKey getCategory() {
-        return (net.minecraft.resources.MinecraftKey) instance.category;
+    public (IdentifierHandle) Identifier getCategory() {
+        return (net.minecraft.resources.Identifier) instance.category;
     }
 
-    public (MinecraftKeyHandle) MinecraftKey getName() {
-        return (net.minecraft.resources.MinecraftKey) instance.name;
+    public (IdentifierHandle) Identifier getName() {
+        return (net.minecraft.resources.Identifier) instance.name;
     }
 
-    public static (ResourceKeyHandle) ResourceKey create((ResourceKeyHandle) ResourceKey category, (MinecraftKeyHandle) MinecraftKey name) {
+    public static (ResourceKeyHandle) ResourceKey create((ResourceKeyHandle) ResourceKey category, (IdentifierHandle) Identifier name) {
         return net.minecraft.resources.ResourceKey.create(category, (Object) name);
     }
 
-    public static (ResourceKeyHandle) ResourceKey createCategory((MinecraftKeyHandle) MinecraftKey categoryName) {
+    public static (ResourceKeyHandle) ResourceKey createCategory((IdentifierHandle) Identifier categoryName) {
         return net.minecraft.resources.ResourceKey.createCategory((Object) categoryName);
     }
 #endif

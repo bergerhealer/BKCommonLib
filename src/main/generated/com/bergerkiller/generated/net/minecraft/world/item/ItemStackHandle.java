@@ -5,8 +5,8 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.CustomModelData;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.BlockStateHandle;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import java.util.List;
@@ -34,7 +34,7 @@ public abstract class ItemStackHandle extends Template.Handle {
         return T.newInstance.invoke(type);
     }
 
-    public static ItemStackHandle fromBlockData(IBlockDataHandle data, int amount) {
+    public static ItemStackHandle fromBlockData(BlockStateHandle data, int amount) {
         return T.fromBlockData.invoke(data, amount);
     }
 
@@ -66,9 +66,9 @@ public abstract class ItemStackHandle extends Template.Handle {
     public abstract GameProfileHandle getSkullProfile();
     public abstract void setSkullProfile(GameProfileHandle profile);
     public abstract boolean hasItemModelSet();
-    public abstract MinecraftKeyHandle getItemModel();
-    public abstract MinecraftKeyHandle getItemModelIfSet();
-    public abstract void setItemModel(MinecraftKeyHandle key);
+    public abstract IdentifierHandle getItemModel();
+    public abstract IdentifierHandle getItemModelIfSet();
+    public abstract void setItemModel(IdentifierHandle key);
     public abstract boolean hasCustomModelData();
     public abstract boolean hasCustomModelDataValue();
     public abstract CustomModelData getCustomModelData();
@@ -152,8 +152,8 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.Method.Converted<GameProfileHandle> getSkullProfile = new Template.Method.Converted<GameProfileHandle>();
         public final Template.Method.Converted<Void> setSkullProfile = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> hasItemModelSet = new Template.Method<Boolean>();
-        public final Template.Method.Converted<MinecraftKeyHandle> getItemModel = new Template.Method.Converted<MinecraftKeyHandle>();
-        public final Template.Method.Converted<MinecraftKeyHandle> getItemModelIfSet = new Template.Method.Converted<MinecraftKeyHandle>();
+        public final Template.Method.Converted<IdentifierHandle> getItemModel = new Template.Method.Converted<IdentifierHandle>();
+        public final Template.Method.Converted<IdentifierHandle> getItemModelIfSet = new Template.Method.Converted<IdentifierHandle>();
         public final Template.Method.Converted<Void> setItemModel = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> hasCustomModelData = new Template.Method<Boolean>();
         public final Template.Method<Boolean> hasCustomModelDataValue = new Template.Method<Boolean>();

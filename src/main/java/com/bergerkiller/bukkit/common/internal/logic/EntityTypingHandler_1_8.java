@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 
@@ -22,8 +23,7 @@ import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
@@ -31,7 +31,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
 class EntityTypingHandler_1_8 extends EntityTypingHandler {
-    private final WorldServerHandle dummyTrackerWorld;
+    private final ServerLevelHandle dummyTrackerWorld;
     private final EntityTrackerHandle dummyTracker;
     private final IntHashMap<Object> entriesMap;
     private final Collection<Object> entries;
@@ -41,8 +41,8 @@ class EntityTypingHandler_1_8 extends EntityTypingHandler {
         // Initialize a dummy world, whose only use is providing access to the 'players' field.
         // This field is used by the EntityTracker to scan for players
         // We explicitly set this to an empty list to guarantee no spawn packets are produced
-        this.dummyTrackerWorld = WorldServerHandle.T.newHandleNull();
-        SafeField.create(WorldHandle.T.getType(), "players", List.class).set(this.dummyTrackerWorld.getRaw(), Collections.emptyList());
+        this.dummyTrackerWorld = ServerLevelHandle.T.newHandleNull();
+        SafeField.create(LevelHandle.T.getType(), "players", List.class).set(this.dummyTrackerWorld.getRaw(), Collections.emptyList());
 
         // Initialize the dummy tracker without calling any methods/constructors
         this.entriesMap = new IntHashMap<Object>();

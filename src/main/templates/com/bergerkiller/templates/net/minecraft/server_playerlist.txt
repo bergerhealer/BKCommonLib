@@ -1,15 +1,14 @@
 package net.minecraft.server.players;
 
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.server.level.EntityPlayer;
-import net.minecraft.server.level.WorldServer;
-import net.minecraft.world.entity.player.EntityHuman;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.nbt.CompoundTag;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 class PlayerList {
-    public final (List<org.bukkit.entity.Player) List<EntityPlayer> players;
+    public final (List<org.bukkit.entity.Player) List<ServerPlayer> players;
 
     //TODO: Is this actually used for anything at the moment?
 #if version >= 1.21.9
@@ -25,13 +24,13 @@ class PlayerList {
     public void setMaxPlayers(int maxPlayers) { instance#maxPlayers = maxPlayers; }
 #endif
 
-    public (CommonTagCompound) NBTTagCompound migratePlayerData((CommonTagCompound) NBTTagCompound playerProfileData) {
+    public (CommonTagCompound) CompoundTag migratePlayerData((CommonTagCompound) CompoundTag playerProfileData) {
 #if version >= 1.20.5
-        #require net.minecraft.world.level.storage.WorldNBTStorage protected final com.mojang.datafixers.DataFixer fixerUpper;
-        net.minecraft.world.level.storage.WorldNBTStorage storage = instance.playerIo;
+        #require net.minecraft.world.level.storage.PlayerDataStorage protected final com.mojang.datafixers.DataFixer fixerUpper;
+        net.minecraft.world.level.storage.PlayerDataStorage storage = instance.playerIo;
         com.mojang.datafixers.DataFixer fixerUpper = storage#fixerUpper;
 
-        int dataVersion = net.minecraft.nbt.GameProfileSerializer.getDataVersion(playerProfileData, -1);
+        int dataVersion = net.minecraft.nbt.NbtUtils.getDataVersion(playerProfileData, -1);
         return net.minecraft.util.datafix.DataFixTypes.PLAYER.updateToCurrentVersion(fixerUpper, playerProfileData, dataVersion);
 #else
         return playerProfileData;
@@ -40,31 +39,31 @@ class PlayerList {
 
 #if version >= 1.18
     public void savePlayers:saveAll();
-    protected void savePlayerFile:save((org.bukkit.entity.Player) EntityPlayer entityplayer);
+    protected void savePlayerFile:save((org.bukkit.entity.Player) ServerPlayer entityplayer);
 #else
     public void savePlayers();
-    protected void savePlayerFile((org.bukkit.entity.Player) EntityPlayer entityplayer);
+    protected void savePlayerFile((org.bukkit.entity.Player) ServerPlayer entityplayer);
 #endif
 
 #if version >= 1.18
-    public void sendRawPacketNearby((org.bukkit.World) WorldServer world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
-        instance.broadcast((EntityHuman) null, x, y, z, radius, world.dimension(), packet);
+    public void sendRawPacketNearby((org.bukkit.World) ServerLevel world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
+        instance.broadcast((net.minecraft.world.entity.player.Player) null, x, y, z, radius, world.dimension(), packet);
     }
 #elseif version >= 1.16
-    public void sendRawPacketNearby((org.bukkit.World) WorldServer world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
-        instance.sendPacketNearby((EntityHuman) null, x, y, z, radius, world.getDimensionKey(), packet);
+    public void sendRawPacketNearby((org.bukkit.World) ServerLevel world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
+        instance.sendPacketNearby((net.minecraft.world.entity.player.Player) null, x, y, z, radius, world.getDimensionKey(), packet);
     }
 #elseif version >= 1.14.1
-    public void sendRawPacketNearby((org.bukkit.World) WorldServer world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
-        instance.sendPacketNearby((EntityHuman) null, x, y, z, radius, world.worldProvider.getDimensionManager().getType(), packet);
+    public void sendRawPacketNearby((org.bukkit.World) ServerLevel world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
+        instance.sendPacketNearby((net.minecraft.world.entity.player.Player) null, x, y, z, radius, world.worldProvider.getDimensionManager().getType(), packet);
     }
 #elseif version >= 1.9
-    public void sendRawPacketNearby((org.bukkit.World) WorldServer world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
-        instance.sendPacketNearby((EntityHuman) null, x, y, z, radius, world.dimension, packet);
+    public void sendRawPacketNearby((org.bukkit.World) ServerLevel world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
+        instance.sendPacketNearby((net.minecraft.world.entity.player.Player) null, x, y, z, radius, world.dimension, packet);
     }
 #else
-    public void sendRawPacketNearby((org.bukkit.World) WorldServer world, double x, double y, double z, double radius, (Object) Packet packet) {
-        instance.sendPacketNearby((EntityHuman) null, x, y, z, radius, world.dimension, packet);
+    public void sendRawPacketNearby((org.bukkit.World) ServerLevel world, double x, double y, double z, double radius, (Object) Packet packet) {
+        instance.sendPacketNearby((net.minecraft.world.entity.player.Player) null, x, y, z, radius, world.dimension, packet);
     }
 #endif
 }

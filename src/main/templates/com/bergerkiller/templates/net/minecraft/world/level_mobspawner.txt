@@ -1,19 +1,19 @@
 package net.minecraft.world.level;
 
-import net.minecraft.core.BlockPosition;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.resources.MinecraftKey;
-import net.minecraft.server.level.WorldServer;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.World;
+import net.minecraft.world.level.Level;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 
-class MobSpawnerAbstract {
+class BaseSpawner {
     public int spawnDelay;
 
     private int minSpawnDelay;
@@ -34,14 +34,14 @@ class MobSpawnerAbstract {
     private int requiredPlayerRange;
     private int spawnRange;
 
-    public void onTick((org.bukkit.World) World world, (IntVector3) BlockPosition blockPosition) {
+    public void onTick((org.bukkit.World) Level world, (IntVector3) BlockPos blockPosition) {
 #if version >= 1.18
-        if (world instanceof WorldServer) {
-            instance.serverTick((WorldServer) world, blockPosition);
+        if (world instanceof ServerLevel) {
+            instance.serverTick((ServerLevel) world, blockPosition);
         }
 #elseif version >= 1.17
-        if (world instanceof WorldServer) {
-            instance.a((WorldServer) world, blockPosition);
+        if (world instanceof ServerLevel) {
+            instance.a((ServerLevel) world, blockPosition);
         }
 #else
         instance.c();
@@ -49,51 +49,51 @@ class MobSpawnerAbstract {
     }
 
 #if version >= 1.18
-    public (MinecraftKeyHandle) MinecraftKey getMobName() {
+    public (IdentifierHandle) Identifier getMobName() {
         // No API :( will need to read NBT directly
-        NBTTagCompound spawnedEntityNBT = instance.nextSpawnData.getEntityToSpawn();
+        CompoundTag spawnedEntityNBT = instance.nextSpawnData.getEntityToSpawn();
   #if version >= 1.21.5
-        return MinecraftKey.tryParse(spawnedEntityNBT.getStringOr("id", ""));
+        return Identifier.tryParse(spawnedEntityNBT.getStringOr("id", ""));
   #else
-        return MinecraftKey.tryParse(spawnedEntityNBT.getString("id"));
+        return Identifier.tryParse(spawnedEntityNBT.getString("id"));
   #endif
     }
-    public void setMobName((MinecraftKeyHandle) MinecraftKey nameKey) {
+    public void setMobName((IdentifierHandle) Identifier nameKey) {
         // Set NBT directly
         instance.nextSpawnData.getEntityToSpawn().putString("id", nameKey.toString());
 
         // Note: spawnPotentials is private on some forge servers
   #if version >= 1.21.5
-        #require MobSpawnerAbstract private net.minecraft.util.random.WeightedList<MobSpawnerData> spawnPotentials;
+        #require BaseSpawner private net.minecraft.util.random.WeightedList<MobSpawnerData> spawnPotentials;
         instance#spawnPotentials = net.minecraft.util.random.WeightedList.of();
   #else
-        #require MobSpawnerAbstract private net.minecraft.util.random.SimpleWeightedRandomList<MobSpawnerData> spawnPotentials;
+        #require BaseSpawner private net.minecraft.util.random.SimpleWeightedRandomList<MobSpawnerData> spawnPotentials;
         instance#spawnPotentials = net.minecraft.util.random.SimpleWeightedRandomList.empty();
   #endif
     }
 #elseif version >= 1.17
-    public (MinecraftKeyHandle) MinecraftKey getMobName() {
+    public (IdentifierHandle) Identifier getMobName() {
         // They added 2 params for debug uses
         return instance.getMobName(null, null);
     }
-    public void setMobName((MinecraftKeyHandle) MinecraftKey nameKey) {
-        instance.setMobName((EntityTypes) BuiltInRegistries.ENTITY_TYPE.get(nameKey));
+    public void setMobName((IdentifierHandle) Identifier nameKey) {
+        instance.setMobName((EntityType) BuiltInRegistries.ENTITY_TYPE.get(nameKey));
     }
 #elseif version >= 1.13.1
-    public (MinecraftKeyHandle) MinecraftKey getMobName();
-    public void setMobName((MinecraftKeyHandle) MinecraftKey nameKey) {
-        instance.setMobName((EntityTypes) BuiltInRegistries.ENTITY_TYPE.get(nameKey));
+    public (IdentifierHandle) Identifier getMobName();
+    public void setMobName((IdentifierHandle) Identifier nameKey) {
+        instance.setMobName((EntityType) BuiltInRegistries.ENTITY_TYPE.get(nameKey));
     }
 #elseif version >= 1.13
-    public (MinecraftKeyHandle) MinecraftKey getMobName();
-    public void setMobName((MinecraftKeyHandle) MinecraftKey nameKey) {
-        instance.setMobName((EntityTypes) EntityTypes.REGISTRY.get(nameKey));
+    public (IdentifierHandle) Identifier getMobName();
+    public void setMobName((IdentifierHandle) Identifier nameKey) {
+        instance.setMobName((EntityType) EntityType.REGISTRY.get(nameKey));
     }
 #elseif version >= 1.11
-    public (MinecraftKeyHandle) MinecraftKey getMobName();
-    public void setMobName((MinecraftKeyHandle) MinecraftKey nameKey);
+    public (IdentifierHandle) Identifier getMobName();
+    public void setMobName((IdentifierHandle) Identifier nameKey);
 #else
-    public (MinecraftKeyHandle) String getMobName();
-    public void setMobName((MinecraftKeyHandle) String nameKey);
+    public (IdentifierHandle) String getMobName();
+    public void setMobName((IdentifierHandle) String nameKey);
 #endif
 }

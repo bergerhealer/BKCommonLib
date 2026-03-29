@@ -4,7 +4,7 @@ import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityItemFrameHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.decoration.ItemFrameHandle;
 
 /**
  * When clustering item frames (finding neighbours), this key is used
@@ -15,7 +15,7 @@ class ItemFrameClusterKey {
     public final BlockFace facing;
     public final int coordinate;
 
-    public ItemFrameClusterKey(EntityItemFrameHandle itemFrame) {
+    public ItemFrameClusterKey(ItemFrameHandle itemFrame) {
         this(itemFrame.getBukkitWorld(), itemFrame.getFacing(), itemFrame.getBlockPosition());
     }
 

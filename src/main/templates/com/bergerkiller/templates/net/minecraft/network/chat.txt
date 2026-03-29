@@ -2,46 +2,46 @@ package net.minecraft.network.chat;
 
 import com.google.gson.JsonElement;
 
-import net.minecraft.EnumChatFormat;
+import net.minecraft.ChatFormatting;
 
 import net.minecraft.network.chat.ComponentSerialization;
-import net.minecraft.nbt.NBTTagString;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 
-import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
-import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.CompoundTagHandle;
+import com.bergerkiller.generated.net.minecraft.network.chat.ComponentHandle;
 
-class IChatBaseComponent {
+class Component {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
-    // Method safely sets a modifier on a IChatBaseComponent, making it mutable if required
+    // Method safely sets a modifier on a Component, making it mutable if required
 #if version >= 1.19
-    #require net.minecraft.network.chat.IChatBaseComponent public abstract IChatBaseComponent makeMutableAndSetChatModifier(ChatModifier modifier) {
-        if (instance instanceof IChatMutableComponent) {
-            return ((IChatMutableComponent) instance).withStyle(modifier);
+    #require net.minecraft.network.chat.Component public abstract Component makeMutableAndSetChatModifier(Style modifier) {
+        if (instance instanceof MutableComponent) {
+            return ((MutableComponent) instance).withStyle(modifier);
         } else {
-            return (IChatBaseComponent.literal("")).append(instance).withStyle(modifier);
+            return (Component.literal("")).append(instance).withStyle(modifier);
         }
     }
 #elseif version >= 1.18
-    #require net.minecraft.network.chat.IChatBaseComponent public abstract IChatBaseComponent makeMutableAndSetChatModifier(ChatModifier modifier) {
-        if (instance instanceof IChatMutableComponent) {
-            return ((IChatMutableComponent) instance).withStyle(modifier);
+    #require net.minecraft.network.chat.Component public abstract Component makeMutableAndSetChatModifier(Style modifier) {
+        if (instance instanceof MutableComponent) {
+            return ((MutableComponent) instance).withStyle(modifier);
         } else {
             return (new ChatComponentText("")).append(instance).withStyle(modifier);
         }
     }
 #elseif version >= 1.16
-    #require net.minecraft.network.chat.IChatBaseComponent public abstract IChatBaseComponent makeMutableAndSetChatModifier(ChatModifier modifier) {
-        if (instance instanceof IChatMutableComponent) {
-            return ((IChatMutableComponent) instance).setChatModifier(modifier);
+    #require net.minecraft.network.chat.Component public abstract Component makeMutableAndSetChatModifier(Style modifier) {
+        if (instance instanceof MutableComponent) {
+            return ((MutableComponent) instance).setChatModifier(modifier);
         } else {
             return (new ChatComponentText("")).addSibling(instance).setChatModifier(modifier);
         }
     }
 #else
-    #require net.minecraft.network.chat.IChatBaseComponent public abstract IChatBaseComponent makeMutableAndSetChatModifier:setChatModifier(ChatModifier modifier);
+    #require net.minecraft.network.chat.Component public abstract Component makeMutableAndSetChatModifier:setChatModifier(Style modifier);
 #endif
 
 #if version >= 1.19
@@ -63,43 +63,43 @@ class IChatBaseComponent {
     }
 
 #if version >= 1.18
-    public (IChatBaseComponentHandle) IChatBaseComponent addSibling((IChatBaseComponentHandle) IChatBaseComponent sibling) {
-        if (instance instanceof IChatMutableComponent) {
-            return ((IChatMutableComponent) instance).append(sibling);
+    public (ComponentHandle) Component addSibling((ComponentHandle) Component sibling) {
+        if (instance instanceof MutableComponent) {
+            return ((MutableComponent) instance).append(sibling);
         } else {
             return instance.copy().append(sibling);
         }
     }
 #elseif version >= 1.16
-    public (IChatBaseComponentHandle) IChatBaseComponent addSibling((IChatBaseComponentHandle) IChatBaseComponent sibling) {
-        if (instance instanceof IChatMutableComponent) {
-            return ((IChatMutableComponent) instance).addSibling(sibling);
+    public (ComponentHandle) Component addSibling((ComponentHandle) Component sibling) {
+        if (instance instanceof MutableComponent) {
+            return ((MutableComponent) instance).addSibling(sibling);
         } else {
             return instance.mutableCopy().addSibling(sibling);
         }
     }
 #else
-    public (IChatBaseComponentHandle) IChatBaseComponent addSibling((IChatBaseComponentHandle) IChatBaseComponent sibling);
+    public (ComponentHandle) Component addSibling((ComponentHandle) Component sibling);
 #endif
 
     public boolean isMutable() {
 #if version >= 1.16
-        return instance instanceof IChatMutableComponent;
+        return instance instanceof MutableComponent;
 #else
         return true;
 #endif
     }
 
 #select version >=
-#case 1.18:    public abstract (IChatBaseComponentHandle) IChatMutableComponent createCopy:copy();
-#case 1.16:    public abstract (IChatBaseComponentHandle) IChatMutableComponent createCopy:mutableCopy();
-#case 1.13.1:  public abstract (IChatBaseComponentHandle) IChatBaseComponent createCopy:h();
-#case 1.13:    public abstract (IChatBaseComponentHandle) IChatBaseComponent createCopy:e();
-#case else:    public abstract (IChatBaseComponentHandle) IChatBaseComponent createCopy:f();
+#case 1.18:    public abstract (ComponentHandle) MutableComponent createCopy:copy();
+#case 1.16:    public abstract (ComponentHandle) MutableComponent createCopy:mutableCopy();
+#case 1.13.1:  public abstract (ComponentHandle) Component createCopy:h();
+#case 1.13:    public abstract (ComponentHandle) Component createCopy:e();
+#case else:    public abstract (ComponentHandle) Component createCopy:f();
 #endselect
 
-    public (IChatBaseComponentHandle) IChatBaseComponent setClickableURL(String url) {
-        ChatModifier modifier = instance.getStyle();
+    public (ComponentHandle) Component setClickableURL(String url) {
+        Style modifier = instance.getStyle();
 #if version >= 1.21.5
         java.net.URI parsedURI = null;
         try {
@@ -118,9 +118,9 @@ class IChatBaseComponent {
         return instance#makeMutableAndSetChatModifier(modifier);
     }
 
-    public (IChatBaseComponentHandle) IChatBaseComponent setClickableContent(String content) {
+    public (ComponentHandle) Component setClickableContent(String content) {
 #if version >= 1.15
-        ChatModifier modifier = instance.getStyle();
+        Style modifier = instance.getStyle();
   #if version >= 1.21.5
         modifier = modifier.withClickEvent(new ChatClickable$CopyToClipboard(content));
   #elseif version >= 1.18
@@ -135,8 +135,8 @@ class IChatBaseComponent {
 #endif
     }
 
-    public (IChatBaseComponentHandle) IChatBaseComponent setClickableSuggestedCommand(String command) {
-        ChatModifier modifier = instance.getStyle();
+    public (ComponentHandle) Component setClickableSuggestedCommand(String command) {
+        Style modifier = instance.getStyle();
 #if version >= 1.21.5
         modifier = modifier.withClickEvent(new ChatClickable$SuggestCommand(command));
 #elseif version >= 1.18
@@ -147,8 +147,8 @@ class IChatBaseComponent {
         return instance#makeMutableAndSetChatModifier(modifier);
     }
 
-    public (IChatBaseComponentHandle) IChatBaseComponent setClickableRunCommand(String command) {
-        ChatModifier modifier = instance.getStyle();
+    public (ComponentHandle) Component setClickableRunCommand(String command) {
+        Style modifier = instance.getStyle();
 #if version >= 1.21.5
         modifier = modifier.withClickEvent(new ChatClickable$RunCommand(command));
 #elseif version >= 1.18
@@ -159,8 +159,8 @@ class IChatBaseComponent {
         return instance#makeMutableAndSetChatModifier(modifier);
     }
 
-    public (IChatBaseComponentHandle) IChatBaseComponent setHoverText((IChatBaseComponentHandle) IChatBaseComponent hoverText) {
-        ChatModifier modifier = instance.getStyle();
+    public (ComponentHandle) Component setHoverText((ComponentHandle) Component hoverText) {
+        Style modifier = instance.getStyle();
 #if version >= 1.21.5
         modifier = modifier.withHoverEvent(new ChatHoverable$e(hoverText));
 #elseif version >= 1.18
@@ -175,10 +175,10 @@ class IChatBaseComponent {
     // ================================== Serialization and de-serialization ====================================
     // ==========================================================================================================
 
-    public static String chatComponentToJson((IChatBaseComponentHandle) IChatBaseComponent chatComponent) {
+    public static String chatComponentToJson((ComponentHandle) Component chatComponent) {
 #if version >= 1.21.6
         // Serialize into JsonElement
-        net.minecraft.core.HolderLookup$a holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
+        net.minecraft.core.HolderLookup$Provider holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
         JsonElement jsonElement = (JsonElement) ComponentSerialization.CODEC.encodeStart(
                  holderLookup.createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE),
                  chatComponent
@@ -197,19 +197,19 @@ class IChatBaseComponent {
         return net.minecraft.network.Utf8String.read(tmpByteBuf, Integer.MAX_VALUE);
 
 #elseif version >= 1.21.5
-        return IChatBaseComponent$ChatSerializer.toJson(chatComponent,
+        return Component$ChatSerializer.toJson(chatComponent,
                 org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry());
 
 #elseif version >= 1.20.5
-        return IChatBaseComponent$ChatSerializer.toJson(chatComponent,
+        return Component$ChatSerializer.toJson(chatComponent,
                 net.minecraft.server.MinecraftServer.getDefaultRegistryAccess());
 
 #else
-        return IChatBaseComponent$ChatSerializer.toJson(chatComponent);
+        return Component$ChatSerializer.toJson(chatComponent);
 #endif
     }
 
-    public static (IChatBaseComponentHandle) IChatBaseComponent jsonToChatComponent(String jsonString) {
+    public static (ComponentHandle) Component jsonToChatComponent(String jsonString) {
 #if version >= 1.21.6
         // Decode json string into JsonElement
         JsonElement jsonelement = com.google.gson.JsonParser.parseString(jsonString);
@@ -217,9 +217,9 @@ class IChatBaseComponent {
             return null;
         }
 
-        // Deserialize into IChatBaseComponent
-        net.minecraft.core.HolderLookup$a holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
-        return (IChatBaseComponent) ComponentSerialization.CODEC.parse(
+        // Deserialize into Component
+        net.minecraft.core.HolderLookup$Provider holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
+        return (Component) ComponentSerialization.CODEC.parse(
                 holderLookup.createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE),
                 jsonelement
             )
@@ -227,43 +227,43 @@ class IChatBaseComponent {
             .orElse(null);
 
 #elseif version >= 1.21.5
-        return IChatBaseComponent$ChatSerializer.fromJson(jsonString,
+        return Component$ChatSerializer.fromJson(jsonString,
                 org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry());
 
 #elseif version >= 1.20.5
-        return IChatBaseComponent$ChatSerializer.fromJson(jsonString,
+        return Component$ChatSerializer.fromJson(jsonString,
                 net.minecraft.server.MinecraftServer.getDefaultRegistryAccess());
 
 #else
-        return IChatBaseComponent$ChatSerializer.fromJson(jsonString);
+        return Component$ChatSerializer.fromJson(jsonString);
 #endif
     }
 
-    public static (IChatBaseComponentHandle) IChatBaseComponent nbtToChatComponent((com.bergerkiller.bukkit.common.nbt.CommonTag) NBTBase nbt) {
+    public static (ComponentHandle) Component nbtToChatComponent((com.bergerkiller.bukkit.common.nbt.CommonTag) Tag nbt) {
 #if version >= 1.21.5
-        // Use the CODEC for this. It'll turn plaintext strings into NBTTagString, and more complicated
+        // Use the CODEC for this. It'll turn plaintext strings into StringTag, and more complicated
         // values are turned into a NBT structure (component or list at root)
-        com.mojang.serialization.DynamicOps dynamicops = net.minecraft.nbt.DynamicOpsNBT.INSTANCE;
-        IChatBaseComponent component = (IChatBaseComponent) ComponentSerialization.CODEC.parse(dynamicops, nbt)
-                    .resultOrPartial(NBTTagCompoundHandle.createPartialErrorLogger(nbt))
+        com.mojang.serialization.DynamicOps dynamicops = net.minecraft.nbt.NbtOps.INSTANCE;
+        Component component = (Component) ComponentSerialization.CODEC.parse(dynamicops, nbt)
+                    .resultOrPartial(CompoundTagHandle.createPartialErrorLogger(nbt))
                     .orElse(null);
         if (component == null) {
-            component = IChatBaseComponent.literal("");
+            component = Component.literal("");
         }
         return component;
 #else
-        // Only NBTTagString is supported on this version
-        if (nbt instanceof NBTTagString) {
-            String jsonString = ((NBTTagString) nbt).getAsString();
+        // Only StringTag is supported on this version
+        if (nbt instanceof StringTag) {
+            String jsonString = ((StringTag) nbt).getAsString();
   #if version >= 1.20.5
-            return IChatBaseComponent$ChatSerializer.fromJson(jsonString,
+            return Component$ChatSerializer.fromJson(jsonString,
                     net.minecraft.server.MinecraftServer.getDefaultRegistryAccess());
   #else
-            return IChatBaseComponent$ChatSerializer.fromJson(jsonString);
+            return Component$ChatSerializer.fromJson(jsonString);
   #endif
         } else {
   #if version >= 1.19
-            return IChatBaseComponent.literal("");
+            return Component.literal("");
   #else
             return new ChatComponentText("");
   #endif
@@ -271,56 +271,56 @@ class IChatBaseComponent {
 #endif
     }
 
-    public static (com.bergerkiller.bukkit.common.nbt.CommonTag) NBTBase chatComponentToNBT((IChatBaseComponentHandle) IChatBaseComponent chatComponent) {
+    public static (com.bergerkiller.bukkit.common.nbt.CommonTag) Tag chatComponentToNBT((ComponentHandle) Component chatComponent) {
 #if version >= 1.21.5
-        com.mojang.serialization.DynamicOps dynamicops = net.minecraft.nbt.DynamicOpsNBT.INSTANCE;
-        return (NBTBase) ComponentSerialization.CODEC.encodeStart(
+        com.mojang.serialization.DynamicOps dynamicops = net.minecraft.nbt.NbtOps.INSTANCE;
+        return (Tag) ComponentSerialization.CODEC.encodeStart(
                  dynamicops, chatComponent).getOrThrow();
 #else
-        // Serialize to json and return that as a NBTTagString
+        // Serialize to json and return that as a StringTag
   #if version >= 1.20.5
-        String jsonString = IChatBaseComponent$ChatSerializer.toJson(chatComponent,
+        String jsonString = Component$ChatSerializer.toJson(chatComponent,
                                     net.minecraft.server.MinecraftServer.getDefaultRegistryAccess());
   #else
-        String jsonString = IChatBaseComponent$ChatSerializer.toJson(chatComponent);
+        String jsonString = Component$ChatSerializer.toJson(chatComponent);
   #endif
   #if version >= 1.15
-        return NBTTagString.valueOf(jsonString);
+        return StringTag.valueOf(jsonString);
   #else
-        return new NBTTagString(jsonString);
+        return new StringTag(jsonString);
   #endif
 #endif
     }
 
-    public static (IChatBaseComponentHandle) IChatBaseComponent empty() {
+    public static (ComponentHandle) Component empty() {
 #if version >= 1.19
-        return IChatBaseComponent.literal("");
+        return Component.literal("");
 #else
         return new ChatComponentText("");
 #endif
     }
 
-    public static (IChatBaseComponentHandle) IChatBaseComponent newLine() {
+    public static (ComponentHandle) Component newLine() {
 #if version >= 1.19
-        return IChatBaseComponent.literal("\n");
+        return Component.literal("\n");
 #else
         return new ChatComponentText("\n");
 #endif
     }
 
     // Gets the immutable EMPTY modifier constant, or creates a new mutable empty modifier
-    #require net.minecraft.network.chat.ChatModifier public static ChatModifier emptyFormat() {
+    #require net.minecraft.network.chat.Style public static Style emptyFormat() {
 #select version >=
-#case 1.17:    return ChatModifier.EMPTY;
-#case 1.16.2:  return ChatModifier.a;
-#case 1.16:    return ChatModifier.b;
-#case else:    return new ChatModifier();
+#case 1.17:    return Style.EMPTY;
+#case 1.16.2:  return Style.a;
+#case 1.16:    return Style.b;
+#case else:    return new Style();
 #endselect
     }
 
     // Sets an initial chat color for an EMPTY/new modifier
-    #require net.minecraft.network.chat.ChatModifier public static ChatModifier emptyWithColor(EnumChatFormat format) {
-        ChatModifier modifier = #emptyFormat();
+    #require net.minecraft.network.chat.Style public static Style emptyWithColor(ChatFormatting format) {
+        Style modifier = #emptyFormat();
 #if version >= 1.18
         return modifier.withColor(format);
 #elseif version >= 1.16
@@ -331,77 +331,77 @@ class IChatBaseComponent {
 #endif
     }
 
-    // Sets various properties of the ChatModifier
+    // Sets various properties of the Style
     // On MC 1.15.2 where the modifier was mutable, it modifies in the original modifier
 #if version >= 1.18
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setBold:withBold(Boolean bold);
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setItalic:withItalic(Boolean italic);
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setStrikethrough:withStrikethrough(Boolean strikethrough);
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setUnderlined:withUnderlined(Boolean underlined);
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setObfuscated:withObfuscated(Boolean obfuscated);
+    #require net.minecraft.network.chat.Style public Style setBold:withBold(Boolean bold);
+    #require net.minecraft.network.chat.Style public Style setItalic:withItalic(Boolean italic);
+    #require net.minecraft.network.chat.Style public Style setStrikethrough:withStrikethrough(Boolean strikethrough);
+    #require net.minecraft.network.chat.Style public Style setUnderlined:withUnderlined(Boolean underlined);
+    #require net.minecraft.network.chat.Style public Style setObfuscated:withObfuscated(Boolean obfuscated);
 #elseif version >= 1.16
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setBold(Boolean bold);
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setItalic(Boolean italic);
+    #require net.minecraft.network.chat.Style public Style setBold(Boolean bold);
+    #require net.minecraft.network.chat.Style public Style setItalic(Boolean italic);
 
     // These were added by CraftBukkit and might be missing on some (forge) server types or have broken remapping
     // This stuff is absolutely awful :(
 
-  #if exists net.minecraft.network.chat.ChatModifier public ChatModifier setStrikethrough(Boolean strikethrough);
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setStrikethrough(Boolean strikethrough);
+  #if exists net.minecraft.network.chat.Style public Style setStrikethrough(Boolean strikethrough);
+    #require net.minecraft.network.chat.Style public Style setStrikethrough(Boolean strikethrough);
   #else
-    #require net.minecraft.network.chat.ChatModifier private static ChatModifier create_modifier:<init>(ChatHexColor color, Boolean bold, Boolean italic, Boolean underlined, Boolean strikethrough, Boolean obfuscated, ChatClickable clickEvent, ChatHoverable hoverEvent, String insertion, MinecraftKey font);
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setStrikethrough(Boolean strikethrough) {
+    #require net.minecraft.network.chat.Style private static Style create_modifier:<init>(ChatHexColor color, Boolean bold, Boolean italic, Boolean underlined, Boolean strikethrough, Boolean obfuscated, ChatClickable clickEvent, ChatHoverable hoverEvent, String insertion, MinecraftKey font);
+    #require net.minecraft.network.chat.Style public Style setStrikethrough(Boolean strikethrough) {
         return #create_modifier(instance.getColor(), instance.isBold(), instance.isItalic(), instance.isUnderlined(), strikethrough, instance.isRandom(), instance.getClickEvent(), instance.getHoverEvent(), instance.getInsertion(), instance.getFont());
     }
   #endif
 
-  #if exists net.minecraft.network.chat.ChatModifier public ChatModifier setUnderline(Boolean underlined);
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setUnderlined:setUnderline(Boolean underlined);
-  #elseif exists net.minecraft.network.chat.ChatModifier public ChatModifier setUnderlined(Boolean underlined);
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setUnderlined(Boolean underlined);
+  #if exists net.minecraft.network.chat.Style public Style setUnderline(Boolean underlined);
+    #require net.minecraft.network.chat.Style public Style setUnderlined:setUnderline(Boolean underlined);
+  #elseif exists net.minecraft.network.chat.Style public Style setUnderlined(Boolean underlined);
+    #require net.minecraft.network.chat.Style public Style setUnderlined(Boolean underlined);
   #else
-    #require net.minecraft.network.chat.ChatModifier private static ChatModifier create_modifier:<init>(ChatHexColor color, Boolean bold, Boolean italic, Boolean underlined, Boolean strikethrough, Boolean obfuscated, ChatClickable clickEvent, ChatHoverable hoverEvent, String insertion, MinecraftKey font);
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setUnderlined(Boolean underlined) {
+    #require net.minecraft.network.chat.Style private static Style create_modifier:<init>(ChatHexColor color, Boolean bold, Boolean italic, Boolean underlined, Boolean strikethrough, Boolean obfuscated, ChatClickable clickEvent, ChatHoverable hoverEvent, String insertion, MinecraftKey font);
+    #require net.minecraft.network.chat.Style public Style setUnderlined(Boolean underlined) {
         return #create_modifier(instance.getColor(), instance.isBold(), instance.isItalic(), underlined, instance.isStrikethrough(), instance.isRandom(), instance.getClickEvent(), instance.getHoverEvent(), instance.getInsertion(), instance.getFont());
     }
   #endif
 
-  #if exists net.minecraft.network.chat.ChatModifier public ChatModifier setRandom(Boolean obfuscated);
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setObfuscated:setRandom(Boolean obfuscated);
-  #elseif exists net.minecraft.network.chat.ChatModifier public ChatModifier setObfuscated(Boolean obfuscated);
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setObfuscated(Boolean obfuscated);
+  #if exists net.minecraft.network.chat.Style public Style setRandom(Boolean obfuscated);
+    #require net.minecraft.network.chat.Style public Style setObfuscated:setRandom(Boolean obfuscated);
+  #elseif exists net.minecraft.network.chat.Style public Style setObfuscated(Boolean obfuscated);
+    #require net.minecraft.network.chat.Style public Style setObfuscated(Boolean obfuscated);
   #else
-    #require net.minecraft.network.chat.ChatModifier private static ChatModifier create_modifier:<init>(ChatHexColor color, Boolean bold, Boolean italic, Boolean underlined, Boolean strikethrough, Boolean obfuscated, ChatClickable clickEvent, ChatHoverable hoverEvent, String insertion, MinecraftKey font);
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setObfuscated(Boolean obfuscated) {
+    #require net.minecraft.network.chat.Style private static Style create_modifier:<init>(ChatHexColor color, Boolean bold, Boolean italic, Boolean underlined, Boolean strikethrough, Boolean obfuscated, ChatClickable clickEvent, ChatHoverable hoverEvent, String insertion, MinecraftKey font);
+    #require net.minecraft.network.chat.Style public Style setObfuscated(Boolean obfuscated) {
         return #create_modifier(instance.getColor(), instance.isBold(), instance.isItalic(), instance.isUnderlined(), instance.isStrikethrough(), obfuscated, instance.getClickEvent(), instance.getHoverEvent(), instance.getInsertion(), instance.getFont());
     }
   #endif
 #else
     // methods modify the original instance. Returns void.
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setBold(Boolean bold) {
+    #require net.minecraft.network.chat.Style public Style setBold(Boolean bold) {
         instance.setBold(bold);
         return instance;
     }
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setItalic(Boolean italic) {
+    #require net.minecraft.network.chat.Style public Style setItalic(Boolean italic) {
         instance.setItalic(italic);
         return instance;
     }
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setStrikethrough(Boolean strikethrough) {
+    #require net.minecraft.network.chat.Style public Style setStrikethrough(Boolean strikethrough) {
         instance.setStrikethrough(strikethrough);
         return instance;
     }
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setUnderlined(Boolean underlined) {
+    #require net.minecraft.network.chat.Style public Style setUnderlined(Boolean underlined) {
         instance.setUnderline(underlined);
         return instance;
     }
-    #require net.minecraft.network.chat.ChatModifier public ChatModifier setObfuscated(Boolean obfuscated) {
+    #require net.minecraft.network.chat.Style public Style setObfuscated(Boolean obfuscated) {
         instance.setRandom(obfuscated);
         return instance;
     }
 #endif
 
-    public static (IChatBaseComponentHandle) IChatBaseComponent modifiersToComponent(java.util.Collection<org.bukkit.ChatColor> colors) {
-        ChatModifier modifier = #emptyFormat();
+    public static (ComponentHandle) Component modifiersToComponent(java.util.Collection<org.bukkit.ChatColor> colors) {
+        Style modifier = #emptyFormat();
         java.util.Iterator iter = colors.iterator();
         while (iter.hasNext()) {
             org.bukkit.ChatColor color = (org.bukkit.ChatColor) iter.next();
@@ -419,18 +419,18 @@ class IChatBaseComponent {
                 modifier = modifier#setObfuscated(Boolean.TRUE);
             } else {
 #if version >= 1.12
-                EnumChatFormat format = org.bukkit.craftbukkit.util.CraftChatMessage.getColor(color);
+                ChatFormatting format = org.bukkit.craftbukkit.util.CraftChatMessage.getColor(color);
 #else
-                #require org.bukkit.craftbukkit.util.CraftChatMessage.StringMessage private static final java.util.Map<Character, net.minecraft.server.EnumChatFormat> formatMap;
+                #require org.bukkit.craftbukkit.util.CraftChatMessage.StringMessage private static final java.util.Map<Character, net.minecraft.server.ChatFormatting> formatMap;
                 java.util.Map formats = #formatMap;
-                EnumChatFormat format = (EnumChatFormat) formats.get(Character.valueOf(color.getChar()));
+                ChatFormatting format = (ChatFormatting) formats.get(Character.valueOf(color.getChar()));
 #endif
                 modifier = #emptyWithColor(format);
             }
         }
 
 #if version >= 1.19
-        return IChatBaseComponent.literal("").withStyle(modifier);
+        return Component.literal("").withStyle(modifier);
 #elseif version >= 1.18
         return new ChatComponentText("").withStyle(modifier);
 #else

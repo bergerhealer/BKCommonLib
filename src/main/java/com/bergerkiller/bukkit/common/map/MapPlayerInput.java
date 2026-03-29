@@ -2,6 +2,8 @@ package com.bergerkiller.bukkit.common.map;
 
 import java.util.UUID;
 
+import com.bergerkiller.generated.net.minecraft.world.entity.LivingEntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -18,14 +20,12 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityTeleportHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPositionHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLivingHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutUpdateAttributesHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundTeleportEntityPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerPositionPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundAddMobPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacketHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityLivingHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 
 /**
  * Input controller for virtual map navigation and UI.
@@ -511,7 +511,7 @@ public class MapPlayerInput implements Tickable {
             EntityHandle playerHandle = EntityHandle.fromBukkit(player);
             double half_width = 0.5 * (double) playerHandle.getWidth();
             double below = 0.1;
-            AxisAlignedBBHandle below_bounds = AxisAlignedBBHandle.createNew(
+            AABBHandle below_bounds = AABBHandle.createNew(
                     playerHandle.getLocX() - half_width,
                     playerHandle.getLocY() - below,
                     playerHandle.getLocZ() - half_width,
@@ -519,7 +519,7 @@ public class MapPlayerInput implements Tickable {
                     playerHandle.getLocY(),
                     playerHandle.getLocZ() + half_width
             );
-            if (WorldHandle.fromBukkit(player.getWorld()).isNotCollidingWithBlocks(playerHandle, below_bounds)) {
+            if (LevelHandle.fromBukkit(player.getWorld()).isNotCollidingWithBlocks(playerHandle, below_bounds)) {
                 updateInputInterception(false);
                 return;
             }
@@ -538,7 +538,7 @@ public class MapPlayerInput implements Tickable {
 
             // Resend current player position to the player
             Location loc = this.player.getLocation();
-            PacketPlayOutPositionHandle positionPacket = PacketPlayOutPositionHandle.createAbsolute(loc);
+            ClientboundPlayerPositionPacketHandle positionPacket = ClientboundPlayerPositionPacketHandle.createAbsolute(loc);
             PacketUtil.sendPacket(player, positionPacket);
             return;
         }
@@ -564,9 +564,9 @@ public class MapPlayerInput implements Tickable {
                 {
                     DataWatcher data = new DataWatcher();
                     data.set(EntityHandle.DATA_FLAGS, (byte) (EntityHandle.DATA_FLAG_INVISIBLE));
-                    data.set(EntityLivingHandle.DATA_HEALTH, 10.0F);
+                    data.set(LivingEntityHandle.DATA_HEALTH, 10.0F);
 
-                    PacketPlayOutSpawnEntityLivingHandle packet = PacketPlayOutSpawnEntityLivingHandle.createNew();
+                    ClientboundAddMobPacketHandle packet = ClientboundAddMobPacketHandle.createNew();
                     packet.setEntityId(this._fakeMountId);
                     packet.setEntityUUID(UUID.randomUUID());
                     packet.setEntityType(EntityType.CHICKEN);
@@ -576,7 +576,7 @@ public class MapPlayerInput implements Tickable {
                     PacketUtil.sendEntityLivingSpawnPacket(player, packet, data);
 
                     // Send attribute for max health = 0 to hide the health bar
-                    PacketUtil.sendPacket(player, PacketPlayOutUpdateAttributesHandle.createZeroMaxHealth(this._fakeMountId));
+                    PacketUtil.sendPacket(player, ClientboundUpdateAttributesPacketHandle.createZeroMaxHealth(this._fakeMountId));
                 }
                 sendMountPacket();
             }
@@ -585,7 +585,7 @@ public class MapPlayerInput implements Tickable {
             if (this._fakeMountId != -1 && !pos.equals(this._fakeMountLastPos)) {
                 this._fakeMountLastPos = pos;
 
-                PacketPlayOutEntityTeleportHandle tp_packet = PacketPlayOutEntityTeleportHandle.createNew(
+                ClientboundTeleportEntityPacketHandle tp_packet = ClientboundTeleportEntityPacketHandle.createNew(
                         this._fakeMountId,
                         pos.getX(), pos.getY(), pos.getZ(),
                         0.0f, 0.0f, false);

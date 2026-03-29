@@ -1,62 +1,62 @@
 package net.minecraft.world.entity.decoration;
 
-import net.minecraft.core.BlockPosition;
-import net.minecraft.core.EnumDirection;
-import net.minecraft.core.Vector3f;
-import net.minecraft.network.syncher.DataWatcherObject;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Rotations;
+import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityLiving;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.ItemWorldMap;
+import net.minecraft.world.item.MapItem;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
-import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityItemFrameHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.decoration.ItemFrameHandle;
 
-class EntityArmorStand extends EntityLiving {
+class ArmorStand extends LivingEntity {
 #if version >= 1.17
-    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_ARMORSTAND_FLAGS:DATA_CLIENT_FLAGS;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_HEAD:DATA_HEAD_POSE;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_BODY:DATA_BODY_POSE;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_LEFT:DATA_LEFT_ARM_POSE;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_RIGHT:DATA_RIGHT_ARM_POSE;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_LEFT:DATA_LEFT_LEG_POSE;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:DATA_RIGHT_LEG_POSE;
+    public static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_ARMORSTAND_FLAGS:DATA_CLIENT_FLAGS;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_HEAD:DATA_HEAD_POSE;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_BODY:DATA_BODY_POSE;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_ARM_LEFT:DATA_LEFT_ARM_POSE;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_ARM_RIGHT:DATA_RIGHT_ARM_POSE;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_LEG_LEFT:DATA_LEFT_LEG_POSE;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_LEG_RIGHT:DATA_RIGHT_LEG_POSE;
 #elseif version >= 1.14
-    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_ARMORSTAND_FLAGS:b;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_HEAD:c;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_BODY:d;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_LEFT:e;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_RIGHT:f;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_LEFT:g;
+    public static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_ARMORSTAND_FLAGS:b;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_HEAD:c;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_BODY:d;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_ARM_LEFT:e;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_ARM_RIGHT:f;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_LEG_LEFT:g;
   #if version >= 1.16.2
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:bh;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_LEG_RIGHT:bh;
   #elseif version >= 1.16
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:bo;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_LEG_RIGHT:bo;
   #elseif version >= 1.15
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:bp;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_LEG_RIGHT:bp;
   #else
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:bs;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_LEG_RIGHT:bs;
   #endif
 #elseif version >= 1.9
-    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_ARMORSTAND_FLAGS:a;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_HEAD:b;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_BODY:c;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_LEFT:d;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_RIGHT:e;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_LEFT:f;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:g;
+    public static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_ARMORSTAND_FLAGS:a;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_HEAD:b;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_BODY:c;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_ARM_LEFT:d;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_ARM_RIGHT:e;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_LEG_LEFT:f;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_LEG_RIGHT:g;
 #else
-    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_ARMORSTAND_FLAGS:###;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_HEAD:###;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_BODY:###;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_LEFT:###;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_RIGHT:###;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_LEFT:###;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:###;
+    public static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_ARMORSTAND_FLAGS:###;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_HEAD:###;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_BODY:###;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_ARM_LEFT:###;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_ARM_RIGHT:###;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_LEG_LEFT:###;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) EntityDataAccessor<Rotations> DATA_POSE_LEG_RIGHT:###;
 #endif
 
     <code>
@@ -76,19 +76,19 @@ class EntityArmorStand extends EntityLiving {
 }
 
 
-class EntityItemFrame extends EntityHanging {
+class ItemFrame extends HangingEntity {
 #if version >= 1.17
-    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM;
+    private static optional final (DataWatcher.Key<Object>) EntityDataAccessor<ItemStack> DATA_ITEM;
 #elseif version >= 1.14
-    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:ITEM;
+    private static optional final (DataWatcher.Key<Object>) EntityDataAccessor<ItemStack> DATA_ITEM:ITEM;
 #elseif version >= 1.13
-    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:e;
+    private static optional final (DataWatcher.Key<Object>) EntityDataAccessor<ItemStack> DATA_ITEM:e;
 #elseif version >= 1.11
-    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:c;
+    private static optional final (DataWatcher.Key<Object>) EntityDataAccessor<ItemStack> DATA_ITEM:c;
 #elseif version >= 1.9
-    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<com.google.common.base.Optional<ItemStack>> DATA_ITEM:c;
+    private static optional final (DataWatcher.Key<Object>) EntityDataAccessor<com.google.common.base.Optional<ItemStack>> DATA_ITEM:c;
 #else
-    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:###;
+    private static optional final (DataWatcher.Key<Object>) EntityDataAccessor<ItemStack> DATA_ITEM:###;
 #endif
 
     <code>
@@ -97,12 +97,12 @@ class EntityItemFrame extends EntityHanging {
 
     public boolean getItemIsMap() {
         ItemStack item = instance.getItem();
-        return item != null && item.getItem() instanceof ItemWorldMap;
+        return item != null && item.getItem() instanceof MapItem;
     }
 
     public java.util.UUID getItemMapDisplayDynamicOnlyUUID() {
         ItemStack item = instance.getItem();
-        if (item == null || !(item.getItem() instanceof ItemWorldMap)) {
+        if (item == null || !(item.getItem() instanceof MapItem)) {
             return null;
         }
         return item#getItemStackMapDisplayUUID();
@@ -110,7 +110,7 @@ class EntityItemFrame extends EntityHanging {
 
     public java.util.UUID getItemMapDisplayUUID() {
         ItemStack item = instance.getItem();
-        if (item == null || !(item.getItem() instanceof ItemWorldMap)) {
+        if (item == null || !(item.getItem() instanceof MapItem)) {
             return null;
         }
         java.util.UUID mapDisplayUUID = item#getItemStackMapDisplayUUID();
@@ -129,7 +129,7 @@ class EntityItemFrame extends EntityHanging {
 
     public void refreshItem() {
         // Paper added an API to update item without physics / sound. Use it if we can.
-#if exists net.minecraft.world.entity.decoration.EntityItemFrame public void setItem(net.minecraft.world.item.ItemStack itemstack, boolean update, boolean playSound);
+#if exists net.minecraft.world.entity.decoration.ItemFrame public void setItem(net.minecraft.world.item.ItemStack itemstack, boolean update, boolean playSound);
         instance.setItem(instance.getItem(), false, false);
 #else
         instance.setItem(instance.getItem());
@@ -139,35 +139,35 @@ class EntityItemFrame extends EntityHanging {
     public int getRotationOrdinal:getRotation();
 
     <code>
-    public static EntityItemFrameHandle fromBukkit(org.bukkit.entity.ItemFrame itemFrame) {
+    public static ItemFrameHandle fromBukkit(org.bukkit.entity.ItemFrame itemFrame) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(itemFrame));
     }
     </code>
 }
 
-class EntityHanging extends Entity {
+class HangingEntity extends Entity {
 
     //TODO: Is this actually useful for anything at all?
-    public void setBlockPositionField((IntVector3) BlockPosition blockPosition) {
+    public void setBlockPositionField((IntVector3) BlockPos blockPosition) {
 #if version >= 1.21
-        #require net.minecraft.world.entity.decoration.BlockAttachedEntity protected BlockPosition blockPositionField:pos;
+        #require net.minecraft.world.entity.decoration.BlockAttachedEntity protected BlockPos blockPositionField:pos;
 #elseif version >= 1.17
-        #require EntityHanging public BlockPosition blockPositionField:pos;
+        #require HangingEntity public BlockPos blockPositionField:pos;
 #else
-        #require EntityHanging public BlockPosition blockPositionField:blockPosition;
+        #require HangingEntity public BlockPos blockPositionField:blockPosition;
 #endif
         instance#blockPositionField = blockPosition;
     }
 
 #if version >= 1.18
-    public (IntVector3) BlockPosition getBlockPosition:getPos();
+    public (IntVector3) BlockPos getBlockPosition:getPos();
 #else
-    public (IntVector3) BlockPosition getBlockPosition();
+    public (IntVector3) BlockPos getBlockPosition();
 #endif
 
 #if forge_nms_obfuscated
-    public (org.bukkit.block.BlockFace) EnumDirection getFacing:bt();
+    public (org.bukkit.block.BlockFace) Direction getFacing:bt();
 #else
-    public (org.bukkit.block.BlockFace) EnumDirection getFacing:getDirection();
+    public (org.bukkit.block.BlockFace) Direction getFacing:getDirection();
 #endif
 }

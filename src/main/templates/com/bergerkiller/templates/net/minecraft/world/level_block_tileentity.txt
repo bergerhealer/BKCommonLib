@@ -1,15 +1,15 @@
 package net.minecraft.world.level.block.entity;
 
-import net.minecraft.core.BlockPosition;
-import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.PacketPlayOutTileEntityData
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.state.IBlockData;
-import net.minecraft.world.level.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 
@@ -19,49 +19,49 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
-import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.core.BlockPosHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntitySignHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.entity.SignBlockEntityHandle;
 
-class TileEntity {
+class BlockEntity {
 #if version >= 1.17
-    protected (org.bukkit.World) World world_field:level;
+    protected (org.bukkit.World) Level world_field:level;
 #else
-    protected (org.bukkit.World) World world_field:world;
+    protected (org.bukkit.World) Level world_field:world;
 #endif
 
 #if version >= 1.17
-    protected (IntVector3) BlockPosition position_field:worldPosition;
+    protected (IntVector3) BlockPos position_field:worldPosition;
 #else
-    protected (IntVector3) BlockPosition position_field:position;
+    protected (IntVector3) BlockPos position_field:position;
 #endif
 
 #if version >= 1.18
-    public (WorldHandle) World getWorld:getLevel();
-    public (BlockPositionHandle) BlockPosition getPosition:getBlockPos();
+    public (LevelHandle) Level getWorld:getLevel();
+    public (BlockPosHandle) BlockPos getPosition:getBlockPos();
 #else
-    public (WorldHandle) World getWorld();
-    public (BlockPositionHandle) BlockPosition getPosition();
+    public (LevelHandle) Level getWorld();
+    public (BlockPosHandle) BlockPos getPosition();
 #endif
 
-    public (BlockData) IBlockData getBlockDataIfCached() {
+    public (BlockData) BlockState getBlockDataIfCached() {
 #if version >= 1.17
-        #require net.minecraft.world.level.block.entity.TileEntity private IBlockData cachedBlockData:blockState;
+        #require net.minecraft.world.level.block.entity.BlockEntity private BlockState cachedBlockData:blockState;
         return instance#cachedBlockData;
 #elseif version >= 1.14
-        #require net.minecraft.world.level.block.entity.TileEntity private IBlockData cachedBlockData:c;
+        #require net.minecraft.world.level.block.entity.BlockEntity private BlockState cachedBlockData:c;
         return instance#cachedBlockData;
 #elseif version >= 1.13
-        #require net.minecraft.world.level.block.entity.TileEntity private IBlockData cachedBlockData:f;
+        #require net.minecraft.world.level.block.entity.BlockEntity private BlockState cachedBlockData:f;
         return instance#cachedBlockData;
 #else
   #if version >= 1.11
-        #require net.minecraft.world.level.block.entity.TileEntity private int cachedBlockDataValue:g;
-        #require net.minecraft.world.level.block.entity.TileEntity protected Block cachedBlockDataBlock:e;
+        #require net.minecraft.world.level.block.entity.BlockEntity private int cachedBlockDataValue:g;
+        #require net.minecraft.world.level.block.entity.BlockEntity protected Block cachedBlockDataBlock:e;
   #else
-        #require net.minecraft.world.level.block.entity.TileEntity private int cachedBlockDataValue:h;
-        #require net.minecraft.world.level.block.entity.TileEntity protected Block cachedBlockDataBlock:e;
+        #require net.minecraft.world.level.block.entity.BlockEntity private int cachedBlockDataValue:h;
+        #require net.minecraft.world.level.block.entity.BlockEntity protected Block cachedBlockDataBlock:e;
   #endif
 
         Block block = instance#cachedBlockDataBlock;
@@ -77,7 +77,7 @@ class TileEntity {
     }
 
 #if version >= 1.21.6
-    public void load((BlockData) IBlockData blockData, (CommonTagCompound) NBTTagCompound nbttagcompound) {
+    public void load((BlockData) BlockState blockData, (CommonTagCompound) CompoundTag nbttagcompound) {
         com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporter reporter = #createScopedProblemReporter();
         try {
             ValueInput input = #createTagValueInput(reporter, instance.getLevel().registryAccess(), nbttagcompound);
@@ -87,39 +87,39 @@ class TileEntity {
         }
     }
 #elseif version >= 1.20.5
-    public void load((BlockData) IBlockData blockData, (CommonTagCompound) NBTTagCompound nbttagcompound) {
+    public void load((BlockData) BlockState blockData, (CommonTagCompound) CompoundTag nbttagcompound) {
         instance.loadWithComponents(nbttagcompound, instance.getLevel().registryAccess());
     }
 #elseif version >= 1.17
-    public void load((BlockData) IBlockData blockData, (CommonTagCompound) NBTTagCompound nbttagcompound) {
+    public void load((BlockData) BlockState blockData, (CommonTagCompound) CompoundTag nbttagcompound) {
         instance.load(nbttagcompound);
     }
 #elseif version >= 1.16
-    public void load((BlockData) IBlockData blockData, (CommonTagCompound) NBTTagCompound nbttagcompound);
+    public void load((BlockData) BlockState blockData, (CommonTagCompound) CompoundTag nbttagcompound);
 #elseif version >= 1.12.1
-    public void load((BlockData) IBlockData blockData, (CommonTagCompound) NBTTagCompound nbttagcompound) {
+    public void load((BlockData) BlockState blockData, (CommonTagCompound) CompoundTag nbttagcompound) {
         instance.load(nbttagcompound);
     }
 #else
-    public void load((BlockData) IBlockData blockData, (CommonTagCompound) NBTTagCompound nbttagcompound) {
+    public void load((BlockData) BlockState blockData, (CommonTagCompound) CompoundTag nbttagcompound) {
         instance.a(nbttagcompound);
     }
 #endif
 
 #if version >= 1.21.6
-    public (CommonTagCompound) NBTTagCompound save() {
+    public (CommonTagCompound) CompoundTag save() {
         // Note: if ever removed, the same ProblemReporter crap as load()
         return instance.saveWithFullMetadata(instance.getLevel().registryAccess());
     }
 #elseif version >= 1.20.5
-    public (CommonTagCompound) NBTTagCompound save() {
+    public (CommonTagCompound) CompoundTag save() {
         return instance.saveWithFullMetadata(instance.getLevel().registryAccess());
     }
 #elseif version >= 1.18
-    public final (CommonTagCompound) NBTTagCompound save:saveWithFullMetadata();
+    public final (CommonTagCompound) CompoundTag save:saveWithFullMetadata();
 #else
-    public (CommonTagCompound) NBTTagCompound save() {
-        NBTTagCompound nbt = new NBTTagCompound();
+    public (CommonTagCompound) CompoundTag save() {
+        CompoundTag nbt = new CompoundTag();
   #if version >= 1.9.4
         return instance.save(nbt);
   #elseif version >= 1.9
@@ -133,8 +133,8 @@ class TileEntity {
 #endif
 
 #if version >= 1.18
-    public (BlockData) IBlockData getBlockData:getBlockState();
-    public (Object) IBlockData getRawBlockData:getBlockState();
+    public (BlockData) BlockState getBlockData:getBlockState();
+    public (Object) BlockState getRawBlockData:getBlockState();
 
     public (org.bukkit.Material) Block getType() {
         return instance.getBlockState().getBlock();
@@ -142,10 +142,10 @@ class TileEntity {
 
     public optional int getLegacyData:###();
 
-    public (CommonPacket) Packet<net.minecraft.network.protocol.game.PacketListenerPlayOut> getUpdatePacket();
+    public (CommonPacket) Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket();
 #elseif version >= 1.13
-    public (BlockData) IBlockData getBlockData:getBlock();
-    public (Object) IBlockData getRawBlockData:getBlock();
+    public (BlockData) BlockState getBlockData:getBlock();
+    public (Object) BlockState getRawBlockData:getBlock();
 
     public (org.bukkit.Material) Block getType() {
         return instance.getBlock().getBlock();
@@ -153,10 +153,10 @@ class TileEntity {
 
     public optional int getLegacyData:###();
 
-    public (CommonPacket) PacketPlayOutTileEntityData getUpdatePacket();
+    public (CommonPacket) ClientboundBlockEntityDataPacket getUpdatePacket();
 #else
 
-    #require TileEntity public IBlockData getBlockDataImpl() {
+    #require BlockEntity public BlockState getBlockDataImpl() {
         Block block;
         int rawData;
   #if version >= 1.11
@@ -172,10 +172,10 @@ class TileEntity {
         return block.fromLegacyData(rawData);
     }
 
-    public (BlockData) IBlockData getBlockData() {
+    public (BlockData) BlockState getBlockData() {
         return instance#getBlockDataImpl();
     }
-    public (Object) IBlockData getRawBlockData() {
+    public (Object) BlockState getRawBlockData() {
         return instance#getBlockDataImpl();
     }
 
@@ -187,10 +187,10 @@ class TileEntity {
 
     #if version >= 1.12.1
         public (org.bukkit.Material) Block getType:getBlock();
-        public (CommonPacket) PacketPlayOutTileEntityData getUpdatePacket();
+        public (CommonPacket) ClientboundBlockEntityDataPacket getUpdatePacket();
     #elseif version >= 1.9.4
         public (org.bukkit.Material) Block getType:getBlock();
-        public (CommonPacket) PacketPlayOutTileEntityData getUpdatePacket();
+        public (CommonPacket) ClientboundBlockEntityDataPacket getUpdatePacket();
     #elseif version >= 1.9
         public (org.bukkit.Material) Block getType:getBlock();
         public (CommonPacket) net.minecraft.network.protocol.Packet<?> getUpdatePacket();
@@ -213,13 +213,13 @@ class TileEntity {
         return com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion.INSTANCE.tileEntityToBlockState(getRaw());
     }
 
-    public static TileEntityHandle fromBukkit(org.bukkit.block.BlockState blockState) {
+    public static BlockEntityHandle fromBukkit(org.bukkit.block.BlockState blockState) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion.INSTANCE.blockStateToTileEntity(blockState));
     }
     </code>
 }
 
-class TileEntityFurnace extends TileEntity {
+class AbstractFurnaceBlockEntity extends BlockEntity {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
 #if version >= 1.21.2
@@ -233,9 +233,9 @@ class TileEntityFurnace extends TileEntity {
         } else {
             Item item = itemstack.getItem();
   #if version >= 1.18
-            Integer fuelTime = (Integer) TileEntityFurnace.getFuel().get(item);
+            Integer fuelTime = (Integer) AbstractFurnaceBlockEntity.getFuel().get(item);
   #else
-            Integer fuelTime = (Integer) TileEntityFurnace.f().get(item);
+            Integer fuelTime = (Integer) AbstractFurnaceBlockEntity.f().get(item);
   #endif
             if (fuelTime == null) {
                 return 0;
@@ -251,19 +251,19 @@ class TileEntityFurnace extends TileEntity {
 #endif
 }
 
-class TileEntityHopper extends TileEntity {
+class HopperBlockEntity extends BlockEntity {
 #if version >= 1.18
-    public static boolean suckItems:suckInItems((org.bukkit.World) World world, (Object) IHopper ihopper);
+    public static boolean suckItems:suckInItems((org.bukkit.World) Level world, (Object) IHopper ihopper);
 #elseif version >= 1.17
-    public static boolean suckItems:a((org.bukkit.World) World world, (Object) IHopper ihopper);
+    public static boolean suckItems:a((org.bukkit.World) Level world, (Object) IHopper ihopper);
 #else
-    public static boolean suckItems((org.bukkit.World) World world, (Object) IHopper ihopper) {
-        return TileEntityHopper.a(ihopper);
+    public static boolean suckItems((org.bukkit.World) Level world, (Object) IHopper ihopper) {
+        return HopperBlockEntity.a(ihopper);
     }
 #endif
 }
 
-class TileEntitySign extends TileEntity {
+class SignBlockEntity extends BlockEntity {
     public Object[] getRawFrontLines() {
 #if version >= 1.20
         return instance.getFrontText().getMessages(false);
@@ -276,11 +276,11 @@ class TileEntitySign extends TileEntity {
 
     public String[] getMessageFrontLines() {
 #if version >= 1.20
-        IChatBaseComponent[] lines = instance.getFrontText().getMessages(false);
+        Component[] lines = instance.getFrontText().getMessages(false);
 #elseif version >= 1.17
-        IChatBaseComponent[] lines = instance.messages;
+        Component[] lines = instance.messages;
 #else
-        IChatBaseComponent[] lines = instance.lines;
+        Component[] lines = instance.lines;
 #endif
         return #formatLinesAsLegacyStrings(lines);
     }
@@ -299,20 +299,20 @@ class TileEntitySign extends TileEntity {
 #if version >= 1.20
         return instance.getBackText().getMessages(false);
 #else
-        return TileEntitySignHandle.ALL_EMPTY_RAW_LINES;
+        return SignBlockEntityHandle.ALL_EMPTY_RAW_LINES;
 #endif
     }
 
     public String[] getMessageBackLines() {
 #if version >= 1.20
-        IChatBaseComponent[] lines = instance.getBackText().getMessages(false);
+        Component[] lines = instance.getBackText().getMessages(false);
         return #formatLinesAsLegacyStrings(lines);
 #else
-        return TileEntitySignHandle.ALL_EMPTY_STRING_LINES;
+        return SignBlockEntityHandle.ALL_EMPTY_STRING_LINES;
 #endif
     }
 
-    public void setFormattedFrontLine(int index, (ChatText) IChatBaseComponent text) {
+    public void setFormattedFrontLine(int index, (ChatText) Component text) {
 #if version >= 1.20
         instance.setText(instance.getFrontText().setMessage(index, text), true);
 #elseif version >= 1.18
@@ -327,7 +327,7 @@ class TileEntitySign extends TileEntity {
 #endif
     }
 
-    public void setFormattedBackLine(int index, (ChatText) IChatBaseComponent text) {
+    public void setFormattedBackLine(int index, (ChatText) Component text) {
 #if version >= 1.20
         instance.setText(instance.getBackText().setMessage(index, text), false);
 #endif
@@ -339,7 +339,7 @@ class TileEntitySign extends TileEntity {
         return (org.bukkit.block.Sign) super.toBukkit();
     }
 
-    public static TileEntitySignHandle fromBukkit(org.bukkit.block.Sign sign) {
+    public static SignBlockEntityHandle fromBukkit(org.bukkit.block.Sign sign) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion.INSTANCE.blockStateToTileEntity(sign));
     }
     </code>

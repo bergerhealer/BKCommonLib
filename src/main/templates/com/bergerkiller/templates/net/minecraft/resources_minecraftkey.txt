@@ -1,14 +1,12 @@
 package net.minecraft.resources;
 
-import net.minecraft.ResourceKeyInvalidException;
+import net.minecraft.ResourceLocationException;
 
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 
-import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.core.RegistryMaterialsHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 
-class MinecraftKey {
+class Identifier {
 #if version >= 1.18
     public String getName:getPath();
     public String getNamespace();
@@ -24,63 +22,63 @@ class MinecraftKey {
 #else
     public String getName:a();
     public String getNamespace() {
-        #require MinecraftKey protected final readonly String namespaceField:a;
+        #require Identifier protected final readonly String namespaceField:a;
         return instance#namespaceField;
     }
 #endif
 
     // Used in generated code. Does not exist on 1.13 and later.
-    protected optional transient (Object) MinecraftKey(int code, String[] parts);
+    protected optional transient (Object) Identifier(int code, String[] parts);
 
 #if version >= 1.13
-    public static (MinecraftKeyHandle) MinecraftKey createNew(String keyToken) {
+    public static (IdentifierHandle) Identifier createNew(String keyToken) {
         try {
   #if version >= 1.21
-            return MinecraftKey.parse(keyToken);
+            return Identifier.parse(keyToken);
   #else
-            return new MinecraftKey(keyToken);
+            return new Identifier(keyToken);
   #endif
-        } catch (ResourceKeyInvalidException ex) {
+        } catch (ResourceLocationException ex) {
             return null;
         }
     }
 
-    public static optional (MinecraftKeyHandle) MinecraftKey createNew2(String namespace, String name) {
+    public static optional (IdentifierHandle) Identifier createNew2(String namespace, String name) {
         try {
   #if version >= 1.21
-            return MinecraftKey.fromNamespaceAndPath(namespace, name);
+            return Identifier.fromNamespaceAndPath(namespace, name);
   #else
-            return new MinecraftKey(namespace, name);
+            return new Identifier(namespace, name);
   #endif
-        } catch (ResourceKeyInvalidException ex) {
+        } catch (ResourceLocationException ex) {
             return null;
         }
     }
 #else
-    public static (MinecraftKeyHandle) MinecraftKey createNew(String keyToken) {
+    public static (IdentifierHandle) Identifier createNew(String keyToken) {
         if (keyToken == null) {
             return null;
         }
-        MinecraftKey key = new MinecraftKey(keyToken);
-        String namespace = (String) MinecraftKeyHandle.T.getNamespace.invoke(key);
-        String name = (String) MinecraftKeyHandle.T.getName.invoke(key);
-        if (!MinecraftKeyHandle.isValidNamespace(namespace)) {
+        Identifier key = new Identifier(keyToken);
+        String namespace = (String) IdentifierHandle.T.getNamespace.invoke(key);
+        String name = (String) IdentifierHandle.T.getName.invoke(key);
+        if (!IdentifierHandle.isValidNamespace(namespace)) {
             return null;
         }
-        if (!MinecraftKeyHandle.isValidName(name)) {
+        if (!IdentifierHandle.isValidName(name)) {
             return null;
         }
         return key;
     }
 
-    public static optional (MinecraftKeyHandle) MinecraftKey createNew2(String namespace, String name) {
-        if (!MinecraftKeyHandle.isValidNamespace(namespace)) {
+    public static optional (IdentifierHandle) Identifier createNew2(String namespace, String name) {
+        if (!IdentifierHandle.isValidNamespace(namespace)) {
             return null;
         }
-        if (!MinecraftKeyHandle.isValidName(name)) {
+        if (!IdentifierHandle.isValidName(name)) {
             return null;
         }
-        return (MinecraftKey) MinecraftKeyHandle.T.constr_code_parts.newInstance(
+        return (Identifier) IdentifierHandle.T.constr_code_parts.newInstance(
             Integer.valueOf(0),
             new String[] { namespace, name }
         );
@@ -131,7 +129,7 @@ class MinecraftKey {
         return true;
     }
 
-    public static MinecraftKeyHandle createNew(String namespace, String name) {
+    public static IdentifierHandle createNew(String namespace, String name) {
         return T.createNew2.invoke(namespace, name);
     }
     </code>

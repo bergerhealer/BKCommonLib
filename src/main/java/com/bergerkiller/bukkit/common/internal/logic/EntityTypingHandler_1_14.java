@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import java.util.IdentityHashMap;
 import java.util.logging.Level;
 
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypeHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import org.bukkit.entity.Entity;
 
@@ -17,8 +18,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
@@ -39,7 +39,7 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
     // Initialize findEntityTypesClass which is a fallback for types we did not pre-register
     public EntityTypingHandler_1_14() {
         this._handler = Template.Class.create(Handler.class, Common.TEMPLATE_RESOLVER);
-        this.nmsWorldHandle = WorldServerHandle.T.newInstanceNull();
+        this.nmsWorldHandle = ServerLevelHandle.T.newInstanceNull();
     }
 
     @Override
@@ -72,12 +72,12 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
         // Go by all static fields in the EntityTypes class and decode the generic type information
         // of the fields to figure out what type is represented. This might fail if generics are stripped
         // during compiling, but most of the time this works fine.
-        for (Field f : EntityTypesHandle.T.getType().getDeclaredFields()) {
+        for (Field f : EntityTypeHandle.T.getType().getDeclaredFields()) {
             if (!Modifier.isStatic(f.getModifiers())) {
                 continue;
             }
             TypeDeclaration typeDec = TypeDeclaration.fromType(f.getGenericType());
-            if (!EntityTypesHandle.T.getType().isAssignableFrom(typeDec.type)) {
+            if (!EntityTypeHandle.T.getType().isAssignableFrom(typeDec.type)) {
                 continue;
             }
             if (typeDec.genericTypes.length != 1) {
@@ -105,10 +105,10 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
     }
 
     private void registerEntityTypes(String name, String nmsClassName) {
-        String realName = Resolver.resolveFieldName(EntityTypesHandle.T.getType(), name);
+        String realName = Resolver.resolveFieldName(EntityTypeHandle.T.getType(), name);
         String s = name.equals(realName) ? name : (name + ":" + realName);
         try {
-            java.lang.reflect.Field field = MPLType.getDeclaredField(EntityTypesHandle.T.getType(), realName);
+            java.lang.reflect.Field field = MPLType.getDeclaredField(EntityTypeHandle.T.getType(), realName);
             if ((field.getModifiers() & Modifier.STATIC) == 0) {
                 throw new IllegalStateException("EntityTypes field " + s + " is not static");
             }

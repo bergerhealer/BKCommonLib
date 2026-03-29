@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.controller;
 
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.LevelChunkHandle;
 import org.bukkit.Chunk;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
@@ -15,7 +16,6 @@ import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.InteractionResult;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
 
 public abstract class EntityController<T extends CommonEntity<?>> extends CommonEntityController<T> {
     private EntityHook hook = null;
@@ -60,7 +60,7 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
     private void markEntityChunkDirty() {
         Chunk chunk = this.entity.getChunk();
         if (chunk != null) {
-            ChunkHandle.fromBukkit(chunk).markEntitiesDirty();
+            LevelChunkHandle.fromBukkit(chunk).markEntitiesDirty();
         }
     }
 
@@ -167,7 +167,7 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
      */
     public void onMove(MoveType moveType, double dx, double dy, double dz) {
         moveHandler.move(this.entity.getWrappedHandle(), moveType, dx, dy ,dz);
-        //hook.base.onMove(com.bergerkiller.generated.net.minecraft.world.entity.EnumMoveTypeHandle.SELF.getRaw(), dx, dy, dz);
+        //hook.base.onMove(com.bergerkiller.generated.net.minecraft.world.entity.MoverTypeHandle.SELF.getRaw(), dx, dy, dz);
     }
 
     /**

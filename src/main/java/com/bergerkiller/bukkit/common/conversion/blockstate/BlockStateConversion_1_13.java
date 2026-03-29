@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import com.bergerkiller.generated.net.minecraft.world.level.block.entity.BlockEntityHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.ReflectionUtil;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
@@ -21,9 +22,8 @@ import com.bergerkiller.bukkit.common.utils.ChunkUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
@@ -75,7 +75,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         }.createInstance(CommonUtil.getClass("net.minecraft.world.ticks.TickListServer"));
 
         // Create a NMS World proxy for handling various calls done from tile entities / block states
-        proxy_nms_world = new WorldServerHook(this).createInstance(WorldServerHandle.T.getType());
+        proxy_nms_world = new WorldServerHook(this).createInstance(ServerLevelHandle.T.getType());
 
         // Create a CraftWorld proxy that only supports the following calls:
         // - getTileEntityAt(x, y, z) to return our requested entity
@@ -210,7 +210,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         }
 
         // Obtain BlockData from Tile Entity if cached, otherwise from the chunk
-        BlockData blockData = TileEntityHandle.T.getBlockDataIfCached.invoke(nmsTileEntity);
+        BlockData blockData = BlockEntityHandle.T.getBlockDataIfCached.invoke(nmsTileEntity);
         if (blockData == null) {
             blockData = ChunkUtil.getBlockData(chunk, block.getX(), block.getY(), block.getZ());
         }
@@ -259,7 +259,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
     }
 
     public Object getTileEntityFromWorld(World world, Object blockPosition) {
-        return WorldHandle.T.getTileEntity.raw.invoke(HandleConversion.toWorldHandle(world), blockPosition);
+        return LevelHandle.T.getTileEntity.raw.invoke(HandleConversion.toWorldHandle(world), blockPosition);
     }
 
     private static final class TileState {
@@ -286,7 +286,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         @SuppressWarnings("unchecked")
         private BlockStateCache(Class<?> type) {
             tileEntityField = ReflectionUtil.getAllNonStaticFields(type)
-                    .filter(f -> TileEntityHandle.T.isAssignableFrom(f.getType()))
+                    .filter(f -> BlockEntityHandle.T.isAssignableFrom(f.getType()))
                     .reduce((first, second) -> second) // Select last
                     .map(FastField::new)
                     .orElse(null);

@@ -16,7 +16,7 @@ import com.bergerkiller.bukkit.common.map.MapDisplayTile;
 import com.bergerkiller.bukkit.common.map.MapSession;
 import com.bergerkiller.bukkit.common.map.binding.ItemFrameInfo;
 import com.bergerkiller.bukkit.common.map.util.MapUUID;
-import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityItemFrameHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.decoration.ItemFrameHandle;
 import com.google.common.collect.SetMultimap;
 
 class MapDisplayItemMapIdUpdater extends Task {
@@ -46,8 +46,8 @@ class MapDisplayItemMapIdUpdater extends Task {
 
             // Find all map UUIDs that exist on the server
             HashSet<MapUUID> validUUIDs = new HashSet<MapUUID>();
-            for (Set<EntityItemFrameHandle> itemFrameSet : controller.itemFrameEntities.values()) {
-                for (EntityItemFrameHandle itemFrame : itemFrameSet) {
+            for (Set<ItemFrameHandle> itemFrameSet : controller.itemFrameEntities.values()) {
+                for (ItemFrameHandle itemFrame : itemFrameSet) {
                     MapUUID mapUUID = controller.getItemFrameMapUUID(itemFrame);
                     if (mapUUID != null) {
                         validUUIDs.add(mapUUID);

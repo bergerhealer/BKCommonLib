@@ -9,9 +9,9 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityMetadataHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawnHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLivingHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetEntityDataPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundAddPlayerPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundAddMobPacketHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 
 import org.bukkit.Location;
@@ -187,13 +187,13 @@ public class PacketUtil {
      * @param metadata
      */
     @SuppressWarnings("deprecation")
-    public static void sendEntityLivingSpawnPacket(Player player, PacketPlayOutSpawnEntityLivingHandle packet, DataWatcher metadata) {
+    public static void sendEntityLivingSpawnPacket(Player player, ClientboundAddMobPacketHandle packet, DataWatcher metadata) {
         if (packet.hasDataWatcherSupport()) {
             packet.setDataWatcher(metadata);
             sendPacket(player, packet);
         } else {
             sendPacket(player, packet);
-            sendPacket(player, PacketPlayOutEntityMetadataHandle.createForSpawn(packet.getEntityId(), metadata));
+            sendPacket(player, ClientboundSetEntityDataPacketHandle.createForSpawn(packet.getEntityId(), metadata));
         }
     }
 
@@ -206,13 +206,13 @@ public class PacketUtil {
      * @param metadata
      */
     @SuppressWarnings("deprecation")
-    public static void sendNamedEntitySpawnPacket(Player player, PacketPlayOutNamedEntitySpawnHandle packet, DataWatcher metadata) {
+    public static void sendNamedEntitySpawnPacket(Player player, ClientboundAddPlayerPacketHandle packet, DataWatcher metadata) {
         if (packet.hasDataWatcherSupport()) {
             packet.setDataWatcher(metadata);
             sendPacket(player, packet);
         } else {
             sendPacket(player, packet);
-            sendPacket(player, PacketPlayOutEntityMetadataHandle.createNew(packet.getEntityId(), metadata, true));
+            sendPacket(player, ClientboundSetEntityDataPacketHandle.createNew(packet.getEntityId(), metadata, true));
         }
     }
 

@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.resources;
 
 import com.bergerkiller.bukkit.common.wrappers.BasicWrapper;
-import com.bergerkiller.generated.net.minecraft.world.level.dimension.DimensionManagerHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.dimension.DimensionTypeHandle;
 
 /**
  * A type of dimension in the Minecraft universe. As of writing this can be overworld (0), the end (1) and the nether (-1).
@@ -9,7 +9,7 @@ import com.bergerkiller.generated.net.minecraft.world.level.dimension.DimensionM
  * It is discouraged to access these dimensions by their id's (-1, 0, 1) since this is legacy behavior
  * and as of Minecraft 1.16 will no longer work for any new dimensions.
  */
-public final class DimensionType extends BasicWrapper<DimensionManagerHandle> {
+public final class DimensionType extends BasicWrapper<DimensionTypeHandle> {
     public static final DimensionType OVERWORLD = fromIdFallback(0);
     public static final DimensionType THE_NETHER = fromIdFallback(-1);
     public static final DimensionType THE_END = fromIdFallback(1);
@@ -23,7 +23,7 @@ public final class DimensionType extends BasicWrapper<DimensionManagerHandle> {
         public static final ResourceKey<DimensionType> THE_END = ResourceCategory.dimension_type.createKey("the_end");
     }
 
-    private DimensionType(DimensionManagerHandle handle) {
+    private DimensionType(DimensionTypeHandle handle) {
         this.setHandle(handle);
     }
 
@@ -91,12 +91,12 @@ public final class DimensionType extends BasicWrapper<DimensionManagerHandle> {
         }
 
         // Return new instance
-        return new DimensionType(DimensionManagerHandle.createHandle(dimensionManagerHandle));
+        return new DimensionType(DimensionTypeHandle.createHandle(dimensionManagerHandle));
     }
 
     // Uses internal lookup table, if available
     private static DimensionType fromIdFallback(int id) {
-        DimensionManagerHandle handle = DimensionManagerHandle.fromId(id);
+        DimensionTypeHandle handle = DimensionTypeHandle.fromId(id);
         if (handle != null) {
             return new DimensionType(handle);
         } else {

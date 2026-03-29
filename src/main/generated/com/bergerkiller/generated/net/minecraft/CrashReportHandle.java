@@ -23,7 +23,7 @@ public abstract class CrashReportHandle extends Template.Handle {
         return T.create.invoke(throwable, message);
     }
 
-    public abstract CrashReportSystemDetailsHandle getSystemDetails(String message);
+    public abstract CrashReportCategoryHandle getSystemDetails(String message);
     /**
      * Stores class members for <b>net.minecraft.CrashReport</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -31,7 +31,7 @@ public abstract class CrashReportHandle extends Template.Handle {
     public static final class CrashReportClass extends Template.Class<CrashReportHandle> {
         public final Template.StaticMethod.Converted<CrashReportHandle> create = new Template.StaticMethod.Converted<CrashReportHandle>();
 
-        public final Template.Method.Converted<CrashReportSystemDetailsHandle> getSystemDetails = new Template.Method.Converted<CrashReportSystemDetailsHandle>();
+        public final Template.Method.Converted<CrashReportCategoryHandle> getSystemDetails = new Template.Method.Converted<CrashReportCategoryHandle>();
 
     }
 

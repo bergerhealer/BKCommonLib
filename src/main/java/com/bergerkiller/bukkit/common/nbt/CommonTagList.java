@@ -3,8 +3,8 @@ package com.bergerkiller.bukkit.common.nbt;
 import com.bergerkiller.bukkit.common.collections.CollectionBasics;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTTagListHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.ListTagHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingIterator;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingListIterator;
 
@@ -50,18 +50,18 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
         super(value);
     }
 
-    public CommonTagList(NBTTagListHandle handle) {
+    public CommonTagList(ListTagHandle handle) {
         super(handle);
     }
 
     @Override
-    public NBTTagListHandle getBackingHandle() {
-        return (NBTTagListHandle) handle;
+    public ListTagHandle getBackingHandle() {
+        return (ListTagHandle) handle;
     }
 
     @Override
     public CommonTagList clone() {
-        return new CommonTagList((NBTTagListHandle) handle.clone());
+        return new CommonTagList((ListTagHandle) handle.clone());
     }
 
     @Override
@@ -99,7 +99,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      * @return element value
      */
     public Object getValue(int index) {
-        return wrapRawData(NBTBaseHandle.getDataForHandle(NBTTagListHandle.T.get_at.raw.invoke(getRawHandle(), index)),
+        return wrapRawData(TagHandle.getDataForHandle(ListTagHandle.T.get_at.raw.invoke(getRawHandle(), index)),
                 readOnly);
     }
 
@@ -153,7 +153,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      */
     public void setValue(int index, Object element) {
         assertWritable();
-        NBTTagListHandle.T.set_at.raw.invoke(getRawHandle(), index, NBTBaseHandle.createRawHandleForData(element));
+        ListTagHandle.T.set_at.raw.invoke(getRawHandle(), index, TagHandle.createRawHandleForData(element));
     }
 
     /**
@@ -166,7 +166,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      */
     public void addValue(int index, Object element) {
         assertWritable();
-        NBTTagListHandle.T.add_at.raw.invoke(getRawHandle(), index, NBTBaseHandle.createRawHandleForData(element));
+        ListTagHandle.T.add_at.raw.invoke(getRawHandle(), index, TagHandle.createRawHandleForData(element));
     }
 
     /**
@@ -178,15 +178,15 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      */
     public void addValue(Object element) {
         assertWritable();
-        NBTTagListHandle.T.add.raw.invoke(getRawHandle(), NBTBaseHandle.createRawHandleForData(element));
+        ListTagHandle.T.add.raw.invoke(getRawHandle(), TagHandle.createRawHandleForData(element));
     }
 
     @Override
     public int indexOf(Object o) {
         if (o instanceof CommonTag) {
             return getRawData().indexOf(((CommonTag) o).getRawHandle());
-        } else if (NBTBaseHandle.isDataSupportedNatively(o)) {
-            return getRawData().indexOf(NBTBaseHandle.createRawHandleForData(o));
+        } else if (TagHandle.isDataSupportedNatively(o)) {
+            return getRawData().indexOf(TagHandle.createRawHandleForData(o));
         } else {
             return -1;
         }
@@ -196,8 +196,8 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
     public int lastIndexOf(Object o) {
         if (o instanceof CommonTag) {
             return getRawData().lastIndexOf(((CommonTag) o).getRawHandle());
-        } else if (NBTBaseHandle.isDataSupportedNatively(o)) {
-            return getRawData().lastIndexOf(NBTBaseHandle.createRawHandleForData(o));
+        } else if (TagHandle.isDataSupportedNatively(o)) {
+            return getRawData().lastIndexOf(TagHandle.createRawHandleForData(o));
         } else {
             return -1;
         }

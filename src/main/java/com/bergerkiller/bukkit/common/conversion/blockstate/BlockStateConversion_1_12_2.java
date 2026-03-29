@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import com.bergerkiller.generated.net.minecraft.core.BlockPosHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.entity.BlockEntityHandle;
 import com.bergerkiller.mountiplex.reflection.ReflectionUtil;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
 import org.bukkit.Chunk;
@@ -20,11 +22,9 @@ import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
@@ -70,7 +70,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
         }.createInstance(CraftChunkHandle.T.getType());
 
         // Only appears to be used on forge servers, standard Spigot never calls getHandle() in CraftWorld
-        proxy_nms_world = new NMSWorldHook().createInstance(WorldServerHandle.T.getType());
+        proxy_nms_world = new NMSWorldHook().createInstance(ServerLevelHandle.T.getType());
 
         // Create a CraftWorld proxy that only supports the following calls:
         // - getTileEntityAt(x, y, z) to return our requested entity
@@ -173,11 +173,11 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
             throw new IllegalArgumentException("Tile Entity is null");
         }
 
-        BlockPositionHandle pos = TileEntityHandle.T.getPosition.invoke(nmsTileEntity);
+        BlockPosHandle pos = BlockEntityHandle.T.getPosition.invoke(nmsTileEntity);
 
         Block block;
         if (chunk == null) {
-            Object world = TileEntityHandle.T.getWorld.raw.invoke(nmsTileEntity);
+            Object world = BlockEntityHandle.T.getWorld.raw.invoke(nmsTileEntity);
             if (world == null) {
                 throw new IllegalArgumentException("Tile Entity has no world set");
             }
@@ -223,7 +223,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
     }
 
     public Object getTileEntityFromWorld(World world, Object blockPosition) {
-        return WorldHandle.T.getTileEntity.raw.invoke(HandleConversion.toWorldHandle(world), blockPosition);
+        return LevelHandle.T.getTileEntity.raw.invoke(HandleConversion.toWorldHandle(world), blockPosition);
     }
 
     private static final class TileState {
@@ -234,7 +234,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
         public TileState(Block block, Object nmsTileEntity) {
             this.block = block;
             this.tileEntity = nmsTileEntity;
-            this.blockData = TileEntityHandle.T.getBlockData.invoke(nmsTileEntity);
+            this.blockData = BlockEntityHandle.T.getBlockData.invoke(nmsTileEntity);
         }
     }
 
@@ -290,7 +290,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
                     .toArray(FastField[]::new);
 
             tileEntityField = allFields.stream()
-                    .filter(f -> TileEntityHandle.T.isAssignableFrom(f.getType()))
+                    .filter(f -> BlockEntityHandle.T.isAssignableFrom(f.getType()))
                     .reduce((first, second) -> second) // Select last
                     .map(FastField::new)
                     .orElse(null);

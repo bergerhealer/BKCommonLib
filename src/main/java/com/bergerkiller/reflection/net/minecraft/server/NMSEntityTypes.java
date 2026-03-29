@@ -1,11 +1,11 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypeHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 
 @Deprecated
 public class NMSEntityTypes {
-    public static final ClassTemplate<?> T = ClassTemplate.create(EntityTypesHandle.T.getType());
+    public static final ClassTemplate<?> T = ClassTemplate.create(EntityTypeHandle.T.getType());
 
     /**
      * Retrieves the class belonging to an Entity, by name.
@@ -15,7 +15,7 @@ public class NMSEntityTypes {
      * @return Entity Class for the Entity registered to this name
      */
     public static Class<?> getEntityClass(String entityName) {
-        return EntityTypesHandle.getEntityClass(entityName);
+        return EntityTypeHandle.getEntityClass(entityName);
     }
 
     /**
@@ -25,7 +25,7 @@ public class NMSEntityTypes {
      * @return Minecraft key
      */
     public static String getName(Class<?> type) {
-        return EntityTypesHandle.getEntityInternalName(type);
+        return EntityTypeHandle.getEntityInternalName(type);
     }
 
     /**

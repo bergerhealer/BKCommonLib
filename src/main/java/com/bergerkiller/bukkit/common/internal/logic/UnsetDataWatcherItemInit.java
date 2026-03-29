@@ -89,7 +89,7 @@ public class UnsetDataWatcherItemInit {
                 mv.visitCode();
                 mv.visitVarInsn(ALOAD, 0);
                 mv.visitInsn(ACONST_NULL);
-                mv.visitFieldInsn(GETSTATIC, MPLType.getInternalName(DataWatcherHandle.class), "UNSET_MARKER_VALUE", "Ljava/lang/Object;");
+                mv.visitFieldInsn(GETSTATIC, MPLType.getInternalName(SynchedEntityDataHandle.class), "UNSET_MARKER_VALUE", "Ljava/lang/Object;");
                 mv.visitMethodInsn(INVOKESPECIAL, MPLType.getInternalName(dataWatcherItemType), "<init>",
                         "(" + MPLType.getDescriptor(dataWatcherObjectType) + "Ljava/lang/Object;)V", false);
                 mv.visitInsn(RETURN);

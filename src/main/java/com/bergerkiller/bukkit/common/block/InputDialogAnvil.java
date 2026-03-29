@@ -5,6 +5,9 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.world.inventory.AbstractContainerMenuHandle;
+import com.bergerkiller.generated.net.minecraft.world.inventory.AnvilMenuHandle;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -35,9 +38,6 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerAnvilHandle;
-import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 
 /**
@@ -160,7 +160,7 @@ public class InputDialogAnvil {
 
     private void handleTextChange(InventoryView view) {
         // String new_text = view.getInventory().getRenameText(); // Not backwards-compatible
-        String new_text = ContainerAnvilHandle.fromBukkit(view).getRenameText();
+        String new_text = AnvilMenuHandle.fromBukkit(view).getRenameText();
         new_text = LogicUtil.fixNull(new_text, "").replace("\0", "");
         LEFT_BUTTON._title = ChatColor.BLACK + new_text;
 
@@ -211,10 +211,10 @@ public class InputDialogAnvil {
             LEFT_BUTTON._title = ChatColor.BLACK + _initialText;
 
             // Open windows for all viewing players
-            final InventoryView view = EntityPlayerHandle.fromBukkit(player).openAnvilWindow(getTitle());
+            final InventoryView view = ServerPlayerHandle.fromBukkit(player).openAnvilWindow(getTitle());
 
             // Required for handling text changes < MC 1.9
-            ContainerAnvilHandle container = ContainerAnvilHandle.fromBukkit(view);
+            AnvilMenuHandle container = AnvilMenuHandle.fromBukkit(view);
             container.setRenameText(_initialText);
             if (!CommonCapabilities.HAS_PREPARE_ANVIL_EVENT) {
                 LegacyContainerAnvilHook hook = ClassHook.get(container.getRaw(), LegacyContainerAnvilHook.class);
@@ -387,7 +387,7 @@ public class InputDialogAnvil {
                 ItemUtil.setViewItem(view, getIndex(), item);
             }
 
-            int windowId = ContainerHandle.fromBukkit(view).getWindowId();
+            int windowId = AbstractContainerMenuHandle.fromBukkit(view).getWindowId();
             CommonPacket set_output_packet = PacketType.OUT_WINDOW_SET_SLOT.newInstance();
             set_output_packet.write(PacketType.OUT_WINDOW_SET_SLOT.windowId, windowId);
             set_output_packet.write(PacketType.OUT_WINDOW_SET_SLOT.slot, getIndex());

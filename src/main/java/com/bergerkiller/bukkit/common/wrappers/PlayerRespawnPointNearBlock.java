@@ -5,8 +5,8 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -20,25 +20,25 @@ import java.lang.ref.WeakReference;
  * @see PlayerRespawnPoint#create(Block) 
  */
 public class PlayerRespawnPointNearBlock extends PlayerRespawnPoint {
-    private final EntityPlayerHandle.RespawnConfigHandle handle;
+    private final ServerPlayerHandle.RespawnConfigHandle handle;
     private WeakReference<World> cachedWorld = LogicUtil.nullWeakReference();
 
     public PlayerRespawnPointNearBlock(ResourceKey<World> dimensionKey, int blockX, int blockY, int blockZ, float angle, boolean forced) {
-        this(EntityPlayerHandle.RespawnConfigHandle.of(dimensionKey, null, new IntVector3(blockX, blockY, blockZ), angle, forced));
+        this(ServerPlayerHandle.RespawnConfigHandle.of(dimensionKey, null, new IntVector3(blockX, blockY, blockZ), angle, forced));
     }
 
     public PlayerRespawnPointNearBlock(World world, int blockX, int blockY, int blockZ, float angle, boolean forced) {
-        this(EntityPlayerHandle.RespawnConfigHandle.of(world, new IntVector3(blockX, blockY, blockZ), angle, forced));
+        this(ServerPlayerHandle.RespawnConfigHandle.of(world, new IntVector3(blockX, blockY, blockZ), angle, forced));
     }
 
-    public PlayerRespawnPointNearBlock(EntityPlayerHandle.RespawnConfigHandle respawnConfig) {
+    public PlayerRespawnPointNearBlock(ServerPlayerHandle.RespawnConfigHandle respawnConfig) {
         if (respawnConfig == null) {
             throw new IllegalArgumentException("RespawnConfig handle cannot be null");
         }
         this.handle = respawnConfig;
     }
 
-    public EntityPlayerHandle.RespawnConfigHandle getHandle() {
+    public ServerPlayerHandle.RespawnConfigHandle getHandle() {
         return handle;
     }
 
@@ -130,13 +130,13 @@ public class PlayerRespawnPointNearBlock extends PlayerRespawnPoint {
      * @return New PlayerRespawnPointNearBlock with forced updated
      */
     public PlayerRespawnPointNearBlock withForced(boolean forced) {
-        return new PlayerRespawnPointNearBlock(EntityPlayerHandle.RespawnConfigHandle.of(
+        return new PlayerRespawnPointNearBlock(ServerPlayerHandle.RespawnConfigHandle.of(
                 handle.dimension(), handle.worldName(), handle.position(), handle.yaw(), handle.pitch(), forced));
     }
 
     @Override
     public void applyToPlayer(Player player) {
-        EntityPlayerHandle.fromBukkit(player).setRespawnConfigSilent(handle);
+        ServerPlayerHandle.fromBukkit(player).setRespawnConfigSilent(handle);
     }
 
     @Override
@@ -151,7 +151,7 @@ public class PlayerRespawnPointNearBlock extends PlayerRespawnPoint {
             nbt.remove("SpawnAngle");
             nbt.remove("SpawnForced");
 
-            EntityPlayerHandle.RespawnConfigHandle.codecToNBT(handle, nbt);
+            ServerPlayerHandle.RespawnConfigHandle.codecToNBT(handle, nbt);
         } else {
             if (CommonCapabilities.PLAYER_SPAWN_WORLD_IS_DIMENSION_KEY) {
                 ResourceKey<World> dimension = handle.dimension();
@@ -192,7 +192,7 @@ public class PlayerRespawnPointNearBlock extends PlayerRespawnPoint {
         if (world == null) {
             return null;
         }
-        return WorldServerHandle.fromBukkit(world).findSafeSpawn(this, alsoWhenDestroyed || isForced(), isDeathRespawn);
+        return ServerLevelHandle.fromBukkit(world).findSafeSpawn(this, alsoWhenDestroyed || isForced(), isDeathRespawn);
     }
 
     @Override

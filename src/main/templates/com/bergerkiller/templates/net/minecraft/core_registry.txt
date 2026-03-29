@@ -1,15 +1,15 @@
 package net.minecraft.core;
 
-import net.minecraft.resources.MinecraftKey;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 
 // Only available >= MC 1.9
-optional class RegistryBlockID {
+optional class IdMapper {
     public int getId(T value);
 }
 
-class RegistryMaterials {
+class MappedRegistry {
 #if version >= 1.13
     protected optional final Map<V, K> opt_inverseLookupField:###;
 #else
@@ -17,11 +17,11 @@ class RegistryMaterials {
 #endif
 
 #if version >= 1.21.2
-    public V get:getValue((Object) MinecraftKey key);
-    public (Object) MinecraftKey getKey(V value);
+    public V get:getValue((Object) Identifier key);
+    public (Object) Identifier getKey(V value);
 #elseif version >= 1.13.1
-    public V get((Object) MinecraftKey key);
-    public (Object) MinecraftKey getKey(V value);
+    public V get((Object) Identifier key);
+    public (Object) Identifier getKey(V value);
 #elseif version >= 1.9
     public V get((Object) K key);
     public (Object) K getKey:b(V value);
@@ -32,11 +32,11 @@ class RegistryMaterials {
 }
 
 // Since MC 1.14 has static fields
-optional class IRegistry {
+optional class Registry {
 #if version >= 1.14
     public static Object getWindowTypeByName(String name) {
         if (name == null) return null;
-        MinecraftKey key = #parseMinecraftKey(name);
+        Identifier key = #parseIdentifier(name);
   #if version >= 1.21.2
         return BuiltInRegistries.MENU.getValue(key);
   #else

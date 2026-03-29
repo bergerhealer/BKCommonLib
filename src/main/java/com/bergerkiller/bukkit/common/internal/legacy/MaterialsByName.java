@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
-import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import org.bukkit.Material;
 
 import com.bergerkiller.bukkit.common.Logging;
@@ -14,7 +13,7 @@ import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.BlockStateHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
@@ -207,7 +206,7 @@ public class MaterialsByName {
      * @param name
      * @return IBlockData
      */
-    public static IBlockDataHandle getBlockDataFromMaterialName(String name) {
+    public static BlockStateHandle getBlockDataFromMaterialName(String name) {
         return CraftMagicNumbersHandle.getBlockDataFromMaterial(getMaterial(name));
     }
 

@@ -4,7 +4,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.lighting.LightingHandler;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.generated.net.minecraft.server.level.LightEngineThreadedHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ThreadedLevelLightEngineHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
@@ -149,7 +149,7 @@ class LightingHandler_1_20 implements LightingHandler {
 
     @Override
     public byte[] getSectionBlockLight(World world, int cx, int cy, int cz) {
-        LightEngineThreadedHandle engine = LightEngineThreadedHandle.forWorld(world);
+        ThreadedLevelLightEngineHandle engine = ThreadedLevelLightEngineHandle.forWorld(world);
         try {
             Object layer = this.light_layer_block.get(engine.getRaw());
             return this.handle.getLightData(layer, cx, cy, cz);
@@ -161,7 +161,7 @@ class LightingHandler_1_20 implements LightingHandler {
 
     @Override
     public byte[] getSectionSkyLight(World world, int cx, int cy, int cz) {
-        LightEngineThreadedHandle engine = LightEngineThreadedHandle.forWorld(world);
+        ThreadedLevelLightEngineHandle engine = ThreadedLevelLightEngineHandle.forWorld(world);
         try {
             Object layer = this.light_layer_sky.get(engine.getRaw());
             return this.handle.getLightData(layer, cx, cy, cz);
@@ -212,13 +212,13 @@ class LightingHandler_1_20 implements LightingHandler {
     // All the updates to perform for a single (world) light engine
     private final class EngineUpdateTaskLists {
         public final World world;
-        public final LightEngineThreadedHandle engine;
+        public final ThreadedLevelLightEngineHandle engine;
         public final List<UpdateTask> tasks;
         private final AtomicInteger stage;
 
         public EngineUpdateTaskLists(World world) {
             this.world = world;
-            this.engine = LightEngineThreadedHandle.forWorld(world);
+            this.engine = ThreadedLevelLightEngineHandle.forWorld(world);
             this.tasks = new ArrayList<UpdateTask>();
             this.stage = new AtomicInteger(0);
             schedule();

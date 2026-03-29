@@ -1,30 +1,28 @@
 package net.minecraft.world.entity;
 
-import net.minecraft.core.BlockPosition;
-import net.minecraft.core.SectionPosition;
-import net.minecraft.CrashReportSystemDetails;
-import net.minecraft.network.chat.IChatBaseComponent;
-import net.minecraft.network.syncher.DataWatcherObject;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.level.ChunkProviderServer;
-import net.minecraft.server.level.WorldServer;
-import net.minecraft.sounds.SoundEffect;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
+import net.minecraft.CrashReportCategory;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.item.EntityItem;
-import net.minecraft.world.entity.player.EntityHuman;
-import net.minecraft.world.EnumHand;
-import net.minecraft.world.EnumInteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.chunk.Chunk;
-import net.minecraft.world.level.World;
-import net.minecraft.world.phys.AxisAlignedBB;
-import net.minecraft.world.phys.Vec3D;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.entity.EntityPose;
+import net.minecraft.world.entity.Pose;
 
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
@@ -35,12 +33,12 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.InteractionResult;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
-import com.bergerkiller.generated.net.minecraft.CrashReportSystemDetailsHandle;
+import com.bergerkiller.generated.net.minecraft.CrashReportCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.world.damagesource.DamageSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
 import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.storage.ValueOutputHandle;
 
@@ -207,7 +205,7 @@ class Entity {
     }
 
     public org.bukkit.util.Vector getLoc() {
-        Vec3D loc = instance.position();
+        Vec3 loc = instance.position();
         return new org.bukkit.util.Vector(loc.x, loc.y, loc.z);
     }
 
@@ -219,26 +217,26 @@ class Entity {
     public void setLoc:setPositionRaw(double x, double y, double z);
 
   #if version >= 1.16
-    // Since 1.16 they got merged into a 'Vec3D loc' field
+    // Since 1.16 they got merged into a 'Vec3 loc' field
     // It is better and safer to just call setPositionRaw
 
     public void setLocX(double x) {
-        Vec3D loc = instance.getPositionVector();
+        Vec3 loc = instance.getPositionVector();
         instance.setPositionRaw(x, loc.y, loc.z);
     }
 
     public void setLocY(double y) {
-        Vec3D loc = instance.getPositionVector();
+        Vec3 loc = instance.getPositionVector();
         instance.setPositionRaw(loc.x, y, loc.z);
     }
 
     public void setLocZ(double z) {
-        Vec3D loc = instance.getPositionVector();
+        Vec3 loc = instance.getPositionVector();
         instance.setPositionRaw(loc.x, loc.y, z);
     }
 
     public org.bukkit.util.Vector getLoc() {
-        Vec3D loc = instance.getPositionVector();
+        Vec3 loc = instance.getPositionVector();
         return new org.bukkit.util.Vector(loc.x, loc.y, loc.z);
     }
   #else
@@ -284,8 +282,8 @@ class Entity {
 #endif
 
     <code>
-    public com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle getWorldServer() {
-        return com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.createHandle(T.getWorld.raw.invoke(getRaw()));
+    public com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle getWorldServer() {
+        return com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle.createHandle(T.getWorld.raw.invoke(getRaw()));
     }
     </code>
 
@@ -296,33 +294,33 @@ class Entity {
 
         // -- DataWatcher Owner field --
 #if version >= 1.18
-        net.minecraft.network.syncher.DataWatcher dw = instance.getEntityData();
+        net.minecraft.network.syncher.SynchedEntityData dw = instance.getEntityData();
 #else
-        net.minecraft.network.syncher.DataWatcher dw = instance.getDataWatcher();
+        net.minecraft.network.syncher.SynchedEntityData dw = instance.getDataWatcher();
 #endif
         if (dw != null) {
 #if version >= 1.20.5
-            #require net.minecraft.network.syncher.DataWatcher private final net.minecraft.network.syncher.SyncedDataHolder dw_owner:owner;
+            #require net.minecraft.network.syncher.SynchedEntityData private final net.minecraft.network.syncher.SyncedDataHolder dw_owner:owner;
 #else
-            #require net.minecraft.network.syncher.DataWatcher private final net.minecraft.world.entity.Entity dw_owner:owner;
+            #require net.minecraft.network.syncher.SynchedEntityData private final net.minecraft.world.entity.Entity dw_owner:owner;
 #endif
             dw#dw_owner = instance;
         }
 
         // MinecartBehavior instance
 #if version >= 1.21.2
-        if (instance instanceof net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstract) {
+        if (instance instanceof net.minecraft.world.entity.vehicle.minecart.AbstractMinecart) {
             net.minecraft.world.entity.vehicle.minecart.MinecartBehavior behavior;
-            behavior = ((net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstract) instance).getBehavior();
-            #require net.minecraft.world.entity.vehicle.minecart.MinecartBehavior protected final net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstract minecart;
-            behavior#minecart = (net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstract)instance;
+            behavior = ((net.minecraft.world.entity.vehicle.minecart.AbstractMinecart) instance).getBehavior();
+            #require net.minecraft.world.entity.vehicle.minecart.MinecartBehavior protected final net.minecraft.world.entity.vehicle.minecart.AbstractMinecart minecart;
+            behavior#minecart = (net.minecraft.world.entity.vehicle.minecart.AbstractMinecart)instance;
         }
 #endif
 
         // CraftBukkit added a 'CommandSource' field to, I guess, avoid instance creation?
-#if version >= 1.21.2 && exists net.minecraft.world.entity.Entity private final net.minecraft.commands.ICommandListener commandSource || version > 1.21.3
-        #require Entity private final net.minecraft.commands.ICommandListener commandSource;
-        net.minecraft.commands.ICommandListener commandSource = instance#commandSource;
+#if version >= 1.21.2 && exists net.minecraft.world.entity.Entity private final net.minecraft.commands.CommandSource commandSource || version > 1.21.3
+        #require Entity private final net.minecraft.commands.CommandSource commandSource;
+        net.minecraft.commands.CommandSource commandSource = instance#commandSource;
         // Can't use #require here because we don't know the name of this anonymous class
         // Identify the instance by inspecting the current value...which could fail
         try {
@@ -343,7 +341,7 @@ class Entity {
   #if exists com.destroystokyo.paper.loottable.PaperMinecartLootableInventory
             if (paperLootableInv instanceof com.destroystokyo.paper.loottable.PaperMinecartLootableInventory) {
                 com.destroystokyo.paper.loottable.PaperMinecartLootableInventory minecartInv = (com.destroystokyo.paper.loottable.PaperMinecartLootableInventory) paperLootableInv;
-                #require com.destroystokyo.paper.loottable.PaperMinecartLootableInventory private net.minecraft.world.entity.vehicle.EntityMinecartContainer emcEntity:entity;
+                #require com.destroystokyo.paper.loottable.PaperMinecartLootableInventory private net.minecraft.world.entity.vehicle.AbstractMinecartContainer emcEntity:entity;
                 minecartInv#emcEntity = instance;
             }
   #endif
@@ -383,20 +381,20 @@ class Entity {
 
 #if version >= 1.18
     public org.bukkit.util.Vector getMot() {
-        Vec3D mot = instance.getDeltaMovement();
+        Vec3 mot = instance.getDeltaMovement();
         return new org.bukkit.util.Vector(mot.x, mot.y, mot.z);
     }
 
     public void setMotVector(org.bukkit.util.Vector mot) {
-        instance.setDeltaMovement(new Vec3D(mot.getX(), mot.getY(), mot.getZ()));
+        instance.setDeltaMovement(new Vec3(mot.getX(), mot.getY(), mot.getZ()));
     }
 
     public void setMot(double x, double y, double z) {
-        instance.setDeltaMovement(new Vec3D(x, y, z));
+        instance.setDeltaMovement(new Vec3(x, y, z));
     }
 
     public void fixMotNaN() {
-        Vec3D mot = instance.getDeltaMovement();
+        Vec3 mot = instance.getDeltaMovement();
         if (Double.isNaN(mot.x) || Double.isNaN(mot.y) || Double.isNaN(mot.z)) {
             double x = mot.x;
             double y = mot.y;
@@ -404,23 +402,23 @@ class Entity {
             if (Double.isNaN(x)) x = 0.0;
             if (Double.isNaN(y)) y = 0.0;
             if (Double.isNaN(z)) z = 0.0;
-            instance.setDeltaMovement(new Vec3D(x, y, z));
+            instance.setDeltaMovement(new Vec3(x, y, z));
         }
     }
 
     public void setMotX(double x) {
-        Vec3D mot = instance.getDeltaMovement();
-        instance.setDeltaMovement(new Vec3D(x, mot.y, mot.z));
+        Vec3 mot = instance.getDeltaMovement();
+        instance.setDeltaMovement(new Vec3(x, mot.y, mot.z));
     }
 
     public void setMotY(double y) {
-        Vec3D mot = instance.getDeltaMovement();
-        instance.setDeltaMovement(new Vec3D(mot.x, y, mot.z));
+        Vec3 mot = instance.getDeltaMovement();
+        instance.setDeltaMovement(new Vec3(mot.x, y, mot.z));
     }
 
     public void setMotZ(double z) {
-        Vec3D mot = instance.getDeltaMovement();
-        instance.setDeltaMovement(new Vec3D(mot.x, mot.y, z));
+        Vec3 mot = instance.getDeltaMovement();
+        instance.setDeltaMovement(new Vec3(mot.x, mot.y, z));
     }
 
     public double getMotX() {
@@ -438,22 +436,22 @@ class Entity {
 #elseif version >= 1.14
     // motX/Y/Z is private 'mot' field on 1.14
     // For performance reasons, use the getMot/setMot methods
-    // Reflection to access the private mot Vec3D is likely slower.
+    // Reflection to access the private mot Vec3 is likely slower.
     public org.bukkit.util.Vector getMot() {
-        Vec3D mot = instance.getMot();
+        Vec3 mot = instance.getMot();
         return new org.bukkit.util.Vector(mot.x, mot.y, mot.z);
     }
 
     public void setMotVector(org.bukkit.util.Vector mot) {
-        instance.setMot(new Vec3D(mot.getX(), mot.getY(), mot.getZ()));
+        instance.setMot(new Vec3(mot.getX(), mot.getY(), mot.getZ()));
     }
 
     public void setMot(double x, double y, double z) {
-        instance.setMot(new Vec3D(x, y, z));
+        instance.setMot(new Vec3(x, y, z));
     }
 
     public void fixMotNaN() {
-        Vec3D mot = instance.getMot();
+        Vec3 mot = instance.getMot();
         if (Double.isNaN(mot.x) || Double.isNaN(mot.y) || Double.isNaN(mot.z)) {
             double x = mot.x;
             double y = mot.y;
@@ -461,23 +459,23 @@ class Entity {
             if (Double.isNaN(x)) x = 0.0;
             if (Double.isNaN(y)) y = 0.0;
             if (Double.isNaN(z)) z = 0.0;
-            instance.setMot(new Vec3D(x, y, z));
+            instance.setMot(new Vec3(x, y, z));
         }
     }
 
     public void setMotX(double x) {
-        Vec3D mot = instance.getMot();
-        instance.setMot(new Vec3D(x, mot.y, mot.z));
+        Vec3 mot = instance.getMot();
+        instance.setMot(new Vec3(x, mot.y, mot.z));
     }
 
     public void setMotY(double y) {
-        Vec3D mot = instance.getMot();
-        instance.setMot(new Vec3D(mot.x, y, mot.z));
+        Vec3 mot = instance.getMot();
+        instance.setMot(new Vec3(mot.x, y, mot.z));
     }
 
     public void setMotZ(double z) {
-        Vec3D mot = instance.getMot();
-        instance.setMot(new Vec3D(mot.x, mot.y, z));
+        Vec3 mot = instance.getMot();
+        instance.setMot(new Vec3(mot.x, mot.y, z));
     }
 
     public double getMotX() {
@@ -551,13 +549,13 @@ class Entity {
     private float pitch:xRot;
     public float lastYaw:yRotO;
     public float lastPitch:xRotO;
-    private (AxisAlignedBBHandle) AxisAlignedBB boundingBoxField:bb;
+    private (AABBHandle) AABB boundingBoxField:bb;
 #else
     public float yaw;
     public float pitch;
     public float lastYaw;
     public float lastPitch;
-    private (AxisAlignedBBHandle) AxisAlignedBB boundingBoxField:boundingBox;
+    private (AABBHandle) AABB boundingBoxField:boundingBox;
 #endif
 
 #if version >= 1.16
@@ -669,17 +667,17 @@ class Entity {
     // On Minecraft 1.14 and later, instead of a boolean, it stores the actual slowdown to apply
     // If this is greater than 1.0E-7D then the factor should be applied
   #if version >= 1.17
-    #require net.minecraft.world.entity.Entity protected Vec3D collidingWithBlockMultiplier:stuckSpeedMultiplier;
+    #require net.minecraft.world.entity.Entity protected Vec3 collidingWithBlockMultiplier:stuckSpeedMultiplier;
   #elseif version >= 1.16
-    #require net.minecraft.world.entity.Entity protected Vec3D collidingWithBlockMultiplier:x;
+    #require net.minecraft.world.entity.Entity protected Vec3 collidingWithBlockMultiplier:x;
   #elseif version >= 1.15
-    #require net.minecraft.world.entity.Entity protected Vec3D collidingWithBlockMultiplier:y;
+    #require net.minecraft.world.entity.Entity protected Vec3 collidingWithBlockMultiplier:y;
   #else
-    #require net.minecraft.world.entity.Entity protected Vec3D collidingWithBlockMultiplier:B;
+    #require net.minecraft.world.entity.Entity protected Vec3 collidingWithBlockMultiplier:B;
   #endif
 
     public boolean isCollidingWithBlock() {
-        Vec3D multiplier = instance#collidingWithBlockMultiplier;
+        Vec3 multiplier = instance#collidingWithBlockMultiplier;
   #if version >= 1.18
         return multiplier.lengthSqr() > 1.0E-7;
   #else
@@ -688,12 +686,12 @@ class Entity {
     }
 
     public org.bukkit.util.Vector getBlockCollisionMultiplier() {
-        Vec3D multiplier = instance#collidingWithBlockMultiplier;
+        Vec3 multiplier = instance#collidingWithBlockMultiplier;
         return new org.bukkit.util.Vector(multiplier.x, multiplier.y, multiplier.z);
     }
 
     public void setNotCollidingWithBlock() {
-        instance#collidingWithBlockMultiplier = Vec3D.ZERO;
+        instance#collidingWithBlockMultiplier = Vec3.ZERO;
     }
 #else
     // On Minecraft 1.13.2 and before, there was only a 'collidingWithBlock' property
@@ -796,47 +794,47 @@ class Entity {
 
   #if version >= 1.18
     public int getChunkX() {
-        BlockPosition blockPosition = instance.blockPosition();
+        BlockPos blockPosition = instance.blockPosition();
         return blockPosition.getX() >> 4;
     }
 
     public int getChunkY() {
-        BlockPosition blockPosition = instance.blockPosition();
+        BlockPos blockPosition = instance.blockPosition();
         return blockPosition.getY() >> 4;
     }
 
     public int getChunkZ() {
-        BlockPosition blockPosition = instance.blockPosition();
+        BlockPos blockPosition = instance.blockPosition();
         return blockPosition.getZ() >> 4;
     }
   #else
     public int getChunkX() {
-        BlockPosition blockPosition = instance.getChunkCoordinates(); // Note: block coords, NOT chunk coords!
+        BlockPos blockPosition = instance.getChunkCoordinates(); // Note: block coords, NOT chunk coords!
         return blockPosition.getX() >> 4;
     }
 
     public int getChunkY() {
-        BlockPosition blockPosition = instance.getChunkCoordinates(); // Note: block coords, NOT chunk coords!
+        BlockPos blockPosition = instance.getChunkCoordinates(); // Note: block coords, NOT chunk coords!
         return blockPosition.getY() >> 4;
     }
 
     public int getChunkZ() {
-        BlockPosition blockPosition = instance.getChunkCoordinates(); // Note: block coords, NOT chunk coords!
+        BlockPos blockPosition = instance.getChunkCoordinates(); // Note: block coords, NOT chunk coords!
         return blockPosition.getZ() >> 4;
     }
   #endif
 
     public optional void setLoadedInWorld_pre_1_17:###(boolean loaded);
 
-  #if exists net.minecraft.world.entity.Entity public net.minecraft.world.level.chunk.Chunk getCurrentChunk();
-    public (org.bukkit.Chunk) Chunk getCurrentChunk();
+  #if exists net.minecraft.world.entity.Entity public net.minecraft.world.level.chunk.LevelChunk getCurrentChunk();
+    public (org.bukkit.Chunk) LevelChunk getCurrentChunk();
   #else
-    public (org.bukkit.Chunk) Chunk getCurrentChunk() {
-        WorldServer world;
+    public (org.bukkit.Chunk) LevelChunk getCurrentChunk() {
+        ServerLevel world;
     #if version >= 1.20
-        world = (WorldServer) instance.level();
+        world = (ServerLevel) instance.level();
     #else
-        world = (WorldServer) instance.level;
+        world = (ServerLevel) instance.level;
     #endif
 
     #if exists net.minecraft.world.entity.Entity public int moonrise$getSectionX();
@@ -858,13 +856,13 @@ class Entity {
 
         // Convert to chunk x/z coordinates
       #if version >= 1.18
-        int chunkX = SectionPosition.x(coordKey);
-        //int chunkY = SectionPosition.y(coordKey);
-        int chunkZ = SectionPosition.z(coordKey);
+        int chunkX = SectionPos.x(coordKey);
+        //int chunkY = SectionPos.y(coordKey);
+        int chunkZ = SectionPos.z(coordKey);
       #else
-        int chunkX = SectionPosition.b(coordKey);
-        //int chunkY = SectionPosition.c(coordKey);
-        int chunkZ = SectionPosition.d(coordKey);
+        int chunkX = SectionPos.b(coordKey);
+        //int chunkY = SectionPos.c(coordKey);
+        int chunkZ = SectionPos.d(coordKey);
       #endif
         return world.getChunkIfLoaded(chunkX, chunkZ);
     #endif
@@ -904,7 +902,7 @@ class Entity {
     #require net.minecraft.world.entity.Entity public int chunkZ:ag;
   #endif
 
-  // #if exists net.minecraft.world.entity.Entity public void setCurrentChunk(net.minecraft.world.level.chunk.Chunk chunk);
+  // #if exists net.minecraft.world.entity.Entity public void setCurrentChunk(net.minecraft.world.level.chunk.LevelChunk chunk);
   //   public void setChunkX(int value) {
   //       instance.setCurrentChunk(null);
   //       com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkX.setInteger(instance, value);
@@ -968,23 +966,23 @@ class Entity {
         instance#isLoaded = loaded;
     }
 
-  #if exists net.minecraft.world.entity.Entity public net.minecraft.world.level.chunk.Chunk getCurrentChunk();
-    public (org.bukkit.Chunk) Chunk getCurrentChunk();
+  #if exists net.minecraft.world.entity.Entity public net.minecraft.world.level.chunk.LevelChunk getCurrentChunk();
+    public (org.bukkit.Chunk) LevelChunk getCurrentChunk();
   #elseif version >= 1.13 && exists net.minecraft.world.entity.Entity public int chunkX;
-    public (org.bukkit.Chunk) Chunk getCurrentChunk() {
+    public (org.bukkit.Chunk) LevelChunk getCurrentChunk() {
         if (!instance.inChunk) {
             return null;
         }
     #if version >= 1.16
-        return ((WorldServer) instance.world).getChunkIfLoaded(instance.chunkX, instance.chunkZ);
-    #elseif exists net.minecraft.world.level.World public net.minecraft.world.level.chunk.Chunk getChunkIfLoaded(int x, int z);
+        return ((ServerLevel) instance.world).getChunkIfLoaded(instance.chunkX, instance.chunkZ);
+    #elseif exists net.minecraft.world.level.Level public net.minecraft.world.level.chunk.LevelChunk getChunkIfLoaded(int x, int z);
         return instance.world.getChunkIfLoaded(instance.chunkX, instance.chunkZ);
     #else
-        return ((ChunkProviderServer) instance.world.getChunkProvider()).getChunkAt(instance.chunkX, instance.chunkZ, false);
+        return ((ServerChunkCache) instance.world.getChunkProvider()).getChunkAt(instance.chunkX, instance.chunkZ, false);
     #endif
     }
   #else
-    public (org.bukkit.Chunk) Chunk getCurrentChunk() {
+    public (org.bukkit.Chunk) LevelChunk getCurrentChunk() {
         boolean isLoaded = instance#isLoaded;
         if (!isLoaded) {
             return null;
@@ -1077,108 +1075,108 @@ class Entity {
 #if version >= 1.17
     public int ticksLived:tickCount;
     public optional int field_maxFireTicks:maxFireTicks;
-    protected final (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.network.syncher.DataWatcher datawatcherField:entityData;
+    protected final (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.network.syncher.SynchedEntityData datawatcherField:entityData;
 #else
     public int ticksLived;
     public optional int field_maxFireTicks:maxFireTicks;
-    protected (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.network.syncher.DataWatcher datawatcherField:datawatcher;
+    protected (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.network.syncher.SynchedEntityData datawatcherField:datawatcher;
 #endif
 
 #if version >= 1.17
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:DATA_SHARED_FLAGS_ID;
-    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:DATA_AIR_SUPPLY_ID;
-    private static optional final (DataWatcher.Key<?>) DataWatcherObject<java.util.Optional<IChatBaseComponent>> DATA_CUSTOM_NAME;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY;
-    protected static optional final (DataWatcher.Key<?>) DataWatcherObject<EntityPose> DATA_POSE;
+    protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_FLAGS:DATA_SHARED_FLAGS_ID;
+    private static optional final (DataWatcher.Key<Integer>) EntityDataAccessor<Integer> DATA_AIR_TICKS:DATA_AIR_SUPPLY_ID;
+    private static optional final (DataWatcher.Key<?>) EntityDataAccessor<java.util.Optional<Component>> DATA_CUSTOM_NAME;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_CUSTOM_NAME_VISIBLE;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_SILENT;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_NO_GRAVITY;
+    protected static optional final (DataWatcher.Key<?>) EntityDataAccessor<Pose> DATA_POSE;
 
 #elseif version >= 1.16.2
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:S;
-    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:AIR_TICKS;
-    private static optional final (DataWatcher.Key<?>) DataWatcherObject<java.util.Optional<IChatBaseComponent>> DATA_CUSTOM_NAME:aq;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:ar;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:as;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:at;
-    protected static optional final (DataWatcher.Key<?>) DataWatcherObject<EntityPose> DATA_POSE:POSE;
+    protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_FLAGS:S;
+    private static optional final (DataWatcher.Key<Integer>) EntityDataAccessor<Integer> DATA_AIR_TICKS:AIR_TICKS;
+    private static optional final (DataWatcher.Key<?>) EntityDataAccessor<java.util.Optional<Component>> DATA_CUSTOM_NAME:aq;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_CUSTOM_NAME_VISIBLE:ar;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_SILENT:as;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_NO_GRAVITY:at;
+    protected static optional final (DataWatcher.Key<?>) EntityDataAccessor<Pose> DATA_POSE:POSE;
 
 #elseif version >= 1.16
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:T;
-    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:AIR_TICKS;
-    private static optional final (DataWatcher.Key<?>) DataWatcherObject<java.util.Optional<IChatBaseComponent>> DATA_CUSTOM_NAME:ax;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:ay;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:az;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aA;
-    protected static optional final (DataWatcher.Key<?>) DataWatcherObject<EntityPose> DATA_POSE:POSE;
+    protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_FLAGS:T;
+    private static optional final (DataWatcher.Key<Integer>) EntityDataAccessor<Integer> DATA_AIR_TICKS:AIR_TICKS;
+    private static optional final (DataWatcher.Key<?>) EntityDataAccessor<java.util.Optional<Component>> DATA_CUSTOM_NAME:ax;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_CUSTOM_NAME_VISIBLE:ay;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_SILENT:az;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_NO_GRAVITY:aA;
+    protected static optional final (DataWatcher.Key<?>) EntityDataAccessor<Pose> DATA_POSE:POSE;
 
 #elseif version >= 1.14
   #if version >= 1.15
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:T;
+    protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_FLAGS:T;
   #else
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:W;
+    protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_FLAGS:W;
   #endif
-    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:AIR_TICKS;
-    private static optional final (DataWatcher.Key<?>) DataWatcherObject<java.util.Optional<IChatBaseComponent>> DATA_CUSTOM_NAME:az;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aA;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aB;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aC;
+    private static optional final (DataWatcher.Key<Integer>) EntityDataAccessor<Integer> DATA_AIR_TICKS:AIR_TICKS;
+    private static optional final (DataWatcher.Key<?>) EntityDataAccessor<java.util.Optional<Component>> DATA_CUSTOM_NAME:az;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_CUSTOM_NAME_VISIBLE:aA;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_SILENT:aB;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_NO_GRAVITY:aC;
   #if version >= 1.14.1
-    protected static optional final (DataWatcher.Key<?>) DataWatcherObject<EntityPose> DATA_POSE:POSE;
+    protected static optional final (DataWatcher.Key<?>) EntityDataAccessor<Pose> DATA_POSE:POSE;
   #else
-    protected static optional final (DataWatcher.Key<?>) DataWatcherObject<EntityPose> DATA_POSE:X;
+    protected static optional final (DataWatcher.Key<?>) EntityDataAccessor<Pose> DATA_POSE:X;
   #endif
 
 #elseif version >= 1.9
     /* === MC 1.9 and onwards has constants like these for datawatcher keys === */
     #select version >=
-    #case 1.13:   protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:ac;
-    #case 1.11:   protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:Z;
-    #case 1.10.2: protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:aa;
-    #case 1.9.4:  private static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:ay;
-    #case else:   private static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:ax;
+    #case 1.13:   protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_FLAGS:ac;
+    #case 1.11:   protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_FLAGS:Z;
+    #case 1.10.2: protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_FLAGS:aa;
+    #case 1.9.4:  private static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_FLAGS:ay;
+    #case else:   private static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_FLAGS:ax;
     #endselect
     #if version >= 1.13
-        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:aD;
-        private static optional final (DataWatcher.Key<?>) DataWatcherObject<java.util.Optional<IChatBaseComponent>> DATA_CUSTOM_NAME:aE;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aF;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aG;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aH;
+        private static optional final (DataWatcher.Key<Integer>) EntityDataAccessor<Integer> DATA_AIR_TICKS:aD;
+        private static optional final (DataWatcher.Key<?>) EntityDataAccessor<java.util.Optional<Component>> DATA_CUSTOM_NAME:aE;
+        private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_CUSTOM_NAME_VISIBLE:aF;
+        private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_SILENT:aG;
+        private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_NO_GRAVITY:aH;
     #elseif version >= 1.12
-        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:aA;
-        private static optional final (DataWatcher.Key<?>) DataWatcherObject<String> DATA_CUSTOM_NAME:aB;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aC;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aD;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aE;
+        private static optional final (DataWatcher.Key<Integer>) EntityDataAccessor<Integer> DATA_AIR_TICKS:aA;
+        private static optional final (DataWatcher.Key<?>) EntityDataAccessor<String> DATA_CUSTOM_NAME:aB;
+        private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_CUSTOM_NAME_VISIBLE:aC;
+        private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_SILENT:aD;
+        private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_NO_GRAVITY:aE;
     #elseif version >= 1.10.2
-        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:az;
-        private static optional final (DataWatcher.Key<?>) DataWatcherObject<String> DATA_CUSTOM_NAME:aA;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aB;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aC;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aD;
+        private static optional final (DataWatcher.Key<Integer>) EntityDataAccessor<Integer> DATA_AIR_TICKS:az;
+        private static optional final (DataWatcher.Key<?>) EntityDataAccessor<String> DATA_CUSTOM_NAME:aA;
+        private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_CUSTOM_NAME_VISIBLE:aB;
+        private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_SILENT:aC;
+        private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_NO_GRAVITY:aD;
     #elseif version >= 1.9.4
-        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:az;
-        private static optional final (DataWatcher.Key<?>) DataWatcherObject<String> DATA_CUSTOM_NAME:aA;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aB;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aC;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:###;
+        private static optional final (DataWatcher.Key<Integer>) EntityDataAccessor<Integer> DATA_AIR_TICKS:az;
+        private static optional final (DataWatcher.Key<?>) EntityDataAccessor<String> DATA_CUSTOM_NAME:aA;
+        private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_CUSTOM_NAME_VISIBLE:aB;
+        private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_SILENT:aC;
+        private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_NO_GRAVITY:###;
     #else
-        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:ay;
-        private static optional final (DataWatcher.Key<?>) DataWatcherObject<String> DATA_CUSTOM_NAME:az;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aA;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aB;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:###;
+        private static optional final (DataWatcher.Key<Integer>) EntityDataAccessor<Integer> DATA_AIR_TICKS:ay;
+        private static optional final (DataWatcher.Key<?>) EntityDataAccessor<String> DATA_CUSTOM_NAME:az;
+        private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_CUSTOM_NAME_VISIBLE:aA;
+        private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_SILENT:aB;
+        private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_NO_GRAVITY:###;
     #endif
 
-    protected static optional final (DataWatcher.Key<?>) DataWatcherObject<EntityPose> DATA_POSE:###;
+    protected static optional final (DataWatcher.Key<?>) EntityDataAccessor<Pose> DATA_POSE:###;
 #else
     /* === MC 1.8.9: These constants do not exist == */
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:###;
-    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:###;
-    private static optional final (DataWatcher.Key<?>) DataWatcherObject<String> DATA_CUSTOM_NAME:###;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:###;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:###;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:###;
-    protected static optional final (DataWatcher.Key<?>) DataWatcherObject<EntityPose> DATA_POSE:###;
+    protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_FLAGS:###;
+    private static optional final (DataWatcher.Key<Integer>) EntityDataAccessor<Integer> DATA_AIR_TICKS:###;
+    private static optional final (DataWatcher.Key<?>) EntityDataAccessor<String> DATA_CUSTOM_NAME:###;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_CUSTOM_NAME_VISIBLE:###;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_SILENT:###;
+    private static optional final (DataWatcher.Key<Boolean>) EntityDataAccessor<Boolean> DATA_NO_GRAVITY:###;
+    protected static optional final (DataWatcher.Key<?>) EntityDataAccessor<Pose> DATA_POSE:###;
 #endif
     <code>
     public static final DataWatcher.Key<Byte> DATA_FLAGS = DataWatcher.Key.Type.BYTE.createKey(T.DATA_FLAGS, 0);
@@ -1252,8 +1250,8 @@ class Entity {
 #endif
 
     /*
-     # protected void ##METHODNAME##(BlockPosition blockposition, Block block) {
-     *     SoundEffectType soundeffecttype = block.getStepSound();
+     # protected void ##METHODNAME##(BlockPos blockposition, Block block) {
+     *     SoundEventType soundeffecttype = block.getStepSound();
      *     if (this.world.getType(blockposition.up()).getBlock() == Blocks.SNOW_LAYER) {
      *         soundeffecttype = Blocks.SNOW_LAYER.getStepSound();
      *         this.a(soundeffecttype.d(), soundeffecttype.a() * 0.15F, soundeffecttype.b());
@@ -1263,9 +1261,9 @@ class Entity {
      * }
      */
 #if version >= 1.13
-    protected void playStepSound((IntVector3) BlockPosition position, (BlockData) IBlockData blockData);
+    protected void playStepSound((IntVector3) BlockPos position, (BlockData) BlockState blockData);
 #else
-    protected void playStepSound((IntVector3) BlockPosition position, (BlockData) Block blockData);
+    protected void playStepSound((IntVector3) BlockPos position, (BlockData) Block blockData);
 #endif
 
     /*
@@ -1338,30 +1336,30 @@ class Entity {
 #endif
 
 #if version >= 1.21.2
-    public (org.bukkit.entity.Item) EntityItem dropItem((org.bukkit.Material) Item material, int amount, float force) {
-        return instance.spawnAtLocation((WorldServer) instance.level(), new ItemStack(material, amount), force);
+    public (org.bukkit.entity.Item) ItemEntity dropItem((org.bukkit.Material) Item material, int amount, float force) {
+        return instance.spawnAtLocation((ServerLevel) instance.level(), new ItemStack(material, amount), force);
     }
 #elseif version >= 1.18
-    public (org.bukkit.entity.Item) EntityItem dropItem((org.bukkit.Material) Item material, int amount, float force) {
+    public (org.bukkit.entity.Item) ItemEntity dropItem((org.bukkit.Material) Item material, int amount, float force) {
         return instance.spawnAtLocation(new ItemStack(material, amount), force);
     }
 #elseif version >= 1.13
-    public (org.bukkit.entity.Item) EntityItem dropItem((org.bukkit.Material) Item material, int amount, float force) {
+    public (org.bukkit.entity.Item) ItemEntity dropItem((org.bukkit.Material) Item material, int amount, float force) {
         return instance.a(new ItemStack(material, amount), force);
     }
 #else
-    public (org.bukkit.entity.Item) EntityItem dropItem:a((org.bukkit.Material) Item material, int amount, float force);
+    public (org.bukkit.entity.Item) ItemEntity dropItem:a((org.bukkit.Material) Item material, int amount, float force);
 #endif
 
 #if version >= 1.21.2
-    public (org.bukkit.entity.Item) EntityItem dropItemStack((org.bukkit.inventory.ItemStack) ItemStack itemstack, float force) {
-        WorldServer world = (WorldServer) instance.level();
+    public (org.bukkit.entity.Item) ItemEntity dropItemStack((org.bukkit.inventory.ItemStack) ItemStack itemstack, float force) {
+        ServerLevel world = (ServerLevel) instance.level();
         return instance.spawnAtLocation(world, itemstack, force);
     }
 #elseif version >= 1.18
-    public (org.bukkit.entity.Item) EntityItem dropItemStack:spawnAtLocation((org.bukkit.inventory.ItemStack) ItemStack itemstack, float force);
+    public (org.bukkit.entity.Item) ItemEntity dropItemStack:spawnAtLocation((org.bukkit.inventory.ItemStack) ItemStack itemstack, float force);
 #else
-    public (org.bukkit.entity.Item) EntityItem dropItemStack:a((org.bukkit.inventory.ItemStack) ItemStack itemstack, float force);
+    public (org.bukkit.entity.Item) ItemEntity dropItemStack:a((org.bukkit.inventory.ItemStack) ItemStack itemstack, float force);
 #endif
 
     /*
@@ -1370,16 +1368,16 @@ class Entity {
      #     this.a(this.##METHODNAME##(), f1, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
      * }
      */
-#if exists net.minecraft.world.entity.Entity public net.minecraft.sounds.SoundEffect getSwimSound();
+#if exists net.minecraft.world.entity.Entity public net.minecraft.sounds.SoundEvent getSwimSound();
     // Paper made it public
-    public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound();
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEvent getSwimSound();
 #elseif version >= 1.9
-    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound();
+    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEvent getSwimSound();
 #else
     protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String getSwimSound();
 #endif
 
-    public void handleMovementEmissionAndPlaySound((org.bukkit.util.Vector) Vec3D movement, (IntVector3) BlockPosition blockPosition, (BlockData) IBlockData iblockdata) {
+    public void handleMovementEmissionAndPlaySound((org.bukkit.util.Vector) Vec3 movement, (IntVector3) BlockPos blockPosition, (BlockData) BlockState iblockdata) {
 #if version >= 1.21.2
         // Get what this entity should emit
         #require Entity protected Entity.MovementEmission getMovementEmission();
@@ -1389,7 +1387,7 @@ class Entity {
         }
 
         // Call the default logic method
-        #require Entity private void applyMovementEmissionAndPlaySound(Entity.MovementEmission emission, Vec3D vec3d, BlockPosition blockPosition, IBlockData iBlockData);
+        #require Entity private void applyMovementEmissionAndPlaySound(Entity.MovementEmission emission, Vec3 vec3d, BlockPos blockPosition, BlockState iBlockData);
         instance#applyMovementEmissionAndPlaySound(entity_movementemission, movement, blockPosition, iblockdata);
 
 #else
@@ -1463,9 +1461,9 @@ class Entity {
 
   #if version >= 1.14
     #if version >= 1.18
-            Vec3D mot = instance.getDeltaMovement();
+            Vec3 mot = instance.getDeltaMovement();
     #else
-            Vec3D mot = instance.getMot();
+            Vec3 mot = instance.getMot();
     #endif
             double motX = mot.x;
             double motY = mot.y;
@@ -1486,11 +1484,11 @@ class Entity {
             net.minecraft.util.RandomSource random = instance.random; // Mojang random 1.19+, java Random before
             float pitch = 1.0F + (random.nextFloat() - random.nextFloat()) * 0.4F;
 
-  #if exists net.minecraft.world.entity.Entity public net.minecraft.sounds.SoundEffect getSwimSound();
-            SoundEffect swimSound = instance.getSwimSound();
+  #if exists net.minecraft.world.entity.Entity public net.minecraft.sounds.SoundEvent getSwimSound();
+            SoundEvent swimSound = instance.getSwimSound();
   #elseif version >= 1.9
-            #require Entity protected SoundEffect getSwimSound();
-            SoundEffect swimSound = instance#getSwimSound();
+            #require Entity protected SoundEvent getSwimSound();
+            SoundEvent swimSound = instance#getSwimSound();
   #else
             #require Entity protected String getSwimSound();
             String swimSound = instance#getSwimSound();
@@ -1499,10 +1497,10 @@ class Entity {
 
         } else {
   #if version >= 1.13
-            #require Entity protected void playStepSound(BlockPosition position, IBlockData blockData);
+            #require Entity protected void playStepSound(BlockPos position, BlockState blockData);
             instance#playStepSound(blockPosition, iblockdata);
   #else
-            #require Entity protected void playStepSound(BlockPosition position, Block block);
+            #require Entity protected void playStepSound(BlockPos position, Block block);
             instance#playStepSound(blockPosition, iblockdata.getBlock());
   #endif
         }
@@ -1515,14 +1513,14 @@ class Entity {
      *     this.##METHODNAME##(this.aa(), f1, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
      * }
      * 
-     # public void ##METHODNAME##(SoundEffect soundeffect, float f, float f1) {
+     # public void ##METHODNAME##(SoundEvent soundeffect, float f, float f1) {
      *     if (!this.isSilent()) {
-     *         this.world.a((EntityHuman) null, this.locX, this.locY, this.locZ, soundeffect, this.bC(), f, f1);
+     *         this.world.a((net.minecraft.world.entity.player.Player) null, this.locX, this.locY, this.locZ, soundeffect, this.bC(), f, f1);
      *     }
      * }
      */
 #if version >= 1.9
-    public void makeSound:playSound((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect soundeffect, float volume, float pitch);
+    public void makeSound:playSound((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEvent soundeffect, float volume, float pitch);
 #else
     public void makeSound:playSound((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String soundeffect, float volume, float pitch);
 #endif
@@ -1595,7 +1593,7 @@ class Entity {
      *     
      *     // CraftBukkit end
      *
-     #     if (this.###METHODNAME###() && (!this.onGround || !this.isSneaking() || !(this instanceof EntityHuman)) && !this.isPassenger()) {
+     #     if (this.###METHODNAME###() && (!this.onGround || !this.isSneaking() || !(this instanceof net.minecraft.world.entity.player.Player)) && !this.isPassenger()) {
      *         double d22 = this.locX - d4;
      *         double d23 = this.locY - d5;
      *         ...
@@ -1623,7 +1621,7 @@ class Entity {
 #endif
 
     /*
-     # protected void ##METHODNAME##(double d0, boolean flag, IBlockData iblockdata, BlockPosition blockposition) {
+     # protected void ##METHODNAME##(double d0, boolean flag, BlockState iblockdata, BlockPos blockposition) {
      *     if (flag) {
      *         if (this.fallDistance > 0.0F) {
      *             iblockdata.getBlock().fallOn(this.world, blockposition, this, this.fallDistance);
@@ -1636,11 +1634,11 @@ class Entity {
      * }
      */
 #if version >= 1.18
-    protected void updateFalling:checkFallDamage(double d0, boolean flag, (BlockData) IBlockData blockData, (IntVector3) BlockPosition position);
+    protected void updateFalling:checkFallDamage(double d0, boolean flag, (BlockData) BlockState blockData, (IntVector3) BlockPos position);
 #elseif version >= 1.9
-    protected void updateFalling:a(double d0, boolean flag, (BlockData) IBlockData blockData, (IntVector3) BlockPosition position);
+    protected void updateFalling:a(double d0, boolean flag, (BlockData) BlockState blockData, (IntVector3) BlockPos position);
 #else
-    protected void updateFalling:a(double d0, boolean flag, (BlockData) Block blockData, (IntVector3) BlockPosition position);
+    protected void updateFalling:a(double d0, boolean flag, (BlockData) Block blockData, (IntVector3) BlockPos position);
 #endif
 
     // Purpur: enables the use of legacy entity tracking, which calls updateViewer() every tick
@@ -1679,10 +1677,10 @@ class Entity {
 
     /*
      * protected void checkBlockCollisions() {
-     *     AxisAlignedBB axisalignedbb = getBoundingBox();
-     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition = BlockPosition.PooledBlockPosition.d(axisalignedbb.a + 0.001D, axisalignedbb.b + 0.001D, axisalignedbb.c + 0.001D);
-     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition1 = BlockPosition.PooledBlockPosition.d(axisalignedbb.d - 0.001D, axisalignedbb.e - 0.001D, axisalignedbb.f - 0.001D);
-     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition2 = BlockPosition.PooledBlockPosition.s();
+     *     AABB axisalignedbb = getBoundingBox();
+     *     BlockPos.PooledBlockPosition blockposition_pooledblockposition = BlockPos.PooledBlockPosition.d(axisalignedbb.a + 0.001D, axisalignedbb.b + 0.001D, axisalignedbb.c + 0.001D);
+     *     BlockPos.PooledBlockPosition blockposition_pooledblockposition1 = BlockPos.PooledBlockPosition.d(axisalignedbb.d - 0.001D, axisalignedbb.e - 0.001D, axisalignedbb.f - 0.001D);
+     *     BlockPos.PooledBlockPosition blockposition_pooledblockposition2 = BlockPos.PooledBlockPosition.s();
      *     ...
      * }
      */
@@ -1731,24 +1729,24 @@ class Entity {
 
 #if version >= 1.18
     public void setSize(float width, float height) {
-        #require net.minecraft.world.entity.Entity private EntitySize dimensions;
+        #require net.minecraft.world.entity.Entity private EntityDimensions dimensions;
         #require net.minecraft.world.entity.Entity private float eyeHeight;
 
-        EntityPose entitypose = instance.getPose();
-        EntitySize newSize = EntitySize.scalable(width, height);
+        Pose entitypose = instance.getPose();
+        EntityDimensions newSize = EntityDimensions.scalable(width, height);
 
         instance#dimensions = newSize;
 
   #if version >= 1.20.5
-        #require net.minecraft.world.entity.Entity protected float getEyeHeight(EntityPose entitypose);
+        #require net.minecraft.world.entity.Entity protected float getEyeHeight(Pose entitypose);
         instance#eyeHeight = instance#getEyeHeight(entitypose);
   #else
-        #require net.minecraft.world.entity.Entity protected float getEyeHeight(EntityPose entitypose, EntitySize entitysize);
+        #require net.minecraft.world.entity.Entity protected float getEyeHeight(Pose entitypose, EntityDimensions entitysize);
         instance#eyeHeight = instance#getEyeHeight(entitypose, newSize);
   #endif
 
         double half_width = (double) width / 2.0;
-        AxisAlignedBB new_BoundingBox = new AxisAlignedBB(
+        AABB new_BoundingBox = new AABB(
             instance.getX() - half_width, instance.getY(), instance.getZ() - half_width,
             instance.getX() + half_width, instance.getY() + (double) height, instance.getZ() + half_width);
 
@@ -1756,18 +1754,18 @@ class Entity {
     }
 #elseif version >= 1.17
     public void setSize(float width, float height) {
-        #require net.minecraft.world.entity.Entity private EntitySize dimensions;
+        #require net.minecraft.world.entity.Entity private EntityDimensions dimensions;
         #require net.minecraft.world.entity.Entity private float eyeHeight;
-        #require net.minecraft.world.entity.Entity protected float getEyeHeight:getHeadHeight(EntityPose entitypose, EntitySize entitysize);
+        #require net.minecraft.world.entity.Entity protected float getEyeHeight:getHeadHeight(Pose entitypose, EntityDimensions entitysize);
 
-        EntityPose entitypose = instance.getPose();
-        EntitySize newSize = EntitySize.b(width, height);
+        Pose entitypose = instance.getPose();
+        EntityDimensions newSize = EntityDimensions.b(width, height);
 
         instance#dimensions = newSize;
         instance#eyeHeight = instance#getEyeHeight(entitypose, newSize);
 
         double half_width = (double) width / 2.0;
-        AxisAlignedBB new_BoundingBox = new AxisAlignedBB(
+        AABB new_BoundingBox = new AABB(
             instance.locX() - half_width, instance.locY(), instance.locZ() - half_width,
             instance.locX() + half_width, instance.locY() + (double) height, instance.locZ() + half_width);
 
@@ -1775,27 +1773,27 @@ class Entity {
     }
 #elseif version >= 1.14
     public void setSize(float width, float height) {
-        #require net.minecraft.world.entity.Entity private EntitySize size;
+        #require net.minecraft.world.entity.Entity private EntityDimensions size;
         #require net.minecraft.world.entity.Entity private float headHeight;
-        #require net.minecraft.world.entity.Entity protected float getHeadHeight(EntityPose entitypose, EntitySize entitysize);
+        #require net.minecraft.world.entity.Entity protected float getHeadHeight(Pose entitypose, EntityDimensions entitysize);
 
   #if version >= 1.14.1
-        EntityPose entitypose = instance.getPose();
+        Pose entitypose = instance.getPose();
   #else
-        EntityPose entitypose = instance.Z();
+        Pose entitypose = instance.Z();
   #endif
-        EntitySize newSize = EntitySize.b(width, height);
+        EntityDimensions newSize = EntityDimensions.b(width, height);
 
         instance#size = newSize;
         instance#headHeight = instance#getHeadHeight(entitypose, newSize);
 
         double half_width = (double) width / 2.0;
   #if version >= 1.15
-        AxisAlignedBB new_BoundingBox = new AxisAlignedBB(
+        AABB new_BoundingBox = new AABB(
             instance.locX() - half_width, instance.locY(), instance.locZ() - half_width,
             instance.locX() + half_width, instance.locY() + (double) height, instance.locZ() + half_width);
   #else
-        AxisAlignedBB new_BoundingBox = new AxisAlignedBB(
+        AABB new_BoundingBox = new AABB(
             instance.locX - half_width, instance.locY, instance.locZ - half_width,
             instance.locX + half_width, instance.locY + (double) height, instance.locZ + half_width);
   #endif
@@ -1812,22 +1810,22 @@ class Entity {
     public void setSize:a(float width, float height);
 #endif
 
-    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox();
+    public (AABBHandle) AABB getBoundingBox();
 
 #if version >= 1.21.5
     public void setPositionRotation:snapTo(double x, double y, double z, float yaw, float pitch);
     public void setLocation:absSnapTo(double x, double y, double z, float yaw, float pitch);
-    public void setBoundingBox((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
+    public void setBoundingBox((AABBHandle) AABB axisalignedbb);
     public float getHeadRotation:getYHeadRot();
 #elseif version >= 1.18
     public void setPositionRotation:moveTo(double x, double y, double z, float yaw, float pitch);
     public void setLocation:absMoveTo(double x, double y, double z, float yaw, float pitch);
-    public void setBoundingBox((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
+    public void setBoundingBox((AABBHandle) AABB axisalignedbb);
     public float getHeadRotation:getYHeadRot();
 #else
     public void setPositionRotation(double x, double y, double z, float yaw, float pitch);
     public void setLocation(double x, double y, double z, float yaw, float pitch);
-    public void setBoundingBox:a((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
+    public void setBoundingBox:a((AABBHandle) AABB axisalignedbb);
     public float getHeadRotation();
 #endif
 
@@ -1864,7 +1862,7 @@ class Entity {
 
 #if version >= 1.16.2
     // Since 1.16.2 this was removed, implementation taken from 1.16.1 (minecart/strider/etc.)
-    public (AxisAlignedBBHandle) AxisAlignedBB getEntityBoundingBox((EntityHandle) Entity entity) {
+    public (AABBHandle) AABB getEntityBoundingBox((EntityHandle) Entity entity) {
   #if version >= 1.18
         return instance.isPushable() ? entity.getBoundingBox() : null;
   #else
@@ -1872,13 +1870,13 @@ class Entity {
   #endif
     }
 #else
-    public (AxisAlignedBBHandle) AxisAlignedBB getEntityBoundingBox:j((EntityHandle) Entity entity);
+    public (AABBHandle) AABB getEntityBoundingBox:j((EntityHandle) Entity entity);
 #endif
 
 #if version >= 1.17
     // Removed since 1.17, maybe because it was 'unsafe'. Calculates position using bounding box.
     public void setPositionFromBoundingBox() {
-        AxisAlignedBB aabb = instance.getBoundingBox();
+        AABB aabb = instance.getBoundingBox();
   #if version >= 1.18
         instance.setPosRaw((aabb.minX + aabb.maxX) / 2.0, aabb.minY, (aabb.minZ + aabb.maxZ) / 2.0);
   #else
@@ -1945,7 +1943,7 @@ class Entity {
     </code>
 
 #if version >= 1.19.4
-    public (EntityHandle) net.minecraft.world.entity.EntityLiving getDriverEntity:getControllingPassenger();
+    public (EntityHandle) net.minecraft.world.entity.LivingEntity getDriverEntity:getControllingPassenger();
 #elseif version >= 1.9
     public (EntityHandle) Entity getDriverEntity:getControllingPassenger();
 #else
@@ -1969,7 +1967,7 @@ class Entity {
 #endif
 
 #if version >= 1.21.6
-    public void loadFromNBT((CommonTagCompound) NBTTagCompound compound) {
+    public void loadFromNBT((CommonTagCompound) CompoundTag compound) {
         com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporter reporter = #createScopedProblemReporter();
         try {
             ValueInput input = #createTagValueInput(reporter, instance.registryAccess(), compound);
@@ -1979,16 +1977,16 @@ class Entity {
         }
     }
 #elseif version >= 1.18
-    public void loadFromNBT:load((CommonTagCompound) NBTTagCompound compound);
+    public void loadFromNBT:load((CommonTagCompound) CompoundTag compound);
 #elseif version >= 1.17
-    public void loadFromNBT:load((CommonTagCompound) NBTTagCompound compound);
+    public void loadFromNBT:load((CommonTagCompound) CompoundTag compound);
 #elseif version >= 1.16
-    public void loadFromNBT:load((CommonTagCompound) NBTTagCompound compound);
+    public void loadFromNBT:load((CommonTagCompound) CompoundTag compound);
 #else
-    public void loadFromNBT:f((CommonTagCompound) NBTTagCompound compound);
+    public void loadFromNBT:f((CommonTagCompound) CompoundTag compound);
 #endif
 
-    // Note: ValueOutput == NBTTagCompound on versions before 1.21.
+    // Note: ValueOutput == CompoundTag on versions before 1.21.
     // Paper/spigot and across versions these parameters changed a lot
     // The API has all parameters that can possibly be specified (for paper)
     // Unsupported ones are ignored.
@@ -2003,7 +2001,7 @@ class Entity {
     }
 
 #if version >= 1.21.6
-    public void saveToNBT((CommonTagCompound) NBTTagCompound compound) {
+    public void saveToNBT((CommonTagCompound) CompoundTag compound) {
         com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporter reporter = #createScopedProblemReporter();
         try {
             ValueOutput output = #createTagValueOutput(reporter, instance.registryAccess(), compound);
@@ -2013,8 +2011,8 @@ class Entity {
         }
     }
 #else
-    public void saveToNBT((CommonTagCompound) NBTTagCompound compound) {
-        // NBTTagCompound == ValueOutput so call the other one directly
+    public void saveToNBT((CommonTagCompound) CompoundTag compound) {
+        // CompoundTag == ValueOutput so call the other one directly
         instance.saveWithoutId(compound);
     }
 #endif
@@ -2023,14 +2021,14 @@ class Entity {
 
 #if version >= 1.18
     public UUID getUniqueID:getUUID();
-    public (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.network.syncher.DataWatcher getDataWatcher:getEntityData();
+    public (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.network.syncher.SynchedEntityData getDataWatcher:getEntityData();
     public boolean isSneaking:isShiftKeyDown();
-    public void appendEntityCrashDetails:fillCrashReportCategory((CrashReportSystemDetailsHandle) CrashReportSystemDetails crashreportsystemdetails);
+    public void appendEntityCrashDetails:fillCrashReportCategory((CrashReportCategoryHandle) CrashReportCategory crashreportsystemdetails);
 #else
     public UUID getUniqueID();
-    public (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.network.syncher.DataWatcher getDataWatcher();
+    public (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.network.syncher.SynchedEntityData getDataWatcher();
     public boolean isSneaking();
-    public void appendEntityCrashDetails((CrashReportSystemDetailsHandle) CrashReportSystemDetails crashreportsystemdetails);
+    public void appendEntityCrashDetails((CrashReportCategoryHandle) CrashReportCategory crashreportsystemdetails);
 #endif
 
 #select version >=
@@ -2108,7 +2106,7 @@ class Entity {
 
         #require PortalProcessor private net.minecraft.world.level.block.Portal portalProcessorPortal:portal;
         net.minecraft.world.level.block.Portal portal = processor#portalProcessorPortal;
-        return portal.getPortalTransitionTime((WorldServer) instance.level(), instance);
+        return portal.getPortalTransitionTime((ServerLevel) instance.level(), instance);
     }
 #else
     #require Entity protected boolean insidePortalThisTick;
@@ -2158,32 +2156,32 @@ class Entity {
 
     // Since MC 1.16
 #if version >= 1.18
-    public optional (InteractionResult) EnumInteractionResult onInteractBy_1_16:interact((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+    public optional (InteractionResult) net.minecraft.world.InteractionResult onInteractBy_1_16:interact((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.MainHand) InteractionHand enumhand);
 #elseif version >= 1.16
-    public optional (InteractionResult) EnumInteractionResult onInteractBy_1_16:a((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+    public optional (InteractionResult) net.minecraft.world.InteractionResult onInteractBy_1_16:a((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.MainHand) InteractionHand enumhand);
 #else
-    public optional (InteractionResult) EnumInteractionResult onInteractBy_1_16:###((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+    public optional (InteractionResult) net.minecraft.world.InteractionResult onInteractBy_1_16:###((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.MainHand) InteractionHand enumhand);
 #endif
 
     // Since MC 1.11.2
 #if version >= 1.11.2 && version < 1.16
-    public optional boolean onInteractBy_1_11_2:b((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+    public optional boolean onInteractBy_1_11_2:b((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.MainHand) InteractionHand enumhand);
 #else
-    public optional boolean onInteractBy_1_11_2:###((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+    public optional boolean onInteractBy_1_11_2:###((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.MainHand) InteractionHand enumhand);
 #endif
 
     // Since MC 1.9
 #if version >= 1.9 && version < 1.11.2
-    public optional boolean onInteractBy_1_9:a((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+    public optional boolean onInteractBy_1_9:a((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (org.bukkit.inventory.MainHand) InteractionHand enumhand);
 #else
-    public optional boolean onInteractBy_1_9:###((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+    public optional boolean onInteractBy_1_9:###((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (org.bukkit.inventory.MainHand) InteractionHand enumhand);
 #endif
 
     // Since MC 1.8.9
 #if version < 1.9
-    public optional boolean onInteractBy_1_8_8:e((org.bukkit.entity.HumanEntity) EntityHuman entityhuman);
+    public optional boolean onInteractBy_1_8_8:e((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player entityhuman);
 #else
-    public optional boolean onInteractBy_1_8_8:###((org.bukkit.entity.HumanEntity) EntityHuman entityhuman);
+    public optional boolean onInteractBy_1_8_8:###((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player entityhuman);
 #endif
 
     // Since MC 1.17 - whether the entity is always ticked even if no players are nearby
@@ -2201,7 +2199,7 @@ class Entity {
     public boolean hasCustomName();
 
 #if version >= 1.13
-    public (ChatText) IChatBaseComponent getCustomName();
+    public (ChatText) Component getCustomName();
 #else
     public (ChatText) String getCustomName();
 #endif
@@ -2217,13 +2215,13 @@ class Entity {
         return instance.level().getWorld();
     }
 
-    public (WorldHandle) World getWorld:level();
+    public (LevelHandle) Level getWorld:level();
 
     // Public on Paper
-  #if exists net.minecraft.world.entity.Entity public void setLevel(net.minecraft.world.level.World world);
-    public void setWorld:setLevel((WorldHandle) World world);
+  #if exists net.minecraft.world.entity.Entity public void setLevel(net.minecraft.world.level.Level world);
+    public void setWorld:setLevel((LevelHandle) Level world);
   #else
-    protected void setWorld:setLevel((WorldHandle) World world);
+    protected void setWorld:setLevel((LevelHandle) Level world);
   #endif
 #else
     public org.bukkit.World getBukkitWorld() {
@@ -2234,7 +2232,7 @@ class Entity {
   #endif
     }
 
-    public (WorldHandle) World getWorld() {
+    public (LevelHandle) Level getWorld() {
   #if version >= 1.17
         return instance.level;
   #else
@@ -2242,7 +2240,7 @@ class Entity {
   #endif
     }
 
-    public void setWorld((WorldHandle) World world) {
+    public void setWorld((LevelHandle) Level world) {
   #if version >= 1.17
         instance.level = world;
   #else

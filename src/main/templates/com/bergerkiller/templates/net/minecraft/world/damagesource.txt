@@ -1,13 +1,10 @@
 package net.minecraft.world.damagesource;
 
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityLiving;
-import net.minecraft.world.entity.player.EntityHuman;
-import net.minecraft.world.entity.projectile.arrow.EntityArrow;
-import net.minecraft.world.entity.projectile.EntityFireball;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.MinecraftKey;
 
 import com.bergerkiller.generated.net.minecraft.world.damagesource.DamageSourceHandle;
 
@@ -35,7 +32,7 @@ class DamageSource {
         return instance.is(DamageTypes.IN_FIRE) || instance.is(DamageTypes.ON_FIRE);
     }
 
-    public static (DamageSourceHandle) DamageSource generic((org.bukkit.World) net.minecraft.world.level.World world) {
+    public static (DamageSourceHandle) DamageSource generic((org.bukkit.World) net.minecraft.world.level.Level world) {
         return world.damageSources().generic();
     }
 
@@ -43,15 +40,15 @@ class DamageSource {
         return entity.damageSources().generic();
     }
 
-    public static (DamageSourceHandle) DamageSource mobAttack((org.bukkit.entity.LivingEntity) EntityLiving livingEntity) {
+    public static (DamageSourceHandle) DamageSource mobAttack((org.bukkit.entity.LivingEntity) LivingEntity livingEntity) {
         return livingEntity.damageSources().mobAttack(livingEntity);
     }
 
-    public static (DamageSourceHandle) DamageSource playerAttack((org.bukkit.entity.HumanEntity) EntityHuman humanEntity) {
+    public static (DamageSourceHandle) DamageSource playerAttack((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player humanEntity) {
         return humanEntity.damageSources().playerAttack(humanEntity);
     }
 
-    public static (DamageSourceHandle) DamageSource arrowHit:arrow((org.bukkit.entity.Arrow) EntityArrow arrow, (org.bukkit.entity.Entity) Entity damager) {
+    public static (DamageSourceHandle) DamageSource arrowHit:arrow((org.bukkit.entity.Arrow) AbstractArrow arrow, (org.bukkit.entity.Entity) Entity damager) {
         return arrow.damageSources().arrow(arrow, damager);
     }
 
@@ -115,7 +112,7 @@ class DamageSource {
     public boolean isFireDamage:o();
 #endif
 
-    public static (DamageSourceHandle) DamageSource generic((org.bukkit.World) net.minecraft.world.level.World world) {
+    public static (DamageSourceHandle) DamageSource generic((org.bukkit.World) net.minecraft.world.level.Level world) {
         return DamageSource.GENERIC;
     }
 
@@ -123,11 +120,11 @@ class DamageSource {
         return DamageSource.GENERIC;
     }
 
-    public static (DamageSourceHandle) DamageSource mobAttack((org.bukkit.entity.LivingEntity) EntityLiving livingEntity);
+    public static (DamageSourceHandle) DamageSource mobAttack((org.bukkit.entity.LivingEntity) LivingEntity livingEntity);
 
-    public static (DamageSourceHandle) DamageSource playerAttack((org.bukkit.entity.HumanEntity) EntityHuman humanEntity);
+    public static (DamageSourceHandle) DamageSource playerAttack((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player humanEntity);
 
-    public static (DamageSourceHandle) DamageSource arrowHit:arrow((org.bukkit.entity.Arrow) EntityArrow arrow, (org.bukkit.entity.Entity) Entity damager);
+    public static (DamageSourceHandle) DamageSource arrowHit:arrow((org.bukkit.entity.Arrow) AbstractArrow arrow, (org.bukkit.entity.Entity) Entity damager);
 
     // Now uses EntityFireballFireball but no clue what that is?
     //public static (DamageSourceHandle) DamageSource fireballHit:fireball((org.bukkit.entity.Fireball) EntityFireball fireball, (org.bukkit.entity.Entity) Entity damager)
@@ -152,7 +149,7 @@ class DamageSource {
     public static (DamageSourceHandle) DamageSource thorns:a((org.bukkit.entity.Entity) Entity entity);
   #endif
 
-    public static DamageSourceHandle byName((org.bukkit.World) net.minecraft.world.level.World world, String name) {
+    public static DamageSourceHandle byName((org.bukkit.World) net.minecraft.world.level.Level world, String name) {
         return (DamageSourceHandle) DamageSourceHandle.INTERNAL_NAME_TO_KEY.get(name);
     }
 

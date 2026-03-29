@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.entity.type;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
 
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartMobSpawnerHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.MinecartSpawnerHandle;
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.inventory.ItemStack;
@@ -38,6 +38,6 @@ public class CommonMinecartMobSpawner extends CommonMinecart<SpawnerMinecart> {
      * @return Mob spawner
      */
     public MobSpawner getMobSpawner() {
-        return EntityMinecartMobSpawnerHandle.T.mobSpawner.get(getHandle());
+        return MinecartSpawnerHandle.T.mobSpawner.get(getHandle());
     }
 }

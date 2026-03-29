@@ -1,27 +1,27 @@
 package net.minecraft.world.item.crafting;
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.IRegistryCustom;
-import net.minecraft.core.IRegistryCustom$Dimension;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.RegistryAccess$Frozen;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 
-import com.bergerkiller.generated.net.minecraft.world.item.crafting.CraftingManagerHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeManagerHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipesFurnaceHandle;
-import com.bergerkiller.generated.net.minecraft.world.item.crafting.IRecipeHandle;
-import com.bergerkiller.generated.net.minecraft.world.item.crafting.FurnaceRecipeHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.SmeltingRecipeHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 
 #if version >= 1.12
 
-class IRecipe {
+class Recipe {
 #if version >= 1.15
     public (org.bukkit.inventory.ItemStack) ItemStack getOutput() {
-        if (instance instanceof RecipeFireworks) {
+        if (instance instanceof FireworkRocketRecipe) {
             // Special case (see getIngredients code)
             net.minecraft.world.item.ItemStack itemstack = new ItemStack(net.minecraft.world.item.Items.FIREWORK_ROCKET, 3);
             ItemStackHandle.T.setFireworksFlightDuration.invoke(itemstack, Integer.valueOf(3));
@@ -29,7 +29,7 @@ class IRecipe {
         } else {
   #if version >= 1.21.2
             //TODO: Technically could support world-specific recipes!
-            IRegistryCustom$Dimension registry = MinecraftServer.getServer().registryAccess();
+            RegistryAccess$Frozen registry = MinecraftServer.getServer().registryAccess();
 
             //TODO: Recipes could change depending on inputs
             RecipeInput input;
@@ -51,7 +51,7 @@ class IRecipe {
             return instance.assemble((RecipeInput) input, registry);
   #elseif version >= 1.19.4
             //TODO: Technically could support world-specific recipes!
-            IRegistryCustom$Dimension registry = MinecraftServer.getServer().registryAccess();
+            RegistryAccess$Frozen registry = MinecraftServer.getServer().registryAccess();
             return instance.getResultItem(registry);
   #elseif version >= 1.18
             return instance.getResultItem();
@@ -102,17 +102,17 @@ class IRecipe {
 #endselect
 
 #if version >= 1.15
-        } else if (instance instanceof RecipeFireworks) {
+        } else if (instance instanceof FireworkRocketRecipe) {
             // Fireworks are a 'complex' recipe with many possible options
             // To sort of work properly rather than not at all, default to
             // crafting a flight 3 firework:
             // Shapeless(1 paper + 3 gunpowder) -> Flight 3 firework
   #if version >= 1.18
-            RecipeItemStack paper = RecipeItemStack.of(new net.minecraft.world.level.IMaterial[] { net.minecraft.world.item.Items.PAPER });
-            RecipeItemStack gunpowder = RecipeItemStack.of(new net.minecraft.world.level.IMaterial[] { net.minecraft.world.item.Items.GUNPOWDER });
+            RecipeItemStack paper = RecipeItemStack.of(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.PAPER });
+            RecipeItemStack gunpowder = RecipeItemStack.of(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.GUNPOWDER });
   #else
-            RecipeItemStack paper = RecipeItemStack.a(new net.minecraft.world.level.IMaterial[] { net.minecraft.world.item.Items.PAPER });
-            RecipeItemStack gunpowder = RecipeItemStack.a(new net.minecraft.world.level.IMaterial[] { net.minecraft.world.item.Items.GUNPOWDER });
+            RecipeItemStack paper = RecipeItemStack.a(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.PAPER });
+            RecipeItemStack gunpowder = RecipeItemStack.a(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.GUNPOWDER });
   #endif
 
             java.util.List ingredients = new java.util.ArrayList(4);
@@ -130,7 +130,7 @@ class IRecipe {
 
 #else
 
-interface IRecipe {
+interface Recipe {
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:b();
     public abstract (List<CraftInputSlot>) List<ItemStack> getIngredients();
 }
@@ -138,11 +138,11 @@ interface IRecipe {
 #endif
 
 // >= MC 1.12
-optional class RecipeItemStack {
+optional class Ingredient {
 #if version >= 1.21.2
     public (List<org.bukkit.inventory.ItemStack>) List<ItemStack> getChoices() {
         if (instance.isExact()) {
-  #if exists net.minecraft.world.item.crafting.RecipeItemStack public java.util.Set<net.minecraft.world.item.ItemStack> itemStacks();
+  #if exists net.minecraft.world.item.crafting.Ingredient public java.util.Set<net.minecraft.world.item.ItemStack> itemStacks();
             java.util.Set itemStacks = instance.itemStacks();
             if (itemStacks.isEmpty()) {
                 return java.util.Collections.emptyList();
@@ -156,7 +156,7 @@ optional class RecipeItemStack {
 
         // Only stores the Item material to match. Create itemstacks out of them (count 1)
   #if version >= 1.21.4
-        #require RecipeItemStack private final net.minecraft.core.HolderSet<net.minecraft.world.item.Item> values;
+        #require Ingredient private final net.minecraft.core.HolderSet<net.minecraft.world.item.Item> values;
         net.minecraft.core.HolderSet items = instance#values;
   #else
         java.util.List items = instance.items();
@@ -184,22 +184,22 @@ optional class RecipeItemStack {
 
     public void setChoices((List<org.bukkit.inventory.ItemStack>) List<ItemStack> choices) {
 #if version >= 1.21.2
-  #if exists net.minecraft.world.item.crafting.RecipeItemStack private java.util.Set<net.minecraft.world.item.ItemStack> itemStacks;
+  #if exists net.minecraft.world.item.crafting.Ingredient private java.util.Set<net.minecraft.world.item.ItemStack> itemStacks;
         // Paper
-        #require net.minecraft.world.item.crafting.RecipeItemStack private Set<ItemStack> choicesRecipeItemStack:itemStacks;
+        #require net.minecraft.world.item.crafting.Ingredient private Set<ItemStack> choicesRecipeItemStack:itemStacks;
         choices = new HashSet(choices); // Safe copy / avoid conversion stuff sticking around
         instance#choicesRecipeItemStack = choices;
   #else
-        #require net.minecraft.world.item.crafting.RecipeItemStack private List<ItemStack> choicesRecipeItemStack:itemStacks;
+        #require net.minecraft.world.item.crafting.Ingredient private List<ItemStack> choicesRecipeItemStack:itemStacks;
         choices = new ArrayList(choices); // Safe copy / avoid conversion stuff sticking around
         instance#choicesRecipeItemStack = choices;
   #endif
 #else
 
   #if version >= 1.17
-        #require net.minecraft.world.item.crafting.RecipeItemStack private ItemStack[] choicesRecipeItemStack:itemStacks;
+        #require net.minecraft.world.item.crafting.Ingredient private ItemStack[] choicesRecipeItemStack:itemStacks;
   #elseif version >= 1.12
-        #require net.minecraft.world.item.crafting.RecipeItemStack public final ItemStack[] choicesRecipeItemStack:choices;
+        #require net.minecraft.world.item.crafting.Ingredient public final ItemStack[] choicesRecipeItemStack:choices;
   #endif
         ItemStack[] choicesArr = (ItemStack[]) choices.toArray(new ItemStack[0]);
         instance#choicesRecipeItemStack = choicesArr;
@@ -226,22 +226,22 @@ optional class RecipesFurnace {
 }
 
 // >= MC 1.13
-optional class FurnaceRecipe extends IRecipe {
+optional class SmeltingRecipe extends Recipe {
 
 #if version >= 1.21.2
-    public (CraftInputSlot) RecipeItemStack getIngredient:input();
+    public (CraftInputSlot) Ingredient getIngredient:input();
 #else
-    public (CraftInputSlot) RecipeItemStack getIngredient() {
+    public (CraftInputSlot) Ingredient getIngredient() {
   #if version >= 1.14
-        #require net.minecraft.world.item.crafting.RecipeCooking protected final RecipeItemStack ingredient;
+        #require net.minecraft.world.item.crafting.AbstractCookingRecipe protected final Ingredient ingredient;
   #elseif version >= 1.13
-        #require net.minecraft.world.item.crafting.FurnaceRecipe private final RecipeItemStack ingredient;
+        #require net.minecraft.world.item.crafting.SmeltingRecipe private final Ingredient ingredient;
   #endif
         return instance#ingredient;
     }
 #endif
 
-    public static (Iterable<FurnaceRecipeHandle>) Iterable<FurnaceRecipe> getRecipes() {
+    public static (Iterable<SmeltingRecipeHandle>) Iterable<SmeltingRecipe> getRecipes() {
 #if version >= 1.18
         java.util.Iterator allRecipes = MinecraftServer.getServer().getRecipeManager().getRecipes().iterator();
 #else
@@ -253,7 +253,7 @@ optional class FurnaceRecipe extends IRecipe {
 #if version >= 1.20.2
             recipe = ((net.minecraft.world.item.crafting.RecipeHolder) recipe).value();
 #endif
-            if (recipe instanceof FurnaceRecipe) {
+            if (recipe instanceof SmeltingRecipe) {
                 filteredResult.add(recipe);
             }
         }
@@ -261,8 +261,8 @@ optional class FurnaceRecipe extends IRecipe {
     }
 }
 
-class CraftingManager {
-    public static (Iterable<IRecipeHandle>) Iterable<IRecipe> getRecipes() {
+class RecipeManager {
+    public static (Iterable<RecipeHandle>) Iterable<Recipe> getRecipes() {
 #if version >= 1.13
   #if version >= 1.18
         java.util.Iterator allRecipes = MinecraftServer.getServer().getRecipeManager().getRecipes().iterator();
@@ -272,7 +272,7 @@ class CraftingManager {
         java.util.List filteredResult = new java.util.ArrayList();
 
   #if version >= 1.19.4
-        IRegistryCustom$Dimension registry = MinecraftServer.getServer().registryAccess();
+        RegistryAccess$Frozen registry = MinecraftServer.getServer().registryAccess();
   #endif
   #if version >= 1.21.2
         RecipeInput emptyCraftingInput = CraftingInput.EMPTY;
@@ -292,7 +292,7 @@ class CraftingManager {
                 continue;
             }
   #else
-            if (!(recipe instanceof ShapedRecipes || recipe instanceof ShapelessRecipes || recipe instanceof IRecipeComplex)) {
+            if (!(recipe instanceof ShapedRecipes || recipe instanceof ShapelessRecipes || recipe instanceof CustomRecipe)) {
                 continue;
             }
   #endif
@@ -301,19 +301,19 @@ class CraftingManager {
             // One is shapeless, the other is complex
             // Correct for this and only keep the complex one!
   #if version >= 1.21.2
-            if (recipe instanceof ShapelessRecipes && ((IRecipe) recipe).assemble(emptyCraftingInput, registry).getItem() == Items.FIREWORK_ROCKET) {
+            if (recipe instanceof ShapelessRecipes && ((Recipe) recipe).assemble(emptyCraftingInput, registry).getItem() == Items.FIREWORK_ROCKET) {
                 continue;
             }
   #elseif version >= 1.19.4
-            if (!(recipe instanceof RecipeFireworks) && ((IRecipe) recipe).getResultItem(registry).getItem() == Items.FIREWORK_ROCKET) {
+            if (!(recipe instanceof FireworkRocketRecipe) && ((Recipe) recipe).getResultItem(registry).getItem() == Items.FIREWORK_ROCKET) {
                 continue;
             }
   #elseif version >= 1.18
-            if (!(recipe instanceof RecipeFireworks) && ((IRecipe) recipe).getResultItem().getItem() == Items.FIREWORK_ROCKET) {
+            if (!(recipe instanceof FireworkRocketRecipe) && ((Recipe) recipe).getResultItem().getItem() == Items.FIREWORK_ROCKET) {
                 continue;
             }
   #elseif version >= 1.17
-            if (!(recipe instanceof RecipeFireworks) && ((IRecipe) recipe).getResult().getItem() == Items.FIREWORK_ROCKET) {
+            if (!(recipe instanceof FireworkRocketRecipe) && ((Recipe) recipe).getResult().getItem() == Items.FIREWORK_ROCKET) {
                 continue;
             }
   #endif
@@ -322,9 +322,9 @@ class CraftingManager {
         }
         return filteredResult;
 #elseif version >= 1.12
-        return CraftingManager.recipes;
+        return RecipeManager.recipes;
 #else
-        return CraftingManager.getInstance().recipes;
+        return RecipeManager.getInstance().recipes;
 #endif
     }
 }

@@ -15,7 +15,7 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.lighting.LightingHandler;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import com.bergerkiller.generated.net.minecraft.server.level.LightEngineThreadedHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ThreadedLevelLightEngineHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -36,7 +36,7 @@ class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
 
     @Override
     public boolean isSupported(World world) {
-        LightEngineThreadedHandle engine = LightEngineThreadedHandle.forWorld(world);
+        ThreadedLevelLightEngineHandle engine = ThreadedLevelLightEngineHandle.forWorld(world);
         return handle.isSupported(engine.getRaw());
     }
 
@@ -124,7 +124,7 @@ class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
 
             // When the scheduler runs, remove it from the cache again
             // Then run all commands in the list
-            LightEngineThreadedHandle.forWorld(world).schedule(() -> {
+            ThreadedLevelLightEngineHandle.forWorld(world).schedule(() -> {
                 List<Runnable> queue;
                 synchronized (lightUpdateQueue) {
                     queue = lightUpdateQueue.remove(world);

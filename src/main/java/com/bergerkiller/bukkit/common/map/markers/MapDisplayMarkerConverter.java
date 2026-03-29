@@ -9,7 +9,7 @@ import java.util.List;
  */
 @Template.Package("net.minecraft.world.level.saveddata.maps")
 @Template.Import("net.minecraft.network.chat.IChatBaseComponent")
-@Template.Import("com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapHandle.Builder")
+@Template.Import("com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMapItemDataPacketHandle.Builder")
 @Template.Import("com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkerTile")
 @Template.Import("com.bergerkiller.bukkit.common.map.MapMarker")
 @Template.Import("com.bergerkiller.bukkit.common.wrappers.ChatText")

@@ -1,6 +1,6 @@
 package net.minecraft.world.level.block.state.properties;
 
-interface IBlockState {
+interface Property {
 #if version >= 1.16
     public abstract String getKeyToken:getName();
 #else

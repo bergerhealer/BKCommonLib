@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 import com.bergerkiller.generated.net.minecraft.resources.ResourceKeyHandle;
 
 /**
@@ -26,11 +26,11 @@ public final class ResourceCategory<T> {
     }
 
     private static <T> ResourceCategory<T> create(String name) {
-        return create(MinecraftKeyHandle.createNew(name));
+        return create(IdentifierHandle.createNew(name));
     }
 
     @SuppressWarnings("unchecked")
-    protected static <T> ResourceCategory<T> create(MinecraftKeyHandle name) {
+    protected static <T> ResourceCategory<T> create(IdentifierHandle name) {
         Object resourceKeyHandle = ResourceKeyHandle.T.createCategory.raw.invoke(name.getRaw());
         return cache.computeIfAbsent(resourceKeyHandle, ResourceCategory::new);
     }
@@ -42,7 +42,7 @@ public final class ResourceCategory<T> {
      * @param name Name to turn into a resource key
      * @return resource key, null if minecraftkey is null
      */
-    public ResourceKey<T> createKey(MinecraftKeyHandle name) {
+    public ResourceKey<T> createKey(IdentifierHandle name) {
         return ResourceKey.fromMinecraftKey(this, name);
     }
 
@@ -81,7 +81,7 @@ public final class ResourceCategory<T> {
      * 
      * @return category name
      */
-    public MinecraftKeyHandle getName() {
+    public IdentifierHandle getName() {
         return this.categoryKey.getName();
     }
 

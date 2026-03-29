@@ -2,22 +2,22 @@ package net.minecraft.server.network;
 
 import net.minecraft.network.protocol.Packet;
 
-import net.minecraft.network.protocol.game.PacketPlayOutPosition;
+import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.entity.RelativeMovement;
-import net.minecraft.world.phys.Vec3D;
+import net.minecraft.world.phys.Vec3;
 
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 
-class PlayerConnection {
+class ServerGamePacketListenerImpl {
     public Object getNetworkManager() {
 #if version >= 1.20.2
         // Moved to ServerCommonPacketListenerImpl
-        #require net.minecraft.server.network.ServerCommonPacketListenerImpl protected final net.minecraft.network.NetworkManager networkManager:connection;
+        #require net.minecraft.server.network.ServerCommonPacketListenerImpl protected final net.minecraft.network.Connection networkManager:connection;
 #elseif version >= 1.17
-        #require PlayerConnection private final net.minecraft.network.NetworkManager networkManager:connection;
+        #require ServerGamePacketListenerImpl private final net.minecraft.network.Connection networkManager:connection;
 #else
-        #require PlayerConnection public final net.minecraft.network.NetworkManager networkManager;
+        #require ServerGamePacketListenerImpl public final net.minecraft.network.Connection networkManager;
 #endif
         return instance#networkManager;
     }
@@ -31,7 +31,7 @@ class PlayerConnection {
 #endif
 
     <code>
-    private static final QueuePacketMethod defaultQueuePacketMethod = com.bergerkiller.generated.net.minecraft.network.NetworkManagerHandle::queuePacketUnsafe;
+    private static final QueuePacketMethod defaultQueuePacketMethod = com.bergerkiller.generated.net.minecraft.network.ConnectionHandle::queuePacketUnsafe;
     private static final java.util.Map<Class<?>, QueuePacketMethod> queuePacketMethods = new java.util.concurrent.ConcurrentHashMap<Class<?>, QueuePacketMethod>(5, 0.75f, 2);
 
     private static interface QueuePacketMethod {
@@ -39,8 +39,8 @@ class PlayerConnection {
     }
 
     static {
-        // Default method when the NetworkManager is vanilla unchanged
-        queuePacketMethods.put(com.bergerkiller.generated.net.minecraft.network.NetworkManagerHandle.T.getType(), defaultQueuePacketMethod);
+        // Default method when the Connection is vanilla unchanged
+        queuePacketMethods.put(com.bergerkiller.generated.net.minecraft.network.ConnectionHandle.T.getType(), defaultQueuePacketMethod);
     }
 
     private static QueuePacketMethod findPacketMethod(Class<?> networkManagerType) throws Throwable {
@@ -78,7 +78,7 @@ class PlayerConnection {
                     queuePacketMethods.put(networkManager.getClass(), method);
                 } else {
                     queuePacketMethods.put(networkManager.getClass(), (n, p) -> {return false;});
-                    com.bergerkiller.bukkit.common.Logging.LOGGER_NETWORK.warning("Unsupported NetworkManager detected: " + networkManager.getClass().getName());
+                    com.bergerkiller.bukkit.common.Logging.LOGGER_NETWORK.warning("Unsupported Connection detected: " + networkManager.getClass().getName());
                     return false;
                 }
             }
@@ -100,27 +100,27 @@ class PlayerConnection {
 
     <code>
     public boolean isConnected() {
-        return com.bergerkiller.generated.net.minecraft.network.NetworkManagerHandle.T.isConnected.invoke(getNetworkManager()).booleanValue();
+        return com.bergerkiller.generated.net.minecraft.network.ConnectionHandle.T.isConnected.invoke(getNetworkManager()).booleanValue();
     }
 
     /**
-     * Gets the PlayerConnection NMS instance, which is used for sending packets to.
+     * Gets the ServerGamePacketListenerImpl NMS instance, which is used for sending packets to.
      * If the player is an NPC, or is disconnected, this method returns null.
      * 
      * @param player
      * @return player connection
      */
-    public static PlayerConnectionHandle forPlayer(org.bukkit.entity.Player player) {
+    public static ServerGamePacketListenerImplHandle forPlayer(org.bukkit.entity.Player player) {
         Object handle = com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player);
 
         // Check not NPC player
         // This check used to exist 7+ years ago or even older, and even back then it was unknown if this check was even needed.
         // I've disabled it (9 apr 2024) because this breaks sending packets when mods/plugins alter the server player instance.
-        //if (!com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle.T.isType(handle)) return null;
+        //if (!com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle.T.isType(handle)) return null;
 
-        final PlayerConnectionHandle connection = com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle.T.playerConnection.get(handle);
+        final ServerGamePacketListenerImplHandle connection = com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle.T.playerConnection.get(handle);
         if (connection == null || !connection.isConnected()) {
-            return null; // No PlayerConnection instance or not connected
+            return null; // No ServerGamePacketListenerImpl instance or not connected
         }
         return connection;
     }
@@ -131,29 +131,29 @@ class PlayerConnection {
         flags.add(RelativeMovement.X_ROT);
         flags.add(RelativeMovement.Y_ROT);
   #if version >= 1.21.2
-        instance.send((Packet) new PacketPlayOutPosition(0, new PositionMoveRotation(
-            new Vec3D(x, y, z), new Vec3D(0.0, 0.0, 0.0), 0.0f, 0.0f
+        instance.send((Packet) new ClientboundPlayerPositionPacket(0, new PositionMoveRotation(
+            new Vec3(x, y, z), new Vec3(0.0, 0.0, 0.0), 0.0f, 0.0f
         ), flags));
   #elseif version >= 1.19.4
-        instance.send((Packet) new PacketPlayOutPosition(x, y, z, 0.0f, 0.0f, flags, 0));
+        instance.send((Packet) new ClientboundPlayerPositionPacket(x, y, z, 0.0f, 0.0f, flags, 0));
   #elseif version >= 1.18
-        instance.send((Packet) new PacketPlayOutPosition(x, y, z, 0.0f, 0.0f, flags, 0, false));
+        instance.send((Packet) new ClientboundPlayerPositionPacket(x, y, z, 0.0f, 0.0f, flags, 0, false));
   #elseif version >= 1.17
-        instance.sendPacket((Packet) new PacketPlayOutPosition(x, y, z, 0.0f, 0.0f, flags, 0, false));
+        instance.sendPacket((Packet) new ClientboundPlayerPositionPacket(x, y, z, 0.0f, 0.0f, flags, 0, false));
   #elseif version >= 1.9
-        instance.sendPacket((Packet) new PacketPlayOutPosition(x, y, z, 0.0f, 0.0f, flags, 0));
+        instance.sendPacket((Packet) new ClientboundPlayerPositionPacket(x, y, z, 0.0f, 0.0f, flags, 0));
   #else
-        instance.sendPacket((Packet) new PacketPlayOutPosition(x, y, z, 0.0f, 0.0f, flags));
+        instance.sendPacket((Packet) new ClientboundPlayerPositionPacket(x, y, z, 0.0f, 0.0f, flags));
   #endif
     }
 
 #if version >= 1.9
   #if version >= 1.17
-    #require PlayerConnection private net.minecraft.world.phys.Vec3D awaitingPositionFromClient;
-    #require PlayerConnection private int awaitingTeleport;
+    #require ServerGamePacketListenerImpl private net.minecraft.world.phys.Vec3 awaitingPositionFromClient;
+    #require ServerGamePacketListenerImpl private int awaitingTeleport;
   #else
-    #require PlayerConnection private net.minecraft.world.phys.Vec3D awaitingPositionFromClient:teleportPos;
-    #require PlayerConnection private int awaitingTeleport:teleportAwait;
+    #require ServerGamePacketListenerImpl private net.minecraft.world.phys.Vec3 awaitingPositionFromClient:teleportPos;
+    #require ServerGamePacketListenerImpl private int awaitingTeleport:teleportAwait;
   #endif
 
     public int getAwaitingTeleportId() {
@@ -161,7 +161,7 @@ class PlayerConnection {
     }
 
     public void resetAwaitTeleport() {
-        net.minecraft.world.phys.Vec3D curr = instance#awaitingPositionFromClient;
+        net.minecraft.world.phys.Vec3 curr = instance#awaitingPositionFromClient;
         if (curr == null) {
             return;
         }

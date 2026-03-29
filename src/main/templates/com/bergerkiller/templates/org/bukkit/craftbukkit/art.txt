@@ -2,7 +2,7 @@ package org.bukkit.craftbukkit;
 
 import net.minecraft.world.entity.decoration.Paintings;
 import net.minecraft.core.Holder;
-import net.minecraft.core.IRegistry;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.decoration.painting.PaintingVariant;
 
@@ -16,7 +16,7 @@ class CraftArt {
     public static (Object) Holder<PaintingVariant> BukkitToNotch(org.bukkit.Art art);
   #endif
 
-    #require BuiltInRegistries public static net.minecraft.core.IRegistry getPaintingVariantRegistry() {
+    #require BuiltInRegistries public static net.minecraft.core.Registry getPaintingVariantRegistry() {
   #if version >= 1.21
         return org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry(net.minecraft.core.registries.Registries.PAINTING_VARIANT);
   #else
@@ -25,7 +25,7 @@ class CraftArt {
     }
 
     public static (Object) Holder<PaintingVariant> NotchFromInternalId(int internalId) {
-        IRegistry paintingRegistry = #getPaintingVariantRegistry();
+        Registry paintingRegistry = #getPaintingVariantRegistry();
   #if version >= 1.21.2
         java.util.Optional opt = paintingRegistry.get(internalId);
   #else
@@ -35,14 +35,14 @@ class CraftArt {
     }
 
     public static int NotchToInternalId((Object) Holder<PaintingVariant> art) {
-        IRegistry paintingRegistry = #getPaintingVariantRegistry();
+        Registry paintingRegistry = #getPaintingVariantRegistry();
         return paintingRegistry.getId((Object) art.value());
     }
 
     public static (Object) Holder<PaintingVariant> NotchFromInternalName(String internalName) {
         // Dear god...
-        net.minecraft.resources.MinecraftKey key = #parseMinecraftKey(internalName);
-        IRegistry paintingRegistry = #getPaintingVariantRegistry();
+        net.minecraft.resources.Identifier key = #parseIdentifier(internalName);
+        Registry paintingRegistry = #getPaintingVariantRegistry();
   #if version >= 1.21.2
         Object valueAtKey = paintingRegistry.getValue(key);
   #else
@@ -61,8 +61,8 @@ class CraftArt {
     }
 
     public static String NotchToInternalName((Object) Holder<PaintingVariant> art) {
-        IRegistry paintingRegistry = #getPaintingVariantRegistry();
-        net.minecraft.resources.MinecraftKey key = (net.minecraft.resources.MinecraftKey) paintingRegistry.getKey((Object) art.value());
+        Registry paintingRegistry = #getPaintingVariantRegistry();
+        net.minecraft.resources.Identifier key = (net.minecraft.resources.Identifier) paintingRegistry.getKey((Object) art.value());
         return (key == null) ? null : key.getPath();
     }
 
@@ -99,7 +99,7 @@ class CraftArt {
     }
 
     public static (Object) Paintings NotchFromInternalName(String internalName) {
-        net.minecraft.resources.MinecraftKey key = #parseMinecraftKey(internalName);
+        net.minecraft.resources.Identifier key = #parseIdentifier(internalName);
   #if version >= 1.13.1
         return (Paintings) BuiltInRegistries.MOTIVE.get(key);
   #elseif version >= 1.13
@@ -117,13 +117,13 @@ class CraftArt {
 
     public static String NotchToInternalName((Object) Paintings art) {
   #if version >= 1.18
-        net.minecraft.resources.MinecraftKey key = (net.minecraft.resources.MinecraftKey) BuiltInRegistries.MOTIVE.getKey((Object) art);
+        net.minecraft.resources.Identifier key = (net.minecraft.resources.Identifier) BuiltInRegistries.MOTIVE.getKey((Object) art);
         return (key == null) ? null : key.getPath();
   #elseif version >= 1.13.1
-        net.minecraft.resources.MinecraftKey key = (net.minecraft.resources.MinecraftKey) BuiltInRegistries.MOTIVE.getKey((Object) art);
+        net.minecraft.resources.Identifier key = (net.minecraft.resources.Identifier) BuiltInRegistries.MOTIVE.getKey((Object) art);
         return (key == null) ? null : key.getKey();
   #elseif version >= 1.13
-        net.minecraft.resources.MinecraftKey key = (net.minecraft.resources.MinecraftKey) Paintings.a.b(art);
+        net.minecraft.resources.Identifier key = (net.minecraft.resources.Identifier) Paintings.a.b(art);
         return (key == null) ? null : key.getKey();
   #else
         return art.B;

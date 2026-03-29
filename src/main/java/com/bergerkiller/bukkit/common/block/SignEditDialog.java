@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.entity.BlockEntityHandle;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -33,10 +35,8 @@ import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockChangeHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundBlockUpdatePacketHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 
 /**
  * Initiates the display of a sign edit dialog the player can type into, and handles
@@ -188,7 +188,7 @@ public abstract class SignEditDialog {
     }
 
     private final void handleOpen(PlayerMetadata metadata, BlockFace backDirection, String[] lines) {
-        EntityPlayerHandle entityPlayer = EntityPlayerHandle.fromBukkit(metadata.player);
+        ServerPlayerHandle entityPlayer = ServerPlayerHandle.fromBukkit(metadata.player);
         IntVector3 coordinates = IntVector3.coordinatesOf(metadata.signBlock);
 
         // Send a block change packet for a sign at the sign coordinates
@@ -209,7 +209,7 @@ public abstract class SignEditDialog {
      * @param metadata
      */
     private final void handleAbort(PlayerMetadata metadata) {
-        EntityPlayerHandle.fromBukkit(metadata.player).closeSignEditWindow();
+        ServerPlayerHandle.fromBukkit(metadata.player).closeSignEditWindow();
 
         // Restore the original block
         metadata.sendOriginalBlock();
@@ -299,7 +299,7 @@ public abstract class SignEditDialog {
         public void sendOriginalBlock() {
             // Send the original Block information. If it was a tile entity, also update its NBT
             sendBlock(WorldUtil.getBlockData(signBlock));
-            TileEntityHandle tileEntity = WorldHandle.fromBukkit(signBlock.getWorld())
+            BlockEntityHandle tileEntity = LevelHandle.fromBukkit(signBlock.getWorld())
                     .getTileEntity(coordinates);
             if (tileEntity != null) {
                 CommonPacket packet = tileEntity.getUpdatePacket();
@@ -310,7 +310,7 @@ public abstract class SignEditDialog {
         }
 
         public void sendBlock(BlockData blockData) {
-            PacketUtil.sendPacket(player, PacketPlayOutBlockChangeHandle.createNew(coordinates, blockData));
+            PacketUtil.sendPacket(player, ClientboundBlockUpdatePacketHandle.createNew(coordinates, blockData));
         }
     }
 

@@ -3,33 +3,32 @@ package net.minecraft.world.item;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.IBlockData;
-import net.minecraft.world.level.IMaterial;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.saveddata.maps.MapId;
-import net.minecraft.world.item.ItemWorldMap;
+import net.minecraft.world.item.MapItem;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.TypedEntityData;
 import net.minecraft.world.item.component.TooltipDisplay;
-import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagLong;
-import net.minecraft.nbt.NBTTagInt;
-import net.minecraft.nbt.NBTTagByte;
-import net.minecraft.nbt.NBTTagString;
-import net.minecraft.nbt.GameProfileSerializer;
-import net.minecraft.resources.MinecraftKey;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.LongTag;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.ByteTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.resources.Identifier;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.CompoundTagHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipesFurnaceHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.BlockStateHandle;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 class ItemStack {
@@ -40,12 +39,12 @@ class ItemStack {
     // None yet?
 #else
   #if version >= 1.13
-    #require net.minecraft.world.item.ItemStack public net.minecraft.nbt.NBTTagCompound getOrCreateTag();
+    #require net.minecraft.world.item.ItemStack public net.minecraft.nbt.CompoundTag getOrCreateTag();
   #else
-    #require net.minecraft.world.item.ItemStack public net.minecraft.nbt.NBTTagCompound getOrCreateTag() {
-        net.minecraft.nbt.NBTTagCompound tag = instance.getTag();
+    #require net.minecraft.world.item.ItemStack public net.minecraft.nbt.CompoundTag getOrCreateTag() {
+        net.minecraft.nbt.CompoundTag tag = instance.getTag();
         if (tag == null) {
-            tag = new net.minecraft.nbt.NBTTagCompound();
+            tag = new net.minecraft.nbt.CompoundTag();
             instance.setTag(tag);
         }
         return tag;
@@ -53,18 +52,18 @@ class ItemStack {
   #endif
 
     #require net.minecraft.world.item.ItemStack public void removeTagIfEmpty() {
-        net.minecraft.nbt.NBTTagCompound tag = instance.getTag();
+        net.minecraft.nbt.CompoundTag tag = instance.getTag();
         if (tag != null && tag.isEmpty()) {
-            instance.setTag((net.minecraft.nbt.NBTTagCompound) null);
+            instance.setTag((net.minecraft.nbt.CompoundTag) null);
         }
     }
 
-    #require net.minecraft.world.item.ItemStack public net.minecraft.nbt.NBTTagCompound getDisplayTag() {
-        net.minecraft.nbt.NBTTagCompound tag = instance.getTag();
+    #require net.minecraft.world.item.ItemStack public net.minecraft.nbt.CompoundTag getDisplayTag() {
+        net.minecraft.nbt.CompoundTag tag = instance.getTag();
         if (tag != null) {
             net.minecraft.nbt.NBTBase displayTag = tag.get("display");
-            if (displayTag instanceof net.minecraft.nbt.NBTTagCompound) {
-                return (net.minecraft.nbt.NBTTagCompound) displayTag;
+            if (displayTag instanceof net.minecraft.nbt.CompoundTag) {
+                return (net.minecraft.nbt.CompoundTag) displayTag;
             }
         }
         return null;
@@ -121,14 +120,14 @@ class ItemStack {
 #endif
         } else {
 #if version >= 1.13
-            return new ItemStack((IMaterial) item, 1);
+            return new ItemStack((net.minecraft.world.level.ItemLike) item, 1);
 #else
             return new ItemStack(item, 1);
 #endif
         }
     }
 
-    public static (ItemStackHandle) ItemStack fromBlockData((IBlockDataHandle) IBlockData data, int amount) {
+    public static (ItemStackHandle) ItemStack fromBlockData((BlockStateHandle) BlockState data, int amount) {
 #if version >= 1.13
         return new ItemStack(data.getBlock(), amount);
 #else
@@ -157,35 +156,35 @@ class ItemStack {
     }
 
 #if version >= 1.20.5
-    public (ChatText) IChatBaseComponent getCustomName() {
-        return (IChatBaseComponent) instance.get(DataComponents.CUSTOM_NAME);
+    public (ChatText) Component getCustomName() {
+        return (Component) instance.get(DataComponents.CUSTOM_NAME);
     }
 #elseif version >= 1.13
-    public (ChatText) IChatBaseComponent getCustomName() {
+    public (ChatText) Component getCustomName() {
         // getHoverName() doesn't return null if none is set...
-        // ChatSerializer fromJson returns null if parsing the string fails
-        NBTTagCompound displayTag = instance#getDisplayTag();
+        // Serializer fromJson returns null if parsing the string fails
+        CompoundTag displayTag = instance#getDisplayTag();
         NBTBase nameTag;
-        if (displayTag != null && (nameTag = displayTag.get("Name")) instanceof NBTTagString) {
-            String jsonContent = ((NBTTagString) nameTag).getAsString();
-            return net.minecraft.network.chat.IChatBaseComponent$ChatSerializer.fromJson(jsonContent);
+        if (displayTag != null && (nameTag = displayTag.get("Name")) instanceof StringTag) {
+            String jsonContent = ((StringTag) nameTag).getAsString();
+            return net.minecraft.network.chat.Component$Serializer.fromJson(jsonContent);
         }
         return null;
     }
 #else
     public (ChatText) String getCustomName() {
         // getName() doesn't return null if none is set...
-        NBTTagCompound displayTag = instance#getDisplayTag();
+        CompoundTag displayTag = instance#getDisplayTag();
         if (displayTag != null) {
             NBTBase nameTag;
-            if ((nameTag = displayTag.get("Name")) instanceof NBTTagString) {
-                return ((NBTTagString) nameTag).getAsString();
+            if ((nameTag = displayTag.get("Name")) instanceof StringTag) {
+                return ((StringTag) nameTag).getAsString();
             }
 
   #if version >= 1.11
             NBTBase locName;
-            if ((locName = displayTag.get("LocName")) instanceof NBTTagString) {
-                String localeKey = ((NBTTagString) locName).getAsString();
+            if ((locName = displayTag.get("LocName")) instanceof StringTag) {
+                String localeKey = ((StringTag) locName).getAsString();
                 return net.minecraft.locale.LocaleI18n.get(localeKey);
             }
   #endif
@@ -195,8 +194,8 @@ class ItemStack {
 #endif
 
 #if version >= 1.20.5
-    public (ChatText) IChatBaseComponent getDisplayName() {
-        IChatBaseComponent customName = instance.get(DataComponents.CUSTOM_NAME);
+    public (ChatText) Component getDisplayName() {
+        Component customName = instance.get(DataComponents.CUSTOM_NAME);
         if (customName == null) {
             customName = instance.getItem().getName(instance);
         }
@@ -205,7 +204,7 @@ class ItemStack {
     public boolean hasCustomName() {
         return instance.has(DataComponents.CUSTOM_NAME);
     }
-    public void setCustomName:setHoverName((ChatText) IChatBaseComponent name) {
+    public void setCustomName:setHoverName((ChatText) Component name) {
         if (name != null) {
             instance.set(DataComponents.CUSTOM_NAME, name);
         } else {
@@ -213,13 +212,13 @@ class ItemStack {
         }
     }
 #elseif version >= 1.18
-    public (ChatText) IChatBaseComponent getDisplayName:getHoverName();
+    public (ChatText) Component getDisplayName:getHoverName();
     public boolean hasCustomName:hasCustomHoverName();
-    public (void) ItemStack setCustomName:setHoverName((ChatText) IChatBaseComponent name);
+    public (void) ItemStack setCustomName:setHoverName((ChatText) Component name);
 #elseif version >= 1.13
-    public (ChatText) IChatBaseComponent getDisplayName:getName();
+    public (ChatText) Component getDisplayName:getName();
     public boolean hasCustomName:hasName();
-    public (void) ItemStack setCustomName:a((ChatText) IChatBaseComponent name);
+    public (void) ItemStack setCustomName:a((ChatText) Component name);
 #else
     public (ChatText) String getDisplayName:getName();
     public boolean hasCustomName:hasName();
@@ -380,11 +379,11 @@ class ItemStack {
         // Set custom name empty as well
         // Seems to be no way to truly hide it
   #if version >= 1.19
-        instance.setHoverName(IChatBaseComponent.literal(""));
+        instance.setHoverName(Component.literal(""));
   #elseif version >= 1.18
-        instance.setHoverName(new net.minecraft.network.chat.ChatComponentText(""));
+        instance.setHoverName(new net.minecraft.network.chat.TextComponent(""));
   #elseif version >= 1.13
-        instance.a(new net.minecraft.network.chat.ChatComponentText(""));
+        instance.a(new net.minecraft.network.chat.TextComponent(""));
   #elseif version >= 1.11
         StringBuilder str = new StringBuilder(org.bukkit.ChatColor.RESET.toString());
         str.append((char) 0);
@@ -424,7 +423,7 @@ class ItemStack {
     }
 
 #if version >= 1.20.5
-    public (List<ChatText>) List<IChatBaseComponent> getLores() {
+    public (List<ChatText>) List<Component> getLores() {
         net.minecraft.world.item.component.ItemLore lore;
         lore = (net.minecraft.world.item.component.ItemLore) instance.get(DataComponents.LORE);
         if (lore != null) {
@@ -433,7 +432,7 @@ class ItemStack {
             return java.util.Collections.emptyList();
         }
     }
-    public void addLore((ChatText) IChatBaseComponent line) {
+    public void addLore((ChatText) Component line) {
         net.minecraft.world.item.component.ItemLore lore;
         lore = (net.minecraft.world.item.component.ItemLore) instance.get(DataComponents.LORE);
         if (lore == null) {
@@ -446,37 +445,37 @@ class ItemStack {
         instance.remove(DataComponents.LORE);
     }
 #else
-    public (List<ChatText>) List<IChatBaseComponent> getLores() {
-        NBTTagCompound displayTag = instance#getDisplayTag();
+    public (List<ChatText>) List<Component> getLores() {
+        CompoundTag displayTag = instance#getDisplayTag();
         if (displayTag == null) {
             return java.util.Collections.emptyList();
         }
 
         NBTBase loreListBase = displayTag.get("Lore");
-        if (!(loreListBase instanceof NBTTagList)) {
+        if (!(loreListBase instanceof ListTag)) {
             return java.util.Collections.emptyList();
         }
 
-        NBTTagList loreList = (NBTTagList) loreListBase;
+        ListTag loreList = (ListTag) loreListBase;
         int loreCount = loreList.size();
         java.util.List result = new java.util.ArrayList(loreCount);
         for (int i = 0; i < loreCount; i++) {
             NBTBase loreLine = loreList.get(i);
-            if (loreLine instanceof NBTTagString) {
-                String line = ((NBTTagString) loreLine).getAsString();
-                IChatBaseComponent lineComponent;
+            if (loreLine instanceof StringTag) {
+                String line = ((StringTag) loreLine).getAsString();
+                Component lineComponent;
   #if version >= 1.20.5
                 // Decode JSON into chat component (uses Minecraft's main server registry)
-                lineComponent = net.minecraft.network.chat.IChatBaseComponent$ChatSerializer.fromJson(line,
+                lineComponent = net.minecraft.network.chat.Component$Serializer.fromJson(line,
                         net.minecraft.server.MinecraftServer.getDefaultRegistryAccess());
   #elseif version >= 1.14
                 // Decode JSON into chat component
-                lineComponent = net.minecraft.network.chat.IChatBaseComponent$ChatSerializer.fromJson(line);
+                lineComponent = net.minecraft.network.chat.Component$Serializer.fromJson(line);
   #else
                 // Wrap String message into chat component
                 // Has a lot of bukkit-esque crap in it, so we use our own ChatText for parsing it
                 ChatText text = ChatText.fromMessage(line);
-                lineComponent = (text == null) ? null : (IChatBaseComponent) text.getRawHandle();
+                lineComponent = (text == null) ? null : (Component) text.getRawHandle();
   #endif
                 if (lineComponent != null) {
                     result.add(lineComponent);
@@ -486,31 +485,31 @@ class ItemStack {
         return java.util.Collections.unmodifiableList(result);
     }
 
-    public void addLore((ChatText) IChatBaseComponent line) {
+    public void addLore((ChatText) Component line) {
         // All this to retrieve the list of lore line tags
-        NBTTagCompound tag = instance#getOrCreateTag();
+        CompoundTag tag = instance#getOrCreateTag();
         NBTBase displayBase = tag.get("display");
-        if (!(displayBase instanceof NBTTagCompound)) {
-            displayBase = new NBTTagCompound();
+        if (!(displayBase instanceof CompoundTag)) {
+            displayBase = new CompoundTag();
             tag.put("display", displayBase);
         }
-        NBTTagCompound display = (NBTTagCompound) displayBase;
+        CompoundTag display = (CompoundTag) displayBase;
         NBTBase loreListBase = display.get("Lore");
-        if (!(loreListBase instanceof NBTTagList)) {
-            loreListBase = new NBTTagList();
+        if (!(loreListBase instanceof ListTag)) {
+            loreListBase = new ListTag();
             display.put("Lore", loreListBase);
         }
-        NBTTagList loreList = (NBTTagList) loreListBase;
+        ListTag loreList = (ListTag) loreListBase;
 
   #if version >= 1.14
         // Add a String entry to the list - Encode as JSON
         if (line != null) {
-            String json = net.minecraft.network.chat.IChatBaseComponent$ChatSerializer.toJson(line);
+            String json = net.minecraft.network.chat.Component$Serializer.toJson(line);
             if (json != null) {
     #if version >= 1.15
-                loreList.add((NBTBase) NBTTagString.valueOf(json));
+                loreList.add((NBTBase) StringTag.valueOf(json));
     #else
-                loreList.add((NBTBase) new NBTTagString(json));
+                loreList.add((NBTBase) new StringTag(json));
     #endif
             }
         }
@@ -519,17 +518,17 @@ class ItemStack {
         // Use ChatText for this as it contains a lot of hacky crap
         ChatText text = ChatText.fromComponent(line);
         if (text != null) {
-            loreList.add((NBTBase) new NBTTagString(text.getMessage()));
+            loreList.add((NBTBase) new StringTag(text.getMessage()));
         }
   #endif
     }
 
     public void clearLores() {
-        NBTTagCompound tag = instance.getTag();
+        CompoundTag tag = instance.getTag();
         if (tag != null) {
             NBTBase displayBase = tag.get("display");
-            if (displayBase instanceof NBTTagCompound) {
-                NBTTagCompound display = (NBTTagCompound) displayBase;
+            if (displayBase instanceof CompoundTag) {
+                CompoundTag display = (CompoundTag) displayBase;
                 display.remove("Lore");
                 if (display.isEmpty()) {
                     tag.remove("display");
@@ -572,11 +571,11 @@ class ItemStack {
 #if version >= 1.20.5
         return instance.has(DataComponents.UNBREAKABLE);
 #else
-        NBTTagCompound tag = instance.getTag();
+        CompoundTag tag = instance.getTag();
         if (tag != null) {
             NBTBase unbreakable = tag.get("Unbreakable");
-            if (unbreakable instanceof NBTTagByte) {
-                return ((NBTTagByte) unbreakable).getAsByte() != 0;
+            if (unbreakable instanceof ByteTag) {
+                return ((ByteTag) unbreakable).getAsByte() != 0;
             }
         }
         return false;
@@ -599,7 +598,7 @@ class ItemStack {
             }
         }
 #else
-        NBTTagCompound tag = instance#getOrCreateTag();
+        CompoundTag tag = instance#getOrCreateTag();
         if (unbreakable) {
             tag.putBoolean("Unbreakable", true);
         } else {
@@ -638,11 +637,11 @@ class ItemStack {
         color = (net.minecraft.world.item.component.MapItemColor) instance.get(DataComponents.MAP_COLOR);
         return (color == null) ? -1 : color.rgb();
 #else
-        NBTTagCompound displayTag = instance#getDisplayTag();
+        CompoundTag displayTag = instance#getDisplayTag();
         if (displayTag != null) {
             NBTBase color = displayTag.get("MapColor");
-            if (color instanceof NBTTagInt) {
-                return ((NBTTagInt) color).getAsInt();
+            if (color instanceof IntTag) {
+                return ((IntTag) color).getAsInt();
             }
         }
         return -1;
@@ -657,19 +656,19 @@ class ItemStack {
         }
 #else
         if (rgb != -1) {
-            NBTTagCompound tag = instance#getOrCreateTag();
+            CompoundTag tag = instance#getOrCreateTag();
             NBTBase displayTag = tag.get("display");
-            if (!(displayTag instanceof NBTTagCompound)) {
-                displayTag = new NBTTagCompound();
+            if (!(displayTag instanceof CompoundTag)) {
+                displayTag = new CompoundTag();
                 tag.put("display", displayTag);
             }
-            ((NBTTagCompound) displayTag).putInt("MapColor", rgb);
+            ((CompoundTag) displayTag).putInt("MapColor", rgb);
         } else {
-            NBTTagCompound tag = instance.getTag();
+            CompoundTag tag = instance.getTag();
             if (tag != null) {
                 NBTBase baseDisplayTag = tag.get("display");
-                if (baseDisplayTag instanceof NBTTagCompound) {
-                    NBTTagCompound displayTag = (NBTTagCompound) baseDisplayTag;
+                if (baseDisplayTag instanceof CompoundTag) {
+                    CompoundTag displayTag = (CompoundTag) baseDisplayTag;
                     displayTag.remove("MapColor");
                     if (displayTag.isEmpty()) {
                         tag.remove("display");
@@ -690,11 +689,11 @@ class ItemStack {
             rgb = color.rgb();
         }
 #else
-        NBTTagCompound displayTag = instance#getDisplayTag();
+        CompoundTag displayTag = instance#getDisplayTag();
         if (displayTag != null) {
             NBTBase color = displayTag.get("color");
-            if (color instanceof NBTTagInt) {
-                rgb = ((NBTTagInt) color).getAsInt();
+            if (color instanceof IntTag) {
+                rgb = ((IntTag) color).getAsInt();
             }
         }
 #endif
@@ -711,11 +710,11 @@ class ItemStack {
             return 0x385DC6;
         }
 #else
-        NBTTagCompound tag = instance.getTag();
+        CompoundTag tag = instance.getTag();
         if (tag != null) {
             NBTBase potionColor = tag.get("CustomPotionColor");
-            if (potionColor instanceof NBTTagInt) {
-                return ((NBTTagInt) potionColor).getAsInt();
+            if (potionColor instanceof IntTag) {
+                return ((IntTag) potionColor).getAsInt();
             }
         }
 
@@ -733,13 +732,13 @@ class ItemStack {
         fireworks = (net.minecraft.world.item.component.Fireworks) instance.get(DataComponents.FIREWORKS);
         return (fireworks != null) ? fireworks.flightDuration() : 0;
 #else
-        NBTTagCompound tag = instance.getTag();
+        CompoundTag tag = instance.getTag();
         if (tag != null) {
             NBTBase fireworksTagBase = tag.get("Fireworks");
-            if (fireworksTagBase instanceof NBTTagCompound) {
-                NBTBase flightDurBase = ((NBTTagCompound) fireworksTagBase).get("Flight");
-                if (flightDurBase instanceof NBTTagByte) {
-                    return (int) ((NBTTagByte) flightDurBase).getAsByte() & 0XFF;
+            if (fireworksTagBase instanceof CompoundTag) {
+                NBTBase flightDurBase = ((CompoundTag) fireworksTagBase).get("Flight");
+                if (flightDurBase instanceof ByteTag) {
+                    return (int) ((ByteTag) flightDurBase).getAsByte() & 0XFF;
                 }
             }
         }
@@ -762,18 +761,18 @@ class ItemStack {
         }
 #else
         if (duration > 0) {
-            NBTTagCompound tag = instance#getOrCreateTag();
+            CompoundTag tag = instance#getOrCreateTag();
             NBTBase fireworksTagBase = tag.get("Fireworks");
-            if (!(fireworksTagBase instanceof NBTTagCompound)) {
-                fireworksTagBase = new NBTTagCompound();
+            if (!(fireworksTagBase instanceof CompoundTag)) {
+                fireworksTagBase = new CompoundTag();
                 tag.put("Fireworks", fireworksTagBase);
             }
-            ((NBTTagCompound) fireworksTagBase).putByte("Flight", (byte) duration);
+            ((CompoundTag) fireworksTagBase).putByte("Flight", (byte) duration);
         } else {
-            NBTTagCompound tag = instance.getTag();
+            CompoundTag tag = instance.getTag();
             if (tag != null) {
                 NBTBase fireworksTagBase = tag.get("Fireworks");
-                if (fireworksTagBase instanceof NBTTagCompound) {
+                if (fireworksTagBase instanceof CompoundTag) {
                     tag.remove("Fireworks");
                     instance#removeTagIfEmpty();
                 }
@@ -793,19 +792,19 @@ class ItemStack {
         resolvableProfile = (net.minecraft.world.item.component.ResolvableProfile) instance.get(DataComponents.PROFILE);
         return (resolvableProfile == null) ? null : resolvableProfile.gameProfile();
 #else
-        NBTTagCompound tag = instance.getTag();
+        CompoundTag tag = instance.getTag();
         if (tag == null) {
             return null;
         }
         NBTBase serializedProfileBase = tag.get("SkullOwner");
-        if (!(serializedProfileBase instanceof NBTTagCompound)) {
+        if (!(serializedProfileBase instanceof CompoundTag)) {
             return null;
         }
-        NBTTagCompound serializedProfile = (NBTTagCompound) serializedProfileBase;
+        CompoundTag serializedProfile = (CompoundTag) serializedProfileBase;
   #if version >= 1.18
-        return GameProfileSerializer.readGameProfile(serializedProfile);
+        return NbtUtils.readGameProfile(serializedProfile);
   #else
-        return GameProfileSerializer.deserialize(serializedProfile);
+        return NbtUtils.deserialize(serializedProfile);
   #endif
 #endif
     }
@@ -825,18 +824,18 @@ class ItemStack {
         }
 #else
         if (profile != null) {
-            NBTTagCompound tag = instance#getOrCreateTag();
+            CompoundTag tag = instance#getOrCreateTag();
   #if version >= 1.18
-            NBTTagCompound serializedProfile = GameProfileSerializer.writeGameProfile(new NBTTagCompound(), profile);
+            CompoundTag serializedProfile = NbtUtils.writeGameProfile(new CompoundTag(), profile);
   #else
-            NBTTagCompound serializedProfile = GameProfileSerializer.serialize(new NBTTagCompound(), profile);
+            CompoundTag serializedProfile = NbtUtils.serialize(new CompoundTag(), profile);
   #endif
             tag.put("SkullOwner", (NBTBase) serializedProfile);
     #if version < 1.13
             instance#durabilityField = 3;
     #endif
         } else {
-            NBTTagCompound tag = instance.getTag();
+            CompoundTag tag = instance.getTag();
             if (tag != null) {
                 tag.remove("SkullOwner");
                 instance#removeTagIfEmpty();
@@ -850,7 +849,7 @@ class ItemStack {
 
     // Sometimes we want read-only access to the tag. Frustrated since 1.21.9 when getUnsafe() was removed.
 #if version >= 1.21.9
-    #require net.minecraft.world.item.component.CustomData private final readonly NBTTagCompound cmd_tag:tag;
+    #require net.minecraft.world.item.component.CustomData private final readonly CompoundTag cmd_tag:tag;
 #endif
 
 #if version >= 1.21.2
@@ -872,19 +871,19 @@ class ItemStack {
         return instance#hasNonDefault(DataComponents.ITEM_MODEL);
     }
 
-    public (MinecraftKeyHandle) MinecraftKey getItemModel() {
-        return (MinecraftKey) instance.get(DataComponents.ITEM_MODEL);
+    public (IdentifierHandle) Identifier getItemModel() {
+        return (Identifier) instance.get(DataComponents.ITEM_MODEL);
     }
 
-    public (MinecraftKeyHandle) MinecraftKey getItemModelIfSet() {
+    public (IdentifierHandle) Identifier getItemModelIfSet() {
         if ( instance#hasNonDefault(DataComponents.ITEM_MODEL) ) {
-            return (MinecraftKey) instance.get(DataComponents.ITEM_MODEL);
+            return (Identifier) instance.get(DataComponents.ITEM_MODEL);
         } else {
             return null;
         }
     }
 
-    public void setItemModel((MinecraftKeyHandle) MinecraftKey key) {
+    public void setItemModel((IdentifierHandle) Identifier key) {
         if (key != null) {
             instance.set(DataComponents.ITEM_MODEL, key);
         } else {
@@ -896,15 +895,15 @@ class ItemStack {
         return false;
     }
 
-    public (MinecraftKeyHandle) MinecraftKey getItemModel() {
+    public (IdentifierHandle) Identifier getItemModel() {
         return null;
     }
 
-    public (MinecraftKeyHandle) MinecraftKey getItemModelIfSet() {
+    public (IdentifierHandle) Identifier getItemModelIfSet() {
         return null;
     }
 
-    public void setItemModel((MinecraftKeyHandle) MinecraftKey key) {
+    public void setItemModel((IdentifierHandle) Identifier key) {
     }
 #endif
 
@@ -981,21 +980,21 @@ class ItemStack {
     }
 #else
     public boolean hasCustomModelData() {
-        NBTTagCompound tag = instance.getTag();
-        return tag != null && tag.get("CustomModelData") instanceof NBTTagInt;
+        CompoundTag tag = instance.getTag();
+        return tag != null && tag.get("CustomModelData") instanceof IntTag;
     }
 
     public boolean hasCustomModelDataValue() {
-        NBTTagCompound tag = instance.getTag();
-        return tag != null && tag.get("CustomModelData") instanceof NBTTagInt;
+        CompoundTag tag = instance.getTag();
+        return tag != null && tag.get("CustomModelData") instanceof IntTag;
     }
 
     public (com.bergerkiller.bukkit.common.wrappers.CustomModelData) net.minecraft.world.item.component.CustomModelData getCustomModelData() {
-        NBTTagCompound tag = instance.getTag();
+        CompoundTag tag = instance.getTag();
         if (tag != null) {
             NBTBase cmd = tag.get("CustomModelData");
-            if (cmd instanceof NBTTagInt) {
-                int value = ((NBTTagInt) cmd).getAsInt();
+            if (cmd instanceof IntTag) {
+                int value = ((IntTag) cmd).getAsInt();
                 return new net.minecraft.world.item.component.CustomModelData(value);
             }
         }
@@ -1003,28 +1002,28 @@ class ItemStack {
     }
 
     public int getCustomModelDataValue() {
-        NBTTagCompound tag = instance.getTag();
+        CompoundTag tag = instance.getTag();
         if (tag != null) {
             NBTBase cmd = tag.get("CustomModelData");
-            if (cmd instanceof NBTTagInt) {
-                return ((NBTTagInt) cmd).getAsInt();
+            if (cmd instanceof IntTag) {
+                return ((IntTag) cmd).getAsInt();
             }
         }
         return -1;
     }
 
     public void setCustomModelData((com.bergerkiller.bukkit.common.wrappers.CustomModelData) net.minecraft.world.item.component.CustomModelData cmd) {
-        NBTTagCompound tag = instance#getOrCreateTag();
+        CompoundTag tag = instance#getOrCreateTag();
         tag.putInt("CustomModelData", cmd.value());
     }
 
     public void setCustomModelDataValue(int value) {
-        NBTTagCompound tag = instance#getOrCreateTag();
+        CompoundTag tag = instance#getOrCreateTag();
         tag.putInt("CustomModelData", value);
     }
 
     public void clearCustomModelData() {
-        NBTTagCompound tag = instance.getTag();
+        CompoundTag tag = instance.getTag();
         if (tag != null) {
             tag.remove("CustomModelData");
             instance#removeTagIfEmpty();
@@ -1037,9 +1036,9 @@ class ItemStack {
         return instance.has(DataComponents.CUSTOM_DATA);
     }
 
-    public (CommonTagCompound) NBTTagCompound getCustomDataCopy() {
+    public (CommonTagCompound) CompoundTag getCustomDataCopy() {
         CustomData customData = (CustomData) instance.get(DataComponents.CUSTOM_DATA);
-        return (customData != null) ? customData.copyTag() : new NBTTagCompound();
+        return (customData != null) ? customData.copyTag() : new CompoundTag();
     }
 
     public CommonTagCompound getCustomData() {
@@ -1049,14 +1048,14 @@ class ItemStack {
         }
 
   #if version >= 1.21.9
-        NBTTagCompound tag = customData#cmd_tag;
+        CompoundTag tag = customData#cmd_tag;
   #else
-        NBTTagCompound tag = customData.getUnsafe();
+        CompoundTag tag = customData.getUnsafe();
   #endif
         return CommonTagCompound.createReadOnly(tag);
     }
 
-    public void setCustomData((CommonTagCompound) NBTTagCompound tag) {
+    public void setCustomData((CommonTagCompound) CompoundTag tag) {
         if (tag == null || tag.isEmpty()) {
             instance.remove(DataComponents.CUSTOM_DATA);
         } else {
@@ -1064,52 +1063,52 @@ class ItemStack {
         }
     }
 
-    public void updateCustomData((java.util.function.Consumer<CommonTagCompound>) java.util.function.Consumer<NBTTagCompound> consumer) {
+    public void updateCustomData((java.util.function.Consumer<CommonTagCompound>) java.util.function.Consumer<CompoundTag> consumer) {
         CustomData.update(DataComponents.CUSTOM_DATA, instance, consumer);
     }
 #else
     public boolean hasCustomData:hasTag();
 
-    public (CommonTagCompound) NBTTagCompound getCustomDataCopy() {
-        NBTTagCompound tag = instance.getTag();
+    public (CommonTagCompound) CompoundTag getCustomDataCopy() {
+        CompoundTag tag = instance.getTag();
         if (tag == null) {
-            return new NBTTagCompound();
+            return new CompoundTag();
         } else {
   #if version >= 1.18
-            return (NBTTagCompound) tag.copy();
+            return (CompoundTag) tag.copy();
   #else
-            return (NBTTagCompound) tag.clone();
+            return (CompoundTag) tag.clone();
   #endif
         }
     }
 
     public CommonTagCompound getCustomData() {
-        NBTTagCompound tag = instance.getTag();
+        CompoundTag tag = instance.getTag();
         return (tag != null) ? CommonTagCompound.createReadOnly(tag) : CommonTagCompound.EMPTY;
     }
 
-    public void setCustomData((CommonTagCompound) NBTTagCompound tag) {
+    public void setCustomData((CommonTagCompound) CompoundTag tag) {
         boolean tagIsNullOrEmpty = tag == null || tag.isEmpty();
         if (tagIsNullOrEmpty) {
-            instance.setTag((NBTTagCompound) null);
+            instance.setTag((CompoundTag) null);
         } else {
   #if version >= 1.18
-            instance.setTag((NBTTagCompound) tag.copy());
+            instance.setTag((CompoundTag) tag.copy());
   #else
-            instance.setTag((NBTTagCompound) tag.clone());
+            instance.setTag((CompoundTag) tag.clone());
   #endif
         }
     }
 
-    public void updateCustomData((java.util.function.Consumer<CommonTagCompound>) java.util.function.Consumer<NBTTagCompound> consumer) {
-        NBTTagCompound tag = instance.getTag();
+    public void updateCustomData((java.util.function.Consumer<CommonTagCompound>) java.util.function.Consumer<CompoundTag> consumer) {
+        CompoundTag tag = instance.getTag();
         if (tag == null) {
-            tag = new NBTTagCompound();
+            tag = new CompoundTag();
         } else {
   #if version >= 1.18
-            tag = (NBTTagCompound) tag.copy();
+            tag = (CompoundTag) tag.copy();
   #else
-            tag = (NBTTagCompound) tag.clone();
+            tag = (CompoundTag) tag.clone();
   #endif
         }
 
@@ -1121,7 +1120,7 @@ class ItemStack {
 #endif
 
     // No longer supported as of 1.20.5
-    //public (CommonTagCompound) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
+    //public (CommonTagCompound) CompoundTag saveToNBT:save((CommonTagCompound) CompoundTag compound);
 
 #if version >= 1.18
     public (ItemStackHandle) ItemStack cloneItemStack:copy();
@@ -1142,7 +1141,7 @@ class ItemStack {
     }
 
     public boolean isMapItem() {
-        return instance.getItem() instanceof ItemWorldMap;
+        return instance.getItem() instanceof MapItem;
     }
 
     public int getMapId() {
@@ -1163,21 +1162,21 @@ class ItemStack {
 #if version >= 1.21.9
         TypedEntityData entityData = (TypedEntityData) instance.get(DataComponents.ENTITY_DATA);
         if (entityData == null) return null;
-        NBTTagCompound tag = entityData.getUnsafe();
+        CompoundTag tag = entityData.getUnsafe();
 #elseif version >= 1.20.5
         CustomData cmd = (CustomData) instance.get(DataComponents.ENTITY_DATA);
         if (cmd == null) return null;
-        NBTTagCompound tag = cmd.getUnsafe();
+        CompoundTag tag = cmd.getUnsafe();
 #else
-        NBTTagCompound fullTag = instance.getTag();
+        CompoundTag fullTag = instance.getTag();
         if (fullTag == null) return null;
         NBTBase tagBase = fullTag.get("EntityTag");
-        if (!(tagBase instanceof NBTTagCompound)) return null;
-        NBTTagCompound tag = (NBTTagCompound) tagBase;
+        if (!(tagBase instanceof CompoundTag)) return null;
+        CompoundTag tag = (CompoundTag) tagBase;
 #endif
         NBTBase tagVariant = tag.get("variant");
-        if (!(tagVariant instanceof NBTTagString)) return null;
-        return ((NBTTagString) tagVariant).getAsString();
+        if (!(tagVariant instanceof StringTag)) return null;
+        return ((StringTag) tagVariant).getAsString();
     }
 
     public void setPaintingName(String name) {
@@ -1185,55 +1184,55 @@ class ItemStack {
         if (name == null) {
             instance.remove(DataComponents.ENTITY_DATA);
         } else {
-            NBTTagCompound tag = new NBTTagCompound();
+            CompoundTag tag = new CompoundTag();
             tag.putString("variant", name);
-            TypedEntityData entityData = TypedEntityData.of(EntityTypes.PAINTING, tag);
+            TypedEntityData entityData = TypedEntityData.of(EntityType.PAINTING, tag);
             instance.set(DataComponents.ENTITY_DATA, entityData);
         }
 #elseif version >= 1.20.5
         if (name == null) {
             instance.remove(DataComponents.ENTITY_DATA);
         } else {
-            NBTTagCompound tag = new NBTTagCompound();
-            tag.putString("id", EntityTypes.getKey(EntityTypes.PAINTING).toString());
+            CompoundTag tag = new CompoundTag();
+            tag.putString("id", EntityType.getKey(EntityType.PAINTING).toString());
             tag.putString("variant", name);
             CustomData entityData = CustomData.of(tag);
             instance.set(DataComponents.ENTITY_DATA, entityData);
         }
 #else
         if (name == null) {
-            NBTTagCompound tag = instance.getTag();
+            CompoundTag tag = instance.getTag();
             if (tag == null) return;
             NBTBase entityTagBase = tag.get("EntityTag");
-            if (!(entityTagBase instanceof NBTTagCompound)) return;
-            NBTTagCompound entityTag = (NBTTagCompound) entityTagBase;
+            if (!(entityTagBase instanceof CompoundTag)) return;
+            CompoundTag entityTag = (CompoundTag) entityTagBase;
             entityTag.remove("variant");
             if (entityTag.isEmpty()) {
                 tag.remove("EntityTag");
             }
             instance#removeTagIfEmpty();
         } else {
-            NBTTagCompound tag = instance#getOrCreateTag();
+            CompoundTag tag = instance#getOrCreateTag();
             NBTBase entityTagBase = tag.get("EntityTag");
-            if (!(entityTagBase instanceof NBTTagCompound)) {
-                entityTagBase = new NBTTagCompound();
+            if (!(entityTagBase instanceof CompoundTag)) {
+                entityTagBase = new CompoundTag();
                 tag.put("EntityTag", entityTagBase);
             }
-            NBTTagCompound entityTag = (NBTTagCompound) entityTagBase;
+            CompoundTag entityTag = (CompoundTag) entityTagBase;
             entityTag.putString("variant", name);
         }
 #endif
     }
 
     public java.util.UUID getMapDisplayDynamicOnlyUUID() {
-        if (!(instance.getItem() instanceof ItemWorldMap)) {
+        if (!(instance.getItem() instanceof MapItem)) {
             return null;
         }
         return instance#getItemStackMapDisplayUUID();
     }
 
     public java.util.UUID getMapDisplayUUID() {
-        if (!(instance.getItem() instanceof ItemWorldMap)) {
+        if (!(instance.getItem() instanceof MapItem)) {
             return null;
         }
         java.util.UUID mapDisplayUUID = instance#getItemStackMapDisplayUUID();

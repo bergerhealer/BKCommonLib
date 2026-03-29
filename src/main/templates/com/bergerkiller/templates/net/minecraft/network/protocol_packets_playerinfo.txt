@@ -1,8 +1,8 @@
 package net.minecraft.network.protocol.game;
 
-import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.world.level.EnumGamemode;
+import net.minecraft.world.level.GameType;
 
 import com.mojang.authlib.GameProfile;
 
@@ -11,15 +11,13 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacketHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacketHandle.PlayerInfoDataHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacketHandle.EnumPlayerInfoActionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacketHandle;
 
 class ClientboundPlayerInfoUpdatePacket extends Packet {
 #if version >= 1.17
-    private final (List<PlayerInfoDataHandle>) List<ClientboundPlayerInfoUpdatePacket.PlayerInfoData> players:entries;
+    private final (List<com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacketHandle.EntryHandle>) List<ClientboundPlayerInfoUpdatePacket.Entry> players:entries;
 #else
-    private final (List<PlayerInfoDataHandle>) List<ClientboundPlayerInfoUpdatePacket.PlayerInfoData> players:b;
+    private final (List<com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacketHandle.EntryHandle>) List<ClientboundPlayerInfoUpdatePacket.Entry> players:b;
 #endif
 
     public static (ClientboundPlayerInfoUpdatePacketHandle) ClientboundPlayerInfoUpdatePacket createNew() {
@@ -34,21 +32,21 @@ class ClientboundPlayerInfoUpdatePacket extends Packet {
     }
 
 #if version >= 1.19.3
-    #require ClientboundPlayerInfoUpdatePacket private final EnumSet<ClientboundPlayerInfoUpdatePacket.EnumPlayerInfoAction> actions;
+    #require ClientboundPlayerInfoUpdatePacket private final EnumSet<ClientboundPlayerInfoUpdatePacket.Action> actions;
 #elseif version >= 1.17
-    #require ClientboundPlayerInfoUpdatePacket private ClientboundPlayerInfoUpdatePacket.EnumPlayerInfoAction action;
+    #require ClientboundPlayerInfoUpdatePacket private ClientboundPlayerInfoUpdatePacket.Action action;
 #else
-    #require ClientboundPlayerInfoUpdatePacket private ClientboundPlayerInfoUpdatePacket.EnumPlayerInfoAction action:a;
+    #require ClientboundPlayerInfoUpdatePacket private ClientboundPlayerInfoUpdatePacket.Action action:a;
 #endif
 
 #if version >= 1.19.3
     // EnumSet
 #elseif version >= 1.18
-    #require ClientboundPlayerInfoUpdatePacket public ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction getAction();
+    #require ClientboundPlayerInfoUpdatePacket public ClientboundPlayerInfoUpdatePacket$Action getAction();
 #elseif version >= 1.17
-    #require ClientboundPlayerInfoUpdatePacket public ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction getAction:c();
+    #require ClientboundPlayerInfoUpdatePacket public ClientboundPlayerInfoUpdatePacket$Action getAction:c();
 #else
-    #require ClientboundPlayerInfoUpdatePacket public ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction getAction() {
+    #require ClientboundPlayerInfoUpdatePacket public ClientboundPlayerInfoUpdatePacket$Action getAction() {
         return instance#action;
     }
 #endif
@@ -59,31 +57,31 @@ class ClientboundPlayerInfoUpdatePacket extends Packet {
 #else
         if (nmsPacketHandle instanceof ClientboundPlayerInfoUpdatePacket) {
             ClientboundPlayerInfoUpdatePacket p = (ClientboundPlayerInfoUpdatePacket) nmsPacketHandle;
-            ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction action = p#getAction();
-            return action == ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction.REMOVE_PLAYER;
+            ClientboundPlayerInfoUpdatePacket$Action action = p#getAction();
+            return action == ClientboundPlayerInfoUpdatePacket$Action.REMOVE_PLAYER;
         } else {
             return false;
         }
 #endif
     }
 
-    public (Set<EnumPlayerInfoActionHandle>) EnumSet<ClientboundPlayerInfoUpdatePacket.EnumPlayerInfoAction> getActions() {
+    public (Set<com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacketHandle.ActionHandle>) EnumSet<ClientboundPlayerInfoUpdatePacket.Action> getActions() {
 #if version >= 1.19.3
         return instance.actions();
 #else
         // Only one action is possible
-        ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction action = instance#getAction();
+        ClientboundPlayerInfoUpdatePacket$Action action = instance#getAction();
         if (action == null) {
-            return EnumSet.noneOf(ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction.class);
+            return EnumSet.noneOf(ClientboundPlayerInfoUpdatePacket$Action.class);
         } else {
             return EnumSet.of(action);
         }
 #endif
     }
 
-    public void setAction((EnumPlayerInfoActionHandle) ClientboundPlayerInfoUpdatePacket.EnumPlayerInfoAction action) {
+    public void setAction((com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacketHandle.ActionHandle) ClientboundPlayerInfoUpdatePacket.Action action) {
 #if version >= 1.19.3
-        EnumSet actions = (action == null) ? EnumSet.noneOf(ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction.class)
+        EnumSet actions = (action == null) ? EnumSet.noneOf(ClientboundPlayerInfoUpdatePacket$Action.class)
                                            : EnumSet.of(action);
         instance#actions = actions;
 #else
@@ -91,13 +89,13 @@ class ClientboundPlayerInfoUpdatePacket extends Packet {
 #endif
     }
 
-    public void setActions((Set<EnumPlayerInfoActionHandle>) Set<ClientboundPlayerInfoUpdatePacket.EnumPlayerInfoAction> actions) {
+    public void setActions((Set<com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacketHandle.ActionHandle>) Set<ClientboundPlayerInfoUpdatePacket.Action> actions) {
 #if version >= 1.19.3
         EnumSet actionsAsEnumSet;
         if (actions instanceof EnumSet) {
             actionsAsEnumSet = (EnumSet) actions;
         } else if (actions == null || actions.isEmpty()) {
-            actionsAsEnumSet = EnumSet.noneOf(ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction.class);
+            actionsAsEnumSet = EnumSet.noneOf(ClientboundPlayerInfoUpdatePacket$Action.class);
         } else {
             actionsAsEnumSet = EnumSet.copyOf(actions);
         }
@@ -108,76 +106,76 @@ class ClientboundPlayerInfoUpdatePacket extends Packet {
         if (size > 1) {
             throw new UnsupportedOperationException("More than one action isn't supported on this Minecraft server version");
         } else {
-            ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction action;
-            action = (size == 0) ? null : (ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction) actions.iterator().next();
+            ClientboundPlayerInfoUpdatePacket$Action action;
+            action = (size == 0) ? null : (ClientboundPlayerInfoUpdatePacket$Action) actions.iterator().next();
             instance#action = action;
         }
 #endif
     }
 
-    class ClientboundPlayerInfoUpdatePacket.PlayerInfoData {
+    class ClientboundPlayerInfoUpdatePacket.Entry {
 
         <code>
-        public static PlayerInfoDataHandle createNew(ClientboundPlayerInfoUpdatePacketHandle packet, GameProfileHandle profile, int ping, org.bukkit.GameMode gameMode, ChatText listName) {
+        public static com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacketHandle.EntryHandle createNew(ClientboundPlayerInfoUpdatePacketHandle packet, GameProfileHandle profile, int ping, org.bukkit.GameMode gameMode, ChatText listName) {
             return createNew(packet, profile, ping, gameMode, listName, true); // Listed like olden times
         }
         </code>
 
-        public static (PlayerInfoDataHandle) ClientboundPlayerInfoUpdatePacket.PlayerInfoData createNew((ClientboundPlayerInfoUpdatePacketHandle) ClientboundPlayerInfoUpdatePacket packet, (GameProfileHandle) GameProfile profile, int ping, (org.bukkit.GameMode) EnumGamemode gameMode, (ChatText) IChatBaseComponent listName, boolean listed) {
+        public static (com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacketHandle.EntryHandle) ClientboundPlayerInfoUpdatePacket.Entry createNew((ClientboundPlayerInfoUpdatePacketHandle) ClientboundPlayerInfoUpdatePacket packet, (GameProfileHandle) GameProfile profile, int ping, (org.bukkit.GameMode) GameType gameMode, (ChatText) Component listName, boolean listed) {
 #if version >= 1.21.9
             java.util.UUID uuid = profile.id();
-            net.minecraft.network.chat.RemoteChatSession$a chatSession = null; //TODO: What to do with this?
+            net.minecraft.network.chat.RemoteChatSession$Data chatSession = null; //TODO: What to do with this?
             boolean showHat = true; //TODO: Important?
             int listOrder = 0; //TODO: Important?
-            return new ClientboundPlayerInfoUpdatePacket$PlayerInfoData(uuid, profile, listed, ping, gameMode, listName, showHat, listOrder, chatSession);
+            return new ClientboundPlayerInfoUpdatePacket$Entry(uuid, profile, listed, ping, gameMode, listName, showHat, listOrder, chatSession);
 #elseif version >= 1.21.4
             java.util.UUID uuid = profile.getId();
-            net.minecraft.network.chat.RemoteChatSession$a chatSession = null; //TODO: What to do with this?
+            net.minecraft.network.chat.RemoteChatSession$Data chatSession = null; //TODO: What to do with this?
             boolean showHat = true; //TODO: Important?
             int listOrder = 0; //TODO: Important?
-            return new ClientboundPlayerInfoUpdatePacket$PlayerInfoData(uuid, profile, listed, ping, gameMode, listName, showHat, listOrder, chatSession);
+            return new ClientboundPlayerInfoUpdatePacket$Entry(uuid, profile, listed, ping, gameMode, listName, showHat, listOrder, chatSession);
 #elseif version >= 1.21.2
             java.util.UUID uuid = profile.getId();
-            net.minecraft.network.chat.RemoteChatSession$a chatSession = null; //TODO: What to do with this?
+            net.minecraft.network.chat.RemoteChatSession$Data chatSession = null; //TODO: What to do with this?
             int listOrder = 0; //TODO: Important?
-            return new ClientboundPlayerInfoUpdatePacket$PlayerInfoData(uuid, profile, listed, ping, gameMode, listName, listOrder, chatSession);
+            return new ClientboundPlayerInfoUpdatePacket$Entry(uuid, profile, listed, ping, gameMode, listName, listOrder, chatSession);
 #elseif version >= 1.19.3
             java.util.UUID uuid = profile.getId();
-            net.minecraft.network.chat.RemoteChatSession$a chatSession = null; //TODO: What to do with this?
-            return new ClientboundPlayerInfoUpdatePacket$PlayerInfoData(uuid, profile, listed, ping, gameMode, listName, chatSession);
+            net.minecraft.network.chat.RemoteChatSession$Data chatSession = null; //TODO: What to do with this?
+            return new ClientboundPlayerInfoUpdatePacket$Entry(uuid, profile, listed, ping, gameMode, listName, chatSession);
 #elseif version >= 1.19
             net.minecraft.world.entity.player.ProfilePublicKey$a publicKey = null; //TODO: What to do with this?
-            return new ClientboundPlayerInfoUpdatePacket$PlayerInfoData(profile, ping, gameMode, listName, publicKey);
+            return new ClientboundPlayerInfoUpdatePacket$Entry(profile, ping, gameMode, listName, publicKey);
 #elseif version >= 1.17
-            return new ClientboundPlayerInfoUpdatePacket$PlayerInfoData(profile, ping, gameMode, listName);
+            return new ClientboundPlayerInfoUpdatePacket$Entry(profile, ping, gameMode, listName);
 #else
-            return new ClientboundPlayerInfoUpdatePacket$PlayerInfoData(packet, profile, ping, gameMode, listName);
+            return new ClientboundPlayerInfoUpdatePacket$Entry(packet, profile, ping, gameMode, listName);
 #endif
         }
 
 #if version >= 1.19.3
         public (GameProfileHandle) GameProfile getProfile:profile();
         public int getPing:latency();
-        public (org.bukkit.GameMode) EnumGamemode getGameMode:gameMode();
-        public (ChatText) IChatBaseComponent getListName:displayName();
+        public (org.bukkit.GameMode) GameType getGameMode:gameMode();
+        public (ChatText) Component getListName:displayName();
 #elseif version >= 1.18
         public (GameProfileHandle) GameProfile getProfile();
         public int getPing:getLatency();
-        public (org.bukkit.GameMode) EnumGamemode getGameMode();
-        public (ChatText) IChatBaseComponent getListName:getDisplayName();
+        public (org.bukkit.GameMode) GameType getGameMode();
+        public (ChatText) Component getListName:getDisplayName();
 #else
         public (GameProfileHandle) GameProfile getProfile:a();
         public int getPing:b();
-        public (org.bukkit.GameMode) EnumGamemode getGameMode:c();
-        public (ChatText) IChatBaseComponent getListName:d();
+        public (org.bukkit.GameMode) GameType getGameMode:c();
+        public (ChatText) Component getListName:d();
 #endif
     }
 
-    class ClientboundPlayerInfoUpdatePacket.EnumPlayerInfoAction {
-        enum (EnumPlayerInfoActionHandle) ClientboundPlayerInfoUpdatePacket.EnumPlayerInfoAction ADD_PLAYER;
-        enum (EnumPlayerInfoActionHandle) ClientboundPlayerInfoUpdatePacket.EnumPlayerInfoAction UPDATE_GAME_MODE;
-        enum (EnumPlayerInfoActionHandle) ClientboundPlayerInfoUpdatePacket.EnumPlayerInfoAction UPDATE_LATENCY;
-        enum (EnumPlayerInfoActionHandle) ClientboundPlayerInfoUpdatePacket.EnumPlayerInfoAction UPDATE_DISPLAY_NAME;
+    class ClientboundPlayerInfoUpdatePacket.Action {
+        enum (com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacketHandle.ActionHandle) ClientboundPlayerInfoUpdatePacket.Action ADD_PLAYER;
+        enum (com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacketHandle.ActionHandle) ClientboundPlayerInfoUpdatePacket.Action UPDATE_GAME_MODE;
+        enum (com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacketHandle.ActionHandle) ClientboundPlayerInfoUpdatePacket.Action UPDATE_LATENCY;
+        enum (com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacketHandle.ActionHandle) ClientboundPlayerInfoUpdatePacket.Action UPDATE_DISPLAY_NAME;
     }
 }
 
@@ -192,20 +190,20 @@ class ClientboundPlayerInfoRemovePacket extends Packet {
     }
 #else
     public List<java.util.UUID> getProfileIds() {
-        // Get list of PlayerInfoData entries
+        // Get list of Entry entries
   #if version >= 1.18
         List entries = instance.getEntries();
   #elseif version >= 1.17
         List entries = instance.b();
   #else
-        #require ClientboundPlayerInfoRemovePacket private final List<ClientboundPlayerInfoRemovePacket.PlayerInfoData> entries:b;
+        #require ClientboundPlayerInfoRemovePacket private final List<ClientboundPlayerInfoRemovePacket.Entry> entries:b;
         List entries = instance#entries;
   #endif
 
         // Convert to list of UUIDs
         List uuids = new java.util.ArrayList(entries.size());
         for (java.util.Iterator iter = entries.iterator(); iter.hasNext();) {
-            ClientboundPlayerInfoRemovePacket$PlayerInfoData info = (ClientboundPlayerInfoRemovePacket$PlayerInfoData) iter.next();
+            ClientboundPlayerInfoRemovePacket$Entry info = (ClientboundPlayerInfoRemovePacket$Entry) iter.next();
   #if version >= 1.18
             com.mojang.authlib.GameProfile profile = info.getProfile();
   #else
@@ -224,23 +222,23 @@ class ClientboundPlayerInfoRemovePacket extends Packet {
             java.util.UUID uuid = (java.util.UUID) iter.next();
             GameProfile profile = new com.mojang.authlib.GameProfile(uuid, "REMOVEDPLAYER");
             int ping = 0;
-            EnumGamemode gameMode = net.minecraft.world.level.EnumGamemode.SURVIVAL;
-            IChatBaseComponent listName;
+            GameType gameMode = net.minecraft.world.level.GameType.SURVIVAL;
+            Component listName;
 
   #if version >= 1.19
-            listName = IChatBaseComponent.literal("");
+            listName = Component.literal("");
   #else
             listName = new net.minecraft.network.chat.ChatComponentText("");
   #endif
 
-            ClientboundPlayerInfoRemovePacket$PlayerInfoData info;
+            ClientboundPlayerInfoRemovePacket$Entry info;
   #if version >= 1.19
             net.minecraft.world.entity.player.ProfilePublicKey.a publicKey = null; //TODO: What to do with this?
-            info = new ClientboundPlayerInfoRemovePacket$PlayerInfoData(profile, ping, gameMode, listName, publicKey);
+            info = new ClientboundPlayerInfoRemovePacket$Entry(profile, ping, gameMode, listName, publicKey);
   #elseif version >= 1.17
-            info = new ClientboundPlayerInfoRemovePacket$PlayerInfoData(profile, ping, gameMode, listName);
+            info = new ClientboundPlayerInfoRemovePacket$Entry(profile, ping, gameMode, listName);
   #else
-            info = new ClientboundPlayerInfoRemovePacket$PlayerInfoData(instance, profile, ping, gameMode, listName);
+            info = new ClientboundPlayerInfoRemovePacket$Entry(instance, profile, ping, gameMode, listName);
   #endif
 
             entries.add(info);
@@ -248,9 +246,9 @@ class ClientboundPlayerInfoRemovePacket extends Packet {
 
         // Apply new list
   #if version >= 1.17
-        #require ClientboundPlayerInfoRemovePacket private final List<ClientboundPlayerInfoRemovePacket.PlayerInfoData> entries;
+        #require ClientboundPlayerInfoRemovePacket private final List<ClientboundPlayerInfoRemovePacket.Entry> entries;
   #else
-        #require ClientboundPlayerInfoRemovePacket private final List<ClientboundPlayerInfoRemovePacket.PlayerInfoData> entries:b;
+        #require ClientboundPlayerInfoRemovePacket private final List<ClientboundPlayerInfoRemovePacket.Entry> entries:b;
   #endif
         instance#entries = entries;
     }
@@ -261,7 +259,7 @@ class ClientboundPlayerInfoRemovePacket extends Packet {
         return new ClientboundPlayerInfoRemovePacket(profileIds);
 #else
         ClientboundPlayerInfoRemovePacket packet;
-        packet = new ClientboundPlayerInfoRemovePacket(ClientboundPlayerInfoRemovePacket$EnumPlayerInfoAction.REMOVE_PLAYER,
+        packet = new ClientboundPlayerInfoRemovePacket(ClientboundPlayerInfoRemovePacket$Action.REMOVE_PLAYER,
                                                        new net.minecraft.server.level.EntityPlayer[0]);
         ClientboundPlayerInfoRemovePacketHandle.T.setProfileIds.invoke(packet, profileIds);
         return packet;

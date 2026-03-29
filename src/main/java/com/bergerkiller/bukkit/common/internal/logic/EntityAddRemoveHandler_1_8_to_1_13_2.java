@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -30,10 +31,9 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.generated.net.minecraft.util.IntHashMapHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.SafeField;
@@ -58,18 +58,18 @@ class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler {
 
     public EntityAddRemoveHandler_1_8_to_1_13_2() {
         this.iWorldAccessType = CommonUtil.getClass("net.minecraft.world.level.IWorldAccess");
-        this.entitiesByIdField = SafeField.create(WorldHandle.T.getType(), "entitiesById", IntHashMapHandle.T.getType());
+        this.entitiesByIdField = SafeField.create(LevelHandle.T.getType(), "entitiesById", IntHashMapHandle.T.getType());
         this.entityListField = new FastField<List<Object>>();
         try {
-            this.entityListField.init(WorldHandle.T.getType().getDeclaredField("entityList"));
+            this.entityListField.init(LevelHandle.T.getType().getDeclaredField("entityList"));
         } catch (Throwable t) {
             throw MountiplexUtil.uncheckedRethrow(t);
         }
 
         // EntitiesByUUID is a Map on MC 1.13.2 and before
         try {
-            String fieldName = Resolver.resolveFieldName(WorldServerHandle.T.getType(), "entitiesByUUID");
-            entitiesByUUIDField.init(MPLType.getDeclaredField(WorldServerHandle.T.getType(), fieldName));
+            String fieldName = Resolver.resolveFieldName(ServerLevelHandle.T.getType(), "entitiesByUUID");
+            entitiesByUUIDField.init(MPLType.getDeclaredField(ServerLevelHandle.T.getType(), fieldName));
             if (!Map.class.isAssignableFrom(entitiesByUUIDField.getType())) {
                 throw new IllegalStateException("Field not assignable to Map");
             }
@@ -79,20 +79,20 @@ class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler {
         }
 
         if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
-            accessListField = LogicUtil.unsafeCast(SafeField.create(WorldHandle.T.getType(), "v", List.class));
+            accessListField = LogicUtil.unsafeCast(SafeField.create(LevelHandle.T.getType(), "v", List.class));
         } else {
-            accessListField = LogicUtil.unsafeCast(SafeField.create(WorldHandle.T.getType(), "u", List.class));
+            accessListField = LogicUtil.unsafeCast(SafeField.create(LevelHandle.T.getType(), "u", List.class));
         }
 
         {
             java.lang.reflect.Field entityRemoveQueueField = null;
             try {
                 if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
-                    entityRemoveQueueField = WorldHandle.T.getType().getDeclaredField("g");
+                    entityRemoveQueueField = LevelHandle.T.getType().getDeclaredField("g");
                 } else if (CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
-                    entityRemoveQueueField = WorldHandle.T.getType().getDeclaredField("f");
+                    entityRemoveQueueField = LevelHandle.T.getType().getDeclaredField("f");
                 } else {
-                    entityRemoveQueueField = WorldHandle.T.getType().getDeclaredField("g");
+                    entityRemoveQueueField = LevelHandle.T.getType().getDeclaredField("g");
                 }
                 if (!Collection.class.isAssignableFrom(entityRemoveQueueField.getType())) {
                     Logging.LOGGER_REFLECTION.warning("Entity remove queue field " + entityRemoveQueueField.toString() + " is of incompatible type");
@@ -207,7 +207,7 @@ class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler {
 
     @Override
     public void replace(EntityHandle oldEntity, EntityHandle newEntity) {
-        WorldServerHandle world = oldEntity.getWorldServer();
+        ServerLevelHandle world = oldEntity.getWorldServer();
         if (newEntity == null) {
             if (world != null) {
                 world.removeEntity(oldEntity);

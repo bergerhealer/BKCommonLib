@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 
 /**
  * Used as net.minecraft.server.ResourceKey on 1.15.2 and earlier, before this class was introduced.
@@ -12,7 +12,7 @@ import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 public final class ResourceKey_1_15_2<T> {
     @SuppressWarnings("rawtypes")
     private static final Map<String, ResourceKey_1_15_2> cache = Collections.synchronizedMap(new IdentityHashMap<String, ResourceKey_1_15_2>());
-    private static final Object root_category = MinecraftKeyHandle.createNew("root").getRaw();
+    private static final Object root_category = IdentifierHandle.createNew("root").getRaw();
     public final Object category;
     public final Object name;
 
@@ -23,7 +23,7 @@ public final class ResourceKey_1_15_2<T> {
 
     // Note: World Dimension! This is not the type, and more than these 3 are in use
     // These constants are only for the 3 main worlds
-    public static final ResourceKey_1_15_2<Object> CATEGORY_WORLD_DIMENSION = createCategory(MinecraftKeyHandle.createNew("dimension").getRaw());
+    public static final ResourceKey_1_15_2<Object> CATEGORY_WORLD_DIMENSION = createCategory(IdentifierHandle.createNew("dimension").getRaw());
     public static final ResourceKey_1_15_2<Object> WORLD_DIMENSION_OVERWORLD = createNamed("dimension", "overworld");
     public static final ResourceKey_1_15_2<Object> WORLD_DIMENSION_THE_NETHER = createNamed("dimension", "the_nether");
     public static final ResourceKey_1_15_2<Object> WORLD_DIMENSION_THE_END = createNamed("dimension", "the_end");
@@ -38,8 +38,8 @@ public final class ResourceKey_1_15_2<T> {
 
     // Pre-1.16 use only!
     public static <T> ResourceKey_1_15_2<T> createNamed(String categoryName, String name) {
-        return fromCache(MinecraftKeyHandle.createNew(categoryName).getRaw(),
-                         MinecraftKeyHandle.createNew(name).getRaw());
+        return fromCache(IdentifierHandle.createNew(categoryName).getRaw(),
+                         IdentifierHandle.createNew(name).getRaw());
     }
 
     @SuppressWarnings("unchecked")

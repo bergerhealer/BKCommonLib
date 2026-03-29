@@ -11,10 +11,10 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonDisabledEntity;
 import com.bergerkiller.bukkit.common.math.Quaternion;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
-import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
-import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherObjectHandle;
-import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherRegistryHandle;
+import com.bergerkiller.generated.net.minecraft.core.RotationsHandle;
+import com.bergerkiller.generated.net.minecraft.network.syncher.SynchedEntityDataHandle;
+import com.bergerkiller.generated.net.minecraft.network.syncher.EntityDataAccessorHandle;
+import com.bergerkiller.generated.net.minecraft.network.syncher.EntityDataSerializersHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
@@ -42,10 +42,10 @@ import org.bukkit.util.Vector;
  * pattern, so that it minimizes the amount of times internal collections have to resize
  * and initialize.
  */
-public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Cloneable {
+public class DataWatcher extends BasicWrapper<SynchedEntityDataHandle> implements Cloneable {
 
     public DataWatcher(org.bukkit.entity.Entity entityOwner) {
-        this(DataWatcherHandle.createNew(entityOwner));
+        this(SynchedEntityDataHandle.createNew(entityOwner));
     }
 
     /**
@@ -54,7 +54,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * Entity-accepting constructor.
      */
     public DataWatcher() {
-        this(DataWatcherHandle.createNew(CommonDisabledEntity.INSTANCE));
+        this(SynchedEntityDataHandle.createNew(CommonDisabledEntity.INSTANCE));
     }
 
     /**
@@ -64,10 +64,10 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * @return DataWatcher
      */
     public static DataWatcher createForHandle(Object nmsDataWatcherHandle) {
-        return new DataWatcher(DataWatcherHandle.createHandle(nmsDataWatcherHandle));
+        return new DataWatcher(SynchedEntityDataHandle.createHandle(nmsDataWatcherHandle));
     }
 
-    private DataWatcher(DataWatcherHandle handle) {
+    private DataWatcher(SynchedEntityDataHandle handle) {
         setHandle(handle);
     }
 
@@ -174,7 +174,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         if (rawItem == null) {
             throw new IllegalArgumentException("This key is not watched in this DataWatcher");
         } else {
-            Object rawValue = DataWatcherHandle.ItemHandle.T.getValue.invoke(rawItem);
+            Object rawValue = SynchedEntityDataHandle.ItemHandle.T.getValue.invoke(rawItem);
             return key.getType().getConverter().convert(rawValue);
         }
     }
@@ -209,7 +209,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         if (rawItem == null) {
             return defaultValue;
         } else {
-            Object rawValue = DataWatcherHandle.ItemHandle.T.getValue.invoke(rawItem);
+            Object rawValue = SynchedEntityDataHandle.ItemHandle.T.getValue.invoke(rawItem);
             return key.getType().getConverter().convert(rawValue);
         }
     }
@@ -243,7 +243,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         if (rawItem == null) {
             return null;
         } else {
-            return new Item<V>(key, DataWatcherHandle.ItemHandle.createHandle(rawItem));
+            return new Item<V>(key, SynchedEntityDataHandle.ItemHandle.createHandle(rawItem));
         }
     }
 
@@ -331,7 +331,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * @return Watched items (immutable)
      */
     public List<Item<?>> getWatchedItems() {
-        List<?> itemHandles = (List<?>) DataWatcherHandle.T.getCopyOfAllItems.raw.invoke(handle.getRaw());
+        List<?> itemHandles = (List<?>) SynchedEntityDataHandle.T.getCopyOfAllItems.raw.invoke(handle.getRaw());
         if (itemHandles == null) {
             itemHandles = Collections.emptyList();
         }
@@ -360,7 +360,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * @return List of all packed items
      */
     public List<PackedItem<?>> packAll() {
-        List<?> itemHandles = (List<?>) DataWatcherHandle.T.packAll.raw.invoke(handle.getRaw());
+        List<?> itemHandles = (List<?>) SynchedEntityDataHandle.T.packAll.raw.invoke(handle.getRaw());
         if (itemHandles == null) {
             itemHandles = Collections.emptyList();
         }
@@ -374,7 +374,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * @return List of packed items of all the changes
      */
     public List<PackedItem<?>> packChanges() {
-        List<?> itemHandles = (List<?>) DataWatcherHandle.T.packChanges.raw.invoke(handle.getRaw());
+        List<?> itemHandles = (List<?>) SynchedEntityDataHandle.T.packChanges.raw.invoke(handle.getRaw());
         if (itemHandles == null) {
             itemHandles = Collections.emptyList();
         }
@@ -390,7 +390,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * @return List of packed items of all the non-default item values
      */
     public List<PackedItem<?>> packNonDefaults() {
-        List<?> itemHandles = (List<?>) DataWatcherHandle.T.packNonDefaults.raw.invoke(handle.getRaw());
+        List<?> itemHandles = (List<?>) SynchedEntityDataHandle.T.packNonDefaults.raw.invoke(handle.getRaw());
         if (itemHandles == null) {
             itemHandles = Collections.emptyList();
         }
@@ -446,9 +446,9 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
     // Gets the raw item handle of a key
     private Object getItemRawHandle(Key<?> key) {
         if (CommonCapabilities.DATAWATCHER_OBJECTS) {
-            return DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getRawHandle());
+            return SynchedEntityDataHandle.T.read.raw.invoke(this.handle.getRaw(), key.getRawHandle());
         } else {
-            return DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getId());
+            return SynchedEntityDataHandle.T.read.raw.invoke(this.handle.getRaw(), key.getId());
         }
     }
 
@@ -605,15 +605,15 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * 
      * @param <V> value type of the item
      */
-    public static class Item<V> extends BasicWrapper<DataWatcherHandle.ItemHandle> {
+    public static class Item<V> extends BasicWrapper<SynchedEntityDataHandle.ItemHandle> {
         private final Key<V> key;
 
-        protected Item(Key<V> key, DataWatcherHandle.ItemHandle handle) {
+        protected Item(Key<V> key, SynchedEntityDataHandle.ItemHandle handle) {
             this.key = key;
             this.setHandle(handle);
         }
 
-        public Item(DataWatcherHandle.ItemHandle handle) {
+        public Item(SynchedEntityDataHandle.ItemHandle handle) {
             this.key = null;
             this.setHandle(handle);
         }
@@ -646,11 +646,11 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                 return this.key;
             } else if (CommonCapabilities.DATAWATCHER_OBJECTS) {
                 // This is for MC >= 1.9
-                return (Key<V>) DataWatcherHandle.ItemHandle.T.key.get(this.handle.getRaw());
+                return (Key<V>) SynchedEntityDataHandle.ItemHandle.T.key.get(this.handle.getRaw());
             } else {
                 // This is for MC 1.8.8, where we use a proxy object storing typeId (serializer token) and keyId
-                int typeId = DataWatcherHandle.ItemHandle.T.typeId.getInteger(this.handle.getRaw());
-                int keyId = DataWatcherHandle.ItemHandle.T.keyId.getInteger(this.handle.getRaw());
+                int typeId = SynchedEntityDataHandle.ItemHandle.T.typeId.getInteger(this.handle.getRaw());
+                int keyId = SynchedEntityDataHandle.ItemHandle.T.keyId.getInteger(this.handle.getRaw());
                 Object token = Integer.valueOf(typeId);
                 Object handle = new com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject<V>(keyId, token);
                 return new Key<V>(handle);
@@ -713,10 +713,10 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      *
      * @param <V> Value type of the item
      */
-    public static class PackedItem<V> extends BasicWrapper<DataWatcherHandle.PackedItemHandle> {
+    public static class PackedItem<V> extends BasicWrapper<SynchedEntityDataHandle.PackedItemHandle> {
         private final Key<V> key;
 
-        private PackedItem(DataWatcherHandle.PackedItemHandle handle, Key<V> key) {
+        private PackedItem(SynchedEntityDataHandle.PackedItemHandle handle, Key<V> key) {
             this.setHandle(handle);
             this.key = key;
         }
@@ -728,7 +728,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
          * @return PackedItem
          */
         public static <T> PackedItem<T> fromHandle(Object nmsPackedItemHandle) {
-            return new PackedItem<T>(DataWatcherHandle.PackedItemHandle.createHandle(nmsPackedItemHandle), null);
+            return new PackedItem<T>(SynchedEntityDataHandle.PackedItemHandle.createHandle(nmsPackedItemHandle), null);
         }
 
         /**
@@ -795,11 +795,11 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      */
     public static class EntityItem<V> {
         private final Key<V> key;
-        private final DataWatcherHandle datawatcher;
+        private final SynchedEntityDataHandle datawatcher;
 
         public EntityItem(ExtendedEntity<?> owner, Key<V> key) {
             this.key = key;
-            this.datawatcher = DataWatcherHandle.createHandle(EntityHandle.T.datawatcherField.raw.get(owner.getHandle()));
+            this.datawatcher = SynchedEntityDataHandle.createHandle(EntityHandle.T.datawatcherField.raw.get(owner.getHandle()));
         }
 
         /**
@@ -859,7 +859,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * 
      * @param <V> value type bound to the key
      */
-    public static class Key<V> extends BasicWrapper<DataWatcherObjectHandle> {
+    public static class Key<V> extends BasicWrapper<EntityDataAccessorHandle> {
         private final Type<V> _serializer;
 
         protected Key(Type<V> serializer) {
@@ -871,7 +871,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         }
 
         public Key(Object handle, Type<V> serializer) {
-            setHandle(DataWatcherObjectHandle.createHandle(handle));
+            setHandle(EntityDataAccessorHandle.createHandle(handle));
             Object token = this.handle.getSerializer();
             DataWatcherSerializers.InternalType internalType = DataWatcherSerializers.getInternalTypeFromToken(token);
 
@@ -914,7 +914,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
          */
         public int getSerializerId() {
             Object rawSerializer = this.handle.getSerializer();
-            return DataWatcherRegistryHandle.T.getSerializerId.invoke(rawSerializer);
+            return EntityDataSerializersHandle.T.getSerializerId.invoke(rawSerializer);
         }
 
         /**
@@ -923,7 +923,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
          * @return Id
          */
         public int getId() {
-            return DataWatcherObjectHandle.T.getId.invoke(this.handle.getRaw());
+            return EntityDataAccessorHandle.T.getId.invoke(this.handle.getRaw());
         }
 
         @Override
@@ -985,7 +985,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             public static final Type<Integer> INTEGER = getForType(Integer.class);
             public static final Type<Float> FLOAT = getForType(Float.class);
             public static final Type<String> STRING = getForType(String.class);
-            public static final Type<Vector> ROTATION_VECTOR = new Type<>(Vector3fHandle.T.getType(), Vector.class);
+            public static final Type<Vector> ROTATION_VECTOR = new Type<>(RotationsHandle.T.getType(), Vector.class);
             public static final Type<Vector> JOML_VECTOR3F = CommonBootstrap.evaluateMCVersion(">=", "1.21.11")
                     ? new Type<>(JOMLConversion.JOML_VECTOR3F_CONSTANT_TYPE, Vector.class)
                     : (CommonBootstrap.evaluateMCVersion(">=", "1.19.4")

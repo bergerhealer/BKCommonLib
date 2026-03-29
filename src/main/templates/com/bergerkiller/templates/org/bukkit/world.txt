@@ -1,7 +1,7 @@
 package org.bukkit;
 
 import org.bukkit.FeatureFlag;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 
 class World {
 
@@ -34,14 +34,14 @@ class World {
         return false;
     }
 
-    public void playSound(Location loc, MinecraftKeyHandle sound, float volume, float pitch) {
+    public void playSound(Location loc, IdentifierHandle sound, float volume, float pitch) {
 #if version >= 1.13
-        // Since 1.13 namespace can also be specified (MinecraftKey in packet)
+        // Since 1.13 namespace can also be specified (Identifier in packet)
         instance.playSound(loc, sound.toString(), volume, pitch);
 #elseif version >= 1.9
         instance.playSound(loc, sound.getName(), volume, pitch);
 #else
-        net.minecraft.world.level.World worldHandle = ((org.bukkit.craftbukkit.CraftWorld) instance).getHandle();
+        net.minecraft.world.level.Level worldHandle = ((org.bukkit.craftbukkit.CraftWorld) instance).getHandle();
         worldHandle.makeSound(loc.getX(), loc.getY(), loc.getZ(), sound.getName(), volume, pitch);
 #endif
     }
@@ -59,10 +59,10 @@ class World {
 #else
     public void setClearWeatherDuration(int duration) {
         // API does not exist yet. Implement a fallback.
-        net.minecraft.world.level.World worldHandle = ((org.bukkit.craftbukkit.CraftWorld) instance).getHandle();
+        net.minecraft.world.level.Level worldHandle = ((org.bukkit.craftbukkit.CraftWorld) instance).getHandle();
 
   #if version >= 1.16
-        net.minecraft.server.level.WorldServer worldServerHandle = (net.minecraft.server.level.WorldServer) worldHandle;
+        net.minecraft.server.level.ServerLevel worldServerHandle = (net.minecraft.server.level.ServerLevel) worldHandle;
         worldServerHandle.worldDataServer.a(duration);
   #elseif version >= 1.13
         worldHandle.getWorldData().g(duration);

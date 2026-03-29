@@ -8,9 +8,9 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInFlyingHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityTeleportHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityVelocityHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundMovePlayerPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundTeleportEntityPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacketHandle;
 
 /**
  * Used on MC 1.16 and later, when multiple passengers could be mounted inside a vehicle,
@@ -87,7 +87,7 @@ public class VehicleMountHandler_1_16 extends VehicleMountHandler_1_9_to_1_15_2 
             }
         } else if (packet.getType() == PacketType.IN_POSITION || packet.getType() == PacketType.IN_POSITION_LOOK) {
             if (isTeleporting()) {
-                PacketPlayInFlyingHandle handle = PacketPlayInFlyingHandle.createHandle(packet.getHandle());
+                ServerboundMovePlayerPacketHandle handle = ServerboundMovePlayerPacketHandle.createHandle(packet.getHandle());
                 Vector v = new Vector(handle.getX(), handle.getY(), handle.getZ());
                 if (in_pos == null || v.distanceSquared(in_pos) > 1.0) {
                     in_pos = v;
@@ -168,11 +168,11 @@ public class VehicleMountHandler_1_16 extends VehicleMountHandler_1_9_to_1_15_2 
 
             if (diff.lengthSquared() > (2.0*2.0)) {
                 Location eye = getPlayer().getEyeLocation();
-                queuePacket(PacketPlayOutEntityTeleportHandle.createNew(getPlayer().getEntityId(),
+                queuePacket(ClientboundTeleportEntityPacketHandle.createNew(getPlayer().getEntityId(),
                         curr_pos.getX(), curr_pos.getY(), curr_pos.getZ(),
                         eye.getYaw(), eye.getPitch(), false));
             } else {
-                queuePacket(PacketPlayOutEntityVelocityHandle.createNew(getPlayer().getEntityId(),
+                queuePacket(ClientboundSetEntityMotionPacketHandle.createNew(getPlayer().getEntityId(),
                         diff.getX(), diff.getY(), diff.getZ()));
             }
         }

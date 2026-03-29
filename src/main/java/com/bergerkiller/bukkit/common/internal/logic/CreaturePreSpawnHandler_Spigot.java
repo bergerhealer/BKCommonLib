@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Level;
 
+import com.bergerkiller.generated.net.minecraft.server.level.ServerChunkCacheHandle;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -20,9 +21,8 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.ChunkProviderServerHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.core.BlockPosHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
@@ -57,13 +57,13 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
         }
 
         if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
-            cpsChunkGeneratorField = LogicUtil.unsafeCast(SafeField.create(ChunkProviderServerHandle.T.getType(),
+            cpsChunkGeneratorField = LogicUtil.unsafeCast(SafeField.create(ServerChunkCacheHandle.T.getType(),
                     "generator", CommonUtil.getClass("net.minecraft.world.level.chunk.ChunkGenerator")));
         } else if (CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
-            cpsChunkGeneratorField = LogicUtil.unsafeCast(SafeField.create(ChunkProviderServerHandle.T.getType(),
+            cpsChunkGeneratorField = LogicUtil.unsafeCast(SafeField.create(ServerChunkCacheHandle.T.getType(),
                     "chunkGenerator", CommonUtil.getClass("net.minecraft.world.level.chunk.ChunkGenerator")));
         } else {
-            cpsChunkGeneratorField = LogicUtil.unsafeCast(SafeField.create(ChunkProviderServerHandle.T.getType(),
+            cpsChunkGeneratorField = LogicUtil.unsafeCast(SafeField.create(ServerChunkCacheHandle.T.getType(),
                     "chunkProvider", CommonUtil.getClass("net.minecraft.world.level.chunk.IChunkProvider")));
         }
 
@@ -131,7 +131,7 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
     }
 
     private static Object getCPS(org.bukkit.World world) {
-        return WorldServerHandle.fromBukkit(world).getChunkProviderServer().getRaw();
+        return ServerLevelHandle.fromBukkit(world).getChunkProviderServer().getRaw();
     }
 
     private static List<Object> handleMobsFor(World world, Object blockposition, List<Object> mobs, Function<Object, CommonEntityType> entityTypeFunc) {
@@ -143,7 +143,7 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
             }
 
             // Wrap the parameters and send the event along
-            BlockPositionHandle pos = BlockPositionHandle.createHandle(blockposition);
+            BlockPosHandle pos = BlockPosHandle.createHandle(blockposition);
 
             // Check all instances of SpawnRateHandle if they need to be cancelled
             // If they're cancelled, initialize a new List with those entries omitted

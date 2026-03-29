@@ -1,33 +1,33 @@
 
 #if version < 1.18
   #if version >= 1.16
-    #remap net.minecraft.network.chat.IChatBaseComponent.ChatSerializer public static net.minecraft.network.chat.IChatMutableComponent fromJson:a(String jsonString);
+    #remap net.minecraft.network.chat.Component.ChatSerializer public static net.minecraft.network.chat.MutableComponent fromJson:a(String jsonString);
   #else
-    #remap net.minecraft.network.chat.IChatBaseComponent.ChatSerializer public static net.minecraft.network.chat.IChatBaseComponent fromJson:a(String jsonString);
+    #remap net.minecraft.network.chat.Component.ChatSerializer public static net.minecraft.network.chat.Component fromJson:a(String jsonString);
   #endif
-  #remap net.minecraft.network.chat.IChatBaseComponent.ChatSerializer public static String toJson:a(net.minecraft.network.chat.IChatBaseComponent chatComponent);
+  #remap net.minecraft.network.chat.Component.ChatSerializer public static String toJson:a(net.minecraft.network.chat.Component chatComponent);
 #endif
 
 #if version >= 1.14.4
-  #remap net.minecraft.network.chat.IChatBaseComponent public java.util.List<IChatBaseComponent> getSiblings();
+  #remap net.minecraft.network.chat.Component public java.util.List<Component> getSiblings();
 #elseif version >= 1.8.3
-  #remap net.minecraft.network.chat.IChatBaseComponent public java.util.List<IChatBaseComponent> getSiblings:a();
+  #remap net.minecraft.network.chat.Component public java.util.List<Component> getSiblings:a();
 #else
-  #remap net.minecraft.network.chat.IChatBaseComponent public java.util.List getSiblings:a();
+  #remap net.minecraft.network.chat.Component public java.util.List getSiblings:a();
 #endif
 
 #if version >= 1.18
-  #remap net.minecraft.network.chat.ChatModifier public boolean isObfuscated();
-  #remap net.minecraft.network.chat.ChatModifier public boolean isEmpty();
-  #remap net.minecraft.network.chat.IChatBaseComponent public net.minecraft.network.chat.ChatModifier getStyle();
+  #remap net.minecraft.network.chat.Style public boolean isObfuscated();
+  #remap net.minecraft.network.chat.Style public boolean isEmpty();
+  #remap net.minecraft.network.chat.Component public net.minecraft.network.chat.Style getStyle();
 #else
-  #remap net.minecraft.network.chat.ChatModifier public boolean isObfuscated:isRandom();
-  #remap net.minecraft.network.chat.ChatModifier public boolean isEmpty:g();
-  #remap net.minecraft.network.chat.IChatBaseComponent public net.minecraft.network.chat.ChatModifier getStyle:getChatModifier();
+  #remap net.minecraft.network.chat.Style public boolean isObfuscated:isRandom();
+  #remap net.minecraft.network.chat.Style public boolean isEmpty:g();
+  #remap net.minecraft.network.chat.Component public net.minecraft.network.chat.Style getStyle:getChatModifier();
 #endif
 
 #if version >= 1.18
-  #remap net.minecraft.network.chat.ChatHexColor public int getValue();
+  #remap net.minecraft.network.chat.TextColor public int getValue();
 #elseif version >= 1.17
-  #remap net.minecraft.network.chat.ChatHexColor public int getValue:a();
+  #remap net.minecraft.network.chat.TextColor public int getValue:a();
 #endif

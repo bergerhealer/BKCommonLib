@@ -1,33 +1,33 @@
 package net.minecraft.world.level.saveddata.maps;
 
-import net.minecraft.network.chat.IChatBaseComponent;
-import net.minecraft.resources.MinecraftKey;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 
 import com.bergerkiller.bukkit.common.map.MapMarker.Type;
 
-import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapIconHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapDecorationHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapDecorationTypeHandle;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 
-class MapIcon {
+class MapDecoration {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
     <code>
-    public static MapIconHandle createNew(Type type, byte x, byte y, byte direction) {
+    public static MapDecorationHandle createNew(Type type, byte x, byte y, byte direction) {
         return createNew(type, x, y, direction, null);
     }
     </code>
 
 #if version >= 1.20.5
-    public static (MapIconHandle) MapIcon createNew((MapMarker.Type) net.minecraft.core.Holder<MapDecorationType> type, byte x, byte y, byte direction, (ChatText) IChatBaseComponent title) {
+    public static (MapDecorationHandle) MapDecoration createNew((MapMarker.Type) net.minecraft.core.Holder<MapDecorationType> type, byte x, byte y, byte direction, (ChatText) Component title) {
         java.util.Optional titleOpt = java.util.Optional.ofNullable(title);
-        return new MapIcon(type, x, y, direction, titleOpt);
+        return new MapDecoration(type, x, y, direction, titleOpt);
     }
 
-    public static (MapIconHandle) MapIcon fromCursor(org.bukkit.map.MapCursor cursor) {
+    public static (MapDecorationHandle) MapDecoration fromCursor(org.bukkit.map.MapCursor cursor) {
         java.util.Optional titleOpt;
         if (cursor.getCaption() != null) {
             titleOpt = java.util.Optional.of(com.bergerkiller.bukkit.common.wrappers.ChatText.fromMessage(cursor.getCaption()).getRawHandle());
@@ -36,7 +36,7 @@ class MapIcon {
         }
         net.minecraft.core.Holder type = org.bukkit.craftbukkit.map.CraftMapCursor$CraftType.bukkitToMinecraftHolder(cursor.getType());
 
-        return new MapIcon(type, cursor.getX(), cursor.getY(), cursor.getDirection(), titleOpt);
+        return new MapDecoration(type, cursor.getX(), cursor.getY(), cursor.getDirection(), titleOpt);
     }
 
     public org.bukkit.map.MapCursor toCursor() {
@@ -60,31 +60,31 @@ class MapIcon {
     }
 
 #elseif version >= 1.13
-    public static (MapIconHandle) MapIcon createNew((MapMarker.Type) MapDecorationType type, byte x, byte y, byte direction, (ChatText) IChatBaseComponent title) {
-        return new MapIcon(type, x, y, direction, title);
+    public static (MapDecorationHandle) MapDecoration createNew((MapMarker.Type) MapDecorationType type, byte x, byte y, byte direction, (ChatText) Component title) {
+        return new MapDecoration(type, x, y, direction, title);
     }
 
-    public static (MapIconHandle) MapIcon fromCursor(org.bukkit.map.MapCursor cursor) {
-        IChatBaseComponent title = null;
+    public static (MapDecorationHandle) MapDecoration fromCursor(org.bukkit.map.MapCursor cursor) {
+        Component title = null;
         if (cursor.getCaption() != null) {
-            title = (IChatBaseComponent) com.bergerkiller.bukkit.common.wrappers.ChatText.fromMessage(cursor.getCaption()).getRawHandle();
+            title = (Component) com.bergerkiller.bukkit.common.wrappers.ChatText.fromMessage(cursor.getCaption()).getRawHandle();
         }
   #if version >= 1.18
-        return new MapIcon(MapDecorationType.byIcon(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), title);
+        return new MapDecoration(MapDecorationType.byIcon(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), title);
   #else
-        return new MapIcon(MapDecorationType.a(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), title);
+        return new MapDecoration(MapDecorationType.a(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), title);
   #endif
     }
 
     public org.bukkit.map.MapCursor toCursor() {
   #if version >= 1.20.2
-        IChatBaseComponent title = instance.name();
+        Component title = instance.name();
         MapDecorationType type = instance.type();
   #elseif version >= 1.14.4
-        IChatBaseComponent title = instance.getName();
+        Component title = instance.getName();
         MapDecorationType type = instance.getType();
   #else
-        IChatBaseComponent title = instance.g();
+        Component title = instance.g();
         MapDecorationType type = instance.b();
   #endif
 
@@ -118,12 +118,12 @@ class MapIcon {
     }
 
 #elseif version >= 1.11
-    public static (MapIconHandle) MapIcon createNew((MapMarker.Type) MapDecorationType type, byte x, byte y, byte direction, (ChatText) IChatBaseComponent title) {
-        return new MapIcon(type, x, y, direction);
+    public static (MapDecorationHandle) MapDecoration createNew((MapMarker.Type) MapDecorationType type, byte x, byte y, byte direction, (ChatText) Component title) {
+        return new MapDecoration(type, x, y, direction);
     }
 
-    public static (MapIconHandle) MapIcon fromCursor(org.bukkit.map.MapCursor cursor) {
-        return new MapIcon(MapDecorationType.a(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection());
+    public static (MapDecorationHandle) MapDecoration fromCursor(org.bukkit.map.MapCursor cursor) {
+        return new MapDecoration(MapDecorationType.a(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection());
     }
 
     public org.bukkit.map.MapCursor toCursor() {
@@ -134,12 +134,12 @@ class MapIcon {
         );
     }
 #else
-    public static (MapIconHandle) MapIcon createNew((MapMarker.Type) byte typeId, byte x, byte y, byte direction, (ChatText) IChatBaseComponent title) {
-         return new MapIcon(typeId, x, y, direction);
+    public static (MapDecorationHandle) MapDecoration createNew((MapMarker.Type) byte typeId, byte x, byte y, byte direction, (ChatText) Component title) {
+         return new MapDecoration(typeId, x, y, direction);
     }
 
-    public static (MapIconHandle) MapIcon fromCursor(org.bukkit.map.MapCursor cursor) {
-        return new MapIcon(cursor.getRawType(), cursor.getX(), cursor.getY(), cursor.getDirection());
+    public static (MapDecorationHandle) MapDecoration fromCursor(org.bukkit.map.MapCursor cursor) {
+        return new MapDecoration(cursor.getRawType(), cursor.getX(), cursor.getY(), cursor.getDirection());
     }
 
     public org.bukkit.map.MapCursor toCursor() {
@@ -175,20 +175,20 @@ class MapIcon {
 }
 
 // Is our proxy MapDecorationType_1_8_to_1_10_2 class on 1.8 - 1.10.2
-// Is MapIcon.Type on 1.11 - 1.20.4
+// Is MapDecoration.Type on 1.11 - 1.20.4
 class MapDecorationType {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
 #if version >= 1.20.5
-    public (MinecraftKeyHandle) MinecraftKey getName:assetId();
+    public (IdentifierHandle) Identifier getName:assetId();
 #elseif version >= 1.20.2
-    public (MinecraftKeyHandle) MinecraftKey getName() {
-        return new MinecraftKey(instance.getSerializedName());
+    public (IdentifierHandle) Identifier getName() {
+        return new Identifier(instance.getSerializedName());
     }
 #else
-    public (MinecraftKeyHandle) MinecraftKey getName() {
+    public (IdentifierHandle) Identifier getName() {
         // Enum with constant values. The names were based on these enum names, but lower-cased
-        return new MinecraftKey(instance.name().toLowerCase(java.util.Locale.ENGLISH));
+        return new Identifier(instance.name().toLowerCase(java.util.Locale.ENGLISH));
     }
 #endif
 

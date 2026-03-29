@@ -31,8 +31,8 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
-import com.bergerkiller.generated.net.minecraft.server.level.ChunkProviderServerHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerChunkCacheHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 
 /**
  * Manages 'forced chunk' logic in a way that allows multiple owners
@@ -356,7 +356,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         public void accept(Object result) {
             // 1.14 - 1.20.4: Either -> Left -> orElse(null)
             // 1.20.5+: ChunkResult -> orElse(null)
-            final org.bukkit.Chunk chunk = ChunkProviderServerHandle.unpackGetChunkAsyncResult(result);
+            final org.bukkit.Chunk chunk = ServerChunkCacheHandle.unpackGetChunkAsyncResult(result);
 
             // If successful, complete the async chunk loading future
             if (chunk != null) {
@@ -391,7 +391,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
 
             // This consumer is called from internal when the chunk is ready
             // Null is returned when loading fails
-            final ChunkProviderServerHandle cps_handle = this.world.handle.getChunkProviderServer();
+            final ServerChunkCacheHandle cps_handle = this.world.handle.getChunkProviderServer();
             final Executor executor = cps_handle.getAsyncExecutor();
             if (executor == null) {
                 cps_handle.getChunkAtAsync(this.cx, this.cz, this);
@@ -407,7 +407,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
     private final class ForcedWorld {
         // Below fields are set to null when the world unloads to prevent a memory leak
         public World world;
-        public WorldServerHandle handle;
+        public ServerLevelHandle handle;
         private final int radius;
         private boolean unloaded;
 
@@ -425,7 +425,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
 
         public ForcedWorld(World world, int radius) {
             this.world = world;
-            this.handle = WorldServerHandle.fromBukkit(world);
+            this.handle = ServerLevelHandle.fromBukkit(world);
             this.radius = radius;
             this.worldName = world.getName();
             this.unloaded = false;
@@ -556,7 +556,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
             // This method is available on 1.13.1+
             // The ChunkUnloadEvent is not used for this, then
             if (CommonCapabilities.HAS_CHUNK_TICKET_API) {
-                WorldServerHandle.fromBukkit(world).setForceLoadedAsync(
+                ServerLevelHandle.fromBukkit(world).setForceLoadedAsync(
                         entry.getX(), entry.getZ(), plugin, forced, radius);
             }
 

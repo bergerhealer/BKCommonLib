@@ -16,13 +16,13 @@ import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffectHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutWorldParticlesHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.player.EntityHumanHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.player.PlayerInventoryHandle;
-import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundCustomSoundPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundLevelParticlesPacketHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.network.ServerGamePacketListenerImplHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.player.PlayerHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.player.InventoryHandle;
+import com.bergerkiller.generated.net.minecraft.world.inventory.AbstractContainerMenuHandle;
 import com.bergerkiller.generated.net.minecraft.world.inventory.SlotHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
@@ -71,7 +71,7 @@ public class PlayerUtil extends EntityUtil {
      * @return True if the player is disconnected, False if not
      */
     public static boolean isDisconnected(Player player) {
-        return PlayerConnectionHandle.forPlayer(player) == null;
+        return ServerGamePacketListenerImplHandle.forPlayer(player) == null;
     }
 
     /**
@@ -93,9 +93,9 @@ public class PlayerUtil extends EntityUtil {
      * @return list of nearby players
      */
     public static List<Player> getNearbyPlayers(Player player, double radius) {
-        EntityPlayerHandle handle = CommonNMS.getHandle(player);
+        ServerPlayerHandle handle = CommonNMS.getHandle(player);
         List<?> nearbyPlayerHandles = handle.getWorld().getRawEntitiesOfType(
-                EntityPlayerHandle.T.getType(),
+                ServerPlayerHandle.T.getType(),
                 handle.getBoundingBox().grow(radius, radius, radius));
         return new ConvertingList<Player>(nearbyPlayerHandles, DuplexConversion.player);
     }
@@ -164,7 +164,7 @@ public class PlayerUtil extends EntityUtil {
      * @return The player's GameProfile
      */
     public static GameProfileHandle getGameProfile(Player player) {
-        return EntityHumanHandle.T.gameProfile.get(HandleConversion.toEntityHandle(player));
+        return PlayerHandle.T.gameProfile.get(HandleConversion.toEntityHandle(player));
     }
 
     /**
@@ -191,7 +191,7 @@ public class PlayerUtil extends EntityUtil {
      * @return True if the chunk is visible to the player, False if not
      */
     public static boolean isChunkVisible(Player player, int chunkX, int chunkZ) {
-        final EntityPlayerHandle ep = CommonNMS.getHandle(player);
+        final ServerPlayerHandle ep = CommonNMS.getHandle(player);
         return ep.getWorldServer().getPlayerChunkMap().isChunkEntered(ep, chunkX, chunkZ);
     }
 
@@ -242,7 +242,7 @@ public class PlayerUtil extends EntityUtil {
      */
     public static int getInventorySlotIndex(int playerInventoryIndex) {
         int index = playerInventoryIndex;
-        if (index < PlayerInventoryHandle.getHotbarSize()) {
+        if (index < InventoryHandle.getHotbarSize()) {
             index += 36;
         } else if (index > 39 && CommonCapabilities.PLAYER_OFF_HAND) {
             index += 5; // Off hand (1.9.2 and onwards only)
@@ -262,8 +262,8 @@ public class PlayerUtil extends EntityUtil {
     @SuppressWarnings("unchecked")
     public static void setItemSilently(Player player, int index, ItemStack item) {
         Object rawContainer = CommonNMS.getHandle(player).getActiveContainer().getRaw();
-        List<Object> rawOldItems = (List<Object>) ContainerHandle.T.oldItems.raw.get(rawContainer);
-        List<Object> rawSlots = (List<Object>) ContainerHandle.T.slots.raw.get(rawContainer);
+        List<Object> rawOldItems = (List<Object>) AbstractContainerMenuHandle.T.oldItems.raw.get(rawContainer);
+        List<Object> rawSlots = (List<Object>) AbstractContainerMenuHandle.T.slots.raw.get(rawContainer);
 
         int convertedIndex = getInventorySlotIndex(index); // conversion is needed
 
@@ -292,8 +292,8 @@ public class PlayerUtil extends EntityUtil {
     @SuppressWarnings("unchecked")
     public static void markItemUnchanged(Player player, int index) {
         Object rawContainer = CommonNMS.getHandle(player).getActiveContainer().getRaw();
-        List<Object> rawOldItems = (List<Object>) ContainerHandle.T.oldItems.raw.get(rawContainer);
-        List<Object> rawSlots = (List<Object>) ContainerHandle.T.slots.raw.get(rawContainer);
+        List<Object> rawOldItems = (List<Object>) AbstractContainerMenuHandle.T.oldItems.raw.get(rawContainer);
+        List<Object> rawSlots = (List<Object>) AbstractContainerMenuHandle.T.slots.raw.get(rawContainer);
 
         index = getInventorySlotIndex(index); // conversion is needed
 
@@ -320,7 +320,7 @@ public class PlayerUtil extends EntityUtil {
      * @param color of the particles
      */
     public static void spawnDustParticles(Player player, Vector position, Color color) {
-        PacketPlayOutWorldParticlesHandle packet = PacketPlayOutWorldParticlesHandle.createNew();
+        ClientboundLevelParticlesPacketHandle packet = ClientboundLevelParticlesPacketHandle.createNew();
         packet.setParticle(ParticleType.DUST, ParticleType.DustOptions.create(color, 1.0f));
         packet.setPos(position);
         PacketUtil.sendPacket(player, packet);
@@ -376,7 +376,7 @@ public class PlayerUtil extends EntityUtil {
      */
     public static void playSound(Player player, Location location, ResourceKey<SoundEffect> soundKey, String category, float volume, float pitch) {
         if (soundKey != null) {
-            PacketUtil.sendPacket(player, PacketPlayOutCustomSoundEffectHandle.createNew(
+            PacketUtil.sendPacket(player, ClientboundCustomSoundPacketHandle.createNew(
                     soundKey, category, location, volume, pitch));
         }
     }
@@ -405,7 +405,7 @@ public class PlayerUtil extends EntityUtil {
      * @param text The text to send, formatted using ChatText
      */
     public static void sendMessage(Player player, ChatText text) {
-        EntityPlayerHandle.fromBukkit(player).sendMessage(text);
+        ServerPlayerHandle.fromBukkit(player).sendMessage(text);
     }
 
     /**

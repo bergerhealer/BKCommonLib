@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
-import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapIconHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapDecorationHandle;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
@@ -37,11 +37,11 @@ public class MapDisplayMarkers {
                 .stream().map(e -> e.value).collect(Collectors.toList()));
     }
 
-    List<MapIconHandle> serializeValuesAsMapIcons(MapDisplayMarkerTile tile) {
+    List<MapDecorationHandle> serializeValuesAsMapIcons(MapDisplayMarkerTile tile) {
         return markersById.values().stream()
                 .filter(e -> e.tile == tile)
                 .map(e -> e.value)
-                .map(marker -> MapIconHandle.createNew(marker.getType(),
+                .map(marker -> MapDecorationHandle.createNew(marker.getType(),
                         tile.encodeX(marker.getPositionX()),
                         tile.encodeY(marker.getPositionY()),
                         tile.encodeRotation(marker.getRotation()),

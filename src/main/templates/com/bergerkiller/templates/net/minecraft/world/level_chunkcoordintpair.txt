@@ -1,24 +1,24 @@
 package net.minecraft.world.level;
 
-import com.bergerkiller.generated.net.minecraft.world.level.ChunkCoordIntPairHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.ChunkPosHandle;
 
-class ChunkCoordIntPair {
+class ChunkPos {
     public final int x;
     public final int z;
 
-    public (ChunkCoordIntPairHandle) ChunkCoordIntPair(int x, int z);
+    public (ChunkPosHandle) ChunkPos(int x, int z);
 
     public com.bergerkiller.bukkit.common.bases.IntVector2 toIntVector2() {
         return new com.bergerkiller.bukkit.common.bases.IntVector2(instance.x, instance.z);
     }
 
     <code>
-    public static ChunkCoordIntPairHandle fromIntVector2(com.bergerkiller.bukkit.common.bases.IntVector2 vector) {
+    public static ChunkPosHandle fromIntVector2(com.bergerkiller.bukkit.common.bases.IntVector2 vector) {
         return createHandle(fromIntVector2Raw(vector));
     }
     </code>
 
     public static Object fromIntVector2Raw(com.bergerkiller.bukkit.common.bases.IntVector2 vector) {
-        return new ChunkCoordIntPair(vector.x, vector.z);
+        return new ChunkPos(vector.x, vector.z);
     }
 }

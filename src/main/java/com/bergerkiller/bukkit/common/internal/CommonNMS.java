@@ -6,15 +6,15 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.server.dedicated.DedicatedPlayerListHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityLivingHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.item.EntityItemHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.player.EntityHumanHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.LivingEntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.item.ItemEntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.player.PlayerHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.LevelChunkHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
@@ -82,8 +82,8 @@ public class CommonNMS {
         }
     }
 
-    public static ChunkHandle getHandle(org.bukkit.Chunk chunk) {
-        return ChunkHandle.createHandle(HandleConversion.toChunkHandle(chunk));
+    public static LevelChunkHandle getHandle(org.bukkit.Chunk chunk) {
+        return LevelChunkHandle.createHandle(HandleConversion.toChunkHandle(chunk));
     }
 
     public static ItemStackHandle getHandle(org.bukkit.inventory.ItemStack stack) {
@@ -94,20 +94,20 @@ public class CommonNMS {
         return getHandle(entity, EntityHandle.T);
     }
 
-    public static EntityItemHandle getHandle(org.bukkit.entity.Item item) {
-        return getHandle(item, EntityItemHandle.T);
+    public static ItemEntityHandle getHandle(org.bukkit.entity.Item item) {
+        return getHandle(item, ItemEntityHandle.T);
     }
 
-    public static EntityLivingHandle getHandle(LivingEntity l) {
-        return getHandle(l, EntityLivingHandle.T);
+    public static LivingEntityHandle getHandle(LivingEntity l) {
+        return getHandle(l, LivingEntityHandle.T);
     }
 
-    public static EntityHumanHandle getHandle(HumanEntity h) {
-        return getHandle(h, EntityHumanHandle.T);
+    public static PlayerHandle getHandle(HumanEntity h) {
+        return getHandle(h, PlayerHandle.T);
     }
 
-    public static EntityPlayerHandle getHandle(Player p) {
-        return getHandle(p, EntityPlayerHandle.T);
+    public static ServerPlayerHandle getHandle(Player p) {
+        return getHandle(p, ServerPlayerHandle.T);
     }
 
     public static Object getRawHandle(org.bukkit.entity.Entity e, Template.Class<?> type) {
@@ -123,8 +123,8 @@ public class CommonNMS {
         }
     }
 
-    public static WorldServerHandle getHandle(org.bukkit.World world) {
-        return WorldServerHandle.createHandle(HandleConversion.toWorldHandle(world));
+    public static ServerLevelHandle getHandle(org.bukkit.World world) {
+        return ServerLevelHandle.createHandle(HandleConversion.toWorldHandle(world));
     }
 
     public static ItemHandle getItem(org.bukkit.Material material) {

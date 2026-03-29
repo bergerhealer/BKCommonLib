@@ -5,23 +5,23 @@ import static org.junit.Assert.*;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMountHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeamHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLivingHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetPassengersPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundAddEntityPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundAddMobPacketHandle;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.resources.BlockStateType;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTileEntityDataHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacketHandle;
 
 public class PacketTest {
 
     @Test
     public void testInitialMovementVector() {
-        PacketPlayOutSpawnEntityHandle packet = PacketPlayOutSpawnEntityHandle.createNew();
+        ClientboundAddEntityPacketHandle packet = ClientboundAddEntityPacketHandle.createNew();
         assertEquals(new org.bukkit.util.Vector(), packet.getMotVector());
         packet.setMotY(0.2);
         assertEquals(new org.bukkit.util.Vector(0.0, 0.2, 0.0), packet.getMotVector());
@@ -51,7 +51,7 @@ public class PacketTest {
         metadata.putValue("Text2", "b");
         metadata.putValue("Text3", "c");
         metadata.putValue("Text4", "d");
-        PacketPlayOutTileEntityDataHandle packet = PacketPlayOutTileEntityDataHandle.createNew(
+        ClientboundBlockEntityDataPacketHandle packet = ClientboundBlockEntityDataPacketHandle.createNew(
                 IntVector3.of(1, 2, 3), BlockStateType.SIGN, metadata.clone());
         assertEquals(IntVector3.of(1, 2, 3), packet.getPosition());
         assertEquals(BlockStateType.SIGN, packet.getType());
@@ -73,19 +73,19 @@ public class PacketTest {
 
     @Test
     public void testPacketEntityLivingCreateNew() {
-        assertNotNull(PacketPlayOutSpawnEntityLivingHandle.createNew());
+        assertNotNull(ClientboundAddMobPacketHandle.createNew());
         assertNotNull(PacketType.OUT_ENTITY_SPAWN_LIVING.newInstance());
     }
 
     @Test
     public void testPacketMountCreateNew() {
-        assertNotNull(PacketPlayOutMountHandle.createNew());
+        assertNotNull(ClientboundSetPassengersPacketHandle.createNew());
         assertNotNull(PacketType.OUT_MOUNT.newInstance());
     }
 
     @Test
     public void testPacketScoreboardTeamParameters() {
-        PacketPlayOutScoreboardTeamHandle packet = PacketPlayOutScoreboardTeamHandle.createNew();
+        ClientboundSetPlayerTeamPacketHandle packet = ClientboundSetPlayerTeamPacketHandle.createNew();
         assertNotNull(packet);
         packet.setDisplayName(ChatText.fromMessage("Dummy"));
         assertEquals(ChatText.fromMessage("Dummy"), packet.getDisplayName());
@@ -93,7 +93,7 @@ public class PacketTest {
 
     @Test
     public void testPacketScoreboardTeamVisibility() {
-        PacketPlayOutScoreboardTeamHandle packet = PacketPlayOutScoreboardTeamHandle.createNew();
+        ClientboundSetPlayerTeamPacketHandle packet = ClientboundSetPlayerTeamPacketHandle.createNew();
         assertNotNull(packet);
 
         packet.setVisibility("never");
@@ -105,7 +105,7 @@ public class PacketTest {
 
     @Test
     public void testPacketScoreboardTeamCollisionRule() {
-        PacketPlayOutScoreboardTeamHandle packet = PacketPlayOutScoreboardTeamHandle.createNew();
+        ClientboundSetPlayerTeamPacketHandle packet = ClientboundSetPlayerTeamPacketHandle.createNew();
         assertNotNull(packet);
 
         packet.setCollisionRule("pushOtherTeams");

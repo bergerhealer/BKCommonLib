@@ -1,45 +1,45 @@
 package net.minecraft.world.entity.player;
 
-import net.minecraft.core.BlockPosition;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.food.FoodMetaData;
-import net.minecraft.world.inventory.Container;
-import net.minecraft.world.inventory.InventoryEnderChest;
+import net.minecraft.world.food.FoodData;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.PlayerEnderChestContainer;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import net.minecraft.network.syncher.DataWatcherObject;
+import net.minecraft.network.syncher.EntityDataAccessor;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
-import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle;
+import com.bergerkiller.generated.net.minecraft.world.inventory.AbstractContainerMenuHandle;
 
-class EntityHuman extends net.minecraft.world.entity.EntityLiving {
-    public (Object) PlayerInventory inventoryRaw:inventory;
+class Player extends net.minecraft.world.entity.LivingEntity {
+    public (Object) net.minecraft.world.entity.player.Inventory inventoryRaw:inventory;
 
 #if version >= 1.17
-    protected (Object) InventoryEnderChest enderChestRaw:enderChestInventory;
+    protected (Object) PlayerEnderChestContainer enderChestRaw:enderChestInventory;
 #elseif version >= 1.12
-    protected (Object) InventoryEnderChest enderChestRaw:enderChest;
+    protected (Object) PlayerEnderChestContainer enderChestRaw:enderChest;
 #else
-    private (Object) InventoryEnderChest enderChestRaw:enderChest;
+    private (Object) PlayerEnderChestContainer enderChestRaw:enderChest;
 #endif
 
 #if version >= 1.17
-    public (ContainerHandle) Container activeContainer:containerMenu;
+    public (AbstractContainerMenuHandle) AbstractContainerMenu activeContainer:containerMenu;
 #else
-    public (ContainerHandle) Container activeContainer;
+    public (AbstractContainerMenuHandle) AbstractContainerMenu activeContainer;
 #endif
 
-    protected (Object) FoodMetaData foodDataRaw:foodData;
+    protected (Object) FoodData foodDataRaw:foodData;
 
     // Bed position is datawatcher value on 1.14
     // Do we actually use this field?
     //#if version >= 1.9
-    //    public (IntVector3) BlockPosition bedPosition;
+    //    public (IntVector3) BlockPos bedPosition;
     //#elseif version >= 1.8.3
-    //    public (IntVector3) BlockPosition bedPosition:bx;
+    //    public (IntVector3) BlockPos bedPosition:bx;
     //#else
-    //    public (IntVector3) BlockPosition bedPosition:bv;
+    //    public (IntVector3) BlockPos bedPosition:bv;
     //#endif
 
 #if version >= 1.17
@@ -48,7 +48,7 @@ class EntityHuman extends net.minecraft.world.entity.EntityLiving {
     public int sleepTicks;
 #endif
 
-    public (com.bergerkiller.bukkit.common.wrappers.PlayerAbilities) PlayerAbilities abilities;
+    public (com.bergerkiller.bukkit.common.wrappers.PlayerAbilities) net.minecraft.world.entity.player.Abilities abilities;
 
 #if version >= 1.17
     public int expLevel:experienceLevel;
@@ -140,40 +140,40 @@ class EntityHuman extends net.minecraft.world.entity.EntityLiving {
 #endif
 
 #if version >= 1.17
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION;
+    protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_PLAYER_MODE_CUSTOMISATION;
 
 #elseif version >= 1.16.2
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bi;
+    protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bi;
 
 #elseif version >= 1.16
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bp;
+    protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bp;
 
 #elseif version >= 1.15
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bq;
+    protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bq;
 
 #elseif version >= 1.14
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bt;
+    protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bt;
 
 #elseif version >= 1.13
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bx;
+    protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bx;
 
 #elseif version >= 1.12
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:br;
+    protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_PLAYER_MODE_CUSTOMISATION:br;
 
 #elseif version >= 1.11
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bq;
+    protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bq;
 
 #elseif version >= 1.10
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:br;
+    protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_PLAYER_MODE_CUSTOMISATION:br;
 
 #elseif version >= 1.9.4
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bq;
+    protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bq;
 
 #elseif version >= 1.9
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bp;
+    protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_PLAYER_MODE_CUSTOMISATION:bp;
 #else
     /* === MC 1.8.9: These constants do not exist == */
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PLAYER_MODE_CUSTOMISATION:###;
+    protected static optional final (DataWatcher.Key<Byte>) EntityDataAccessor<Byte> DATA_PLAYER_MODE_CUSTOMISATION:###;
 
 #endif
     <code>

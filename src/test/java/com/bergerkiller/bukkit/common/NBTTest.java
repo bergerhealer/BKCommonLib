@@ -1,6 +1,8 @@
 package com.bergerkiller.bukkit.common;
 
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.generated.net.minecraft.nbt.ListTagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle;
 import org.bukkit.block.BlockFace;
 import org.bukkit.permissions.PermissionDefault;
 import org.junit.Test;
@@ -14,8 +16,6 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTTagListHandle;
 
 public class NBTTest {
 
@@ -31,55 +31,55 @@ public class NBTTest {
         CommonTag tag;
 
         tag = CommonTag.createForData("String");
-        assertTrue(NBTBaseHandle.NBTTagStringHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
+        assertTrue(TagHandle.StringTagHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
         assertEquals("String", tag.getData());
 
         tag = CommonTag.createForData((byte) 12);
-        assertTrue(NBTBaseHandle.NBTTagByteHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
+        assertTrue(TagHandle.ByteTagHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
         assertEquals((byte) 12, tag.getData());
 
         tag = CommonTag.createForData((short) 12);
-        assertTrue(NBTBaseHandle.NBTTagShortHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
+        assertTrue(TagHandle.ShortTagHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
         assertEquals((short) 12, tag.getData());
 
         tag = CommonTag.createForData(12);
-        assertTrue(NBTBaseHandle.NBTTagIntHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
+        assertTrue(TagHandle.IntTagHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
         assertEquals(12, tag.getData());
 
         tag = CommonTag.createForData(12L);
-        assertTrue(NBTBaseHandle.NBTTagLongHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
+        assertTrue(TagHandle.LongTagHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
         assertEquals(12L, tag.getData());
 
         tag = CommonTag.createForData(12F);
-        assertTrue(NBTBaseHandle.NBTTagFloatHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
+        assertTrue(TagHandle.FloatTagHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
         assertEquals(12F, tag.getData());
 
         tag = CommonTag.createForData(12D);
-        assertTrue(NBTBaseHandle.NBTTagDoubleHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
+        assertTrue(TagHandle.DoubleTagHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
         assertEquals(12D, tag.getData());
 
         tag = CommonTag.createForData(new byte[] { 12, 13, 14 });
-        assertTrue(NBTBaseHandle.NBTTagByteArrayHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
+        assertTrue(TagHandle.ByteArrayTagHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
         assertTrue(Arrays.equals(new byte[] { 12, 13, 14 }, (byte[]) tag.getData()));
 
         tag = CommonTag.createForData(new int[] { 12, 13, 14 });
-        assertTrue(NBTBaseHandle.NBTTagIntArrayHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
+        assertTrue(TagHandle.IntArrayTagHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
         assertTrue(Arrays.equals(new int[] { 12, 13, 14 }, (int[]) tag.getData()));
 
-        if (NBTBaseHandle.NBTTagLongArrayHandle.T.isAvailable()) {
+        if (TagHandle.LongArrayTagHandle.T.isAvailable()) {
             tag = CommonTag.createForData(new long[] { 12, 13, 14 });
-            assertTrue(NBTBaseHandle.NBTTagLongArrayHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
+            assertTrue(TagHandle.LongArrayTagHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
             assertTrue(Arrays.equals(new long[] { 12, 13, 14 }, (long[]) tag.getData()));
         }
 
         // List with 3 values. Verify the second value is NBTTagInt with value 13
         tag = CommonTag.createForData(Arrays.asList(12, 13, 14));
         assertTrue(tag instanceof CommonTagList);
-        assertTrue(NBTTagListHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
+        assertTrue(ListTagHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
         CommonTagList tag_list = (CommonTagList) tag;
         assertEquals(3, tag_list.size());
         tag = tag_list.get(1);
-        assertTrue(NBTBaseHandle.NBTTagIntHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
+        assertTrue(TagHandle.IntTagHandle.class.isAssignableFrom(tag.getBackingHandle().getClass()));
         assertEquals(13, tag.getData());
     }
 

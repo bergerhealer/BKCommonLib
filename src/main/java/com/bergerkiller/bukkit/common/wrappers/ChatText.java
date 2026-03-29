@@ -5,20 +5,20 @@ import java.util.Collections;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.generated.net.minecraft.network.chat.ComponentHandle;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
-import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftChatMessageHandle;
 
 /**
  * Minecraft formatted text represented as chat components, which can be converted between legacy chat messages
  * and JSON formatted text.
  */
-public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> implements Cloneable {
+public final class ChatText extends BasicWrapper<ComponentHandle> implements Cloneable {
 
     private ChatText() {
     }
@@ -61,7 +61,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
         if (handle == null) {
             return CommonTagCompound.EMPTY;
         } else {
-            return IChatBaseComponentHandle.chatComponentToNBT(handle);
+            return ComponentHandle.chatComponentToNBT(handle);
         }
     }
 
@@ -73,7 +73,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
      * @param nbt NBT to decode
      */
     public final void setNBT(CommonTag nbt) {
-        handle = IChatBaseComponentHandle.nbtToChatComponent(nbt);
+        handle = ComponentHandle.nbtToChatComponent(nbt);
     }
 
     /**
@@ -85,7 +85,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
         if (handle == null) {
             return "{}";
         } else {
-            return IChatBaseComponentHandle.chatComponentToJson(handle);
+            return ComponentHandle.chatComponentToJson(handle);
         }
     }
 
@@ -95,7 +95,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
      * @param jsonText to set to
      */
     public final void setJson(String jsonText) {
-        handle = IChatBaseComponentHandle.jsonToChatComponent(jsonText);
+        handle = ComponentHandle.jsonToChatComponent(jsonText);
     }
 
     /**
@@ -147,12 +147,12 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
     public final void setMessage(String messageText) {
         // Optimization for empty strings
         if (messageText.isEmpty()) {
-            handle = IChatBaseComponentHandle.empty();
+            handle = ComponentHandle.empty();
             return;
         }
 
         // Use CraftBukkit util's method of parsing
-        IChatBaseComponentHandle[] parts = CraftChatMessageHandle.fromString(messageText, true);
+        ComponentHandle[] parts = CraftChatMessageHandle.fromString(messageText, true);
         handle = parts[0];
         for (int i = 1; i < parts.length; i++) {
             handle = handle.addSibling(parts[i]);
@@ -171,7 +171,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
             break;
         }
         if (!trailing_formatting_chars.isEmpty()) {
-            handle = handle.addSibling(IChatBaseComponentHandle.modifiersToComponent(trailing_formatting_chars));
+            handle = handle.addSibling(ComponentHandle.modifiersToComponent(trailing_formatting_chars));
         }
     }
 
@@ -185,7 +185,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
         return append(text.handle);
     }
 
-    private final ChatText append(IChatBaseComponentHandle handle) {
+    private final ChatText append(ComponentHandle handle) {
         this.handle = this.handle.addSibling(handle);
         return this;
     }
@@ -245,7 +245,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
      * @return this
      */
     public final ChatText appendNewLine() {
-        return append(IChatBaseComponentHandle.newLine());
+        return append(ComponentHandle.newLine());
     }
 
     /**
@@ -457,7 +457,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
             return null;
         }
         ChatText text = new ChatText();
-        text.setHandle(IChatBaseComponentHandle.createHandle(iChatBaseComponentHandle));
+        text.setHandle(ComponentHandle.createHandle(iChatBaseComponentHandle));
         return text;
     }
 
@@ -472,7 +472,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
             return null;
         }
         ChatText text = new ChatText();
-        text.setHandle(IChatBaseComponentHandle.modifiersToComponent(Collections.singleton(color)));
+        text.setHandle(ComponentHandle.modifiersToComponent(Collections.singleton(color)));
         return text;
     }
 

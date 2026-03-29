@@ -1,20 +1,20 @@
 package com.bergerkiller.bukkit.common.bases;
 
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.NibbleArrayHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.DataLayerHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNibbleArray;
 
 /**
  * Base class to work with Nibble Array implementations
  */
 public class NibbleArrayBase {
-    private final NibbleArrayHandle arr;
+    private final DataLayerHandle arr;
 
     public NibbleArrayBase(byte[] data) {
-        this.arr = NibbleArrayHandle.createNew(data);
+        this.arr = DataLayerHandle.createNew(data);
     }
 
     public NibbleArrayBase() {
-        this.arr = NibbleArrayHandle.createNew();
+        this.arr = DataLayerHandle.createNew();
     }
 
     /**
@@ -68,6 +68,6 @@ public class NibbleArrayBase {
      * @return handle
      */
     public Object toHandle() {
-        return NibbleArrayHandle.T.constr_data.raw.newInstance(this.getData());
+        return DataLayerHandle.T.constr_data.raw.newInstance(this.getData());
     }
 }

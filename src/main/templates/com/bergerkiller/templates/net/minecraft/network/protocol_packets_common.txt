@@ -3,20 +3,20 @@ package net.minecraft.network.protocol.common;
 import io.netty.buffer.Unpooled;
 
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.chat.IChatBaseComponent;
-import net.minecraft.network.PacketDataSerializer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.common.custom.BukkitCustomPayload;
 import net.minecraft.network.protocol.common.custom.DiscardedPayload;
 import net.minecraft.server.level.ClientInformation;
-import net.minecraft.world.entity.player.EnumChatVisibility;
+import net.minecraft.world.entity.player.ChatVisiblity;
 
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 
 import com.bergerkiller.generated.net.minecraft.network.protocol.common.ClientboundKeepAlivePacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.common.ClientboundCustomPayloadPacketHandle;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.ResourceLocationHandle;
 
 class ServerboundKeepAlivePacket extends Packet {
 #if version >= 1.12.2
@@ -75,14 +75,12 @@ class ClientboundKeepAlivePacket extends Packet {
 }
 
 class ServerboundResourcePackPacket extends Packet {
-    private optional String message:a;
-
 #if version >= 1.17
-    public (Object) ServerboundResourcePackPacket.EnumResourcePackStatus status:action;
+    public (Object) ServerboundResourcePackPacket.Action status:action;
 #elseif version >= 1.9
-    public (Object) ServerboundResourcePackPacket.EnumResourcePackStatus status;
+    public (Object) ServerboundResourcePackPacket.Action status;
 #else
-    public (Object) ServerboundResourcePackPacket.EnumResourcePackStatus status:b;
+    public (Object) ServerboundResourcePackPacket.Action status:b;
 #endif
 }
 
@@ -99,7 +97,7 @@ class ClientboundResourcePackPushPacket extends Packet {
 
 #if version >= 1.20.5
     #require net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket private final boolean required;
-    #require net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket private final java.util.Optional<IChatBaseComponent> prompt;
+    #require net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket private final java.util.Optional<Component> prompt;
 
     public void setRequired(boolean required) {
         instance#required = required;
@@ -109,18 +107,18 @@ class ClientboundResourcePackPushPacket extends Packet {
         return instance#required;
     }
 
-    public void setPrompt((ChatText) IChatBaseComponent prompt) {
+    public void setPrompt((ChatText) Component prompt) {
         java.util.Optional opt = java.util.Optional.ofNullable(prompt);
         instance#prompt = opt;
     }
 
-    public (ChatText) IChatBaseComponent getPrompt() {
+    public (ChatText) Component getPrompt() {
         java.util.Optional opt = instance#prompt;
-        return (IChatBaseComponent) opt.orElse(null);
+        return (Component) opt.orElse(null);
     }
 #elseif version >= 1.17
     #require net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket private final boolean required;
-    #require net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket private final IChatBaseComponent prompt;
+    #require net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket private final Component prompt;
 
     public void setRequired(boolean required) {
         instance#required = required;
@@ -130,11 +128,11 @@ class ClientboundResourcePackPushPacket extends Packet {
         return instance#required;
     }
 
-    public void setPrompt((ChatText) IChatBaseComponent prompt) {
+    public void setPrompt((ChatText) Component prompt) {
         instance#prompt = prompt;
     }
 
-    public (ChatText) IChatBaseComponent getPrompt() {
+    public (ChatText) Component getPrompt() {
         return instance#prompt;
     }
 #else
@@ -145,10 +143,10 @@ class ClientboundResourcePackPushPacket extends Packet {
         return false;
     }
 
-    public void setPrompt((ChatText) IChatBaseComponent prompt) {
+    public void setPrompt((ChatText) Component prompt) {
     }
 
-    public (ChatText) IChatBaseComponent getPrompt() {
+    public (ChatText) Component getPrompt() {
         return null;
     }
 #endif
@@ -173,22 +171,22 @@ class ClientboundCustomPayloadPacket extends Packet {
 #if version >= 1.20.5
         CustomPacketPayload payload = instance.payload();
         if (payload instanceof DiscardedPayload) {
-            net.minecraft.resources.MinecraftKey channel = ((DiscardedPayload) payload).id();
+            net.minecraft.resources.ResourceLocation channel = ((DiscardedPayload) payload).id();
             return (channel == null) ? null : channel.toString();
         }
         return null;
 #elseif version >= 1.20.2
-        net.minecraft.resources.MinecraftKey channel = instance.payload().id();
+        net.minecraft.resources.ResourceLocation channel = instance.payload().id();
         return (channel == null) ? null : channel.toString();
 #elseif version >= 1.13
     #select version >=
-    #case 1.17:    #require ClientboundCustomPayloadPacket private final net.minecraft.resources.MinecraftKey channel:identifier;
-    #case 1.15:    #require ClientboundCustomPayloadPacket private net.minecraft.resources.MinecraftKey channel:r;
-    #case 1.14.1:  #require ClientboundCustomPayloadPacket private net.minecraft.resources.MinecraftKey channel:n;
-    #case 1.14:    #require ClientboundCustomPayloadPacket private net.minecraft.resources.MinecraftKey channel:m;
-    #case else:    #require ClientboundCustomPayloadPacket private net.minecraft.resources.MinecraftKey channel:i;
+    #case 1.17:    #require ClientboundCustomPayloadPacket private final net.minecraft.resources.ResourceLocation channel:identifier;
+    #case 1.15:    #require ClientboundCustomPayloadPacket private net.minecraft.resources.ResourceLocation channel:r;
+    #case 1.14.1:  #require ClientboundCustomPayloadPacket private net.minecraft.resources.ResourceLocation channel:n;
+    #case 1.14:    #require ClientboundCustomPayloadPacket private net.minecraft.resources.ResourceLocation channel:m;
+    #case else:    #require ClientboundCustomPayloadPacket private net.minecraft.resources.ResourceLocation channel:i;
     #endselect
-        net.minecraft.resources.MinecraftKey channel = instance#channel;
+        net.minecraft.resources.ResourceLocation channel = instance#channel;
         return (channel == null) ? null : channel.toString();
 #else
         #require ClientboundCustomPayloadPacket private String channel:a;
@@ -229,20 +227,20 @@ class ClientboundCustomPayloadPacket extends Packet {
         } else {
             // Use serializer with a byte buffer
             io.netty.buffer.ByteBuf buf = Unpooled.buffer();
-            PacketDataSerializer serializer = new PacketDataSerializer(buf);
+            FriendlyByteBuf serializer = new FriendlyByteBuf(buf);
             payload.write(serializer);
             return java.util.Arrays.copyOf(buf.array(), buf.writerIndex());
         }
 #else
     #select version >=
-    #case 1.17:    #require ClientboundCustomPayloadPacket private final PacketDataSerializer payload_data:data;
-    #case 1.15:    #require ClientboundCustomPayloadPacket private PacketDataSerializer payload_data:s;
-    #case 1.14.1:  #require ClientboundCustomPayloadPacket private PacketDataSerializer payload_data:o;
-    #case 1.14:    #require ClientboundCustomPayloadPacket private PacketDataSerializer payload_data:n;
-    #case 1.13:    #require ClientboundCustomPayloadPacket private PacketDataSerializer payload_data:j;
-    #case else:    #require ClientboundCustomPayloadPacket private PacketDataSerializer payload_data:b;
+    #case 1.17:    #require ClientboundCustomPayloadPacket private final FriendlyByteBuf payload_data:data;
+    #case 1.15:    #require ClientboundCustomPayloadPacket private FriendlyByteBuf payload_data:s;
+    #case 1.14.1:  #require ClientboundCustomPayloadPacket private FriendlyByteBuf payload_data:o;
+    #case 1.14:    #require ClientboundCustomPayloadPacket private FriendlyByteBuf payload_data:n;
+    #case 1.13:    #require ClientboundCustomPayloadPacket private FriendlyByteBuf payload_data:j;
+    #case else:    #require ClientboundCustomPayloadPacket private FriendlyByteBuf payload_data:b;
     #endselect
-        PacketDataSerializer payload = instance#payload_data;
+        FriendlyByteBuf payload = instance#payload_data;
         return payload.array();
 #endif
     }
@@ -250,24 +248,24 @@ class ClientboundCustomPayloadPacket extends Packet {
     // Constructor
     public static (ClientboundCustomPayloadPacketHandle) ClientboundCustomPayloadPacket createNew(String channel, byte[] message) {
 #if version >= 1.20.2
-        net.minecraft.resources.MinecraftKey key;
-        key = (net.minecraft.resources.MinecraftKey) MinecraftKeyHandle.createNew(channel).getRaw();
+        net.minecraft.resources.ResourceLocation key;
+        key = (net.minecraft.resources.ResourceLocation) ResourceLocationHandle.createNew(channel).getRaw();
 
   #if version >= 1.20.5
-    #if exists net.minecraft.network.protocol.common.custom.DiscardedPayload public DiscardedPayload(net.minecraft.resources.MinecraftKey id, byte[] data);
+    #if exists net.minecraft.network.protocol.common.custom.DiscardedPayload public DiscardedPayload(net.minecraft.resources.ResourceLocation id, byte[] data);
         CustomPacketPayload payload = new DiscardedPayload(key, message);
     #else
         CustomPacketPayload payload = new DiscardedPayload(key, Unpooled.wrappedBuffer(message));
     #endif
-  #elseif exists net.minecraft.network.protocol.common.custom.BukkitCustomPayload BukkitCustomPayload(org.bukkit.craftbukkit.entity.CraftPlayer p, byte[] message, net.minecraft.resources.MinecraftKey channel);
+  #elseif exists net.minecraft.network.protocol.common.custom.BukkitCustomPayload BukkitCustomPayload(org.bukkit.craftbukkit.entity.CraftPlayer p, byte[] message, net.minecraft.resources.ResourceLocation channel);
         // Warning: this type is fake and is remapped in CommonBootstrap to an anonymous class in CraftPlayer!
         // If the server was built with a newer JDK the CraftPlayer argument may have been dropped as well - future-proof it!
-        #require BukkitCustomPayload BukkitCustomPayload createCustom:<init>(org.bukkit.craftbukkit.entity.CraftPlayer p, byte[] message, net.minecraft.resources.MinecraftKey channel);
+        #require BukkitCustomPayload BukkitCustomPayload createCustom:<init>(org.bukkit.craftbukkit.entity.CraftPlayer p, byte[] message, net.minecraft.resources.ResourceLocation channel);
         CustomPacketPayload payload = BukkitCustomPayload#createCustom(null, message, key);
-  #elseif exists net.minecraft.network.protocol.common.custom.BukkitCustomPayload BukkitCustomPayload(byte[] message, net.minecraft.resources.MinecraftKey channel);
+  #elseif exists net.minecraft.network.protocol.common.custom.BukkitCustomPayload BukkitCustomPayload(byte[] message, net.minecraft.resources.ResourceLocation channel);
         // Warning: this type is fake and is remapped in CommonBootstrap to an anonymous class in CraftPlayer!
         // If the server was built with a newer JDK the CraftPlayer argument may have been dropped as well - future-proof it!
-        #require BukkitCustomPayload BukkitCustomPayload createCustom:<init>(byte[] message, net.minecraft.resources.MinecraftKey channel);
+        #require BukkitCustomPayload BukkitCustomPayload createCustom:<init>(byte[] message, net.minecraft.resources.ResourceLocation channel);
         CustomPacketPayload payload = BukkitCustomPayload#createCustom(message, key);
   #else
         #error Missing BukkitCustomPayload constructor we can use!
@@ -275,11 +273,11 @@ class ClientboundCustomPayloadPacket extends Packet {
 
         return new ClientboundCustomPayloadPacket(payload);
 #else
-        PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.wrappedBuffer(message));
+        FriendlyByteBuf serializer = new FriendlyByteBuf(Unpooled.wrappedBuffer(message));
 
   #if version >= 1.13
-        net.minecraft.resources.MinecraftKey key;
-        key = (net.minecraft.resources.MinecraftKey) MinecraftKeyHandle.createNew(channel).getRaw();
+        net.minecraft.resources.ResourceLocation key;
+        key = (net.minecraft.resources.ResourceLocation) ResourceLocationHandle.createNew(channel).getRaw();
         return new ClientboundCustomPayloadPacket(key, serializer);
   #else
         return new ClientboundCustomPayloadPacket(channel, serializer);
@@ -297,9 +295,9 @@ class ClientboundCustomPayloadPacket extends Packet {
 
 class ClientboundDisconnectPacket extends Packet {
 #if version >= 1.17
-  private (ChatText) IChatBaseComponent reason;
+  private (ChatText) Component reason;
 #else
-  private (ChatText) IChatBaseComponent reason:a;
+  private (ChatText) Component reason:a;
 #endif
 }
 
@@ -307,7 +305,7 @@ class ServerboundClientInformationPacket extends Packet {
 #if version >= 1.20.2
     public String getLocale() { return instance.information().language(); }
     public int getView() { return instance.information().viewDistance(); }
-    public (Object) EnumChatVisibility getChatVisibility() { return instance.information().chatVisibility(); }
+    public (Object) ChatVisiblity getChatVisibility() { return instance.information().chatVisibility(); }
     public boolean getEnableColors() { return instance.information().chatColors(); }
     public int getModelPartFlags() { return instance.information().modelCustomisation(); }
 #else
@@ -322,9 +320,9 @@ class ServerboundClientInformationPacket extends Packet {
 
   #if version >= 1.17
     #require ServerboundClientInformationPacket private readonly int view:viewDistance;
-  #elseif fieldexists net.minecraft.network.protocol.game.PacketPlayInSettings public int viewDistance
+  #elseif fieldexists net.minecraft.network.protocol.game.ServerboundClientInformationPacket public int viewDistance
     #require ServerboundClientInformationPacket public readonly int view:viewDistance;
-  #elseif fieldexists net.minecraft.network.protocol.game.PacketPlayInSettings private int viewDistance
+  #elseif fieldexists net.minecraft.network.protocol.game.ServerboundClientInformationPacket private int viewDistance
     #require ServerboundClientInformationPacket private readonly int view:viewDistance;
   #else
     #require ServerboundClientInformationPacket private readonly int view:b;
@@ -332,15 +330,15 @@ class ServerboundClientInformationPacket extends Packet {
     public int getView() { return instance#view; }
 
   #if version >= 1.17
-    #require ServerboundClientInformationPacket private readonly EnumChatVisibility chatVisibility;
+    #require ServerboundClientInformationPacket private readonly ChatVisiblity chatVisibility;
     #require ServerboundClientInformationPacket private readonly boolean enableColors:chatColors;
     #require ServerboundClientInformationPacket private readonly int modelPartFlags:modelCustomisation;
   #else
-    #require ServerboundClientInformationPacket private readonly EnumChatVisibility chatVisibility:c;
+    #require ServerboundClientInformationPacket private readonly ChatVisiblity chatVisibility:c;
     #require ServerboundClientInformationPacket private readonly boolean enableColors:d;
     #require ServerboundClientInformationPacket private readonly int modelPartFlags:e;
   #endif
-    public (Object) EnumChatVisibility getChatVisibility() { return instance#chatVisibility; }
+    public (Object) ChatVisiblity getChatVisibility() { return instance#chatVisibility; }
     public boolean getEnableColors() { return instance#enableColors; }
     public int getModelPartFlags() { return instance#modelPartFlags; }
 
@@ -348,11 +346,11 @@ class ServerboundClientInformationPacket extends Packet {
 #endif
 
 #if version >= 1.9
-    public (HumanHand) net.minecraft.world.entity.EnumMainHand getMainHand() {
+    public (HumanHand) net.minecraft.world.entity.HumanoidArm getMainHand() {
   #if version >= 1.17
-        #require ServerboundClientInformationPacket private net.minecraft.world.entity.EnumMainHand mainHand;
+        #require ServerboundClientInformationPacket private net.minecraft.world.entity.HumanoidArm mainHand;
   #else
-        #require ServerboundClientInformationPacket private net.minecraft.world.entity.EnumMainHand mainHand:f;
+        #require ServerboundClientInformationPacket private net.minecraft.world.entity.HumanoidArm mainHand:f;
   #endif
   #if version >= 1.20.2
         return instance.information().mainHand();

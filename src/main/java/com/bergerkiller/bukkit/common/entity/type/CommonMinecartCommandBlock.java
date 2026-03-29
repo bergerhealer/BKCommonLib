@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.EntityMinecartCommandBlockHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.MinecartCommandBlockHandle;
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.CommandMinecart;
 import org.bukkit.inventory.ItemStack;
@@ -21,8 +21,8 @@ public class CommonMinecartCommandBlock extends CommonMinecart<CommandMinecart> 
     private static final Material _COMMAND_BLOCK_TYPE = CommonCapabilities.MATERIAL_ENUM_CHANGES ?
             Material.getMaterial("COMMAND_BLOCK") : Material.getMaterial("COMMAND");
 
-    public final DataWatcher.EntityItem<String> metaCommand = getDataItem(EntityMinecartCommandBlockHandle.DATA_COMMAND);
-    public final DataWatcher.EntityItem<ChatText> metaPreviousOutput = getDataItem(EntityMinecartCommandBlockHandle.DATA_PREVIOUS_OUTPUT);
+    public final DataWatcher.EntityItem<String> metaCommand = getDataItem(MinecartCommandBlockHandle.DATA_COMMAND);
+    public final DataWatcher.EntityItem<ChatText> metaPreviousOutput = getDataItem(MinecartCommandBlockHandle.DATA_PREVIOUS_OUTPUT);
 
     public CommonMinecartCommandBlock(CommandMinecart base) {
         super(base);

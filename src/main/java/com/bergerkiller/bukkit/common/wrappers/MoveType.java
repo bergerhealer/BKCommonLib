@@ -1,18 +1,18 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import com.bergerkiller.generated.net.minecraft.world.entity.EnumMoveTypeHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.MoverTypeHandle;
 
 public enum MoveType {
-    PISTON(EnumMoveTypeHandle.PISTON),
-    PLAYER(EnumMoveTypeHandle.PLAYER),
-    SELF(EnumMoveTypeHandle.SELF),
-    SHULKER(EnumMoveTypeHandle.SHULKER),
-    SHULKER_BOX(EnumMoveTypeHandle.SHULKER_BOX);
+    PISTON(MoverTypeHandle.PISTON),
+    PLAYER(MoverTypeHandle.PLAYER),
+    SELF(MoverTypeHandle.SELF),
+    SHULKER(MoverTypeHandle.SHULKER),
+    SHULKER_BOX(MoverTypeHandle.SHULKER_BOX);
 
     private final Object handle;
 
-    private MoveType(EnumMoveTypeHandle handle) {
-        if (EnumMoveTypeHandle.T.isValid()) {
+    private MoveType(MoverTypeHandle handle) {
+        if (MoverTypeHandle.T.isValid()) {
             this.handle = handle.getRaw();
         } else {
             this.handle = new Object(); // dummy

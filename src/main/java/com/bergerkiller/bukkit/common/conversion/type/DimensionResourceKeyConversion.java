@@ -14,9 +14,9 @@ import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.dimension.DimensionManagerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.dimension.DimensionTypeHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
@@ -67,7 +67,7 @@ public class DimensionResourceKeyConversion {
 
     @ConverterMethod(input="net.minecraft.resources.ResourceKey<net.minecraft.world.level.dimension.DimensionManager>")
     public static DimensionType toDimensionType(Object resourceKeyHandle) {
-        Object registry = DimensionManagerHandle.getDimensionTypeRegistry();
+        Object registry = DimensionTypeHandle.getDimensionTypeRegistry();
         Object dimensionManagerHandle = registryGetByKeyMethod.invoke(registry, resourceKeyHandle);
         if (dimensionManagerHandle == null) {
             // Try cache
@@ -86,7 +86,7 @@ public class DimensionResourceKeyConversion {
     @ConverterMethod(output="net.minecraft.resources.ResourceKey<net.minecraft.world.level.dimension.DimensionManager>")
     public static Object toResourceKey(DimensionType dimensionType) {
         Object dimensionManagerHandle = dimensionType.getDimensionManagerHandle();
-        Object registry = DimensionManagerHandle.getDimensionTypeRegistry();
+        Object registry = DimensionTypeHandle.getDimensionTypeRegistry();
         java.util.Optional<?> resourceKeyHandle = registryGetByValueMethod.invoke(registry, dimensionManagerHandle);
         if (resourceKeyHandle != null && resourceKeyHandle.isPresent()) {
             return resourceKeyHandle.get();
@@ -116,24 +116,24 @@ public class DimensionResourceKeyConversion {
             this.listener = new Listener() {
                 @EventHandler(priority = EventPriority.MONITOR)
                 protected void onWorldInit(final WorldInitEvent event) {
-                    registerDimensionManager(WorldServerHandle.fromBukkit(event.getWorld()));
+                    registerDimensionManager(ServerLevelHandle.fromBukkit(event.getWorld()));
                 }
 
                 @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
                 protected void onWorldUnload(WorldUnloadEvent event) {
-                    deregisterDimensionManager(WorldServerHandle.fromBukkit(event.getWorld()));
+                    deregisterDimensionManager(ServerLevelHandle.fromBukkit(event.getWorld()));
                 }
             };
         }
 
         @Override
         public void enable() throws Throwable {
-            getWorldTypeKeyMethod.init(Resolver.resolveAndGetDeclaredMethod(WorldHandle.T.getType(), "getTypeKey"));
+            getWorldTypeKeyMethod.init(Resolver.resolveAndGetDeclaredMethod(LevelHandle.T.getType(), "getTypeKey"));
             getWorldTypeKeyMethod.forceInitialization();
 
             // Now all is well, register the initial values and go
             for (World world : Bukkit.getWorlds()) {
-                registerDimensionManager(WorldServerHandle.fromBukkit(world));
+                registerDimensionManager(ServerLevelHandle.fromBukkit(world));
             }
             Bukkit.getPluginManager().registerEvents(this.listener, this.plugin);
 
@@ -155,7 +155,7 @@ public class DimensionResourceKeyConversion {
             return RESOURCE_KEY_BY_DIMENSION_MANAGER.get(dimensionManager);
         }
 
-        private void registerDimensionManager(WorldServerHandle world) {
+        private void registerDimensionManager(ServerLevelHandle world) {
             Object dimensionManager = world.getDimensionType().getDimensionManagerHandle();
             Object rawResourceKey = getWorldTypeKeyMethod.invoke(world.getRaw());
             ResourceKey<?> resourceKey = ResourceKey.fromResourceKeyHandle(rawResourceKey);
@@ -165,7 +165,7 @@ public class DimensionResourceKeyConversion {
             }
         }
 
-        private void deregisterDimensionManager(WorldServerHandle world) {
+        private void deregisterDimensionManager(ServerLevelHandle world) {
             Object dimensionManager = world.getDimensionType().getDimensionManagerHandle();
 
             synchronized (this) {

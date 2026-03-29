@@ -1,6 +1,8 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -11,8 +13,6 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.resources.ResourceCategory;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
 
 /**
  * All the information of a bed (re)spawn point,
@@ -60,7 +60,7 @@ public abstract class PlayerRespawnPoint {
 
         @Override
         public void applyToPlayer(Player player) {
-            EntityPlayerHandle.fromBukkit(player).setRespawnConfigSilent(null);
+            ServerPlayerHandle.fromBukkit(player).setRespawnConfigSilent(null);
         }
 
         @Override
@@ -298,7 +298,7 @@ public abstract class PlayerRespawnPoint {
 
         // Read the new packed format as of 1.21.5
         if (CommonCapabilities.PLAYER_SPAWN_WORLD_IS_DIMENSION_KEY) {
-            EntityPlayerHandle.RespawnConfigHandle respawnConfig = EntityPlayerHandle.RespawnConfigHandle.codecFromNBT(nbt);
+            ServerPlayerHandle.RespawnConfigHandle respawnConfig = ServerPlayerHandle.RespawnConfigHandle.codecFromNBT(nbt);
             if (respawnConfig != null) {
                 return new PlayerRespawnPointNearBlock(respawnConfig);
             }
@@ -306,7 +306,7 @@ public abstract class PlayerRespawnPoint {
 
         // Read the SpawnDimension in the new format
         if (CommonCapabilities.PLAYER_SPAWN_WORLD_IS_DIMENSION_KEY) {
-            MinecraftKeyHandle spawnDimensionName = nbt.getMinecraftKey("SpawnDimension");
+            IdentifierHandle spawnDimensionName = nbt.getMinecraftKey("SpawnDimension");
             if (spawnDimensionName != null) {
                 world = WorldUtil.getWorldByDimensionKey(ResourceCategory.dimension.createKey(spawnDimensionName));
             }
@@ -341,8 +341,8 @@ public abstract class PlayerRespawnPoint {
      * @return respawn point set for the player
      */
     public static PlayerRespawnPoint forPlayer(Player player) {
-        EntityPlayerHandle handle = EntityPlayerHandle.fromBukkit(player);
-        EntityPlayerHandle.RespawnConfigHandle respawnConfig = handle.getRespawnConfig();
+        ServerPlayerHandle handle = ServerPlayerHandle.fromBukkit(player);
+        ServerPlayerHandle.RespawnConfigHandle respawnConfig = handle.getRespawnConfig();
         if (respawnConfig != null) {
             return new PlayerRespawnPointNearBlock(respawnConfig);
         }

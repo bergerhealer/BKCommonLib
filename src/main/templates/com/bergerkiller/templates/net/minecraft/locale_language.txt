@@ -1,14 +1,14 @@
 package net.minecraft.locale;
 
-import com.bergerkiller.generated.net.minecraft.locale.LocaleLanguageHandle;
+import com.bergerkiller.generated.net.minecraft.locale.LanguageHandle;
 
-class LocaleLanguage {
+class Language {
 #if version >= 1.17
-    private static volatile (LocaleLanguageHandle) LocaleLanguage INSTANCE:instance;
+    private static volatile (LanguageHandle) Language INSTANCE:instance;
 #elseif version >= 1.16
-    private static volatile (LocaleLanguageHandle) LocaleLanguage INSTANCE:d;
+    private static volatile (LanguageHandle) Language INSTANCE:d;
 #else
-    private static final (LocaleLanguageHandle) LocaleLanguage INSTANCE:c;
+    private static final (LanguageHandle) Language INSTANCE:c;
 #endif
 
 #if version >= 1.18

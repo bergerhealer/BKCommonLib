@@ -31,7 +31,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityItemFrameHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.decoration.ItemFrameHandle;
 
 /**
  * Maintains metadata information for a single item frame
@@ -39,7 +39,7 @@ import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityIt
 public class ItemFrameInfo {
     private final CommonMapController controller;
     public final ItemFrame itemFrame;
-    public final EntityItemFrameHandle itemFrameHandle;
+    public final ItemFrameHandle itemFrameHandle;
     public final DataWatcher.Item<?> itemFrame_dw_item;
     public final IntVector3 coordinates;
     private final List<Player> viewersAdded; // Avoids concurrent modification problems firing events
@@ -66,11 +66,11 @@ public class ItemFrameInfo {
     // Tracker object for updating this item frame
     public final UpdateEntry updateEntry = new UpdateEntry(this);
 
-    public ItemFrameInfo(CommonMapController controller, EntityItemFrameHandle itemFrame) {
+    public ItemFrameInfo(CommonMapController controller, ItemFrameHandle itemFrame) {
         this.controller = controller;
         this.itemFrame = (ItemFrame) itemFrame.getBukkitEntity();
         this.itemFrameHandle = itemFrame;
-        this.itemFrame_dw_item = this.itemFrameHandle.getDataWatcher().getItem(EntityItemFrameHandle.DATA_ITEM);
+        this.itemFrame_dw_item = this.itemFrameHandle.getDataWatcher().getItem(ItemFrameHandle.DATA_ITEM);
         this.coordinates = this.itemFrameHandle.getBlockPosition();
         this.viewersAdded = new ArrayList<>();
         this.viewers = SortedIdentityCache.createLinked(raw_viewer -> {

@@ -1,7 +1,7 @@
 package com.bergerkiller.generated.org.bukkit;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 import org.bukkit.Location;
 
 /**
@@ -22,7 +22,7 @@ public abstract class WorldHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract boolean hasFeatureFlag(String featureFlagName);
-    public abstract void playSound(Location loc, MinecraftKeyHandle sound, float volume, float pitch);
+    public abstract void playSound(Location loc, IdentifierHandle sound, float volume, float pitch);
     public abstract int getMinHeight();
     public abstract void setClearWeatherDuration(int duration);
     /**

@@ -1,8 +1,8 @@
 package net.minecraft.core;
 
-import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.core.BlockPosHandle;
 
-class BaseBlockPosition {
+class Vec3i {
     public int getX();
     public int getY();
     public int getZ();
@@ -19,25 +19,25 @@ class BaseBlockPosition {
     }
 }
 
-class BlockPosition extends BaseBlockPosition {
+class BlockPos extends Vec3i {
 
-    public (BlockPositionHandle) BlockPosition(int x, int y, int z);
+    public (BlockPosHandle) BlockPos(int x, int y, int z);
 
     <code>
-    public static BlockPositionHandle fromIntVector3(com.bergerkiller.bukkit.common.bases.IntVector3 vector) {
+    public static BlockPosHandle fromIntVector3(com.bergerkiller.bukkit.common.bases.IntVector3 vector) {
         return createHandle(fromIntVector3Raw(vector));
     }
 
-    public static BlockPositionHandle fromBukkitBlock(org.bukkit.block.Block block) {
+    public static BlockPosHandle fromBukkitBlock(org.bukkit.block.Block block) {
         return createHandle(fromBukkitBlock(block));
     }
     </code>
 
     public static Object fromIntVector3Raw(com.bergerkiller.bukkit.common.bases.IntVector3 vector) {
-        return new BlockPosition(vector.x, vector.y, vector.z);
+        return new BlockPos(vector.x, vector.y, vector.z);
     }
 
     public static Object fromBukkitBlockRaw(org.bukkit.block.Block block) {
-        return new BlockPosition(block.getX(), block.getY(), block.getZ());
+        return new BlockPos(block.getX(), block.getY(), block.getZ());
     }
 }

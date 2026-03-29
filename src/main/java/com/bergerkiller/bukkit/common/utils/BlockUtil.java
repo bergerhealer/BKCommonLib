@@ -3,6 +3,9 @@ package com.bergerkiller.bukkit.common.utils;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import com.bergerkiller.generated.net.minecraft.core.BlockPosHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.LevelChunkHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
 import com.bergerkiller.generated.org.bukkit.block.SignHandle;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,12 +26,9 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.entity.BlockEntityHandle;
 import com.bergerkiller.generated.org.bukkit.event.block.BlockCanBuildEventHandle;
 
 /**
@@ -46,7 +46,7 @@ public class BlockUtil extends MaterialUtil {
      * @param block Block
      * @return bounding box, relative to block coordinates. Can be null!
      */
-    public static AxisAlignedBBHandle getBoundingBox(Block block) {
+    public static AABBHandle getBoundingBox(Block block) {
         return WorldUtil.getBlockData(block).getBoundingBox(block);
     }
 
@@ -56,7 +56,7 @@ public class BlockUtil extends MaterialUtil {
      * @param block Block
      * @return interactable bounding box, relative to block coordinates. Can be null (air)!
      */
-    public static AxisAlignedBBHandle getInteractableBox(Block block) {
+    public static AABBHandle getInteractableBox(Block block) {
         return WorldUtil.getBlockData(block).getInteractableBox(block);
     }
 
@@ -421,7 +421,7 @@ public class BlockUtil extends MaterialUtil {
      * @param updateSelf whether the block itself is updated. With false, only surrounding blocks are notified.
      */
     public static void applyPhysics(org.bukkit.block.Block block, Material callerType, boolean updateSelf) {
-        WorldServerHandle.fromBukkit(block.getWorld()).applyBlockPhysics(new IntVector3(block), BlockData.fromMaterial(callerType), updateSelf);
+        ServerLevelHandle.fromBukkit(block.getWorld()).applyBlockPhysics(new IntVector3(block), BlockData.fromMaterial(callerType), updateSelf);
     }
 
     /**
@@ -435,7 +435,7 @@ public class BlockUtil extends MaterialUtil {
     public static CommonPacket getUpdatePacket(BlockState blockState) {
         if (blockState == null) return null;
         Object tileEntity = HandleConversion.toTileEntityHandle(blockState);
-        return (tileEntity == null) ? null : TileEntityHandle.T.getUpdatePacket.invoke(tileEntity);
+        return (tileEntity == null) ? null : BlockEntityHandle.T.getUpdatePacket.invoke(tileEntity);
     }
 
     /**
@@ -524,8 +524,8 @@ public class BlockUtil extends MaterialUtil {
         try {
             if (radiusX == 0 && radiusY == 0 && radiusZ == 0) {
                 // find a single BlockState at this position
-                Object blockPosition = BlockPositionHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
-                Object tile = WorldHandle.T.getTileEntity.raw.invoke(HandleConversion.toWorldHandle(world), blockPosition);
+                Object blockPosition = BlockPosHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
+                Object tile = LevelHandle.T.getTileEntity.raw.invoke(HandleConversion.toWorldHandle(world), blockPosition);
                 if (tile != null) {
                     blockStateBuff.add(WrapperConversion.toBlockState(tile));
                 }
@@ -553,10 +553,10 @@ public class BlockUtil extends MaterialUtil {
 
                         // Check tile entities held inside
                         ChunkBlockStateConverter converter = null;
-                        Collection<?> rawTiles = ChunkHandle.T.getRawTileEntities.invoke(HandleConversion.toChunkHandle(chunk));
+                        Collection<?> rawTiles = LevelChunkHandle.T.getRawTileEntities.invoke(HandleConversion.toChunkHandle(chunk));
                         for (Object tile : rawTiles) {
-                            BlockPositionHandle blockPosition;
-                            blockPosition = BlockPositionHandle.createHandle(TileEntityHandle.T.position_field.raw.get(tile));
+                            BlockPosHandle blockPosition;
+                            blockPosition = BlockPosHandle.createHandle(BlockEntityHandle.T.position_field.raw.get(tile));
                             if (blockPosition.isPositionInBox(xMin, yMin, zMin, xMax, yMax, zMax)) {
                                 if (converter == null) {
                                     converter = new ChunkBlockStateConverter(chunk);

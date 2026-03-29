@@ -1,53 +1,53 @@
 package net.minecraft.server.level;
 
-import net.minecraft.core.BlockPosition;
-import net.minecraft.world.level.chunk.Chunk;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
-import net.minecraft.world.level.chunk.storage.IChunkLoader;
-import net.minecraft.world.level.ChunkCoordIntPair;
+import net.minecraft.world.level.chunk.storage.ChunkStorage;
+import net.minecraft.world.level.ChunkPos;
 
-import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.core.BlockPosHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.LevelChunkHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 
-class ChunkProviderServer {
+class ServerChunkCache {
     // Gone since MC 1.14
-    // private final (Object) IChunkLoader chunkLoader;
+    // private final (Object) ChunkStorage chunkLoader;
 
 #if version >= 1.17
-    public final (WorldServerHandle) WorldServer world:level;
+    public final (ServerLevelHandle) ServerLevel world:level;
 #else
-    public final (WorldServerHandle) WorldServer world;
+    public final (ServerLevelHandle) ServerLevel world;
 #endif
 
 #if version >= 1.18
-    public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
-        return (Chunk) instance.getChunk(cx, cz, ChunkStatus.FULL, true);
+    public (LevelChunkHandle) LevelChunk getChunkAt(int cx, int cz) {
+        return (LevelChunk) instance.getChunk(cx, cz, ChunkStatus.FULL, true);
     }
 #elseif version >= 1.14
-    public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
-        return (Chunk) instance.getChunkAt(cx, cz, ChunkStatus.FULL, true);
+    public (LevelChunkHandle) LevelChunk getChunkAt(int cx, int cz) {
+        return (LevelChunk) instance.getChunkAt(cx, cz, ChunkStatus.FULL, true);
     }
 #elseif version >= 1.13.1
-    public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
+    public (LevelChunkHandle) LevelChunk getChunkAt(int cx, int cz) {
         return instance.getChunkAt(cx, cz, true, true);
     }
-#elseif forge && !exists net.minecraft.server.level.ChunkProviderServer public net.minecraft.world.level.chunk.Chunk getChunkAt(int cx, int cz);
-    public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
+#elseif forge && !exists net.minecraft.server.level.ServerChunkCache public net.minecraft.world.level.chunk.LevelChunk getChunkAt(int cx, int cz);
+    public (LevelChunkHandle) LevelChunk getChunkAt(int cx, int cz) {
         return instance.getChunkAt(cx, cz, (Runnable) null);
     }
 #else
-    public (ChunkHandle) Chunk getChunkAt(int cx, int cz);
+    public (LevelChunkHandle) LevelChunk getChunkAt(int cx, int cz);
 #endif
 
 #if version >= 1.17
     public java.util.concurrent.Executor getAsyncExecutor() {
-        #require net.minecraft.server.level.ChunkProviderServer private final (java.util.concurrent.Executor) ChunkProviderServer.MainThreadExecutor mainThreadProcessor;
+        #require net.minecraft.server.level.ServerChunkCache private final (java.util.concurrent.Executor) ServerChunkCache.MainThreadExecutor mainThreadProcessor;
         return instance#mainThreadProcessor;
     }
 #elseif version >= 1.14
     public java.util.concurrent.Executor getAsyncExecutor() {
-        #require net.minecraft.server.level.ChunkProviderServer private final (java.util.concurrent.Executor) ChunkProviderServer.MainThreadExecutor serverThreadQueue;
+        #require net.minecraft.server.level.ServerChunkCache private final (java.util.concurrent.Executor) ServerChunkCache.MainThreadExecutor serverThreadQueue;
         return instance#serverThreadQueue;
     }
 #else
@@ -58,40 +58,40 @@ class ChunkProviderServer {
 
 #if version >= 1.20.5
     public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {
-        #require net.minecraft.server.level.ChunkProviderServer private java.util.concurrent.CompletableFuture<net.minecraft.server.level.ChunkResult<net.minecraft.world.level.chunk.IChunkAccess>> getChunkFutureMainThread(int cx, int cz, net.minecraft.world.level.chunk.status.ChunkStatus chunkstatus, boolean flag);
+        #require net.minecraft.server.level.ServerChunkCache private java.util.concurrent.CompletableFuture<net.minecraft.server.level.ChunkResult<net.minecraft.world.level.chunk.ChunkAccess>> getChunkFutureMainThread(int cx, int cz, net.minecraft.world.level.chunk.status.ChunkStatus chunkstatus, boolean flag);
 
         java.util.concurrent.CompletableFuture future;
         future = instance#getChunkFutureMainThread(cx, cz, ChunkStatus.FULL, true);
         future.thenAccept(consumer);
     }
 
-    public static (org.bukkit.Chunk) net.minecraft.world.level.chunk.Chunk unpackGetChunkAsyncResult((Object) net.minecraft.server.level.ChunkResult result) {
-        return (net.minecraft.world.level.chunk.Chunk) result.orElse((Object) null);
+    public static (org.bukkit.Chunk) net.minecraft.world.level.chunk.LevelChunk unpackGetChunkAsyncResult((Object) net.minecraft.server.level.ChunkResult result) {
+        return (net.minecraft.world.level.chunk.LevelChunk) result.orElse((Object) null);
     }
 #elseif version >= 1.14
     public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {
-        #require net.minecraft.server.level.ChunkProviderServer private java.util.concurrent.CompletableFuture<com.mojang.datafixers.util.Either<net.minecraft.world.level.chunk.IChunkAccess, net.minecraft.server.level.PlayerChunk.Failure>> getChunkFutureMainThread(int cx, int cz, net.minecraft.world.level.chunk.status.ChunkStatus chunkstatus, boolean flag);
+        #require net.minecraft.server.level.ServerChunkCache private java.util.concurrent.CompletableFuture<com.mojang.datafixers.util.Either<net.minecraft.world.level.chunk.ChunkAccess, net.minecraft.server.level.ChunkHolder.Failure>> getChunkFutureMainThread(int cx, int cz, net.minecraft.world.level.chunk.status.ChunkStatus chunkstatus, boolean flag);
 
         java.util.concurrent.CompletableFuture future;
         future = instance#getChunkFutureMainThread(cx, cz, ChunkStatus.FULL, true);
         future.thenAccept(consumer);
     }
 
-    public static (org.bukkit.Chunk) net.minecraft.world.level.chunk.Chunk unpackGetChunkAsyncResult((Object) com.mojang.datafixers.util.Either result) {
+    public static (org.bukkit.Chunk) net.minecraft.world.level.chunk.LevelChunk unpackGetChunkAsyncResult((Object) com.mojang.datafixers.util.Either result) {
         java.util.Optional opt = (java.util.Optional) result.left();
-        return (net.minecraft.world.level.chunk.Chunk) opt.orElse(null);
+        return (net.minecraft.world.level.chunk.LevelChunk) opt.orElse(null);
     }
 #elseif version >= 1.13
     public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {
-        Iterable iterable = java.util.Collections.singleton(new ChunkCoordIntPair(cx, cz));
-  #if methodexists net.minecraft.server.level.ChunkProviderServer public java.util.concurrent.CompletableFuture<Void> loadAllChunks(Iterable<net.minecraft.world.level.ChunkCoordIntPair> iterable, java.util.function.Consumer<net.minecraft.world.level.chunk.Chunk> consumer)
+        Iterable iterable = java.util.Collections.singleton(new ChunkPos(cx, cz));
+  #if methodexists net.minecraft.server.level.ServerChunkCache public java.util.concurrent.CompletableFuture<Void> loadAllChunks(Iterable<net.minecraft.world.level.ChunkPos> iterable, java.util.function.Consumer<net.minecraft.world.level.chunk.LevelChunk> consumer)
         instance.loadAllChunks(iterable, consumer);
   #else
         instance.a(iterable, consumer);
   #endif
     }
 
-    public static (org.bukkit.Chunk) net.minecraft.world.level.chunk.Chunk unpackGetChunkAsyncResult((Object) net.minecraft.world.level.chunk.Chunk result) {
+    public static (org.bukkit.Chunk) net.minecraft.world.level.chunk.LevelChunk unpackGetChunkAsyncResult((Object) net.minecraft.world.level.chunk.LevelChunk result) {
         return result;
     }
 #else
@@ -105,55 +105,55 @@ class ChunkProviderServer {
   #endif
     }
 
-    public static (org.bukkit.Chunk) net.minecraft.world.level.chunk.Chunk unpackGetChunkAsyncResult((Object) net.minecraft.world.level.chunk.Chunk result) {
+    public static (org.bukkit.Chunk) net.minecraft.world.level.chunk.LevelChunk unpackGetChunkAsyncResult((Object) net.minecraft.world.level.chunk.LevelChunk result) {
         return result;
     }
 #endif
 
 #if version >= 1.18
-    public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
-        instance.chunkMap.save((net.minecraft.world.level.chunk.IChunkAccess) chunk);
+    public void saveLoadedChunk((LevelChunkHandle) LevelChunk chunk) {
+        instance.chunkMap.save((net.minecraft.world.level.chunk.ChunkAccess) chunk);
     }
 #elseif version >= 1.17
-    public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
-        instance.chunkMap.saveChunk((net.minecraft.world.level.chunk.IChunkAccess) chunk);
+    public void saveLoadedChunk((LevelChunkHandle) LevelChunk chunk) {
+        instance.chunkMap.saveChunk((net.minecraft.world.level.chunk.ChunkAccess) chunk);
     }
 #elseif version >= 1.14.1
-    public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
+    public void saveLoadedChunk((LevelChunkHandle) LevelChunk chunk) {
         // Since 1.14.1: returns boolean
-        #require net.minecraft.server.level.PlayerChunkMap private boolean saveChunk(net.minecraft.world.level.chunk.IChunkAccess chunk);
+        #require net.minecraft.server.level.ChunkMap private boolean saveChunk(net.minecraft.world.level.chunk.ChunkAccess chunk);
         instance.playerChunkMap#saveChunk(chunk);
     }
 #elseif version >= 1.14
-    public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
-        // Since 1.14: moved to PlayerChunkMap
-        #require net.minecraft.server.level.PlayerChunkMap private void saveChunk(net.minecraft.world.level.chunk.IChunkAccess chunk);
+    public void saveLoadedChunk((LevelChunkHandle) LevelChunk chunk) {
+        // Since 1.14: moved to ChunkMap
+        #require net.minecraft.server.level.ChunkMap private void saveChunk(net.minecraft.world.level.chunk.ChunkAccess chunk);
         instance.playerChunkMap#saveChunk(chunk);
     }
-#elseif exists net.minecraft.server.level.ChunkProviderServer public void saveChunk(net.minecraft.world.level.chunk.Chunk chunk, boolean unloaded);
-    public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
+#elseif exists net.minecraft.server.level.ServerChunkCache public void saveChunk(net.minecraft.world.level.chunk.LevelChunk chunk, boolean unloaded);
+    public void saveLoadedChunk((LevelChunkHandle) LevelChunk chunk) {
         // 1.12.1 to 1.12.2 added unloaded=false parameter
         instance.saveChunk(chunk, false);
     }
-#elseif exists net.minecraft.server.level.ChunkProviderServer public void saveChunk(net.minecraft.world.level.chunk.IChunkAccess chunk, boolean unloaded);
-    public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
-        // 1.13 uses IChunkAccess for whatever reason
-        instance.saveChunk((net.minecraft.world.level.chunk.IChunkAccess) chunk, false);
+#elseif exists net.minecraft.server.level.ServerChunkCache public void saveChunk(net.minecraft.world.level.chunk.ChunkAccess chunk, boolean unloaded);
+    public void saveLoadedChunk((LevelChunkHandle) LevelChunk chunk) {
+        // 1.13 uses ChunkAccess for whatever reason
+        instance.saveChunk((net.minecraft.world.level.chunk.ChunkAccess) chunk, false);
     }
-#elseif !exists net.minecraft.server.level.ChunkProviderServer public void saveChunk(net.minecraft.world.level.chunk.Chunk chunk);
+#elseif !exists net.minecraft.server.level.ServerChunkCache public void saveChunk(net.minecraft.world.level.chunk.LevelChunk chunk);
     // Forge 1.12.2
-    private void saveLoadedChunk:saveChunk((ChunkHandle) Chunk chunk);
+    private void saveLoadedChunk:saveChunk((LevelChunkHandle) LevelChunk chunk);
 #else
     // <= 1.12
-    public void saveLoadedChunk:saveChunk((ChunkHandle) Chunk chunk);
+    public void saveLoadedChunk:saveChunk((LevelChunkHandle) LevelChunk chunk);
 #endif
 
 #if version >= 1.18
-    public void markBlockDirty:blockChanged((BlockPositionHandle) BlockPosition blockPosition);
+    public void markBlockDirty:blockChanged((BlockPosHandle) BlockPos blockPosition);
 #elseif version >= 1.14
-    public void markBlockDirty:flagDirty((BlockPositionHandle) BlockPosition blockPosition);
+    public void markBlockDirty:flagDirty((BlockPosHandle) BlockPos blockPosition);
 #else
-    public void markBlockDirty((BlockPositionHandle) BlockPosition blockPosition) {
+    public void markBlockDirty((BlockPosHandle) BlockPos blockPosition) {
         instance.world.getPlayerChunkMap().flagDirty(blockPosition);
     }
 #endif

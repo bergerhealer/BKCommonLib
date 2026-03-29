@@ -20,8 +20,8 @@ import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntitySignHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.entity.SignBlockEntityHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
@@ -37,7 +37,7 @@ public class SignChangeTracker implements Cloneable, SignLineAccessor {
     private final Block block;
     private Sign state;
     private BlockData blockData;
-    private TileEntitySignHandle tileEntity;
+    private SignBlockEntityHandle tileEntity;
     private Object[] lastRawFrontLines;
     private Object[] lastRawBackLines;
     private String[] lastMessageFrontLines;
@@ -50,7 +50,7 @@ public class SignChangeTracker implements Cloneable, SignLineAccessor {
         if (Common.evaluateMCVersion("<=", "1.12.2") && Common.SERVER.isForgeServer()) {
             try {
                 final FastField<List<Object>> tileEntityListField = new FastField<>();
-                tileEntityListField.init(Resolver.resolveAndGetDeclaredField(WorldHandle.T.getType(), "tileEntityList"));
+                tileEntityListField.init(Resolver.resolveAndGetDeclaredField(LevelHandle.T.getType(), "tileEntityList"));
                 constr = block -> {
                     List<Object> worldTileEntities = tileEntityListField.get(HandleConversion.toWorldHandle(block.getWorld()));
                     return new SignChangeTrackerMohistLegacy(block, worldTileEntities);
@@ -70,10 +70,10 @@ public class SignChangeTracker implements Cloneable, SignLineAccessor {
 
     private void initState(Sign state) {
         this.state = state;
-        this.loadTileEntity(TileEntitySignHandle.fromBukkit(state));
+        this.loadTileEntity(SignBlockEntityHandle.fromBukkit(state));
     }
 
-    private void loadTileEntity(TileEntitySignHandle tile) {
+    private void loadTileEntity(SignBlockEntityHandle tile) {
         if (tile == null) {
             this.resetTileEntity();
         } else {
@@ -435,7 +435,7 @@ public class SignChangeTracker implements Cloneable, SignLineAccessor {
      * @return True if changes occurred, or the sign was removed
      */
     public boolean update() {
-        TileEntitySignHandle tileEntity = this.tileEntity;
+        SignBlockEntityHandle tileEntity = this.tileEntity;
 
         // Check world to see if a tile entity now exists at this Block.
         // Reading tile entities is slow, so avoid doing that if we can.
@@ -481,11 +481,11 @@ public class SignChangeTracker implements Cloneable, SignLineAccessor {
         }
     }
 
-    protected boolean isTileRemoved(TileEntitySignHandle tileEntity) {
+    protected boolean isTileRemoved(SignBlockEntityHandle tileEntity) {
         return tileEntity.isRemoved();
     }
 
-    private boolean detectChangedLines(TileEntitySignHandle tileEntity) {
+    private boolean detectChangedLines(SignBlockEntityHandle tileEntity) {
         Object[] oldRawFrontLines = this.lastRawFrontLines;
         Object[] newRawFrontLines = tileEntity.getRawFrontLines();
 
@@ -546,9 +546,9 @@ public class SignChangeTracker implements Cloneable, SignLineAccessor {
         Object rawTileEntity;
         if (MaterialUtil.ISSIGN.get(block) && // Initiates sync chunk load if needed
             (rawTileEntity = CraftBlockHandle.getBlockTileEntity(block)) != null &&
-            TileEntitySignHandle.T.isAssignableFrom(rawTileEntity)
+            SignBlockEntityHandle.T.isAssignableFrom(rawTileEntity)
         ) {
-            TileEntitySignHandle tileEntity = TileEntitySignHandle.createHandle(rawTileEntity);
+            SignBlockEntityHandle tileEntity = SignBlockEntityHandle.createHandle(rawTileEntity);
             this.state = tileEntity.toBukkit();
             this.loadTileEntity(tileEntity);
             return true;
@@ -649,7 +649,7 @@ public class SignChangeTracker implements Cloneable, SignLineAccessor {
         }
 
         @Override
-        protected boolean isTileRemoved(TileEntitySignHandle tileEntity) {
+        protected boolean isTileRemoved(SignBlockEntityHandle tileEntity) {
             List<Object> list = this.worldTileEntities;
             Object rawTileEntity = tileEntity.getRaw();
             if (lastIndex >= 0 && lastIndex < list.size() && list.get(lastIndex) == rawTileEntity) {

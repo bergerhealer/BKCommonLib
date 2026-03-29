@@ -173,9 +173,9 @@ class Entity {
         //
         // Added here in front of the Paper check because some builds of Paper are bugged too :(
         if (instance instanceof org.bukkit.entity.HumanEntity) {
-            net.minecraft.world.entity.EnumItemSlot nmsEquipmentSlot = org.bukkit.craftbukkit.CraftEquipmentSlot.getNMS(slot);
-            return nmsEquipmentSlot.getType() == net.minecraft.world.entity.EnumItemSlot$Function.HUMANOID_ARMOR ||
-                   nmsEquipmentSlot.getType() == net.minecraft.world.entity.EnumItemSlot$Function.HAND;
+            net.minecraft.world.entity.EquipmentSlot nmsEquipmentSlot = org.bukkit.craftbukkit.CraftEquipmentSlot.getNMS(slot);
+            return nmsEquipmentSlot.getType() == net.minecraft.world.entity.EquipmentSlot$Type.HUMANOID_ARMOR ||
+                   nmsEquipmentSlot.getType() == net.minecraft.world.entity.EquipmentSlot$Type.HAND;
         }
   #endif
 
@@ -196,9 +196,9 @@ class Entity {
   #if version >= 1.21
         // Defer to NMS, which might catch some of this...
         if (instance instanceof org.bukkit.craftbukkit.entity.CraftLivingEntity) {
-            net.minecraft.world.entity.EntityLiving nmsEntityLiving;
+            net.minecraft.world.entity.LivingEntity nmsEntityLiving;
             nmsEntityLiving = ((org.bukkit.craftbukkit.entity.CraftLivingEntity) instance).getHandle();
-            net.minecraft.world.entity.EnumItemSlot nmsEquipmentSlot = org.bukkit.craftbukkit.CraftEquipmentSlot.getNMS(slot);
+            net.minecraft.world.entity.EquipmentSlot nmsEquipmentSlot = org.bukkit.craftbukkit.CraftEquipmentSlot.getNMS(slot);
             return nmsEntityLiving.canUseSlot(nmsEquipmentSlot);
         }
   #endif

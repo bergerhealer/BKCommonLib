@@ -2,7 +2,7 @@ package com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 import org.bukkit.map.MapCursor.Type;
 import java.util.List;
 
@@ -27,7 +27,7 @@ public abstract class MapDecorationTypeHandle extends Template.Handle {
         return T.getValues.invoke();
     }
 
-    public abstract MinecraftKeyHandle getName();
+    public abstract IdentifierHandle getName();
     public abstract boolean isShownOnItemFrame();
     public abstract Type toBukkit();
     public abstract byte getId();
@@ -38,7 +38,7 @@ public abstract class MapDecorationTypeHandle extends Template.Handle {
     public static final class MapDecorationTypeClass extends Template.Class<MapDecorationTypeHandle> {
         public final Template.StaticMethod.Converted<List<Holder<MapDecorationTypeHandle>>> getValues = new Template.StaticMethod.Converted<List<Holder<MapDecorationTypeHandle>>>();
 
-        public final Template.Method.Converted<MinecraftKeyHandle> getName = new Template.Method.Converted<MinecraftKeyHandle>();
+        public final Template.Method.Converted<IdentifierHandle> getName = new Template.Method.Converted<IdentifierHandle>();
         public final Template.Method<Boolean> isShownOnItemFrame = new Template.Method<Boolean>();
         public final Template.Method<Type> toBukkit = new Template.Method<Type>();
         public final Template.Method<Byte> getId = new Template.Method<Byte>();

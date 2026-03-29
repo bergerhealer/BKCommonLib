@@ -14,12 +14,12 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.BasicWrapper;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.generated.net.minecraft.core.particles.ParticleHandle;
+import com.bergerkiller.generated.net.minecraft.core.particles.ParticleTypeHandle;
 
 /**
  * Stores types of particles supported by Minecraft.
  */
-public class ParticleType<T> extends BasicWrapper<ParticleHandle> {
+public class ParticleType<T> extends BasicWrapper<ParticleTypeHandle> {
     /**
      * Particle Type returned when the particle type cannot be identified, or where
      * the particle type is not supported on the current version of the server.
@@ -29,7 +29,7 @@ public class ParticleType<T> extends BasicWrapper<ParticleHandle> {
     private static Map<Object, ParticleType<?>> byNMSHandle;
     static {
         IdentityHashMap<Object, ParticleType<?>> byNMSHandleInit = new IdentityHashMap<>();
-        for (Object nmsHandle : ParticleHandle.values()) {
+        for (Object nmsHandle : ParticleTypeHandle.values()) {
             byNMSHandleInit.put(nmsHandle, new ParticleType<Object>(nmsHandle));
         }
         byNMSHandle = byNMSHandleInit;
@@ -177,11 +177,11 @@ public class ParticleType<T> extends BasicWrapper<ParticleHandle> {
     public static final ParticleType<ShriekOptions> SHRIEK = byName("shriek");
 
     protected ParticleType() {
-        this.setHandle(ParticleHandle.T.createHandle(null, true));
+        this.setHandle(ParticleTypeHandle.T.createHandle(null, true));
     }
 
     private ParticleType(Object nmsHandle) {
-        this.setHandle(ParticleHandle.createHandle(nmsHandle));
+        this.setHandle(ParticleTypeHandle.createHandle(nmsHandle));
     }
 
     /**
@@ -250,7 +250,7 @@ public class ParticleType<T> extends BasicWrapper<ParticleHandle> {
      */
     @SuppressWarnings("unchecked")
     public static <T> ParticleType<T> byName(String name) {
-        return (ParticleType<T>) byNMSParticleHandle(ParticleHandle.byName(name));
+        return (ParticleType<T>) byNMSParticleHandle(ParticleTypeHandle.byName(name));
     }
 
     private static <T> ParticleType<T> byName_1_13(String name_1_12, String name_1_13) {

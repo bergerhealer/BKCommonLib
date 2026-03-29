@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.internal.proxy;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeMapBaseHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeMapHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
 import com.bergerkiller.mountiplex.reflection.util.fast.NullInvoker;
@@ -28,6 +28,6 @@ public class DummyAttributeMapBase {
                 }
             }
         };
-        INSTANCE = interceptor.createInstance(AttributeMapBaseHandle.T.getType());
+        INSTANCE = interceptor.createInstance(AttributeMapHandle.T.getType());
     }
 }

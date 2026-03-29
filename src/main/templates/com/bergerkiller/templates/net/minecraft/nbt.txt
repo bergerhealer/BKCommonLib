@@ -1,40 +1,40 @@
 package net.minecraft.nbt;
 
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTTagListHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.NBTTagStringHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.NBTTagByteHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.NBTTagShortHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.NBTTagIntHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.NBTTagLongHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.NBTTagFloatHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.NBTTagDoubleHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.NBTTagByteArrayHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.NBTTagIntArrayHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.NBTTagLongArrayHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.ListTagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.CompoundTagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle.StringTagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle.ByteTagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle.ShortTagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle.IntTagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle.LongTagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle.FloatTagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle.DoubleTagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle.ByteArrayTagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle.IntArrayTagHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle.LongArrayTagHandle;
 
-class NBTBase {
+class Tag {
 #if version >= 1.18
     public abstract byte getTypeId:getId();
-    public abstract (Object) NBTBase raw_clone:copy();
+    public abstract (Object) Tag raw_clone:copy();
 #else
     public abstract byte getTypeId();
-    public abstract (Object) NBTBase raw_clone:clone();
+    public abstract (Object) Tag raw_clone:clone();
 #endif
 
-    public static NBTBaseHandle createHandle(Object instance) {
-        if (!(instance instanceof NBTBase)) {
-            throw new IllegalArgumentException("Input is not an instance of NBTBase");
+    public static TagHandle createHandle(Object instance) {
+        if (!(instance instanceof Tag)) {
+            throw new IllegalArgumentException("Input is not an instance of Tag");
         }
-        return com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.createHandleForData(instance);
+        return com.bergerkiller.generated.net.minecraft.nbt.TagHandle.createHandleForData(instance);
     }
 
     <code>
     public com.bergerkiller.bukkit.common.nbt.CommonTag toCommonTag() {
         return new com.bergerkiller.bukkit.common.nbt.CommonTag(this);
     }
-    public abstract NBTBaseHandle clone();
+    public abstract TagHandle clone();
     public abstract Object getData();
 
     public final String toPrettyString() {
@@ -91,12 +91,12 @@ class NBTBase {
 
     private static final class TypeInfo {
         public final Class<?> dataType;
-        public final Template.Class<? extends NBTBaseHandle> handleClass;
+        public final Template.Class<? extends TagHandle> handleClass;
         public final java.util.function.Function<Object, Object> constructor;
         public final java.util.function.Function<Object, Object> get_data;
 
         public TypeInfo(Class<?> dataType,
-                        Template.Class<? extends NBTBaseHandle> handleClass,
+                        Template.Class<? extends TagHandle> handleClass,
                         java.util.function.Function<Object, Object> constructor,
                         java.util.function.Function<Object, Object> get_data)
         {
@@ -113,32 +113,32 @@ class NBTBase {
 
         public TypeInfoLookup() {
             toStringFallback = new TypeInfo(
-                    String.class, NBTTagStringHandle.T,
-                    data -> NBTTagStringHandle.T.create.raw.invoke(com.bergerkiller.bukkit.common.conversion.Conversion.toString.convert(data, "")),
+                    String.class, StringTagHandle.T,
+                    data -> StringTagHandle.T.create.raw.invoke(com.bergerkiller.bukkit.common.conversion.Conversion.toString.convert(data, "")),
                     java.util.function.Function.identity()
             );
 
-            registerTypeInfo(String.class, NBTTagStringHandle.T, NBTTagStringHandle.T.create.raw::invoke, NBTTagStringHandle.T.getData::invoke);
-            registerTypeInfo(byte.class, NBTTagByteHandle.T, NBTTagByteHandle.T.create.raw::invoke, NBTTagByteHandle.T.getByteData::invoke);
-            registerTypeInfo(short.class, NBTTagShortHandle.T, NBTTagShortHandle.T.create.raw::invoke, NBTTagShortHandle.T.getShortData::invoke);
-            registerTypeInfo(int.class, NBTTagIntHandle.T, NBTTagIntHandle.T.create.raw::invoke, NBTTagIntHandle.T.getIntegerData::invoke);
-            registerTypeInfo(long.class, NBTTagLongHandle.T, NBTTagLongHandle.T.create.raw::invoke, NBTTagLongHandle.T.getLongData::invoke);
-            registerTypeInfo(float.class, NBTTagFloatHandle.T, NBTTagFloatHandle.T.create.raw::invoke, NBTTagFloatHandle.T.getFloatData::invoke);
-            registerTypeInfo(double.class, NBTTagDoubleHandle.T, NBTTagDoubleHandle.T.create.raw::invoke, NBTTagDoubleHandle.T.getDoubleData::invoke);
-            registerTypeInfo(byte[].class, NBTTagByteArrayHandle.T, NBTTagByteArrayHandle.T.create.raw::invoke, NBTTagByteArrayHandle.T.getData::invoke);
-            registerTypeInfo(int[].class, NBTTagIntArrayHandle.T, NBTTagIntArrayHandle.T.create.raw::invoke, NBTTagIntArrayHandle.T.getData::invoke);
+            registerTypeInfo(String.class, StringTagHandle.T, StringTagHandle.T.create.raw::invoke, StringTagHandle.T.getData::invoke);
+            registerTypeInfo(byte.class, ByteTagHandle.T, ByteTagHandle.T.create.raw::invoke, ByteTagHandle.T.getByteData::invoke);
+            registerTypeInfo(short.class, ShortTagHandle.T, ShortTagHandle.T.create.raw::invoke, ShortTagHandle.T.getShortData::invoke);
+            registerTypeInfo(int.class, IntTagHandle.T, IntTagHandle.T.create.raw::invoke, IntTagHandle.T.getIntegerData::invoke);
+            registerTypeInfo(long.class, LongTagHandle.T, LongTagHandle.T.create.raw::invoke, LongTagHandle.T.getLongData::invoke);
+            registerTypeInfo(float.class, FloatTagHandle.T, FloatTagHandle.T.create.raw::invoke, FloatTagHandle.T.getFloatData::invoke);
+            registerTypeInfo(double.class, DoubleTagHandle.T, DoubleTagHandle.T.create.raw::invoke, DoubleTagHandle.T.getDoubleData::invoke);
+            registerTypeInfo(byte[].class, ByteArrayTagHandle.T, ByteArrayTagHandle.T.create.raw::invoke, ByteArrayTagHandle.T.getData::invoke);
+            registerTypeInfo(int[].class, IntArrayTagHandle.T, IntArrayTagHandle.T.create.raw::invoke, IntArrayTagHandle.T.getData::invoke);
 
-            if (NBTTagLongArrayHandle.T.isAvailable()) {
-                registerTypeInfo(long[].class, NBTTagLongArrayHandle.T, NBTTagLongArrayHandle.T.create.raw::invoke, NBTTagLongArrayHandle.T.getData::invoke);
+            if (LongArrayTagHandle.T.isAvailable()) {
+                registerTypeInfo(long[].class, LongArrayTagHandle.T, LongArrayTagHandle.T.create.raw::invoke, LongArrayTagHandle.T.getData::invoke);
             }
 
-            registerTypeInfo(java.util.Collection.class, NBTTagListHandle.T, NBTTagListHandle.T.create.raw::invoke, NBTTagListHandle.T.data.raw::get);
-            registerTypeInfo(java.util.Map.class, NBTTagCompoundHandle.T, NBTTagCompoundHandle.T.create.raw::invoke, NBTTagCompoundHandle.T.data.raw::get);
+            registerTypeInfo(java.util.Collection.class, ListTagHandle.T, ListTagHandle.T.create.raw::invoke, ListTagHandle.T.data.raw::get);
+            registerTypeInfo(java.util.Map.class, CompoundTagHandle.T, CompoundTagHandle.T.create.raw::invoke, CompoundTagHandle.T.data.raw::get);
         }
 
         private void registerTypeInfo(
                 Class<?> dataType,
-                Template.Class<? extends NBTBaseHandle> handleClass,
+                Template.Class<? extends TagHandle> handleClass,
                 java.util.function.Function<Object, Object> constructor,
                 java.util.function.Function<Object, Object> get_data)
         {
@@ -164,17 +164,17 @@ class NBTBase {
 
     private static TypeInfoLookup lookup() {
         TypeInfoLookup lookup;
-        if ((lookup = NBTBaseHandle.lookup) != null) {
+        if ((lookup = TagHandle.lookup) != null) {
             return lookup;
         }
 
-        synchronized (NBTBaseHandle.class) {
-            if ((lookup = NBTBaseHandle.lookup) != null) {
+        synchronized (TagHandle.class) {
+            if ((lookup = TagHandle.lookup) != null) {
                 return lookup;
             }
 
             lookup = new TypeInfoLookup();
-            NBTBaseHandle.lookup = lookup;
+            TagHandle.lookup = lookup;
             return lookup;
         }
     }
@@ -213,7 +213,7 @@ class NBTBase {
         return findTypeInfo(data).constructor.apply(data);
     }
 
-    public static NBTBaseHandle createHandleForData(Object data) {
+    public static TagHandle createHandleForData(Object data) {
         TypeInfo info = findTypeInfo(data);
         return info.handleClass.createHandle(info.constructor.apply(data));
     }
@@ -228,127 +228,127 @@ class NBTBase {
     }
     </code>
 
-    class NBTTagString extends NBTBase {
+    class StringTag extends Tag {
 #if version >= 1.15
-        public static (NBTBaseHandle.NBTTagStringHandle) NBTTagString create:valueOf(String data);
+        public static (TagHandle.StringTagHandle) StringTag create:valueOf(String data);
 #else
-        public static (NBTBaseHandle.NBTTagStringHandle) NBTTagString create(String data) { return new NBTTagString(data); }
+        public static (TagHandle.StringTagHandle) StringTag create(String data) { return new StringTag(data); }
 #endif
 
-        // Overrides getData() in NBTBase
+        // Overrides getData() in Tag
         public String getData:getAsString();
 
         <code>
-        public NBTBaseHandle.NBTTagStringHandle clone() {
+        public TagHandle.StringTagHandle clone() {
             return com.bergerkiller.bukkit.common.internal.CommonCapabilities.IMMUTABLE_NBT_PRIMITIVES ? this : createHandle(raw_clone());
         }
         </code>
     }
 
-    class NBTTagByte extends NBTBase {
+    class ByteTag extends Tag {
 #if version >= 1.15
-        public static (NBTBaseHandle.NBTTagByteHandle) NBTTagByte create:valueOf(byte data);
+        public static (TagHandle.ByteTagHandle) ByteTag create:valueOf(byte data);
 #else
-        public static (NBTBaseHandle.NBTTagByteHandle) NBTTagByte create(byte data) { return new NBTTagByte(data); }
+        public static (TagHandle.ByteTagHandle) ByteTag create(byte data) { return new ByteTag(data); }
 #endif
 
         public byte getByteData:getAsByte();
 
         <code>
-        public NBTBaseHandle.NBTTagByteHandle clone() {
+        public TagHandle.ByteTagHandle clone() {
             return com.bergerkiller.bukkit.common.internal.CommonCapabilities.IMMUTABLE_NBT_PRIMITIVES ? this : createHandle(raw_clone());
         }
         public Byte getData() { return Byte.valueOf(getByteData()); }
         </code>
     }
 
-    class NBTTagShort extends NBTBase {
+    class ShortTag extends Tag {
 #if version >= 1.15
-        public static (NBTBaseHandle.NBTTagShortHandle) NBTTagShort create:valueOf(short data);
+        public static (TagHandle.ShortTagHandle) ShortTag create:valueOf(short data);
 #else
-        public static (NBTBaseHandle.NBTTagShortHandle) NBTTagShort create(short data) { return new NBTTagShort(data); }
+        public static (TagHandle.ShortTagHandle) ShortTag create(short data) { return new ShortTag(data); }
 #endif
 
         public short getShortData:getAsShort();
 
         <code>
         public static Object createRaw(Object data) { return T.create.raw.invoke(data); }
-        public NBTBaseHandle.NBTTagShortHandle clone() {
+        public TagHandle.ShortTagHandle clone() {
             return com.bergerkiller.bukkit.common.internal.CommonCapabilities.IMMUTABLE_NBT_PRIMITIVES ? this : createHandle(raw_clone());
         }
         public Short getData() { return Short.valueOf(getShortData()); }
         </code>
     }
 
-    class NBTTagInt extends NBTBase {
+    class IntTag extends Tag {
 #if version >= 1.15
-        public static (NBTBaseHandle.NBTTagIntHandle) NBTTagInt create:valueOf(int data);
+        public static (TagHandle.IntTagHandle) IntTag create:valueOf(int data);
 #else
-        public static (NBTBaseHandle.NBTTagIntHandle) NBTTagInt create(int data) { return new NBTTagInt(data); }
+        public static (TagHandle.IntTagHandle) IntTag create(int data) { return new IntTag(data); }
 #endif
         public int getIntegerData:getAsInt();
 
         <code>
-        public NBTBaseHandle.NBTTagIntHandle clone() {
+        public TagHandle.IntTagHandle clone() {
             return com.bergerkiller.bukkit.common.internal.CommonCapabilities.IMMUTABLE_NBT_PRIMITIVES ? this : createHandle(raw_clone());
         }
         public Integer getData() { return Integer.valueOf(getIntegerData()); }
         </code>
     }
 
-    class NBTTagLong extends NBTBase {
+    class LongTag extends Tag {
 #if version >= 1.15
-        public static (NBTBaseHandle.NBTTagLongHandle) NBTTagLong create:valueOf(long data);
+        public static (TagHandle.LongTagHandle) LongTag create:valueOf(long data);
 #else
-        public static (NBTBaseHandle.NBTTagLongHandle) NBTTagLong create(long data) { return new NBTTagLong(data); }
+        public static (TagHandle.LongTagHandle) LongTag create(long data) { return new LongTag(data); }
 #endif
 
         public long getLongData:getAsLong();
 
         <code>
-        public NBTBaseHandle.NBTTagLongHandle clone() {
+        public TagHandle.LongTagHandle clone() {
             return com.bergerkiller.bukkit.common.internal.CommonCapabilities.IMMUTABLE_NBT_PRIMITIVES ? this : createHandle(raw_clone());
         }
         public Long getData() { return Long.valueOf(getLongData()); }
         </code>
     }
 
-    class NBTTagFloat extends NBTBase {
+    class FloatTag extends Tag {
 #if version >= 1.15
-        public static (NBTBaseHandle.NBTTagFloatHandle) NBTTagFloat create:valueOf(float data);
+        public static (TagHandle.FloatTagHandle) FloatTag create:valueOf(float data);
 #else
-        public static (NBTBaseHandle.NBTTagFloatHandle) NBTTagFloat create(float data) { return new NBTTagFloat(data); }
+        public static (TagHandle.FloatTagHandle) FloatTag create(float data) { return new FloatTag(data); }
 #endif
 
         public float getFloatData:getAsFloat();
 
         <code>
-        public NBTBaseHandle.NBTTagFloatHandle clone() {
+        public TagHandle.FloatTagHandle clone() {
             return com.bergerkiller.bukkit.common.internal.CommonCapabilities.IMMUTABLE_NBT_PRIMITIVES ? this : createHandle(raw_clone());
         }
         public Float getData() { return Float.valueOf(getFloatData()); }
         </code>
     }
 
-    class NBTTagDouble extends NBTBase {
+    class DoubleTag extends Tag {
 #if version >= 1.15
-        public static (NBTBaseHandle.NBTTagDoubleHandle) NBTTagDouble create:valueOf(double data);
+        public static (TagHandle.DoubleTagHandle) DoubleTag create:valueOf(double data);
 #else
-        public static (NBTBaseHandle.NBTTagDoubleHandle) NBTTagDouble create(double data) { return new NBTTagDouble(data); }
+        public static (TagHandle.DoubleTagHandle) DoubleTag create(double data) { return new DoubleTag(data); }
 #endif
 
         public double getDoubleData:getAsDouble();
 
         <code>
-        public NBTBaseHandle.NBTTagDoubleHandle clone() {
+        public TagHandle.DoubleTagHandle clone() {
             return com.bergerkiller.bukkit.common.internal.CommonCapabilities.IMMUTABLE_NBT_PRIMITIVES ? this : createHandle(raw_clone());
         }
         public Double getData() { return Double.valueOf(getDoubleData()); }
         </code>
     }
 
-    class NBTTagByteArray extends NBTBase {
-        public static (NBTBaseHandle.NBTTagByteArrayHandle) NBTTagByteArray create(byte[] data) { return new NBTTagByteArray(data); }
+    class ByteArrayTag extends Tag {
+        public static (TagHandle.ByteArrayTagHandle) ByteArrayTag create(byte[] data) { return new ByteArrayTag(data); }
 #if version >= 1.18
         public byte[] getData:getAsByteArray();
 #elseif version >= 1.14
@@ -358,8 +358,8 @@ class NBTBase {
 #endif
     }
 
-    class NBTTagIntArray extends NBTBase {
-        public static (NBTBaseHandle.NBTTagIntArrayHandle) NBTTagIntArray create(int[] data) { return new NBTTagIntArray(data); }
+    class IntArrayTag extends Tag {
+        public static (TagHandle.IntArrayTagHandle) IntArrayTag create(int[] data) { return new IntArrayTag(data); }
 #if version >= 1.18
         public int[] getData:getAsIntArray();
 #elseif version >= 1.14
@@ -372,8 +372,8 @@ class NBTBase {
     }
 
     // Since MC 1.12
-    optional class NBTTagLongArray extends NBTBase {
-        public static (NBTBaseHandle.NBTTagLongArrayHandle) NBTTagLongArray create(long[] data) { return new NBTTagLongArray(data); }
+    optional class LongArrayTag extends Tag {
+        public static (TagHandle.LongArrayTagHandle) LongArrayTag create(long[] data) { return new LongArrayTag(data); }
 #if version >= 1.18
         public long[] getData:getAsLongArray();
 #elseif version >= 1.14
@@ -382,41 +382,41 @@ class NBTBase {
         public long[] getData:d();
 #elseif version >= 1.12
         public long[] getData() {
-            #require net.minecraft.nbt.NBTTagLongArray private long[] data_field:b;
+            #require net.minecraft.nbt.LongArrayTag private long[] data_field:b;
             return instance#data_field;
         }
 #else
         public long[] getData() {
-            throw new UnsupportedOperationException("NBTTagLongArray is not available");
+            throw new UnsupportedOperationException("LongArrayTag is not available");
         }
 #endif
     }
 }
 
-class NBTTagList extends NBTBase {
+class ListTag extends Tag {
 #if version >= 1.18
-    #require net.minecraft.nbt.NBTBase public abstract byte getTagTypeId:getId();
+    #require net.minecraft.nbt.Tag public abstract byte getTagTypeId:getId();
 #else
-    #require net.minecraft.nbt.NBTBase public abstract byte getTagTypeId:getTypeId();
+    #require net.minecraft.nbt.Tag public abstract byte getTagTypeId:getTypeId();
 #endif
 
-    // Results in getData() being added, which overrides the one in NBTBase
-    private readonly (List<NBTBaseHandle>) List<NBTBase> data:list;
+    // Results in getData() being added, which overrides the one in Tag
+    private readonly (List<TagHandle>) List<Tag> data:list;
 
-    public static (NBTTagListHandle) NBTTagList createEmpty() {
-        return new NBTTagList();
+    public static (ListTagHandle) ListTag createEmpty() {
+        return new ListTag();
     }
 
-    public static (NBTTagListHandle) NBTTagList create(java.util.Collection<?> data) {
-        NBTTagList result = new NBTTagList();
+    public static (ListTagHandle) ListTag create(java.util.Collection<?> data) {
+        ListTag result = new ListTag();
         if (!data.isEmpty()) {
             java.util.Iterator iter = data.iterator();
             com.bergerkiller.mountiplex.reflection.declarations.Template.Method add_method;
-            add_method = (com.bergerkiller.mountiplex.reflection.declarations.Template.Method) com.bergerkiller.generated.net.minecraft.nbt.NBTTagListHandle.T.add.raw;
+            add_method = (com.bergerkiller.mountiplex.reflection.declarations.Template.Method) com.bergerkiller.generated.net.minecraft.nbt.ListTagHandle.T.add.raw;
             while (iter.hasNext()) {
                 Object element = iter.next();
-                if (!(element instanceof NBTBase)) {
-                    element = com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.createRawHandleForData(element);
+                if (!(element instanceof Tag)) {
+                    element = com.bergerkiller.generated.net.minecraft.nbt.TagHandle.createRawHandleForData(element);
                 }
                 add_method.invoke(result, element);
             }
@@ -425,7 +425,7 @@ class NBTTagList extends NBTBase {
     }
 
     <code>
-    public NBTTagListHandle clone() {
+    public ListTagHandle clone() {
         return createHandle(raw_clone());
     }
     </code>
@@ -453,34 +453,34 @@ class NBTTagList extends NBTBase {
     public (byte) int getElementTypeId:f();
 #endif
 
-    public (NBTBaseHandle) NBTBase get_at:get(int index);
+    public (TagHandle) Tag get_at:get(int index);
 
 #if version >= 1.14
     public void clear();
 
   #if version >= 1.16.5 && forge == mohist
     // Mohist 1.16.5+ remapping bug
-    public (NBTBaseHandle) NBTBase set_at:d(int index, (NBTBaseHandle) NBTBase nbt_value);
-    public (NBTBaseHandle) NBTBase remove_at:c(int index);
-    public void add_at:c(int index, (NBTBaseHandle) NBTBase value);
+    public (TagHandle) Tag set_at:d(int index, (TagHandle) Tag nbt_value);
+    public (TagHandle) Tag remove_at:c(int index);
+    public void add_at:c(int index, (TagHandle) Tag value);
   #elseif version >= 1.16.5 && forge == magma
     // Magma 1.16.5+ remapping bug
-    public (NBTBaseHandle) NBTBase set_at:d(int index, (NBTBaseHandle) NBTBase nbt_value);
-    public (NBTBaseHandle) NBTBase remove_at:c(int index);
-    public void add_at:c(int index, (NBTBaseHandle) NBTBase value);
+    public (TagHandle) Tag set_at:d(int index, (TagHandle) Tag nbt_value);
+    public (TagHandle) Tag remove_at:c(int index);
+    public void add_at:c(int index, (TagHandle) Tag value);
   #else
-    public (NBTBaseHandle) NBTBase set_at:set(int index, (NBTBaseHandle) NBTBase nbt_value);
-    public (NBTBaseHandle) NBTBase remove_at:remove(int index);
-    public void add_at:add(int index, (NBTBaseHandle) NBTBase value);
+    public (TagHandle) Tag set_at:set(int index, (TagHandle) Tag nbt_value);
+    public (TagHandle) Tag remove_at:remove(int index);
+    public void add_at:add(int index, (TagHandle) Tag value);
   #endif
 
-    public boolean add((NBTBaseHandle) NBTBase value) {
+    public boolean add((TagHandle) Tag value) {
         instance.add(value);
         return true;
     }
 #else
-    #require net.minecraft.nbt.NBTTagList private java.util.List list;
-    #require net.minecraft.nbt.NBTTagList private byte type;
+    #require net.minecraft.nbt.ListTag private java.util.List list;
+    #require net.minecraft.nbt.ListTag private byte type;
 
     public void clear() {
         java.util.List list = instance#list;
@@ -488,13 +488,13 @@ class NBTTagList extends NBTBase {
         instance#type = (byte) 0;
     }
 
-    public (NBTBaseHandle) NBTBase set_at(int index, (NBTBaseHandle) NBTBase nbt_value) {
+    public (TagHandle) Tag set_at(int index, (TagHandle) Tag nbt_value) {
         byte list_type = instance#type;
         if (list_type != 0 && list_type != nbt_value#getTagTypeId()) {
             throw new UnsupportedOperationException("Trying to set tag of type " +
                 nbt_value#getTagTypeId() + " in list of " + list_type);
         }
-        NBTBase old_value = instance.get(index);
+        Tag old_value = instance.get(index);
   #if version >= 1.18
         instance.setTag(index, nbt_value);
   #else
@@ -503,7 +503,7 @@ class NBTTagList extends NBTBase {
         return old_value;
     }
 
-    public void add_at(int index, (NBTBaseHandle) NBTBase value) {
+    public void add_at(int index, (TagHandle) Tag value) {
         byte list_type = instance#type;
         if (list_type == 0) {
             instance#type = value#getTagTypeId();
@@ -516,11 +516,11 @@ class NBTTagList extends NBTBase {
         return true;
     }
 
-    public (NBTBaseHandle) NBTBase remove_at(int index) {
+    public (TagHandle) Tag remove_at(int index) {
   #if version >= 1.9
-        NBTBase removed = instance.remove(index);
+        Tag removed = instance.remove(index);
   #else
-        NBTBase removed = instance.a(index);
+        Tag removed = instance.a(index);
   #endif
         if (instance.isEmpty()) {
             instance#type = (byte) 0;
@@ -528,7 +528,7 @@ class NBTTagList extends NBTBase {
         return removed;
     }
 
-    public boolean add((NBTBaseHandle) NBTBase value) {
+    public boolean add((TagHandle) Tag value) {
   #if version >= 1.13
         if (!instance.add(value)) {
             byte list_type = instance#type;
@@ -558,9 +558,9 @@ class NBTTagList extends NBTBase {
         for (int i = 0; i < indent; i++) {
             str.append("  ");
         }
-        List<NBTBaseHandle> values = getData();
+        List<TagHandle> values = getData();
         str.append("TagList: ").append(values.size()).append(" entries [");
-        for (NBTBaseHandle value : values) {
+        for (TagHandle value : values) {
             str.append('\n');
             value.toPrettyString(str, indent + 1);
         }
@@ -575,31 +575,31 @@ class NBTTagList extends NBTBase {
     </code>
 }
 
-class NBTTagCompound extends NBTBase {
-    // Results in getData() being added, which overrides the one in NBTBase
+class CompoundTag extends Tag {
+    // Results in getData() being added, which overrides the one in Tag
 #if version >= 1.17
-    private final readonly (Map<String, NBTBaseHandle>) Map<String, NBTBase> data:tags;
-#elseif exists net.minecraft.nbt.NBTTagCompound private final it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<String, NBTBase> map;
+    private final readonly (Map<String, TagHandle>) Map<String, Tag> data:tags;
+#elseif exists net.minecraft.nbt.CompoundTag private final it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<String, Tag> map;
     // Nachospigot / Azurite
-    private final readonly (Map<String, NBTBaseHandle>) it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<String, NBTBase> data:map;
+    private final readonly (Map<String, TagHandle>) it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<String, Tag> data:map;
 #else
-    private final readonly (Map<String, NBTBaseHandle>) Map<String, NBTBase> data:map;
+    private final readonly (Map<String, TagHandle>) Map<String, Tag> data:map;
 #endif
 
-    public static (NBTTagCompoundHandle) NBTTagCompound createEmpty() { return new NBTTagCompound(); }
+    public static (CompoundTagHandle) CompoundTag createEmpty() { return new CompoundTag(); }
 
-    public static (NBTTagCompoundHandle) NBTTagCompound create(java.util.Map<String, ?> map) {
-        NBTTagCompound result = new NBTTagCompound();
+    public static (CompoundTagHandle) CompoundTag create(java.util.Map<String, ?> map) {
+        CompoundTag result = new CompoundTag();
         if (!map.isEmpty()) {
             java.util.Iterator iter = map.entrySet().iterator();
             while (iter.hasNext()) {
                 java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
                 Object value = entry.getValue();
-                NBTBase nbt_value;
-                if (value instanceof NBTBase) {
-                    nbt_value = (NBTBase) value;
+                Tag nbt_value;
+                if (value instanceof Tag) {
+                    nbt_value = (Tag) value;
                 } else {
-                    nbt_value = (NBTBase) com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.createRawHandleForData(value);
+                    nbt_value = (Tag) com.bergerkiller.generated.net.minecraft.nbt.TagHandle.createRawHandleForData(value);
                 }
                 result.put((String) entry.getKey(), nbt_value);
             }
@@ -608,7 +608,7 @@ class NBTTagCompound extends NBTBase {
     }
 
     <code>
-    public NBTTagCompoundHandle clone() {
+    public CompoundTagHandle clone() {
         return createHandle(raw_clone());
     }
     </code>
@@ -638,22 +638,22 @@ class NBTTagCompound extends NBTBase {
 #endif
 
 #if version >= 1.21.11
-    public (void) NBTBase remove(String key);
+    public (void) Tag remove(String key);
 #else
     public (void) void remove(String key);
 #endif
 
 #if version >= 1.14
-    public (NBTBaseHandle) NBTBase put(String key, (NBTBaseHandle) NBTBase value);
+    public (TagHandle) Tag put(String key, (TagHandle) Tag value);
 #else
-    public (NBTBaseHandle) NBTBase put(String key, (NBTBaseHandle) NBTBase value) {
-        NBTBase prev_value = instance.get(key);
+    public (TagHandle) Tag put(String key, (TagHandle) Tag value) {
+        Tag prev_value = instance.get(key);
         instance.put(key, value);
         return prev_value;
     }
 #endif
 
-    public (NBTBaseHandle) NBTBase get(String key);
+    public (TagHandle) Tag get(String key);
 
 #if version >= 1.18
     public boolean containsKey:contains(String key);
@@ -671,9 +671,9 @@ class NBTTagCompound extends NBTBase {
         for (int i = 0; i < indent; i++) {
             str.append("  ");
         }
-        Map<String, NBTBaseHandle> values = getData();
+        Map<String, TagHandle> values = getData();
         str.append("TagCompound: ").append(values.size()).append(" entries {");
-        for (Map.Entry<String, NBTBaseHandle> entry : values.entrySet()) {
+        for (Map.Entry<String, TagHandle> entry : values.entrySet()) {
             str.append('\n');
             for (int i = 0; i <= indent; i++) {
                 str.append("  ");
@@ -694,23 +694,23 @@ class NBTTagCompound extends NBTBase {
     </code>
 }
 
-class NBTCompressedStreamTools {
+class NbtIo {
 
 #if version >= 1.21.5
-    #require MojangsonParser public static NBTTagCompound snbtParseCompoundFully:parseCompoundFully(String snbtContent);
+    #require MojangsonParser public static CompoundTag snbtParseCompoundFully:parseCompoundFully(String snbtContent);
 #elseif version >= 1.18
-    #require MojangsonParser public static NBTTagCompound snbtParseCompoundFully:parseTag(String snbtContent);
+    #require MojangsonParser public static CompoundTag snbtParseCompoundFully:parseTag(String snbtContent);
 #else
-    #require MojangsonParser public static NBTTagCompound snbtParseCompoundFully:parse(String snbtContent);
+    #require MojangsonParser public static CompoundTag snbtParseCompoundFully:parse(String snbtContent);
 #endif
 
-    public static (NBTTagCompoundHandle) NBTTagCompound parseTagCompoundFromSNBT(String snbtContent) {
+    public static (CompoundTagHandle) CompoundTag parseTagCompoundFromSNBT(String snbtContent) {
         return #snbtParseCompoundFully(snbtContent);
     }
 
-    public static (NBTBaseHandle) NBTBase parseTagFromSNBT(String snbtContent) {
+    public static (TagHandle) Tag parseTagFromSNBT(String snbtContent) {
         // Is the input an ordinary compound? If so, we can use the
-        // static public method to parse it into an NBTTagCompound.
+        // static public method to parse it into an CompoundTag.
         boolean isCompound = false;
         for (int i = 0; i < snbtContent.length(); i++) {
             char c = snbtContent.charAt(i);
@@ -728,9 +728,9 @@ class NBTCompressedStreamTools {
         }
 
 #if version >= 1.21.5
-        #require MojangsonParser private static final MojangsonParser<NBTBase> NBT_OPS_PARSER;
+        #require MojangsonParser private static final MojangsonParser<Tag> NBT_OPS_PARSER;
         MojangsonParser parser = #NBT_OPS_PARSER;
-        return (NBTBase) parser.parseFully(new com.mojang.brigadier.StringReader(snbtContent));
+        return (Tag) parser.parseFully(new com.mojang.brigadier.StringReader(snbtContent));
 #elseif version >= 1.18
         MojangsonParser parser = new MojangsonParser(new com.mojang.brigadier.StringReader(snbtContent));
         return parser.readValue();
@@ -739,16 +739,16 @@ class NBTCompressedStreamTools {
         return parser.d();
 #elseif version >= 1.13
         MojangsonParser parser = new MojangsonParser(new com.mojang.brigadier.StringReader(snbtContent));
-        #require MojangsonParser protected NBTBase readValue:d();
+        #require MojangsonParser protected Tag readValue:d();
         return parser#readValue();
 #elseif version >= 1.12
         #require MojangsonParser MojangsonParser createParser:<init>(String content);
-        #require MojangsonParser protected NBTBase readValue:d();
+        #require MojangsonParser protected Tag readValue:d();
         MojangsonParser parser = #createParser(snbtContent);
         return parser#readValue();
 #else
         #require MojangsonParser static MojangsonParser.MojangsonTypeParser createParserFor:a(String key, String content);
-        #require MojangsonParser.MojangsonTypeParser public abstract NBTBase completeParse:a();
+        #require MojangsonParser.MojangsonTypeParser public abstract Tag completeParse:a();
         MojangsonParser$MojangsonTypeParser parser = #createParserFor("tag", snbtContent);
         return parser#completeParse();
 #endif
@@ -775,52 +775,52 @@ class NBTCompressedStreamTools {
 
 #if version >= 1.18
     // Uncompressed tag
-    public static void uncompressed_writeTag:writeUnnamedTag((NBTBaseHandle) NBTBase nbtbase, java.io.DataOutput dataoutput);
-    public static (NBTBaseHandle) NBTBase uncompressed_readTag(java.io.DataInput datainput) {
+    public static void uncompressed_writeTag:writeUnnamedTag((TagHandle) Tag nbtbase, java.io.DataOutput dataoutput);
+    public static (TagHandle) Tag uncompressed_readTag(java.io.DataInput datainput) {
   #if version >= 1.20.2
-        #require net.minecraft.nbt.NBTCompressedStreamTools private static NBTBase readUnnamedTag(java.io.DataInput datainput, NBTReadLimiter nbtreadlimiter);
-        return #readUnnamedTag(datainput, NBTReadLimiter.unlimitedHeap());
+        #require net.minecraft.nbt.NbtIo private static Tag readUnnamedTag(java.io.DataInput datainput, NbtAccounter nbtreadlimiter);
+        return #readUnnamedTag(datainput, NbtAccounter.unlimitedHeap());
   #else
-        #require net.minecraft.nbt.NBTCompressedStreamTools private static NBTBase readUnnamedTag(java.io.DataInput datainput, int i, NBTReadLimiter nbtreadlimiter);
-        return #readUnnamedTag(datainput, 0, NBTReadLimiter.a);
+        #require net.minecraft.nbt.NbtIo private static Tag readUnnamedTag(java.io.DataInput datainput, int i, NbtAccounter nbtreadlimiter);
+        return #readUnnamedTag(datainput, 0, NbtAccounter.a);
   #endif
     }
 
     // Uncompressed tag compound
-    public static void uncompressed_writeTagCompound:write((NBTTagCompoundHandle) NBTTagCompound nbttagcompound, java.io.DataOutput dataoutput);
-    public static (NBTTagCompoundHandle) NBTTagCompound uncompressed_readTagCompound(java.io.DataInput datainput) {
+    public static void uncompressed_writeTagCompound:write((CompoundTagHandle) CompoundTag nbttagcompound, java.io.DataOutput dataoutput);
+    public static (CompoundTagHandle) CompoundTag uncompressed_readTagCompound(java.io.DataInput datainput) {
   #if version >= 1.20.2
-        return NBTCompressedStreamTools.read(datainput, NBTReadLimiter.unlimitedHeap());
+        return NbtIo.read(datainput, NbtAccounter.unlimitedHeap());
   #else
-        return NBTCompressedStreamTools.read(datainput, NBTReadLimiter.a);
+        return NbtIo.read(datainput, NbtAccounter.a);
   #endif
     }
 
     // Compressed tag compound
   #if version >= 1.20.3
-    public static (NBTTagCompoundHandle) NBTTagCompound compressed_readTagCompound(java.io.InputStream inputstream) {
-        return NBTCompressedStreamTools.readCompressed(inputstream, NBTReadLimiter.unlimitedHeap());
+    public static (CompoundTagHandle) CompoundTag compressed_readTagCompound(java.io.InputStream inputstream) {
+        return NbtIo.readCompressed(inputstream, NbtAccounter.unlimitedHeap());
     }
   #else
-    public static (NBTTagCompoundHandle) NBTTagCompound compressed_readTagCompound:readCompressed(java.io.InputStream inputstream);
+    public static (CompoundTagHandle) CompoundTag compressed_readTagCompound:readCompressed(java.io.InputStream inputstream);
   #endif
-    public static void compressed_writeTagCompound:writeCompressed((NBTTagCompoundHandle) NBTTagCompound nbttagcompound, java.io.OutputStream outputstream);
+    public static void compressed_writeTagCompound:writeCompressed((CompoundTagHandle) CompoundTag nbttagcompound, java.io.OutputStream outputstream);
 #else
     // Uncompressed tag
-    private static void uncompressed_writeTag:a((NBTBaseHandle) NBTBase nbtbase, java.io.DataOutput dataoutput);
-    public static (NBTBaseHandle) NBTBase uncompressed_readTag(java.io.DataInput datainput) {
-        #require net.minecraft.nbt.NBTCompressedStreamTools private static NBTBase readTag:a(java.io.DataInput datainput, int i, NBTReadLimiter nbtreadlimiter);
-        return #readTag(datainput, 0, NBTReadLimiter.a);
+    private static void uncompressed_writeTag:a((TagHandle) Tag nbtbase, java.io.DataOutput dataoutput);
+    public static (TagHandle) Tag uncompressed_readTag(java.io.DataInput datainput) {
+        #require net.minecraft.nbt.NbtIo private static Tag readTag:a(java.io.DataInput datainput, int i, NbtAccounter nbtreadlimiter);
+        return #readTag(datainput, 0, NbtAccounter.a);
     }
 
     // Uncompressed tag compound
-    public static void uncompressed_writeTagCompound:a((NBTTagCompoundHandle) NBTTagCompound nbttagcompound, java.io.DataOutput dataoutput);
-    public static (NBTTagCompoundHandle) NBTTagCompound uncompressed_readTagCompound(java.io.DataInput datainput) {
-        return NBTCompressedStreamTools.a(datainput, NBTReadLimiter.a);
+    public static void uncompressed_writeTagCompound:a((CompoundTagHandle) CompoundTag nbttagcompound, java.io.DataOutput dataoutput);
+    public static (CompoundTagHandle) CompoundTag uncompressed_readTagCompound(java.io.DataInput datainput) {
+        return NbtIo.a(datainput, NbtAccounter.a);
     }
 
     // Compressed tag compound
-    public static (NBTTagCompoundHandle) NBTTagCompound compressed_readTagCompound:a(java.io.InputStream inputstream);
-    public static void compressed_writeTagCompound:a((NBTTagCompoundHandle) NBTTagCompound nbttagcompound, java.io.OutputStream outputstream);
+    public static (CompoundTagHandle) CompoundTag compressed_readTagCompound:a(java.io.InputStream inputstream);
+    public static void compressed_writeTagCompound:a((CompoundTagHandle) CompoundTag nbttagcompound, java.io.OutputStream outputstream);
 #endif
 }

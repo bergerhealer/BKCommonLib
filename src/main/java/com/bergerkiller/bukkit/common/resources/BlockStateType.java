@@ -4,8 +4,8 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 import com.bergerkiller.bukkit.common.wrappers.BasicWrapper;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.entity.BlockEntityTypeHandle;
 
 /**
  * A type of block state. Used for Block State change packet listening
@@ -15,12 +15,12 @@ import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEnt
  * Note: BlockStateType instances are unique, and can be compared using
  * reference equality rather than .equals(). It behaves similar to an enum.
  */
-public class BlockStateType extends BasicWrapper<TileEntityTypesHandle> {
+public class BlockStateType extends BasicWrapper<BlockEntityTypeHandle> {
     private static final Map<Object, BlockStateType> _cache = new IdentityHashMap<>();
     public static final BlockStateType SIGN = byName("sign");
     public static final BlockStateType HANGING_SIGN = byName("hanging_sign");
 
-    private BlockStateType(TileEntityTypesHandle handle) {
+    private BlockStateType(BlockEntityTypeHandle handle) {
         setHandle(handle);
     }
 
@@ -40,7 +40,7 @@ public class BlockStateType extends BasicWrapper<TileEntityTypesHandle> {
      *
      * @return Block state type key
      */
-    public MinecraftKeyHandle getKey() {
+    public IdentifierHandle getKey() {
         return handle.getKey();
     }
 
@@ -57,7 +57,7 @@ public class BlockStateType extends BasicWrapper<TileEntityTypesHandle> {
      * @see #getSerializedId()
      */
     public static BlockStateType bySerializedId(int id) {
-        return fromTileEntityTypesHandle(TileEntityTypesHandle.getRawById(id));
+        return fromTileEntityTypesHandle(BlockEntityTypeHandle.getRawById(id));
     }
 
     /**
@@ -67,7 +67,7 @@ public class BlockStateType extends BasicWrapper<TileEntityTypesHandle> {
      * @return Block state type, or null if not registered
      */
     public static BlockStateType byName(String name) {
-        return byKey(MinecraftKeyHandle.createNew(name));
+        return byKey(IdentifierHandle.createNew(name));
     }
 
     /**
@@ -76,8 +76,8 @@ public class BlockStateType extends BasicWrapper<TileEntityTypesHandle> {
      * @param key Minecraft key
      * @return Block state type, or null if not registered
      */
-    public static BlockStateType byKey(MinecraftKeyHandle key) {
-        return fromTileEntityTypesHandle(TileEntityTypesHandle.getRawByKey(key));
+    public static BlockStateType byKey(IdentifierHandle key) {
+        return fromTileEntityTypesHandle(BlockEntityTypeHandle.getRawByKey(key));
     }
 
     /**
@@ -94,7 +94,7 @@ public class BlockStateType extends BasicWrapper<TileEntityTypesHandle> {
 
         synchronized (_cache) {
             return _cache.computeIfAbsent(nmsTileEntityTypesHandle,
-                    raw -> new BlockStateType(TileEntityTypesHandle.createHandle(raw)));
+                    raw -> new BlockStateType(BlockEntityTypeHandle.createHandle(raw)));
         }
     }
 }

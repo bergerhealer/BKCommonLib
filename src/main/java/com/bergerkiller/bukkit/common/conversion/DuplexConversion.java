@@ -38,7 +38,7 @@ import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
-import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.TagHandle;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.conversion.Converter;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
@@ -106,7 +106,7 @@ public class DuplexConversion {
     public static final DuplexConverter<Object, CommonTag> nbtBase_commonTag = new DuplexConverter<Object, CommonTag>(CommonUtil.getClass("net.minecraft.nbt.NBTBase", false), CommonTag.class) {
         @Override
         public CommonTag convertInput(Object value) {
-            return NBTBaseHandle.createHandleForData(value).toCommonTag();
+            return TagHandle.createHandleForData(value).toCommonTag();
         }
 
         @Override
@@ -117,7 +117,7 @@ public class DuplexConversion {
     public static final DuplexConverter<Object, CommonTag> nbtBase_commonTag_readOnly = new DuplexConverter<Object, CommonTag>(CommonUtil.getClass("net.minecraft.nbt.NBTBase", false), CommonTag.class) {
         @Override
         public CommonTag convertInput(Object value) {
-            return CommonTag.makeReadOnly(NBTBaseHandle.createHandleForData(value).toCommonTag());
+            return CommonTag.makeReadOnly(TagHandle.createHandleForData(value).toCommonTag());
         }
 
         @Override
@@ -125,14 +125,14 @@ public class DuplexConversion {
             return value.getRawHandle();
         }
     };
-    public static final DuplexConverter<Object, NBTBaseHandle> nbtBase_nbtBaseHandle = new DuplexConverter<Object, NBTBaseHandle>(CommonUtil.getClass("net.minecraft.nbt.NBTBase", false), NBTBaseHandle.class) {
+    public static final DuplexConverter<Object, TagHandle> nbtBase_nbtBaseHandle = new DuplexConverter<Object, TagHandle>(CommonUtil.getClass("net.minecraft.nbt.NBTBase", false), TagHandle.class) {
         @Override
-        public NBTBaseHandle convertInput(Object value) {
-            return NBTBaseHandle.createHandleForData(value);
+        public TagHandle convertInput(Object value) {
+            return TagHandle.createHandleForData(value);
         }
 
         @Override
-        public Object convertOutput(NBTBaseHandle value) {
+        public Object convertOutput(TagHandle value) {
             return value.getRaw();
         }
     };

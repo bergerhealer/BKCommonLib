@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.lang.reflect.Method;
 
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -11,7 +12,6 @@ import org.bukkit.entity.Player;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
@@ -38,7 +38,7 @@ class PortalHandler_1_14 extends PortalHandler {
                 return null;
             }
         };
-        _dummyEntityInstance = interceptor.createInstance(EntityPlayerHandle.T.getType());
+        _dummyEntityInstance = interceptor.createInstance(ServerPlayerHandle.T.getType());
     }
 
     @Override
@@ -90,7 +90,7 @@ class PortalHandler_1_14 extends PortalHandler {
 
     @Override
     public void showEndCredits(Player player) {
-        EntityPlayerHandle ep = EntityPlayerHandle.fromBukkit(player);
+        ServerPlayerHandle ep = ServerPlayerHandle.fromBukkit(player);
         _pta.showEndCredits(HandleConversion.toEntityHandle(player), ep.hasSeenCredits());
         ep.setHasSeenCredits(true);
     }

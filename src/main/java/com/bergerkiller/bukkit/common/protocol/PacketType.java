@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
-import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
+import com.bergerkiller.generated.net.minecraft.network.syncher.SynchedEntityDataHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeField;
@@ -53,7 +53,6 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacket DEFAULT = new NMSPacket();
     public static final NMSPacketPlayOutAbilities OUT_ABILITIES = new NMSPacketPlayOutAbilities();
     public static final NMSPacketPlayOutAdvancements OUT_ADVANCEMENTS = new NMSPacketPlayOutAdvancements();
-    public static final NMSPacketPlayOutBed OUT_BED = Common.evaluateMCVersion(">=", "1.14") ? null : new NMSPacketPlayOutBed();
     public static final NMSPacketPlayOutBlockAction OUT_BLOCK_ACTION = new NMSPacketPlayOutBlockAction();
     //public static final NMSPacketPlayOutChat OUT_CHAT = new NMSPacketPlayOutChat();
     public static final NMSPacketPlayOutCollect OUT_COLLECT = new NMSPacketPlayOutCollect();
@@ -252,7 +251,7 @@ public class PacketType extends ClassTemplate<Object> {
         // Obtain the datawatcher Field
         FieldAccessor<DataWatcher> dataWatcherField = null;
         for (SafeField<?> field : this.getFields()) {
-            if (DataWatcherHandle.T.isType(field.getType())) {
+            if (SynchedEntityDataHandle.T.isType(field.getType())) {
                 dataWatcherField = field.translate(DuplexConversion.dataWatcher);
                 break;
             }

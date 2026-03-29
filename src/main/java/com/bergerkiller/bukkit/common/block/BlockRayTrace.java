@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.block;
 
 import com.bergerkiller.bukkit.common.utils.MathUtil;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.MovingObjectPositionHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.HitResultHandle;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -148,7 +148,7 @@ public final class BlockRayTrace {
      *         was hit (air)
      */
     public HitResult rayTrace() {
-        MovingObjectPositionHandle mop = WorldHandle.fromBukkit(world).rayTrace(from, to);
+        HitResultHandle mop = LevelHandle.fromBukkit(world).rayTrace(from, to);
         return mop == null ? null : new HitResult(this, mop);
     }
 
@@ -161,7 +161,7 @@ public final class BlockRayTrace {
         private final BlockFace hitFace;
         private final Block block;
 
-        private HitResult(BlockRayTrace rayTrace, MovingObjectPositionHandle mop) {
+        private HitResult(BlockRayTrace rayTrace, HitResultHandle mop) {
             this.rayTrace = rayTrace;
             this.absolutePosition = mop.getPos();
             this.hitFace = mop.getDirection();

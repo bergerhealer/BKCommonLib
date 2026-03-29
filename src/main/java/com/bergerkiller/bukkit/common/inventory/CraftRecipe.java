@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.inventory;
 
 import com.bergerkiller.bukkit.common.utils.*;
-import com.bergerkiller.generated.net.minecraft.world.item.crafting.IRecipeHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeHandle;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -270,10 +270,10 @@ public class CraftRecipe {
      */
     @Deprecated
     public static CraftRecipe create(Object recipe) {
-        return create(IRecipeHandle.createHandle(recipe));
+        return create(RecipeHandle.createHandle(recipe));
     }
 
-    public static CraftRecipe create(IRecipeHandle recipe) {
+    public static CraftRecipe create(RecipeHandle recipe) {
         final ItemStack output = recipe.getOutput();
         final List<CraftInputSlot> ingredients = recipe.getIngredients();
         if (ingredients != null) {

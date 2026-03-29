@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.scoreboards;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeamHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacketHandle;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -159,17 +159,17 @@ public class CommonTeam implements Serializable {
 
         if (this.sendToAll) {
             for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-                PacketUtil.sendPacket(p, this.getPacket(PacketPlayOutScoreboardTeamHandle.METHOD_JOIN));
+                PacketUtil.sendPacket(p, this.getPacket(ClientboundSetPlayerTeamPacketHandle.METHOD_JOIN));
             }
         } else {
             if (player instanceof Player && ((Player) player).isValid()) {
-                PacketUtil.sendPacket((Player) player, this.getPacket(PacketPlayOutScoreboardTeamHandle.METHOD_ADD));
+                PacketUtil.sendPacket((Player) player, this.getPacket(ClientboundSetPlayerTeamPacketHandle.METHOD_ADD));
             }
 
             for (String user : players) {
                 Player p = Bukkit.getPlayer(user);
                 if (p != null && p.isValid()) {
-                    PacketUtil.sendPacket(p, this.getPacket(PacketPlayOutScoreboardTeamHandle.METHOD_JOIN));
+                    PacketUtil.sendPacket(p, this.getPacket(ClientboundSetPlayerTeamPacketHandle.METHOD_JOIN));
                 }
             }
         }
@@ -185,17 +185,17 @@ public class CommonTeam implements Serializable {
 
         if (this.sendToAll) {
             for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-                PacketUtil.sendPacket(p, this.getPacket(PacketPlayOutScoreboardTeamHandle.METHOD_LEAVE));
+                PacketUtil.sendPacket(p, this.getPacket(ClientboundSetPlayerTeamPacketHandle.METHOD_LEAVE));
             }
         } else {
             if (player instanceof Player && ((Player) player).isValid()) {
-                PacketUtil.sendPacket((Player) player, this.getPacket(PacketPlayOutScoreboardTeamHandle.METHOD_REMOVE));
+                PacketUtil.sendPacket((Player) player, this.getPacket(ClientboundSetPlayerTeamPacketHandle.METHOD_REMOVE));
             }
 
             for (String user : players) {
                 Player p = Bukkit.getPlayer(user);
                 if (p != null && p.isValid()) {
-                    PacketUtil.sendPacket(p, this.getPacket(PacketPlayOutScoreboardTeamHandle.METHOD_LEAVE));
+                    PacketUtil.sendPacket(p, this.getPacket(ClientboundSetPlayerTeamPacketHandle.METHOD_LEAVE));
                 }
             }
         }
@@ -225,13 +225,13 @@ public class CommonTeam implements Serializable {
     public void hide() {
         if (this.sendToAll) {
             for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-                PacketUtil.sendPacket(p, this.getPacket(PacketPlayOutScoreboardTeamHandle.METHOD_REMOVE));
+                PacketUtil.sendPacket(p, this.getPacket(ClientboundSetPlayerTeamPacketHandle.METHOD_REMOVE));
             }
         } else {
             for (String user : players) {
                 Player p = Bukkit.getPlayer(user);
                 if (p != null && p.isValid()) {
-                    PacketUtil.sendPacket(p, this.getPacket(PacketPlayOutScoreboardTeamHandle.METHOD_REMOVE));
+                    PacketUtil.sendPacket(p, this.getPacket(ClientboundSetPlayerTeamPacketHandle.METHOD_REMOVE));
                 }
             }
         }
@@ -243,7 +243,7 @@ public class CommonTeam implements Serializable {
     private void update() {
         if (this.sendToAll) {
             for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-                PacketUtil.sendPacket(p, this.getPacket(PacketPlayOutScoreboardTeamHandle.METHOD_CHANGE));
+                PacketUtil.sendPacket(p, this.getPacket(ClientboundSetPlayerTeamPacketHandle.METHOD_CHANGE));
             }
         } else {
             for (String user : players) {
@@ -261,7 +261,7 @@ public class CommonTeam implements Serializable {
      * @param player to receive team data
      */
     public void send(Player player) {
-        PacketUtil.sendPacket(player, this.getPacket(PacketPlayOutScoreboardTeamHandle.METHOD_ADD));
+        PacketUtil.sendPacket(player, this.getPacket(ClientboundSetPlayerTeamPacketHandle.METHOD_ADD));
     }
 
     /**
@@ -271,13 +271,13 @@ public class CommonTeam implements Serializable {
      * @return Packet
      */
     private CommonPacket getPacket(int method) {
-        PacketPlayOutScoreboardTeamHandle packet = PacketPlayOutScoreboardTeamHandle.createNew();
+        ClientboundSetPlayerTeamPacketHandle packet = ClientboundSetPlayerTeamPacketHandle.createNew();
         packet.setMethod(method);
         packet.setName(this.name);
         packet.setPlayers(this.players);
 
         // Only needed when a new team is created or updated
-        if (method == PacketPlayOutScoreboardTeamHandle.METHOD_ADD || method == PacketPlayOutScoreboardTeamHandle.METHOD_CHANGE) {
+        if (method == ClientboundSetPlayerTeamPacketHandle.METHOD_ADD || method == ClientboundSetPlayerTeamPacketHandle.METHOD_CHANGE) {
             packet.setDisplayName(ChatText.fromMessage(this.displayName));
             packet.setPrefix(ChatText.fromMessage(this.prefix));
             packet.setSuffix(ChatText.fromMessage(this.suffix));

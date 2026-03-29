@@ -1,6 +1,6 @@
 package net.minecraft.util;
 
-class RegistryID {
+class CrudeIncrementalIntIdentityHashBiMap {
 #if version >= 1.9
     public int getId(K value);
 #else

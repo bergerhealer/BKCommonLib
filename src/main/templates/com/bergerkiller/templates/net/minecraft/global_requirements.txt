@@ -3,10 +3,10 @@ package net.minecraft.world.item;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.CustomData;
 
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTNumber;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagLong;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NumericTag;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.LongTag;
 
 import net.minecraft.world.level.saveddata.maps.MapId;
 
@@ -15,22 +15,22 @@ import net.minecraft.world.level.saveddata.maps.MapId;
     MapId mapId = (MapId) instance.get(DataComponents.MAP_ID);
     return (mapId == null) ? -1 : mapId.id();
 #elseif version >= 1.13
-    NBTTagCompound metadata = instance.getTag();
+    CompoundTag metadata = instance.getTag();
     if (metadata == null) {
         return -1;
     }
-    NBTBase mapId = metadata.get("map");
-    if (!(mapId instanceof NBTNumber)) {
+    Tag mapId = metadata.get("map");
+    if (!(mapId instanceof NumericTag)) {
         return -1;
     }
   #if version >= 1.18
-    return ((NBTNumber) mapId).getAsInt();
+    return ((NumericTag) mapId).getAsInt();
   #elseif version >= 1.13.2
-    return ((NBTNumber) mapId).asInt();
+    return ((NumericTag) mapId).asInt();
   #elseif version >= 1.10.2
-    return ((NBTNumber) mapId).e();
+    return ((NumericTag) mapId).e();
   #else
-    return ((NBTNumber) mapId).d();
+    return ((NumericTag) mapId).d();
   #endif
 #else
     return instance.getData();
@@ -45,32 +45,32 @@ import net.minecraft.world.level.saveddata.maps.MapId;
     }
 
   #if version >= 1.21.9
-    #require net.minecraft.world.item.component.CustomData private final readonly NBTTagCompound cmd_tag:tag;
-    NBTTagCompound metadata = customData#cmd_tag; // Note: unmodifiable!
+    #require net.minecraft.world.item.component.CustomData private final readonly CompoundTag cmd_tag:tag;
+    CompoundTag metadata = customData#cmd_tag; // Note: unmodifiable!
   #else
-    NBTTagCompound metadata = customData.getUnsafe(); // Note: unmodifiable!
+    CompoundTag metadata = customData.getUnsafe(); // Note: unmodifiable!
   #endif
 #else
-    NBTTagCompound metadata = instance.getTag();
+    CompoundTag metadata = instance.getTag();
 #endif
     if (metadata != null) {
-        NBTBase mapDisplayUUIDMost = metadata.get("mapDisplayUUIDMost");
-        if (mapDisplayUUIDMost instanceof NBTTagLong) {
-            NBTBase mapDisplayUUIDLeast = metadata.get("mapDisplayUUIDLeast");
-            if (mapDisplayUUIDLeast instanceof NBTTagLong) {
+        Tag mapDisplayUUIDMost = metadata.get("mapDisplayUUIDMost");
+        if (mapDisplayUUIDMost instanceof LongTag) {
+            Tag mapDisplayUUIDLeast = metadata.get("mapDisplayUUIDLeast");
+            if (mapDisplayUUIDLeast instanceof LongTag) {
                 long mostBits, leastBits;
 #if version >= 1.18
-                mostBits = ((NBTTagLong) mapDisplayUUIDMost).getAsLong();
-                leastBits = ((NBTTagLong) mapDisplayUUIDLeast).getAsLong();
+                mostBits = ((LongTag) mapDisplayUUIDMost).getAsLong();
+                leastBits = ((LongTag) mapDisplayUUIDLeast).getAsLong();
 #elseif version >= 1.13.2
-                mostBits = ((NBTTagLong) mapDisplayUUIDMost).asLong();
-                leastBits = ((NBTTagLong) mapDisplayUUIDLeast).asLong();
+                mostBits = ((LongTag) mapDisplayUUIDMost).asLong();
+                leastBits = ((LongTag) mapDisplayUUIDLeast).asLong();
 #elseif version >= 1.10.2
-                mostBits = ((NBTTagLong) mapDisplayUUIDMost).d();
-                leastBits = ((NBTTagLong) mapDisplayUUIDLeast).d();
+                mostBits = ((LongTag) mapDisplayUUIDMost).d();
+                leastBits = ((LongTag) mapDisplayUUIDLeast).d();
 #else
-                mostBits = ((NBTTagLong) mapDisplayUUIDMost).c();
-                leastBits = ((NBTTagLong) mapDisplayUUIDLeast).c();
+                mostBits = ((LongTag) mapDisplayUUIDMost).c();
+                leastBits = ((LongTag) mapDisplayUUIDLeast).c();
 #endif
                 return new java.util.UUID(mostBits, leastBits);
             }

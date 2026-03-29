@@ -38,7 +38,7 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
@@ -75,7 +75,7 @@ class EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem extends EntityAddRemoveHan
             Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to find EntityLookup class");
         }
         try {
-            getEntityLookupMethod.init(WorldServerHandle.T.getType().getDeclaredMethod("getEntityLookup"));
+            getEntityLookupMethod.init(ServerLevelHandle.T.getType().getDeclaredMethod("getEntityLookup"));
             if (!entityLookupClass.isAssignableFrom(getEntityLookupMethod.getMethod().getReturnType())) {
                 throw new IllegalStateException("Return type of getEntityLookup not assignable to EntityLookup");
             }
@@ -217,7 +217,7 @@ class EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem extends EntityAddRemoveHan
 
     @Override
     public void replace(EntityHandle oldEntity, EntityHandle newEntity) {
-        WorldServerHandle world = oldEntity.getWorldServer();
+        ServerLevelHandle world = oldEntity.getWorldServer();
         if (newEntity == null) {
             if (world != null) {
                 world.removeEntity(oldEntity);

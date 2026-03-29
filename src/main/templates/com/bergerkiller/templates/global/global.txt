@@ -1,8 +1,7 @@
 // Global functions and macros that are available in all templates
 // This file is loaded in at the very beginning
 
-import net.minecraft.EnumChatFormat;
-import net.minecraft.network.chat.ChatModifier;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.contents.TranslatableContents;
 
 import net.minecraft.world.level.storage.ValueOutput;
@@ -68,19 +67,19 @@ import net.minecraft.world.level.storage.TagValueInput;
         }
     }
 #elseif version >= 1.18
-    #require net.minecraft.network.chat.IChatBaseComponent public abstract String getComponentText:getContents();
-    #require net.minecraft.network.chat.IChatBaseComponent public boolean isComponentContentEmpty() {
+    #require net.minecraft.network.chat.Component public abstract String getComponentText:getContents();
+    #require net.minecraft.network.chat.Component public boolean isComponentContentEmpty() {
         return instance.getContents().isEmpty();
     }
 #else
-    #require net.minecraft.network.chat.IChatBaseComponent public abstract String getComponentText:getText();
-    #require net.minecraft.network.chat.IChatBaseComponent public boolean isComponentContentEmpty() {
+    #require net.minecraft.network.chat.Component public abstract String getComponentText:getText();
+    #require net.minecraft.network.chat.Component public boolean isComponentContentEmpty() {
         return instance.getText().isEmpty();
     }
 #endif
 
 // Formats a chat component, and its siblings/children, as a legacy-color-formatted message String
-#require net.minecraft.network.chat.IChatBaseComponent public String formatAsLegacyString() {
+#require net.minecraft.network.chat.Component public String formatAsLegacyString() {
     IChatBaseComponent component = instance;
 
     // Some optimizations
@@ -110,7 +109,7 @@ import net.minecraft.world.level.storage.TagValueInput;
     StringBuilder out = new StringBuilder();
     java.util.Iterator iter = ((Iterable) component).iterator();
 
-    EnumChatFormat prev_color_format = null;
+    ChatFormatting prev_color_format = null;
     boolean prev_was_bold = false;
     boolean prev_was_italic = false;
     boolean prev_was_underlined = false;
@@ -119,7 +118,7 @@ import net.minecraft.world.level.storage.TagValueInput;
 
     while (iter.hasNext()) {
         IChatBaseComponent c = (IChatBaseComponent) iter.next();
-        ChatModifier modi = c.getStyle();
+        net.minecraft.network.chat.Style modi = c.getStyle();
 
         // Place reset character when too many style flags are active
         if ((prev_was_bold && !modi.isBold()) ||
@@ -134,12 +133,12 @@ import net.minecraft.world.level.storage.TagValueInput;
             prev_was_underlined = false;
             prev_was_strikeThrough = false;
             prev_was_obfuscated = false;
-            out.append(EnumChatFormat.RESET);
+            out.append(ChatFormatting.RESET);
         }
 
         if (modi.getColor() != null) {
 #if version >= 1.16
-            EnumChatFormat color_format = modi.getColor().format;
+            ChatFormatting color_format = modi.getColor().format;
             if (color_format != null) {
                 // Track as 16 color format, omit duplicates
                 if (prev_color_format != color_format) {
@@ -151,8 +150,8 @@ import net.minecraft.world.level.storage.TagValueInput;
   #if version >= 1.17
                 int rgb = modi.getColor().getValue();
   #else
-                #require net.minecraft.network.chat.ChatHexColor private final int chc_rgb:rgb;
-                net.minecraft.network.chat.ChatHexColor hexcolor = modi.getColor();
+                #require net.minecraft.network.chat.TextColor private final int chc_rgb:rgb;
+                net.minecraft.network.chat.TextColor hexcolor = modi.getColor();
                 int rgb = hexcolor#chc_rgb;
   #endif
 
@@ -176,23 +175,23 @@ import net.minecraft.world.level.storage.TagValueInput;
         }
         if (modi.isBold() && !prev_was_bold) {
             prev_was_bold = true;
-            out.append(EnumChatFormat.BOLD);
+            out.append(ChatFormatting.BOLD);
         }
         if (modi.isItalic() && !prev_was_italic) {
             prev_was_italic = true;
-            out.append(EnumChatFormat.ITALIC);
+            out.append(ChatFormatting.ITALIC);
         }
         if (modi.isUnderlined() && !prev_was_underlined) {
             prev_was_underlined = true;
-            out.append(EnumChatFormat.UNDERLINE);
+            out.append(ChatFormatting.UNDERLINE);
         }
         if (modi.isStrikethrough() && !prev_was_strikeThrough) {
             prev_was_strikeThrough = true;
-            out.append(EnumChatFormat.STRIKETHROUGH);
+            out.append(ChatFormatting.STRIKETHROUGH);
         }
         if (modi.isObfuscated() && !prev_was_obfuscated) {
             prev_was_obfuscated = true;
-            out.append(EnumChatFormat.OBFUSCATED);
+            out.append(ChatFormatting.OBFUSCATED);
         }
 
         String text = c#getComponentText();
@@ -201,7 +200,7 @@ import net.minecraft.world.level.storage.TagValueInput;
     return out.toString();
 }
 
-#require net.minecraft.network.chat.IChatBaseComponent public static String[] formatLinesAsLegacyStrings(IChatBaseComponent[] lines) {
+#require net.minecraft.network.chat.Component public static String[] formatLinesAsLegacyStrings(IChatBaseComponent[] lines) {
     int numLines = lines.length;
     String[] legacyLines = new String[numLines];
     for (int i = 0; i < numLines; i++) {
@@ -211,12 +210,12 @@ import net.minecraft.world.level.storage.TagValueInput;
     return legacyLines;
 }
 
-// Creates a new MinecraftKey from a key or namespace:key formatted String
-#require net.minecraft.resources.MinecraftKey public static MinecraftKey parseMinecraftKey(String keyStr) {
+// Creates a new Identifier from a key or namespace:key formatted String
+#require net.minecraft.resources.Identifier public static Identifier parseIdentifier(String keyStr) {
 #if version >= 1.21
-    return MinecraftKey.parse(keyStr);
+    return Identifier.parse(keyStr);
 #else
-    return new MinecraftKey(keyStr);
+    return new Identifier(keyStr);
 #endif
 }
 
@@ -227,30 +226,30 @@ import net.minecraft.world.level.storage.TagValueInput;
                 com.bergerkiller.bukkit.common.Logging.LOGGER);
     }
 
-    #require TagValueOutput public static ValueOutput createTagValueOutput(net.minecraft.util.ProblemReporter problemreporter, net.minecraft.core.HolderLookup.a holderlookup_a, net.minecraft.nbt.NBTTagCompound nbttagcompound) {
-        #require TagValueOutput static TagValueOutput tagValueOutputCtor:<init>(net.minecraft.util.ProblemReporter problemreporter, com.mojang.serialization.DynamicOps<net.minecraft.nbt.NBTBase> dynamicops, net.minecraft.nbt.NBTTagCompound nbttagcompound);
+    #require TagValueOutput public static ValueOutput createTagValueOutput(net.minecraft.util.ProblemReporter problemreporter, net.minecraft.core.HolderLookup.Provider holderlookup_a, net.minecraft.nbt.CompoundTag nbttagcompound) {
+        #require TagValueOutput static TagValueOutput tagValueOutputCtor:<init>(net.minecraft.util.ProblemReporter problemreporter, com.mojang.serialization.DynamicOps<net.minecraft.nbt.Tag> dynamicops, net.minecraft.nbt.CompoundTag nbttagcompound);
 
-        com.mojang.serialization.DynamicOps dynamicops = holderlookup_a.createSerializationContext(net.minecraft.nbt.DynamicOpsNBT.INSTANCE);
+        com.mojang.serialization.DynamicOps dynamicops = holderlookup_a.createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE);
         return #tagValueOutputCtor(problemreporter, dynamicops, nbttagcompound);
     }
 
-    #require TagValueOutput public static ValueOutput.TypedOutputList createTagListValueOutput(net.minecraft.util.ProblemReporter problemreporter, net.minecraft.core.HolderLookup.a holderlookup_a, com.mojang.serialization.Codec codec, net.minecraft.nbt.NBTTagList nbttaglist) {
-        #require TagValueOutput.TypedListWrapper static TagValueInput.TypedListWrapper tagListOutputCtor:<init>(net.minecraft.util.ProblemReporter problemreporter, String s, com.mojang.serialization.DynamicOps<net.minecraft.nbt.NBTBase> dynamicops, com.mojang.serialization.Codec codec, net.minecraft.nbt.NBTTagList nbttaglist);
+    #require TagValueOutput public static ValueOutput.TypedOutputList createTagListValueOutput(net.minecraft.util.ProblemReporter problemreporter, net.minecraft.core.HolderLookup.Provider holderlookup_a, com.mojang.serialization.Codec codec, net.minecraft.nbt.ListTag nbttaglist) {
+        #require TagValueOutput.TypedListWrapper static TagValueInput.TypedListWrapper tagListOutputCtor:<init>(net.minecraft.util.ProblemReporter problemreporter, String s, com.mojang.serialization.DynamicOps<net.minecraft.nbt.Tag> dynamicops, com.mojang.serialization.Codec codec, net.minecraft.nbt.ListTag nbttaglist);
 
         com.mojang.serialization.DynamicOps dynamicops = holderlookup_a.createSerializationContext(net.minecraft.nbt.DynamicOpsNBT.INSTANCE);
         return (ValueOutput.TypedOutputList) #tagListOutputCtor(problemreporter, "", dynamicops, codec, nbttaglist);
     }
 
-    #require TagValueInput public static ValueInput createTagValueInput:create(net.minecraft.util.ProblemReporter problemreporter, net.minecraft.core.HolderLookup.a holderlookup_a, net.minecraft.nbt.NBTTagCompound nbttagcompound);
+    #require TagValueInput public static ValueInput createTagValueInput:create(net.minecraft.util.ProblemReporter problemreporter, net.minecraft.core.HolderLookup.Provider holderlookup_a, net.minecraft.nbt.CompoundTag nbttagcompound);
 
-    #require TagValueInput public static ValueInput.TypedInputList createTagListValueInput(net.minecraft.util.ProblemReporter problemreporter, net.minecraft.core.HolderLookup.a holderlookup_a, com.mojang.serialization.Codec codec, net.minecraft.nbt.NBTTagList nbttaglist) {
-        net.minecraft.world.level.storage.ValueInputContextHelper context = new net.minecraft.world.level.storage.ValueInputContextHelper(holderlookup_a, net.minecraft.nbt.DynamicOpsNBT.INSTANCE);
+    #require TagValueInput public static ValueInput.TypedInputList createTagListValueInput(net.minecraft.util.ProblemReporter problemreporter, net.minecraft.core.HolderLookup.Provider holderlookup_a, com.mojang.serialization.Codec codec, net.minecraft.nbt.ListTag nbttaglist) {
+        net.minecraft.world.level.storage.ValueInputContextHelper context = new net.minecraft.world.level.storage.ValueInputContextHelper(holderlookup_a, net.minecraft.nbt.NbtOps.INSTANCE);
 
         if (nbttaglist.isEmpty()) {
             return context.emptyTypedList();
         }
 
-        #require TagValueInput.TypedListWrapper static TagValueInput.TypedListWrapper tagListInputCtor:<init>(net.minecraft.util.ProblemReporter problemreporter, String s, net.minecraft.world.level.storage.ValueInputContextHelper context, com.mojang.serialization.Codec codec, net.minecraft.nbt.NBTTagList nbttaglist);
+        #require TagValueInput.TypedListWrapper static TagValueInput.TypedListWrapper tagListInputCtor:<init>(net.minecraft.util.ProblemReporter problemreporter, String s, net.minecraft.world.level.storage.ValueInputContextHelper context, com.mojang.serialization.Codec codec, net.minecraft.nbt.ListTag nbttaglist);
         return (ValueInput$TypedInputList) #tagListInputCtor(problemreporter, "", context, codec, nbttaglist);
     }
 #endif

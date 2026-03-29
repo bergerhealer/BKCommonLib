@@ -3,8 +3,8 @@ package com.bergerkiller.generated.net.minecraft.world.level.block;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.BlockStateHandle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -33,27 +33,27 @@ public abstract class BlockHandle extends Template.Handle {
         return T.getRegistry.invoker.invoke(null);
     }
 
-    public static IBlockDataHandle getByCombinedId(int combinedId) {
+    public static BlockStateHandle getByCombinedId(int combinedId) {
         return T.getByCombinedId.invoke(combinedId);
     }
 
-    public static int getCombinedId(IBlockDataHandle iblockdata) {
+    public static int getCombinedId(BlockStateHandle iblockdata) {
         return T.getCombinedId.invoke(iblockdata);
     }
 
-    public abstract void entityHitVertical(WorldHandle world, EntityHandle entity);
+    public abstract void entityHitVertical(LevelHandle world, EntityHandle entity);
     public abstract String getTitle();
-    public abstract boolean isFaceOpaque(IBlockDataHandle iblockdata, World world, int x, int y, int z, BlockFace direction);
-    public abstract int getOpacity(IBlockDataHandle iblockdata, World world, int x, int y, int z);
-    public abstract int getEmission(IBlockDataHandle iblockdata, World world, int x, int y, int z);
-    public abstract boolean isOccluding_at(IBlockDataHandle iblockdata, World world, int x, int y, int z);
-    public abstract boolean isOccluding(IBlockDataHandle iblockdata, Block block);
-    public abstract boolean canSupportOnFace(IBlockDataHandle iblockdata, Block block, BlockFace direction);
+    public abstract boolean isFaceOpaque(BlockStateHandle iblockdata, World world, int x, int y, int z, BlockFace direction);
+    public abstract int getOpacity(BlockStateHandle iblockdata, World world, int x, int y, int z);
+    public abstract int getEmission(BlockStateHandle iblockdata, World world, int x, int y, int z);
+    public abstract boolean isOccluding_at(BlockStateHandle iblockdata, World world, int x, int y, int z);
+    public abstract boolean isOccluding(BlockStateHandle iblockdata, Block block);
+    public abstract boolean canSupportOnFace(BlockStateHandle iblockdata, Block block, BlockFace direction);
     public abstract float getDamageResillience();
-    public abstract void dropNaturally(IBlockDataHandle iblockdata, World world, IntVector3 blockposition, float yield, int chance);
-    public abstract void stepOn(World world, IntVector3 blockposition, IBlockDataHandle iblockdata, Entity entity);
-    public abstract IBlockDataHandle updateState(IBlockDataHandle iblockdata, World world, IntVector3 blockposition);
-    public abstract IBlockDataHandle getBlockData();
+    public abstract void dropNaturally(BlockStateHandle iblockdata, World world, IntVector3 blockposition, float yield, int chance);
+    public abstract void stepOn(World world, IntVector3 blockposition, BlockStateHandle iblockdata, Entity entity);
+    public abstract BlockStateHandle updateState(BlockStateHandle iblockdata, World world, IntVector3 blockposition);
+    public abstract BlockStateHandle getBlockData();
     /**
      * Stores class members for <b>net.minecraft.world.level.block.Block</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -63,7 +63,7 @@ public abstract class BlockHandle extends Template.Handle {
         public final Template.StaticField.Converted<Iterable> REGISTRY_ID = new Template.StaticField.Converted<Iterable>();
 
         public final Template.StaticMethod<Iterable<?>> getRegistry = new Template.StaticMethod<Iterable<?>>();
-        public final Template.StaticMethod.Converted<IBlockDataHandle> getByCombinedId = new Template.StaticMethod.Converted<IBlockDataHandle>();
+        public final Template.StaticMethod.Converted<BlockStateHandle> getByCombinedId = new Template.StaticMethod.Converted<BlockStateHandle>();
         public final Template.StaticMethod.Converted<Integer> getCombinedId = new Template.StaticMethod.Converted<Integer>();
 
         public final Template.Method.Converted<Void> entityHitVertical = new Template.Method.Converted<Void>();
@@ -77,8 +77,8 @@ public abstract class BlockHandle extends Template.Handle {
         public final Template.Method<Float> getDamageResillience = new Template.Method<Float>();
         public final Template.Method.Converted<Void> dropNaturally = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> stepOn = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<IBlockDataHandle> updateState = new Template.Method.Converted<IBlockDataHandle>();
-        public final Template.Method.Converted<IBlockDataHandle> getBlockData = new Template.Method.Converted<IBlockDataHandle>();
+        public final Template.Method.Converted<BlockStateHandle> updateState = new Template.Method.Converted<BlockStateHandle>();
+        public final Template.Method.Converted<BlockStateHandle> getBlockData = new Template.Method.Converted<BlockStateHandle>();
 
     }
 

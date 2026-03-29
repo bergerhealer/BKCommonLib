@@ -1,0 +1,109 @@
+package com.bergerkiller.generated.net.minecraft.world.entity;
+
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+import com.bergerkiller.bukkit.common.wrappers.Holder;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectInstanceHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeInstanceHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeMapHandle;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
+import java.util.Collection;
+import java.util.Map;
+
+/**
+ * Instance wrapper handle for type <b>net.minecraft.world.entity.LivingEntity</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
+@Template.InstanceType("net.minecraft.world.entity.LivingEntity")
+public abstract class LivingEntityHandle extends EntityHandle {
+    /** @see LivingEntityClass */
+    public static final LivingEntityClass T = Template.Class.create(LivingEntityClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
+    /* ============================================================================== */
+
+    public static LivingEntityHandle createHandle(Object handleInstance) {
+        return T.createHandle(handleInstance);
+    }
+
+    /* ============================================================================== */
+
+    public abstract void resetAttributes();
+    public abstract void detectEquipmentChanges();
+    public abstract void loadEquipment(CommonTagCompound data);
+    public abstract CommonTagCompound saveEquipment();
+    public abstract AttributeMapHandle getAttributeMap();
+    public abstract AttributeInstanceHandle getAttribute(Holder<AttributeHandle> attribute);
+    public abstract Vector getMoveIntent();
+    public abstract Collection<MobEffectInstanceHandle> getEffects();
+    public abstract ItemStack getEquipment(EquipmentSlot paramEnumItemSlot);
+    public abstract float getHealth();
+    public abstract float getMaxHealth();
+    public abstract float getAbsorptionAmount();
+    public abstract void setAbsorptionAmount(float extraHealth);
+    public static final Key<Byte> DATA_LIVING_FLAGS = Key.Type.BYTE.createKey(T.DATA_LIVING_FLAGS, -1);
+    public static final Key<Float> DATA_HEALTH = Key.Type.FLOAT.createKey(T.DATA_HEALTH, 6);
+    public static final Key<Boolean> DATA_PARTICLES_HIDDEN = Key.Type.BOOLEAN.createKey(T.DATA_PARTICLES_HIDDEN, 8);
+    public static final Key<Integer> DATA_UNKNOWN1 = Key.Type.INTEGER.createKey(T.DATA_ARROWCOUNT, 9);
+    public static final Key<IntVector3> DATA_BEDPOSITION = Key.Type.BLOCK_POSITION.createKey(T.DATA_BEDPOSITION, -1);
+
+    public float getSideMovement() {
+        return (float) getMoveIntent().getX();
+    }
+
+    public float getForwardMovement() {
+        return (float) getMoveIntent().getZ();
+    }
+
+    public static LivingEntityHandle fromBukkit(org.bukkit.entity.LivingEntity livingEntity) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(livingEntity));
+    }
+    public abstract Map<Holder<MobEffectHandle>, MobEffectInstanceHandle> getMobEffects();
+    public abstract void setMobEffects(Map<Holder<MobEffectHandle>, MobEffectInstanceHandle> value);
+    public abstract float getLastDamage();
+    public abstract void setLastDamage(float value);
+    public abstract boolean isUpdateEffects();
+    public abstract void setUpdateEffects(boolean value);
+    /**
+     * Stores class members for <b>net.minecraft.world.entity.LivingEntity</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
+    public static final class LivingEntityClass extends Template.Class<LivingEntityHandle> {
+        @Template.Optional
+        public final Template.StaticField.Converted<Key<Byte>> DATA_LIVING_FLAGS = new Template.StaticField.Converted<Key<Byte>>();
+        @Template.Optional
+        public final Template.StaticField.Converted<Key<Float>> DATA_HEALTH = new Template.StaticField.Converted<Key<Float>>();
+        @Template.Optional
+        public final Template.StaticField.Converted<Key<Boolean>> DATA_PARTICLES_HIDDEN = new Template.StaticField.Converted<Key<Boolean>>();
+        @Template.Optional
+        public final Template.StaticField.Converted<Key<Integer>> DATA_ARROWCOUNT = new Template.StaticField.Converted<Key<Integer>>();
+        @Template.Optional
+        public final Template.StaticField.Converted<Key<IntVector3>> DATA_BEDPOSITION = new Template.StaticField.Converted<Key<IntVector3>>();
+
+        public final Template.Field.Converted<Map<Holder<MobEffectHandle>, MobEffectInstanceHandle>> mobEffects = new Template.Field.Converted<Map<Holder<MobEffectHandle>, MobEffectInstanceHandle>>();
+        public final Template.Field.Float lastDamage = new Template.Field.Float();
+        public final Template.Field.Boolean updateEffects = new Template.Field.Boolean();
+
+        public final Template.Method<Void> resetAttributes = new Template.Method<Void>();
+        public final Template.Method<Void> detectEquipmentChanges = new Template.Method<Void>();
+        public final Template.Method.Converted<Void> loadEquipment = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<CommonTagCompound> saveEquipment = new Template.Method.Converted<CommonTagCompound>();
+        public final Template.Method.Converted<AttributeMapHandle> getAttributeMap = new Template.Method.Converted<AttributeMapHandle>();
+        public final Template.Method.Converted<AttributeInstanceHandle> getAttribute = new Template.Method.Converted<AttributeInstanceHandle>();
+        public final Template.Method.Converted<Vector> getMoveIntent = new Template.Method.Converted<Vector>();
+        public final Template.Method.Converted<Collection<MobEffectInstanceHandle>> getEffects = new Template.Method.Converted<Collection<MobEffectInstanceHandle>>();
+        public final Template.Method.Converted<ItemStack> getEquipment = new Template.Method.Converted<ItemStack>();
+        public final Template.Method<Float> getHealth = new Template.Method<Float>();
+        public final Template.Method<Float> getMaxHealth = new Template.Method<Float>();
+        public final Template.Method<Float> getAbsorptionAmount = new Template.Method<Float>();
+        public final Template.Method<Void> setAbsorptionAmount = new Template.Method<Void>();
+
+    }
+
+}
+

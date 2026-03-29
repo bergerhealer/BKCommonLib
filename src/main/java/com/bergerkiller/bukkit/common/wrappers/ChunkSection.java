@@ -1,13 +1,13 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkSectionHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.DataPaletteBlockHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.LevelChunkSectionHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.PalettedContainerHandle;
 
-public class ChunkSection extends BasicWrapper<ChunkSectionHandle> {
-    private final DataPaletteBlockHandle blockIds;
+public class ChunkSection extends BasicWrapper<LevelChunkSectionHandle> {
+    private final PalettedContainerHandle blockIds;
     private final int yPos;
 
-    public ChunkSection(ChunkSectionHandle nmsChunkSectionHandle, int yPos) {
+    public ChunkSection(LevelChunkSectionHandle nmsChunkSectionHandle, int yPos) {
         setHandle(nmsChunkSectionHandle);
         this.blockIds = handle.getBlockPalette();
         this.yPos = yPos;

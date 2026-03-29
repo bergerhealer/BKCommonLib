@@ -3,8 +3,8 @@ package com.bergerkiller.bukkit.common.conversion.type;
 import java.util.WeakHashMap;
 
 import com.bergerkiller.bukkit.common.wrappers.Holder;
-import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeBaseHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeHandle;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -16,7 +16,7 @@ import com.bergerkiller.bukkit.common.component.LibraryComponent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
-import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
+import com.bergerkiller.generated.net.minecraft.sounds.SoundEventHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
@@ -89,26 +89,26 @@ public class MC1_18_2_Conversion {
 
     @ConverterMethod(output="net.minecraft.core.Holder<net.minecraft.sounds.SoundEffect>")
     public static Object soundEffectHolderFromResourceKey(ResourceKey<SoundEffect> soundKey) {
-        return SoundEffectHandle.T.rawSoundEffectResourceKeyToHolder.invoke(soundKey.getRawHandle());
+        return SoundEventHandle.T.rawSoundEffectResourceKeyToHolder.invoke(soundKey.getRawHandle());
     }
 
     @ConverterMethod(input="net.minecraft.core.Holder<net.minecraft.world.effect.MobEffectList>")
-    public static Holder<MobEffectListHandle> wrapMobEffectHolder(Object nmsHolder) {
-        return Holder.fromHandle(nmsHolder, MobEffectListHandle::createHandle);
+    public static Holder<MobEffectHandle> wrapMobEffectHolder(Object nmsHolder) {
+        return Holder.fromHandle(nmsHolder, MobEffectHandle::createHandle);
     }
 
     @ConverterMethod(output="net.minecraft.core.Holder<net.minecraft.world.effect.MobEffectList>")
-    public static Object unwrapMobEffectHolder(Holder<MobEffectListHandle> holder) {
+    public static Object unwrapMobEffectHolder(Holder<MobEffectHandle> holder) {
         return holder.toRawHolder();
     }
 
     @ConverterMethod(input="net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.AttributeBase>")
-    public static Holder<AttributeBaseHandle> wrapAttributeHolder(Object nmsHolder) {
-        return Holder.fromHandle(nmsHolder, AttributeBaseHandle::createHandle);
+    public static Holder<AttributeHandle> wrapAttributeHolder(Object nmsHolder) {
+        return Holder.fromHandle(nmsHolder, AttributeHandle::createHandle);
     }
 
     @ConverterMethod(output="net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.AttributeBase>")
-    public static Object unwrapAttributeHolder(Holder<AttributeBaseHandle> holder) {
+    public static Object unwrapAttributeHolder(Holder<AttributeHandle> holder) {
         return holder.toRawHolder();
     }
 

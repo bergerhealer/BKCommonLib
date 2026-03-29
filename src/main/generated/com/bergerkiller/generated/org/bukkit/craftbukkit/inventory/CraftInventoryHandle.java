@@ -1,7 +1,7 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.inventory;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
+import com.bergerkiller.generated.net.minecraft.world.ContainerHandle;
 import com.bergerkiller.generated.org.bukkit.inventory.InventoryHandle;
 import org.bukkit.inventory.Inventory;
 
@@ -20,25 +20,25 @@ public abstract class CraftInventoryHandle extends InventoryHandle {
         return T.createHandle(handleInstance);
     }
 
-    public static final Inventory createNew(Object nmsIInventory) {
-        return T.constr_nmsIInventory.newInstance(nmsIInventory);
+    public static final Inventory createNew(Object nmsContainer) {
+        return T.constr_nmsContainer.newInstance(nmsContainer);
     }
 
     /* ============================================================================== */
 
-    public abstract IInventoryHandle getHandle();
-    public abstract IInventoryHandle getHandleField();
-    public abstract void setHandleField(IInventoryHandle value);
+    public abstract ContainerHandle getHandle();
+    public abstract ContainerHandle getHandleField();
+    public abstract void setHandleField(ContainerHandle value);
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.inventory.CraftInventory</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class CraftInventoryClass extends Template.Class<CraftInventoryHandle> {
-        public final Template.Constructor.Converted<Inventory> constr_nmsIInventory = new Template.Constructor.Converted<Inventory>();
+        public final Template.Constructor.Converted<Inventory> constr_nmsContainer = new Template.Constructor.Converted<Inventory>();
 
-        public final Template.Field.Converted<IInventoryHandle> handleField = new Template.Field.Converted<IInventoryHandle>();
+        public final Template.Field.Converted<ContainerHandle> handleField = new Template.Field.Converted<ContainerHandle>();
 
-        public final Template.Method.Converted<IInventoryHandle> getHandle = new Template.Method.Converted<IInventoryHandle>();
+        public final Template.Method.Converted<ContainerHandle> getHandle = new Template.Method.Converted<ContainerHandle>();
 
     }
 

@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.entity;
 
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -83,7 +83,7 @@ public enum PlayerInstancePhase {
         } else if (Bukkit.getPlayer(player.getUniqueId()) != player) {
             // This also happens while a Player is in the LOGIN phase, so check the
             // player is truly disconnected as well to differentiate the two.
-            if (EntityPlayerHandle.fromBukkit(player).hasDisconnected()) {
+            if (ServerPlayerHandle.fromBukkit(player).hasDisconnected()) {
                 return OFFLINE;
             } else {
                 return JOINING;

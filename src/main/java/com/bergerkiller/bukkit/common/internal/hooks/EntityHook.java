@@ -8,6 +8,7 @@ import com.bergerkiller.bukkit.common.controller.EntityPositionApplier;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.world.level.storage.ValueOutputHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.Vec3Handle;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import org.bukkit.entity.Entity;
@@ -24,12 +25,11 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.InteractionResult;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
-import com.bergerkiller.generated.net.minecraft.locale.LocaleLanguageHandle;
+import com.bergerkiller.generated.net.minecraft.locale.LanguageHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.item.EntityItemHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.player.EntityHumanHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypeHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.item.ItemEntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.player.PlayerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import org.bukkit.util.Vector;
 
@@ -354,9 +354,9 @@ public class EntityHook extends ClassHook<EntityHook> {
     @HookMethodCondition("version >= 1.14")
     @HookMethod("public void move(net.minecraft.world.entity.EnumMoveType enummovetype, net.minecraft.world.phys.Vec3D vec3d)")
     public void onMove_v3(Object enumMoveType, Object vec3d) {
-        double dx = Vec3DHandle.T.x.getDouble(vec3d);
-        double dy = Vec3DHandle.T.y.getDouble(vec3d);
-        double dz = Vec3DHandle.T.z.getDouble(vec3d);
+        double dx = Vec3Handle.T.x.getDouble(vec3d);
+        double dy = Vec3Handle.T.y.getDouble(vec3d);
+        double dz = Vec3Handle.T.z.getDouble(vec3d);
         this.onMove_v2(enumMoveType, dx, dy, dz);
     }
 
@@ -372,7 +372,7 @@ public class EntityHook extends ClassHook<EntityHook> {
                 }
             } else {
                 if (CommonCapabilities.ENTITY_MOVE_VER3) {
-                    base.onMove_v3(enumMoveType, Vec3DHandle.T.constr_x_y_z.raw.newInstance(dx, dy, dz));
+                    base.onMove_v3(enumMoveType, Vec3Handle.T.constr_x_y_z.raw.newInstance(dx, dy, dz));
                 } else if (CommonCapabilities.ENTITY_MOVE_VER2) {
                     base.onMove_v2(enumMoveType, dx, dy, dz);
                 } else {
@@ -545,12 +545,12 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
 
         // <= 1.10.2 we already take care of this issue with the class translating map of entity names
-        if (EntityTypesHandle.T.opt_typeNameMap_1_10_2.isAvailable()) {
+        if (EntityTypeHandle.T.opt_typeNameMap_1_10_2.isAvailable()) {
             return base.getStringUUID();
         }
 
         // Special handling for some entity types and when a custom name is set
-        if (EntityHumanHandle.T.isAssignableFrom(instance) || EntityItemHandle.T.isAssignableFrom(instance)) {
+        if (PlayerHandle.T.isAssignableFrom(instance) || ItemEntityHandle.T.isAssignableFrom(instance)) {
             return base.getStringUUID();
         }
         if (EntityHandle.T.hasCustomName.invoke(instance)) {
@@ -559,12 +559,12 @@ public class EntityHook extends ClassHook<EntityHook> {
 
         // Only used MC 1.11 to 1.12.2 inclusively
         // Retrieve MinecraftKey of this entity class, and the String internal name from that
-        int typeId = EntityTypesHandle.getEntityTypeId(EntityHook.findInstanceBaseType(instance));
-        String name = EntityTypesHandle.T.opt_typeIdToName_1_11.get().get(typeId);
+        int typeId = EntityTypeHandle.getEntityTypeId(EntityHook.findInstanceBaseType(instance));
+        String name = EntityTypeHandle.T.opt_typeIdToName_1_11.get().get(typeId);
         if (name == null) {
             name = "generic";
         }
-        return LocaleLanguageHandle.INSTANCE().get("entity." + name + ".name");
+        return LanguageHandle.INSTANCE().get("entity." + name + ".name");
     }
 
     private boolean handleSaveAsPassenger(Object valueoutput, boolean includeAll, boolean includeNonSaveable, boolean forceSerialization) {
@@ -628,7 +628,7 @@ public class EntityHook extends ClassHook<EntityHook> {
 
     /* This key is used for later de-serializing the entity */
     private static final String getSavedName(Object instance) {
-        return EntityTypesHandle.getEntityInternalName(EntityHook.findInstanceBaseType(instance));
+        return EntityTypeHandle.getEntityInternalName(EntityHook.findInstanceBaseType(instance));
     }
 
     @HookMethod("public void collide:???(net.minecraft.world.entity.Entity entity)")

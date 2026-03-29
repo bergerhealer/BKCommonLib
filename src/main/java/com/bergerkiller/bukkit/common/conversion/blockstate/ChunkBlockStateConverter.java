@@ -1,17 +1,17 @@
 package com.bergerkiller.bukkit.common.conversion.blockstate;
 
+import com.bergerkiller.generated.net.minecraft.world.level.block.entity.BlockEntityHandle;
 import org.bukkit.Chunk;
 import org.bukkit.block.BlockState;
 
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 
 public class ChunkBlockStateConverter extends DuplexConverter<Object, BlockState> {
     private final Chunk chunk;
 
     public ChunkBlockStateConverter(Chunk chunk) {
-        super(TileEntityHandle.T.getType(), BlockState.class);
+        super(BlockEntityHandle.T.getType(), BlockState.class);
         this.chunk = chunk;
     }
 

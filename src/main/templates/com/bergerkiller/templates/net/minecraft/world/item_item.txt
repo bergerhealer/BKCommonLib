@@ -1,7 +1,6 @@
 package net.minecraft.world.item;
 
-import net.minecraft.core.RegistryMaterials;
-import net.minecraft.resources.MinecraftKey;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.PatchedDataComponentMap;
@@ -12,11 +11,11 @@ class Item {
         com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
 #if version >= 1.14
-        #require net.minecraft.core.registries.BuiltInRegistries public static final net.minecraft.core.RegistryBlocks<net.minecraft.world.item.Item> REGISTRY:ITEM;
+        #require net.minecraft.core.registries.BuiltInRegistries public static final net.minecraft.core.DefaultedRegistry<net.minecraft.world.item.Item> REGISTRY:ITEM;
 #elseif version >= 1.13.1
-        #require net.minecraft.core.IRegistry public static final net.minecraft.core.IRegistry<net.minecraft.world.item.Item> REGISTRY:ITEM;
+        #require net.minecraft.core.Registry public static final net.minecraft.core.Registry<net.minecraft.world.item.Item> REGISTRY:ITEM;
 #else
-        #require net.minecraft.world.item.Item public static final net.minecraft.core.RegistryMaterials<MinecraftKey, net.minecraft.world.item.Item> REGISTRY;
+        #require net.minecraft.world.item.Item public static final net.minecraft.core.MappedRegistry<Identifier, net.minecraft.world.item.Item> REGISTRY;
 #endif
         return #REGISTRY;
     }
