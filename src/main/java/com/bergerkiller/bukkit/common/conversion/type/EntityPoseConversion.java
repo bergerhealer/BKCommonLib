@@ -16,7 +16,7 @@ import java.util.Map;
  * Only used on Minecraft 1.14+.
  */
 public class EntityPoseConversion {
-    public static final Class<?> NMS_ENTITY_POSE_TYPE = CommonUtil.getClass("net.minecraft.world.entity.EntityPose");
+    public static final Class<?> NMS_ENTITY_POSE_TYPE = CommonUtil.getClass("net.minecraft.world.entity.Pose");
     private static final Map<Object, EntityPose> toWrapper;
     private static final Map<EntityPose, Object> toHandle;
     static {
@@ -45,12 +45,12 @@ public class EntityPoseConversion {
         }
     }
 
-    @ConverterMethod(output="net.minecraft.world.entity.EntityPose")
+    @ConverterMethod(output="net.minecraft.world.entity.Pose")
     public static Object getEnumEntityPose(EntityPose pose) {
         return toHandle.get(pose);
     }
 
-    @ConverterMethod(input="net.minecraft.world.entity.EntityPose")
+    @ConverterMethod(input="net.minecraft.world.entity.Pose")
     public static EntityPose getEntityPose(Object enumEntityPose) {
         return toWrapper.get(enumEntityPose);
     }

@@ -12,12 +12,12 @@ import org.bukkit.map.MapCursor;
  */
 public class MapConversion {
 
-    @ConverterMethod(output="net.minecraft.world.level.saveddata.maps.MapIcon")
+    @ConverterMethod(output="net.minecraft.world.level.saveddata.maps.MapDecoration")
     public static Object toMapIconHandle(MapCursor cursor) {
         return MapDecorationHandle.fromCursor(cursor).getRaw();
     }
 
-    @ConverterMethod(input="net.minecraft.world.level.saveddata.maps.MapIcon")
+    @ConverterMethod(input="net.minecraft.world.level.saveddata.maps.MapDecoration")
     public static MapCursor toMapCursor(Object nmsMapCursorHandle) {
         return MapDecorationHandle.createHandle(nmsMapCursorHandle).toCursor();
     }

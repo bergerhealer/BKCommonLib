@@ -19,7 +19,7 @@ public class MC1_17_Conversion {
     private static final FastField<Object> epConnectionField = new FastField<Object>();
 
     public static void init() {
-        Class<?> entityPlayerType = Resolver.loadClass("net.minecraft.server.level.EntityPlayer", false);
+        Class<?> entityPlayerType = Resolver.loadClass("net.minecraft.server.level.ServerPlayer", false);
         Class<?> spcType = Resolver.loadClass("net.minecraft.server.network.ServerPlayerConnection", false);
 
         try {
@@ -55,12 +55,12 @@ public class MC1_17_Conversion {
         }
     }
 
-    @ConverterMethod(input="net.minecraft.server.network.ServerPlayerConnection", output="net.minecraft.server.level.EntityPlayer")
+    @ConverterMethod(input="net.minecraft.server.network.ServerPlayerConnection", output="net.minecraft.server.level.ServerPlayer")
     public static Object serverConnectionToEntityPlayer(Object nmsServerPlayerConnection) {
         return spcGetEntityPlayerMethod.invoke(nmsServerPlayerConnection);
     }
 
-    @ConverterMethod(input="net.minecraft.server.level.EntityPlayer", output="net.minecraft.server.network.ServerPlayerConnection")
+    @ConverterMethod(input="net.minecraft.server.level.ServerPlayer", output="net.minecraft.server.network.ServerPlayerConnection")
     public static Object entityPlayerToServerConnection(Object nmsEntityPlayer) {
         return epConnectionField.get(nmsEntityPlayer);
     }

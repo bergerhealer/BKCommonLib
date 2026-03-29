@@ -42,7 +42,7 @@ public class DimensionResourceKeyConversion {
         }
 
         // Methods of IRegistry to get a value by key, or key by value
-        Class<?> registryType = Resolver.loadClass("net.minecraft.core.IRegistry", false);
+        Class<?> registryType = Resolver.loadClass("net.minecraft.core.Registry", false);
         if (registryType == null) {
             throw new IllegalStateException("IRegistry type not found");
         }
@@ -65,7 +65,7 @@ public class DimensionResourceKeyConversion {
         registryGetByValueMethod.forceInitialization();
     }
 
-    @ConverterMethod(input="net.minecraft.resources.ResourceKey<net.minecraft.world.level.dimension.DimensionManager>")
+    @ConverterMethod(input="net.minecraft.resources.ResourceKey<net.minecraft.world.level.dimension.DimensionType>")
     public static DimensionType toDimensionType(Object resourceKeyHandle) {
         Object registry = DimensionTypeHandle.getDimensionTypeRegistry();
         Object dimensionManagerHandle = registryGetByKeyMethod.invoke(registry, resourceKeyHandle);
@@ -83,7 +83,7 @@ public class DimensionResourceKeyConversion {
         return DimensionType.fromDimensionManagerHandle(dimensionManagerHandle);
     }
 
-    @ConverterMethod(output="net.minecraft.resources.ResourceKey<net.minecraft.world.level.dimension.DimensionManager>")
+    @ConverterMethod(output="net.minecraft.resources.ResourceKey<net.minecraft.world.level.dimension.DimensionType>")
     public static Object toResourceKey(DimensionType dimensionType) {
         Object dimensionManagerHandle = dimensionType.getDimensionManagerHandle();
         Object registry = DimensionTypeHandle.getDimensionTypeRegistry();

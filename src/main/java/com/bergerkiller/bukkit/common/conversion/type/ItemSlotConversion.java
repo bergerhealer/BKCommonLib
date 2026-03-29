@@ -55,12 +55,12 @@ public class ItemSlotConversion {
         }
     }
 
-    @ConverterMethod(output="net.minecraft.world.entity.EnumItemSlot")
+    @ConverterMethod(output="net.minecraft.world.entity.EquipmentSlot")
     public static Object getEnumItemSlot(EquipmentSlot slot) {
         return slotMap_b.get(slot);
     }
 
-    @ConverterMethod(input="net.minecraft.world.entity.EnumItemSlot")
+    @ConverterMethod(input="net.minecraft.world.entity.EquipmentSlot")
     public static EquipmentSlot getEquipmentSlot(Object enumItemSlot) {
         return slotMap_a.get(enumItemSlot);
     }

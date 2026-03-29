@@ -21,11 +21,11 @@ import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
- * Converts between Holder&lt;DimensionManager&gt; and DimensionManager, and does
- * similar logic for MobEffectList (potion effects) and AttributeBase (attributes)
+ * Converts between Holder&lt;DimensionType&gt; and DimensionType, and does
+ * similar logic for MobEffect (potion effects) and Attribute (attributes)
  */
 public class MC1_18_2_Conversion {
-    private static WeakHashMap<Object, Object> holdersByDimensionManager = new WeakHashMap<>();
+    private static WeakHashMap<Object, Object> holdersByDimensionType = new WeakHashMap<>();
     private static HolderLogic handler;
 
     public static void init() {
@@ -50,31 +50,31 @@ public class MC1_18_2_Conversion {
 
             @Override
             public void disable() throws Throwable {
-                synchronized (holdersByDimensionManager) {
-                    holdersByDimensionManager.clear();
+                synchronized (holdersByDimensionType) {
+                    holdersByDimensionType.clear();
                 }
             }
         };
     }
 
     private static void track(World world) {
-        synchronized (holdersByDimensionManager) {
-            holdersByDimensionManager.put(handler.getDimensionTypeOfWorld(world),
+        synchronized (holdersByDimensionType) {
+            holdersByDimensionType.put(handler.getDimensionTypeOfWorld(world),
                                           handler.getHolderOfWorld(world));
         }
     }
 
-    @ConverterMethod(input="net.minecraft.core.Holder<net.minecraft.world.level.dimension.DimensionManager>",
-                     output="net.minecraft.world.level.dimension.DimensionManager")
-    public static Object fromHolderToDimensionManager(Object holder) {
+    @ConverterMethod(input="net.minecraft.core.Holder<net.minecraft.world.level.dimension.DimensionType>",
+                     output="net.minecraft.world.level.dimension.DimensionType")
+    public static Object fromHolderToDimensionType(Object holder) {
         return handler.getValue(holder);
     }
 
-    @ConverterMethod(input="net.minecraft.world.level.dimension.DimensionManager",
-                     output="net.minecraft.core.Holder<net.minecraft.world.level.dimension.DimensionManager>")
-    public static Object fromDimensionManagerToHolder(Object dimensionManager) {
-        synchronized (holdersByDimensionManager) {
-            Object holder = holdersByDimensionManager.get(dimensionManager);
+    @ConverterMethod(input="net.minecraft.world.level.dimension.DimensionType",
+                     output="net.minecraft.core.Holder<net.minecraft.world.level.dimension.DimensionType>")
+    public static Object fromDimensionTypeToHolder(Object dimensionManager) {
+        synchronized (holdersByDimensionType) {
+            Object holder = holdersByDimensionType.get(dimensionManager);
             if (holder == null) {
                 throw new IllegalArgumentException("Unknown or unregistered dimension type");
             }
@@ -82,39 +82,39 @@ public class MC1_18_2_Conversion {
         }
     }
 
-    @ConverterMethod(input="net.minecraft.core.Holder<net.minecraft.sounds.SoundEffect>")
+    @ConverterMethod(input="net.minecraft.core.Holder<net.minecraft.sounds.SoundEvent>")
     public static ResourceKey<SoundEffect> soundEffectHolderToResourceKey(Object nmsHolderHandle) {
         return ResourceKey.fromResourceKeyHandle(handler.getResourceKey(nmsHolderHandle));
     }
 
-    @ConverterMethod(output="net.minecraft.core.Holder<net.minecraft.sounds.SoundEffect>")
+    @ConverterMethod(output="net.minecraft.core.Holder<net.minecraft.sounds.SoundEvent>")
     public static Object soundEffectHolderFromResourceKey(ResourceKey<SoundEffect> soundKey) {
         return SoundEventHandle.T.rawSoundEffectResourceKeyToHolder.invoke(soundKey.getRawHandle());
     }
 
-    @ConverterMethod(input="net.minecraft.core.Holder<net.minecraft.world.effect.MobEffectList>")
+    @ConverterMethod(input="net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect>")
     public static Holder<MobEffectHandle> wrapMobEffectHolder(Object nmsHolder) {
         return Holder.fromHandle(nmsHolder, MobEffectHandle::createHandle);
     }
 
-    @ConverterMethod(output="net.minecraft.core.Holder<net.minecraft.world.effect.MobEffectList>")
+    @ConverterMethod(output="net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect>")
     public static Object unwrapMobEffectHolder(Holder<MobEffectHandle> holder) {
         return holder.toRawHolder();
     }
 
-    @ConverterMethod(input="net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.AttributeBase>")
+    @ConverterMethod(input="net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute>")
     public static Holder<AttributeHandle> wrapAttributeHolder(Object nmsHolder) {
         return Holder.fromHandle(nmsHolder, AttributeHandle::createHandle);
     }
 
-    @ConverterMethod(output="net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.AttributeBase>")
+    @ConverterMethod(output="net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute>")
     public static Object unwrapAttributeHolder(Holder<AttributeHandle> holder) {
         return holder.toRawHolder();
     }
 
     @Template.Optional
     @Template.Import("org.bukkit.craftbukkit.CraftWorld")
-    @Template.Import("net.minecraft.world.level.dimension.DimensionManager")
+    @Template.Import("net.minecraft.world.level.dimension.DimensionType")
     @Template.InstanceType("net.minecraft.core.Holder")
     public static abstract class HolderLogic extends Template.Class<Template.Handle> {
 
@@ -148,7 +148,7 @@ public class MC1_18_2_Conversion {
         /*
          * <GET_HOLDER_OF_WORLD>
          * public static Object getHolder(CraftWorld world) {
-         *     return ((net.minecraft.world.level.World) world.getHandle()).dimensionTypeRegistration();
+         *     return ((net.minecraft.world.level.Level) world.getHandle()).dimensionTypeRegistration();
          * }
          */
         @Template.Generated("%GET_HOLDER_OF_WORLD%")

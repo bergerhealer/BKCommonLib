@@ -32,17 +32,17 @@ public class MC1_8_8_Conversion {
         return getMobEffectListId(holder.rawValue());
     }
 
-    @ConverterMethod(output="net.minecraft.world.effect.MobEffectList")
+    @ConverterMethod(output="net.minecraft.world.effect.MobEffect")
     public static Object createMobEffectListFromId(Integer id) {
         return MobEffectHandle.T.fromId.raw.invoker.invoke(null, id);
     }
 
-    @ConverterMethod(input="net.minecraft.world.effect.MobEffectList")
+    @ConverterMethod(input="net.minecraft.world.effect.MobEffect")
     public static Integer getMobEffectListId(Object mobEffectListHandle) {
         return (Integer) MobEffectHandle.T.getId.raw.invoker.invoke(null, mobEffectListHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.network.syncher.DataWatcher.WatchableObject")
+    @ConverterMethod(input="net.minecraft.network.syncher.SynchedEntityData.WatchableObject")
     public static com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?> watchableObjectToItem(Object watchableObject) {
         SynchedEntityDataHandle.ItemHandle handle = SynchedEntityDataHandle.ItemHandle.createHandle(watchableObject);
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<Object>(handle);

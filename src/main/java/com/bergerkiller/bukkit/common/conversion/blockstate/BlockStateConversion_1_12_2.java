@@ -239,6 +239,8 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
     }
 
     @ClassHook.HookPackage("net.minecraft.server")
+    @ClassHook.HookImport("net.minecraft.world.level.block.state.BlockState")
+    @ClassHook.HookImport("net.minecraft.core.BlockPos")
     public class NMSWorldHook extends ClassHook<NMSWorldHook> {
         @Override
         protected Invoker<?> getCallback(Class<?> hookedType, Method method) {
@@ -246,7 +248,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
             return (callback != null) ? callback : non_instrumented_invokable;
         }
 
-        @HookMethod("public TileEntity getTileEntity(BlockPosition blockposition)")
+        @HookMethod("public net.minecraft.world.level.block.entity.BlockEntity getTileEntity(BlockPos blockposition)")
         public Object getTileEntity(Object blockPosition) {
             return input_state.tileEntity;
         }
@@ -256,12 +258,12 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
             return MinecraftServerHandle.instance().getRaw();
         }
 
-        @HookMethod("public IBlockData getType(BlockPosition blockposition)")
+        @HookMethod("public BlockState getType(BlockPos blockposition)")
         public Object getType(Object blockPosition) {
             return input_state.blockData.getData();
         }
 
-        @HookMethod("public boolean setTypeAndData(BlockPosition blockposition, IBlockData iblockdata, int i)")
+        @HookMethod("public boolean setTypeAndData(BlockPos blockposition, BlockState iblockdata, int i)")
         public boolean setTypeAndData(Object blockPosition, Object iblockdata, int i) {
             return true;
         }

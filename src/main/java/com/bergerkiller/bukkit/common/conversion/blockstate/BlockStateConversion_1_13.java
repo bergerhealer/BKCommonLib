@@ -72,7 +72,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                     return non_instrumented_invokable;
                 }
             }
-        }.createInstance(CommonUtil.getClass("net.minecraft.world.ticks.TickListServer"));
+        }.createInstance(CommonUtil.getClass("net.minecraft.world.ticks.LevelTicks"));
 
         // Create a NMS World proxy for handling various calls done from tile entities / block states
         proxy_nms_world = new WorldServerHook(this).createInstance(ServerLevelHandle.T.getType());
@@ -81,7 +81,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         // - getTileEntityAt(x, y, z) to return our requested entity
         // All other methods will fail.
         proxy_world = (World) new ClassInterceptor() {
-            private final Class<?> tileEntityType = CommonUtil.getClass("net.minecraft.world.level.block.entity.TileEntity");
+            private final Class<?> tileEntityType = CommonUtil.getClass("net.minecraft.world.level.block.entity.BlockEntity");
 
             @Override
             protected Invoker<?> getCallback(Method method) {
@@ -303,19 +303,19 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
     }
 
     @ClassHook.HookPackage("net.minecraft.world.level")
-    @ClassHook.HookImport("net.minecraft.core.BlockPosition")
+    @ClassHook.HookImport("net.minecraft.core.BlockPos")
     @ClassHook.HookImport("net.minecraft.server.MinecraftServer")
     @ClassHook.HookImport("net.minecraft.world.level.block.Block")
-    @ClassHook.HookImport("net.minecraft.world.level.block.entity.TileEntity")
-    @ClassHook.HookImport("net.minecraft.world.level.block.state.IBlockData")
-    @ClassHook.HookImport("net.minecraft.world.level.chunk.Chunk")
+    @ClassHook.HookImport("net.minecraft.world.level.block.entity.BlockEntity")
+    @ClassHook.HookImport("net.minecraft.world.level.block.state.BlockState")
     @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
     public static class WorldServerHook extends ClassHook<WorldServerHook> {
         private final BlockStateConversion_1_13 conversion;
-        private static final Class<?> tileEntityType = CommonUtil.getClass("net.minecraft.world.level.block.entity.TileEntity");
-        private static final Class<?> iBlockDataType = CommonUtil.getClass("net.minecraft.world.level.block.state.IBlockData");
-        private static final Class<?> customRegistryType = CommonUtil.getClass("net.minecraft.core.IRegistryCustom");
+        private static final Class<?> tileEntityType = CommonUtil.getClass("net.minecraft.world.level.block.entity.BlockEntity");
+        private static final Class<?> iBlockDataType = CommonUtil.getClass("net.minecraft.world.level.block.state.BlockState");
+        private static final Class<?> customRegistryType = CommonUtil.getClass("net.minecraft.core.RegistryAccess");
         private static final Class<?> minecraftServerType = CommonUtil.getClass("net.minecraft.server.MinecraftServer");
+        private static final Class<?> tickAccessType = CommonUtil.getClass("net.minecraft.world.ticks.TickAccess");
 
         public WorldServerHook(BlockStateConversion_1_13 conversion) {
             this.conversion = conversion;
@@ -330,7 +330,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
 
             // Fluid and Block Tick list
             Class<?>[] params = method.getParameterTypes();
-            if (params.length == 0 && CommonUtil.getClass("net.minecraft.world.ticks.TickList").isAssignableFrom(method.getReturnType())) {
+            if (params.length == 0 && tickAccessType.isAssignableFrom(method.getReturnType())) {
                 return ConstantReturningInvoker.of(this.conversion.proxy_nms_world_ticklist);
             }
 
@@ -372,7 +372,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         // Note there is also a setBlockData variant with two ints (default of second int is 512)
         // Since a later version of Minecraft, this method calls that one. For this reason on Paper,
         // this method is final. As such we've made the method optional so it won't warn.
-        @HookMethod(value="public boolean setBlockData:???(BlockPosition blockposition, IBlockData iblockdata, int updateFlags)", optional=true)
+        @HookMethod(value="public boolean setBlockData:???(BlockPos blockposition, BlockState iblockdata, int updateFlags)", optional=true)
         public boolean setBlockData(Object blockPosition, Object iblockdata, int updateFlags) {
             return true;
         }
@@ -381,7 +381,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         // is made final and calls this method. To override properly, we must override this method
         // as well.
         @HookMethodCondition("version >= 1.16 && version <= 1.17.1")
-        @HookMethod("public boolean a(BlockPosition blockposition, IBlockData iblockdata, int i, int j)")
+        @HookMethod("public boolean a(BlockPos blockposition, BlockState iblockdata, int i, int j)")
         public boolean setBlockData(Object blockPosition, Object iblockdata, int updateFlags, int otherFlags) {
             return true;
         }

@@ -26,8 +26,8 @@ public class SerializedEnumConversion {
      */
     public static void registerMinecraftEnumConversion() {
         if (CommonBootstrap.evaluateMCVersion(">=", "1.21.5")) {
-            registerEnum("net.minecraft.world.scores.ScoreboardTeamBase$EnumNameTagVisibility", "getSerializedName");
-            registerEnum("net.minecraft.world.scores.ScoreboardTeamBase$EnumTeamPush", "getSerializedName");
+            registerEnum("net.minecraft.world.scores.Team$Visibility", "getSerializedName");
+            registerEnum("net.minecraft.world.scores.Team$CollisionRule", "getSerializedName");
         }
     }
 

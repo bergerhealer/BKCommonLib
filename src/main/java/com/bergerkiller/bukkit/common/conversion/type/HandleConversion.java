@@ -75,12 +75,12 @@ import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
 public class HandleConversion {
 
-    @ConverterMethod(output="net.minecraft.nbt.NBTTagCompound")
+    @ConverterMethod(output="net.minecraft.nbt.CompoundTag")
     public static Object serializeBlockStateChange(BlockStateChange blockStateChange) {
         return blockStateChange.serialize().getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.world.level.block.entity.TileEntityTypes")
+    @ConverterMethod(output="net.minecraft.world.level.block.entity.BlockEntityType")
     public static Object toTileEntityTypesHandle(BlockStateType blockStateType) {
         return blockStateType.getRawHandle();
     }
@@ -90,7 +90,7 @@ public class HandleConversion {
         return blockStateType.getSerializedId();
     }
 
-    @ConverterMethod(output="net.minecraft.resources.MinecraftKey")
+    @ConverterMethod(output="net.minecraft.resources.Identifier")
     public static Object blockStateTypeToKey(BlockStateType blockStateType) {
         return blockStateType.getKey().getRaw();
     }
@@ -108,7 +108,7 @@ public class HandleConversion {
         }
     }
 
-    @ConverterMethod(output="net.minecraft.server.level.WorldServer")
+    @ConverterMethod(output="net.minecraft.server.level.ServerLevel")
     public static Object toWorldHandle(org.bukkit.World world) {
         try {
             return CraftWorldHandle.T.getHandle.invoker.invoke(world);
@@ -121,7 +121,7 @@ public class HandleConversion {
         }
     }
 
-    @ConverterMethod(output="net.minecraft.world.level.chunk.Chunk")
+    @ConverterMethod(output="net.minecraft.world.level.chunk.LevelChunk")
     public static Object toChunkHandle(org.bukkit.Chunk chunk) {
         return ChunkHandleTracker.INSTANCE.getChunkHandle(chunk);
     }
@@ -150,23 +150,23 @@ public class HandleConversion {
         return raw_handle;
     }
 
-    @ConverterMethod(output="T extends net.minecraft.world.level.block.entity.TileEntity")
+    @ConverterMethod(output="T extends net.minecraft.world.level.block.entity.BlockEntity")
     public static Object toTileEntityHandle(org.bukkit.block.BlockState blockState) {
         return BlockStateConversion.INSTANCE.blockStateToTileEntity(blockState);
     }
 
-    @ConverterMethod(output="T extends net.minecraft.world.level.block.entity.TileEntity")
+    @ConverterMethod(output="T extends net.minecraft.world.level.block.entity.BlockEntity")
     public static Object getTileEntityHandle(org.bukkit.block.Block block) {
         Object blockPosition = BlockPosHandle.createNew(block.getX(), block.getY(), block.getZ());
         return LevelHandle.T.getTileEntity.raw.invoke(toWorldHandle(block.getWorld()), blockPosition);
     }
 
-    @ConverterMethod(output="net.minecraft.world.IInventory")
+    @ConverterMethod(output="net.minecraft.world.Container")
     public static Object toIInventoryHandle(InventoryBase inventory) {
         return inventory.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.world.IInventory")
+    @ConverterMethod(output="net.minecraft.world.Container")
     public static Object toIInventoryHandle(org.bukkit.inventory.Inventory inventory) {
         if (CraftInventoryHandle.T.isAssignableFrom(inventory)) {
             return CraftInventoryHandle.T.getHandle.raw.invoke(inventory);
@@ -175,12 +175,12 @@ public class HandleConversion {
         }
     }
 
-    @ConverterMethod(output="net.minecraft.network.syncher.DataWatcher")
+    @ConverterMethod(output="net.minecraft.network.syncher.SynchedEntityData")
     public static Object toDataWatcherHandle(com.bergerkiller.bukkit.common.wrappers.DataWatcher dataWatcher) {
         return dataWatcher.getRawHandle();
     }
 
-    @ConverterMethod(input="net.minecraft.world.entity.Entity", output="net.minecraft.network.syncher.DataWatcher")
+    @ConverterMethod(input="net.minecraft.world.entity.Entity", output="net.minecraft.network.syncher.SynchedEntityData")
     public static Object toDataWatcherHandle(Object nmsEntityHandle) {
         return EntityHandle.T.getDataWatcher.raw.invoke(nmsEntityHandle);
     }
@@ -200,28 +200,28 @@ public class HandleConversion {
         return blockData.getBlockRaw();
     }
 
-    @ConverterMethod(output="T extends net.minecraft.world.level.block.state.IBlockData")
+    @ConverterMethod(output="T extends net.minecraft.world.level.block.state.BlockState")
     public static Object toIBlockDataHandle(com.bergerkiller.bukkit.common.wrappers.BlockData blockData) {
         return blockData.getData();
     }
 
-    @ConverterMethod(input="net.minecraft.world.level.block.Block", output="T extends net.minecraft.world.level.block.state.IBlockData")
+    @ConverterMethod(input="net.minecraft.world.level.block.Block", output="T extends net.minecraft.world.level.block.state.BlockState")
     public static Object toIBlockDataHandleFromBlock(Object nmsBlockHandle) {
         return BlockHandle.T.getBlockData.raw.invoke(nmsBlockHandle);
     }
 
     @SuppressWarnings("deprecation")
-    @ConverterMethod(output="net.minecraft.world.level.EnumGamemode")
+    @ConverterMethod(output="net.minecraft.world.level.GameType")
     public static Object toEnumGamemodeHandle(org.bukkit.GameMode gameMode) {
         return GameTypeHandle.T.getById.raw.invoke(gameMode.getValue());
     }
 
-    @ConverterMethod(input="org.bukkit.inventory.MainHand", output="net.minecraft.world.EnumHand", optional=true)
+    @ConverterMethod(input="org.bukkit.inventory.MainHand", output="net.minecraft.world.InteractionHand", optional=true)
     public static Object mainHandToEnumHandHandle(Object mainHand) {
         return HumanHand.fromMainHand(mainHand).toNMSEnumHand(null);
     }
 
-    @ConverterMethod(output="net.minecraft.world.EnumHand", optional=true)
+    @ConverterMethod(output="net.minecraft.world.InteractionHand", optional=true)
     public static Object humanHandToEnumHandHandle(HumanHand hand) {
         return hand.toNMSEnumHand(null);
     }
@@ -231,7 +231,7 @@ public class HandleConversion {
         return hand.toMainHand();
     }
 
-    @ConverterMethod(output="net.minecraft.world.entity.EnumMainHand", optional=true)
+    @ConverterMethod(output="net.minecraft.world.entity.HumanoidArm", optional=true)
     public static Object humanHandToEnumMainHandHandle(HumanHand hand) {
         if (hand == HumanHand.LEFT) {
             return HumanoidArmHandle.LEFT.getRaw();
@@ -250,32 +250,32 @@ public class HandleConversion {
         return commonPacket.getHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.world.level.ChunkCoordIntPair")
+    @ConverterMethod(output="net.minecraft.world.level.ChunkPos")
     public static Object toChunkCoordIntPairHandle(IntVector2 intVector2) {
         return ChunkPosHandle.T.fromIntVector2Raw.invoker.invoke(null, intVector2);
     }
 
-    @ConverterMethod(output="net.minecraft.core.BlockPosition")
+    @ConverterMethod(output="net.minecraft.core.BlockPos")
     public static Object toBlockPositionHandle(IntVector3 intVector3) {
         return BlockPosHandle.T.fromIntVector3Raw.invoker.invoke(null, intVector3);
     }
 
-    @ConverterMethod(output="net.minecraft.core.BlockPosition")
+    @ConverterMethod(output="net.minecraft.core.BlockPos")
     public static Object toBlockPositionHandle(Block block) {
         return BlockPosHandle.T.fromBukkitBlockRaw.invoker.invoke(null, block);
     }
 
-    @ConverterMethod(output="net.minecraft.world.phys.Vec3D")
+    @ConverterMethod(output="net.minecraft.world.phys.Vec3")
     public static Object toVec3DHandle(Vector vector) {
         return Vec3Handle.T.fromBukkitRaw.invoker.invoke(null, vector);
     }
 
-    @ConverterMethod(output="net.minecraft.core.Vector3f")
+    @ConverterMethod(output="net.minecraft.core.Rotations")
     public static Object toVector3fHandle(Vector vector) {
         return RotationsHandle.T.fromBukkitRaw.invoker.invoke(null, vector);
     }
 
-    @ConverterMethod(output="net.minecraft.world.entity.player.PlayerAbilities")
+    @ConverterMethod(output="net.minecraft.world.entity.player.Abilities")
     public static Object toPlayerAbilitiesHandle(PlayerAbilities playerAbilities) {
         return playerAbilities.getRawHandle();
     }
@@ -295,18 +295,18 @@ public class HandleConversion {
         return intHashMapWrapper.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.world.EnumDifficulty")
+    @ConverterMethod(output="net.minecraft.world.Difficulty")
     public static Object toEnumDifficultyHandle(Integer difficultyId) {
         return DifficultyHandle.T.getById.raw.invoke(difficultyId);
     }
 
     @SuppressWarnings("deprecation")
-    @ConverterMethod(output="net.minecraft.world.EnumDifficulty")
+    @ConverterMethod(output="net.minecraft.world.Difficulty")
     public static Object toEnumDifficultyHandle(Difficulty difficulty) {
         return DifficultyHandle.T.getById.raw.invoke(difficulty.getValue());
     }
 
-    @ConverterMethod(output="net.minecraft.world.level.chunk.ChunkSection")
+    @ConverterMethod(output="net.minecraft.world.level.chunk.LevelChunkSection")
     public static Object toChunkSectionHandle(ChunkSection section) {
         return section.getRawHandle();
     }
@@ -317,7 +317,7 @@ public class HandleConversion {
         return potionEffectType.getId();
     }
 
-    @ConverterMethod(output="net.minecraft.world.effect.MobEffectList")
+    @ConverterMethod(output="net.minecraft.world.effect.MobEffect")
     public static Object toMobEffectListHandle(PotionEffectType potionEffectType) {
         @SuppressWarnings("deprecation")
         int id = potionEffectType.getId();
@@ -325,27 +325,27 @@ public class HandleConversion {
         return MobEffectHandle.T.fromId.invoke(id);
     }
 
-    @ConverterMethod(output="net.minecraft.world.effect.MobEffect")
+    @ConverterMethod(output="net.minecraft.world.effect.MobEffectInstance")
     public static Object toMobEffectHandle(PotionEffect potionEffect) {
         return MobEffectInstanceHandle.T.fromBukkit.raw.invoke(potionEffect);
     }
 
-    @ConverterMethod(output="net.minecraft.world.level.MobSpawnerAbstract")
+    @ConverterMethod(output="net.minecraft.world.level.BaseSpawner")
     public static Object toMobSpawnerAbstractHandle(MobSpawner mobSpawner) {
         return mobSpawner.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.network.syncher.DataWatcherObject<V>")
+    @ConverterMethod(output="net.minecraft.network.syncher.EntityDataAccessor<V>")
     public static Object toDataWatcherObjectHandle(DataWatcher.Key<?> keyWrapper) {
         return keyWrapper.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.network.syncher.DataWatcher.Item<V>")
+    @ConverterMethod(output="net.minecraft.network.syncher.SynchedEntityData.Item<V>")
     public static Object toDataWatcherItemHandle(DataWatcher.Item<?> itemWrapper) {
         return itemWrapper.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.network.syncher.DataWatcher.PackedItem<V>")
+    @ConverterMethod(output="net.minecraft.network.syncher.SynchedEntityData.PackedItem<V>")
     public static Object toDataWatcherPackedItemHandle(DataWatcher.PackedItem<?> itemWrapper) {
         return itemWrapper.getRawHandle();
     }
@@ -360,7 +360,7 @@ public class HandleConversion {
         return worldType.name();
     }
 
-    @ConverterMethod(output="net.minecraft.network.chat.IChatBaseComponent")
+    @ConverterMethod(output="net.minecraft.network.chat.Component")
     public static Object toChatBaseComponent(ChatText text) {
         return text.getRawHandle();
     }
@@ -385,27 +385,27 @@ public class HandleConversion {
     }
 
     // 1.12 =>
-    @ConverterMethod(output="net.minecraft.world.item.crafting.RecipeItemStack", optional=true)
+    @ConverterMethod(output="net.minecraft.world.item.crafting.Ingredient", optional=true)
     public static Object toRecipeItemStackHandle(CraftInputSlot slot) {
         return IngredientHandle.createRawRecipeItemStack(Arrays.asList(slot.getChoices()));
     }
 
-    @ConverterMethod(output="net.minecraft.resources.MinecraftKey")
+    @ConverterMethod(output="net.minecraft.resources.Identifier")
     public static Object getMinecraftKeyFromName(String name) {
         return IdentifierHandle.T.createNew.raw.invoke(name);
     }
 
-    @ConverterMethod(input="net.minecraft.resources.MinecraftKey")
+    @ConverterMethod(input="net.minecraft.resources.Identifier")
     public static String getNameFromMinecraftKey(Object minecraftKeyHandle) {
         return minecraftKeyHandle.toString();
     }
 
-    @ConverterMethod(input="net.minecraft.sounds.SoundCategory", optional=true)
+    @ConverterMethod(input="net.minecraft.sounds.SoundSource", optional=true)
     public static String getNameFromSoundCategory(Object soundCategoryHandle) {
         return SoundSourceHandle.T.getName.invoker.invoke(soundCategoryHandle);
     }
 
-    @ConverterMethod(output="net.minecraft.sounds.SoundCategory", optional=true)
+    @ConverterMethod(output="net.minecraft.sounds.SoundSource", optional=true)
     public static Object getSoundCategoryFromName(String soundCategoryName) {
         Object result = SoundSourceHandle.T.byName.raw.invoke(soundCategoryName);
         if (result == null) {
@@ -434,7 +434,7 @@ public class HandleConversion {
         return inventoryClickType.getId();
     }
 
-    @ConverterMethod(input="net.minecraft.util.EntitySlice<?>", optional=true)
+    @ConverterMethod(input="net.minecraft.util.ClassInstanceMultiMap<?>", optional=true)
     public static List<Object> cbEntitySliceToList(Object nmsEntitySliceHandle) {
         if (CommonCapabilities.REVISED_CHUNK_ENTITY_SLICE) {
             return new EntitySliceProxy_1_8_3<Object>(ClassInstanceMultiMapHandle.createHandle(nmsEntitySliceHandle));
@@ -443,7 +443,7 @@ public class HandleConversion {
         }
     }
 
-    @ConverterMethod(output="net.minecraft.util.EntitySlice<net.minecraft.world.entity.Entity>", optional=true)
+    @ConverterMethod(output="net.minecraft.util.ClassInstanceMultiMap<net.minecraft.world.entity.Entity>", optional=true)
     public static Object cbListToEntitySlice(List<?> entitySliceList) {
         if (entitySliceList instanceof EntitySliceProxy_1_8_3) {
             return ((EntitySliceProxy_1_8_3<?>) entitySliceList).getHandle().getRaw();
@@ -458,7 +458,7 @@ public class HandleConversion {
         return entitySlice.getRaw();
     }
 
-    @ConverterMethod(output="net.minecraft.world.level.levelgen.HeightMap")
+    @ConverterMethod(output="net.minecraft.world.level.levelgen.Heightmap")
     public static Object toHeightMapHandle(HeightMap heightmap) {
         return heightmap.getRawHandle();
     }
@@ -468,12 +468,12 @@ public class HandleConversion {
         return CommonEntityType.getNMSEntityTypeByEntityClass(entityClass);
     }
 
-    @ConverterMethod(output="net.minecraft.world.entity.EntityTypes", optional=true)
+    @ConverterMethod(output="net.minecraft.world.entity.EntityType", optional=true)
     public static Object toEntityTypesHandleFromEntityClass(Class<?> entityClass) {
         return Template.Handle.getRaw(toEntityTypesHandleWrapperFromEntityClass(entityClass));
     }
 
-    @ConverterMethod(input="net.minecraft.world.level.block.state.IBlockData", output="org.bukkit.block.data.BlockData", optional=true)
+    @ConverterMethod(input="net.minecraft.world.level.block.state.BlockState", output="org.bukkit.block.data.BlockData", optional=true)
     public static Object bukkitBlockDataFromIBlockData(Object nmsIBlockdataHandle) {
         return CraftBlockDataHandle.T.fromData.raw.invoke(nmsIBlockdataHandle);
     }
@@ -483,12 +483,12 @@ public class HandleConversion {
         return CraftBlockDataHandle.T.fromData.invoke(blockData);
     }
 
-    @ConverterMethod(input="List<net.minecraft.world.phys.AxisAlignedBB>", output="net.minecraft.world.phys.shapes.VoxelShape", optional=true)
+    @ConverterMethod(input="List<net.minecraft.world.phys.AABB>", output="net.minecraft.world.phys.shapes.VoxelShape", optional=true)
     public static Object voxelShapeFromAxisAlignedBBList(List<?> axisAlignedBBHandles) {
         return VoxelShapeHandle.createRawFromAABB(axisAlignedBBHandles);
     }
 
-    @ConverterMethod(output="net.minecraft.EnumChatFormat")
+    @ConverterMethod(output="net.minecraft.ChatFormatting")
     public static Object chatColorToEnumChatFormatHandle(ChatColor color) {
         return ChatFormattingHandle.byChar(color.getChar()).getRaw();
     }
@@ -518,28 +518,28 @@ public class HandleConversion {
         return dimension.getId();
     }
 
-    @ConverterMethod(input="net.minecraft.world.level.dimension.DimensionManager")
+    @ConverterMethod(input="net.minecraft.world.level.dimension.DimensionType")
     public static DimensionType dimensionFromDimensionManager(Object nmsDimensionManagerHandle) {
         return DimensionType.fromDimensionManagerHandle(nmsDimensionManagerHandle);
     }
 
-    @ConverterMethod(output="net.minecraft.world.level.dimension.DimensionManager")
+    @ConverterMethod(output="net.minecraft.world.level.dimension.DimensionType")
     public static Object dimensionManagerFromDimension(DimensionType dimension) {
         return dimension.getDimensionManagerHandle();
     }
 
-    @ConverterMethod(input="List<net.minecraft.world.phys.AxisAlignedBB>")
+    @ConverterMethod(input="List<net.minecraft.world.phys.AABB>")
     public static java.util.stream.Stream<VoxelShapeHandle> axisAlignedBBListToVoxelShapeStream(List<?> axisAlignedBBList) {
         return MountiplexUtil.toStream(VoxelShapeHandle.createHandle(voxelShapeFromAxisAlignedBBList(axisAlignedBBList)));
     }
 
     // Since Minecraft 1.9
-    @ConverterMethod(output="net.minecraft.server.EnumInteractionResult", optional = true)
+    @ConverterMethod(output="net.minecraft.world.InteractionResult", optional = true)
     public static Object nmsEnumInteractionResultFromInteractionResult(InteractionResult result) {
         return result.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.core.particles.Particle")
+    @ConverterMethod(output="net.minecraft.core.particles.ParticleType")
     public static Object toParticleHandle(ParticleType<?> particleType) {
         return particleType.getRawHandle();
     }
