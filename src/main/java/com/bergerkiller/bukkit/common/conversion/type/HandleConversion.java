@@ -340,12 +340,12 @@ public class HandleConversion {
         return keyWrapper.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.network.syncher.SynchedEntityData.Item<V>")
+    @ConverterMethod(output="net.minecraft.network.syncher.SynchedEntityData.DataItem<V>")
     public static Object toDataWatcherItemHandle(DataWatcher.Item<?> itemWrapper) {
         return itemWrapper.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.network.syncher.SynchedEntityData.PackedItem<V>")
+    @ConverterMethod(output="net.minecraft.network.syncher.SynchedEntityData.DataValue<V>")
     public static Object toDataWatcherPackedItemHandle(DataWatcher.PackedItem<?> itemWrapper) {
         return itemWrapper.getRawHandle();
     }

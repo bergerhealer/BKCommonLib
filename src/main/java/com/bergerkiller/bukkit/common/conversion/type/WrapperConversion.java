@@ -557,13 +557,13 @@ public class WrapperConversion {
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T>(nmsDataWatcherObjectHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.network.syncher.SynchedEntityData.Item")
+    @ConverterMethod(input="net.minecraft.network.syncher.SynchedEntityData.DataItem")
     public static <T> com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T> toDataWatcherItem(Object nmsDataWatcherItemHandle) {
-        SynchedEntityDataHandle.ItemHandle handle = SynchedEntityDataHandle.ItemHandle.createHandle(nmsDataWatcherItemHandle);
+        SynchedEntityDataHandle.DataItemHandle handle = SynchedEntityDataHandle.DataItemHandle.createHandle(nmsDataWatcherItemHandle);
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>(handle);
     }
 
-    @ConverterMethod(input="net.minecraft.network.syncher.SynchedEntityData.PackedItem")
+    @ConverterMethod(input="net.minecraft.network.syncher.SynchedEntityData.DataValue")
     public static <T> com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<T> toDataWatcherPackedItem(Object nmsDataWatcherPackedItemHandle) {
         return com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem.fromHandle(nmsDataWatcherPackedItemHandle);
     }

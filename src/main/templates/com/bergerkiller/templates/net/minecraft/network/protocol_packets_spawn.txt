@@ -416,7 +416,7 @@ class ClientboundAddPlayerPacket extends Packet {
     private optional (com.bergerkiller.bukkit.common.wrappers.DataWatcher) SynchedEntityData opt_dataWatcher:###;
 #elseif version >= 1.9
     private optional (com.bergerkiller.bukkit.common.wrappers.DataWatcher) SynchedEntityData opt_dataWatcher:h;
-    private unknown List<SynchedEntityData.Item<?>> dataWatcherItems:i;
+    private unknown List<SynchedEntityData.DataItem<?>> dataWatcherItems:i;
 #else
     private optional (com.bergerkiller.bukkit.common.wrappers.DataWatcher) SynchedEntityData opt_dataWatcher:i;
     private unknown List<SynchedEntityData.WatchableObject> dataWatcherItems:j;
@@ -588,7 +588,7 @@ class ClientboundAddMobPacket extends Packet {
     private optional (com.bergerkiller.bukkit.common.wrappers.DataWatcher) SynchedEntityData opt_dataWatcher:###;
 #elseif version >= 1.9
     private optional (com.bergerkiller.bukkit.common.wrappers.DataWatcher) SynchedEntityData opt_dataWatcher:m;
-    private unknown List<SynchedEntityData.Item<?>> dataWatcherItems:n;
+    private unknown List<SynchedEntityData.DataItem<?>> dataWatcherItems:n;
 #else
     private optional (com.bergerkiller.bukkit.common.wrappers.DataWatcher) SynchedEntityData opt_dataWatcher:l;
     private unknown List<SynchedEntityData.WatchableObject> dataWatcherItems:m;

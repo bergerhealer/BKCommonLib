@@ -7,7 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.CommonPlayerSpawnInfo;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.network.syncher.SynchedEntityData.PackedItem;
+import net.minecraft.network.syncher.SynchedEntityData.DataValue;
 import net.minecraft.network.syncher.SynchedEntityData.WatchableObject;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.nbt.CompoundTag;
@@ -2321,9 +2321,9 @@ class ClientboundSetEntityDataPacket extends Packet {
 #endif
 
 #if version >= 1.17
-    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<Object>>) List<SynchedEntityData.PackedItem<?>> metadataItems:packedItems;
+    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<Object>>) List<SynchedEntityData.DataValue<?>> metadataItems:packedItems;
 #elseif version >= 1.9
-    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<Object>>) List<SynchedEntityData.PackedItem<?>> metadataItems:b;
+    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<Object>>) List<SynchedEntityData.DataValue<?>> metadataItems:b;
 #else
     private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<Object>>) List<SynchedEntityData.WatchableObject> metadataItems:b;
 #endif

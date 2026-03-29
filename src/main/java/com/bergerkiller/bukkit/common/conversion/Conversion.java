@@ -62,7 +62,7 @@ public class Conversion {
     public static final InputConverter<Object> toInventoryHandle = getConverterToHandle("net.minecraft.world.Container");
     public static final InputConverter<Object> toDataWatcherHandle = getConverterToHandle("net.minecraft.network.syncher.SynchedEntityData");
     public static final InputConverter<Object> toDataWatcherObjectHandle = getConverterToHandle("net.minecraft.network.syncher.EntityDataAccessor");
-    public static final InputConverter<Object> toDataWatcherItemHandle = getConverterToHandle("net.minecraft.network.syncher.SynchedEntityData.Item");
+    public static final InputConverter<Object> toDataWatcherItemHandle = getConverterToHandle("net.minecraft.network.syncher.SynchedEntityData.DataItem");
     public static final InputConverter<Object> toNBTTagHandle = getConverterToHandle("net.minecraft.nbt.Tag");
     public static final InputConverter<Object> toBlockHandle = getConverterToHandle("net.minecraft.world.level.block.Block");
     public static final InputConverter<Object> toGameModeHandle = getConverterToHandle("net.minecraft.world.level.GameType");

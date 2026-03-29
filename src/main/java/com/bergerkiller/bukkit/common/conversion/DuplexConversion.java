@@ -65,8 +65,8 @@ public class DuplexConversion {
     public static final DuplexConverter<Object, GameMode> gameMode = pair(toGameMode, toGameModeHandle);
     public static final DuplexConverter<Object, DataWatcher> dataWatcher = pair(toDataWatcher, toDataWatcherHandle);
     public static final DuplexConverter<Object, DataWatcher.Key<?>> dataWatcherKey = findByPath("net.minecraft.network.syncher.EntityDataAccessor", DataWatcher.Key.class);
-    public static final DuplexConverter<Object, DataWatcher.Item<?>> dataWatcherItem = findByPath("net.minecraft.network.syncher.SynchedEntityData.Item", DataWatcher.Item.class);
-    public static final DuplexConverter<Object, DataWatcher.PackedItem<?>> dataWatcherPackedItem = findByPath("net.minecraft.network.syncher.SynchedEntityData.PackedItem", DataWatcher.PackedItem.class);
+    public static final DuplexConverter<Object, DataWatcher.Item<?>> dataWatcherItem = findByPath("net.minecraft.network.syncher.SynchedEntityData.DataItem", DataWatcher.Item.class);
+    public static final DuplexConverter<Object, DataWatcher.PackedItem<?>> dataWatcherPackedItem = findByPath("net.minecraft.network.syncher.SynchedEntityData.DataValue", DataWatcher.PackedItem.class);
     public static final DuplexConverter<Object, CommonTag> commonTag = pair(toCommonTag, toNBTTagHandle);
     public static final DuplexConverter<Object, CommonTagCompound> commonTagCompound = findByPath("net.minecraft.nbt.CompoundTag", CommonTagCompound.class);
     public static final DuplexConverter<Object, CommonTagList> commonTagList = findByPath("net.minecraft.nbt.ListTag", CommonTagList.class);

@@ -300,9 +300,9 @@ public class TemplateTest {
             assertAvailable(EntityHandle.T.DATA_FLAGS);
             assertAvailable(EntityHandle.T.DATA_CUSTOM_NAME);
             assertAvailable(EntityHandle.T.DATA_CUSTOM_NAME_VISIBLE);
-            assertAvailable(SynchedEntityDataHandle.ItemHandle.T.key);
+            assertAvailable(SynchedEntityDataHandle.DataItemHandle.T.key);
         } else {
-            assertAvailable(SynchedEntityDataHandle.ItemHandle.T.keyId);
+            assertAvailable(SynchedEntityDataHandle.DataItemHandle.T.keyId);
         }
     }
 

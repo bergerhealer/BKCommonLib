@@ -71,17 +71,17 @@ public abstract class SynchedEntityDataHandle extends Template.Handle {
 
 
     /**
-     * Instance wrapper handle for type <b>net.minecraft.network.syncher.SynchedEntityData.Item</b>.
+     * Instance wrapper handle for type <b>net.minecraft.network.syncher.SynchedEntityData.DataItem</b>.
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
-    @Template.InstanceType("net.minecraft.network.syncher.SynchedEntityData.Item")
-    public abstract static class ItemHandle extends Template.Handle {
-        /** @see ItemClass */
-        public static final ItemClass T = Template.Class.create(ItemClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
+    @Template.InstanceType("net.minecraft.network.syncher.SynchedEntityData.DataItem")
+    public abstract static class DataItemHandle extends Template.Handle {
+        /** @see DataItemClass */
+        public static final DataItemClass T = Template.Class.create(DataItemClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
-        public static ItemHandle createHandle(Object handleInstance) {
+        public static DataItemHandle createHandle(Object handleInstance) {
             return T.createHandle(handleInstance);
         }
 
@@ -91,12 +91,12 @@ public abstract class SynchedEntityDataHandle extends Template.Handle {
         public abstract boolean isChanged();
         public abstract Object getValue();
         public abstract void setValue(Object value);
-        public abstract PackedItemHandle pack();
+        public abstract DataValueHandle pack();
         /**
-         * Stores class members for <b>net.minecraft.network.syncher.SynchedEntityData.Item</b>.
+         * Stores class members for <b>net.minecraft.network.syncher.SynchedEntityData.DataItem</b>.
          * Methods, fields, and constructors can be used without using Handle Objects.
          */
-        public static final class ItemClass extends Template.Class<ItemHandle> {
+        public static final class DataItemClass extends Template.Class<DataItemHandle> {
             @Template.Optional
             public final Template.Field.Integer typeId = new Template.Field.Integer();
             @Template.Optional
@@ -108,7 +108,7 @@ public abstract class SynchedEntityDataHandle extends Template.Handle {
             public final Template.Method<Boolean> isChanged = new Template.Method<Boolean>();
             public final Template.Method<Object> getValue = new Template.Method<Object>();
             public final Template.Method<Void> setValue = new Template.Method<Void>();
-            public final Template.Method.Converted<PackedItemHandle> pack = new Template.Method.Converted<PackedItemHandle>();
+            public final Template.Method.Converted<DataValueHandle> pack = new Template.Method.Converted<DataValueHandle>();
 
         }
 
@@ -116,32 +116,32 @@ public abstract class SynchedEntityDataHandle extends Template.Handle {
 
 
     /**
-     * Instance wrapper handle for type <b>net.minecraft.network.syncher.SynchedEntityData.PackedItem</b>.
+     * Instance wrapper handle for type <b>net.minecraft.network.syncher.SynchedEntityData.DataValue</b>.
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
-    @Template.InstanceType("net.minecraft.network.syncher.SynchedEntityData.PackedItem")
-    public abstract static class PackedItemHandle extends Template.Handle {
-        /** @see PackedItemClass */
-        public static final PackedItemClass T = Template.Class.create(PackedItemClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
+    @Template.InstanceType("net.minecraft.network.syncher.SynchedEntityData.DataValue")
+    public abstract static class DataValueHandle extends Template.Handle {
+        /** @see DataValueClass */
+        public static final DataValueClass T = Template.Class.create(DataValueClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
-        public static PackedItemHandle createHandle(Object handleInstance) {
+        public static DataValueHandle createHandle(Object handleInstance) {
             return T.createHandle(handleInstance);
         }
 
         /* ============================================================================== */
 
         public abstract Object value();
-        public abstract PackedItemHandle cloneWithValue(Object value);
+        public abstract DataValueHandle cloneWithValue(Object value);
         public abstract boolean isForKey(Key<?> key);
         /**
-         * Stores class members for <b>net.minecraft.network.syncher.SynchedEntityData.PackedItem</b>.
+         * Stores class members for <b>net.minecraft.network.syncher.SynchedEntityData.DataValue</b>.
          * Methods, fields, and constructors can be used without using Handle Objects.
          */
-        public static final class PackedItemClass extends Template.Class<PackedItemHandle> {
+        public static final class DataValueClass extends Template.Class<DataValueHandle> {
             public final Template.Method<Object> value = new Template.Method<Object>();
-            public final Template.Method.Converted<PackedItemHandle> cloneWithValue = new Template.Method.Converted<PackedItemHandle>();
+            public final Template.Method.Converted<DataValueHandle> cloneWithValue = new Template.Method.Converted<DataValueHandle>();
             public final Template.Method.Converted<Boolean> isForKey = new Template.Method.Converted<Boolean>();
 
         }

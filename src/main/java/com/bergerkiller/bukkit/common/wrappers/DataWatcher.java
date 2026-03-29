@@ -174,7 +174,7 @@ public class DataWatcher extends BasicWrapper<SynchedEntityDataHandle> implement
         if (rawItem == null) {
             throw new IllegalArgumentException("This key is not watched in this DataWatcher");
         } else {
-            Object rawValue = SynchedEntityDataHandle.ItemHandle.T.getValue.invoke(rawItem);
+            Object rawValue = SynchedEntityDataHandle.DataItemHandle.T.getValue.invoke(rawItem);
             return key.getType().getConverter().convert(rawValue);
         }
     }
@@ -209,7 +209,7 @@ public class DataWatcher extends BasicWrapper<SynchedEntityDataHandle> implement
         if (rawItem == null) {
             return defaultValue;
         } else {
-            Object rawValue = SynchedEntityDataHandle.ItemHandle.T.getValue.invoke(rawItem);
+            Object rawValue = SynchedEntityDataHandle.DataItemHandle.T.getValue.invoke(rawItem);
             return key.getType().getConverter().convert(rawValue);
         }
     }
@@ -243,7 +243,7 @@ public class DataWatcher extends BasicWrapper<SynchedEntityDataHandle> implement
         if (rawItem == null) {
             return null;
         } else {
-            return new Item<V>(key, SynchedEntityDataHandle.ItemHandle.createHandle(rawItem));
+            return new Item<V>(key, SynchedEntityDataHandle.DataItemHandle.createHandle(rawItem));
         }
     }
 
@@ -605,15 +605,15 @@ public class DataWatcher extends BasicWrapper<SynchedEntityDataHandle> implement
      * 
      * @param <V> value type of the item
      */
-    public static class Item<V> extends BasicWrapper<SynchedEntityDataHandle.ItemHandle> {
+    public static class Item<V> extends BasicWrapper<SynchedEntityDataHandle.DataItemHandle> {
         private final Key<V> key;
 
-        protected Item(Key<V> key, SynchedEntityDataHandle.ItemHandle handle) {
+        protected Item(Key<V> key, SynchedEntityDataHandle.DataItemHandle handle) {
             this.key = key;
             this.setHandle(handle);
         }
 
-        public Item(SynchedEntityDataHandle.ItemHandle handle) {
+        public Item(SynchedEntityDataHandle.DataItemHandle handle) {
             this.key = null;
             this.setHandle(handle);
         }
@@ -646,11 +646,11 @@ public class DataWatcher extends BasicWrapper<SynchedEntityDataHandle> implement
                 return this.key;
             } else if (CommonCapabilities.DATAWATCHER_OBJECTS) {
                 // This is for MC >= 1.9
-                return (Key<V>) SynchedEntityDataHandle.ItemHandle.T.key.get(this.handle.getRaw());
+                return (Key<V>) SynchedEntityDataHandle.DataItemHandle.T.key.get(this.handle.getRaw());
             } else {
                 // This is for MC 1.8.8, where we use a proxy object storing typeId (serializer token) and keyId
-                int typeId = SynchedEntityDataHandle.ItemHandle.T.typeId.getInteger(this.handle.getRaw());
-                int keyId = SynchedEntityDataHandle.ItemHandle.T.keyId.getInteger(this.handle.getRaw());
+                int typeId = SynchedEntityDataHandle.DataItemHandle.T.typeId.getInteger(this.handle.getRaw());
+                int keyId = SynchedEntityDataHandle.DataItemHandle.T.keyId.getInteger(this.handle.getRaw());
                 Object token = Integer.valueOf(typeId);
                 Object handle = new com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject<V>(keyId, token);
                 return new Key<V>(handle);
@@ -713,10 +713,10 @@ public class DataWatcher extends BasicWrapper<SynchedEntityDataHandle> implement
      *
      * @param <V> Value type of the item
      */
-    public static class PackedItem<V> extends BasicWrapper<SynchedEntityDataHandle.PackedItemHandle> {
+    public static class PackedItem<V> extends BasicWrapper<SynchedEntityDataHandle.DataValueHandle> {
         private final Key<V> key;
 
-        private PackedItem(SynchedEntityDataHandle.PackedItemHandle handle, Key<V> key) {
+        private PackedItem(SynchedEntityDataHandle.DataValueHandle handle, Key<V> key) {
             this.setHandle(handle);
             this.key = key;
         }
@@ -728,7 +728,7 @@ public class DataWatcher extends BasicWrapper<SynchedEntityDataHandle> implement
          * @return PackedItem
          */
         public static <T> PackedItem<T> fromHandle(Object nmsPackedItemHandle) {
-            return new PackedItem<T>(SynchedEntityDataHandle.PackedItemHandle.createHandle(nmsPackedItemHandle), null);
+            return new PackedItem<T>(SynchedEntityDataHandle.DataValueHandle.createHandle(nmsPackedItemHandle), null);
         }
 
         /**
