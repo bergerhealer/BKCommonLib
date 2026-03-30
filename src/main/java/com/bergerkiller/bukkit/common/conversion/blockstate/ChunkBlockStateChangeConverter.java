@@ -19,7 +19,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
  */
 public final class ChunkBlockStateChangeConverter extends DuplexConverter<Object, BlockStateChange> {
     private static final TypeDeclaration INPUT_TYPE = TypeDeclaration.fromClass(
-            ClientboundLevelChunkPacketDataHandle.BlockEntityDataHandle.T.getType());
+            ClientboundLevelChunkPacketDataHandle.BlockEntityInfoHandle.T.getType());
     private static final TypeDeclaration OUTPUT_TYPE = TypeDeclaration.fromClass(BlockStateChange.class);
     private final int chunkX;
     private final int chunkZ;
@@ -36,8 +36,8 @@ public final class ChunkBlockStateChangeConverter extends DuplexConverter<Object
 
     @Override
     public BlockStateChange convertInput(Object value) {
-        final ClientboundLevelChunkPacketDataHandle.BlockEntityDataHandle handle;
-        handle = ClientboundLevelChunkPacketDataHandle.BlockEntityDataHandle.createHandle(value);
+        final ClientboundLevelChunkPacketDataHandle.BlockEntityInfoHandle handle;
+        handle = ClientboundLevelChunkPacketDataHandle.BlockEntityInfoHandle.createHandle(value);
 
         // Deferred readout of metadata for performance, as we're using reflection
         IntVector3 position = handle.getPosition(this.chunkX, this.chunkZ);
@@ -61,7 +61,7 @@ public final class ChunkBlockStateChangeConverter extends DuplexConverter<Object
 
     @Override
     public Object convertOutput(BlockStateChange value) {
-        return ClientboundLevelChunkPacketDataHandle.BlockEntityDataHandle.encodeRaw(
+        return ClientboundLevelChunkPacketDataHandle.BlockEntityInfoHandle.encodeRaw(
                 value.getPosition(), value.getType(),
                 value.hasMetadata() ? value.getMetadata() : null);
     }

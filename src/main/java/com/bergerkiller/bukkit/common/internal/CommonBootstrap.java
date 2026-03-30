@@ -428,142 +428,17 @@ public class CommonBootstrap {
     private static void initResolvers(CommonServer server) {
         final Map<String, String> remappings = new HashMap<String, String>();
 
-        // We renamed EntityTrackerEntry to EntityTrackerEntryState to account for the wrapping EntityTracker on 1.14 and later
+        // Custom static remappings that are BKCommonLib-specific used on the latest version of Minecraft
+
+        // We renamed ServerEntity to EntityTrackerEntryState to account for the wrapping EntityTracker on 1.14 and later
+        remappings.put("net.minecraft.server.level.EntityTracker", "net.minecraft.server.level.ChunkMap");
+        remappings.put("net.minecraft.server.level.EntityTrackerEntry", "net.minecraft.server.level.ChunkMap$TrackedEntity");
         remappings.put("net.minecraft.server.level.EntityTrackerEntryState", "net.minecraft.server.level.ServerEntity");
 
         // Instead of CraftBukkit LongHashSet, we use a custom implementation with bugfixes on 1.13.2 and earlier
         // This is now possible since we no longer interface with CraftBukkit LongHashSet anywhere
         remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet", "com.bergerkiller.bukkit.common.internal.proxy.LongHashSet_pre_1_13_2");
         remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet$LongIterator", "com.bergerkiller.bukkit.common.internal.proxy.LongHashSet_pre_1_13_2$LongIterator");
-
-        // Name was all over the place, internally we refer to this as "BiomeSpawnCluster"
-        // This is a record/struct of a mob entity type, min spawn count and max spawn count
-        remappings.put("net.minecraft.world.level.biome.BiomeSpawnCluster", "net.minecraft.world.level.biome.Biome$BiomeMeta");
-
-        // Obfuscated class name
-        remappings.put("net.minecraft.server.level.ChunkProviderServer$MainThreadExecutor", "net.minecraft.server.level.ChunkProviderServer$a");
-
-        // Before Minecraft 1.10 EnumGameMode sat inside WorldSettings
-        if (evaluateMCVersion("<", "1.10.2")) {
-            remappings.put("net.minecraft.world.level.EnumGamemode", "net.minecraft.world.level.WorldSettings$EnumGamemode");
-        }
-
-        // EnumChatVisibility moved from EntityHuman to package level during MC 1.14
-        if (evaluateMCVersion("<", "1.14")) {
-            remappings.put("net.minecraft.world.entity.player.EnumChatVisibility", "net.minecraft.world.entity.player.EntityHuman$EnumChatVisibility");
-        }
-
-        // Botched deobfuscation of class names on 1.8.8 / proxy missing classes to simplify API
-        if (evaluateMCVersion("<", "1.9")) {
-            remappings.put("net.minecraft.world.level.MobSpawnerData", "net.minecraft.world.level.MobSpawnerAbstract$a");
-            remappings.put("net.minecraft.world.level.block.SoundEffectType", "net.minecraft.world.level.block.Block$StepSound"); // workaround
-            remappings.put("net.minecraft.server.level.PlayerChunk", "net.minecraft.server.level.PlayerChunkMap$PlayerChunk"); // nested on 1.8.8
-
-            // PacketPlayInUseItem and PacketPlayInBlockPlace were merged as one packet on these versions
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayInUseItem", "net.minecraft.network.protocol.game.PacketPlayInBlockPlace");
-
-            // ClientboundCustomSoundPacket does not yet exist on 1.8 - 1.8.8, it is proxied by
-            // the ClientboundSoundPacket packet so it still (mostly) works
-            remappings.put("net.minecraft.network.protocol.game.ClientboundCustomSoundPacket", "net.minecraft.network.protocol.game.ClientboundSoundPacket");
-
-            // We proxy a bunch of classes, because they don't exist in 1.8.8
-            // Writing custom wrappers with switches would be too tiresome
-            // This allows continued use of the same API without trouble
-            // Converters take care to convert between the Class and Id used internally
-            remappings.put("net.minecraft.world.entity.EnumItemSlot", "com.bergerkiller.bukkit.common.internal.proxy.EnumItemSlot");
-            remappings.put("net.minecraft.world.level.chunk.DataPaletteBlock", "com.bergerkiller.bukkit.common.internal.proxy.DataPaletteBlock");
-            remappings.put("net.minecraft.sounds.SoundEffect", "com.bergerkiller.bukkit.common.internal.proxy.SoundEffect_1_8_8");
-            remappings.put("net.minecraft.world.level.dimension.DimensionManager", "com.bergerkiller.bukkit.common.internal.proxy.DimensionManager_1_8_8");
-
-            // This one MIGHT exist on some server types (weird!)
-            try {
-                Class.forName(server.getNMSRoot() + ".MobEffectList");
-            } catch (ClassNotFoundException e) {
-                remappings.put("net.minecraft.world.effect.MobEffectList", "com.bergerkiller.bukkit.common.internal.proxy.MobEffectList");
-            }
-        }
-
-        // On version 1.8, for some reason all child classes were on package level
-        if (evaluateMCVersion("<=", "1.8")) {
-            remappings.put("net.minecraft.world.level.block.state.BlockStateList$BlockData", "net.minecraft.world.level.block.state.BlockData");
-            remappings.put("net.minecraft.world.level.EnumGamemode", "net.minecraft.world.level.EnumGamemode");
-            remappings.put("net.minecraft.world.level.block.SoundEffectType", "net.minecraft.world.level.block.StepSound");
-            remappings.put("net.minecraft.world.level.block.Block$StepSound", "net.minecraft.world.level.block.StepSound");
-            remappings.put("net.minecraft.core.EnumDirection$EnumAxis", "net.minecraft.core.EnumAxis");
-            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$Action", "net.minecraft.network.protocol.game.EnumPlayerInfoAction");
-            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$PlayerInfoData", "net.minecraft.network.protocol.game.PlayerInfoData");
-            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket$PlayerInfoData", "net.minecraft.network.protocol.game.PlayerInfoData");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayInUseEntity$EnumEntityUseAction", "net.minecraft.network.protocol.game.EnumEntityUseAction");
-            remappings.put("net.minecraft.world.level.MobSpawnerData", "net.minecraft.world.level.block.entity.TileEntityMobSpawnerData");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore$EnumScoreboardAction", "net.minecraft.network.protocol.game.EnumScoreboardAction");
-            remappings.put("net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket$ChunkMap", "net.minecraft.network.protocol.game.ChunkMap");
-            remappings.put("net.minecraft.world.entity.RelativeMovement", "net.minecraft.network.protocol.game.EnumPlayerTeleportFlags");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutTitle$EnumTitleAction", "net.minecraft.network.protocol.game.EnumTitleAction");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutCombatEvent$EnumCombatEventType", "net.minecraft.network.protocol.game.EnumCombatEventType");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutWorldBorder$EnumWorldBorderAction", "net.minecraft.network.protocol.game.EnumWorldBorderAction");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayInResourcePackStatus$Action", "net.minecraft.network.protocol.game.EnumResourcePackStatus");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayInBlockDig$EnumPlayerDigType", "net.minecraft.network.protocol.game.EnumPlayerDigType");
-            remappings.put("net.minecraft.world.entity.player.EnumChatVisibility", "net.minecraft.world.entity.player.EnumChatVisibility");
-            remappings.put("net.minecraft.server.level.PlayerChunk", "net.minecraft.server.level.PlayerChunk");
-            remappings.put("net.minecraft.util.WeightedRandom$WeightedRandomChoice", "net.minecraft.util.WeightedRandomChoice");
-            remappings.put("net.minecraft.world.level.biome.BiomeSpawnCluster", "net.minecraft.world.level.biome.BiomeMeta");
-            remappings.put("net.minecraft.util.IntHashMap$IntHashMapEntry", "net.minecraft.util.IntHashMapEntry");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutEntity$PacketPlayOutEntityLook", "net.minecraft.network.protocol.game.PacketPlayOutEntityLook");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutEntity$PacketPlayOutRelEntityMove", "net.minecraft.network.protocol.game.PacketPlayOutRelEntityMove");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook", "net.minecraft.network.protocol.game.PacketPlayOutRelEntityMoveLook");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayInFlying$PacketPlayInLook", "net.minecraft.network.protocol.game.PacketPlayInLook");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayInFlying$PacketPlayInPosition", "net.minecraft.network.protocol.game.PacketPlayInPosition");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayInFlying$PacketPlayInPositionLook", "net.minecraft.network.protocol.game.PacketPlayInPositionLook");
-            remappings.put("net.minecraft.network.chat.Component$Serializer", "net.minecraft.network.chat.ChatSerializer");
-            remappings.put("net.minecraft.network.NetworkManager$QueuedPacket", "net.minecraft.network.QueuedPacket");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutPosition$EnumPlayerTeleportFlags", "net.minecraft.network.protocol.game.EnumPlayerTeleportFlags");
-            remappings.put("net.minecraft.network.chat.ChatClickable$EnumClickAction", "net.minecraft.network.chat.EnumClickAction");
-            remappings.put("net.minecraft.network.chat.ChatHoverable$EnumHoverAction", "net.minecraft.network.chat.EnumHoverAction");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayInClientCommand$EnumClientCommand", "net.minecraft.network.protocol.game.EnumClientCommand");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayInEntityAction$EnumPlayerAction", "net.minecraft.network.protocol.game.EnumPlayerAction");
-            remappings.put("net.minecraft.world.scores.criteria.IScoreboardCriteria$EnumScoreboardHealthDisplay", "net.minecraft.world.scores.criteria.EnumScoreboardHealthDisplay");
-            remappings.put("net.minecraft.nbt.MojangsonParser$MojangsonTypeParser", "net.minecraft.nbt.MojangsonTypeParser");
-        }
-
-        // MapIcon$Type (MapDecorationType) did not exist before 1.11, we use a proxy class for 1.8 - 1.10.2
-        if (evaluateMCVersion("<", "1.11")) {
-            remappings.put("net.minecraft.world.level.saveddata.maps.MapDecorationType", "com.bergerkiller.bukkit.common.internal.proxy.MapDecorationType_1_8_to_1_10_2");
-        }
-
-        // Proxy classes that were added in 1.13 so that 1.12.2 and before works with the same API
-        if (evaluateMCVersion("<", "1.13")) {
-            remappings.put("net.minecraft.world.level.levelgen.HeightMap", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2");
-            remappings.put("net.minecraft.world.level.levelgen.HeightMap$Type", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2$Type");
-            remappings.put("com.bergerkiller.bukkit.common.internal.proxy.HeightMap.Type", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2$Type");
-            remappings.put("net.minecraft.world.phys.shapes.VoxelShape", "com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy");
-            remappings.put("net.minecraft.world.level.block.entity.TileEntityTypes", "com.bergerkiller.bukkit.common.internal.proxy.TileEntityTypesProxy_1_8_to_1_12_2");
-            // Stop sound works using an MC|StopSound custom message
-            remappings.put("net.minecraft.network.protocol.game.ClientboundStopSoundPacket", "net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket");
-        }
-
-        // EnumArt has seen many places...
-        if (evaluateMCVersion("<=", "1.8")) {
-            remappings.put("net.minecraft.world.entity.decoration.Paintings", "net.minecraft.world.entity.decoration.EnumArt");
-        } else if (evaluateMCVersion("<", "1.13")) {
-            remappings.put("net.minecraft.world.entity.decoration.Paintings", "net.minecraft.world.entity.decoration.EntityPainting$EnumArt");
-        } else {
-            // Located at net.minecraft.world.entity.decoration.Paintings like normal.
-        }
-
-        // Still obfuscated on these versions of MC
-        if (evaluateMCVersion(">=", "1.14") && evaluateMCVersion("<=", "1.14.1")) {
-            remappings.put("net.minecraft.world.level.block.state.pattern.BlockPattern$Shape", "net.minecraft.world.level.block.state.pattern.ShapeDetector$c");
-        }
-
-        // EnumScoreboardAction was moved to a ScoreboardServer class during 1.13
-        // There is now a ParticleType class. For 1.12.2 and before, we refer to EnumParticle instead to simplify API
-        if (evaluateMCVersion(">=", "1.13")) {
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore$EnumScoreboardAction", "net.minecraft.server.ScoreboardServer$Action");
-        } else {
-            remappings.put("net.minecraft.core.particles.Particle", "net.minecraft.core.particles.EnumParticle");
-            remappings.put("net.minecraft.core.particles.Particles", "net.minecraft.core.particles.EnumParticle");
-            remappings.put("net.minecraft.core.particles.ParticleType", "net.minecraft.core.particles.EnumParticle");
-        }
 
         // Many classes disappeared, merged or moved with MC 1.14
         if (evaluateMCVersion(">=", "1.14")) {
@@ -603,8 +478,6 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.util.IntHashMap", unimi_fastutil_path + "ints.Int2ObjectMap");
             remappings.put("net.minecraft.util.IntHashMap$IntHashMapEntry", unimi_fastutil_path + "ints.Int2ObjectMap$Entry");
             remappings.put(unimi_fastutil_path + "ints.IntHashMap$IntHashMapEntry", unimi_fastutil_path + "ints.Int2ObjectMap$Entry");
-            remappings.put("net.minecraft.server.level.EntityTracker", "net.minecraft.server.level.PlayerChunkMap");
-            remappings.put("net.minecraft.server.level.EntityTrackerEntry", "net.minecraft.server.level.PlayerChunkMap$EntityTracker");
         }
 
         // Remaps CraftLegacy from legacy to util (moved since 1.15.2)
@@ -625,252 +498,6 @@ public class CommonBootstrap {
             if (craftLegacyIsInUtil) {
                 remappings.put("org.bukkit.craftbukkit.legacy.CraftLegacy", "org.bukkit.craftbukkit.util.CraftLegacy");
             }
-        }
-
-        // Maps nms ResourceKey to the internal proxy class replacement pre-1.16
-        if (evaluateMCVersion("<", "1.16")) {
-            remappings.put("net.minecraft.resources.ResourceKey", "com.bergerkiller.bukkit.common.internal.proxy.ResourceKey_1_15_2");
-        }
-
-        // WorldData was changed at 1.16 to WorldDataServer, with WorldData now being an interface with bare properties both server and client contain
-        if (evaluateMCVersion("<", "1.16")) {
-            remappings.put("net.minecraft.world.level.storage.WorldDataServer", "net.minecraft.world.level.storage.WorldData");
-        }
-
-        // BiomeBase.BiomeMeta was removed and replaced with BiomeSettingsMobs.c
-        // Assume a more human-readable name and remap the name prior to the right place
-        if (evaluateMCVersion(">=", "1.16.2")) {
-            remappings.put("net.minecraft.world.level.biome.BiomeSpawnCluster", "net.minecraft.world.level.biome.BiomeSettingsMobs$c");
-        }
-
-        // 1.17 mappings
-        if (evaluateMCVersion(">=", "1.17")) {
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayInUseEntity$EnumEntityUseAction", "net.minecraft.network.protocol.game.PacketPlayInUseEntity$b");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayInUseEntity$UseType", "net.minecraft.network.protocol.game.PacketPlayInUseEntity$EnumEntityUseAction");
-        }
-
-        // 1.18 mappings
-        if (evaluateMCVersion(">=", "1.18")) {
-            // Some class names still obfuscated
-            remappings.put("net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData$BlockEntityData", "net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData$a");
-
-            // Obfuscated class name changed
-            remappings.put("net.minecraft.server.level.ChunkProviderServer$MainThreadExecutor", "net.minecraft.server.level.ChunkProviderServer$b");
-        } else {
-            // ClientboundLevelChunkPacket was replaced by a different packet which stores light and block data at 1.18
-            // Before that, we got to map back to the spigot name
-            // To simplify the BKCL API we use the same packet class, since in both cases the buffer, heightmap data
-            // and changed block state information is available. We handle the adaptering in template code.
-            remappings.put("net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket", "net.minecraft.network.protocol.game.ClientboundLevelChunkPacket");
-        }
-
-        // 1.19 mappings
-        if (evaluateMCVersion(">=", "1.19")) {
-            // Painting / living entity spawn packets were merged into one
-            remappings.put("net.minecraft.network.protocol.game.ClientboundAddMobPacket", "net.minecraft.network.protocol.game.ClientboundAddEntityPacket");
-            remappings.put("net.minecraft.network.protocol.game.ClientboundAddPaintingPacket", "net.minecraft.network.protocol.game.ClientboundAddEntityPacket");
-        } else {
-            // Uses a normal java.util.Random on this version
-            remappings.put("net.minecraft.util.RandomSource", "java.util.Random");
-        }
-
-        // 1.19.3 mappings - some classes were split out into their own places
-        if (evaluateMCVersion(">=", "1.19.3")) {
-            // Spigot decided to revert back to mojangs name here for some reason
-            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket");
-            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$a");
-            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$PlayerInfoData", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$b");
-            // CustomSoundEffect was removed as of 1.19.3, now fully handled by the unified ClientboundSoundPacket packet
-            remappings.put("net.minecraft.network.protocol.game.ClientboundCustomSoundPacket", "net.minecraft.network.protocol.game.ClientboundSoundPacket");
-        } else {
-            // BuiltInRegistries class does not exist, but all relevant fields are found in IRegistry instead
-            remappings.put("net.minecraft.core.registries.BuiltInRegistries", "net.minecraft.core.IRegistry");
-            // Remap to spigots names. Removing and updating player information was handled by the same packet here.
-            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo");
-            remappings.putIfAbsent("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
-            remappings.putIfAbsent("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$PlayerInfoData", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData");
-            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo");
-            remappings.putIfAbsent("net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
-            remappings.putIfAbsent("net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket$PlayerInfoData", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData");
-        }
-
-        // 1.19.4 mappings
-        if (evaluateMCVersion(">=", "1.19.4")) {
-            //NOOP
-
-        } else {
-            // This class was moved from an inner class of PacketPlayOutPosition to be its own RelativeMovement class
-            remappings.put("net.minecraft.world.entity.RelativeMovement", "net.minecraft.network.protocol.game.PacketPlayOutPosition$EnumPlayerTeleportFlags");
-        }
-
-        // 1.20 mappings
-        if (evaluateMCVersion(">=", "1.20")) {
-            // Obfuscated class name
-            remappings.put("net.minecraft.world.level.storage.loot.LootParams$Builder", "net.minecraft.world.level.storage.loot.LootParams$a");
-        }
-
-        // 1.20.2 mappings
-        if (evaluateMCVersion(">=", "1.20.2")) {
-            // Not de-obfuscated
-            remappings.put("net.minecraft.network.protocol.common.ServerboundResourcePackPacket$Action", "net.minecraft.network.protocol.common.ServerboundResourcePackPacket$a");
-
-            // The Named spawn packet was removed and the normal spawn packet can now be used
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn", "net.minecraft.network.protocol.game.PacketPlayOutSpawnEntity");
-
-            // Since 1.20.3 resource packs can be loaded and unloaded ('pushed and popped')
-            // For easier compatibility, the 'push' packet handle handles the legacy "set resourcepack" packet, too
-            // It emulates a non-existent UUID
-            if (evaluateMCVersion("<", "1.20.3")) {
-                remappings.put("net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket", "net.minecraft.network.protocol.common.ClientboundResourcePackPacket");
-            }
-
-            // De-obfuscate a ClientboundCustomPayloadPacket implementation used when sending messages using Bukkit API
-            // Spigot devs made this an anonymous Class which is highly annoying if you want to send it yourself
-            // No longer exists as of 1.20.5, where they abuse the DiscardedPayload class instead
-            if (evaluateMCVersion("<", "1.20.5")) {
-                Class<?> customPayloadType = null;
-                try {
-                    customPayloadType = MPLType.getClassByName("net.minecraft.network.protocol.common.custom.CustomPacketPayload");
-                } catch (Throwable t) {
-                    Logging.LOGGER_REFLECTION.log(Level.WARNING, "Unable to identify the CustomPacketPayload type", t);
-                }
-                String anonTypeName = null;
-                if (customPayloadType != null) {
-                    for (int n = 1; n < 1000; n++) {
-                        String name = server.getCBRoot() + ".entity.CraftPlayer$" + n;
-                        try {
-                            Class<?> type = MPLType.getClassByName(name);
-                            if (customPayloadType.isAssignableFrom(type)) {
-                                anonTypeName = name;
-                                break;
-                            }
-                        } catch (ClassNotFoundException e) {
-                            break;
-                        }
-                    }
-                }
-                if (anonTypeName != null) {
-                    remappings.put("net.minecraft.network.protocol.common.custom.BukkitCustomPayload", anonTypeName);
-                } else {
-                    Logging.LOGGER_REFLECTION.log(Level.WARNING, "Unable to identify the Bukkit custom payload type");
-                }
-            }
-        } else {
-            // For 1.20.1 and before, we got to move a few classes
-            remappings.put("net.minecraft.network.protocol.common.ServerboundKeepAlivePacket", "net.minecraft.network.protocol.game.PacketPlayInKeepAlive");
-            remappings.put("net.minecraft.network.protocol.common.ClientboundKeepAlivePacket", "net.minecraft.network.protocol.game.PacketPlayOutKeepAlive");
-            remappings.put("net.minecraft.network.protocol.common.ServerboundResourcePackPacket", "net.minecraft.network.protocol.game.PacketPlayInResourcePackStatus");
-            remappings.put("net.minecraft.network.protocol.common.ServerboundResourcePackPacket$Action", "net.minecraft.network.protocol.game.PacketPlayInResourcePackStatus$EnumResourcePackStatus");
-            remappings.put("net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket", "net.minecraft.network.protocol.game.PacketPlayOutResourcePackSend");
-            remappings.put("net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket", "net.minecraft.network.protocol.game.PacketPlayOutCustomPayload");
-            remappings.put("net.minecraft.network.protocol.common.ClientboundDisconnectPacket", "net.minecraft.network.protocol.game.PacketPlayOutKickDisconnect");
-            remappings.put("net.minecraft.network.protocol.common.ServerboundClientInformationPacket", "net.minecraft.network.protocol.game.PacketPlayInSettings");
-        }
-
-        // 1.20.3 mappings
-        if (evaluateMCVersion(">=", "1.20.3")) {
-
-        } else {
-            // Before 1.20.3 the score reset was handled by the PacketPlayOutScoreboardScore with an 'action' field
-            remappings.put("net.minecraft.network.protocol.game.ClientboundResetScorePacket", "net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore");
-        }
-
-        // 1.20.5 mappings
-        if (evaluateMCVersion(">=", "1.20.5")) {
-            // Nothing
-        } else {
-            // Before 1.20.5, ChunkStatus was elsewhere
-            remappings.put("net.minecraft.world.level.chunk.status.ChunkStatus", "net.minecraft.world.level.chunk.ChunkStatus");
-            // Before 1.20.5, MapDecorationType was an enum and not in a registry
-            remappings.put("net.minecraft.world.level.saveddata.maps.MapDecorationType",
-                    remappings.getOrDefault("net.minecraft.world.level.saveddata.maps.MapDecorationType",
-                                 "net.minecraft.world.level.saveddata.maps.MapIcon$Type"));
-            // Before 1.20.5, SerializableMeta was a subclass of CraftMetaItem
-            remappings.put("org.bukkit.craftbukkit.inventory.SerializableMeta", "org.bukkit.craftbukkit.inventory.CraftMetaItem$SerializableMeta");
-            // Before 1.20.5, CustomModelData did not exist so proxy it
-            remappings.put("net.minecraft.world.item.component.CustomModelData", "com.bergerkiller.bukkit.common.internal.proxy.CustomModelData_pre_1_20_5");
-        }
-
-        // 1.21.2 mappings
-        if (evaluateMCVersion(">=", "1.21.2")) {
-            remappings.put("net.minecraft.world.entity.RelativeMovement", "net.minecraft.world.entity.Relative");
-
-            // Spigot uses the wrong one. We need the sync packet for behavior similar to 1.21.1 and before
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport", "net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket");
-
-            // Borked.
-            remappings.put("net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior$LerpStep", "net.minecraft.world.entity.vehicle.NewMinecartBehavior$a");
-        } else {
-            // Before this version the client rotation packet doesn't exist
-            // It is emulated with the out-position packet instead (with x/y/z 0.0 relative)
-            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerRotationPacket", "net.minecraft.network.protocol.game.PacketPlayOutPosition");
-        }
-
-        // 1.21.5 mappings
-        if (evaluateMCVersion(">=", "1.21.5")) {
-            // Obfuscated class name changed
-            remappings.put("net.minecraft.server.level.ChunkProviderServer$MainThreadExecutor", "net.minecraft.server.level.ChunkProviderServer$a");
-        } else {
-            // RespawnConfig record class was added in 1.21.5, use a proxy on versions prior to hold this data
-            remappings.put("net.minecraft.server.level.EntityPlayer$RespawnConfig", "com.bergerkiller.bukkit.common.internal.proxy.PlayerRespawnConfig_pre_1_21_5");
-        }
-
-        // 1.21.6 mappings
-        if (evaluateMCVersion(">=", "1.21.6")) {
-            // Broken obfuscated crap on spigot :(
-            remappings.put("net.minecraft.world.level.storage.ValueInput$TypedInputList", "net.minecraft.world.level.storage.ValueInput$a");
-            remappings.put("net.minecraft.world.level.storage.ValueOutput$TypedOutputList", "net.minecraft.world.level.storage.ValueOutput$a");
-            remappings.put("net.minecraft.world.level.storage.TagValueInput$TypedListWrapper", "net.minecraft.world.level.storage.TagValueInput$f");
-            remappings.put("net.minecraft.world.level.storage.TagValueOutput$TypedListWrapper", "net.minecraft.world.level.storage.TagValueOutput$e");
-        } else {
-            // On versions before ValueOutput/Input existed, pretend they use NBTTagCompound instead
-            // This makes the internal API look simple
-            remappings.put("net.minecraft.world.level.storage.ValueOutput", "net.minecraft.nbt.NBTTagCompound");
-            remappings.put("net.minecraft.world.level.storage.ValueInput", "net.minecraft.nbt.NBTTagCompound");
-            remappings.put("net.minecraft.world.level.storage.TagValueOutput", "net.minecraft.nbt.NBTTagCompound");
-            remappings.put("net.minecraft.world.level.storage.TagValueInput", "net.minecraft.nbt.NBTTagCompound");
-        }
-
-        // 1.21.9 mappings
-        if (evaluateMCVersion(">=", "1.21.9")) {
-            // Broken obfuscated crap on spigot :(
-            remappings.put("net.minecraft.world.level.storage.WorldData$RespawnData", "net.minecraft.world.level.storage.WorldData$a");
-        }
-
-        // 1.21.11 mappings
-        if (evaluateMCVersion(">=", "1.21.11")) {
-            // Moved. We keep the old package path so API's don't break needlessly.
-            remappings.put("net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior$LerpStep", "net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior$a");
-        } else {
-            // A lot of classes were moved to new packages. These remap it back to the old path for older versions.
-
-            // Painting
-            remappings.put("net.minecraft.world.entity.decoration.painting.PaintingVariant", "net.minecraft.world.entity.decoration.PaintingVariant");
-
-            // Arrow
-            remappings.put("net.minecraft.world.entity.projectile.arrow.EntityArrow", "net.minecraft.world.entity.projectile.EntityArrow");
-
-            // Hurting projectile
-            remappings.put("net.minecraft.world.entity.projectile.hurtingprojectile.EntityLargeFireball", "net.minecraft.world.entity.projectile.EntityLargeFireball");
-
-            // Boat
-            remappings.put("net.minecraft.world.entity.vehicle.boat.EntityBoat", "net.minecraft.world.entity.vehicle.EntityBoat");
-
-            // Minecart
-            remappings.put("net.minecraft.world.entity.vehicle.minecart.MinecartBehavior", "net.minecraft.world.entity.vehicle.MinecartBehavior");
-            remappings.put("net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior", "net.minecraft.world.entity.vehicle.NewMinecartBehavior");
-            remappings.put("net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior$LerpStep", "net.minecraft.world.entity.vehicle.NewMinecartBehavior$a");
-            remappings.put("net.minecraft.world.entity.vehicle.minecart.OldMinecartBehavior", "net.minecraft.world.entity.vehicle.OldMinecartBehavior");
-            remappings.put("net.minecraft.world.entity.vehicle.minecart.MinecartBehavior", "net.minecraft.world.entity.vehicle.MinecartBehavior");
-            remappings.put("net.minecraft.world.entity.vehicle.minecart.EntityMinecartAbstract", "net.minecraft.world.entity.vehicle.EntityMinecartAbstract");
-            remappings.put("net.minecraft.world.entity.vehicle.minecart.EntityMinecartContainer", "net.minecraft.world.entity.vehicle.EntityMinecartContainer");
-            remappings.put("net.minecraft.world.entity.vehicle.minecart.EntityMinecartTNT", "net.minecraft.world.entity.vehicle.EntityMinecartTNT");
-            remappings.put("net.minecraft.world.entity.vehicle.minecart.EntityMinecartCommandBlock", "net.minecraft.world.entity.vehicle.EntityMinecartCommandBlock");
-            remappings.put("net.minecraft.world.entity.vehicle.minecart.EntityMinecartRideable", "net.minecraft.world.entity.vehicle.EntityMinecartRideable");
-            remappings.put("net.minecraft.world.entity.vehicle.minecart.EntityMinecartMobSpawner", "net.minecraft.world.entity.vehicle.EntityMinecartMobSpawner");
-            remappings.put("net.minecraft.world.entity.vehicle.minecart.EntityMinecartHopper", "net.minecraft.world.entity.vehicle.EntityMinecartHopper");
-            remappings.put("net.minecraft.world.entity.vehicle.minecart.EntityMinecartFurnace", "net.minecraft.world.entity.vehicle.EntityMinecartFurnace");
-            remappings.put("net.minecraft.world.entity.vehicle.minecart.EntityMinecartChest", "net.minecraft.world.entity.vehicle.EntityMinecartChest");
         }
 
         // There have been various locations where starlight was installed
@@ -931,18 +558,263 @@ public class CommonBootstrap {
             }
         }
 
-        // If remappings exist, add a resolver for them
-        if (!remappings.isEmpty()) {
-            if (server instanceof CraftBukkitServer) {
-                // Perform early remappings so that servers such as Mohist don't get super confused
-                ((CraftBukkitServer) server).setEarlyRemappings(remappings);
-            } else {
-                // Add an extra class resolver to do it in
-                Resolver.registerClassResolver(classPath -> {
-                    String remapped = remappings.get(classPath);
-                    return (remapped != null) ? remapped : classPath;
-                });
+        /*
+        ****************************************************************************************************************
+        * Below are changes to the Mojang-mapped class names in reverse order
+        * Each acts as a migration to use the newest mojang-mapped class name on older Minecraft versions
+        * In cases where we do not know the mojang-mapped name at all (pre-1.17), this is typically instead handled by
+        * the mojang <> spigot class mappings (class_mappings.dat) since Mojang Mapping wasn't in practical use.
+        ****************************************************************************************************************
+        */
+
+        /* ======== Mojang remapping changes for 1.21.11 ======== */
+        if (evaluateMCVersion("<", "1.21.11")) {
+            // A lot of classes were moved to new packages. These remap it back to the old path for older versions.
+
+            // Paintings were moved to a painting sub-package
+            remappings.put("net.minecraft.world.entity.decoration.painting.PaintingVariants", "net.minecraft.world.entity.decoration.PaintingVariants");
+            remappings.put("net.minecraft.world.entity.decoration.painting.PaintingVariant", "net.minecraft.world.entity.decoration.PaintingVariant");
+            remappings.put("net.minecraft.world.entity.decoration.painting.Painting", "net.minecraft.world.entity.decoration.Painting");
+
+            // Arrows were moved to an arrow sub-package
+            remappings.put("net.minecraft.world.entity.projectile.arrow.ThrownTrident", "net.minecraft.world.entity.projectile.ThrownTrident");
+            remappings.put("net.minecraft.world.entity.projectile.arrow.SpectralArrow", "net.minecraft.world.entity.projectile.SpectralArrow");
+            remappings.put("net.minecraft.world.entity.projectile.arrow.Arrow", "net.minecraft.world.entity.projectile.Arrow");
+            remappings.put("net.minecraft.world.entity.projectile.arrow.AbstractArrow", "net.minecraft.world.entity.projectile.AbstractArrow");
+
+            // Hurting projectiles were moved to a hurtingprojectile sub-package
+            remappings.put("net.minecraft.world.entity.projectile.hurtingprojectile.WitherSkull", "net.minecraft.world.entity.projectile.WitherSkull");
+            remappings.put("net.minecraft.world.entity.projectile.hurtingprojectile.SmallFireball", "net.minecraft.world.entity.projectile.SmallFireball");
+            remappings.put("net.minecraft.world.entity.projectile.hurtingprojectile.LargeFireball", "net.minecraft.world.entity.projectile.LargeFireball");
+            remappings.put("net.minecraft.world.entity.projectile.hurtingprojectile.Fireball", "net.minecraft.world.entity.projectile.Fireball");
+            remappings.put("net.minecraft.world.entity.projectile.hurtingprojectile.DragonFireball", "net.minecraft.world.entity.projectile.DragonFireball");
+            remappings.put("net.minecraft.world.entity.projectile.hurtingprojectile.AbstractHurtingProjectile", "net.minecraft.world.entity.projectile.AbstractHurtingProjectile");
+
+            // Boat classes were moved to a boat sub-package
+            remappings.put("net.minecraft.world.entity.vehicle.boat.Boat", "net.minecraft.world.entity.vehicle.Boat");
+            remappings.put("net.minecraft.world.entity.vehicle.boat.ChestBoat", "net.minecraft.world.entity.vehicle.ChestBoat");
+            remappings.put("net.minecraft.world.entity.vehicle.boat.AbstractChestBoat", "net.minecraft.world.entity.vehicle.AbstractChestBoat");
+            remappings.put("net.minecraft.world.entity.vehicle.boat.AbstractBoat", "net.minecraft.world.entity.vehicle.AbstractBoat");
+
+            // Minecart classes were moved to a minecart sub-package
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.MinecartBehavior", "net.minecraft.world.entity.vehicle.MinecartBehavior");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior", "net.minecraft.world.entity.vehicle.NewMinecartBehavior");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior$MinecartStep", "net.minecraft.world.entity.vehicle.NewMinecartBehavior$MinecartStep");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.OldMinecartBehavior", "net.minecraft.world.entity.vehicle.OldMinecartBehavior");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.AbstractMinecart", "net.minecraft.world.entity.vehicle.AbstractMinecart");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.AbstractMinecartContainer", "net.minecraft.world.entity.vehicle.AbstractMinecartContainer");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.Minecart", "net.minecraft.world.entity.vehicle.Minecart");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.MinecartTNT", "net.minecraft.world.entity.vehicle.MinecartTNT");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.MinecartCommandBlock", "net.minecraft.world.entity.vehicle.MinecartCommandBlock");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.MinecartSpawner", "net.minecraft.world.entity.vehicle.MinecartSpawner");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.MinecartHopper", "net.minecraft.world.entity.vehicle.MinecartHopper");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.MinecartFurnace", "net.minecraft.world.entity.vehicle.MinecartFurnace");
+            remappings.put("net.minecraft.world.entity.vehicle.minecart.MinecartChest", "net.minecraft.world.entity.vehicle.MinecartChest");
+        }
+
+        /* ======== Mojang remapping changes for 1.21.6 ======== */
+        if (evaluateMCVersion("<", "1.21.6")) {
+            // On versions before ValueOutput/Input existed, pretend they use CompoundTag (NBTTagCompound) instead to keep things simple
+            remappings.put("net.minecraft.world.level.storage.ValueOutput", "net.minecraft.nbt.CompoundTag");
+            remappings.put("net.minecraft.world.level.storage.ValueInput", "net.minecraft.nbt.CompoundTag");
+            remappings.put("net.minecraft.world.level.storage.TagValueOutput", "net.minecraft.nbt.CompoundTag");
+            remappings.put("net.minecraft.world.level.storage.TagValueInput", "net.minecraft.nbt.CompoundTag");
+        }
+
+        /* ======== Mojang remapping changes for 1.21.5 ======== */
+        if (evaluateMCVersion("<", "1.21.5")) {
+            // RespawnConfig record class was added in 1.21.5, use a proxy on versions prior to hold this data
+            remappings.put("net.minecraft.server.level.ServerPlayer$RespawnConfig", "com.bergerkiller.bukkit.common.internal.proxy.PlayerRespawnConfig_pre_1_21_5");
+        }
+
+        /* ======== Mojang remapping changes for 1.21.2 ======== */
+        if (evaluateMCVersion("<", "1.21.2")) {
+            remappings.put("net.minecraft.world.entity.Relative", "net.minecraft.world.entity.RelativeMovement");
+
+            // Before this version the ClientboundPlayerRotationPacket doesn't exist
+            // It is emulated with the ClientboundPlayerPositionPacket (PacketPlayOutPosition) instead (with x/y/z 0.0 relative)
+            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerRotationPacket", "net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket");
+
+            // Before this version the ClientboundEntityPositionSyncPacket doesn't exist
+            // It is emulated with the ClientboundTeleportEntityPacket (PacketPlayOutEntityTeleport) instead which behaves identically
+            remappings.put("net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket", "net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket");
+        }
+
+        /* ======== Mojang remapping changes for 1.20.5 ======== */
+        if (evaluateMCVersion("<", "1.20.5")) {
+            // ChunkStatus is now in a status package. Remap to it on older versions.
+            remappings.put("net.minecraft.world.level.chunk.status.ChunkStatus", "net.minecraft.world.level.chunk.ChunkStatus");
+            // SerializableMeta is now a standalone class, before it was a subclass of CraftMetaItem. Remap to it.
+            remappings.put("org.bukkit.craftbukkit.inventory.SerializableMeta", "org.bukkit.craftbukkit.inventory.CraftMetaItem$SerializableMeta");
+            // CustomModelData was introduced. Map to our proxy class on older versions.
+            remappings.put("net.minecraft.world.item.component.CustomModelData", "com.bergerkiller.bukkit.common.internal.proxy.CustomModelData_pre_1_20_5");
+        }
+
+        /* ======== Mojang remapping changes for 1.20.3 ======== */
+        if (evaluateMCVersion("<", "1.20.3")) {
+            // Before 1.20.3 the score reset was handled by the ClientboundSetScorePacket with an 'action' field
+            remappings.put("net.minecraft.network.protocol.game.ClientboundResetScorePacket", "net.minecraft.network.protocol.game.ClientboundSetScorePacket");
+        }
+
+        /* ======== Mojang remapping changes for 1.20.2 ======== */
+        if (evaluateMCVersion(">=", "1.20.2")) {
+            // The ClientboundAddPlayerPacket (PacketPlayOutNamedEntitySpawn) was removed. Instead to spawn players,
+            // the generic ClientboundAddEntityPacket (PacketPlayOutSpawnEntity) is used instead.
+            remappings.put("net.minecraft.network.protocol.game.ClientboundAddPlayerPacket", "net.minecraft.network.protocol.game.ClientboundAddEntityPacket");
+
+            // De-obfuscate a ClientboundCustomPayloadPacket implementation used when sending messages using Bukkit API
+            // Spigot devs made this an anonymous Class which is highly annoying if you want to send it yourself
+            // No longer exists as of 1.20.5, where they abuse the DiscardedPayload class instead
+            if (evaluateMCVersion("<", "1.20.5")) {
+                Class<?> customPayloadType = null;
+                try {
+                    customPayloadType = MPLType.getClassByName("net.minecraft.network.protocol.common.custom.CustomPacketPayload");
+                } catch (Throwable t) {
+                    Logging.LOGGER_REFLECTION.log(Level.WARNING, "Unable to identify the CustomPacketPayload type", t);
+                }
+                String anonTypeName = null;
+                if (customPayloadType != null) {
+                    for (int n = 1; n < 1000; n++) {
+                        String name = server.getCBRoot() + ".entity.CraftPlayer$" + n;
+                        try {
+                            Class<?> type = MPLType.getClassByName(name);
+                            if (customPayloadType.isAssignableFrom(type)) {
+                                anonTypeName = name;
+                                break;
+                            }
+                        } catch (ClassNotFoundException e) {
+                            break;
+                        }
+                    }
+                }
+                if (anonTypeName != null) {
+                    remappings.put("net.minecraft.network.protocol.common.custom.BukkitCustomPayload", anonTypeName);
+                } else {
+                    Logging.LOGGER_REFLECTION.log(Level.WARNING, "Unable to identify the Bukkit custom payload type");
+                }
             }
+        }
+        if (evaluateMCVersion("==", "1.20.2")) {
+            // On Minecraft 1.20.2 ClientboundResourcePackPacket was shortly moved to the 'common' package
+            // The BKCL API for ClientboundResourcePackPushPacket covers both, so we got to map to it
+            remappings.put("net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket", "net.minecraft.network.protocol.common.ClientboundResourcePackPacket");
+        }
+        if (evaluateMCVersion("<", "1.20.2")) {
+            // Before Minecraft 1.20.2 ClientboundResourcePackPushPacket does not exist
+            // It is handled by ClientboundResourcePackPacket (PacketPlayOutResourcePackSend) instead
+            remappings.put("net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket", "net.minecraft.network.protocol.game.ClientboundResourcePackPacket");
+
+            // Before Minecraft 1.20.2 all of these packets existed in the game package, after they are in common. Remap them so common works.
+            remappings.put("net.minecraft.network.protocol.common.ServerboundKeepAlivePacket", "net.minecraft.network.protocol.game.ServerboundKeepAlivePacket");
+            remappings.put("net.minecraft.network.protocol.common.ClientboundKeepAlivePacket", "net.minecraft.network.protocol.game.ClientboundKeepAlivePacket");
+            remappings.put("net.minecraft.network.protocol.common.ServerboundResourcePackPacket", "net.minecraft.network.protocol.game.ServerboundResourcePackPacket");
+            remappings.put("net.minecraft.network.protocol.common.ServerboundResourcePackPacket$Action", "net.minecraft.network.protocol.game.ServerboundResourcePackPacket$Action");
+            remappings.put("net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket", "net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket");
+            remappings.put("net.minecraft.network.protocol.common.ClientboundDisconnectPacket", "net.minecraft.network.protocol.game.ClientboundDisconnectPacket");
+            remappings.put("net.minecraft.network.protocol.common.ServerboundClientInformationPacket", "net.minecraft.network.protocol.game.ServerboundClientInformationPacket");
+        }
+
+        /* ======== Mojang remapping changes for 1.19.4 ======== */
+        if (evaluateMCVersion("<", "1.19.4")) {
+            remappings.put("net.minecraft.world.entity.Relative", "net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket$RelativeArgument");
+        }
+
+        /* ======== Mojang remapping changes for 1.19.3 ======== */
+        if (evaluateMCVersion(">=", "1.19.3")) {
+            // CustomSoundEffect was removed as of 1.19.3, now fully handled by the unified ClientboundSoundPacket (PacketPlayOutNamedSoundEffect)
+            remappings.put("net.minecraft.network.protocol.game.ClientboundCustomSoundPacket", "net.minecraft.network.protocol.game.ClientboundSoundPacket");
+        } else {
+            // BuiltInRegistries class does not exist before 1.19.3, all relevant registry fields are found in Registry (IRegistry) instead
+            remappings.put("net.minecraft.core.registries.BuiltInRegistries", "net.minecraft.core.Registry");
+        }
+
+        /* ======== Mojang remapping changes for 1.19 ======== */
+        if (evaluateMCVersion(">=", "1.19")) {
+            // Painting / living entity spawn packets were merged into one
+            remappings.put("net.minecraft.network.protocol.game.ClientboundAddMobPacket", "net.minecraft.network.protocol.game.ClientboundAddEntityPacket");
+            remappings.put("net.minecraft.network.protocol.game.ClientboundAddPaintingPacket", "net.minecraft.network.protocol.game.ClientboundAddEntityPacket");
+        } else {
+            // Uses a normal java.util.Random on older versions
+            remappings.put("net.minecraft.util.RandomSource", "java.util.Random");
+        }
+
+        /* ======== Mojang remapping changes for 1.18 ======== */
+        if (evaluateMCVersion("<", "1.18")) {
+            // ClientboundLevelChunkPacket was replaced with a different packet which stores light and block data at 1.18
+            // To simplify the BKCL API we use ClientboundLevelChunkWithLightPacket, since in both cases the buffer, heightmap data
+            // and changed block state information is available. We handle the adaptering in template code.
+            // On Spigot this is further mapped to PacketPlayOutMapChunk
+            remappings.put("net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket", "net.minecraft.network.protocol.game.ClientboundLevelChunkPacket");
+        }
+
+        /* ======== Mojang remapping changes for 1.16 ======== */
+        if (evaluateMCVersion("<", "1.16")) {
+            // Maps nms ResourceKey to the internal proxy class replacement pre-1.16
+            remappings.put("net.minecraft.resources.ResourceKey", "com.bergerkiller.bukkit.common.internal.proxy.ResourceKey_1_15_2");
+        }
+
+        /* ======== Mojang remapping changes for 1.14 ======== */
+        if (evaluateMCVersion("<", "1.14")) {
+            remappings.put("net.minecraft.server.level.EntityTracker", "net.minecraft.server.level.EntityTracker");
+            remappings.put("net.minecraft.server.level.EntityTrackerEntry", "net.minecraft.server.level.ServerEntity");
+        }
+
+        /* ======== Mojang remapping changes for 1.13 ======== */
+        if (evaluateMCVersion("<", "1.13")) {
+            // Proxy classes that were added in 1.13
+            remappings.put("net.minecraft.world.level.levelgen.Heightmap", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2");
+            remappings.put("net.minecraft.world.level.levelgen.HeightMap$Types", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2$Type");
+            remappings.put("net.minecraft.world.phys.shapes.VoxelShape", "com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy");
+            remappings.put("net.minecraft.world.level.block.entity.BlockEntityType", "com.bergerkiller.bukkit.common.internal.proxy.TileEntityTypesProxy_1_8_to_1_12_2");
+            // Stop sound works using an MC|StopSound custom message
+            remappings.put("net.minecraft.network.protocol.game.ClientboundStopSoundPacket", "net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket");
+        }
+
+        /* ======== Mojang remapping changes for 1.11 ======== */
+        if (evaluateMCVersion("<", "1.11")) {
+            // MapDecorationType (MapIcon$Type) did not exist before 1.11, we use a proxy class for 1.8 - 1.10.2
+            remappings.put("net.minecraft.world.level.saveddata.maps.MapDecorationType", "com.bergerkiller.bukkit.common.internal.proxy.MapDecorationType_1_8_to_1_10_2");
+        }
+
+        /* ======== Mojang remapping changes for 1.9 ======== */
+        if (evaluateMCVersion("<", "1.9")) {
+            // Before Minecraft 1.9 some servers implement MobEffectList, but others do not
+            // Remap to our proxy class if missing
+            try {
+                Class.forName(server.getNMSRoot() + ".MobEffectList");
+            } catch (ClassNotFoundException e) {
+                remappings.put("net.minecraft.world.effect.MobEffect", "com.bergerkiller.bukkit.common.internal.proxy.MobEffectList");
+            }
+
+            // ServerboundUseItemOnPacket (PacketPlayInUseItem) did not exist on 1.8
+            // The packet is handled by ServerboundUseItemPacket (PacketPlayInBlockPlace) instead
+            remappings.put("net.minecraft.network.protocol.game.ServerboundUseItemOnPacket", "net.minecraft.network.protocol.game.ServerboundUseItemPacket");
+
+            // ClientboundCustomSoundPacket (PacketPlayOutCustomSoundEffect) did not exist on 1.8
+            // The packet is handled by ClientboundSoundPacket (PacketPlayOutNamedSoundEffect) instead
+            remappings.put("net.minecraft.network.protocol.game.ClientboundCustomSoundPacket", "net.minecraft.network.protocol.game.ClientboundSoundPacket");
+
+            // We proxy a bunch of classes, because they don't exist in 1.8
+            // Writing custom wrappers with switches would be too tiresome
+            // This allows continued use of the same API without trouble
+            // Converters take care to convert between the Class and Id used internally
+            remappings.put("net.minecraft.world.entity.EquipmentSlot", "com.bergerkiller.bukkit.common.internal.proxy.EnumItemSlot");
+            remappings.put("net.minecraft.world.level.chunk.PalettedContainer", "com.bergerkiller.bukkit.common.internal.proxy.DataPaletteBlock");
+            remappings.put("net.minecraft.sounds.SoundEvent", "com.bergerkiller.bukkit.common.internal.proxy.SoundEffect_1_8_8");
+            remappings.put("net.minecraft.world.level.dimension.DimensionType", "com.bergerkiller.bukkit.common.internal.proxy.DimensionManager_1_8_8");
+        }
+
+        // Register the remappings with the server if it supports it, otherwise register a class resolver to do it
+        if (server instanceof CraftBukkitServer) {
+            // Perform early remappings so that servers such as Mohist don't get super confused
+            // This also ensures that MojMap -> Spigot translation occurs after these remappings
+            ((CraftBukkitServer) server).setEarlyRemappings(remappings);
+        } else {
+            // Add an extra class resolver to do it in
+            Resolver.registerClassResolver(classPath -> {
+                String remapped = remappings.get(classPath);
+                return (remapped != null) ? remapped : classPath;
+            });
         }
 
         // Initialize this one right away, as it's used in generated code

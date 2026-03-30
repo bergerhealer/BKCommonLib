@@ -8,6 +8,8 @@ import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria.RenderType;
 import net.minecraft.world.scores.Team$Visibility;
 import net.minecraft.world.scores.Team$CollisionRule;
+import net.minecraft.server.ServerScoreboard;
+import net.minecraft.server.ServerScoreboard$Method;
 
 import org.bukkit.scoreboard.DisplaySlot;
 
@@ -15,7 +17,6 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundResetScorePacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetScorePacketHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetScorePacketHandle.EnumScoreboardActionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacketHandle;
 
 class ClientboundSetPlayerTeamPacket extends Packet {
@@ -57,7 +58,7 @@ class ClientboundSetPlayerTeamPacket extends Packet {
 
     public static (ClientboundSetPlayerTeamPacketHandle) ClientboundSetPlayerTeamPacket createNew() {
 #if version >= 1.20.5
-        #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket private ClientboundSetPlayerTeamPacket createTeamPacket:<init>(String s, int i, java.util.Optional<ClientboundSetPlayerTeamPacket.b> opt, java.util.Collection<String> collection);
+        #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket private ClientboundSetPlayerTeamPacket createTeamPacket:<init>(String s, int i, java.util.Optional<ClientboundSetPlayerTeamPacket.Parameters> opt, java.util.Collection<String> collection);
         return #createTeamPacket("", 0, java.util.Optional.empty(), java.util.Collections.emptyList());
 #elseif version >= 1.17
         ClientboundSetPlayerTeamPacket packet = new ClientboundSetPlayerTeamPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
@@ -71,42 +72,42 @@ class ClientboundSetPlayerTeamPacket extends Packet {
 #if version >= 1.17
     // All properties grouped in a container class
 
-    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.b private final Component displayName;
-    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.b private final Component prefix:playerPrefix;
-    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.b private final Component suffix:playerSuffix;
+    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final Component displayName;
+    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final Component prefix:playerPrefix;
+    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final Component suffix:playerSuffix;
   #if version >= 1.21.5
-    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.b private final (String) net.minecraft.world.scores.Team.Visibility visibility:nametagVisibility;
-    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.b private final (String) net.minecraft.world.scores.Team.CollisionRule collisionRule;
+    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final (String) net.minecraft.world.scores.Team.Visibility visibility:nametagVisibility;
+    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final (String) net.minecraft.world.scores.Team.CollisionRule collisionRule;
   #else
-    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.b private final String visibility:nametagVisibility;
-    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.b private final String collisionRule;
+    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final String visibility:nametagVisibility;
+    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final String collisionRule;
   #endif
-    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.b private final ChatFormatting color;
-    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.b private final int teamOptionFlags:options;
+    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final ChatFormatting color;
+    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final int teamOptionFlags:options;
 
-    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket private final Optional<ClientboundSetPlayerTeamPacket.b> parameters;
-    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket public ClientboundSetPlayerTeamPacket.b getParameters() {
+    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket private final Optional<ClientboundSetPlayerTeamPacket.Parameters> parameters;
+    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket public ClientboundSetPlayerTeamPacket.Parameters getParameters() {
         Optional opt = instance#parameters;
         if (opt == null) {
             return null;
         } else {
-            return (ClientboundSetPlayerTeamPacket$b) opt.orElse(null);
+            return (ClientboundSetPlayerTeamPacket$Parameters) opt.orElse(null);
         }
     }
-    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket public ClientboundSetPlayerTeamPacket.b createParameters() {
+    #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket public ClientboundSetPlayerTeamPacket.Parameters createParameters() {
         // Get existing
         Optional opt = instance#parameters;
         if (opt != null && opt.isPresent()) {
-            return (ClientboundSetPlayerTeamPacket$b) opt.get();
+            return (ClientboundSetPlayerTeamPacket$Parameters) opt.get();
         }
 
         // Create new with default values
   #if version >= 1.20.5
         // It does a bunch of byte stream reading now for NBT, which is incompatible with our null serializer
         // Create a new scoreboard team, which seems to work ok. Will need a null instantiator otherwise though.
-        ClientboundSetPlayerTeamPacket$b parameters = new ClientboundSetPlayerTeamPacket$b(new net.minecraft.world.scores.PlayerTeam((net.minecraft.world.scores.Scoreboard) null, "unset"));
+        ClientboundSetPlayerTeamPacket$Parameters parameters = new ClientboundSetPlayerTeamPacket$Parameters(new net.minecraft.world.scores.PlayerTeam((net.minecraft.world.scores.Scoreboard) null, "unset"));
   #else
-        ClientboundSetPlayerTeamPacket$b parameters = new ClientboundSetPlayerTeamPacket$b(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+        ClientboundSetPlayerTeamPacket$Parameters parameters = new ClientboundSetPlayerTeamPacket$Parameters(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
   #endif
   #if version >= 1.19
         parameters#displayName = Component.empty();
@@ -130,7 +131,7 @@ class ClientboundSetPlayerTeamPacket extends Packet {
     }
 
     public (ChatText) Component getDisplayName() {
-        ClientboundSetPlayerTeamPacket$b parameters = instance#getParameters();
+        ClientboundSetPlayerTeamPacket$Parameters parameters = instance#getParameters();
         if (parameters == null) {
 #if version >= 1.19
             return Component.empty();
@@ -143,12 +144,12 @@ class ClientboundSetPlayerTeamPacket extends Packet {
     }
 
     public void setDisplayName((ChatText) Component displayName) {
-        ClientboundSetPlayerTeamPacket$b parameters = instance#createParameters();
+        ClientboundSetPlayerTeamPacket$Parameters parameters = instance#createParameters();
         parameters#displayName = displayName;
     }
 
     public (ChatText) Component getPrefix() {
-        ClientboundSetPlayerTeamPacket$b parameters = instance#getParameters();
+        ClientboundSetPlayerTeamPacket$Parameters parameters = instance#getParameters();
         if (parameters == null) {
 #if version >= 1.19
             return Component.empty();
@@ -161,12 +162,12 @@ class ClientboundSetPlayerTeamPacket extends Packet {
     }
 
     public void setPrefix((ChatText) Component prefix) {
-        ClientboundSetPlayerTeamPacket$b parameters = instance#createParameters();
+        ClientboundSetPlayerTeamPacket$Parameters parameters = instance#createParameters();
         parameters#prefix = prefix;
     }
 
     public (ChatText) Component getSuffix() {
-        ClientboundSetPlayerTeamPacket$b parameters = instance#getParameters();
+        ClientboundSetPlayerTeamPacket$Parameters parameters = instance#getParameters();
         if (parameters == null) {
 #if version >= 1.19
             return Component.empty();
@@ -179,12 +180,12 @@ class ClientboundSetPlayerTeamPacket extends Packet {
     }
 
     public void setSuffix((ChatText) Component suffix) {
-        ClientboundSetPlayerTeamPacket$b parameters = instance#createParameters();
+        ClientboundSetPlayerTeamPacket$Parameters parameters = instance#createParameters();
         parameters#suffix = suffix;
     }
 
     public String getVisibility() {
-        ClientboundSetPlayerTeamPacket$b parameters = instance#getParameters();
+        ClientboundSetPlayerTeamPacket$Parameters parameters = instance#getParameters();
         if (parameters == null) {
             return Team$Visibility.ALWAYS.name;
         } else {
@@ -193,12 +194,12 @@ class ClientboundSetPlayerTeamPacket extends Packet {
     }
 
     public void setVisibility(String visibility) {
-        ClientboundSetPlayerTeamPacket$b parameters = instance#createParameters();
+        ClientboundSetPlayerTeamPacket$Parameters parameters = instance#createParameters();
         parameters#visibility = visibility;
     }
 
     public String getCollisionRule() {
-        ClientboundSetPlayerTeamPacket$b parameters = instance#getParameters();
+        ClientboundSetPlayerTeamPacket$Parameters parameters = instance#getParameters();
         if (parameters == null) {
             return Team$CollisionRule.ALWAYS.name;
         } else {
@@ -207,12 +208,12 @@ class ClientboundSetPlayerTeamPacket extends Packet {
     }
 
     public void setCollisionRule(String rule) {
-        ClientboundSetPlayerTeamPacket$b parameters = instance#createParameters();
+        ClientboundSetPlayerTeamPacket$Parameters parameters = instance#createParameters();
         parameters#collisionRule = rule;
     }
 
     public (org.bukkit.ChatColor) ChatFormatting getColor() {
-        ClientboundSetPlayerTeamPacket$b parameters = instance#getParameters();
+        ClientboundSetPlayerTeamPacket$Parameters parameters = instance#getParameters();
         if (parameters == null) {
             return ChatFormatting.RESET;
         } else {
@@ -221,12 +222,12 @@ class ClientboundSetPlayerTeamPacket extends Packet {
     }
 
     public void setColor((org.bukkit.ChatColor) ChatFormatting color) {
-        ClientboundSetPlayerTeamPacket$b parameters = instance#createParameters();
+        ClientboundSetPlayerTeamPacket$Parameters parameters = instance#createParameters();
         parameters#color = color;
     }
 
     public int getTeamOptionFlags() {
-        ClientboundSetPlayerTeamPacket$b parameters = instance#getParameters();
+        ClientboundSetPlayerTeamPacket$Parameters parameters = instance#getParameters();
         if (parameters == null) {
             return 0;
         } else {
@@ -235,7 +236,7 @@ class ClientboundSetPlayerTeamPacket extends Packet {
     }
 
     public void setTeamOptionFlags(int teamOptionFlags) {
-        ClientboundSetPlayerTeamPacket$b parameters = instance#createParameters();
+        ClientboundSetPlayerTeamPacket$Parameters parameters = instance#createParameters();
         parameters#teamOptionFlags = teamOptionFlags;
     }
 #else
@@ -380,7 +381,7 @@ class ClientboundResetScorePacket extends Packet {
 #if version >= 1.20.3
         return new ClientboundResetScorePacket(name, objectiveName);
 #elseif version >= 1.13
-        return new ClientboundResetScorePacket(ClientboundSetScorePacket$EnumScoreboardAction.REMOVE, objectiveName, name, 0);
+        return new ClientboundResetScorePacket(ServerScoreboard$Method.REMOVE, objectiveName, name, 0);
 #else
         ClientboundResetScorePacket packet = new ClientboundResetScorePacket(name);
         #require ClientboundResetScorePacket private String objName:b;
@@ -406,17 +407,17 @@ class ClientboundSetScorePacket extends Packet {
         //TODO: Display and number format
         return new ClientboundSetScorePacket(name, objectiveName, score, null, null);
 #elseif version >= 1.13
-        return new ClientboundSetScorePacket(ClientboundSetScorePacket$EnumScoreboardAction.CHANGE, objectiveName, name, score);
+        return new ClientboundSetScorePacket(ServerScoreboard$Method.CHANGE, objectiveName, name, score);
 #else
         ClientboundSetScorePacket packet = new ClientboundSetScorePacket();
         #require ClientboundSetScorePacket private String scorePacketName:a;
         #require ClientboundSetScorePacket private String scorePacketObjName:b;
         #require ClientboundSetScorePacket private int scorePacketValue:c;
-        #require ClientboundSetScorePacket private ClientboundSetScorePacket.EnumScoreboardAction scorePacketAction:d;
+        #require ClientboundSetScorePacket private net.minecraft.server.ServerScoreboard.Method scorePacketAction:d;
         packet#scorePacketName = name;
         packet#scorePacketObjName = objectiveName;
         packet#scorePacketValue = score;
-        packet#scorePacketAction = ClientboundSetScorePacket$EnumScoreboardAction.CHANGE;
+        packet#scorePacketAction = ServerScoreboard$Method.CHANGE;
         return packet;
 #endif
     }

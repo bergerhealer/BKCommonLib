@@ -20,7 +20,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundTeleportEntityPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerPositionPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundAddMobPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacketHandle;
@@ -585,7 +585,7 @@ public class MapPlayerInput implements Tickable {
             if (this._fakeMountId != -1 && !pos.equals(this._fakeMountLastPos)) {
                 this._fakeMountLastPos = pos;
 
-                ClientboundTeleportEntityPacketHandle tp_packet = ClientboundTeleportEntityPacketHandle.createNew(
+                ClientboundEntityPositionSyncPacketHandle tp_packet = ClientboundEntityPositionSyncPacketHandle.createNew(
                         this._fakeMountId,
                         pos.getX(), pos.getY(), pos.getZ(),
                         0.0f, 0.0f, false);

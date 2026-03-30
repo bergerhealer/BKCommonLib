@@ -19,7 +19,7 @@ class Connection {
     public boolean isConnected:g();
 #endif
 
-    // Only used on 1.20.2+ in the callback for a QueuedPacket
+    // Only used on 1.20.2+ in the callback for a PacketHolder
 #if version >= 1.21.6
     private void queue_sendPacketImpl:sendPacket((Object) Packet<?> packet, (Object) io.netty.channel.ChannelFutureListener packetsendlistener, boolean flush);
 #elseif version >= 1.20.2
@@ -54,8 +54,8 @@ class Connection {
         Object queuedPacket;
   #if version >= 1.21.6
     #if exists net.minecraft.network.Connection.PacketSendAction
-        #require net.minecraft.network.Connection.PacketSendAction private net.minecraft.network.Connection.PacketSendAction createQueuedPacket:<init>(net.minecraft.network.protocol.Packet<?> packet, io.netty.channel.ChannelFutureListener listener, boolean flush);
-        queuedPacket = #createQueuedPacket((net.minecraft.network.protocol.Packet) packet, (io.netty.channel.ChannelFutureListener) null, false);
+        #require net.minecraft.network.Connection.PacketSendAction private net.minecraft.network.Connection.PacketSendAction createPacketSendAction:<init>(net.minecraft.network.protocol.Packet<?> packet, io.netty.channel.ChannelFutureListener listener, boolean flush);
+        queuedPacket = #createPacketSendAction((net.minecraft.network.protocol.Packet) packet, (io.netty.channel.ChannelFutureListener) null, false);
     #else
         #if paper
             #warning Connection PacketSendAction class was not identified, errors might occur queueing packets!
@@ -64,23 +64,23 @@ class Connection {
     #endif
   #elseif version >= 1.20.2
     #if exists net.minecraft.network.Connection.PacketSendAction
-        #require net.minecraft.network.Connection.PacketSendAction private net.minecraft.network.Connection.PacketSendAction createQueuedPacket:<init>(net.minecraft.network.protocol.Packet<?> packet, net.minecraft.network.PacketSendListener listener, boolean flush);
-        queuedPacket = #createQueuedPacket((net.minecraft.network.protocol.Packet) packet, (net.minecraft.network.PacketSendListener) null, false);
+        #require net.minecraft.network.Connection.PacketSendAction private net.minecraft.network.Connection.PacketSendAction createPacketSendAction:<init>(net.minecraft.network.protocol.Packet<?> packet, net.minecraft.network.PacketSendListener listener, boolean flush);
+        queuedPacket = #createPacketSendAction((net.minecraft.network.protocol.Packet) packet, (net.minecraft.network.PacketSendListener) null, false);
     #else
         #if version >= 1.20.5 && paper
             #warning Connection PacketSendAction class was not identified, errors might occur queueing packets!
         #endif
         queuedPacket = new com.bergerkiller.bukkit.common.internal.proxy.QueuedPacket_1_20_2(packet, null, false);
     #endif
-  #elseif exists net.minecraft.network.Connection.QueuedPacket public Connection.QueuedPacket(net.minecraft.network.protocol.Packet<?> packet, io.netty.util.concurrent.GenericFutureListener listener)
-        #require net.minecraft.network.Connection.QueuedPacket public Connection.QueuedPacket createQueuedPacket:<init>((Object) Packet<?> packet, GenericFutureListener listener);
-        queuedPacket = #createQueuedPacket(packet, (GenericFutureListener) null);
-  #elseif exists net.minecraft.network.Connection.QueuedPacket public Connection.QueuedPacket(net.minecraft.network.protocol.Packet<?> packet, io.netty.util.concurrent.GenericFutureListener[] listener)
-        #require net.minecraft.network.Connection.QueuedPacket public Connection.QueuedPacket createQueuedPacket:<init>((Object) Packet<?> packet, GenericFutureListener[] listener);
-        queuedPacket = #createQueuedPacket(packet, (GenericFutureListener[]) null);
-  #elseif exists net.minecraft.network.Connection.QueuedPacket public Connection.QueuedPacket(net.minecraft.network.protocol.Packet<?> packet, net.minecraft.network.PacketSendListener listener)
-        #require net.minecraft.network.Connection.QueuedPacket public Connection.QueuedPacket createQueuedPacket:<init>((Object) Packet<?> packet, net.minecraft.network.PacketSendListener listener);
-        queuedPacket = #createQueuedPacket(packet, (net.minecraft.network.PacketSendListener) null);
+  #elseif exists net.minecraft.network.Connection.PacketHolder public Connection.PacketHolder(net.minecraft.network.protocol.Packet<?> packet, io.netty.util.concurrent.GenericFutureListener listener)
+        #require net.minecraft.network.Connection.PacketHolder public Connection.PacketHolder createPacketHolder:<init>((Object) Packet<?> packet, GenericFutureListener listener);
+        queuedPacket = #createPacketHolder(packet, (GenericFutureListener) null);
+  #elseif exists net.minecraft.network.Connection.PacketHolder public Connection.PacketHolder(net.minecraft.network.protocol.Packet<?> packet, io.netty.util.concurrent.GenericFutureListener[] listener)
+        #require net.minecraft.network.Connection.PacketHolder public Connection.PacketHolder createPacketHolder:<init>((Object) Packet<?> packet, GenericFutureListener[] listener);
+        queuedPacket = #createPacketHolder(packet, (GenericFutureListener[]) null);
+  #elseif exists net.minecraft.network.Connection.PacketHolder public Connection.PacketHolder(net.minecraft.network.protocol.Packet<?> packet, net.minecraft.network.PacketSendListener listener)
+        #require net.minecraft.network.Connection.PacketHolder public Connection.PacketHolder createPacketHolder:<init>((Object) Packet<?> packet, net.minecraft.network.PacketSendListener listener);
+        queuedPacket = #createPacketHolder(packet, (net.minecraft.network.PacketSendListener) null);
   #else
         #error Cannot queue packets - queued packet constructor not found!
   #endif

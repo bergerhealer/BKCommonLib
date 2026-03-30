@@ -40,41 +40,50 @@ class BlockDataWrapperHook_Impl_Default extends BlockDataWrapperHook {
         final Class<?> immutableMapType;
         Field valuesField;
 
+        // We always store our hook inside the StateHolder class, which is the base implementation of block data on the server
+        // that holds the actual state properties. The location of this class differs greatly between minecraft versions,
+        // which is handled by the moj-spigot class mapping. This class by this name also acted as an interface, so it's
+        // a little confusing.
+        //
+        // Mappings:
+        // [1.8 - 1.8] net.minecraft.server.BlockData
+        // [1.8.1 - 1.12.2] net.minecraft.world.level.block.state.BlockStateList$BlockData
+        // [1.13 - 1.15.2] net.minecraft.world.level.block.state.BlockDataAbstract
+        // [1.16 - 1.21.11] net.minecraft.world.level.block.state.IBlockDataHolder
+
+        Class<?> stateHolderType = getClassVerify("net.minecraft.world.level.block.state.StateHolder");
+
         if (CommonBootstrap.evaluateMCVersion(">=", "1.20.5")) {
             // Reference2ObjectArrayMap after 1.20.5
             immutableMapType = getClassVerify("it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap");
-            Class<?> iBlockDataHolderType = getClassVerify("net.minecraft.world.level.block.state.StateHolder");
-            valuesField = Resolver.resolveAndGetDeclaredField(iBlockDataHolderType, "values");
+            valuesField = Resolver.resolveAndGetDeclaredField(stateHolderType, "values");
         } else {
             // ImmutableMap before MC 1.20.5
             // Version-specific field names...
             immutableMapType = getClassVerify("com.google.common.collect.ImmutableMap");
             if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
-                // Since MC 1.16: Field is stored in the StateHolder class
-                Class<?> iBlockDataHolderType = getClassVerify("net.minecraft.world.level.block.state.StateHolder");
+                // Since MC 1.16: Field is stored in the IBlockDataHolder class
                 if (CommonBootstrap.evaluateMCVersion(">=", "1.18")) {
-                    valuesField = Resolver.resolveAndGetDeclaredField(iBlockDataHolderType, "values");
+                    valuesField = Resolver.resolveAndGetDeclaredField(stateHolderType, "values");
                 } else if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
-                    valuesField = Resolver.resolveAndGetDeclaredField(iBlockDataHolderType, "values");
+                    valuesField = Resolver.resolveAndGetDeclaredField(stateHolderType, "values");
                 } else {
-                    valuesField = Resolver.resolveAndGetDeclaredField(iBlockDataHolderType, "b");
+                    valuesField = Resolver.resolveAndGetDeclaredField(stateHolderType, "b");
                 }
             } else if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
                 // Since MC 1.13: Field is stored in the BlockDataAbstract class
-                Class<?> blockDataAbstractType = CommonUtil.getClass("net.minecraft.world.level.block.state.BlockDataAbstract");
                 if (CommonBootstrap.evaluateMCVersion(">=", "1.14")) {
-                    valuesField = Resolver.resolveAndGetDeclaredField(blockDataAbstractType, "d");
+                    valuesField = Resolver.resolveAndGetDeclaredField(stateHolderType, "d");
                 } else {
-                    valuesField = Resolver.resolveAndGetDeclaredField(blockDataAbstractType, "c");
+                    valuesField = Resolver.resolveAndGetDeclaredField(stateHolderType, "c");
                 }
             } else {
-                // MC 1.8 - 1.12.2: Field is stored in the BlockData class
-                Class<?> blockDataType = CommonUtil.getClass("net.minecraft.world.level.block.state.StateDefinition$BlockData");
-                if (SafeField.contains(blockDataType, "bAsImmutableMap", immutableMapType)) {
+                // MC 1.8 - 1.12.2: Field is stored in the BlockStateList$BlockData class
+                if (SafeField.contains(stateHolderType, "bAsImmutableMap", immutableMapType)) {
                     // Optimization on TacoSpigot / BurritoSpigot
-                    valuesField = blockDataType.getDeclaredField("bAsImmutableMap");
+                    valuesField = stateHolderType.getDeclaredField("bAsImmutableMap");
                 } else {
-                    valuesField = Resolver.resolveAndGetDeclaredField(blockDataType, "b");
+                    valuesField = Resolver.resolveAndGetDeclaredField(stateHolderType, "b");
                 }
             }
         }

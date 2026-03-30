@@ -2,7 +2,7 @@ package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.NewMinecartBehaviorHandle.LerpStepHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.NewMinecartBehaviorHandle.MinecartStepHandle;
 import java.util.List;
 
 /**
@@ -23,12 +23,12 @@ public abstract class ClientboundMoveMinecartPacketHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public static ClientboundMoveMinecartPacketHandle createNew(int entityId, List<LerpStepHandle> lerpSteps) {
+    public static ClientboundMoveMinecartPacketHandle createNew(int entityId, List<MinecartStepHandle> lerpSteps) {
         return T.createNew.invoke(entityId, lerpSteps);
     }
 
     public abstract int getEntityId();
-    public abstract List<LerpStepHandle> getLerpSteps();
+    public abstract List<MinecartStepHandle> getLerpSteps();
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.ClientboundMoveMinecartPacket</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -37,7 +37,7 @@ public abstract class ClientboundMoveMinecartPacketHandle extends PacketHandle {
         public final Template.StaticMethod.Converted<ClientboundMoveMinecartPacketHandle> createNew = new Template.StaticMethod.Converted<ClientboundMoveMinecartPacketHandle>();
 
         public final Template.Method<Integer> getEntityId = new Template.Method<Integer>();
-        public final Template.Method.Converted<List<LerpStepHandle>> getLerpSteps = new Template.Method.Converted<List<LerpStepHandle>>();
+        public final Template.Method.Converted<List<MinecartStepHandle>> getLerpSteps = new Template.Method.Converted<List<MinecartStepHandle>>();
 
     }
 

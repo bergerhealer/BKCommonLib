@@ -405,7 +405,7 @@ class LevelChunk {
     }
 #else
     public (com.bergerkiller.bukkit.common.wrappers.HeightMap) Heightmap getLightHeightMap(boolean initialize) {
-        Heightmap heightMap = new com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2(instance, instance.heightMap);
+        Heightmap heightMap = new Heightmap(instance, instance.heightMap);
         if (initialize) {
              com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightmapHandle.T.initialize.invoke(heightMap);
         }

@@ -6,7 +6,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.NewMinecartBehaviorHandle.LerpStepHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.NewMinecartBehaviorHandle.MinecartStepHandle;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
@@ -303,15 +303,15 @@ class MinecartSpawner extends AbstractMinecart {
 
 // Since Minecraft 1.21.2
 optional class NewMinecartBehavior {
-    optional class NewMinecartBehavior.LerpStep {
+    optional class NewMinecartBehavior.MinecartStep {
         public (org.bukkit.util.Vector) Vec3 getPosition:position();
         public (org.bukkit.util.Vector) Vec3 getMovement:movement();
         public float getYaw:yRot();
         public float getPitch:xRot();
         public float getWeight:weight();
 
-        public static (NewMinecartBehaviorHandle.LerpStepHandle) NewMinecartBehavior.LerpStep createNew((org.bukkit.util.Vector) Vec3 position, (org.bukkit.util.Vector) Vec3 movement, float yaw, float pitch, float weight) {
-            return new NewMinecartBehavior$LerpStep(position, movement, yaw, pitch, weight);
+        public static (NewMinecartBehaviorHandle.MinecartStepHandle) NewMinecartBehavior.MinecartStep createNew((org.bukkit.util.Vector) Vec3 position, (org.bukkit.util.Vector) Vec3 movement, float yaw, float pitch, float weight) {
+            return new NewMinecartBehavior$MinecartStep(position, movement, yaw, pitch, weight);
         }
     }
 }

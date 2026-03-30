@@ -1,6 +1,6 @@
 package org.bukkit.craftbukkit;
 
-import net.minecraft.world.entity.decoration.Paintings;
+import net.minecraft.world.entity.decoration.Motive;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -76,13 +76,13 @@ class CraftArt {
   #elseif version >= 1.13.1
         return (Paintings) BuiltInRegistries.MOTIVE.fromId(internalId);
   #elseif version >= 1.13
-        return (Paintings) Paintings.a.getId(internalId);
+        return (Paintings) Motive.a.getId(internalId);
   #else
-        Paintings[] values = Paintings.values();
+        Paintings[] values = Motive.values();
         if (internalId >= 0 && internalId < values.length) {
             return values[internalId];
         }
-        return Paintings.KEBAB;
+        return Motive.KEBAB;
   #endif
     }
 
@@ -92,7 +92,7 @@ class CraftArt {
   #elseif version >= 1.13.1
         return BuiltInRegistries.MOTIVE.a((Object) art);
   #elseif version >= 1.13
-        return Paintings.a.a((Object) art);
+        return Motive.a.a((Object) art);
   #else
         return art.ordinal();
   #endif
@@ -103,15 +103,15 @@ class CraftArt {
   #if version >= 1.13.1
         return (Paintings) BuiltInRegistries.MOTIVE.get(key);
   #elseif version >= 1.13
-        return (Paintings) Paintings.a.get(key);
+        return (Paintings) Motive.a.get(key);
   #else
-        Paintings[] values = Paintings.values();
+        Paintings[] values = Motive.values();
         for (int i = 0; i < values.length; i++) {
             if (values[i].B.equals(internalName)) {
                 return values[i];
             }
         }
-        return Paintings.KEBAB;
+        return Motive.KEBAB;
   #endif
     }
 
@@ -123,7 +123,7 @@ class CraftArt {
         net.minecraft.resources.Identifier key = (net.minecraft.resources.Identifier) BuiltInRegistries.MOTIVE.getKey((Object) art);
         return (key == null) ? null : key.getKey();
   #elseif version >= 1.13
-        net.minecraft.resources.Identifier key = (net.minecraft.resources.Identifier) Paintings.a.b(art);
+        net.minecraft.resources.Identifier key = (net.minecraft.resources.Identifier) Motive.a.b(art);
         return (key == null) ? null : key.getKey();
   #else
         return art.B;

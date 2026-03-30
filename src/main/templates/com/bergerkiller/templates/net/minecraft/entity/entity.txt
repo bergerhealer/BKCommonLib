@@ -1251,7 +1251,7 @@ class Entity {
 
     /*
      # protected void ##METHODNAME##(BlockPos blockposition, Block block) {
-     *     SoundEventType soundeffecttype = block.getStepSound();
+     *     SoundType soundeffecttype = block.getStepSound();
      *     if (this.world.getType(blockposition.up()).getBlock() == Blocks.SNOW_LAYER) {
      *         soundeffecttype = Blocks.SNOW_LAYER.getStepSound();
      *         this.a(soundeffecttype.d(), soundeffecttype.a() * 0.15F, soundeffecttype.b());

@@ -2,7 +2,7 @@ package net.minecraft.network.protocol.game;
 
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.entity.PositionMoveRotation;
-import net.minecraft.world.entity.RelativeMovement;
+import net.minecraft.world.entity.Relative;
 import net.minecraft.world.phys.Vec3;
 
 import com.bergerkiller.bukkit.common.wrappers.RelativeFlags;
@@ -18,7 +18,7 @@ class ClientboundPlayerPositionPacket extends Packet {
     public double getZ() { return instance.change().position().z; }
     public float getYaw() { return instance.change().yRot(); }
     public float getPitch() { return instance.change().xRot(); }
-    public (RelativeFlags) Set<RelativeMovement> getRelativeFlags:relatives();
+    public (RelativeFlags) Set<Relative> getRelativeFlags:relatives();
     public int getTeleportWaitTimer:id();
 #elseif version >= 1.18
     public double getX();
@@ -26,7 +26,7 @@ class ClientboundPlayerPositionPacket extends Packet {
     public double getZ();
     public float getYaw:getYRot();
     public float getPitch:getXRot();
-    public (RelativeFlags) Set<RelativeMovement> getRelativeFlags:getRelativeArguments();
+    public (RelativeFlags) Set<Relative> getRelativeFlags:getRelativeArguments();
     public int getTeleportWaitTimer:getId();
 #elseif version >= 1.17
     public double getX:b();
@@ -34,7 +34,7 @@ class ClientboundPlayerPositionPacket extends Packet {
     public double getZ:d();
     public float getYaw:e();
     public float getPitch:f();
-    public (RelativeFlags) Set<RelativeMovement> getRelativeFlags:i();
+    public (RelativeFlags) Set<Relative> getRelativeFlags:i();
     public int getTeleportWaitTimer:g();
 #else
     #require ClientboundPlayerPositionPacket private double x:a;
@@ -42,14 +42,14 @@ class ClientboundPlayerPositionPacket extends Packet {
     #require ClientboundPlayerPositionPacket private double z:c;
     #require ClientboundPlayerPositionPacket private float yaw:d;
     #require ClientboundPlayerPositionPacket private float pitch:e;
-    #require ClientboundPlayerPositionPacket private Set<RelativeMovement> relativeArguments:f;
+    #require ClientboundPlayerPositionPacket private Set<Relative> relativeArguments:f;
 
     public double getX() { return instance#x; }
     public double getY() { return instance#y; }
     public double getZ() { return instance#z; }
     public float getYaw() { return instance#yaw; }
     public float getPitch() { return instance#pitch; }
-    public (RelativeFlags) Set<RelativeMovement> getRelativeFlags() { return instance#relativeArguments; }
+    public (RelativeFlags) Set<Relative> getRelativeFlags() { return instance#relativeArguments; }
 
     public int getTeleportWaitTimer() {
   #if version >= 1.9
@@ -61,7 +61,7 @@ class ClientboundPlayerPositionPacket extends Packet {
     }
 #endif
 
-    public static (ClientboundPlayerPositionPacketHandle) ClientboundPlayerPositionPacket createNew(double x, double y, double z, float yaw, float pitch, double deltaX, double deltaY, double deltaZ, (RelativeFlags) Set<RelativeMovement> relativeFlags, int teleportWaitTimer) {
+    public static (ClientboundPlayerPositionPacketHandle) ClientboundPlayerPositionPacket createNew(double x, double y, double z, float yaw, float pitch, double deltaX, double deltaY, double deltaZ, (RelativeFlags) Set<Relative> relativeFlags, int teleportWaitTimer) {
 #if version >= 1.21.2
         return ClientboundPlayerPositionPacket.of(teleportWaitTimer, new PositionMoveRotation(
             new Vec3(x, y, z), new Vec3(deltaX, deltaY, deltaZ), yaw, pitch
@@ -121,10 +121,10 @@ class ClientboundPlayerRotationPacket extends Packet {
     public float getPitch:getXRot();
 
     public boolean isYawRelative() {
-        return instance.getRelativeArguments().contains((Object) RelativeMovement.Y_ROT);
+        return instance.getRelativeArguments().contains((Object) Relative.Y_ROT);
     }
     public boolean isPitchRelative() {
-        return instance.getRelativeArguments().contains((Object) RelativeMovement.X_ROT);
+        return instance.getRelativeArguments().contains((Object) Relative.X_ROT);
     }
 
 #elseif version >= 1.17
@@ -132,27 +132,27 @@ class ClientboundPlayerRotationPacket extends Packet {
     public float getPitch:f();
 
     public boolean isYawRelative() {
-        return instance.i().contains((Object) RelativeMovement.Y_ROT);
+        return instance.i().contains((Object) Relative.Y_ROT);
     }
     public boolean isPitchRelative() {
-        return instance.i().contains((Object) RelativeMovement.X_ROT);
+        return instance.i().contains((Object) Relative.X_ROT);
     }
 
 #else
     #require ClientboundPlayerPositionPacket private float yaw:d;
     #require ClientboundPlayerPositionPacket private float pitch:e;
-    #require ClientboundPlayerPositionPacket private Set<RelativeMovement> relativeArguments:f;
+    #require ClientboundPlayerPositionPacket private Set<Relative> relativeArguments:f;
 
     public float getYaw() { return instance#yaw; }
     public float getPitch() { return instance#pitch; }
 
     public boolean isYawRelative() {
         java.util.Set relativeFlags = instance#relativeArguments;
-        return relativeFlags.contains((Object) RelativeMovement.Y_ROT);
+        return relativeFlags.contains((Object) Relative.Y_ROT);
     }
     public boolean isPitchRelative() {
         java.util.Set relativeFlags = instance#relativeArguments;
-        return relativeFlags.contains((Object) RelativeMovement.X_ROT);
+        return relativeFlags.contains((Object) Relative.X_ROT);
     }
 #endif
 
@@ -178,14 +178,14 @@ class ClientboundPlayerRotationPacket extends Packet {
         double z = 0.0;
         int teleportWaitTimer = 0;
         java.util.Set relativeFlags = new java.util.LinkedHashSet();
-        relativeFlags.add((Object) RelativeMovement.X);
-        relativeFlags.add((Object) RelativeMovement.Y);
-        relativeFlags.add((Object) RelativeMovement.Z);
+        relativeFlags.add((Object) Relative.X);
+        relativeFlags.add((Object) Relative.Y);
+        relativeFlags.add((Object) Relative.Z);
         if (isYawRelative) {
-            relativeFlags.add((Object) RelativeMovement.Y_ROT);
+            relativeFlags.add((Object) Relative.Y_ROT);
         }
         if (isPitchRelative) {
-            relativeFlags.add((Object) RelativeMovement.X_ROT);
+            relativeFlags.add((Object) Relative.X_ROT);
         }
   #if version >= 1.19.4
         return new ClientboundPlayerPositionPacket(x, y, z, yaw, pitch, relativeFlags, teleportWaitTimer);

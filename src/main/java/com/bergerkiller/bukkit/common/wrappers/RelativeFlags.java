@@ -35,19 +35,19 @@ public final class RelativeFlags {
 
     // Used for converting between these RelativeFlags and internally-used Set of movement relative flags
     public static final FastMethod<Set<?>> unpackMethod = new FastMethod<>(m -> {
-        Class<?> relativeMovementType = CommonUtil.getClass("net.minecraft.world.entity.RelativeMovement");
+        Class<?> relativeType = CommonUtil.getClass("net.minecraft.world.entity.Relative");
         if (CommonBootstrap.evaluateMCVersion(">=", "1.18")) {
-            m.init(Resolver.resolveAndGetDeclaredMethod(relativeMovementType, "unpack", int.class));
+            m.init(Resolver.resolveAndGetDeclaredMethod(relativeType, "unpack", int.class));
         } else {
-            m.init(Resolver.resolveAndGetDeclaredMethod(relativeMovementType, "a", int.class));
+            m.init(Resolver.resolveAndGetDeclaredMethod(relativeType, "a", int.class));
         }
     });
     public static final FastMethod<Integer> packMethod = new FastMethod<>(m -> {
-        Class<?> relativeMovementType = CommonUtil.getClass("net.minecraft.world.entity.RelativeMovement");
+        Class<?> relativeType = CommonUtil.getClass("net.minecraft.world.entity.Relative");
         if (CommonBootstrap.evaluateMCVersion(">=", "1.18")) {
-            m.init(Resolver.resolveAndGetDeclaredMethod(relativeMovementType, "pack", Set.class));
+            m.init(Resolver.resolveAndGetDeclaredMethod(relativeType, "pack", Set.class));
         } else {
-            m.init(Resolver.resolveAndGetDeclaredMethod(relativeMovementType, "a", Set.class));
+            m.init(Resolver.resolveAndGetDeclaredMethod(relativeType, "a", Set.class));
         }
     });
 
@@ -233,7 +233,7 @@ public final class RelativeFlags {
      * @param rawRelativeFlags Raw relative flags for use internally
      * @return RelativeFlags value
      */
-    @ConverterMethod(input="java.util.Set<net.minecraft.world.entity.RelativeMovement>")
+    @ConverterMethod(input="java.util.Set<net.minecraft.world.entity.Relative>")
     public static RelativeFlags fromRawRelativeFlags(Set<?> rawRelativeFlags) {
         return fromFlags(packMethod.invoke(null, rawRelativeFlags));
     }
@@ -245,7 +245,7 @@ public final class RelativeFlags {
      * @param flags RelativeFlags
      * @return Set of raw flags
      */
-    @ConverterMethod(output="java.util.Set<net.minecraft.world.entity.RelativeMovement>")
+    @ConverterMethod(output="java.util.Set<net.minecraft.world.entity.Relative>")
     public static Set<?> toRawRelativeFlags(RelativeFlags flags) {
         return flags.relativeFlags;
     }

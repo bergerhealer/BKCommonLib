@@ -26,8 +26,8 @@ public abstract class ServerboundPlayerActionPacketHandle extends PacketHandle {
     public abstract void setPosition(IntVector3 value);
     public abstract BlockFace getDirection();
     public abstract void setDirection(BlockFace value);
-    public abstract EnumPlayerDigTypeHandle getDigType();
-    public abstract void setDigType(EnumPlayerDigTypeHandle value);
+    public abstract ActionHandle getDigType();
+    public abstract void setDigType(ActionHandle value);
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.ServerboundPlayerActionPacket</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -35,45 +35,45 @@ public abstract class ServerboundPlayerActionPacketHandle extends PacketHandle {
     public static final class ServerboundPlayerActionPacketClass extends Template.Class<ServerboundPlayerActionPacketHandle> {
         public final Template.Field.Converted<IntVector3> position = new Template.Field.Converted<IntVector3>();
         public final Template.Field.Converted<BlockFace> direction = new Template.Field.Converted<BlockFace>();
-        public final Template.Field.Converted<EnumPlayerDigTypeHandle> digType = new Template.Field.Converted<EnumPlayerDigTypeHandle>();
+        public final Template.Field.Converted<ActionHandle> digType = new Template.Field.Converted<ActionHandle>();
 
     }
 
 
     /**
-     * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.EnumPlayerDigType</b>.
+     * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action</b>.
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
-    @Template.InstanceType("net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.EnumPlayerDigType")
-    public abstract static class EnumPlayerDigTypeHandle extends Template.Handle {
-        /** @see EnumPlayerDigTypeClass */
-        public static final EnumPlayerDigTypeClass T = Template.Class.create(EnumPlayerDigTypeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-        public static final EnumPlayerDigTypeHandle START_DESTROY_BLOCK = T.START_DESTROY_BLOCK.getSafe();
-        public static final EnumPlayerDigTypeHandle ABORT_DESTROY_BLOCK = T.ABORT_DESTROY_BLOCK.getSafe();
-        public static final EnumPlayerDigTypeHandle STOP_DESTROY_BLOCK = T.STOP_DESTROY_BLOCK.getSafe();
-        public static final EnumPlayerDigTypeHandle DROP_ALL_ITEMS = T.DROP_ALL_ITEMS.getSafe();
-        public static final EnumPlayerDigTypeHandle DROP_ITEM = T.DROP_ITEM.getSafe();
-        public static final EnumPlayerDigTypeHandle RELEASE_USE_ITEM = T.RELEASE_USE_ITEM.getSafe();
+    @Template.InstanceType("net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action")
+    public abstract static class ActionHandle extends Template.Handle {
+        /** @see ActionClass */
+        public static final ActionClass T = Template.Class.create(ActionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
+        public static final ActionHandle START_DESTROY_BLOCK = T.START_DESTROY_BLOCK.getSafe();
+        public static final ActionHandle ABORT_DESTROY_BLOCK = T.ABORT_DESTROY_BLOCK.getSafe();
+        public static final ActionHandle STOP_DESTROY_BLOCK = T.STOP_DESTROY_BLOCK.getSafe();
+        public static final ActionHandle DROP_ALL_ITEMS = T.DROP_ALL_ITEMS.getSafe();
+        public static final ActionHandle DROP_ITEM = T.DROP_ITEM.getSafe();
+        public static final ActionHandle RELEASE_USE_ITEM = T.RELEASE_USE_ITEM.getSafe();
         /* ============================================================================== */
 
-        public static EnumPlayerDigTypeHandle createHandle(Object handleInstance) {
+        public static ActionHandle createHandle(Object handleInstance) {
             return T.createHandle(handleInstance);
         }
 
         /* ============================================================================== */
 
         /**
-         * Stores class members for <b>net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.EnumPlayerDigType</b>.
+         * Stores class members for <b>net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action</b>.
          * Methods, fields, and constructors can be used without using Handle Objects.
          */
-        public static final class EnumPlayerDigTypeClass extends Template.Class<EnumPlayerDigTypeHandle> {
-            public final Template.EnumConstant.Converted<EnumPlayerDigTypeHandle> START_DESTROY_BLOCK = new Template.EnumConstant.Converted<EnumPlayerDigTypeHandle>();
-            public final Template.EnumConstant.Converted<EnumPlayerDigTypeHandle> ABORT_DESTROY_BLOCK = new Template.EnumConstant.Converted<EnumPlayerDigTypeHandle>();
-            public final Template.EnumConstant.Converted<EnumPlayerDigTypeHandle> STOP_DESTROY_BLOCK = new Template.EnumConstant.Converted<EnumPlayerDigTypeHandle>();
-            public final Template.EnumConstant.Converted<EnumPlayerDigTypeHandle> DROP_ALL_ITEMS = new Template.EnumConstant.Converted<EnumPlayerDigTypeHandle>();
-            public final Template.EnumConstant.Converted<EnumPlayerDigTypeHandle> DROP_ITEM = new Template.EnumConstant.Converted<EnumPlayerDigTypeHandle>();
-            public final Template.EnumConstant.Converted<EnumPlayerDigTypeHandle> RELEASE_USE_ITEM = new Template.EnumConstant.Converted<EnumPlayerDigTypeHandle>();
+        public static final class ActionClass extends Template.Class<ActionHandle> {
+            public final Template.EnumConstant.Converted<ActionHandle> START_DESTROY_BLOCK = new Template.EnumConstant.Converted<ActionHandle>();
+            public final Template.EnumConstant.Converted<ActionHandle> ABORT_DESTROY_BLOCK = new Template.EnumConstant.Converted<ActionHandle>();
+            public final Template.EnumConstant.Converted<ActionHandle> STOP_DESTROY_BLOCK = new Template.EnumConstant.Converted<ActionHandle>();
+            public final Template.EnumConstant.Converted<ActionHandle> DROP_ALL_ITEMS = new Template.EnumConstant.Converted<ActionHandle>();
+            public final Template.EnumConstant.Converted<ActionHandle> DROP_ITEM = new Template.EnumConstant.Converted<ActionHandle>();
+            public final Template.EnumConstant.Converted<ActionHandle> RELEASE_USE_ITEM = new Template.EnumConstant.Converted<ActionHandle>();
 
         }
 

@@ -5,27 +5,27 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 import org.bukkit.entity.Entity;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket</b>.
+ * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket")
-public abstract class ClientboundTeleportEntityPacketHandle extends PacketHandle {
-    /** @see ClientboundTeleportEntityPacketClass */
-    public static final ClientboundTeleportEntityPacketClass T = Template.Class.create(ClientboundTeleportEntityPacketClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
+@Template.InstanceType("net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket")
+public abstract class ClientboundEntityPositionSyncPacketHandle extends PacketHandle {
+    /** @see ClientboundEntityPositionSyncPacketClass */
+    public static final ClientboundEntityPositionSyncPacketClass T = Template.Class.create(ClientboundEntityPositionSyncPacketClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
-    public static ClientboundTeleportEntityPacketHandle createHandle(Object handleInstance) {
+    public static ClientboundEntityPositionSyncPacketHandle createHandle(Object handleInstance) {
         return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
-    public static ClientboundTeleportEntityPacketHandle createNewForEntity(Entity entity) {
+    public static ClientboundEntityPositionSyncPacketHandle createNewForEntity(Entity entity) {
         return T.createNewForEntity.invoke(entity);
     }
 
-    public static ClientboundTeleportEntityPacketHandle createNew(int entityId, double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
+    public static ClientboundEntityPositionSyncPacketHandle createNew(int entityId, double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
         return T.createNew.invokeVA(entityId, posX, posY, posZ, yaw, pitch, onGround);
     }
 
@@ -79,17 +79,17 @@ public abstract class ClientboundTeleportEntityPacketHandle extends PacketHandle
         }
         public Builder onGround(boolean onGround) { this.onGround = onGround; return this; }
 
-        public ClientboundTeleportEntityPacketHandle create() {
-            return ClientboundTeleportEntityPacketHandle.createNew(entityId, posX, posY, posZ, yaw, pitch, onGround);
+        public ClientboundEntityPositionSyncPacketHandle create() {
+            return ClientboundEntityPositionSyncPacketHandle.createNew(entityId, posX, posY, posZ, yaw, pitch, onGround);
         }
     }
     /**
-     * Stores class members for <b>net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket</b>.
+     * Stores class members for <b>net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
-    public static final class ClientboundTeleportEntityPacketClass extends Template.Class<ClientboundTeleportEntityPacketHandle> {
-        public final Template.StaticMethod.Converted<ClientboundTeleportEntityPacketHandle> createNewForEntity = new Template.StaticMethod.Converted<ClientboundTeleportEntityPacketHandle>();
-        public final Template.StaticMethod.Converted<ClientboundTeleportEntityPacketHandle> createNew = new Template.StaticMethod.Converted<ClientboundTeleportEntityPacketHandle>();
+    public static final class ClientboundEntityPositionSyncPacketClass extends Template.Class<ClientboundEntityPositionSyncPacketHandle> {
+        public final Template.StaticMethod.Converted<ClientboundEntityPositionSyncPacketHandle> createNewForEntity = new Template.StaticMethod.Converted<ClientboundEntityPositionSyncPacketHandle>();
+        public final Template.StaticMethod.Converted<ClientboundEntityPositionSyncPacketHandle> createNew = new Template.StaticMethod.Converted<ClientboundEntityPositionSyncPacketHandle>();
 
         public final Template.Method<Integer> getEntityId = new Template.Method<Integer>();
         public final Template.Method<Double> getPosX = new Template.Method<Double>();

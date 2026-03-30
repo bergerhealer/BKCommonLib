@@ -14,14 +14,14 @@ optional class ClientboundLevelChunkPacketData {
     // Note: field template code is in PacketPlayOutMapChunk for simplicity, since
     //       we need the chunk x/z for deserialization purposes.
 
-    optional class ClientboundLevelChunkPacketData.BlockEntityData {
+    optional class ClientboundLevelChunkPacketData.BlockEntityInfo {
         final (BlockStateType) BlockEntityType<?> type;
         final (CommonTagCompound) CompoundTag tag;
 
         public IntVector3 getPosition(int chunkX, int chunkZ) {
 #if version >= 1.18
-            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityData final int packedXZ;
-            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityData final int blockEntityY:y;
+            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo final int packedXZ;
+            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo final int blockEntityY:y;
 #endif
             int packedXZ = instance#packedXZ;
             int y = instance#blockEntityY;
@@ -36,7 +36,7 @@ optional class ClientboundLevelChunkPacketData {
 
         public static Object encodeRaw(IntVector3 position, (BlockStateType) BlockEntityType<?> type, (CommonTagCompound) CompoundTag tag) {
 #if version >= 1.18
-            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityData private ClientboundLevelChunkPacketData.BlockEntityData createData:<init>(int packedXZ, int y, BlockEntityType<?> type, CompoundTag tag);
+            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo private ClientboundLevelChunkPacketData.BlockEntityInfo createData:<init>(int packedXZ, int y, BlockEntityType<?> type, CompoundTag tag);
 #endif
 
             // If tag is empty, make null

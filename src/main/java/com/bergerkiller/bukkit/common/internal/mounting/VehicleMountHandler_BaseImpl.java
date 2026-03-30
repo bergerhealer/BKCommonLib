@@ -28,7 +28,7 @@ import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMoveEntityPacketHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundTeleportEntityPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetPassengersPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundAddPlayerPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundAddEntityPacketHandle;
@@ -446,7 +446,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
                         ClientboundAddPlayerPacketHandle handle = ClientboundAddPlayerPacketHandle.createHandle(packet.getHandle());
                         handleSpawn(handle.getEntityId(), CommonEntityType.PLAYER, new Vector(handle.getPosX(), handle.getPosY(), handle.getPosZ()));
                     } else if (type == PacketType.OUT_ENTITY_TELEPORT) {
-                        ClientboundTeleportEntityPacketHandle handle = ClientboundTeleportEntityPacketHandle.createHandle(packet.getHandle());
+                        ClientboundEntityPositionSyncPacketHandle handle = ClientboundEntityPositionSyncPacketHandle.createHandle(packet.getHandle());
                         handleMove(handle.getEntityId(), (position) -> {
                             position.setX(handle.getPosX());
                             position.setY(handle.getPosY());

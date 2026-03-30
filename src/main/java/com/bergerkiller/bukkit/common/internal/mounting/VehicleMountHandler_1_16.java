@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.mounting;
 
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacketHandle;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -9,7 +10,6 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundMovePlayerPacketHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundTeleportEntityPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacketHandle;
 
 /**
@@ -168,7 +168,7 @@ public class VehicleMountHandler_1_16 extends VehicleMountHandler_1_9_to_1_15_2 
 
             if (diff.lengthSquared() > (2.0*2.0)) {
                 Location eye = getPlayer().getEyeLocation();
-                queuePacket(ClientboundTeleportEntityPacketHandle.createNew(getPlayer().getEntityId(),
+                queuePacket(ClientboundEntityPositionSyncPacketHandle.createNew(getPlayer().getEntityId(),
                         curr_pos.getX(), curr_pos.getY(), curr_pos.getZ(),
                         eye.getYaw(), eye.getPitch(), false));
             } else {

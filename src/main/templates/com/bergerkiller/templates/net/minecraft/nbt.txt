@@ -1,5 +1,7 @@
 package net.minecraft.nbt;
 
+import net.minecraft.nbt.TagParser;
+
 import com.bergerkiller.generated.net.minecraft.nbt.TagHandle;
 import com.bergerkiller.generated.net.minecraft.nbt.ListTagHandle;
 import com.bergerkiller.generated.net.minecraft.nbt.CompoundTagHandle;
@@ -697,11 +699,11 @@ class CompoundTag extends Tag {
 class NbtIo {
 
 #if version >= 1.21.5
-    #require MojangsonParser public static CompoundTag snbtParseCompoundFully:parseCompoundFully(String snbtContent);
+    #require TagParser public static CompoundTag snbtParseCompoundFully:parseCompoundFully(String snbtContent);
 #elseif version >= 1.18
-    #require MojangsonParser public static CompoundTag snbtParseCompoundFully:parseTag(String snbtContent);
+    #require TagParser public static CompoundTag snbtParseCompoundFully:parseTag(String snbtContent);
 #else
-    #require MojangsonParser public static CompoundTag snbtParseCompoundFully:parse(String snbtContent);
+    #require TagParser public static CompoundTag snbtParseCompoundFully:parse(String snbtContent);
 #endif
 
     public static (CompoundTagHandle) CompoundTag parseTagCompoundFromSNBT(String snbtContent) {
@@ -728,28 +730,28 @@ class NbtIo {
         }
 
 #if version >= 1.21.5
-        #require MojangsonParser private static final MojangsonParser<Tag> NBT_OPS_PARSER;
-        MojangsonParser parser = #NBT_OPS_PARSER;
+        #require TagParser private static final TagParser<Tag> NBT_OPS_PARSER;
+        TagParser parser = #NBT_OPS_PARSER;
         return (Tag) parser.parseFully(new com.mojang.brigadier.StringReader(snbtContent));
 #elseif version >= 1.18
-        MojangsonParser parser = new MojangsonParser(new com.mojang.brigadier.StringReader(snbtContent));
+        TagParser parser = new TagParser(new com.mojang.brigadier.StringReader(snbtContent));
         return parser.readValue();
 #elseif version >= 1.14
-        MojangsonParser parser = new MojangsonParser(new com.mojang.brigadier.StringReader(snbtContent));
+        TagParser parser = new TagParser(new com.mojang.brigadier.StringReader(snbtContent));
         return parser.d();
 #elseif version >= 1.13
-        MojangsonParser parser = new MojangsonParser(new com.mojang.brigadier.StringReader(snbtContent));
-        #require MojangsonParser protected Tag readValue:d();
+        TagParser parser = new TagParser(new com.mojang.brigadier.StringReader(snbtContent));
+        #require TagParser protected Tag readValue:d();
         return parser#readValue();
 #elseif version >= 1.12
-        #require MojangsonParser MojangsonParser createParser:<init>(String content);
-        #require MojangsonParser protected Tag readValue:d();
-        MojangsonParser parser = #createParser(snbtContent);
+        #require TagParser TagParser createParser:<init>(String content);
+        #require TagParser protected Tag readValue:d();
+        TagParser parser = #createParser(snbtContent);
         return parser#readValue();
 #else
-        #require MojangsonParser static MojangsonParser.MojangsonTypeParser createParserFor:a(String key, String content);
-        #require MojangsonParser.MojangsonTypeParser public abstract Tag completeParse:a();
-        MojangsonParser$MojangsonTypeParser parser = #createParserFor("tag", snbtContent);
+        #require TagParser static TagParser.TagTypeParser createParserFor:a(String key, String content);
+        #require TagParser.TagTypeParser public abstract Tag completeParse:a();
+        TagParser$TagTypeParser parser = #createParserFor("tag", snbtContent);
         return parser#completeParse();
 #endif
     }
@@ -764,7 +766,7 @@ class NbtIo {
             return exception.getMessage();
         }
 #else
-        if (exception instanceof net.minecraft.nbt.MojangsonParseException) {
+        if (exception instanceof net.minecraft.nbt.TagParseException) {
             return exception.getMessage();
         }
 #endif

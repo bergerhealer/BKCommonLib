@@ -108,12 +108,12 @@ class Component {
             // Not a valid URL at all
         }
         if (parsedURI != null) {
-            modifier = modifier.withClickEvent(new ChatClickable$OpenUrl(parsedURI));
+            modifier = modifier.withClickEvent(new ClickEvent$OpenUrl(parsedURI));
         }
 #elseif version >= 1.18
-        modifier = modifier.withClickEvent(new ChatClickable(ChatClickable$EnumClickAction.OPEN_URL, url));
+        modifier = modifier.withClickEvent(new ClickEvent(ClickEvent$Action.OPEN_URL, url));
 #else
-        modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.OPEN_URL, url));
+        modifier = modifier.setChatClickable(new ClickEvent(ClickEvent$Action.OPEN_URL, url));
 #endif
         return instance#makeMutableAndSetChatModifier(modifier);
     }
@@ -122,11 +122,11 @@ class Component {
 #if version >= 1.15
         Style modifier = instance.getStyle();
   #if version >= 1.21.5
-        modifier = modifier.withClickEvent(new ChatClickable$CopyToClipboard(content));
+        modifier = modifier.withClickEvent(new ClickEvent$CopyToClipboard(content));
   #elseif version >= 1.18
-        modifier = modifier.withClickEvent(new ChatClickable(ChatClickable$EnumClickAction.COPY_TO_CLIPBOARD, content));
+        modifier = modifier.withClickEvent(new ClickEvent(ClickEvent$Action.COPY_TO_CLIPBOARD, content));
   #else
-        modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.COPY_TO_CLIPBOARD, content));
+        modifier = modifier.setChatClickable(new ClickEvent(ClickEvent$Action.COPY_TO_CLIPBOARD, content));
   #endif
         return instance#makeMutableAndSetChatModifier(modifier);
 #else
@@ -138,11 +138,11 @@ class Component {
     public (ComponentHandle) Component setClickableSuggestedCommand(String command) {
         Style modifier = instance.getStyle();
 #if version >= 1.21.5
-        modifier = modifier.withClickEvent(new ChatClickable$SuggestCommand(command));
+        modifier = modifier.withClickEvent(new ClickEvent$SuggestCommand(command));
 #elseif version >= 1.18
-        modifier = modifier.withClickEvent(new ChatClickable(ChatClickable$EnumClickAction.SUGGEST_COMMAND, command));
+        modifier = modifier.withClickEvent(new ClickEvent(ClickEvent$Action.SUGGEST_COMMAND, command));
 #else
-        modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.SUGGEST_COMMAND, command));
+        modifier = modifier.setChatClickable(new ClickEvent(ClickEvent$Action.SUGGEST_COMMAND, command));
 #endif
         return instance#makeMutableAndSetChatModifier(modifier);
     }
@@ -150,11 +150,11 @@ class Component {
     public (ComponentHandle) Component setClickableRunCommand(String command) {
         Style modifier = instance.getStyle();
 #if version >= 1.21.5
-        modifier = modifier.withClickEvent(new ChatClickable$RunCommand(command));
+        modifier = modifier.withClickEvent(new ClickEvent$RunCommand(command));
 #elseif version >= 1.18
-        modifier = modifier.withClickEvent(new ChatClickable(ChatClickable$EnumClickAction.RUN_COMMAND, command));
+        modifier = modifier.withClickEvent(new ClickEvent(ClickEvent$Action.RUN_COMMAND, command));
 #else
-        modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.RUN_COMMAND, command));
+        modifier = modifier.setChatClickable(new ClickEvent(ClickEvent$Action.RUN_COMMAND, command));
 #endif
         return instance#makeMutableAndSetChatModifier(modifier);
     }
@@ -162,11 +162,11 @@ class Component {
     public (ComponentHandle) Component setHoverText((ComponentHandle) Component hoverText) {
         Style modifier = instance.getStyle();
 #if version >= 1.21.5
-        modifier = modifier.withHoverEvent(new ChatHoverable$e(hoverText));
+        modifier = modifier.withHoverEvent(new HoverEvent$e(hoverText));
 #elseif version >= 1.18
-        modifier = modifier.withHoverEvent(new ChatHoverable(ChatHoverable$EnumHoverAction.SHOW_TEXT, hoverText));
+        modifier = modifier.withHoverEvent(new HoverEvent(HoverEvent$Action.SHOW_TEXT, hoverText));
 #else
-        modifier = modifier.setChatHoverable(new ChatHoverable(ChatHoverable$EnumHoverAction.SHOW_TEXT, hoverText));
+        modifier = modifier.setChatHoverable(new HoverEvent(HoverEvent$Action.SHOW_TEXT, hoverText));
 #endif
         return instance#makeMutableAndSetChatModifier(modifier);
     }
@@ -349,7 +349,7 @@ class Component {
   #if exists net.minecraft.network.chat.Style public Style setStrikethrough(Boolean strikethrough);
     #require net.minecraft.network.chat.Style public Style setStrikethrough(Boolean strikethrough);
   #else
-    #require net.minecraft.network.chat.Style private static Style create_modifier:<init>(ChatHexColor color, Boolean bold, Boolean italic, Boolean underlined, Boolean strikethrough, Boolean obfuscated, ChatClickable clickEvent, ChatHoverable hoverEvent, String insertion, MinecraftKey font);
+    #require net.minecraft.network.chat.Style private static Style create_modifier:<init>(ChatHexColor color, Boolean bold, Boolean italic, Boolean underlined, Boolean strikethrough, Boolean obfuscated, ClickEvent clickEvent, HoverEvent hoverEvent, String insertion, MinecraftKey font);
     #require net.minecraft.network.chat.Style public Style setStrikethrough(Boolean strikethrough) {
         return #create_modifier(instance.getColor(), instance.isBold(), instance.isItalic(), instance.isUnderlined(), strikethrough, instance.isRandom(), instance.getClickEvent(), instance.getHoverEvent(), instance.getInsertion(), instance.getFont());
     }
@@ -360,7 +360,7 @@ class Component {
   #elseif exists net.minecraft.network.chat.Style public Style setUnderlined(Boolean underlined);
     #require net.minecraft.network.chat.Style public Style setUnderlined(Boolean underlined);
   #else
-    #require net.minecraft.network.chat.Style private static Style create_modifier:<init>(ChatHexColor color, Boolean bold, Boolean italic, Boolean underlined, Boolean strikethrough, Boolean obfuscated, ChatClickable clickEvent, ChatHoverable hoverEvent, String insertion, MinecraftKey font);
+    #require net.minecraft.network.chat.Style private static Style create_modifier:<init>(ChatHexColor color, Boolean bold, Boolean italic, Boolean underlined, Boolean strikethrough, Boolean obfuscated, ClickEvent clickEvent, HoverEvent hoverEvent, String insertion, MinecraftKey font);
     #require net.minecraft.network.chat.Style public Style setUnderlined(Boolean underlined) {
         return #create_modifier(instance.getColor(), instance.isBold(), instance.isItalic(), underlined, instance.isStrikethrough(), instance.isRandom(), instance.getClickEvent(), instance.getHoverEvent(), instance.getInsertion(), instance.getFont());
     }
@@ -371,7 +371,7 @@ class Component {
   #elseif exists net.minecraft.network.chat.Style public Style setObfuscated(Boolean obfuscated);
     #require net.minecraft.network.chat.Style public Style setObfuscated(Boolean obfuscated);
   #else
-    #require net.minecraft.network.chat.Style private static Style create_modifier:<init>(ChatHexColor color, Boolean bold, Boolean italic, Boolean underlined, Boolean strikethrough, Boolean obfuscated, ChatClickable clickEvent, ChatHoverable hoverEvent, String insertion, MinecraftKey font);
+    #require net.minecraft.network.chat.Style private static Style create_modifier:<init>(ChatHexColor color, Boolean bold, Boolean italic, Boolean underlined, Boolean strikethrough, Boolean obfuscated, ClickEvent clickEvent, HoverEvent hoverEvent, String insertion, MinecraftKey font);
     #require net.minecraft.network.chat.Style public Style setObfuscated(Boolean obfuscated) {
         return #create_modifier(instance.getColor(), instance.isBold(), instance.isItalic(), instance.isUnderlined(), instance.isStrikethrough(), obfuscated, instance.getClickEvent(), instance.getHoverEvent(), instance.getInsertion(), instance.getFont());
     }

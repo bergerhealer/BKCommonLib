@@ -32,18 +32,18 @@ public abstract class ClientboundLevelChunkPacketDataHandle extends Template.Han
 
 
     /**
-     * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityData</b>.
+     * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo</b>.
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
     @Template.Optional
-    @Template.InstanceType("net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityData")
-    public abstract static class BlockEntityDataHandle extends Template.Handle {
-        /** @see BlockEntityDataClass */
-        public static final BlockEntityDataClass T = Template.Class.create(BlockEntityDataClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
+    @Template.InstanceType("net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo")
+    public abstract static class BlockEntityInfoHandle extends Template.Handle {
+        /** @see BlockEntityInfoClass */
+        public static final BlockEntityInfoClass T = Template.Class.create(BlockEntityInfoClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
-        public static BlockEntityDataHandle createHandle(Object handleInstance) {
+        public static BlockEntityInfoHandle createHandle(Object handleInstance) {
             return T.createHandle(handleInstance);
         }
 
@@ -59,10 +59,10 @@ public abstract class ClientboundLevelChunkPacketDataHandle extends Template.Han
         public abstract CommonTagCompound getTag();
         public abstract void setTag(CommonTagCompound value);
         /**
-         * Stores class members for <b>net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityData</b>.
+         * Stores class members for <b>net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo</b>.
          * Methods, fields, and constructors can be used without using Handle Objects.
          */
-        public static final class BlockEntityDataClass extends Template.Class<BlockEntityDataHandle> {
+        public static final class BlockEntityInfoClass extends Template.Class<BlockEntityInfoHandle> {
             public final Template.Field.Converted<BlockStateType> type = new Template.Field.Converted<BlockStateType>();
             public final Template.Field.Converted<CommonTagCompound> tag = new Template.Field.Converted<CommonTagCompound>();
 

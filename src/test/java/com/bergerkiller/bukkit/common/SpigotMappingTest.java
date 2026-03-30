@@ -38,11 +38,13 @@ public class SpigotMappingTest {
      * is used.
      */
     @Test
-    @Ignore
+    //@Ignore
     public void testVisualizeMappingsForMojangClass() {
-        String mojangClassName = "net.minecraft.world.level.saveddata.maps.MapItemSavedData$MapPatch";
+        String mojangClassName = "net.minecraft.world.effect.MobEffect";
 
         SpigotMappings mappings = loadMappings();
+
+        // net.minecraft.network.protocol.game.ClientboundResourcePackPacket -> net.minecraft.network.protocol.game.PacketPlayOutResourcePackSend
 
         boolean first = true;
         String prev = null;
@@ -75,7 +77,7 @@ public class SpigotMappingTest {
     @Test
     @Ignore
     public void testVisualizeMappingsForSpigotClass() {
-        String spigotClassName = "net.minecraft.world.ticks.TickList";
+        String spigotClassName = "net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport";
 
         SpigotMappings mappings = loadMappings();
 
@@ -129,9 +131,10 @@ public class SpigotMappingTest {
 
         //mappings.renameKey("old.path.to.Class", "new.path.to.Class");
 
-        mappings.storeAppendForVersionRange("1.8", "1.17.1",
-                "net.minecraft.world.ticks.TickAccess",
-                "net.minecraft.world.level.TickList");
+        mappings.storeAppendForVersionRange("1.8", "1.20.1",
+                "net.minecraft.network.protocol.common.ServerboundKeepAlivePacket",
+                "net.minecraft.network.protocol.game.PacketPlayInKeepAlive");
+
 
         saveMappings(mappings);
     }

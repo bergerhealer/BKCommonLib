@@ -161,7 +161,7 @@ public class NMSPacketClasses {
 
         public final FieldAccessor<IntVector3> position = ServerboundPlayerActionPacketHandle.T.position.toFieldAccessor();
         public final FieldAccessor<BlockFace> direction = ServerboundPlayerActionPacketHandle.T.direction.toFieldAccessor();
-        public final FieldAccessor<ServerboundPlayerActionPacketHandle.EnumPlayerDigTypeHandle> status = ServerboundPlayerActionPacketHandle.T.digType.toFieldAccessor();
+        public final FieldAccessor<ServerboundPlayerActionPacketHandle.ActionHandle> status = ServerboundPlayerActionPacketHandle.T.digType.toFieldAccessor();
     }
 
     public static class NMSPacketPlayInBlockPlace extends NMSPacket {
@@ -1227,7 +1227,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> entityId = new FieldAccessor<Integer>() {
             @Override
             public Integer get(Object instance) {
-                return ClientboundTeleportEntityPacketHandle.createHandle(instance).getEntityId();
+                return ClientboundEntityPositionSyncPacketHandle.createHandle(instance).getEntityId();
             }
 
             @Override
@@ -1238,7 +1238,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Double> x = new SafeDirectField<Double>() {
             @Override
             public Double get(Object instance) {
-                return ClientboundTeleportEntityPacketHandle.createHandle(instance).getPosX();
+                return ClientboundEntityPositionSyncPacketHandle.createHandle(instance).getPosX();
             }
 
             @Override
@@ -1249,7 +1249,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Double> y = new SafeDirectField<Double>() {
             @Override
             public Double get(Object instance) {
-                return ClientboundTeleportEntityPacketHandle.createHandle(instance).getPosY();
+                return ClientboundEntityPositionSyncPacketHandle.createHandle(instance).getPosY();
             }
 
             @Override
@@ -1260,7 +1260,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Double> z = new SafeDirectField<Double>() {
             @Override
             public Double get(Object instance) {
-                return ClientboundTeleportEntityPacketHandle.createHandle(instance).getPosZ();
+                return ClientboundEntityPositionSyncPacketHandle.createHandle(instance).getPosZ();
             }
 
             @Override
@@ -1271,7 +1271,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Float> yaw = new SafeDirectField<Float>() {
             @Override
             public Float get(Object instance) {
-                return ClientboundTeleportEntityPacketHandle.createHandle(instance).getYaw();
+                return ClientboundEntityPositionSyncPacketHandle.createHandle(instance).getYaw();
             }
 
             @Override
@@ -1282,7 +1282,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Float> pitch = new SafeDirectField<Float>() {
             @Override
             public Float get(Object instance) {
-                return ClientboundTeleportEntityPacketHandle.createHandle(instance).getPitch();
+                return ClientboundEntityPositionSyncPacketHandle.createHandle(instance).getPitch();
             }
 
             @Override
@@ -1293,7 +1293,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Boolean> onGround = new SafeDirectField<Boolean>() {
             @Override
             public Boolean get(Object instance) {
-                return ClientboundTeleportEntityPacketHandle.createHandle(instance).isOnGround();
+                return ClientboundEntityPositionSyncPacketHandle.createHandle(instance).isOnGround();
             }
 
             @Override
@@ -1313,11 +1313,11 @@ public class NMSPacketClasses {
         }
 
         public CommonPacket newInstance(org.bukkit.entity.Entity entity) {
-            return ClientboundTeleportEntityPacketHandle.createNewForEntity(entity).toCommonPacket();
+            return ClientboundEntityPositionSyncPacketHandle.createNewForEntity(entity).toCommonPacket();
         }
 
         public CommonPacket newInstance(int entityId, double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
-            return ClientboundTeleportEntityPacketHandle.createNew(entityId, posX, posY, posZ, yaw, pitch, onGround).toCommonPacket();
+            return ClientboundEntityPositionSyncPacketHandle.createNew(entityId, posX, posY, posZ, yaw, pitch, onGround).toCommonPacket();
         }
     }
 
@@ -2354,40 +2354,6 @@ public class NMSPacketClasses {
         }
     }
 
-    /*
-    public static class NMSPacketPlayOutTitle extends NMSPacket {
-        public final FieldAccessor<PacketPlayOutTitleHandle.EnumTitleActionHandle> action = PacketPlayOutTitleHandle.T.action.toFieldAccessor();
-        public final FieldAccessor<ChatText> chatComponent = PacketPlayOutTitleHandle.T.title.toFieldAccessor();
-        public final FieldAccessor<Integer> fadeIn = PacketPlayOutTitleHandle.T.fadeIn.toFieldAccessor();
-        public final FieldAccessor<Integer> stay = PacketPlayOutTitleHandle.T.stay.toFieldAccessor();
-        public final FieldAccessor<Integer> fadeOut = PacketPlayOutTitleHandle.T.fadeOut.toFieldAccessor();
-
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EnumTitleActionHandle.T.getType(), ComponentHandle.T.getType(), int.class, int.class, int.class);
-
-        public CommonPacket newInstance(int fadeIn, int stay, int fadeOut) {
-            return constructor1.newInstance(EnumTitleActionHandle.TIMES.getRaw(), null, fadeIn, stay, fadeOut);
-        }
-
-        public CommonPacket newInstance(EnumTitleActionHandle enumTitleAction, ChatText title) {
-            return constructor1.newInstance(enumTitleAction.getRaw(), title.getRawHandle(), -1, -1, -1);
-        }
-
-        public CommonPacket newInstance(EnumTitleActionHandle enumTitleAction, ChatText title, int fadeIn, int stay, int fadeOut) {
-            return constructor1.newInstance(enumTitleAction.getRaw(), title.getRawHandle(), fadeIn, stay, fadeOut);
-        }
-
-        @Deprecated
-        public CommonPacket newInstance(EnumTitleActionHandle enumTitleAction, ComponentHandle iChatBaseComponent) {
-            return constructor1.newInstance(enumTitleAction.getRaw(), iChatBaseComponent.getRaw(), -1, -1, -1);
-        }
-
-        @Deprecated
-        public CommonPacket newInstance(EnumTitleActionHandle enumTitleAction, ComponentHandle iChatBaseComponent, int fadeIn, int stay, int fadeOut) {
-            return constructor1.newInstance(enumTitleAction.getRaw(), iChatBaseComponent.getRaw(), fadeIn, stay, fadeOut);
-        }
-    }
-    */
-
     public static class NMSPacketPlayOutUnloadChunk extends NMSPacket {
 
         public final FieldAccessor<Integer> x = new SafeDirectField<Integer>() {
@@ -2517,29 +2483,6 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> windowId = ClientboundContainerSetContentPacketHandle.T.windowId.toFieldAccessor();
         public final FieldAccessor<List<ItemStack>> items = ClientboundContainerSetContentPacketHandle.T.items.toFieldAccessor();
     }
-
-    // Removed since MC 1.17, there is little use for this packet so I'm getting rid of it.
-    /*
-    public static class NMSPacketPlayOutWorldBorder extends NMSPacket {
-
-        public final FieldAccessor<Object> action = nextField("private PacketPlayOutWorldBorder.EnumWorldBorderAction a");
-        public final FieldAccessor<Integer> b = nextFieldSignature("private int b");
-        public final FieldAccessor<Double> cx = nextFieldSignature("private double c");
-        public final FieldAccessor<Double> cz = nextFieldSignature("private double d");
-        public final FieldAccessor<Double> e = nextFieldSignature("private double e");
-        public final FieldAccessor<Double> size = nextFieldSignature("private double f");
-        public final FieldAccessor<Long> g = nextFieldSignature("private long g");
-        public final FieldAccessor<Integer> warningTime = nextFieldSignature("private int h");
-        public final FieldAccessor<Integer> warningDistance = nextFieldSignature("private int i");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(
-                CommonUtil.getClass("net.minecraft.world.level.border.WorldBorder"),
-                CommonUtil.getClass("net.minecraft.network.protocol.game.PacketPlayOutWorldBorder.EnumWorldBorderAction"));
-
-        public CommonPacket newInstance (Object nmsWorldBorder, Object nmsEnumBorderAction) {
-            return constructor1.newInstance(nmsWorldBorder, nmsEnumBorderAction);
-        }
-    }
-    */
 
     public static class NMSPacketPlayOutWorldEvent extends NMSPacket {
 

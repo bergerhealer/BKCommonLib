@@ -7,6 +7,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.CommonPlayerSpawnInfo;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.network.syncher.SynchedEntityData.DataValue;
 import net.minecraft.network.FriendlyByteBuf;
@@ -59,7 +60,6 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundInteractPacketHandle.Action;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetTitlesPacketHandle.EnumTitleActionHandle
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundRemoveMobEffectPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacketHandle;
@@ -67,8 +67,9 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.Clientboun
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetEquipmentPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetEquipmentPacketHandle.OwnerType;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetPassengersPacketHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetEntityDataPacketHandle
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundPlayerActionPacketHandle.EnumPlayerDigTypeHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetEntityDataPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundPlayerActionPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundPlayerActionPacketHandle.ActionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundOpenScreenPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundSetCreativeModeSlotPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacketHandle;
@@ -265,7 +266,7 @@ class ServerboundInteractPacket extends Packet {
 #endif
 
 #if version >= 1.17
-    #require net.minecraft.network.protocol.game.ServerboundInteractPacket private final ServerboundInteractPacket.UseType action;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket private final ServerboundInteractPacket.Action action;
     #require net.minecraft.network.protocol.game.ServerboundInteractPacket.InteractionAction private final readonly net.minecraft.world.InteractionHand interactHand:hand;
     #require net.minecraft.network.protocol.game.ServerboundInteractPacket.InteractionAtLocationAction private final readonly net.minecraft.world.InteractionHand interactAtHand:hand;
     #require net.minecraft.network.protocol.game.ServerboundInteractPacket.InteractionAtLocationAction private final readonly net.minecraft.world.phys.Vec3 interactAtLocation:location;
@@ -740,54 +741,23 @@ class ServerboundPlayerActionPacket extends Packet {
 #if version >= 1.17
     private (IntVector3) BlockPos position:pos;
     private (org.bukkit.block.BlockFace) Direction direction;
-    private (EnumPlayerDigTypeHandle) ServerboundPlayerActionPacket.EnumPlayerDigType digType:action;
+    private (ServerboundPlayerActionPacketHandle.ActionHandle) ServerboundPlayerActionPacket.Action digType:action;
 #else
     private (IntVector3) BlockPos position:a;
     private (org.bukkit.block.BlockFace) Direction direction:b;
-    private (EnumPlayerDigTypeHandle) ServerboundPlayerActionPacket.EnumPlayerDigType digType:c;
+    private (ServerboundPlayerActionPacketHandle.ActionHandle) ServerboundPlayerActionPacket.Action digType:c;
 #endif
 
-    class ServerboundPlayerActionPacket.EnumPlayerDigType {
-        enum (EnumPlayerDigTypeHandle) ServerboundPlayerActionPacket.EnumPlayerDigType START_DESTROY_BLOCK;
-        enum (EnumPlayerDigTypeHandle) ServerboundPlayerActionPacket.EnumPlayerDigType ABORT_DESTROY_BLOCK;
-        enum (EnumPlayerDigTypeHandle) ServerboundPlayerActionPacket.EnumPlayerDigType STOP_DESTROY_BLOCK;
-        enum (EnumPlayerDigTypeHandle) ServerboundPlayerActionPacket.EnumPlayerDigType DROP_ALL_ITEMS;
-        enum (EnumPlayerDigTypeHandle) ServerboundPlayerActionPacket.EnumPlayerDigType DROP_ITEM;
-        enum (EnumPlayerDigTypeHandle) ServerboundPlayerActionPacket.EnumPlayerDigType RELEASE_USE_ITEM;
+    class ServerboundPlayerActionPacket.Action {
+        enum (ServerboundPlayerActionPacketHandle.ActionHandle) ServerboundPlayerActionPacket.Action START_DESTROY_BLOCK;
+        enum (ServerboundPlayerActionPacketHandle.ActionHandle) ServerboundPlayerActionPacket.Action ABORT_DESTROY_BLOCK;
+        enum (ServerboundPlayerActionPacketHandle.ActionHandle) ServerboundPlayerActionPacket.Action STOP_DESTROY_BLOCK;
+        enum (ServerboundPlayerActionPacketHandle.ActionHandle) ServerboundPlayerActionPacket.Action DROP_ALL_ITEMS;
+        enum (ServerboundPlayerActionPacketHandle.ActionHandle) ServerboundPlayerActionPacket.Action DROP_ITEM;
+        enum (ServerboundPlayerActionPacketHandle.ActionHandle) ServerboundPlayerActionPacket.Action RELEASE_USE_ITEM;
         //TODO: SWAP_ITEM_WITH_OFFHAND?
     }
 }
-
-// Gone since 1.17, we don't use it, it's not worth the time to support this.
-/*
-class ClientboundSetTitlesPacket extends Packet {
-    private (ClientboundSetTitlesPacketHandle.EnumTitleActionHandle) ClientboundSetTitlesPacket.EnumTitleAction action:a;
-    private (ChatText) Component title:b;
-
-    // Introduced in newer 1.16.5 paperspigot builds, replacing the "components" field
-    // If this field is set, it overrules the 'title' field
-#if exists net.minecraft.network.protocol.game.ClientboundSetTitlesPacket public net.kyori.adventure.text.Component adventure$text;
-    public unknown net.kyori.adventure.text.Component adventure$text;
-#endif
-
-    private int fadeIn:c;
-    private int stay:d;
-    private int fadeOut:e;
-
-    // Note: paper includes a 'components' field for md_5's chat api
-    //       if this field is set, it overrules the 'title' field
-    // public net.md_5.bungee.api.chat.BaseComponent[] components;
-
-    class ClientboundSetTitlesPacket.EnumTitleAction {
-        enum (EnumTitleActionHandle) ClientboundSetTitlesPacket.EnumTitleAction TITLE;
-        enum (EnumTitleActionHandle) ClientboundSetTitlesPacket.EnumTitleAction SUBTITLE;
-        enum optional (EnumTitleActionHandle) ClientboundSetTitlesPacket.EnumTitleAction ACTIONBAR;
-        enum (EnumTitleActionHandle) ClientboundSetTitlesPacket.EnumTitleAction TIMES;
-        enum (EnumTitleActionHandle) ClientboundSetTitlesPacket.EnumTitleAction CLEAR;
-        enum (EnumTitleActionHandle) ClientboundSetTitlesPacket.EnumTitleAction RESET;
-    }
-}
-*/
 
 class ClientboundTakeItemEntityPacket extends Packet {
 #if version >= 1.17
@@ -1571,7 +1541,7 @@ class ClientboundLevelChunkWithLightPacket extends Packet {
 
 #elseif version >= 1.18
         #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData private final CompoundTag heightmaps;
-        net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData data = instance.getChunkData();
+        ClientboundLevelChunkPacketData data = instance.getChunkData();
         data#heightmaps = heightmapsData;
 #elseif version >= 1.17
         #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private final CompoundTag heightmaps;
@@ -1597,30 +1567,30 @@ class ClientboundLevelChunkWithLightPacket extends Packet {
 #elseif version >= 1.9
     #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private byte[] chunkDataBuffer:d;
 #else
-    #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private ClientboundLevelChunkWithLightPacket.ChunkMap chunkData:c;
-    #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket.ChunkMap  public byte[] chunkDataBuffer:a;
+    #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData chunkData:c;
+    #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData public byte[] chunkDataBuffer:a;
 #endif
 
     public byte[] getBuffer() {
 #if version >= 1.18
-        net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData data = instance.getChunkData();
+        ClientboundLevelChunkPacketData data = instance.getChunkData();
         return data#chunkDataBuffer;
 #elseif version >= 1.9
         return instance#chunkDataBuffer;
 #else
-        ClientboundLevelChunkWithLightPacket$ChunkMap data = instance#chunkData;
+        ClientboundLevelChunkPacketData data = instance#chunkData;
         return data#chunkDataBuffer;
 #endif
     }
 
     public void setBuffer(byte[] buffer) {
 #if version >= 1.18
-        net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData data = instance.getChunkData();
+        ClientboundLevelChunkPacketData data = instance.getChunkData();
         data#chunkDataBuffer = buffer;
 #elseif version >= 1.9
         instance#chunkDataBuffer = buffer;
 #else
-        ClientboundLevelChunkWithLightPacket$ChunkMap data = instance#chunkData;
+        ClientboundLevelChunkPacketData data = instance#chunkData;
         data#chunkDataBuffer = buffer;
 #endif
     }
@@ -1630,7 +1600,7 @@ class ClientboundLevelChunkWithLightPacket extends Packet {
 #if version >= 1.18
         // Complicated: requires conversion using chunk x/z
         net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData data = instance.getChunkData();
-        #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData private final List<net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityData> blockEntitiesData;
+        #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData private final List<net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo> blockEntitiesData;
         return com.bergerkiller.bukkit.common.conversion.blockstate.ChunkBlockStateChangeConverter.convertList(
                 data#blockEntitiesData, instance.getX(), instance.getZ());
 #elseif version >= 1.9.4
@@ -2239,21 +2209,6 @@ optional class ClientboundSetPassengersPacket extends Packet {
     </code>
 }
 
-// Gone since 1.17, not worth keeping.
-/*
-class ClientboundPlayerCombatPacket extends Packet {
-    public (Object) ClientboundPlayerCombatPacket.EnumCombatEventType eventType:a;
-    public int entityId1:b;
-    public int entityId2:c;
-    public int tickDuration:d;
-#if version >= 1.9
-    public (ChatText) Component message:e;
-#else
-    public (ChatText) String message:e;
-#endif
-}
-*/
-
 // Only >= MC 1.9
 optional class ClientboundCooldownPacket extends Packet {
 #if version >= 1.17
@@ -2455,9 +2410,9 @@ class ClientboundUpdateAttributesPacket extends Packet {
 
 class ServerboundClientCommandPacket extends Packet {
 #if version >= 1.17
-    private (Object) ServerboundClientCommandPacket.EnumClientCommand action;
+    private (Object) ServerboundClientCommandPacket.Action action;
 #else
-    private (Object) ServerboundClientCommandPacket.EnumClientCommand action:a;
+    private (Object) ServerboundClientCommandPacket.Action action:a;
 #endif
 }
 
@@ -3128,11 +3083,11 @@ class ClientboundSetDefaultSpawnPositionPacket extends Packet {
 class ServerboundPlayerCommandPacket extends Packet {
 #if version >= 1.17
     private final int playerId:id;
-    private final (Object) ServerboundPlayerCommandPacket.EnumPlayerAction action;
+    private final (Object) ServerboundPlayerCommandPacket.Action action;
     private final int data;
 #else
     private int playerId:a;
-    private (Object) ServerboundPlayerCommandPacket.EnumPlayerAction action:animation;
+    private (Object) ServerboundPlayerCommandPacket.Action action:animation;
     private int data:c;
 #endif
 }

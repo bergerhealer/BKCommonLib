@@ -40,20 +40,20 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
     private final Class<? extends ClassHook<?>> hookType;
     private final Function<World, ? extends ClassHook<?>> hookConstructor;
 
-    private static final BiomeSpawnClusterHandle spawnClusterHandle = LogicUtil.tryCreate(
+    private static final SpawnerDataHandle spawnerDataHandle = LogicUtil.tryCreate(
             () -> {
-                BiomeSpawnClusterHandle h = Template.Class.create(BiomeSpawnClusterHandle.class, Common.TEMPLATE_RESOLVER);
+                SpawnerDataHandle h = Template.Class.create(SpawnerDataHandle.class, Common.TEMPLATE_RESOLVER);
                 h.forceInitialization();;
                 return h;
             },
             (err) -> {
-                Logging.LOGGER.log(Level.SEVERE, "Failed to initialize template for the mob spawn cluster", err);
+                Logging.LOGGER.log(Level.SEVERE, "Failed to initialize template for the mob spawner data", err);
                 return null;
             });
 
     public CreaturePreSpawnHandler_Spigot() throws Throwable {
-        if (spawnClusterHandle == null) {
-            throw new UnsupportedOperationException("Spawn cluster template is not available");
+        if (spawnerDataHandle == null) {
+            throw new UnsupportedOperationException("Spawner data template is not available");
         }
 
         if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
@@ -199,8 +199,8 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
         private Object processWeightedList(Object weightedList, Object blockposition) {
             List<Object> weights = weightedListHandle.extractList(weightedList);
             List<Object> newMobWeights = handleMobsFor(this.world, blockposition, weights, weightedEntry -> {
-                Object spawnCluster = weightedListHandle.getWeightedEntryValue(weightedEntry);
-                return spawnClusterHandle.getEntityType(spawnCluster);
+                Object spawnerDataRaw = weightedListHandle.getWeightedEntryValue(weightedEntry);
+                return spawnerDataHandle.getEntityType(spawnerDataRaw);
             });
             if (newMobWeights != weights) {
                 return weightedListHandle.createWeightedList(newMobWeights);
@@ -280,7 +280,7 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
 
         private Object processWeightedList(Object weightedList, Object blockposition) {
             List<Object> mobs = weightedRandomListHandle.extractList(weightedList);
-            List<Object> newMobs = handleMobsFor(this.world, blockposition, mobs, spawnClusterHandle::getEntityType);
+            List<Object> newMobs = handleMobsFor(this.world, blockposition, mobs, spawnerDataHandle::getEntityType);
             if (newMobs != mobs) {
                 return weightedRandomListHandle.createWeightedRandomList(newMobs);
             } else {
@@ -334,7 +334,7 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
         @HookMethod("public List getMobsFor(Biome biomeBase, StructureManager structManager, MobCategory enumcreaturetype, BlockPos blockposition)")
         public List<Object> getMobsFor(Object biomeBase, Object structureManager, Object enumcreaturetype, Object blockposition) {
             List<Object> mobs = base.getMobsFor(biomeBase, structureManager, enumcreaturetype, blockposition);
-            return handleMobsFor(this.world, blockposition, mobs, spawnClusterHandle::getEntityType);
+            return handleMobsFor(this.world, blockposition, mobs, spawnerDataHandle::getEntityType);
         }
     }
 
@@ -351,42 +351,45 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
         @HookMethod("public List getMobsFor(MobCategory enumcreaturetype, BlockPos blockposition)")
         public List<Object> getMobsFor(Object enumcreaturetype, Object blockposition) {
             List<Object> mobs = base.getMobsFor(enumcreaturetype, blockposition);
-            return handleMobsFor(this.world, blockposition, mobs, spawnClusterHandle::getEntityType);
+            return handleMobsFor(this.world, blockposition, mobs, spawnerDataHandle::getEntityType);
         }
     }
 
-    // 1.8 - 1.16.1: net.minecraft.world.level.biome.Biome.BiomeMeta
-    // 1.17+: net.minecraft.world.level.biome.BiomeSettingsMobs$c
+    // Data class: net.minecraft.world.level.biome.MobSpawnSettings$SpawnerData
+    // Spigot mappings:
+    //   1.8: net.minecraft.server.BiomeMeta
+    //   1.8.1 - 1.16.1: net.minecraft.world.level.biome.Biome$BiomeMeta
+    //   1.16.2+: net.minecraft.world.level.biome.BiomeSettingsMobs$c
     @Template.Import("com.bergerkiller.bukkit.common.entity.CommonEntityType")
     @Template.Import("net.minecraft.world.entity.EntityType")
-    @Template.InstanceType("net.minecraft.world.level.biome.BiomeSpawnCluster")
-    public static abstract class BiomeSpawnClusterHandle extends Template.Class<Template.Handle> {
+    @Template.InstanceType("net.minecraft.world.level.biome.MobSpawnSettings$SpawnerData")
+    public static abstract class SpawnerDataHandle extends Template.Class<Template.Handle> {
 
         /*
          * <GET_CLUSTER_ENTITY_TYPE>
-         * public static CommonEntityType getEntityType(BiomeSpawnCluster biomeSpawnCluster) {
+         * public static CommonEntityType getEntityType(MobSpawnSettings$SpawnerData spawnerData) {
          * #if version >= 1.13
          *     EntityType entityType;
          *   #if version >= 1.21.5
-         *     entityType = biomeSpawnCluster.type();
+         *     entityType = spawnerData.type();
          *   #else
          *     #select version >=
-         *     #case 1.17: #require net.minecraft.world.level.biome.BiomeSpawnCluster public net.minecraft.world.entity.EntityType entityType:type;
-         *     #case 1.16: #require net.minecraft.world.level.biome.BiomeSpawnCluster public net.minecraft.world.entity.EntityType entityType:c;
-         *     #case else: #require net.minecraft.world.level.biome.BiomeSpawnCluster public net.minecraft.world.entity.EntityType entityType:b;
+         *     #case 1.17: #require net.minecraft.world.level.biome.MobSpawnSettings$SpawnerData public net.minecraft.world.entity.EntityType entityType:type;
+         *     #case 1.16: #require net.minecraft.world.level.biome.MobSpawnSettings$SpawnerData public net.minecraft.world.entity.EntityType entityType:c;
+         *     #case else: #require net.minecraft.world.level.biome.MobSpawnSettings$SpawnerData public net.minecraft.world.entity.EntityType entityType:b;
          *     #endselect
-         *     entityType = biomeSpawnCluster#entityType;
+         *     entityType = spawnerData#entityType;
          *   #endif
          *
          *     return CommonEntityType.byNMSEntityTypeRaw(entityType);
          * #else
-         *     #require net.minecraft.world.level.biome.BiomeSpawnCluster public java.lang.Class<? extends net.minecraft.world.entity.Mob> entityClass:b;
-         *     Class entityClass = biomeSpawnCluster#entityClass;
+         *     #require net.minecraft.world.level.biome.MobSpawnSettings$SpawnerData public java.lang.Class<? extends net.minecraft.world.entity.Mob> entityClass:b;
+         *     Class entityClass = spawnerData#entityClass;
          *     return CommonEntityType.byNMSEntityClass(entityClass);
          * #endif
          * }
          */
         @Template.Generated("%GET_CLUSTER_ENTITY_TYPE%")
-        public abstract CommonEntityType getEntityType(Object biomeSpawnCluster);
+        public abstract CommonEntityType getEntityType(Object spawnerData);
     }
 }
