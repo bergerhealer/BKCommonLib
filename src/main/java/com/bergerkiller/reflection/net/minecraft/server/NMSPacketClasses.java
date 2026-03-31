@@ -90,8 +90,8 @@ public class NMSPacketClasses {
                         "#if exists " + this.getType().getName() + " private " + this.getType().getSimpleName() + "();\n" +
                         "    #require " + this.getType().getName() + " private " + this.getType().getSimpleName() + " createPacket:<init>()\n" +
                         "    Object packet = #createPacket();\n" +
-                        "#elseif exists " + this.getType().getName() + " private " + this.getType().getSimpleName() + " (net.minecraft.network.PacketDataSerializer serializer)\n" +
-                        "    #require " + this.getType().getName() + " private " + this.getType().getSimpleName() + " createPacket:<init>(net.minecraft.network.PacketDataSerializer serializer)\n" +
+                        "#elseif exists " + this.getType().getName() + " private " + this.getType().getSimpleName() + " (net.minecraft.network.FriendlyByteBuf serializer)\n" +
+                        "    #require " + this.getType().getName() + " private " + this.getType().getSimpleName() + " createPacket:<init>(net.minecraft.network.FriendlyByteBuf serializer)\n" +
                         "    Object packet = #createPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);\n" +
                         "#elseif exists " + this.getType().getName() + " private " + this.getType().getSimpleName() + " (net.minecraft.network.RegistryFriendlyByteBuf byteBuf)\n" +
                         "    #require " + this.getType().getName() + " private " + this.getType().getSimpleName() + " createPacket:<init>(net.minecraft.network.RegistryFriendlyByteBuf byteBuf)\n" +
@@ -115,13 +115,13 @@ public class NMSPacketClasses {
      * ========================================================================================
      */
 
-    public static class NMSPacketPlayInAbilities extends NMSPacket {
+    public static class NMSServerboundPlayerAbilitiesPacket extends NMSPacket {
         //TODO: Only has 'isFlying' property since 1.16
         //Do we care about the other fields for past versions?
         public final FieldAccessor<Boolean> isFlying = ServerboundPlayerAbilitiesPacketHandle.T.isFlying.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayInArmAnimation extends NMSPacket {
+    public static class NMSServerboundSwingPacket extends NMSPacket {
 
         /**
          * Sets the hand that is animated
@@ -157,14 +157,14 @@ public class NMSPacketClasses {
      * @deprecated Use {@link ServerboundPlayerActionPacketHandle} instead
      */
     @Deprecated
-    public static class NMSPacketPlayInBlockDig extends NMSPacket {
+    public static class NMSServerboundPlayerActionPacket extends NMSPacket {
 
         public final FieldAccessor<IntVector3> position = ServerboundPlayerActionPacketHandle.T.position.toFieldAccessor();
         public final FieldAccessor<BlockFace> direction = ServerboundPlayerActionPacketHandle.T.direction.toFieldAccessor();
         public final FieldAccessor<ServerboundPlayerActionPacketHandle.ActionHandle> status = ServerboundPlayerActionPacketHandle.T.digType.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayInBlockPlace extends NMSPacket {
+    public static class NMSServerboundUseItemPacket extends NMSPacket {
 
         public final FieldAccessor<Long> timestamp = ServerboundUseItemPacketHandle.T.timestamp.toFieldAccessor().ignoreInvalid(0L);
 
@@ -214,7 +214,7 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayInUseItem extends NMSPacket {
+    public static class NMSServerboundUseItemOnPacket extends NMSPacket {
 
         public final FieldAccessor<IntVector3> position = new SafeDirectField<IntVector3>() {
             @Override
@@ -312,50 +312,50 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayInBoatMove extends NMSPacket {
+    public static class NMSServerboundPaddleBoatPacket extends NMSPacket {
 
         public final FieldAccessor<Boolean> leftPaddle = ServerboundPaddleBoatPacketHandle.T.leftPaddle.toFieldAccessor();
         public final FieldAccessor<Boolean> rightPaddle = ServerboundPaddleBoatPacketHandle.T.rightPaddle.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayInChat extends NMSPacket {
+    public static class NMSServerboundChatPacket extends NMSPacket {
 
         public final FieldAccessor<String> message = ServerboundChatPacketHandle.T.message.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayInClientCommand extends NMSPacket {
+    public static class NMSServerboundClientCommandPacket extends NMSPacket {
 
         public final FieldAccessor<Object> command = ServerboundClientCommandPacketHandle.T.action.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayInCloseWindow extends NMSPacket {
+    public static class NMSServerboundContainerClosePacket extends NMSPacket {
 
         public final FieldAccessor<Integer> windowId = ServerboundContainerClosePacketHandle.T.windowId.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayInCustomPayload extends NMSPacket {
+    public static class NMSServerboundCustomPayloadPacket extends NMSPacket {
 
         // public final FieldAccessor<String> tag = nextField("private String a");
         // public final FieldAccessor<Object> data = nextFieldSignature("private PacketDataSerializer b");
     }
 
-    public static class NMSPacketPlayInEnchantItem extends NMSPacket {
+    public static class NMSServerboundContainerButtonClickPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> windowId = ServerboundContainerButtonClickPacketHandle.T.windowId.toFieldAccessor();
         public final FieldAccessor<Integer> buttonId = ServerboundContainerButtonClickPacketHandle.T.buttonId.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayInEntityAction extends NMSPacket {
+    public static class NMSServerboundPlayerCommandPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> playerId = ServerboundPlayerCommandPacketHandle.T.playerId.toFieldAccessor();
         public final FieldAccessor<Object> action = ServerboundPlayerCommandPacketHandle.T.action.toFieldAccessor();
         public final FieldAccessor<Integer> jumpBoost = ServerboundPlayerCommandPacketHandle.T.data.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayInFlying extends NMSPacket {
+    public static class NMSServerboundMovePlayerPacket extends NMSPacket {
 
-        protected NMSPacketPlayInFlying(String subType) {
-            super(CommonUtil.getClass("net.minecraft.network.protocol.game.PacketPlayInFlying." + subType));
+        protected NMSServerboundMovePlayerPacket(String subType) {
+            super(CommonUtil.getClass("net.minecraft.network.protocol.game.ServerboundMovePlayerPacket." + subType));
         }
 
         public final FieldAccessor<Double> x = ServerboundMovePlayerPacketHandle.T.x.toFieldAccessor();
@@ -368,25 +368,25 @@ public class NMSPacketClasses {
         public final FieldAccessor<Boolean> hasLook = ServerboundMovePlayerPacketHandle.T.hasLook.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayInLook extends NMSPacketPlayInFlying {
-        public NMSPacketPlayInLook() {
-            super("PacketPlayInLook");
+    public static class NMSServerboundMovePlayerPacketRot extends NMSServerboundMovePlayerPacket {
+        public NMSServerboundMovePlayerPacketRot() {
+            super("Rot");
         }
     }
 
-    public static class NMSPacketPlayInPosition extends NMSPacketPlayInFlying {
-        public NMSPacketPlayInPosition() {
-            super("PacketPlayInPosition");
+    public static class NMSServerboundMovePlayerPacketPos extends NMSServerboundMovePlayerPacket {
+        public NMSServerboundMovePlayerPacketPos() {
+            super("Pos");
         }
     }
 
-    public static class NMSPacketPlayInPositionLook extends NMSPacketPlayInFlying {
-        public NMSPacketPlayInPositionLook() {
-            super("PacketPlayInPositionLook");
+    public static class NMSServerboundMovePlayerPacketPosRot extends NMSServerboundMovePlayerPacket {
+        public NMSServerboundMovePlayerPacketPosRot() {
+            super("PosRot");
         }
     }
 
-    public static class NMSPacketPlayInHeldItemSlot extends NMSPacket {
+    public static class NMSServerboundSetCarriedItemPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> slot = ServerboundSetCarriedItemPacketHandle.T.itemInHandIndex.toFieldAccessor();
     }
@@ -412,7 +412,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Object> enumStatus = ServerboundResourcePackPacketHandle.T.status.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayInSetCreativeSlot extends NMSPacket {
+    public static class NMSServerboundSetCreativeModeSlotPacket extends NMSPacket {
     }
 
     public static class NMSServerboundClientInformationPacket extends NMSPacket {
@@ -485,7 +485,7 @@ public class NMSPacketClasses {
         };
     }
 
-    public static class NMSPacketPlayInSpectate extends NMSPacket {
+    public static class NMSServerboundTeleportToEntityPacket extends NMSPacket {
 
         public final FieldAccessor<UUID> uuid = ServerboundTeleportToEntityPacketHandle.T.uuid.toFieldAccessor();
 
@@ -494,7 +494,7 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayInSteerVehicle extends NMSPacket {
+    public static class NMSServerboundPlayerInputPacket extends NMSPacket {
 
         public final FieldAccessor<Float> sideways = new FieldAccessor<Float>() {
             @Override
@@ -542,36 +542,19 @@ public class NMSPacketClasses {
         };
     }
 
-    public static class NMSPacketPlayInTabComplete extends NMSPacket {
+    public static class NMSServerboundCommandSuggestionPacket extends NMSPacket {
 
         // public final FieldAccessor<String> text = PacketPlayInTabCompleteHandle.T.text.toFieldAccessor();
         // public final FieldAccessor<Boolean> assumeCommand = PacketPlayInTabCompleteHandle.T.assumeCommand.toFieldAccessor().ignoreInvalid(false);
         // public final FieldAccessor<IntVector3> position = PacketPlayInTabCompleteHandle.T.position.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayInTeleportAccept extends NMSPacket {
+    public static class NMSServerboundAcceptTeleportationPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> teleportId = ServerboundAcceptTeleportationPacketHandle.T.teleportId.toFieldAccessor();
     }
 
-    // Gone since 1.17, won't bother supporting
-    /*
-    public static class NMSPacketPlayInTransaction extends NMSPacket {
-
-        public final FieldAccessor<Integer> windowId = nextField("private int a");
-        public final FieldAccessor<Short> action = nextFieldSignature("private short b");
-        public final FieldAccessor<Boolean> accepted = nextFieldSignature("private boolean c");
-    }
-
-    public static class NMSPacketPlayOutTransaction extends NMSPacket {
-
-        public final FieldAccessor<Integer> windowId = nextField("private int a");
-        public final FieldAccessor<Short> action = nextField("private short b");
-        public final FieldAccessor<Boolean> accepted = nextFieldSignature("private boolean c");
-    }
-    */
-
-    public static class NMSPacketPlayInUpdateSign extends NMSPacket {
+    public static class NMSServerboundSignUpdatePacket extends NMSPacket {
 
         public final FieldAccessor<IntVector3> position = ServerboundSignUpdatePacketHandle.T.position.toFieldAccessor();
         public final FieldAccessor<ChatText[]> lines = ServerboundSignUpdatePacketHandle.T.lines.toFieldAccessor();
@@ -589,7 +572,7 @@ public class NMSPacketClasses {
      * @deprecated Please use ServerboundInteractPacketHandle instead for complete api support
      */
     @Deprecated
-    public static class NMSPacketPlayInUseEntity extends NMSPacket {
+    public static class NMSServerboundInteractPacket extends NMSPacket {
         public final FieldAccessor<Integer> clickedEntityId = ServerboundInteractPacketHandle.T.usedEntityId.toFieldAccessor();
 
         /**
@@ -614,7 +597,7 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayInVehicleMove extends NMSPacket {
+    public static class NMSServerboundMoveVehiclePacket extends NMSPacket {
 
         public final FieldAccessor<Double> posX = new SafeDirectField<Double>() {
             @Override
@@ -688,7 +671,7 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayInWindowClick extends NMSPacket {
+    public static class NMSServerboundContainerClickPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> windowId = ServerboundContainerClickPacketHandle.T.windowId.toFieldAccessor();
         public final FieldAccessor<Short> slot = ServerboundContainerClickPacketHandle.T.slot.toFieldAccessor();
@@ -703,7 +686,7 @@ public class NMSPacketClasses {
      * ========================================================================================
      */
 
-    public static class NMSPacketPlayOutAbilities extends NMSPacket {
+    public static class NMSClientboundPlayerAbilitiesPacket extends NMSPacket {
 
         public final FieldAccessor<Boolean> isInvulnerable = ClientboundPlayerAbilitiesPacketHandle.T.invulnerable.toFieldAccessor();
         public final FieldAccessor<Boolean> isFlying = ClientboundPlayerAbilitiesPacketHandle.T.isFlying.toFieldAccessor();
@@ -717,13 +700,13 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutAdvancements extends NMSPacket {
+    public static class NMSClientboundUpdateAdvancementsPacket extends NMSPacket {
 
         public final FieldAccessor<Boolean> initial = ClientboundUpdateAdvancementsPacketHandle.T.initial.toFieldAccessor();
         //TODO: Fields
     }
 
-    public static class NMSPacketPlayOutAnimation extends NMSPacket {
+    public static class NMSClientboundAnimatePacket extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = ClientboundAnimatePacketHandle.T.entityId.toFieldAccessor();
         public final FieldAccessor<Integer> animation = ClientboundAnimatePacketHandle.T.action.toFieldAccessor();
@@ -734,7 +717,7 @@ public class NMSPacketClasses {
      * It no longer implies anything about vehicles or passengers
      * The mount packet is for that instead
      */
-    public static class NMSPacketPlayOutAttachEntity extends NMSPacket {
+    public static class NMSClientboundSetEntityLinkPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> vehicleId = ClientboundSetEntityLinkPacketHandle.T.vehicleId.toFieldAccessor();
         public final FieldAccessor<Integer> passengerId = ClientboundSetEntityLinkPacketHandle.T.passengerId.toFieldAccessor();
@@ -748,7 +731,7 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutBlockAction extends NMSPacket {
+    public static class NMSClientboundBlockEventPacket extends NMSPacket {
 
         public final TranslatorFieldAccessor<IntVector3> position = ClientboundBlockEventPacketHandle.T.position.toFieldAccessor();
         public final FieldAccessor<Integer> b0 = ClientboundBlockEventPacketHandle.T.b0.toFieldAccessor();
@@ -756,14 +739,14 @@ public class NMSPacketClasses {
         public final FieldAccessor<Material> block = ClientboundBlockEventPacketHandle.T.block.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutBlockBreakAnimation extends NMSPacket {
+    public static class NMSClientboundBlockDestructionPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> id = ClientboundBlockDestructionPacketHandle.T.id.toFieldAccessor();
         public final TranslatorFieldAccessor<IntVector3> position = ClientboundBlockDestructionPacketHandle.T.position.toFieldAccessor();
         public final FieldAccessor<Integer> progress = ClientboundBlockDestructionPacketHandle.T.progress.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutBlockChange extends NMSPacket {
+    public static class NMSClientboundBlockUpdatePacket extends NMSPacket {
 
         public final TranslatorFieldAccessor<IntVector3> position = ClientboundBlockUpdatePacketHandle.T.position.toFieldAccessor();
         public final TranslatorFieldAccessor<BlockData> blockData = ClientboundBlockUpdatePacketHandle.T.blockData.toFieldAccessor();
@@ -779,26 +762,26 @@ public class NMSPacketClasses {
     }
 
     @Deprecated
-    public static class NMSPacketPlayOutBoss extends NMSPacket {
+    public static class NMSClientboundBossEventPacket extends NMSPacket {
     }
 
-    public static class NMSPacketPlayOutCamera extends NMSPacket {
+    public static class NMSClientboundSetCameraPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = ClientboundSetCameraPacketHandle.T.entityId.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutCloseWindow extends NMSPacket {
+    public static class NMSClientboundContainerClosePacket extends NMSPacket {
 
         public final FieldAccessor<Integer> windowId = ClientboundContainerClosePacketHandle.T.windowId.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutCollect extends NMSPacket {
+    public static class NMSClientboundTakeItemEntityPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> collectedItemId = ClientboundTakeItemEntityPacketHandle.T.collectedItemId.toFieldAccessor();
         public final FieldAccessor<Integer> collectorEntityId = ClientboundTakeItemEntityPacketHandle.T.collectorEntityId.toFieldAccessor();
         public final FieldAccessor<Integer> amount;
 
-        public NMSPacketPlayOutCollect() {
+        public NMSClientboundTakeItemEntityPacket() {
             if (ClientboundTakeItemEntityPacketHandle.T.amount.isAvailable()) {
                 this.amount = ClientboundTakeItemEntityPacketHandle.T.amount.toFieldAccessor();
             } else {
@@ -806,18 +789,6 @@ public class NMSPacketClasses {
             }
         }
     }
-
-    // Gone since 1.17, not worth keeping.
-    /*
-    public static class NMSPacketPlayOutCombatEvent extends NMSPacket {
-
-          public final FieldAccessor<Object> eventType = PacketPlayOutCombatEventHandle.T.eventType.toFieldAccessor();
-          public final FieldAccessor<Integer> entityId1 = PacketPlayOutCombatEventHandle.T.entityId1.toFieldAccessor();
-          public final FieldAccessor<Integer> entityId2 = PacketPlayOutCombatEventHandle.T.entityId2.toFieldAccessor();
-          public final FieldAccessor<Integer> tickDuration = PacketPlayOutCombatEventHandle.T.tickDuration.toFieldAccessor();
-          public final FieldAccessor<ChatText> message = PacketPlayOutCombatEventHandle.T.message.toFieldAccessor();
-    }
-    */
 
     public static class NMSClientboundCustomPayloadPacket extends NMSPacket {
 
@@ -850,7 +821,7 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutCustomSoundEffect extends NMSPacket {
+    public static class NMSClientboundCustomSoundPacket extends NMSPacket {
 
         public final FieldAccessor<ResourceKey<SoundEffect>> sound = ClientboundCustomSoundPacketHandle.T.sound.toFieldAccessor();
         public final FieldAccessor<String> category = new SafeDirectField<String>() {
@@ -918,7 +889,7 @@ public class NMSPacketClasses {
 
     /// ====================== NMSPacketPlayOutEntity and derivatives ===========================
 
-    public static class NMSPacketPlayOutEntity extends NMSPacket {
+    public static class NMSClientboundMoveEntityPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = ClientboundMoveEntityPacketHandle.T.entityId.toFieldAccessor();
 
@@ -985,18 +956,18 @@ public class NMSPacketClasses {
         };
         public final FieldAccessor<Boolean> onGround = ClientboundMoveEntityPacketHandle.T.onGround.toFieldAccessor();
 
-        public NMSPacketPlayOutEntity() {
+        public NMSClientboundMoveEntityPacket() {
             super();
         }
 
-        protected NMSPacketPlayOutEntity(Class<?> packetClass) {
+        protected NMSClientboundMoveEntityPacket(Class<?> packetClass) {
             super(packetClass);
         }
     }
 
-    public static class NMSPacketPlayOutRelEntityMove extends NMSPacketPlayOutEntity {
+    public static class NMSClientboundMoveEntityPacketPos extends NMSClientboundMoveEntityPacket {
 
-        public NMSPacketPlayOutRelEntityMove() {
+        public NMSClientboundMoveEntityPacketPos() {
             super(ClientboundMoveEntityPacketHandle.PosHandle.T.getType());
         }
 
@@ -1005,9 +976,9 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutRelEntityMoveLook extends NMSPacketPlayOutEntity {
+    public static class NMSClientboundMoveEntityPacketPosRot extends NMSClientboundMoveEntityPacket {
 
-        public NMSPacketPlayOutRelEntityMoveLook() {
+        public NMSClientboundMoveEntityPacketPosRot() {
             super(ClientboundMoveEntityPacketHandle.PosRotHandle.T.getType());
         }
 
@@ -1016,9 +987,9 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutEntityLook extends NMSPacketPlayOutEntity {
+    public static class NMSClientboundMoveEntityPacketRot extends NMSClientboundMoveEntityPacket {
 
-        public NMSPacketPlayOutEntityLook() {
+        public NMSClientboundMoveEntityPacketRot() {
             super(ClientboundMoveEntityPacketHandle.RotHandle.T.getType());
         }
 
@@ -1029,7 +1000,7 @@ public class NMSPacketClasses {
 
     // ====================================================================================================
 
-    public static class NMSPacketPlayOutEntityDestroy extends NMSPacket {
+    public static class NMSClientboundRemoveEntitiesPacket extends NMSPacket {
 
         /**
          * <b>Warning: </b>Setting multiple entity id's
@@ -1125,7 +1096,7 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutEntityEffect extends NMSPacket {
+    public static class NMSClientboundUpdateMobEffectPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = ClientboundUpdateMobEffectPacketHandle.T.entityId.toFieldAccessor();
         public final FieldAccessor<PotionEffectType> effect = new SafeDirectField<PotionEffectType>() {
@@ -1168,7 +1139,7 @@ public class NMSPacketClasses {
      * <b>Deprecated: please use {@link ClientboundSetEquipmentPacketHandle} instead.</b>
      */
     @Deprecated
-    public static class NMSPacketPlayOutEntityEquipment extends NMSPacket {
+    public static class NMSClientboundSetEquipmentPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = ClientboundSetEquipmentPacketHandle.T.entityId.toFieldAccessor();
 
@@ -1177,7 +1148,7 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutEntityHeadRotation extends NMSPacket {
+    public static class NMSClientboundRotateHeadPacket extends NMSPacket {
         public final FieldAccessor<Integer> entityId = ClientboundRotateHeadPacketHandle.T.entityId.toFieldAccessor();
 
         public final FieldAccessor<Float> headYaw = new SafeDirectField<Float>() {
@@ -1198,7 +1169,7 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutEntityMetadata extends NMSPacket {
+    public static class NMSClientboundSetEntityDataPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = ClientboundSetEntityDataPacketHandle.T.entityId.toFieldAccessor();
         public final FieldAccessor<List<DataWatcher.PackedItem<Object>>> watchedObjects = ClientboundSetEntityDataPacketHandle.T.metadataItems.toFieldAccessor();
@@ -1216,13 +1187,13 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutEntityStatus extends NMSPacket {
+    public static class NMSClientboundEntityEventPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = ClientboundEntityEventPacketHandle.T.entityId.toFieldAccessor();
         public final FieldAccessor<Byte> status = ClientboundEntityEventPacketHandle.T.eventId.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutEntityTeleport extends NMSPacket {
+    public static class NMSClientboundEntityPositionSyncPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = new FieldAccessor<Integer>() {
             @Override
@@ -1321,7 +1292,7 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutEntityVelocity extends NMSPacket {
+    public static class NMSClientboundSetEntityMotionPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = ClientboundSetEntityMotionPacketHandle.T.entityId.toFieldAccessor();
         public final FieldAccessor<Vector> motion = new SafeDirectField<Vector>() {
@@ -1352,7 +1323,7 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutExperience extends NMSPacket {
+    public static class NMSClientboundSetExperiencePacket extends NMSPacket {
 
         public final FieldAccessor<Float> bar = ClientboundSetExperiencePacketHandle.T.experienceProgress.toFieldAccessor();
         public final FieldAccessor<Integer> level = ClientboundSetExperiencePacketHandle.T.experienceLevel.toFieldAccessor();
@@ -1366,7 +1337,7 @@ public class NMSPacketClasses {
 
     //TODO: Actually implement a method to create new explosion packets
     //      Inspecting the fields of the packet is just not worth it anymore (is a record class now...)
-    public static class NMSPacketPlayOutExplosion extends NMSPacket {
+    public static class NMSClientboundExplodePacket extends NMSPacket {
         // Pain in the ass API with loads of parameters. Needs builder API honestly.
         /*
         public CommonPacket newInstance(double x, double y, double z, float radius) {
@@ -1378,16 +1349,16 @@ public class NMSPacketClasses {
         }
 
         public CommonPacket newInstance(double x, double y, double z, float power, List<IntVector3> blocks, Vector knockback) {
-            return PacketPlayOutExplosionHandle.createNew(x, y, z, power, blocks, knockback).toCommonPacket();
+            return ClientboundExplodePacketHandle.createNew(x, y, z, power, blocks, knockback).toCommonPacket();
         }
          */
     }
 
-    public static class NMSPacketPlayOutGameStateChange extends NMSPacket {
+    public static class NMSClientboundGameEventPacket extends NMSPacket {
         //TODO: What does it all mean???
     }
 
-    public static class NMSPacketPlayOutHeldItemSlot extends NMSPacket {
+    public static class NMSClientboundSetHeldSlotPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> slot = ClientboundSetHeldSlotPacketHandle.T.itemInHandIndex.toFieldAccessor();
     }
@@ -1402,7 +1373,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<ChatText> reason = ClientboundDisconnectPacketHandle.T.reason.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutLogin extends NMSPacket {
+    public static class NMSClientboundLoginPacket extends NMSPacket {
 
         public final FieldAccessor<GameMode> gameMode = new SafeDirectField<GameMode>() {
             @Override
@@ -1429,10 +1400,10 @@ public class NMSPacketClasses {
         public final FieldAccessor<Difficulty> difficulty = ClientboundLoginPacketHandle.T.difficulty.toFieldAccessor().ignoreInvalid(Difficulty.NORMAL);
     }
 
-    public static class NMSPacketPlayOutMap extends NMSPacket {
+    public static class NMSClientboundMapItemDataPacket extends NMSPacket {
     }
 
-    public static class NMSPacketPlayOutMapChunk extends NMSPacket {
+    public static class NMSClientboundLevelChunkWithLightPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> x = ClientboundLevelChunkWithLightPacketHandle.T.x.toFieldAccessor();
         public final FieldAccessor<Integer> z = ClientboundLevelChunkWithLightPacketHandle.T.z.toFieldAccessor();
@@ -1474,7 +1445,7 @@ public class NMSPacketClasses {
         };
     }
 
-    public static class NMSPacketPlayOutMount extends NMSPacket {
+    public static class NMSClientboundSetPassengersPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = ClientboundSetPassengersPacketHandle.T.entityId.toFieldAccessor();
         public final FieldAccessor<int[]> mountedEntityIds = ClientboundSetPassengersPacketHandle.T.mountedEntityIds.toFieldAccessor();
@@ -1496,31 +1467,7 @@ public class NMSPacketClasses {
         }
     }
 
-    // Too complicated to maintain
-    // TODO: Restore this for post-1.16.2 or in general I guess
-    /*
-    public static class NMSPacketPlayOutMultiBlockChange extends NMSPacket {
-
-        public final FieldAccessor<IntVector2> chunk = nextField("private net.minecraft.world.level.ChunkCoordIntPair a").translate(DuplexConversion.chunkIntPair);
-        public final FieldAccessor<Object[]> blockChangeInfoArray = nextFieldSignature("private MultiBlockChangeInfo[] b");
-
-        public ChangeInfo CHANGE_INFO = new ChangeInfo(resolveClass("MultiBlockChangeInfo"));
-
-        public class ChangeInfo {
-            public final ClassTemplate<?> T;
-            public final FieldAccessor<Short> typeId;
-            public final FieldAccessor<Object> data;
-
-            protected ChangeInfo(Class<?> clazz) {
-                T = ClassTemplate.create(clazz);
-                typeId = T.nextField("private final short b");
-                data = T.nextFieldSignature("private final IBlockData c");
-            }
-        }
-    }
-    */
-
-    public static class NMSPacketPlayOutNamedEntitySpawn extends NMSPacket {
+    public static class NMSClientboundAddPlayerPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = ClientboundAddPlayerPacketHandle.T.entityId.toFieldAccessor();
         public final FieldAccessor<UUID> uuid = ClientboundAddPlayerPacketHandle.T.entityUUID.toFieldAccessor();
@@ -1587,7 +1534,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Material> heldItemId = ClientboundAddPlayerPacketHandle.T.heldItem.toFieldAccessor().ignoreInvalid(Material.AIR);
     }
 
-    public static class NMSPacketPlayOutNamedSoundEffect extends NMSPacket {
+    public static class NMSClientboundSoundPacket extends NMSPacket {
 
         // Only used >= MC 1.10.2 to denote the sound bank name
         public final FieldAccessor<String> category = new SafeDirectField<String>() {
@@ -1622,12 +1569,12 @@ public class NMSPacketClasses {
         };
     }
 
-    public static class NMSPacketPlayOutOpenSignEditor extends NMSPacket {
+    public static class NMSClientboundOpenSignEditorPacket extends NMSPacket {
 
         public final FieldAccessor<IntVector3> signPosition = ClientboundOpenSignEditorPacketHandle.T.signPosition.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutOpenWindow extends NMSPacket {
+    public static class NMSClientboundOpenScreenPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> windowId = ClientboundOpenScreenPacketHandle.T.windowId.toFieldAccessor();
         public final FieldAccessor<WindowType> windowType = new SafeDirectField<WindowType>() {
@@ -1669,13 +1616,13 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutPlayerListHeaderFooter extends NMSPacket {
+    public static class NMSClientboundTabListPacket extends NMSPacket {
 
         public final FieldAccessor<ChatText> header = ClientboundTabListPacketHandle.T.header.toFieldAccessor();
         public final FieldAccessor<ChatText> footer = ClientboundTabListPacketHandle.T.footer.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutPosition extends NMSPacket {
+    public static class NMSClientboundPlayerPositionPacket extends NMSPacket {
 
         public final FieldAccessor<Double> x = new FieldAccessor<Double>() {
             @Override
@@ -1799,7 +1746,7 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutRemoveEntityEffect extends NMSPacket {
+    public static class NMSClientboundRemoveMobEffectPacket extends NMSPacket {
 
         public CommonPacket newInstance(int entityId, PotionEffectType effectType) {
             return ClientboundRemoveMobEffectPacketHandle.createNew(entityId, effectType).toCommonPacket();
@@ -1821,13 +1768,13 @@ public class NMSPacketClasses {
     }
 
     /**
-     * @deprecated Use ClientboundResourcePackPopPacket instead
+     * @deprecated Use ClientboundResourcePackPopPacketHandle instead
      */
     @Deprecated
     public static class NMSClientboundResourcePackPopPacket extends NMSPacket {
     }
 
-    public static class NMSPacketPlayOutRespawn extends NMSPacket {
+    public static class NMSClientboundRespawnPacket extends NMSPacket {
 
         public final FieldAccessor<DimensionType> dimensionType = new SafeDirectField<DimensionType>() {
             @Override
@@ -1874,13 +1821,13 @@ public class NMSPacketClasses {
         };
     }
 
-    public static class NMSPacketPlayOutScoreboardDisplayObjective extends NMSPacket {
+    public static class NMSClientboundSetDisplayObjectivePacket extends NMSPacket {
 
         public final FieldAccessor<DisplaySlot> display = ClientboundSetDisplayObjectivePacketHandle.T.display.toFieldAccessor();
         public final FieldAccessor<String> name = ClientboundSetDisplayObjectivePacketHandle.T.name.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutScoreboardObjective extends NMSPacket {
+    public static class NMSClientboundSetObjectivePacket extends NMSPacket {
 
         public final FieldAccessor<String> name = ClientboundSetObjectivePacketHandle.T.name.toFieldAccessor();
         public final FieldAccessor<ChatText> displayName = ClientboundSetObjectivePacketHandle.T.displayName.toFieldAccessor();
@@ -1895,7 +1842,7 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutScoreboardScore extends NMSPacket {
+    public static class NMSClientboundSetScorePacket extends NMSPacket {
 
         public final FieldAccessor<String> name = ClientboundSetScorePacketHandle.T.name.toFieldAccessor();
         public final FieldAccessor<String> objName = ClientboundSetScorePacketHandle.T.objName.toFieldAccessor();
@@ -1910,7 +1857,7 @@ public class NMSPacketClasses {
      * @deprecated Please use {@link ClientboundSetPlayerTeamPacketHandle} instead
      */
     @Deprecated
-    public static class NMSPacketPlayOutScoreboardTeam extends NMSPacket {
+    public static class NMSClientboundSetPlayerTeamPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> method = ClientboundSetPlayerTeamPacketHandle.T.method.toFieldAccessor();
         public final FieldAccessor<String> name = ClientboundSetPlayerTeamPacketHandle.T.name.toFieldAccessor();
@@ -1929,26 +1876,26 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutServerDifficulty extends NMSPacket {
+    public static class NMSClientboundChangeDifficultyPacket extends NMSPacket {
 
         public final FieldAccessor<Difficulty> difficulty = ClientboundChangeDifficultyPacketHandle.T.difficulty.toFieldAccessor();
         public final FieldAccessor<Boolean> hardcore = ClientboundChangeDifficultyPacketHandle.T.hardcore.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutSetCooldown extends NMSPacket {
+    public static class NMSClientboundCooldownPacket extends NMSPacket {
 
         //public final FieldAccessor<Material> material = ClientboundCooldownPacketHandle.T.material.toFieldAccessor();
         public final FieldAccessor<Integer> cooldown = ClientboundCooldownPacketHandle.T.cooldown.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutSetSlot extends NMSPacket {
+    public static class NMSClientboundContainerSetSlotPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> windowId = ClientboundContainerSetSlotPacketHandle.T.windowId.toFieldAccessor();
         public final FieldAccessor<Integer> slot = ClientboundContainerSetSlotPacketHandle.T.slot.toFieldAccessor();
         public final FieldAccessor<ItemStack> item = ClientboundContainerSetSlotPacketHandle.T.item.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutSpawnEntity extends NMSPacket {
+    public static class NMSClientboundAddEntityPacket extends NMSPacket {
         public final FieldAccessor<Integer> entityId = ClientboundAddEntityPacketHandle.T.entityId.toFieldAccessor();
         public final FieldAccessor<UUID> UUID = ClientboundAddEntityPacketHandle.T.entityUUID.toFieldAccessor().ignoreInvalid(new java.util.UUID(0L, 0L));
         public final FieldAccessor<Double> posX = new SafeDirectField<Double>() {
@@ -2082,7 +2029,7 @@ public class NMSPacketClasses {
         };
     }
 
-    public static class NMSPacketPlayOutSpawnEntityExperienceOrb extends NMSPacket {
+    public static class NMSClientboundAddExperienceOrbPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = ClientboundAddExperienceOrbPacketHandle.T.entityId.toFieldAccessor();
         public final FieldAccessor<Double> posX = new SafeDirectField<Double>() {
@@ -2124,7 +2071,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> experience = ClientboundAddExperienceOrbPacketHandle.T.experience.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutSpawnEntityLiving extends NMSPacket {
+    public static class NMSClientboundAddMobPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = ClientboundAddMobPacketHandle.T.entityId.toFieldAccessor();
         public final FieldAccessor<UUID> entityUUID = ClientboundAddMobPacketHandle.T.entityUUID.toFieldAccessor().ignoreInvalid(new UUID(0L, 0L));
@@ -2258,7 +2205,7 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutSpawnEntityPainting extends NMSPacket {
+    public static class NMSClientboundAddPaintingPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = ClientboundAddPaintingPacketHandle.T.entityId.toFieldAccessor();
 
@@ -2316,7 +2263,7 @@ public class NMSPacketClasses {
      * @deprecated Use {@link ClientboundSetDefaultSpawnPositionPacketHandle} instead
      */
     @Deprecated
-    public static class NMSPacketPlayOutSpawnPosition extends NMSPacket {
+    public static class NMSClientboundSetDefaultSpawnPositionPacket extends NMSPacket {
 
         public final FieldAccessor<IntVector3> position = new SafeDirectField<IntVector3>() {
             @Override
@@ -2331,19 +2278,19 @@ public class NMSPacketClasses {
         };
     }
 
-    public static class NMSPacketPlayOutStatistic extends NMSPacket {
+    public static class NMSClientboundAwardStatsPacket extends NMSPacket {
 
         // Changed to Object2IntMap<Statistic> on MC 1.13
         // public final FieldAccessor<Map<Object, Integer>> statsMap = nextField("private Map<Statistic, Integer> a");
     }
 
-    public static class NMSPacketPlayOutTabComplete extends NMSPacket {
+    public static class NMSClientboundCommandSuggestionsPacket extends NMSPacket {
 
         // Changed format on MC 1.13
         // public final FieldAccessor<String[]> response = nextField("private String[] a");
     }
 
-    public static class NMSPacketPlayOutTileEntityData extends NMSPacket {
+    public static class NMSClientboundBlockEntityDataPacket extends NMSPacket {
 
         public final TranslatorFieldAccessor<IntVector3> position = ClientboundBlockEntityDataPacketHandle.T.position.toFieldAccessor();
         public final FieldAccessor<BlockStateType> type = ClientboundBlockEntityDataPacketHandle.T.type.toFieldAccessor();
@@ -2354,7 +2301,7 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutUnloadChunk extends NMSPacket {
+    public static class NMSClientboundForgetLevelChunkPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> x = new SafeDirectField<Integer>() {
             @Override
@@ -2382,7 +2329,7 @@ public class NMSPacketClasses {
         };
     }
 
-    public static class NMSPacketPlayOutUpdateAttributes extends NMSPacket {
+    public static class NMSClientboundUpdateAttributesPacket extends NMSPacket {
 
         /**
          * A list of NMS.Attribute elements - may require further API to work
@@ -2395,20 +2342,20 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutUpdateHealth extends NMSPacket {
+    public static class NMSClientboundSetHealthPacket extends NMSPacket {
 
         public final FieldAccessor<Float> health = ClientboundSetHealthPacketHandle.T.health.toFieldAccessor();
         public final FieldAccessor<Integer> food = ClientboundSetHealthPacketHandle.T.food.toFieldAccessor();
         public final FieldAccessor<Float> foodSaturation = ClientboundSetHealthPacketHandle.T.foodSaturation.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutUpdateTime extends NMSPacket {
+    public static class NMSClientboundSetTimePacket extends NMSPacket {
 
         public final FieldAccessor<Long> age = ClientboundSetTimePacketHandle.T.gameTime.toFieldAccessor();
         public final FieldAccessor<Long> timeOfDay = ClientboundSetTimePacketHandle.T.dayTime.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutVehicleMove extends NMSPacket {
+    public static class NMSClientboundMoveVehiclePacket extends NMSPacket {
 
         public final FieldAccessor<Double> posX = new SafeDirectField<Double>() {
             @Override
@@ -2471,20 +2418,20 @@ public class NMSPacketClasses {
         }
     }
 
-    public static class NMSPacketPlayOutWindowData extends NMSPacket {
+    public static class NMSClientboundContainerSetDataPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> windowId = ClientboundContainerSetDataPacketHandle.T.windowId.toFieldAccessor();
         public final FieldAccessor<Integer> id = ClientboundContainerSetDataPacketHandle.T.id.toFieldAccessor();
         public final FieldAccessor<Integer> value = ClientboundContainerSetDataPacketHandle.T.value.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutWindowItems extends NMSPacket {
+    public static class NMSClientboundContainerSetContentPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> windowId = ClientboundContainerSetContentPacketHandle.T.windowId.toFieldAccessor();
         public final FieldAccessor<List<ItemStack>> items = ClientboundContainerSetContentPacketHandle.T.items.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutWorldEvent extends NMSPacket {
+    public static class NMSClientboundLevelEventPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> effectId = ClientboundLevelEventPacketHandle.T.effectId.toFieldAccessor();
         public final TranslatorFieldAccessor<IntVector3> position = ClientboundLevelEventPacketHandle.T.position.toFieldAccessor();
@@ -2492,7 +2439,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Boolean> noRelativeVolume = ClientboundLevelEventPacketHandle.T.globalEvent.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutWorldParticles extends NMSPacket {
+    public static class NMSClientboundLevelParticlesPacket extends NMSPacket {
 
         public final FieldAccessor<Double> x = new SafeDirectField<Double>() {
             @Override

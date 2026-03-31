@@ -5,12 +5,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -21,9 +18,8 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.cdn.MojangIO.VersionManifest;
 import com.bergerkiller.bukkit.common.io.VersionedMappingsFileIO;
 import com.bergerkiller.bukkit.common.server.CraftBukkitServer;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 
 /**
  * Communicates with hub.spigotmc.org to generate spigot &lt;&gt; mojang class
@@ -165,6 +161,88 @@ public class SpigotMappings extends VersionedMappingsFileIO<SpigotMappings.Class
 
         return spigotMappings.get(minecraftVersion)
                 .orElseThrow(() -> new IllegalStateException("Version has no mappings"));
+    }
+
+    /**
+     * Visualizes all of the mappings for a particular Mojang class name, showing which Spigot class name it points to
+     * across all versions of Minecraft. This is useful for debugging and development.
+     *
+     * @param mojangClassName Mojang-mapped class name (net.minecraft.server.level.ServerPlayer)
+     */
+    public void visualizeMappingsForMojangClass(String mojangClassName) {
+        boolean first = true;
+        String prev = null;
+        String startVersion = null;
+        String endVersion = null;
+        for (String version : getVersions()) {
+            String spigotName = get(version)
+                    .orElseThrow(() -> new UnsupportedOperationException("Version bug: " + version))
+                    .getMojangToSpigot()
+                    .get(mojangClassName);
+            if (startVersion == null) {
+                startVersion = version;
+                endVersion = version;
+            }
+            if (!first && !LogicUtil.bothNullOrEqual(prev, spigotName)) {
+                System.out.println("[" + startVersion + " - " + endVersion + "] " + mojangClassName + " -> " + prev);
+                startVersion = version;
+                endVersion = version;
+            }
+            endVersion = version;
+            prev = spigotName;
+            first = false;
+        }
+        if (startVersion != null) {
+            System.out.println("[" + startVersion + " - " + endVersion + "] " + mojangClassName + " -> " + prev);
+        }
+    }
+
+    /**
+     * Visualizes all of the mappings for a particular Spigot class name, showing which Mojang class names point to it
+     * across all versions of Minecraft. This is useful for debugging and development.
+     *
+     * @param spigotClassName Spigot-mapped class name (net.minecraft.server.level.EntityPlayer)
+     */
+    public void visualizeMappingsForSpigotClass(String spigotClassName) {
+        boolean first = true;
+        Set<String> prev = null;
+        String startVersion = null;
+        String endVersion = null;
+        for (String version : getVersions()) {
+            Set<String> mojangNames = get(version)
+                    .orElseThrow(() -> new UnsupportedOperationException("Version bug: " + version))
+                    .getSpigotToMojang()
+                    .get(spigotClassName);
+            if (startVersion == null) {
+                startVersion = version;
+                endVersion = version;
+            }
+            if (!first && !LogicUtil.bothNullOrEqual(prev, mojangNames)) {
+                if (prev != null) {
+                    System.out.println("[" + startVersion + " - " + endVersion + "]:");
+                    for (String mojangName : prev) {
+                        System.out.println("  - " + mojangName + " -> " + spigotClassName);
+                    }
+                } else {
+                    System.out.println("[" + startVersion + " - " + endVersion + "]: None");
+                }
+                startVersion = version;
+                endVersion = version;
+            }
+            endVersion = version;
+            prev = mojangNames;
+            first = false;
+        }
+        if (startVersion != null) {
+            if (prev != null) {
+                System.out.println("[" + startVersion + " - " + endVersion + "]:");
+                for (String mojangName : prev) {
+                    System.out.println("  - " + mojangName + " -> " + spigotClassName);
+                }
+            } else {
+                System.out.println("[" + startVersion + " - " + endVersion + "]: None");
+            }
+        }
     }
 
     private static class SpigotVersionMeta {

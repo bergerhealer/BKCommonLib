@@ -40,34 +40,9 @@ public class SpigotMappingTest {
     @Test
     @Ignore
     public void testVisualizeMappingsForMojangClass() {
-        String mojangClassName = "net.minecraft.network.Connection$WrappedConsumer";
-
         SpigotMappings mappings = loadMappings();
 
-        // net.minecraft.network.protocol.game.ClientboundResourcePackPacket -> net.minecraft.network.protocol.game.PacketPlayOutResourcePackSend
-
-        boolean first = true;
-        String prev = null;
-        String startVersion = null;
-        String endVersion = null;
-        for (String version : mappings.getVersions()) {
-            String spigotName = mappings.get(version).orElse(null).getMojangToSpigot().get(mojangClassName);
-            if (startVersion == null) {
-                startVersion = version;
-                endVersion = version;
-            }
-            if (!first && !LogicUtil.bothNullOrEqual(prev, spigotName)) {
-                System.out.println("[" + startVersion + " - " + endVersion + "] " + mojangClassName + " -> " + prev);
-                startVersion = version;
-                endVersion = version;
-            }
-            endVersion = version;
-            prev = spigotName;
-            first = false;
-        }
-        if (startVersion != null) {
-            System.out.println("[" + startVersion + " - " + endVersion + "] " + mojangClassName + " -> " + prev);
-        }
+        mappings.visualizeMappingsForMojangClass("net.minecraft.network.Connection$WrappedConsumer");
     }
 
     /**
@@ -77,46 +52,10 @@ public class SpigotMappingTest {
     @Test
     @Ignore
     public void testVisualizeMappingsForSpigotClass() {
-        String spigotClassName = "net.minecraft.world.level.biome.BiomeSettingsMobs$c";
-
         SpigotMappings mappings = loadMappings();
 
-        boolean first = true;
-        Set<String> prev = null;
-        String startVersion = null;
-        String endVersion = null;
-        for (String version : mappings.getVersions()) {
-            Set<String> mojangNames = mappings.get(version).orElse(null).getSpigotToMojang().get(spigotClassName);
-            if (startVersion == null) {
-                startVersion = version;
-                endVersion = version;
-            }
-            if (!first && !LogicUtil.bothNullOrEqual(prev, mojangNames)) {
-                if (prev != null) {
-                    System.out.println("[" + startVersion + " - " + endVersion + "]:");
-                    for (String mojangName : prev) {
-                        System.out.println("  - " + mojangName + " -> " + spigotClassName);
-                    }
-                } else {
-                    System.out.println("[" + startVersion + " - " + endVersion + "]: None");
-                }
-                startVersion = version;
-                endVersion = version;
-            }
-            endVersion = version;
-            prev = mojangNames;
-            first = false;
-        }
-        if (startVersion != null) {
-            if (prev != null) {
-                System.out.println("[" + startVersion + " - " + endVersion + "]:");
-                for (String mojangName : prev) {
-                    System.out.println("  - " + mojangName + " -> " + spigotClassName);
-                }
-            } else {
-                System.out.println("[" + startVersion + " - " + endVersion + "]: None");
-            }
-        }
+        mappings.visualizeMappingsForSpigotClass("net.minecraft.network.protocol.game.PacketPlayOutStatistic");
+        mappings.visualizeMappingsForSpigotClass("net.minecraft.network.protocol.game.PacketPlayOutTabComplete");
     }
 
     /**

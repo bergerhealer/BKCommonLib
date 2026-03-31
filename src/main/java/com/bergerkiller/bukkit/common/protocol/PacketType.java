@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.protocol;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
@@ -51,92 +50,92 @@ public class PacketType extends ClassTemplate<Object> {
      */
     /* Misc. packets */
     public static final NMSPacket DEFAULT = new NMSPacket();
-    public static final NMSPacketPlayOutAbilities OUT_ABILITIES = new NMSPacketPlayOutAbilities();
-    public static final NMSPacketPlayOutAdvancements OUT_ADVANCEMENTS = new NMSPacketPlayOutAdvancements();
-    public static final NMSPacketPlayOutBlockAction OUT_BLOCK_ACTION = new NMSPacketPlayOutBlockAction();
+    public static final NMSClientboundPlayerAbilitiesPacket OUT_ABILITIES = new NMSClientboundPlayerAbilitiesPacket();
+    public static final NMSClientboundUpdateAdvancementsPacket OUT_ADVANCEMENTS = new NMSClientboundUpdateAdvancementsPacket();
+    public static final NMSClientboundBlockEventPacket OUT_BLOCK_ACTION = new NMSClientboundBlockEventPacket();
     //public static final NMSPacketPlayOutChat OUT_CHAT = new NMSPacketPlayOutChat();
-    public static final NMSPacketPlayOutCollect OUT_COLLECT = new NMSPacketPlayOutCollect();
+    public static final NMSClientboundTakeItemEntityPacket OUT_COLLECT = new NMSClientboundTakeItemEntityPacket();
     public static final NMSClientboundCustomPayloadPacket OUT_CUSTOM_PAYLOAD = new NMSClientboundCustomPayloadPacket();
-    public static final NMSPacketPlayOutExperience OUT_EXPERIENCE = new NMSPacketPlayOutExperience();
-    public static final NMSPacketPlayOutExplosion OUT_EXPLOSION = new NMSPacketPlayOutExplosion();
-    public static final NMSPacketPlayOutGameStateChange OUT_GAME_STATE_CHANGE = new NMSPacketPlayOutGameStateChange();
-    public static final NMSPacketPlayOutHeldItemSlot OUT_HELD_ITEM_SLOT = new NMSPacketPlayOutHeldItemSlot();
+    public static final NMSClientboundSetExperiencePacket OUT_EXPERIENCE = new NMSClientboundSetExperiencePacket();
+    public static final NMSClientboundExplodePacket OUT_EXPLOSION = new NMSClientboundExplodePacket();
+    public static final NMSClientboundGameEventPacket OUT_GAME_STATE_CHANGE = new NMSClientboundGameEventPacket();
+    public static final NMSClientboundSetHeldSlotPacket OUT_HELD_ITEM_SLOT = new NMSClientboundSetHeldSlotPacket();
     public static final NMSClientboundKeepAlivePacket OUT_KEEP_ALIVE = new NMSClientboundKeepAlivePacket();
     public static final NMSClientboundDisconnectPacket OUT_KICK_DISCONNECT = new NMSClientboundDisconnectPacket();
-    public static final NMSPacketPlayOutLogin OUT_LOGIN = new NMSPacketPlayOutLogin();
-    public static final NMSPacketPlayOutMap OUT_MAP = new NMSPacketPlayOutMap();
-    public static final NMSPacketPlayOutMapChunk OUT_MAP_CHUNK = new NMSPacketPlayOutMapChunk();
-    public static final NMSPacketPlayOutPlayerListHeaderFooter OUT_PLAYER_LIST_HEADER_FOOTER = new NMSPacketPlayOutPlayerListHeaderFooter();
+    public static final NMSClientboundLoginPacket OUT_LOGIN = new NMSClientboundLoginPacket();
+    public static final NMSClientboundMapItemDataPacket OUT_MAP = new NMSClientboundMapItemDataPacket();
+    public static final NMSClientboundLevelChunkWithLightPacket OUT_MAP_CHUNK = new NMSClientboundLevelChunkWithLightPacket();
+    public static final NMSClientboundTabListPacket OUT_PLAYER_LIST_HEADER_FOOTER = new NMSClientboundTabListPacket();
     //public static final NMSPacketPlayOutMultiBlockChange OUT_MULTI_BLOCK_CHANGE = new NMSPacketPlayOutMultiBlockChange();
-    public static final NMSPacketPlayOutNamedSoundEffect OUT_NAMED_SOUND_EFFECT = new NMSPacketPlayOutNamedSoundEffect();
-    public static final NMSPacketPlayOutOpenSignEditor OUT_OPEN_SIGN_EDITOR = new NMSPacketPlayOutOpenSignEditor();
+    public static final NMSClientboundSoundPacket OUT_NAMED_SOUND_EFFECT = new NMSClientboundSoundPacket();
+    public static final NMSClientboundOpenSignEditorPacket OUT_OPEN_SIGN_EDITOR = new NMSClientboundOpenSignEditorPacket();
     public static final NMSClientboundPlayerInfoUpdatePacket OUT_PLAYER_INFO_UPDATE = new NMSClientboundPlayerInfoUpdatePacket();
     public static final NMSClientboundPlayerInfoRemovePacket OUT_PLAYER_INFO_REMOVE = new NMSClientboundPlayerInfoRemovePacket();
-    public static final NMSPacketPlayOutPosition OUT_POSITION = new NMSPacketPlayOutPosition();
+    public static final NMSClientboundPlayerPositionPacket OUT_POSITION = new NMSClientboundPlayerPositionPacket();
     public static final NMSClientboundPlayerRotationPacket OUT_ROTATION = new NMSClientboundPlayerRotationPacket();
-    public static final NMSPacketPlayOutRespawn OUT_RESPAWN = new NMSPacketPlayOutRespawn();
-    public static final NMSPacketPlayOutSpawnPosition OUT_SPAWN_POSITION = new NMSPacketPlayOutSpawnPosition();
-    public static final NMSPacketPlayOutStatistic OUT_STATISTIC = new NMSPacketPlayOutStatistic();
-    public static final NMSPacketPlayOutTabComplete OUT_TAB_COMPLETE = new NMSPacketPlayOutTabComplete();
-    public static final NMSPacketPlayOutTileEntityData OUT_TILE_ENTITY_DATA = new NMSPacketPlayOutTileEntityData();
+    public static final NMSClientboundRespawnPacket OUT_RESPAWN = new NMSClientboundRespawnPacket();
+    public static final NMSClientboundSetDefaultSpawnPositionPacket OUT_SPAWN_POSITION = new NMSClientboundSetDefaultSpawnPositionPacket();
+    public static final NMSClientboundAwardStatsPacket OUT_STATISTIC = new NMSClientboundAwardStatsPacket();
+    public static final NMSClientboundCommandSuggestionsPacket OUT_TAB_COMPLETE = new NMSClientboundCommandSuggestionsPacket();
+    public static final NMSClientboundBlockEntityDataPacket OUT_TILE_ENTITY_DATA = new NMSClientboundBlockEntityDataPacket();
     //public static final NMSPacketPlayOutTitle OUT_TITLE = new NMSPacketPlayOutTitle();
-    public static final NMSPacketPlayOutUpdateHealth OUT_UPDATE_HEALTH = new NMSPacketPlayOutUpdateHealth();
-    public static final NMSPacketPlayOutUpdateTime OUT_UPDATE_TIME = new NMSPacketPlayOutUpdateTime();
-    public static final NMSPacketPlayOutWorldEvent OUT_WORLD_EVENT = new NMSPacketPlayOutWorldEvent();
-    public static final NMSPacketPlayOutWorldParticles OUT_WORLD_PARTICLES = new NMSPacketPlayOutWorldParticles();
-    public static final NMSPacketPlayOutBlockBreakAnimation OUT_BLOCK_BREAK_ANIMATION = new NMSPacketPlayOutBlockBreakAnimation();
-    public static final NMSPacketPlayOutBlockChange OUT_BLOCK_CHANGE = new NMSPacketPlayOutBlockChange();
-    public static final NMSPacketPlayOutBoss OUT_BOSS = new NMSPacketPlayOutBoss();
-    public static final NMSPacketPlayOutCamera OUT_CAMERA = new NMSPacketPlayOutCamera();
-    public static final NMSPacketPlayOutCustomSoundEffect OUT_CUSTOM_SOUND_EFFECT = new NMSPacketPlayOutCustomSoundEffect();
+    public static final NMSClientboundSetHealthPacket OUT_UPDATE_HEALTH = new NMSClientboundSetHealthPacket();
+    public static final NMSClientboundSetTimePacket OUT_UPDATE_TIME = new NMSClientboundSetTimePacket();
+    public static final NMSClientboundLevelEventPacket OUT_WORLD_EVENT = new NMSClientboundLevelEventPacket();
+    public static final NMSClientboundLevelParticlesPacket OUT_WORLD_PARTICLES = new NMSClientboundLevelParticlesPacket();
+    public static final NMSClientboundBlockDestructionPacket OUT_BLOCK_BREAK_ANIMATION = new NMSClientboundBlockDestructionPacket();
+    public static final NMSClientboundBlockUpdatePacket OUT_BLOCK_CHANGE = new NMSClientboundBlockUpdatePacket();
+    public static final NMSClientboundBossEventPacket OUT_BOSS = new NMSClientboundBossEventPacket();
+    public static final NMSClientboundSetCameraPacket OUT_CAMERA = new NMSClientboundSetCameraPacket();
+    public static final NMSClientboundCustomSoundPacket OUT_CUSTOM_SOUND_EFFECT = new NMSClientboundCustomSoundPacket();
     public static final NMSClientboundResourcePackPushPacket OUT_RESOURCE_PACK_PUSH = new NMSClientboundResourcePackPushPacket();
     public static final NMSClientboundResourcePackPopPacket OUT_RESOURCE_PACK_POP = new NMSClientboundResourcePackPopPacket();
-    public static final NMSPacketPlayOutServerDifficulty OUT_SERVER_DIFFICULTY = new NMSPacketPlayOutServerDifficulty();
-    public static final NMSPacketPlayOutSetCooldown OUT_SET_COOLDOWN = new NMSPacketPlayOutSetCooldown();
-    public static final NMSPacketPlayOutUnloadChunk OUT_UNLOAD_CHUNK = new NMSPacketPlayOutUnloadChunk();
+    public static final NMSClientboundChangeDifficultyPacket OUT_SERVER_DIFFICULTY = new NMSClientboundChangeDifficultyPacket();
+    public static final NMSClientboundCooldownPacket OUT_SET_COOLDOWN = new NMSClientboundCooldownPacket();
+    public static final NMSClientboundForgetLevelChunkPacket OUT_UNLOAD_CHUNK = new NMSClientboundForgetLevelChunkPacket();
     /* Scoreboard-related packets */
-    public static final NMSPacketPlayOutScoreboardDisplayObjective OUT_SCOREBOARD_DISPLAY_OBJECTIVE = new NMSPacketPlayOutScoreboardDisplayObjective();
-    public static final NMSPacketPlayOutScoreboardObjective OUT_SCOREBOARD_OBJECTIVE = new NMSPacketPlayOutScoreboardObjective();
-    public static final NMSPacketPlayOutScoreboardScore OUT_SCOREBOARD_SCORE = new NMSPacketPlayOutScoreboardScore();
+    public static final NMSClientboundSetDisplayObjectivePacket OUT_SCOREBOARD_DISPLAY_OBJECTIVE = new NMSClientboundSetDisplayObjectivePacket();
+    public static final NMSClientboundSetObjectivePacket OUT_SCOREBOARD_OBJECTIVE = new NMSClientboundSetObjectivePacket();
+    public static final NMSClientboundSetScorePacket OUT_SCOREBOARD_SCORE = new NMSClientboundSetScorePacket();
     public static final NMSClientboundResetScorePacket OUT_SCOREBOARD_SCORE_RESET = new NMSClientboundResetScorePacket();
-    public static final NMSPacketPlayOutScoreboardTeam OUT_SCOREBOARD_TEAM = new NMSPacketPlayOutScoreboardTeam();
+    public static final NMSClientboundSetPlayerTeamPacket OUT_SCOREBOARD_TEAM = new NMSClientboundSetPlayerTeamPacket();
     /* Window-related packets */
-    public static final NMSPacketPlayOutCloseWindow OUT_WINDOW_CLOSE = new NMSPacketPlayOutCloseWindow();
-    public static final NMSPacketPlayOutWindowData OUT_WINDOW_DATA = new NMSPacketPlayOutWindowData();
-    public static final NMSPacketPlayOutOpenWindow OUT_WINDOW_OPEN = new NMSPacketPlayOutOpenWindow();
-    public static final NMSPacketPlayOutSetSlot OUT_WINDOW_SET_SLOT = new NMSPacketPlayOutSetSlot();
-    public static final NMSPacketPlayOutWindowItems OUT_WINDOW_ITEMS = new NMSPacketPlayOutWindowItems();
+    public static final NMSClientboundContainerClosePacket OUT_WINDOW_CLOSE = new NMSClientboundContainerClosePacket();
+    public static final NMSClientboundContainerSetDataPacket OUT_WINDOW_DATA = new NMSClientboundContainerSetDataPacket();
+    public static final NMSClientboundOpenScreenPacket OUT_WINDOW_OPEN = new NMSClientboundOpenScreenPacket();
+    public static final NMSClientboundContainerSetSlotPacket OUT_WINDOW_SET_SLOT = new NMSClientboundContainerSetSlotPacket();
+    public static final NMSClientboundContainerSetContentPacket OUT_WINDOW_ITEMS = new NMSClientboundContainerSetContentPacket();
     /* Entity-related packets */
-    public static final NMSPacketPlayOutSpawnEntity OUT_ENTITY_SPAWN = new NMSPacketPlayOutSpawnEntity();
-    public static final NMSPacketPlayOutNamedEntitySpawn OUT_ENTITY_SPAWN_NAMED = new NMSPacketPlayOutNamedEntitySpawn();
+    public static final NMSClientboundAddEntityPacket OUT_ENTITY_SPAWN = new NMSClientboundAddEntityPacket();
+    public static final NMSClientboundAddPlayerPacket OUT_ENTITY_SPAWN_NAMED = new NMSClientboundAddPlayerPacket();
 
     /**
      * Used on Minecraft 1.8 - 1.21.4 to spawn exp orbs.
      * Use {@link #OUT_ENTITY_SPAWN} on 1.21.5 instead, and set the
      * experience value in the entity datawatcher metadata
      */
-    public static final NMSPacketPlayOutSpawnEntityExperienceOrb OUT_ENTITY_SPAWN_EXPORB = new NMSPacketPlayOutSpawnEntityExperienceOrb();
+    public static final NMSClientboundAddExperienceOrbPacket OUT_ENTITY_SPAWN_EXPORB = new NMSClientboundAddExperienceOrbPacket();
 
-    public static final NMSPacketPlayOutSpawnEntityLiving OUT_ENTITY_SPAWN_LIVING = new NMSPacketPlayOutSpawnEntityLiving();
-    public static final NMSPacketPlayOutSpawnEntityPainting OUT_ENTITY_SPAWN_PAINTING = new NMSPacketPlayOutSpawnEntityPainting();
+    public static final NMSClientboundAddMobPacket OUT_ENTITY_SPAWN_LIVING = new NMSClientboundAddMobPacket();
+    public static final NMSClientboundAddPaintingPacket OUT_ENTITY_SPAWN_PAINTING = new NMSClientboundAddPaintingPacket();
     public static final NMSPacketPlayOutSpawnEntityWeather OUT_ENTITY_SPAWN_WITHER = new NMSPacketPlayOutSpawnEntityWeather();
-    public static final NMSPacketPlayOutEntityDestroy OUT_ENTITY_DESTROY = new NMSPacketPlayOutEntityDestroy();
-    public static final NMSPacketPlayOutAttachEntity OUT_ENTITY_ATTACH = new NMSPacketPlayOutAttachEntity();
-    public static final NMSPacketPlayOutEntityEffect OUT_ENTITY_EFFECT_ADD = new NMSPacketPlayOutEntityEffect();
-    public static final NMSPacketPlayOutRemoveEntityEffect OUT_ENTITY_EFFECT_REMOVE = new NMSPacketPlayOutRemoveEntityEffect();
-    public static final NMSPacketPlayOutEntityEquipment OUT_ENTITY_EQUIPMENT = new NMSPacketPlayOutEntityEquipment();
-    public static final NMSPacketPlayOutEntityHeadRotation OUT_ENTITY_HEAD_ROTATION = new NMSPacketPlayOutEntityHeadRotation();
-    public static final NMSPacketPlayOutEntityLook OUT_ENTITY_LOOK = new NMSPacketPlayOutEntityLook();
-    public static final NMSPacketPlayOutAnimation OUT_ENTITY_ANIMATION = new NMSPacketPlayOutAnimation();
-    public static final NMSPacketPlayOutEntityMetadata OUT_ENTITY_METADATA = new NMSPacketPlayOutEntityMetadata();
-    public static final NMSPacketPlayOutEntityStatus OUT_ENTITY_STATUS = new NMSPacketPlayOutEntityStatus();
-    public static final NMSPacketPlayOutEntityTeleport OUT_ENTITY_TELEPORT = new NMSPacketPlayOutEntityTeleport();
-    public static final NMSPacketPlayOutEntityVelocity OUT_ENTITY_VELOCITY = new NMSPacketPlayOutEntityVelocity();
-    public static final NMSPacketPlayOutRelEntityMove OUT_ENTITY_MOVE = new NMSPacketPlayOutRelEntityMove();
-    public static final NMSPacketPlayOutRelEntityMoveLook OUT_ENTITY_MOVE_LOOK = new NMSPacketPlayOutRelEntityMoveLook();
-    public static final NMSPacketPlayOutUpdateAttributes OUT_ENTITY_UPDATE_ATTRIBUTES = new NMSPacketPlayOutUpdateAttributes();
-    public static final NMSPacketPlayOutMount OUT_MOUNT = new NMSPacketPlayOutMount();
-    public static final NMSPacketPlayOutVehicleMove OUT_VEHICLE_MOVE = new NMSPacketPlayOutVehicleMove();
+    public static final NMSClientboundRemoveEntitiesPacket OUT_ENTITY_DESTROY = new NMSClientboundRemoveEntitiesPacket();
+    public static final NMSClientboundSetEntityLinkPacket OUT_ENTITY_ATTACH = new NMSClientboundSetEntityLinkPacket();
+    public static final NMSClientboundUpdateMobEffectPacket OUT_ENTITY_EFFECT_ADD = new NMSClientboundUpdateMobEffectPacket();
+    public static final NMSClientboundRemoveMobEffectPacket OUT_ENTITY_EFFECT_REMOVE = new NMSClientboundRemoveMobEffectPacket();
+    public static final NMSClientboundSetEquipmentPacket OUT_ENTITY_EQUIPMENT = new NMSClientboundSetEquipmentPacket();
+    public static final NMSClientboundRotateHeadPacket OUT_ENTITY_HEAD_ROTATION = new NMSClientboundRotateHeadPacket();
+    public static final NMSClientboundMoveEntityPacketRot OUT_ENTITY_LOOK = new NMSClientboundMoveEntityPacketRot();
+    public static final NMSClientboundAnimatePacket OUT_ENTITY_ANIMATION = new NMSClientboundAnimatePacket();
+    public static final NMSClientboundSetEntityDataPacket OUT_ENTITY_METADATA = new NMSClientboundSetEntityDataPacket();
+    public static final NMSClientboundEntityEventPacket OUT_ENTITY_STATUS = new NMSClientboundEntityEventPacket();
+    public static final NMSClientboundEntityPositionSyncPacket OUT_ENTITY_TELEPORT = new NMSClientboundEntityPositionSyncPacket();
+    public static final NMSClientboundSetEntityMotionPacket OUT_ENTITY_VELOCITY = new NMSClientboundSetEntityMotionPacket();
+    public static final NMSClientboundMoveEntityPacketPos OUT_ENTITY_MOVE = new NMSClientboundMoveEntityPacketPos();
+    public static final NMSClientboundMoveEntityPacketPosRot OUT_ENTITY_MOVE_LOOK = new NMSClientboundMoveEntityPacketPosRot();
+    public static final NMSClientboundUpdateAttributesPacket OUT_ENTITY_UPDATE_ATTRIBUTES = new NMSClientboundUpdateAttributesPacket();
+    public static final NMSClientboundSetPassengersPacket OUT_MOUNT = new NMSClientboundSetPassengersPacket();
+    public static final NMSClientboundMoveVehiclePacket OUT_VEHICLE_MOVE = new NMSClientboundMoveVehiclePacket();
 
     // MC 1.8.8 only
     public static final NMSPacketPlayOutUpdateSign OUT_UPDATE_SIGN = new NMSPacketPlayOutUpdateSign();
@@ -149,37 +148,37 @@ public class PacketType extends ClassTemplate<Object> {
      * === Incoming packets ===
      * ========================
      */
-    public static final NMSPacketPlayInAbilities IN_ABILITIES = new NMSPacketPlayInAbilities();
-    public static final NMSPacketPlayInArmAnimation IN_ENTITY_ANIMATION = new NMSPacketPlayInArmAnimation();
-    public static final NMSPacketPlayInBlockDig IN_BLOCK_DIG = new NMSPacketPlayInBlockDig();
-    public static final NMSPacketPlayInBlockPlace IN_BLOCK_PLACE = new NMSPacketPlayInBlockPlace();
-    public static final NMSPacketPlayInBoatMove IN_BOAT_MOVE = new NMSPacketPlayInBoatMove();
-    public static final NMSPacketPlayInChat IN_CHAT = new NMSPacketPlayInChat();
-    public static final NMSPacketPlayInClientCommand IN_CLIENT_COMMAND = new NMSPacketPlayInClientCommand();
-    public static final NMSPacketPlayInCustomPayload IN_CUSTOM_PAYLOAD = new NMSPacketPlayInCustomPayload();
-    public static final NMSPacketPlayInEntityAction IN_ENTITY_ACTION = new NMSPacketPlayInEntityAction();
-    public static final NMSPacketPlayInLook IN_LOOK = new NMSPacketPlayInLook();
-    public static final NMSPacketPlayInPosition IN_POSITION = new NMSPacketPlayInPosition();
-    public static final NMSPacketPlayInPositionLook IN_POSITION_LOOK = new NMSPacketPlayInPositionLook();
-    public static final NMSPacketPlayInHeldItemSlot IN_HELD_ITEM_SLOT = new NMSPacketPlayInHeldItemSlot();
+    public static final NMSServerboundPlayerAbilitiesPacket IN_ABILITIES = new NMSServerboundPlayerAbilitiesPacket();
+    public static final NMSServerboundSwingPacket IN_ENTITY_ANIMATION = new NMSServerboundSwingPacket();
+    public static final NMSServerboundPlayerActionPacket IN_BLOCK_DIG = new NMSServerboundPlayerActionPacket();
+    public static final NMSServerboundUseItemPacket IN_BLOCK_PLACE = new NMSServerboundUseItemPacket();
+    public static final NMSServerboundPaddleBoatPacket IN_BOAT_MOVE = new NMSServerboundPaddleBoatPacket();
+    public static final NMSServerboundChatPacket IN_CHAT = new NMSServerboundChatPacket();
+    public static final NMSServerboundClientCommandPacket IN_CLIENT_COMMAND = new NMSServerboundClientCommandPacket();
+    public static final NMSServerboundCustomPayloadPacket IN_CUSTOM_PAYLOAD = new NMSServerboundCustomPayloadPacket();
+    public static final NMSServerboundPlayerCommandPacket IN_ENTITY_ACTION = new NMSServerboundPlayerCommandPacket();
+    public static final NMSServerboundMovePlayerPacketRot IN_LOOK = new NMSServerboundMovePlayerPacketRot();
+    public static final NMSServerboundMovePlayerPacketPos IN_POSITION = new NMSServerboundMovePlayerPacketPos();
+    public static final NMSServerboundMovePlayerPacketPosRot IN_POSITION_LOOK = new NMSServerboundMovePlayerPacketPosRot();
+    public static final NMSServerboundSetCarriedItemPacket IN_HELD_ITEM_SLOT = new NMSServerboundSetCarriedItemPacket();
     public static final NMSServerboundKeepAlivePacket IN_KEEP_ALIVE = new NMSServerboundKeepAlivePacket();
-    public static final NMSPacketPlayInSpectate IN_SPECTATE = new NMSPacketPlayInSpectate();
-    public static final NMSPacketPlayInSetCreativeSlot IN_SET_CREATIVE_SLOT = new NMSPacketPlayInSetCreativeSlot();
+    public static final NMSServerboundTeleportToEntityPacket IN_SPECTATE = new NMSServerboundTeleportToEntityPacket();
+    public static final NMSServerboundSetCreativeModeSlotPacket IN_SET_CREATIVE_SLOT = new NMSServerboundSetCreativeModeSlotPacket();
     public static final NMSServerboundClientInformationPacket IN_SETTINGS = new NMSServerboundClientInformationPacket();
-    public static final NMSPacketPlayInSteerVehicle IN_STEER_VEHICLE = new NMSPacketPlayInSteerVehicle();
-    public static final NMSPacketPlayInTabComplete IN_TAB_COMPLETE = new NMSPacketPlayInTabComplete();
-    public static final NMSPacketPlayInTeleportAccept IN_TELEPORT_ACCEPT = new NMSPacketPlayInTeleportAccept();
-    public static final NMSPacketPlayInUpdateSign IN_UPDATE_SIGN = new NMSPacketPlayInUpdateSign();
-    public static final NMSPacketPlayInUseEntity IN_USE_ENTITY = new NMSPacketPlayInUseEntity();
-    public static final NMSPacketPlayInUseItem IN_USE_ITEM = new NMSPacketPlayInUseItem();
-    public static final NMSPacketPlayInVehicleMove IN_VEHICLE_MOVE = new NMSPacketPlayInVehicleMove();
+    public static final NMSServerboundPlayerInputPacket IN_STEER_VEHICLE = new NMSServerboundPlayerInputPacket();
+    public static final NMSServerboundCommandSuggestionPacket IN_TAB_COMPLETE = new NMSServerboundCommandSuggestionPacket();
+    public static final NMSServerboundAcceptTeleportationPacket IN_TELEPORT_ACCEPT = new NMSServerboundAcceptTeleportationPacket();
+    public static final NMSServerboundSignUpdatePacket IN_UPDATE_SIGN = new NMSServerboundSignUpdatePacket();
+    public static final NMSServerboundInteractPacket IN_USE_ENTITY = new NMSServerboundInteractPacket();
+    public static final NMSServerboundUseItemOnPacket IN_USE_ITEM = new NMSServerboundUseItemOnPacket();
+    public static final NMSServerboundMoveVehiclePacket IN_VEHICLE_MOVE = new NMSServerboundMoveVehiclePacket();
     public static final NMSServerboundClientTickEndPacket IN_CLIENT_TICK_END = new NMSServerboundClientTickEndPacket();
 
     /* Window-related packets */
-    public static final NMSPacketPlayInCloseWindow IN_WINDOW_CLOSE = new NMSPacketPlayInCloseWindow();
-    public static final NMSPacketPlayInEnchantItem IN_WINDOW_ENCHANT_ITEM = new NMSPacketPlayInEnchantItem();
+    public static final NMSServerboundContainerClosePacket IN_WINDOW_CLOSE = new NMSServerboundContainerClosePacket();
+    public static final NMSServerboundContainerButtonClickPacket IN_WINDOW_ENCHANT_ITEM = new NMSServerboundContainerButtonClickPacket();
     public static final NMSServerboundResourcePackPacket IN_WINDOW_RESOURCEPACK_STATUS = new NMSServerboundResourcePackPacket();
-    public static final NMSPacketPlayInWindowClick IN_WINDOW_CLICK = new NMSPacketPlayInWindowClick();
+    public static final NMSServerboundContainerClickPacket IN_WINDOW_CLICK = new NMSServerboundContainerClickPacket();
 
     private final String name;
     private final boolean outgoing;
