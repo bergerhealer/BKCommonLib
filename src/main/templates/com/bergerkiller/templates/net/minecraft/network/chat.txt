@@ -162,7 +162,7 @@ class Component {
     public (ComponentHandle) Component setHoverText((ComponentHandle) Component hoverText) {
         Style modifier = instance.getStyle();
 #if version >= 1.21.5
-        modifier = modifier.withHoverEvent(new HoverEvent$e(hoverText));
+        modifier = modifier.withHoverEvent(new HoverEvent$ShowText(hoverText));
 #elseif version >= 1.18
         modifier = modifier.withHoverEvent(new HoverEvent(HoverEvent$Action.SHOW_TEXT, hoverText));
 #else

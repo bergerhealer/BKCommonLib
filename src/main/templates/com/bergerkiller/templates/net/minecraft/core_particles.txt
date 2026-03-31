@@ -31,7 +31,7 @@ public class ParticleType {
         Identifier key;
         try {
             key = #parseIdentifier(name);
-        } catch (net.minecraft.ResourceLocationException ex) {
+        } catch (net.minecraft.IdentifierException ex) {
             return null;
         }
   #if version >= 1.21.2

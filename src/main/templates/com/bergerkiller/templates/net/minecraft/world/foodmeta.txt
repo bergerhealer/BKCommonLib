@@ -1,6 +1,6 @@
 package net.minecraft.world.food;
 
-import net.minecraft.nbt.TagCompound;
+import net.minecraft.nbt.CompoundTag;
 
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 class FoodData {
 #if version >= 1.21.6
-    public void loadFromNBT((CommonTagCompound) TagCompound compound) {
+    public void loadFromNBT((CommonTagCompound) CompoundTag compound) {
         net.minecraft.core.HolderLookup$Provider holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
         com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporter reporter = #createScopedProblemReporter();
         try {
@@ -19,7 +19,7 @@ class FoodData {
             reporter.close();
         }
     }
-    public void saveToNBT((CommonTagCompound) TagCompound compound) {
+    public void saveToNBT((CommonTagCompound) CompoundTag compound) {
         net.minecraft.core.HolderLookup$Provider holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
         com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporter reporter = #createScopedProblemReporter();
         try {
@@ -30,10 +30,10 @@ class FoodData {
         }
     }
 #elseif version >= 1.18
-    public void loadFromNBT:readAdditionalSaveData((CommonTagCompound) TagCompound compound);
-    public void saveToNBT:addAdditionalSaveData((CommonTagCompound) TagCompound compound);
+    public void loadFromNBT:readAdditionalSaveData((CommonTagCompound) CompoundTag compound);
+    public void saveToNBT:addAdditionalSaveData((CommonTagCompound) CompoundTag compound);
 #else
-    public void loadFromNBT:a((CommonTagCompound) TagCompound compound);
-    public void saveToNBT:b((CommonTagCompound) TagCompound compound);
+    public void loadFromNBT:a((CommonTagCompound) CompoundTag compound);
+    public void saveToNBT:b((CommonTagCompound) CompoundTag compound);
 #endif
 }

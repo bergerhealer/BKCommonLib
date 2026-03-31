@@ -237,13 +237,13 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
         /*
          * <IS_MAIN_WORLD>
          * public static boolean isMainEndWorld(org.bukkit.World world) {
-         *     Level world = (World) ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
+         *     Level world = (Level) ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
          * #if version >= 1.18
-         *     return world.dimension() == World.END;
+         *     return world.dimension() == Level.END;
          * #elseif version >= 1.17
-         *     return world.getDimensionKey() == World.END;
+         *     return world.getDimensionKey() == Level.END;
          * #elseif version >= 1.16
-         *     return world.getDimensionKey() == World.THE_END;
+         *     return world.getDimensionKey() == Level.THE_END;
          * #else
          *     return world.getWorldProvider().getDimensionManager().getType() == DimensionType.THE_END;
          * #endif

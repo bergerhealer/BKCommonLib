@@ -1,7 +1,6 @@
 package net.minecraft.world.level.dimension;
 
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess$RegistryHolder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -27,7 +26,7 @@ class DimensionType {
         MinecraftServer server = MinecraftServer.getServer();
 
         // Get registry
-        RegistryAccess$RegistryHolder registry;
+        net.minecraft.core.RegistryAccess$Frozen registry;
   #if version >= 1.19.3
         registry = server.registryAccess();
   #elseif version >= 1.17

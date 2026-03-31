@@ -103,7 +103,7 @@ class AttributeMap {
         net.minecraft.core.HolderLookup$Provider holderLookup = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
         RegistryOps registryops = holderLookup.createSerializationContext(NbtOps.INSTANCE);
 
-        java.util.List packed = (java.util.List) AttributeInstance$a.LIST_CODEC.parse(registryops, nbttaglist)
+        java.util.List packed = (java.util.List) AttributeInstance$Packed.LIST_CODEC.parse(registryops, nbttaglist)
             .resultOrPartial(TagHandle.createPartialErrorLogger(nbttaglist))
             .orElse(null);
 
@@ -117,7 +117,7 @@ class AttributeMap {
 
         java.util.List packed = instance.pack();
 
-        return (ListTag) AttributeInstance$a.LIST_CODEC.encode(packed, registryops, new ListTag());
+        return (ListTag) AttributeInstance$Packed.LIST_CODEC.encode(packed, registryops, new ListTag());
     }
 #elseif version >= 1.18
     public void loadFromNBT:load((CommonTagList) ListTag nbttaglist);

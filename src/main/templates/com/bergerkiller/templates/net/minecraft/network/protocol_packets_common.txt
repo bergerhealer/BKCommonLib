@@ -16,7 +16,7 @@ import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 
 import com.bergerkiller.generated.net.minecraft.network.protocol.common.ClientboundKeepAlivePacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.common.ClientboundCustomPayloadPacketHandle;
-import com.bergerkiller.generated.net.minecraft.resources.ResourceLocationHandle;
+import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 
 class ServerboundKeepAlivePacket extends Packet {
 #if version >= 1.12.2
@@ -171,22 +171,22 @@ class ClientboundCustomPayloadPacket extends Packet {
 #if version >= 1.20.5
         CustomPacketPayload payload = instance.payload();
         if (payload instanceof DiscardedPayload) {
-            net.minecraft.resources.ResourceLocation channel = ((DiscardedPayload) payload).id();
+            net.minecraft.resources.Identifier channel = ((DiscardedPayload) payload).id();
             return (channel == null) ? null : channel.toString();
         }
         return null;
 #elseif version >= 1.20.2
-        net.minecraft.resources.ResourceLocation channel = instance.payload().id();
+        net.minecraft.resources.Identifier channel = instance.payload().id();
         return (channel == null) ? null : channel.toString();
 #elseif version >= 1.13
     #select version >=
-    #case 1.17:    #require ClientboundCustomPayloadPacket private final net.minecraft.resources.ResourceLocation channel:identifier;
-    #case 1.15:    #require ClientboundCustomPayloadPacket private net.minecraft.resources.ResourceLocation channel:r;
-    #case 1.14.1:  #require ClientboundCustomPayloadPacket private net.minecraft.resources.ResourceLocation channel:n;
-    #case 1.14:    #require ClientboundCustomPayloadPacket private net.minecraft.resources.ResourceLocation channel:m;
-    #case else:    #require ClientboundCustomPayloadPacket private net.minecraft.resources.ResourceLocation channel:i;
+    #case 1.17:    #require ClientboundCustomPayloadPacket private final net.minecraft.resources.Identifier channel:identifier;
+    #case 1.15:    #require ClientboundCustomPayloadPacket private net.minecraft.resources.Identifier channel:r;
+    #case 1.14.1:  #require ClientboundCustomPayloadPacket private net.minecraft.resources.Identifier channel:n;
+    #case 1.14:    #require ClientboundCustomPayloadPacket private net.minecraft.resources.Identifier channel:m;
+    #case else:    #require ClientboundCustomPayloadPacket private net.minecraft.resources.Identifier channel:i;
     #endselect
-        net.minecraft.resources.ResourceLocation channel = instance#channel;
+        net.minecraft.resources.Identifier channel = instance#channel;
         return (channel == null) ? null : channel.toString();
 #else
         #require ClientboundCustomPayloadPacket private String channel:a;
@@ -248,24 +248,24 @@ class ClientboundCustomPayloadPacket extends Packet {
     // Constructor
     public static (ClientboundCustomPayloadPacketHandle) ClientboundCustomPayloadPacket createNew(String channel, byte[] message) {
 #if version >= 1.20.2
-        net.minecraft.resources.ResourceLocation key;
-        key = (net.minecraft.resources.ResourceLocation) ResourceLocationHandle.createNew(channel).getRaw();
+        net.minecraft.resources.Identifier key;
+        key = (net.minecraft.resources.Identifier) IdentifierHandle.createNew(channel).getRaw();
 
   #if version >= 1.20.5
-    #if exists net.minecraft.network.protocol.common.custom.DiscardedPayload public DiscardedPayload(net.minecraft.resources.ResourceLocation id, byte[] data);
+    #if exists net.minecraft.network.protocol.common.custom.DiscardedPayload public DiscardedPayload(net.minecraft.resources.Identifier id, byte[] data);
         CustomPacketPayload payload = new DiscardedPayload(key, message);
     #else
         CustomPacketPayload payload = new DiscardedPayload(key, Unpooled.wrappedBuffer(message));
     #endif
-  #elseif exists net.minecraft.network.protocol.common.custom.BukkitCustomPayload BukkitCustomPayload(org.bukkit.craftbukkit.entity.CraftPlayer p, byte[] message, net.minecraft.resources.ResourceLocation channel);
+  #elseif exists net.minecraft.network.protocol.common.custom.BukkitCustomPayload BukkitCustomPayload(org.bukkit.craftbukkit.entity.CraftPlayer p, byte[] message, net.minecraft.resources.Identifier channel);
         // Warning: this type is fake and is remapped in CommonBootstrap to an anonymous class in CraftPlayer!
         // If the server was built with a newer JDK the CraftPlayer argument may have been dropped as well - future-proof it!
-        #require BukkitCustomPayload BukkitCustomPayload createCustom:<init>(org.bukkit.craftbukkit.entity.CraftPlayer p, byte[] message, net.minecraft.resources.ResourceLocation channel);
+        #require BukkitCustomPayload BukkitCustomPayload createCustom:<init>(org.bukkit.craftbukkit.entity.CraftPlayer p, byte[] message, net.minecraft.resources.Identifier channel);
         CustomPacketPayload payload = BukkitCustomPayload#createCustom(null, message, key);
-  #elseif exists net.minecraft.network.protocol.common.custom.BukkitCustomPayload BukkitCustomPayload(byte[] message, net.minecraft.resources.ResourceLocation channel);
+  #elseif exists net.minecraft.network.protocol.common.custom.BukkitCustomPayload BukkitCustomPayload(byte[] message, net.minecraft.resources.Identifier channel);
         // Warning: this type is fake and is remapped in CommonBootstrap to an anonymous class in CraftPlayer!
         // If the server was built with a newer JDK the CraftPlayer argument may have been dropped as well - future-proof it!
-        #require BukkitCustomPayload BukkitCustomPayload createCustom:<init>(byte[] message, net.minecraft.resources.ResourceLocation channel);
+        #require BukkitCustomPayload BukkitCustomPayload createCustom:<init>(byte[] message, net.minecraft.resources.Identifier channel);
         CustomPacketPayload payload = BukkitCustomPayload#createCustom(message, key);
   #else
         #error Missing BukkitCustomPayload constructor we can use!
@@ -276,8 +276,8 @@ class ClientboundCustomPayloadPacket extends Packet {
         FriendlyByteBuf serializer = new FriendlyByteBuf(Unpooled.wrappedBuffer(message));
 
   #if version >= 1.13
-        net.minecraft.resources.ResourceLocation key;
-        key = (net.minecraft.resources.ResourceLocation) ResourceLocationHandle.createNew(channel).getRaw();
+        net.minecraft.resources.Identifier key;
+        key = (net.minecraft.resources.Identifier) IdentifierHandle.createNew(channel).getRaw();
         return new ClientboundCustomPayloadPacket(key, serializer);
   #else
         return new ClientboundCustomPayloadPacket(channel, serializer);

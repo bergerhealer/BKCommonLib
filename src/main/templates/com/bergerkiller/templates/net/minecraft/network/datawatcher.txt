@@ -276,7 +276,7 @@ class SynchedEntityData {
         return resultItems;
     }
 
-    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatchSynchedEntityDataer.Item<?>> getCopyOfAllItems() {
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<SynchedEntityData.DataItem<?>> getCopyOfAllItems() {
         // No method is available on this version, so use reflection to hack something together
         // Note: vanilla does some locking, doesn't appear to be used on spigot/paper
         SynchedEntityData$DataItem[] itemsById = instance#itemsById;

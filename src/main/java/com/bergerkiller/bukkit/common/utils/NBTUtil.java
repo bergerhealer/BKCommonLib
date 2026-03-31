@@ -78,7 +78,7 @@ public class NBTUtil {
     //  * Saves an itemstack to a Tag Compound
     //  *
     //  * @param item ItemStack
-    //  * @param compound TagCompound
+    //  * @param compound CompoundTag
     //  */
     // public static void saveItemStack(org.bukkit.inventory.ItemStack item, CommonTagCompound compound) {
     //     ItemStackHandle stack = ItemStackHandle.fromBukkit(item);

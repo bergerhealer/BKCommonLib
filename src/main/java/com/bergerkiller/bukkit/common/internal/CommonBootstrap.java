@@ -571,6 +571,10 @@ public class CommonBootstrap {
         if (evaluateMCVersion("<", "1.21.11")) {
             // A lot of classes were moved to new packages. These remap it back to the old path for older versions.
 
+            // Identifier moved, though spigot still maps it to the same location. Definitely moved on 26.1+
+            remappings.put("net.minecraft.resources.Identifier", "net.minecraft.resources.ResourceLocation");
+            remappings.put("net.minecraft.IdentifierException", "net.minecraft.ResourceLocationException");
+
             // Util (SystemUtils) was moved to a util sub-package
             remappings.put("net.minecraft.util.Util", "net.minecraft.Util");
 
@@ -739,6 +743,12 @@ public class CommonBootstrap {
         } else {
             // Uses a normal java.util.Random on older versions
             remappings.put("net.minecraft.util.RandomSource", "java.util.Random");
+        }
+
+        /* ======== Mojang remapping changes for 1.18.2 ======== */
+        if (evaluateMCVersion("<", "1.18.2")) {
+            // Different MojMap name for Frozen on 1.18.1 and earlier
+            remappings.put("net.minecraft.core.RegistryAccess$Frozen", "net.minecraft.core.RegistryAccess$RegistryHolder");
         }
 
         /* ======== Mojang remapping changes for 1.18 ======== */

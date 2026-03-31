@@ -1,6 +1,6 @@
 package net.minecraft.resources;
 
-import net.minecraft.ResourceLocationException;
+import net.minecraft.IdentifierException;
 
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 
@@ -38,7 +38,7 @@ class Identifier {
   #else
             return new Identifier(keyToken);
   #endif
-        } catch (ResourceLocationException ex) {
+        } catch (IdentifierException ex) {
             return null;
         }
     }
@@ -50,7 +50,7 @@ class Identifier {
   #else
             return new Identifier(namespace, name);
   #endif
-        } catch (ResourceLocationException ex) {
+        } catch (IdentifierException ex) {
             return null;
         }
     }

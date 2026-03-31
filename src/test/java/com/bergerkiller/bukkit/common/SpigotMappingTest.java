@@ -41,7 +41,7 @@ public class SpigotMappingTest {
     public void testVisualizeMappings() {
         SpigotMappings mappings = loadMappings();
 
-        mappings.visualizeMapping("ResourceManager");
+        mappings.visualizeMapping("HoverEvent");
 
         //mappings.visualizeMappingsForSpigotClass("net.minecraft.server.DataPackResources");
 

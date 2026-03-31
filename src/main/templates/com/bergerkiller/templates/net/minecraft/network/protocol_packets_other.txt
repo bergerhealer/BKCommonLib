@@ -2553,7 +2553,7 @@ class ClientboundLevelParticlesPacket extends Packet {
 
 #if version >= 1.13
     // ParticleOptions API
-    public optional void setParticle(Particle<?> particleType, Object options) {
+    public optional void setParticle(ParticleType<?> particleType, Object options) {
         ParticleOptions param;
         if (particleType instanceof ParticleOptions) {
             param = (ParticleOptions) particleType;
@@ -2616,7 +2616,7 @@ class ClientboundLevelParticlesPacket extends Packet {
             net.minecraft.world.level.gameevent.PositionSource source;
             if (vo.destination instanceof com.bergerkiller.bukkit.common.resources.ParticleType$BlockPositionOption) {
                 com.bergerkiller.bukkit.common.resources.ParticleType$BlockPositionOption dest = (com.bergerkiller.bukkit.common.resources.ParticleType$BlockPositionOption) vo.destination;
-                source = new net.minecraft.world.level.gameevent.BlockPositionSource(new BlockPosition(dest.x, dest.y, dest.z));
+                source = new net.minecraft.world.level.gameevent.BlockPositionSource(new BlockPos(dest.x, dest.y, dest.z));
             } else if (vo.destination instanceof com.bergerkiller.bukkit.common.resources.ParticleType$EntityByIdPositionOption) {
                 com.bergerkiller.bukkit.common.resources.ParticleType$EntityByIdPositionOption pos = (com.bergerkiller.bukkit.common.resources.ParticleType$EntityByIdPositionOption) vo.destination;
     #if version >= 1.19
@@ -2684,7 +2684,7 @@ class ClientboundLevelParticlesPacket extends Packet {
   #endif
     }
 
-    public (com.bergerkiller.bukkit.common.resources.ParticleType<?>) Particle<?> getParticleType() {
+    public (com.bergerkiller.bukkit.common.resources.ParticleType<?>) ParticleType<?> getParticleType() {
         ParticleOptions param = instance#particle;
         if (param == null) return null;
   #if version >= 1.18
@@ -2743,7 +2743,7 @@ class ClientboundLevelParticlesPacket extends Packet {
         instance#particleOptions = data;
     }
 
-    public (com.bergerkiller.bukkit.common.resources.ParticleType<?>) Particle<?> getParticleType() {
+    public (com.bergerkiller.bukkit.common.resources.ParticleType<?>) ParticleType<?> getParticleType() {
         return instance#particle;
     }
 #endif
