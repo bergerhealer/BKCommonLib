@@ -110,20 +110,24 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
     public String resolveClassPath(final String path) {
         // Mohist class name remapping bugs
 
-        if (path.equals("net.minecraft.server.level.PlayerChunkMap$a") &&
-            this.evaluateMCVersion(">=", "1.16.5")) {
+        if (
+            path.equals("net.minecraft.server.level.ChunkMap$DistanceManager") &&
+            this.evaluateMCVersion(">=", "1.16.5")
+        ) {
             return tryResolveElse(path, "net.minecraft.world.server.ChunkManager$ProxyTicketManager");
         }
 
-        if (path.equals("net.minecraft.server.level.ChunkProviderServer$MainThreadExecutor") &&
-            this.evaluateMCVersion(">=", "1.16.5")) {
+        if (
+            path.equals("net.minecraft.server.level.ServerChunkCache$MainThreadExecutor") &&
+            this.evaluateMCVersion(">=", "1.16.5")
+        ) {
             return tryResolveElse(path, "net.minecraft.world.server.ServerChunkProvider$ChunkExecutor");
         }
 
-        if ((path.equals("net.minecraft.world.level.biome.BiomeBase$BiomeMeta") ||
-             path.equals("net.minecraft.world.level.biome.BiomeSettingsMobs$c")) &&
-                this.evaluateMCVersion(">=", "1.16.5"))
-        {
+        if (
+            path.equals("net.minecraft.world.level.biome.MobSpawnSettings$SpawnerData") &&
+            this.evaluateMCVersion(">=", "1.16.5")
+        ) {
             return tryResolveElse(path, "net.minecraft.world.biome.MobSpawnInfo$Spawners");
         }
 
@@ -144,7 +148,8 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
 
     private String resolveClassPathBase(final String path) {
         // Mohist class name remapping bug
-        if (path.equals("net.minecraft.server.level.ChunkProviderServer$MainThreadExecutor") &&
+        if (
+            path.equals("net.minecraft.server.level.ServerChunkCache$MainThreadExecutor") &&
             this.evaluateMCVersion(">=", "1.16.5")
         ) {
             return "net.minecraft.world.server.ServerChunkProvider$ChunkExecutor";

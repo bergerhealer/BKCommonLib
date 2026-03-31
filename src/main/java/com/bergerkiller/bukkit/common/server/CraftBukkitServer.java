@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.server;
 
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.internal.cdn.MojangSpigotRemapper;
+import com.bergerkiller.bukkit.common.internal.cdn.MojangRemapper;
 import com.bergerkiller.bukkit.common.internal.cdn.SpigotMappings;
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
@@ -76,7 +76,7 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
      * to obfuscated names as used in the server jar at runtime. Only used on Minecraft
      * 1.17 and later.
      */
-    private MojangSpigotRemapper mojangSpigotRemapper = null;
+    private MojangRemapper mojangRemapper = null;
     /**
      * Used on Mojangmap-mapped servers (Paper) when people choose the "mojmap" jar.
      */
@@ -130,35 +130,31 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
         // All servers since Minecraft 26.1 are Mojang-mapped. Prior, Paper also had a mode
         // to publish Mojang-mapped jars, but it was not the default and not all versions had it.
         // There we must detect this at runtime.
+        // We assume that servers with extra remapping (Forge hybrids) will not ever use this
+        // mojang-mapped mode, so we do not try to remap the class name as part of this detection.
         boolean isUnobfuscatedMojangMapJar = false;
         if (TextValueSequence.evaluateText(MC_VERSION, ">=", "26.1")) {
             isUnobfuscatedMojangMapJar = true;
         } else if (TextValueSequence.evaluateText(MC_VERSION, ">=", "1.17")) {
+            Class<?> mojangClass = null, spigotClass = null;
             try {
-                isInitializingMojangSpigotRemapper = true;
+                mojangClass = Resolver.getClassByExactName("net.minecraft.server.level.ServerPlayer");
+            } catch (Throwable t) {}
+            try {
+                spigotClass = Resolver.getClassByExactName("net.minecraft.server.level.EntityPlayer");
+            } catch (Throwable t) {}
 
-                Class<?> mojangClass = null, spigotClass = null;
+            if (mojangClass != null && spigotClass == null) {
+                // Sanity check: the getCamera() method must exist unobfuscated
+                boolean hasMojangMethod = false;
                 try {
-                    mojangClass = resolveFindClassEarly("net.minecraft.server.level.ServerPlayer");
-                } catch (Throwable t) {}
-                try {
-                    spigotClass = resolveFindClassEarly("net.minecraft.server.level.EntityPlayer");
+                    MPLType.getDeclaredMethod(mojangClass, "getCamera");
+                    hasMojangMethod = true;
                 } catch (Throwable t) {}
 
-                if (mojangClass != null && spigotClass == null) {
-                    // Sanity check: the tick() method must exist as well!
-                    boolean hasMojangMethod = false;
-                    try {
-                        MPLType.getDeclaredMethod(mojangClass, "getCamera");
-                        hasMojangMethod = true;
-                    } catch (Throwable t) {}
-
-                    if (hasMojangMethod) {
-                        isUnobfuscatedMojangMapJar = true;
-                    }
+                if (hasMojangMethod) {
+                    isUnobfuscatedMojangMapJar = true;
                 }
-            } finally {
-                isInitializingMojangSpigotRemapper = false;
             }
         }
 
@@ -173,83 +169,37 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
             HAS_MOJANG_FIELD_MAPPINGS = TextValueSequence.evaluateText(MC_VERSION, ">=", "1.17");
             HAS_MOJANG_METHOD_MAPPINGS = TextValueSequence.evaluateText(MC_VERSION, ">=", "1.18");
             REMAP_TO_NMS = TextValueSequence.evaluateText(MC_VERSION, "<", "1.17");
+        }
 
-            // Check whether the server is at all compatible with the template definitions
-            if (!event.getResolver().isSupported(MC_VERSION)) {
-                event.signalIncompatible("Minecraft " + MC_VERSION + " is not supported!");
-            }
+        // Check whether the server is at all compatible with the template definitions
+        if (!event.getResolver().isSupported(MC_VERSION)) {
+            event.signalIncompatible("Minecraft " + MC_VERSION + " is not supported!");
+        }
 
+        if (!isUnobfuscatedMojangMapJar) {
             // We must remap all requested Mojang classes to the Spigot class names.
             mojangToSpigotClassRemapper = SpigotMappings.fromCacheOrDownload(MC_VERSION);
-
-            // Additional mappings required due to Paper changes
-            mojangToSpigotClassRemapper.remapMojangSubClass("net.minecraft.network.Connection", "WrappedConsumer");
-            mojangToSpigotClassRemapper.remapMojangSubClass("net.minecraft.network.Connection", "PacketSendAction");
 
             // Initialize the field/method mappings on Minecraft 1.17 and later
             if (HAS_MOJANG_FIELD_MAPPINGS || HAS_MOJANG_METHOD_MAPPINGS) {
                 try {
                     isInitializingMojangSpigotRemapper = true;
-                    mojangSpigotRemapper = MojangSpigotRemapper.load(MC_VERSION, this::resolveClassPathEarly);
+                    mojangRemapper = MojangRemapper.load(MC_VERSION, this);
 
-                    // Minor tweaks are needed when Spigot alters methods, because then the
-                    // method name is no longer obfuscated in some cases.
-                    removeMethodMapping("net.minecraft.server.level.EntityPlayer", "nextContainerCounter");
+                    // Spigot changed this field, which causes the field to no longer be obfuscated in the server by accident
+                    // To avoid issues remove this field mapping from the mojang remapper
+                    try {
+                        Class<?> declaringClass = Resolver.getClassByExactName(this.resolveClassPath("net.minecraft.server.level.ServerPlayer"));
+                        mojangRemapper.removeMethodMapping(declaringClass, "nextContainerCounter");
+                    } catch (ClassNotFoundException ex) {
+                        Logging.LOGGER.severe("Mapping filter fail: declaring class net.minecraft.server.level.ServerPlayer not found");
+                        return;
+                    }
                 } finally {
                     isInitializingMojangSpigotRemapper = false;
                 }
             }
         }
-    }
-
-    private void removeMethodMapping(String declaringClassName, String methodName, String... parameterTypeNames) {
-        Class<?> declaringClass;
-        try {
-            declaringClass = resolveFindClassEarly(declaringClassName);
-        } catch (ClassNotFoundException ex) {
-            Logging.LOGGER.severe("Mapping filter fail: declaring class " + declaringClassName + " not found");
-            return;
-        }
-        Class<?>[] paramTypes = new Class<?>[parameterTypeNames.length];
-        for (int i = 0; i < paramTypes.length; i++) {
-            try {
-                paramTypes[i] = resolveFindClassEarly(parameterTypeNames[i]);
-            } catch (ClassNotFoundException ex) {
-                Logging.LOGGER.severe("Mapping filter fail: parameter[" + i + "] class " +
-                        parameterTypeNames[i] + " not found");
-                return;
-            }
-        }
-        mojangSpigotRemapper.removeMethodMapping(declaringClass, methodName, paramTypes);
-    }
-
-    private Class<?> resolveFindClassEarly(String path) throws ClassNotFoundException {
-        return Resolver.getClassByExactName(this.resolveClassPathEarly(path));
-    }
-
-    /**
-     * Can be overrided by forks of CraftBukkit to properly find class names before this
-     * server is initialized. This is called on Minecraft 1.17 and later when initializing
-     * the remapper for mojang mappings. It is never called after.<br>
-     * <br>
-     * This method should perform any required remappings to find the true, actual, class
-     * name. It should do so without using the mojang remapper, since it will not yet be
-     * initialized.<br>
-     * <br>
-     * Only class names will be provided that are known spigot class names,
-     * no user- or template-provided class names are sent this way.
-     *
-     * @param path
-     * @return Remapped class path for use by resolver, same as path if not remapped
-     */
-    protected String resolveClassPathEarly(String path) {
-        // Call the normal resolveClassPath(). We're assuming that no dangerous
-        // things will be happening. For this purpose we're using a flag to avoid
-        // any special remappings that could throw it out of balance.
-        //
-        // If this does cause trouble a server implementation can override this
-        // and execute alternative instructions.
-        return resolveClassPath(path);
     }
 
     @Override
@@ -266,6 +216,12 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
         // to the right (versioned) package after. That way there is
         // no need to track versions in the remapped paths.
         path = this.remappings.getOrDefault(path, path);
+
+        // Now remap the mojang-mapped class name to the right name on spigot, if the server uses
+        // spigot mapped class names.
+        if (mojangToSpigotClassRemapper != null) {
+            path = mojangToSpigotClassRemapper.toSpigot(path);
+        }
 
         // Remap org.bukkit.craftbukkit to the right package-versioned path
         if (path.startsWith(CB_ROOT) && !path.startsWith(CB_ROOT_VERSIONED) && !path.startsWith(CB_ROOT_LIBS)) {
@@ -301,10 +257,6 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
             path = remapped;
         }
 
-        if (mojangToSpigotClassRemapper != null) {
-            path = mojangToSpigotClassRemapper.toSpigot(path);
-        }
-
         return path;
     }
 
@@ -312,7 +264,7 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
     public String resolveFieldName(Class<?> declaringClass, String fieldName) {
         // Minecraft 1.17 and later require remapping, as all field names are obfuscated
         if (HAS_MOJANG_FIELD_MAPPINGS) {
-            fieldName = mojangSpigotRemapper.remapFieldName(declaringClass, fieldName, fieldName);
+            fieldName = mojangRemapper.remapFieldName(declaringClass, fieldName, fieldName);
         }
 
         return fieldName;
@@ -322,7 +274,7 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
     public String resolveFieldAlias(Field field, String name) {
         // Minecraft 1.17 and later require remapping, as all field names are obfuscated
         if (HAS_MOJANG_FIELD_MAPPINGS) {
-            return mojangSpigotRemapper.remapFieldNameReverse(field.getDeclaringClass(), name, null);
+            return mojangRemapper.remapFieldNameReverse(field.getDeclaringClass(), name, null);
         }
 
         return null; // Try fallbacks
@@ -332,7 +284,7 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
     public String resolveMethodName(Class<?> declaringClass, String methodName, Class<?>[] parameterTypes) {
         // Minecraft 1.18 and later require remapping, as all method names are obfuscated
         if (HAS_MOJANG_METHOD_MAPPINGS) {
-            return mojangSpigotRemapper.remapMethodName(declaringClass, methodName, parameterTypes, methodName);
+            return mojangRemapper.remapMethodName(declaringClass, methodName, parameterTypes, methodName);
         }
 
         return methodName;
@@ -342,7 +294,7 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
     public String resolveMethodAlias(Method method, String name) {
         // Minecraft 1.18 and later require remapping, as all method names are obfuscated
         if (HAS_MOJANG_METHOD_MAPPINGS) {
-            return mojangSpigotRemapper.remapMethodNameReverse(method.getDeclaringClass(), name, method.getParameterTypes(), null);
+            return mojangRemapper.remapMethodNameReverse(method.getDeclaringClass(), name, method.getParameterTypes(), null);
         }
 
         return null; // Try fallbacks

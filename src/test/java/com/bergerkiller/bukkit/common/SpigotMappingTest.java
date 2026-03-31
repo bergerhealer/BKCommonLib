@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.cdn.MojangMappings;
-import com.bergerkiller.bukkit.common.internal.cdn.MojangSpigotRemapper;
+import com.bergerkiller.bukkit.common.internal.cdn.MojangRemapper;
 import com.bergerkiller.bukkit.common.internal.cdn.SpigotMappings;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.junit.Ignore;
@@ -38,9 +38,9 @@ public class SpigotMappingTest {
      * is used.
      */
     @Test
-    //@Ignore
+    @Ignore
     public void testVisualizeMappingsForMojangClass() {
-        String mojangClassName = "net.minecraft.world.effect.MobEffect";
+        String mojangClassName = "net.minecraft.network.Connection$WrappedConsumer";
 
         SpigotMappings mappings = loadMappings();
 
@@ -77,7 +77,7 @@ public class SpigotMappingTest {
     @Test
     @Ignore
     public void testVisualizeMappingsForSpigotClass() {
-        String spigotClassName = "net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport";
+        String spigotClassName = "net.minecraft.world.level.biome.BiomeSettingsMobs$c";
 
         SpigotMappings mappings = loadMappings();
 
@@ -132,8 +132,8 @@ public class SpigotMappingTest {
         //mappings.renameKey("old.path.to.Class", "new.path.to.Class");
 
         mappings.storeAppendForVersionRange("1.8", "1.20.1",
-                "net.minecraft.network.protocol.common.ServerboundKeepAlivePacket",
-                "net.minecraft.network.protocol.game.PacketPlayInKeepAlive");
+                "net.minecraft.network.Connection$WrappedConsumer",
+                "net.minecraft.network.Connection$WrappedConsumer");
 
 
         saveMappings(mappings);
@@ -168,7 +168,7 @@ public class SpigotMappingTest {
     @Test
     @Ignore
     public void testMojangSpigotRemapper() throws Throwable {
-        MojangSpigotRemapper remapper = MojangSpigotRemapper.load("1.17.1", p -> p);
+        MojangRemapper remapper = MojangRemapper.load("1.17.1", p -> p);
 
         Class<?> pathFinderTargetCondition = Class.forName("net.minecraft.world.entity.ai.targeting.PathfinderTargetCondition",
                 false, TemplateTest.class.getClassLoader());
