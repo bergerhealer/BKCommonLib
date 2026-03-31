@@ -32,7 +32,7 @@ class TestServerFactory_1_8 extends TestServerFactory {
     @Override
     protected void init(ServerEnvironment env) throws Throwable {
         // Bootstrap is required
-        Class<?> dispenserRegistryClass = Class.forName(env.NMS_ROOT + "DispenserRegistry");
+        Class<?> dispenserRegistryClass = resolveClass("net.minecraft.server.Bootstrap");
         Method dispenserRegistryBootstrapMethod = dispenserRegistryClass.getMethod("c");
         dispenserRegistryBootstrapMethod.invoke(null);
 
@@ -40,8 +40,8 @@ class TestServerFactory_1_8 extends TestServerFactory {
         // This prevents loads of extra server logic executing during test
         ClassTemplate<?> server_t = ClassTemplate.create(CommonServerBase.SERVER_CLASS);
         Object server = server_t.newInstanceNull();
-        Class<?> minecraftServerType = Class.forName(env.NMS_ROOT + "MinecraftServer");
-        Class<?> dedicatedType = Class.forName(env.NMS_ROOT + "DedicatedServer");
+        Class<?> minecraftServerType = resolveClass("net.minecraft.server.MinecraftServer");
+        Class<?> dedicatedType = resolveClass("net.minecraft.server.dedicated.DedicatedServer");
         ClassTemplate<?> mc_server_t = ClassTemplate.create(dedicatedType);
         Object mc_server = mc_server_t.newInstanceNull();
         env.mc_server = mc_server;
@@ -56,7 +56,7 @@ class TestServerFactory_1_8 extends TestServerFactory {
         if (CommonBootstrap.evaluateMCVersion(">=", "1.13.1")) {
             setField(mc_server, "worldServer", Collections.emptyMap());
         } else {
-            Class<?> worldServerType = Class.forName(env.NMS_ROOT + "WorldServer", false, TestServerFactory.class.getClassLoader());
+            Class<?> worldServerType = resolveClass("net.minecraft.server.level.ServerLevel", false);
             setField(mc_server, "worldServer", LogicUtil.createArray(worldServerType, 0));
             setField(mc_server, "worlds", Collections.emptyList());
         }
@@ -67,19 +67,16 @@ class TestServerFactory_1_8 extends TestServerFactory {
         bkServerField.set(null, server);
 
         // Initialize propertyManager field, which is responsible for server-wide settings like view distance
-        Object propertyManager = ClassTemplate.create(env.NMS_ROOT + "PropertyManager").newInstanceNull();
+        Object propertyManager = ClassTemplate.create("net.minecraft.server.dedicated.Settings").newInstanceNull();
         setField(mc_server, "propertyManager", propertyManager);
         setField(propertyManager, "properties", new java.util.Properties());
 
         // Create data converter registry manager object - used for serialization/deserialization
         // Only used >= MC 1.10.2
-        Class<?> dataConverterRegistryClass = null;
-        try {
-            dataConverterRegistryClass = Class.forName(env.NMS_ROOT + "DataConverterRegistry");
-            Method dataConverterRegistryInitMethod = dataConverterRegistryClass.getMethod("a");
-            Object dataConverterManager = dataConverterRegistryInitMethod.invoke(null);
-            setField(mc_server, "dataConverterManager", dataConverterManager);
-        } catch (ClassNotFoundException ex) {}
+        Class<?> dataConverterRegistryClass = resolveClass("net.minecraft.util.datafix.DataFixers");
+        Method dataConverterRegistryInitMethod = dataConverterRegistryClass.getMethod("a");
+        Object dataConverterManager = dataConverterRegistryInitMethod.invoke(null);
+        setField(mc_server, "dataConverterManager", dataConverterManager);
 
         // Create CraftingManager instance and load recipes for >= MC 1.13
         boolean hasLocalCraftingManager = false;
@@ -92,7 +89,7 @@ class TestServerFactory_1_8 extends TestServerFactory {
             // this.ac = new ResourceManager(EnumResourcePackType.SERVER_DATA);
             {
                 setField(mc_server, "ac", createFromCode(minecraftServerType,
-                        "return new ResourceManager(EnumResourcePackType.SERVER_DATA);"));
+                        "return new ResourceManager(net.minecraft.server.packs.PackType.SERVER_DATA);"));
             }
 
             // this.resourcePackRepository = new ResourcePackRepository(ResourcePackLoader::new);
@@ -110,13 +107,13 @@ class TestServerFactory_1_8 extends TestServerFactory {
                        + ");"
                        +"}");
 
-                Class<?> resourcePackLoaderFuncType = Class.forName(env.NMS_ROOT + "ResourcePackLoader$b");
+                Class<?> resourcePackLoaderFuncType = resolveClass("net.minecraft.server.packs.repository.Pack$PackConstructor");
                 Object resourcePackLoaderFunc = Proxy.newProxyInstance(
                        TestServerFactory.class.getClassLoader(),
                        new Class<?>[]{resourcePackLoaderFuncType},
                        (proxy, method, args) -> loaderCreator.invoke(null, args));
 
-                Class<?> resourcePackRepositoryType = Class.forName(env.NMS_ROOT + "ResourcePackRepository");
+                Class<?> resourcePackRepositoryType = resolveClass("net.minecraft.server.packs.repository.PackRepository");
                 setField(mc_server, "resourcePackRepository", construct(resourcePackRepositoryType, resourcePackLoaderFunc));
             }
 
@@ -134,13 +131,13 @@ class TestServerFactory_1_8 extends TestServerFactory {
 
             // this.ag = new CraftingManager();
             {
-                Class<?> craftingManagerType = Class.forName(env.NMS_ROOT + "CraftingManager");
+                Class<?> craftingManagerType = resolveClass("net.minecraft.world.item.crafting.RecipeManager");
                 setField(mc_server, "ag", craftingManagerType.newInstance());
             }
 
             // this.ah = new TagRegistry();
             {
-                Class<?> craftingManagerType = Class.forName(env.NMS_ROOT + "TagRegistry");
+                Class<?> craftingManagerType = resolveClass("net.minecraft.tags.TagManager");
                 setField(mc_server, "ah", craftingManagerType.newInstance());
             }
 
@@ -162,7 +159,7 @@ class TestServerFactory_1_8 extends TestServerFactory {
 
             // Initialize the server further, loading the resource packs, by calling MinecraftServer.a(File, WorldData)
             File serverDir = new File(System.getProperty("user.dir"), "target");
-            Class<?> worldDataType = Class.forName(env.NMS_ROOT + "WorldData");
+            Class<?> worldDataType = resolveClass("net.minecraft.world.level.storage.LevelData");
             java.lang.reflect.Constructor<?> con = worldDataType.getDeclaredConstructor();
             con.setAccessible(true);
             Object worldData = con.newInstance();

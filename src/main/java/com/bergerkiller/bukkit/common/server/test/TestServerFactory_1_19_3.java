@@ -23,7 +23,7 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
     @Override
     protected void init(ServerEnvironment env) throws Throwable {
         // Initialize shared constants first - required by DispenserRegistry and DataConverterRegistry
-        Class<?> sharedConstantsClass = Class.forName("net.minecraft.SharedConstants");
+        Class<?> sharedConstantsClass = resolveClass("net.minecraft.SharedConstants");
         Method initSharedConstantsMethod = Resolver.resolveAndGetDeclaredMethod(sharedConstantsClass, "tryDetectVersion");
         initSharedConstantsMethod.invoke(null);
 
@@ -31,12 +31,12 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         // We don't need that trash during the tests we run - it slows it down by way too much
         // This is done by temporarily hacking the bootstrapExecutor to never run tasks - this allows
         // the build() method to return instantly.
-        try (BackgroundWorkerDefuser defuser = BackgroundWorkerDefuser.start(Class.forName(env.systemUtilsClassName))) {
-            Class.forName("net.minecraft.util.datafix.DataConverterRegistry");
+        try (BackgroundWorkerDefuser defuser = BackgroundWorkerDefuser.start(resolveClass("net.minecraft.util.Util"))) {
+            resolveClass("net.minecraft.util.datafix.DataFixers", true);
         }
 
         // Bootstrap is required
-        Class<?> dispenserRegistryClass = Class.forName("net.minecraft.server.DispenserRegistry");
+        Class<?> dispenserRegistryClass = resolveClass("net.minecraft.server.Bootstrap");
         Method dispenserRegistryBootstrapMethod = Resolver.resolveAndGetDeclaredMethod(dispenserRegistryClass, "bootStrap");
         dispenserRegistryBootstrapMethod.invoke(null);
 
@@ -44,14 +44,14 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         // This prevents loads of extra server logic executing during test
         ClassTemplate<?> server_t = ClassTemplate.create(CommonServerBase.SERVER_CLASS);
         Object server = server_t.newInstanceNull();
-        env.mc_server_type = Class.forName("net.minecraft.server.MinecraftServer");
-        Class<?> dedicatedType = Class.forName("net.minecraft.server.dedicated.DedicatedServer");
+        env.mc_server_type = resolveClass("net.minecraft.server.MinecraftServer");
+        Class<?> dedicatedType = resolveClass("net.minecraft.server.dedicated.DedicatedServer");
         ClassTemplate<?> mc_server_t = ClassTemplate.create(dedicatedType);
         Object mc_server = mc_server_t.newInstanceNull();
         env.mc_server = mc_server;
 
         // Since we null-construct, some members of the parent class "IAsyncTaskHandler" are not initialized. Do that here.
-        Class<?> iAsyncTaskHandlerClass = Class.forName("net.minecraft.util.thread.IAsyncTaskHandler");
+        Class<?> iAsyncTaskHandlerClass = resolveClass("net.minecraft.util.thread.BlockableEventLoop");
         setField(mc_server, iAsyncTaskHandlerClass, "name", "Server");
         setField(mc_server, iAsyncTaskHandlerClass, "pendingRunnables", createFromCode(env.mc_server_type,
                 "return com.google.common.collect.Queues.newConcurrentLinkedQueue();"));
@@ -73,8 +73,8 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         initVanillaResourceManager(env);
 
         // Feature flag set for loading the data pack
-        env.featureFlagSet = createFromCode(Class.forName("net.minecraft.world.level.WorldDataConfiguration"),
-                "return WorldDataConfiguration.DEFAULT.enabledFeatures();");
+        env.featureFlagSet = createFromCode(resolveClass("net.minecraft.world.level.WorldDataConfiguration"),
+                "return net.minecraft.world.level.WorldDataConfiguration.DEFAULT.enabledFeatures();");
 
         // Use the resource manager to initialize the registries, assign field
         Object registries = initRegistries(env);
@@ -95,22 +95,22 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         // Initialize propertyManager field, which is responsible for server-wide settings like view distance
         Object propertyManager = ClassTemplate.create("net.minecraft.server.dedicated.DedicatedServerSettings").newInstanceNull();
         setField(mc_server, "settings", propertyManager);
-        setField(propertyManager, "properties", createFromCode(Class.forName("net.minecraft.server.dedicated.DedicatedServerProperties"),
-                "return new DedicatedServerProperties(new java.util.Properties(), new joptsimple.OptionParser().parse(new String[0]));\n"));
+        setField(propertyManager, "properties", createFromCode(resolveClass("net.minecraft.server.dedicated.DedicatedServerProperties"), "" +
+                "return new net.minecraft.server.dedicated.DedicatedServerProperties(" +
+                "    new java.util.Properties()," +
+                "    new joptsimple.OptionParser().parse(new String[0])" +
+                ");"));
 
         // Create data converter registry manager object - used for serialization/deserialization
-        Class<?> dataConverterRegistryClass = null;
-        try {
-            dataConverterRegistryClass = Class.forName("net.minecraft.util.datafix.DataConverterRegistry");
-            Method dataConverterRegistryInitMethod = Resolver.resolveAndGetDeclaredMethod(dataConverterRegistryClass, "getDataFixer");
-            Object dataConverterManager = dataConverterRegistryInitMethod.invoke(null);
-            setField(mc_server, "fixerUpper", dataConverterManager);
-        } catch (ClassNotFoundException ex) {}
+        Class<?> dataConverterRegistryClass = resolveClass("net.minecraft.util.datafix.DataFixers");
+        Method dataConverterRegistryInitMethod = Resolver.resolveAndGetDeclaredMethod(dataConverterRegistryClass, "getDataFixer");
+        Object dataConverterManager = dataConverterRegistryInitMethod.invoke(null);
+        setField(mc_server, "fixerUpper", dataConverterManager);
 
         // this.executorService = SystemUtils.e();
         {
             setField(mc_server, "executor", createFromCode(env.mc_server_type,
-                    "return " + env.systemUtilsClassName + ".backgroundExecutor();"));
+                    "return net.minecraft.util.Util.backgroundExecutor();"));
         }
 
         // ResourcePack initialization (makes recipes available)
@@ -123,37 +123,35 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         // The WorldDataConfiguration must have the feature set
         // Damn mojang, so many nested classes!
         {
-            Object worldDataConfiguration = createFromCode(Class.forName("net.minecraft.world.level.WorldDataConfiguration"),
-                                                           "return WorldDataConfiguration.DEFAULT;");
+            Object worldDataConfiguration = createFromCode(resolveClass("net.minecraft.world.level.WorldDataConfiguration"),
+                                                           "return net.minecraft.world.level.WorldDataConfiguration.DEFAULT;");
 
-            Object worldSettings = NullInstantiator.of(Class.forName("net.minecraft.world.level.WorldSettings")).create();
+            Object worldSettings = NullInstantiator.of(resolveClass("net.minecraft.world.level.LevelSettings")).create();
             setField(worldSettings, "dataConfiguration", worldDataConfiguration);
 
-            Object worldData = NullInstantiator.of(Class.forName("net.minecraft.world.level.storage.WorldDataServer")).create();
+            Object worldData = NullInstantiator.of(resolveClass("net.minecraft.world.level.storage.PrimaryLevelData")).create();
             setField(worldData, "settings", worldSettings);
             setField(mc_server, "worldData", worldData);
         }
     }
 
     protected Object initCustomRegistryDimension(Class<?> minecraftServerType) {
-        return createFromCode(minecraftServerType, "return net.minecraft.core.IRegistryCustom.fromRegistryOfRegistries(net.minecraft.core.registries.BuiltInRegistries.REGISTRY);");
+        return createFromCode(minecraftServerType, "return net.minecraft.core.RegistryAccess.fromRegistryOfRegistries(net.minecraft.core.registries.BuiltInRegistries.REGISTRY);");
     }
 
     protected Object createVanillaResourcePackRepository() throws Throwable {
-        final String repopath = "net.minecraft.server.packs.repository.";
-        final Class<?> resourcePackRepositoryType = Class.forName(repopath + "ResourcePackRepository");
+        final Class<?> resourcePackRepositoryType = resolveClass("net.minecraft.server.packs.repository.PackRepository");
 
         // arg1: ResourcePackSource[]
-        final Object[] resourcePackSources = LogicUtil.createArray(Class.forName(repopath + "ResourcePackSource"), 1);
-        resourcePackSources[0] = construct(Class.forName(repopath + "ResourcePackSourceVanilla"));
+        final Object[] resourcePackSources = LogicUtil.createArray(resolveClass("net.minecraft.server.packs.repository.RepositorySource"), 1);
+        resourcePackSources[0] = construct(resolveClass("net.minecraft.server.packs.repository.ServerPacksSource"));
 
         // Construct new ResourcePackRepository
         return construct(resourcePackRepositoryType, new Object[] {resourcePackSources});
     }
 
     protected void initVanillaResourceManager(ServerEnvironment env) throws Throwable {
-        final String repopath = "net.minecraft.server.packs.repository.";
-        final Class<?> resourcePackRepositoryType = Class.forName(repopath + "ResourcePackRepository");
+        final Class<?> resourcePackRepositoryType = resolveClass("net.minecraft.server.packs.repository.PackRepository");
 
         /*
          * Create ResourcePackRepository (Main.java)
@@ -165,7 +163,7 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         Object resourcepacktype;
         {
             // arg0: EnumResourcePackType
-            Class<?> enumSourcePackTypeClass = Class.forName("net.minecraft.server.packs.EnumResourcePackType");
+            Class<?> enumSourcePackTypeClass = resolveClass("net.minecraft.server.packs.PackType");
             resourcepacktype = getStaticField(enumSourcePackTypeClass, "SERVER_DATA");
 
             // Construct new ResourcePackRepository
@@ -190,7 +188,7 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         {
             java.util.List<?> packs = (java.util.List<?>) Resolver.resolveAndGetDeclaredMethod(resourcePackRepositoryType, "openAllSelected")
                     .invoke(resourcepackrepository);
-            resourcemanager = construct(Class.forName("net.minecraft.server.packs.resources.ResourceManager"),
+            resourcemanager = construct(resolveClass("net.minecraft.server.packs.resources.MultiPackResourceManager"),
                     resourcepacktype, packs);
         }
 
@@ -236,12 +234,12 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
          */
         Object customRegistryDimension;
         {
-            customRegistryDimension = createFromCode(Class.forName("net.minecraft.core.LayeredRegistryAccess"),
+            customRegistryDimension = createFromCode(resolveClass("net.minecraft.core.LayeredRegistryAccess"),
                                                      "return arg0.getAccessForLoading(net.minecraft.server.RegistryLayer.RELOADABLE);",
                                                      registries);
             /*
             customRegistryDimension = Resolver.resolveAndGetDeclaredMethod(
-                    Class.forName("net.minecraft.core.LayeredRegistryAccess"), "compositeAccess")
+                    resolveClass("net.minecraft.core.LayeredRegistryAccess"), "compositeAccess")
                 .invoke(registries);
             */
         }
@@ -260,7 +258,7 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         CompletableFuture<Object> futureDPLoaded;
         Object datapackresources;
         {
-            Class<?> serverTypeType = Class.forName("net.minecraft.commands.CommandDispatcher$ServerType");
+            Class<?> serverTypeType = resolveClass("net.minecraft.commands.Commands$CommandSelection");
             Object serverType = getStaticField(serverTypeType, "DEDICATED");
             int functionPermissionLevel = 2;
             Executor executor1;
@@ -268,11 +266,11 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
                 // They now have some hidden threadpool crap going on. So just don't bother.
                 executor1 = newThreadExecutor();
             } else {
-                executor1 = (Executor) Resolver.resolveAndGetDeclaredMethod(Class.forName("net.minecraft.SystemUtils"),
+                executor1 = (Executor) Resolver.resolveAndGetDeclaredMethod(resolveClass("net.minecraft.util.Util"),
                         "bootstrapExecutor").invoke(null);
             }
             Executor executor2 = newThreadExecutor();
-            Class<?> dataPackResourcesType = Class.forName("net.minecraft.server.DataPackResources");
+            Class<?> dataPackResourcesType = resolveClass("net.minecraft.server.ReloadableServerResources");
 
             if (CommonBootstrap.evaluateMCVersion(">=", "1.21.11")) {
                 /*
@@ -288,16 +286,16 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
                  */
 
                 // We need a PermissionSet instance
-                Class<?> permissionSetType = Class.forName("net.minecraft.server.permissions.PermissionSet");
-                Object allPermissions = createFromCode(permissionSetType, "return PermissionSet.ALL_PERMISSIONS;");
+                Class<?> permissionSetType = resolveClass("net.minecraft.server.permissions.PermissionSet");
+                Object allPermissions = createFromCode(permissionSetType, "return net.minecraft.server.permissions.PermissionSet.ALL_PERMISSIONS;");
 
                 // Pass the registries object instead of the customdimension object
                 // It calls the same getAccessForLoading internally
                 Method startLoadingMethod = Resolver.resolveAndGetDeclaredMethod(dataPackResourcesType, "loadResources",
-                        Class.forName("net.minecraft.server.packs.resources.IResourceManager"),
-                        Class.forName("net.minecraft.core.LayeredRegistryAccess"),
+                        resolveClass("net.minecraft.server.packs.resources.ResourceManager"),
+                        resolveClass("net.minecraft.core.LayeredRegistryAccess"),
                         java.util.List.class, // tagDataPackRegistries List
-                        Class.forName("net.minecraft.world.flag.FeatureFlagSet"),
+                        resolveClass("net.minecraft.world.flag.FeatureFlagSet"),
                         serverTypeType,
                         permissionSetType,
                         Executor.class,
@@ -310,7 +308,7 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
 
                 // Call updateStaticRegistryTags() on the result - which calls bind() on the tags
                 {
-                    Class<?> datapackresourceType = Class.forName("net.minecraft.server.DataPackResources");
+                    Class<?> datapackresourceType = resolveClass("net.minecraft.server.ReloadableServerResources");
                     Resolver.resolveAndGetDeclaredMethod(datapackresourceType, "updateStaticRegistryTags")
                             .invoke(datapackresources);
                 }
@@ -330,10 +328,10 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
                 // Pass the registries object instead of the customdimension object
                 // It calls the same getAccessForLoading internally
                 Method startLoadingMethod = Resolver.resolveAndGetDeclaredMethod(dataPackResourcesType, "loadResources",
-                        Class.forName("net.minecraft.server.packs.resources.IResourceManager"),
-                        Class.forName("net.minecraft.core.LayeredRegistryAccess"),
+                        resolveClass("net.minecraft.server.packs.resources.ResourceManager"),
+                        resolveClass("net.minecraft.core.LayeredRegistryAccess"),
                         java.util.List.class, // tagDataPackRegistries List
-                        Class.forName("net.minecraft.world.flag.FeatureFlagSet"),
+                        resolveClass("net.minecraft.world.flag.FeatureFlagSet"),
                         serverTypeType,
                         int.class,
                         Executor.class,
@@ -346,7 +344,7 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
 
                 // Call updateStaticRegistryTags() on the result - which calls bind() on the tags
                 {
-                    Class<?> datapackresourceType = Class.forName("net.minecraft.server.DataPackResources");
+                    Class<?> datapackresourceType = resolveClass("net.minecraft.server.ReloadableServerResources");
                     Resolver.resolveAndGetDeclaredMethod(datapackresourceType, "updateStaticRegistryTags")
                             .invoke(datapackresources);
                 }
@@ -354,9 +352,9 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
                 // Pass the registries object instead of the customdimension object
                 // It calls the same getAccessForLoading internally
                 Method startLoadingMethod = Resolver.resolveAndGetDeclaredMethod(dataPackResourcesType, "loadResources",
-                        Class.forName("net.minecraft.server.packs.resources.IResourceManager"),
-                        Class.forName("net.minecraft.core.LayeredRegistryAccess"),
-                        Class.forName("net.minecraft.world.flag.FeatureFlagSet"),
+                        resolveClass("net.minecraft.server.packs.resources.ResourceManager"),
+                        resolveClass("net.minecraft.core.LayeredRegistryAccess"),
+                        resolveClass("net.minecraft.world.flag.FeatureFlagSet"),
                         serverTypeType,
                         int.class,
                         Executor.class,
@@ -369,16 +367,16 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
 
                 // Call updateRegistryTags() on the result - which calls bind() on the tags
                 {
-                    Class<?> datapackresourceType = Class.forName("net.minecraft.server.DataPackResources");
+                    Class<?> datapackresourceType = resolveClass("net.minecraft.server.ReloadableServerResources");
                     Resolver.resolveAndGetDeclaredMethod(datapackresourceType, "updateRegistryTags")
                             .invoke(datapackresources);
                 }
             } else {
                 // 1.19.3 - 1.20.4
                 Method startLoadingMethod = Resolver.resolveAndGetDeclaredMethod(dataPackResourcesType, "loadResources",
-                        Class.forName("net.minecraft.server.packs.resources.IResourceManager"),
-                        Class.forName("net.minecraft.core.IRegistryCustom$Dimension"),
-                        Class.forName("net.minecraft.world.flag.FeatureFlagSet"),
+                        resolveClass("net.minecraft.server.packs.resources.ResourceManager"),
+                        resolveClass("net.minecraft.core.RegistryAccess$Frozen"),
+                        resolveClass("net.minecraft.world.flag.FeatureFlagSet"),
                         serverTypeType,
                         int.class,
                         Executor.class,
@@ -392,9 +390,9 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
                 // Call j() on the result - which calls bind() on the tags
                 // datapackresources.i();
                 {
-                    Class<?> datapackresourceType = Class.forName("net.minecraft.server.DataPackResources");
+                    Class<?> datapackresourceType = resolveClass("net.minecraft.server.ReloadableServerResources");
                     Resolver.resolveAndGetDeclaredMethod(datapackresourceType, "updateRegistryTags",
-                                    Class.forName("net.minecraft.core.IRegistryCustom"))
+                                    resolveClass("net.minecraft.core.RegistryAccess"))
                             .invoke(datapackresources, customRegistryDimension);
                 }
             }
@@ -410,8 +408,8 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
             field.setAccessible(true);
 
             Constructor<?> constr = field.getType().getConstructor(
-                    Class.forName("net.minecraft.server.packs.resources.IReloadableResourceManager"),
-                    Class.forName("net.minecraft.server.DataPackResources"));
+                    resolveClass("net.minecraft.server.packs.resources.CloseableResourceManager"),
+                    resolveClass("net.minecraft.server.ReloadableServerResources"));
             constr.setAccessible(true);
             Object managerWithResources = constr.newInstance(env.resourceManager, datapackresources);
 

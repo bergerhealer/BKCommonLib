@@ -571,6 +571,9 @@ public class CommonBootstrap {
         if (evaluateMCVersion("<", "1.21.11")) {
             // A lot of classes were moved to new packages. These remap it back to the old path for older versions.
 
+            // Util (SystemUtils) was moved to a util sub-package
+            remappings.put("net.minecraft.util.Util", "net.minecraft.Util");
+
             // Paintings were moved to a painting sub-package
             remappings.put("net.minecraft.world.entity.decoration.painting.PaintingVariants", "net.minecraft.world.entity.decoration.PaintingVariants");
             remappings.put("net.minecraft.world.entity.decoration.painting.PaintingVariant", "net.minecraft.world.entity.decoration.PaintingVariant");

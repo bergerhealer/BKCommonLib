@@ -21,12 +21,12 @@ class TestServerFactory_1_17 extends TestServerFactory {
     @Override
     protected void init(ServerEnvironment env) throws Throwable {
         // Initialize shared constants first - required by DispenserRegistry
-        Class<?> sharedConstantsClass = Class.forName("net.minecraft.SharedConstants");
+        Class<?> sharedConstantsClass = resolveClass("net.minecraft.SharedConstants");
         Method initSharedConstantsMethod = sharedConstantsClass.getDeclaredMethod("a");
         initSharedConstantsMethod.invoke(null);
 
         // Bootstrap is required
-        Class<?> dispenserRegistryClass = Class.forName("net.minecraft.server.DispenserRegistry");
+        Class<?> dispenserRegistryClass = resolveClass("net.minecraft.server.Bootstrap");
         Method dispenserRegistryBootstrapMethod = dispenserRegistryClass.getMethod("init");
         dispenserRegistryBootstrapMethod.invoke(null);
 
@@ -34,14 +34,14 @@ class TestServerFactory_1_17 extends TestServerFactory {
         // This prevents loads of extra server logic executing during test
         ClassTemplate<?> server_t = ClassTemplate.create(CommonServerBase.SERVER_CLASS);
         Object server = server_t.newInstanceNull();
-        Class<?> minecraftServerType = Class.forName("net.minecraft.server.MinecraftServer");
-        Class<?> dedicatedType = Class.forName("net.minecraft.server.dedicated.DedicatedServer");
+        Class<?> minecraftServerType = resolveClass("net.minecraft.server.MinecraftServer");
+        Class<?> dedicatedType = resolveClass("net.minecraft.server.dedicated.DedicatedServer");
         ClassTemplate<?> mc_server_t = ClassTemplate.create(dedicatedType);
         Object mc_server = mc_server_t.newInstanceNull();
         env.mc_server = mc_server;
 
         // Since we null-construct, some members of the parent class "IAsyncTaskHandler" are not initialized. Do that here.
-        Class<?> iAsyncTaskHandlerClass = Class.forName("net.minecraft.util.thread.IAsyncTaskHandler");
+        Class<?> iAsyncTaskHandlerClass = resolveClass("net.minecraft.util.thread.BlockableEventLoop");
         setField(mc_server, iAsyncTaskHandlerClass, "name", "Server");
         setField(mc_server, iAsyncTaskHandlerClass, "pendingRunnables", createFromCode(minecraftServerType, 
                 "return com.google.common.collect.Queues.newConcurrentLinkedQueue();"));
@@ -57,7 +57,7 @@ class TestServerFactory_1_17 extends TestServerFactory {
         // Initialize the dimension root registry for the server
         // IRegistryCustom.Dimension iregistrycustom_dimension = IRegistryCustom.b(); (Main.java)
         // this.f = iregistrycustom_dimension; (MinecraftServer.java)
-        Object customRegistry = createFromCode(minecraftServerType, "return net.minecraft.core.IRegistryCustom.a();");
+        Object customRegistry = createFromCode(minecraftServerType, "return net.minecraft.core.RegistryAccess.a();");
         setField(mc_server, "registryHolder", customRegistry);
 
         // Assign to the Bukkit server silently (don't want a duplicate server info log line with random null's)
@@ -68,18 +68,18 @@ class TestServerFactory_1_17 extends TestServerFactory {
         // Initialize propertyManager field, which is responsible for server-wide settings like view distance
         Object propertyManager = ClassTemplate.create("net.minecraft.server.dedicated.DedicatedServerSettings").newInstanceNull();
         setField(mc_server, "settings", propertyManager);
-        setField(propertyManager, "properties", createFromCode(Class.forName("net.minecraft.server.dedicated.DedicatedServerProperties"),
-                "return new DedicatedServerProperties(new java.util.Properties(), new joptsimple.OptionParser().parse(new String[0]));\n"));
+        setField(propertyManager, "properties", createFromCode(resolveClass("net.minecraft.server.dedicated.DedicatedServerProperties"), "" +
+                "return new net.minecraft.server.dedicated.DedicatedServerProperties(" +
+                "    new java.util.Properties()," +
+                "    new joptsimple.OptionParser().parse(new String[0])" +
+                ");"));
 
         // Create data converter registry manager object - used for serialization/deserialization
         // Only used >= MC 1.10.2
-        Class<?> dataConverterRegistryClass = null;
-        try {
-            dataConverterRegistryClass = Class.forName("net.minecraft.util.datafix.DataConverterRegistry");
-            Method dataConverterRegistryInitMethod = dataConverterRegistryClass.getMethod("a");
-            Object dataConverterManager = dataConverterRegistryInitMethod.invoke(null);
-            setField(mc_server, "fixerUpper", dataConverterManager);
-        } catch (ClassNotFoundException ex) {}
+        Class<?> dataConverterRegistryClass = resolveClass("net.minecraft.util.datafix.DataFixers");
+        Method dataConverterRegistryInitMethod = dataConverterRegistryClass.getMethod("a");
+        Object dataConverterManager = dataConverterRegistryInitMethod.invoke(null);
+        setField(mc_server, "fixerUpper", dataConverterManager);
 
         // Create CraftingManager instance and load recipes for >= MC 1.13
         minecraftServerType.getDeclaredMethod("getCraftingManager");
@@ -87,7 +87,7 @@ class TestServerFactory_1_17 extends TestServerFactory {
         // this.executorService = SystemUtils.e();
         {
             setField(mc_server, "executor", createFromCode(minecraftServerType,
-                    "return " + env.systemUtilsClassName + ".e();"));
+                    "return net.minecraft.util.Util.e();"));
         }
 
         // this.dataPackResources = DataPackResources (passed through constructor)
@@ -95,8 +95,6 @@ class TestServerFactory_1_17 extends TestServerFactory {
         // Difference is that no configuration is read in, and we assume a default environment
         // Lambdas are a pain in the ass, but we're coping :(
         {
-            final String repopath = "net.minecraft.server.packs.repository.";
-
             /*
              * First create a lambda, which requires generating a class that implements an anonymous interface
              * 
@@ -120,10 +118,10 @@ class TestServerFactory_1_17 extends TestServerFactory {
              */
             Object resourcePackLoaderNew;
             {
-                Class<?> enumSourcePackTypeClass = Class.forName("net.minecraft.server.packs.EnumResourcePackType");
+                Class<?> enumSourcePackTypeClass = resolveClass("net.minecraft.server.packs.PackType");
                 final Object packTypeServerData = getStaticField(enumSourcePackTypeClass, "SERVER_DATA");
                 
-                final Class<?> resourcePackLoaderType = Class.forName(repopath + "ResourcePackLoader");
+                final Class<?> resourcePackLoaderType = resolveClass("net.minecraft.server.packs.repository.Pack");
                 ClassInterceptor interceptor = new ClassInterceptor() {
                     @Override
                     protected Invoker<?> getCallback(Method method) {
@@ -144,7 +142,7 @@ class TestServerFactory_1_17 extends TestServerFactory {
                     }
                 };
 
-                resourcePackLoaderNew = interceptor.createInstance(Class.forName(repopath + "ResourcePackLoader$a"));
+                resourcePackLoaderNew = interceptor.createInstance(resolveClass("net.minecraft.server.packs.repository.Pack$PackConstructor"));
             }
 
             /*
@@ -156,9 +154,9 @@ class TestServerFactory_1_17 extends TestServerFactory {
              */
             Object resourcepackrepository;
             {
-                Object[] resourcePackSources = LogicUtil.createArray(Class.forName(repopath + "ResourcePackSource"), 1);
-                resourcePackSources[0] = construct(Class.forName(repopath + "ResourcePackSourceVanilla"));
-                resourcepackrepository = construct(Class.forName(repopath + "ResourcePackRepository"),
+                Object[] resourcePackSources = LogicUtil.createArray(resolveClass("net.minecraft.server.packs.repository.RepositorySource"), 1);
+                resourcePackSources[0] = construct(resolveClass("net.minecraft.server.packs.repository.ServerPacksSource"));
+                resourcepackrepository = construct(resolveClass("net.minecraft.server.packs.repository.PackRepository"),
                         resourcePackLoaderNew, resourcePackSources);
             }
 
@@ -169,10 +167,10 @@ class TestServerFactory_1_17 extends TestServerFactory {
              */
             Object datapackconfiguration;
             {
-                Object defaultDPConfig = getStaticField(Class.forName("net.minecraft.world.level.DataPackConfiguration"), "a");
+                Object defaultDPConfig = getStaticField(resolveClass("net.minecraft.world.level.DataPackConfig"), "a");
                 Method createDPConfig = minecraftServerType.getDeclaredMethod("a",
-                        Class.forName(repopath + "ResourcePackRepository"),
-                        Class.forName("net.minecraft.world.level.DataPackConfiguration"),
+                        resolveClass("net.minecraft.server.packs.repository.PackRepository"),
+                        resolveClass("net.minecraft.world.level.DataPackConfig"),
                         boolean.class);
                 datapackconfiguration = createDPConfig.invoke(null, resourcepackrepository, defaultDPConfig, true);
             }
@@ -191,14 +189,14 @@ class TestServerFactory_1_17 extends TestServerFactory {
             CompletableFuture<Object> futureDPLoaded;
             {
                 java.util.List<?> packs = (java.util.List<?>) resourcepackrepository.getClass().getMethod("f").invoke(resourcepackrepository);
-                Class<?> serverTypeType = Class.forName("net.minecraft.commands.CommandDispatcher$ServerType");
+                Class<?> serverTypeType = resolveClass("net.minecraft.commands.Commands$CommandSelection");
                 Object serverType = getStaticField(serverTypeType, "DEDICATED");
                 int functionPermissionLevel = 2;
-                Executor executor1 = (Executor) Class.forName(env.systemUtilsClassName).getMethod("f").invoke(null);
+                Executor executor1 = (Executor) resolveClass("net.minecraft.util.Util").getMethod("f").invoke(null);
                 Executor executor2 = newThreadExecutor();
-                Method startLoadingMethod = Class.forName("net.minecraft.server.DataPackResources").getDeclaredMethod("a",
+                Method startLoadingMethod = resolveClass("net.minecraft.server.ServerResources").getDeclaredMethod("a",
                         List.class,
-                        Class.forName("net.minecraft.core.IRegistryCustom"),
+                        resolveClass("net.minecraft.core.RegistryAccess"),
                         serverTypeType,
                         int.class,
                         Executor.class,
@@ -213,7 +211,7 @@ class TestServerFactory_1_17 extends TestServerFactory {
             // Call j() on the result - which calls bind() on the tags
             // datapackresources.i();
             {
-                Class<?> datapackresourceType = Class.forName("net.minecraft.server.DataPackResources");
+                Class<?> datapackresourceType = resolveClass("net.minecraft.server.ServerResources");
                 datapackresourceType.getMethod("j").invoke(datapackresources);
             }
 
@@ -231,7 +229,7 @@ class TestServerFactory_1_17 extends TestServerFactory {
             Object worldSettings = createFromCode(minecraftServerType, "return MinecraftServer.c;");
             Object generatorSettings = createFromCode(minecraftServerType, "return GeneratorSettings.a();");
             Object lifeCycle = createFromCode(minecraftServerType, "return com.mojang.serialization.Lifecycle.stable();");
-            Class<?> worldDataType = Class.forName(nms_root + "WorldDataServer");
+            Class<?> worldDataType = resolveClass(nms_root + "WorldDataServer");
             worldData = construct(worldDataType, worldSettings, generatorSettings, lifeCycle);
         }
         */

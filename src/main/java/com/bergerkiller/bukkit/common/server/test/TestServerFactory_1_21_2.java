@@ -25,9 +25,9 @@ class TestServerFactory_1_21_2 extends TestServerFactory_1_20_2 {
         //            List<IRegistry.a<?>> list = TagDataPack.loadTagsForExistingRegistries(ireloadableresourcemanager, layeredregistryaccess.getLayer(RegistryLayer.STATIC));
         {
             env.tagDataPackRegistries = (java.util.List<?>) createFromCode(env.mc_server_type, "" +
-                    "net.minecraft.server.packs.resources.IReloadableResourceManager ireloadableresourcemanager = arg0;\n" +
+                    "net.minecraft.server.packs.resources.CloseableResourceManager ireloadableresourcemanager = arg0;\n" +
                     "net.minecraft.core.LayeredRegistryAccess layeredregistryaccess = arg1;\n" +
-                    "return net.minecraft.tags.TagDataPack.loadTagsForExistingRegistries(ireloadableresourcemanager, layeredregistryaccess.getLayer(net.minecraft.server.RegistryLayer.STATIC));",
+                    "return net.minecraft.tags.TagLoader.loadTagsForExistingRegistries(ireloadableresourcemanager, layeredregistryaccess.getLayer(net.minecraft.server.RegistryLayer.STATIC));",
 
                     env.resourceManager, registryAccess);
         }
@@ -42,16 +42,16 @@ class TestServerFactory_1_21_2 extends TestServerFactory_1_20_2 {
         //            IRegistryCustom.Dimension iregistrycustom_dimension2 = RegistryDataLoader.load((IResourceManager) ireloadableresourcemanager, list2, RegistryDataLoader.DIMENSION_REGISTRIES);
         {
             env.registries = createFromCode(env.mc_server_type, "" +
-                    "net.minecraft.server.packs.resources.IReloadableResourceManager ireloadableresourcemanager = arg0;\n" +
+                    "net.minecraft.server.packs.resources.CloseableResourceManager ireloadableresourcemanager = arg0;\n" +
                     "net.minecraft.core.LayeredRegistryAccess layeredregistryaccess = arg1;\n" +
                     "java.util.List list = arg2;\n" +
-                    "net.minecraft.core.IRegistryCustom$Dimension iregistrycustom_dimension = layeredregistryaccess.getAccessForLoading(net.minecraft.server.RegistryLayer.WORLDGEN);\n" +
-                    "java.util.List list1 = net.minecraft.tags.TagDataPack.buildUpdatedLookups(iregistrycustom_dimension, list);\n" +
-                    "net.minecraft.core.IRegistryCustom$Dimension iregistrycustom_dimension1 = net.minecraft.resources.RegistryDataLoader.load((net.minecraft.server.packs.resources.IResourceManager) ireloadableresourcemanager, list1, net.minecraft.resources.RegistryDataLoader.WORLDGEN_REGISTRIES);\n" +
+                    "net.minecraft.core.RegistryAccess$Frozen iregistrycustom_dimension = layeredregistryaccess.getAccessForLoading(net.minecraft.server.RegistryLayer.WORLDGEN);\n" +
+                    "java.util.List list1 = net.minecraft.tags.TagLoader.buildUpdatedLookups(iregistrycustom_dimension, list);\n" +
+                    "net.minecraft.core.RegistryAccess$Frozen iregistrycustom_dimension1 = net.minecraft.resources.RegistryDataLoader.load((net.minecraft.server.packs.resources.ResourceManager) ireloadableresourcemanager, list1, net.minecraft.resources.RegistryDataLoader.WORLDGEN_REGISTRIES);\n" +
                     "java.util.List list2 = java.util.stream.Stream.concat(list1.stream(), iregistrycustom_dimension1.listRegistries()).toList();\n" +
-                    "net.minecraft.core.IRegistryCustom$Dimension iregistrycustom_dimension2 = net.minecraft.resources.RegistryDataLoader.load((net.minecraft.server.packs.resources.IResourceManager) ireloadableresourcemanager, list2, net.minecraft.resources.RegistryDataLoader.DIMENSION_REGISTRIES);\n" +
+                    "net.minecraft.core.RegistryAccess$Frozen iregistrycustom_dimension2 = net.minecraft.resources.RegistryDataLoader.load((net.minecraft.server.packs.resources.ResourceManager) ireloadableresourcemanager, list2, net.minecraft.resources.RegistryDataLoader.DIMENSION_REGISTRIES);\n" +
                     "\n" +
-                    "return layeredregistryaccess.replaceFrom(RegistryLayer.WORLDGEN, java.util.Collections.singletonList(iregistrycustom_dimension1));",
+                    "return layeredregistryaccess.replaceFrom(net.minecraft.server.RegistryLayer.WORLDGEN, java.util.Collections.singletonList(iregistrycustom_dimension1));",
 
                     env.resourceManager, registryAccess, env.tagDataPackRegistries);
         }

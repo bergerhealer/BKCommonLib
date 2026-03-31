@@ -30,9 +30,7 @@ public abstract class TestServerFactory {
         }
 
         TestServerFactory factory;
-        if (CommonBootstrap.evaluateMCVersion(">=", "1.21.11")) {
-            factory = new TestServerFactory_1_21_11();
-        } else if (CommonBootstrap.evaluateMCVersion(">=", "1.21.2")) {
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.21.2")) {
             factory = new TestServerFactory_1_21_2();
         } else if (CommonBootstrap.evaluateMCVersion(">=", "1.20.2")) {
             factory = new TestServerFactory_1_20_2();
@@ -125,6 +123,19 @@ public abstract class TestServerFactory {
             f.set(instance, value);
         } catch (Throwable ex) {
             throw new RuntimeException("Failed to set field " + name, ex);
+        }
+    }
+
+    protected static Class<?> resolveClass(String name) {
+        return resolveClass(name, true);
+    }
+
+    protected static Class<?> resolveClass(String name, boolean initialize) {
+        String resolvedType = Resolver.resolveClassPath(name);
+        try {
+            return Class.forName(resolvedType, initialize, TestServerFactory.class.getClassLoader());
+        } catch (ClassNotFoundException ex) {
+            throw new RuntimeException("Failed to find class " + name + " (" + resolvedType + ")", ex);
         }
     }
 
@@ -248,7 +259,6 @@ public abstract class TestServerFactory {
     protected static final class ServerEnvironment {
         public String CB_ROOT = "FAIL";
         public String NMS_ROOT = "FAIL";
-        public String systemUtilsClassName = "net.minecraft.SystemUtils";
         public Object mc_server = null;
         public Class<?> mc_server_type = null;
         public Object registries = null;

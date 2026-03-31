@@ -7,18 +7,17 @@ class TestServerFactory_1_20_2 extends TestServerFactory_1_19_3 {
         super.init(env);
 
         // Normally done in CraftServer
-        createFromCode(Class.forName(env.CB_ROOT + ".CraftServer"),
-                "CraftRegistry.setMinecraftRegistry(arg0.registryAccess());",
+        createFromCode(resolveClass("org.bukkit.craftbukkit.CraftServer"),
+                "org.bukkit.craftbukkit.CraftRegistry.setMinecraftRegistry(arg0.registryAccess());",
                 env.mc_server);
     }
 
     @Override
     protected Object createVanillaResourcePackRepository() throws Throwable {
-        final String repopath = "net.minecraft.server.packs.repository.";
-        final Class<?> resourcePackRepositoryType = Class.forName(repopath + "ResourcePackSourceVanilla");
+        final Class<?> resourcePackRepositoryType = resolveClass("net.minecraft.server.packs.repository.ServerPacksSource");
 
         // Now has a handy method we can call that does it all
         return createFromCode(resourcePackRepositoryType,
-                "return ResourcePackSourceVanilla.createVanillaTrustedRepository();");
+                "return net.minecraft.server.packs.repository.ServerPacksSource.createVanillaTrustedRepository();");
     }
 }

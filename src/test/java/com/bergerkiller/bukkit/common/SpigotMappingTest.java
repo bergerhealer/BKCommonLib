@@ -34,28 +34,21 @@ public class SpigotMappingTest {
     private static final File mappingsFile = new File("src/main/resources/com/bergerkiller/bukkit/common/internal/resources/class_mappings.dat");
 
     /**
-     * Visualizes the spigot class name for all different Minecraft versions where a unique class
-     * is used.
+     * Visualizes the spigot <> mojang mapping details for debug/dev purposes
      */
     @Test
     @Ignore
-    public void testVisualizeMappingsForMojangClass() {
+    public void testVisualizeMappings() {
         SpigotMappings mappings = loadMappings();
 
-        mappings.visualizeMappingsForMojangClass("net.minecraft.network.Connection$WrappedConsumer");
-    }
+        mappings.visualizeMapping("ResourceManager");
 
-    /**
-     * Visualizes all of the Mojang-map names that point towards a particular Spigot class name
-     * on different versions of the game.
-     */
-    @Test
-    @Ignore
-    public void testVisualizeMappingsForSpigotClass() {
-        SpigotMappings mappings = loadMappings();
+        //mappings.visualizeMappingsForSpigotClass("net.minecraft.server.DataPackResources");
 
-        mappings.visualizeMappingsForSpigotClass("net.minecraft.network.protocol.game.PacketPlayOutStatistic");
-        mappings.visualizeMappingsForSpigotClass("net.minecraft.network.protocol.game.PacketPlayOutTabComplete");
+        //mappings.visualizeMappingsForMojangClass("net.minecraft.network.Connection$WrappedConsumer");
+
+        //mappings.visualizeMappingsForSpigotClass("net.minecraft.network.protocol.game.PacketPlayOutStatistic");
+        //mappings.visualizeMappingsForSpigotClass("net.minecraft.network.protocol.game.PacketPlayOutTabComplete");
     }
 
     /**
@@ -70,10 +63,9 @@ public class SpigotMappingTest {
 
         //mappings.renameKey("old.path.to.Class", "new.path.to.Class");
 
-        mappings.storeAppendForVersionRange("1.8", "1.20.1",
-                "net.minecraft.network.Connection$WrappedConsumer",
-                "net.minecraft.network.Connection$WrappedConsumer");
-
+        mappings.storeAppendForVersionRange("1.13", "1.15.2",
+                "net.minecraft.server.packs.repository.Pack$PackConstructor",
+                "net.minecraft.server.packs.repository.ResourcePackLoader$b");
 
         saveMappings(mappings);
     }

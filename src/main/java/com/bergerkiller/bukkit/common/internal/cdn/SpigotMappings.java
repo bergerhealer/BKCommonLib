@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.cdn.MojangIO.VersionManifest;
@@ -161,6 +162,31 @@ public class SpigotMappings extends VersionedMappingsFileIO<SpigotMappings.Class
 
         return spigotMappings.get(minecraftVersion)
                 .orElseThrow(() -> new IllegalStateException("Version has no mappings"));
+    }
+
+    /**
+     * Visualizes all information related to a particular key word. You can specify just the base name of
+     * the class and it'll log all information about it, whether its part of a mojang or spigot class
+     * name it does not matter. Use this for debugging and development purposes.
+     *
+     * @param searchQuery Text contents to match
+     */
+    public void visualizeMapping(String searchQuery) {
+        Set<String> mojangMatches = getAll().stream()
+                .flatMap(m -> m.getMojangToSpigot().keySet().stream())
+                .filter(e -> e.contains(searchQuery))
+                .collect(Collectors.toSet());
+        Set<String> spigotMatches = getAll().stream()
+                .flatMap(m -> m.getSpigotToMojang().keySet().stream())
+                .filter(e -> e.contains(searchQuery))
+                .collect(Collectors.toSet());
+        System.out.println("All mapping details for search query: " + searchQuery);
+        for (String mojangClassName : mojangMatches) {
+            visualizeMappingsForMojangClass(mojangClassName);
+        }
+        for (String spigotClassName : spigotMatches) {
+            visualizeMappingsForSpigotClass(spigotClassName);
+        }
     }
 
     /**

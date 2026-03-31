@@ -13,14 +13,13 @@ class TestServerFactory_1_18_2 extends TestServerFactory_1_18 {
 
     @Override
     protected Object initCustomRegistryDimension(Class<?> minecraftServerType) {
-        return createFromCode(minecraftServerType, "return net.minecraft.core.IRegistryCustom.builtinCopy().freeze();");
+        return createFromCode(minecraftServerType, "return net.minecraft.core.RegistryAccess.builtinCopy().freeze();");
     }
 
     @Override
     @SuppressWarnings("unchecked")
     protected void initDataPack(Class<?> minecraftServerType, Object mc_server, Object customRegistryDimension) throws Throwable {
-        final String repopath = "net.minecraft.server.packs.repository.";
-        final Class<?> resourcePackRepositoryType = Class.forName(repopath + "ResourcePackRepository");
+        final Class<?> resourcePackRepositoryType = resolveClass("net.minecraft.server.packs.repository.PackRepository");
 
         /*
          * Create ResourcePackRepository (Main.java)
@@ -32,12 +31,12 @@ class TestServerFactory_1_18_2 extends TestServerFactory_1_18 {
         Object resourcepacktype;
         {
             // arg0: EnumResourcePackType
-            Class<?> enumSourcePackTypeClass = Class.forName("net.minecraft.server.packs.EnumResourcePackType");
+            Class<?> enumSourcePackTypeClass = resolveClass("net.minecraft.server.packs.PackType");
             resourcepacktype = getStaticField(enumSourcePackTypeClass, "SERVER_DATA");
 
             // arg1: ResourcePackSource[]
-            final Object[] resourcePackSources = LogicUtil.createArray(Class.forName(repopath + "ResourcePackSource"), 1);
-            resourcePackSources[0] = construct(Class.forName(repopath + "ResourcePackSourceVanilla"));
+            final Object[] resourcePackSources = LogicUtil.createArray(resolveClass("net.minecraft.server.packs.repository.RepositorySource"), 1);
+            resourcePackSources[0] = construct(resolveClass("net.minecraft.server.packs.repository.ServerPacksSource"));
 
             // Construct new ResourcePackRepository
             resourcepackrepository = construct(resourcePackRepositoryType, resourcepacktype, resourcePackSources);
@@ -50,10 +49,10 @@ class TestServerFactory_1_18_2 extends TestServerFactory_1_18 {
          */
         Object datapackconfiguration;
         {
-            Object defaultDPConfig = getStaticField(Class.forName("net.minecraft.world.level.DataPackConfiguration"), "DEFAULT");
+            Object defaultDPConfig = getStaticField(resolveClass("net.minecraft.world.level.DataPackConfig"), "DEFAULT");
             Method createDPConfig = Resolver.resolveAndGetDeclaredMethod(minecraftServerType, "configurePackRepository",
                     resourcePackRepositoryType,
-                    Class.forName("net.minecraft.world.level.DataPackConfiguration"),
+                    resolveClass("net.minecraft.world.level.DataPackConfig"),
                     boolean.class);
             datapackconfiguration = createDPConfig.invoke(null, resourcepackrepository, defaultDPConfig, true);
         }
@@ -65,7 +64,7 @@ class TestServerFactory_1_18_2 extends TestServerFactory_1_18 {
         {
             java.util.List<?> packs = (java.util.List<?>) Resolver.resolveAndGetDeclaredMethod(resourcePackRepositoryType, "openAllSelected")
                     .invoke(resourcepackrepository);
-            resourcemanager = construct(Class.forName("net.minecraft.server.packs.resources.ResourceManager"),
+            resourcemanager = construct(resolveClass("net.minecraft.server.packs.resources.MultiPackResourceManager"),
                     resourcepacktype, packs);
         }
 
@@ -82,16 +81,16 @@ class TestServerFactory_1_18_2 extends TestServerFactory_1_18 {
          */
         CompletableFuture<Object> futureDPLoaded;
         {
-            Class<?> serverTypeType = Class.forName("net.minecraft.commands.CommandDispatcher$ServerType");
+            Class<?> serverTypeType = resolveClass("net.minecraft.commands.Commands$CommandSelection");
             Object serverType = getStaticField(serverTypeType, "DEDICATED");
             int functionPermissionLevel = 2;
-            Executor executor1 = (Executor) Resolver.resolveAndGetDeclaredMethod(Class.forName("net.minecraft.SystemUtils"),
+            Executor executor1 = (Executor) Resolver.resolveAndGetDeclaredMethod(resolveClass("net.minecraft.util.Util"),
                     "bootstrapExecutor").invoke(null);
             Executor executor2 = newThreadExecutor();
-            Class<?> dataPackResourcesType = Class.forName("net.minecraft.server.DataPackResources");
+            Class<?> dataPackResourcesType = resolveClass("net.minecraft.server.ReloadableServerResources");
             Method startLoadingMethod = Resolver.resolveAndGetDeclaredMethod(dataPackResourcesType, "loadResources",
-                    Class.forName("net.minecraft.server.packs.resources.IResourceManager"),
-                    Class.forName("net.minecraft.core.IRegistryCustom$Dimension"),
+                    resolveClass("net.minecraft.server.packs.resources.ResourceManager"),
+                    resolveClass("net.minecraft.core.RegistryAccess$Frozen"),
                     serverTypeType,
                     int.class,
                     Executor.class,
@@ -106,9 +105,9 @@ class TestServerFactory_1_18_2 extends TestServerFactory_1_18 {
         // Call j() on the result - which calls bind() on the tags
         // datapackresources.i();
         {
-            Class<?> datapackresourceType = Class.forName("net.minecraft.server.DataPackResources");
+            Class<?> datapackresourceType = resolveClass("net.minecraft.server.ReloadableServerResources");
             Resolver.resolveAndGetDeclaredMethod(datapackresourceType, "updateRegistryTags",
-                    Class.forName("net.minecraft.core.IRegistryCustom"))
+                    resolveClass("net.minecraft.core.RegistryAccess"))
                         .invoke(datapackresources, customRegistryDimension);
         }
 
@@ -123,8 +122,8 @@ class TestServerFactory_1_18_2 extends TestServerFactory_1_18 {
             field.setAccessible(true);
 
             Constructor<?> constr = field.getType().getConstructor(
-                    Class.forName("net.minecraft.server.packs.resources.IReloadableResourceManager"),
-                    Class.forName("net.minecraft.server.DataPackResources"));
+                    resolveClass("net.minecraft.server.packs.resources.CloseableResourceManager"),
+                    resolveClass("net.minecraft.server.ReloadableServerResources"));
             constr.setAccessible(true);
             Object managerWithResources = constr.newInstance(resourcemanager, datapackresources);
 

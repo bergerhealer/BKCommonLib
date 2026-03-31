@@ -5,10 +5,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Optional;
@@ -71,6 +73,19 @@ public class VersionedMappingsFileIO<T> {
     public Optional<T> get(String version) {
         MappedVersion<T> mapped = byVersion.get(version);
         return mapped == null ? Optional.empty() : Optional.of(mapped.data());
+    }
+
+    /**
+     * Gets all decoded mapping data
+     *
+     * @return Mappings for all versions
+     */
+    public List<T> getAll() {
+        List<T> result = new ArrayList<>(byVersion.size());
+        for (MappedVersion<T> mapped : byVersion.values()) {
+            result.add(mapped.data());
+        }
+        return result;
     }
 
     /**
