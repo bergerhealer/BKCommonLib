@@ -199,6 +199,7 @@ The table below contains other notable Handle classes in `src/main/generated/com
 | AttributeModifiableHandle  | AttributeInstanceHandle          |
 | MobEffectHandle            | MobEffectInstanceHandle         |
 | MobEffectListHandle        | MobEffectHandle                  |
+| EnumHandHandle |        | InteractionHandHandle            |
 
 There may have been some package location changes too, as the new names closely resemble where Mojang classes exist as of 1.21.11.
 
