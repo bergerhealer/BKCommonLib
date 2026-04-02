@@ -90,6 +90,7 @@ Notes:
 | PacketPlayInWindowClickHandle                           | ServerboundContainerClickPacketHandle          |
 | PacketPlayInCloseWindowHandle                           | ServerboundContainerClosePacketHandle          |
 | PacketPlayInUseEntityHandle                             | ServerboundInteractPacketHandle                |
+| PacketPlayInArmAnimationHandle                          | ServerboundSwingPacketHandle                  |
 | PacketPlayInFlyingHandle                                | ServerboundMovePlayerPacketHandle              |
 | PacketPlayInFlyingHandle.PacketPlayInPositionHandle     | ServerboundMovePlayerPacketHandle.PosHandle    |
 | PacketPlayInFlyingHandle.PacketPlayInLookHandle         | ServerboundMovePlayerPacketHandle.RotHandle    |
