@@ -11,10 +11,10 @@ import net.minecraft.world.level.storage.TagValueInput;
 
 // Gets the text representation of a chat component (and only that component. It is not recursive.)
 #if version >= 1.19
-    #require net.minecraft.network.chat.IChatBaseComponent public String getComponentText() {
+    #require net.minecraft.network.chat.Component public String getComponentText() {
         net.minecraft.network.chat.ComponentContents contents = instance.getContents();
-        if (contents instanceof net.minecraft.network.chat.contents.LiteralContents) {
-            return ((net.minecraft.network.chat.contents.LiteralContents) contents).text();
+        if (contents instanceof net.minecraft.network.chat.contents.PlainTextContents) {
+            return ((net.minecraft.network.chat.contents.PlainTextContents) contents).text();
         } else if (contents instanceof TranslatableContents) {
   #if exists com.mohistmc.paper.adventure.PaperAdventure
             return com.mohistmc.paper.adventure.PaperAdventure.asPlain(com.mohistmc.paper.adventure.PaperAdventure.asAdventure(instance), null);
@@ -58,10 +58,10 @@ import net.minecraft.world.level.storage.TagValueInput;
         }
     }
 
-    #require net.minecraft.network.chat.IChatBaseComponent public boolean isComponentContentEmpty() {
+    #require net.minecraft.network.chat.Component public boolean isComponentContentEmpty() {
         net.minecraft.network.chat.ComponentContents contents = instance.getContents();
-        if (contents instanceof net.minecraft.network.chat.contents.LiteralContents) {
-            return ((net.minecraft.network.chat.contents.LiteralContents) contents).text().isEmpty();
+        if (contents instanceof net.minecraft.network.chat.contents.PlainTextContents) {
+            return ((net.minecraft.network.chat.contents.PlainTextContents) contents).text().isEmpty();
         } else {
             return contents == net.minecraft.network.chat.CommonComponents.EMPTY;
         }
@@ -80,7 +80,7 @@ import net.minecraft.world.level.storage.TagValueInput;
 
 // Formats a chat component, and its siblings/children, as a legacy-color-formatted message String
 #require net.minecraft.network.chat.Component public String formatAsLegacyString() {
-    IChatBaseComponent component = instance;
+    Component component = instance;
 
     // Some optimizations
     {
@@ -93,7 +93,7 @@ import net.minecraft.world.level.storage.TagValueInput;
         if (numSiblings == 1 && component.getStyle().isEmpty()) {
             String text = component#getComponentText();
             if (text.isEmpty()) {
-                component = (IChatBaseComponent) siblings.get(0);
+                component = (Component) siblings.get(0);
                 siblings = component.getSiblings();
                 numSiblings = siblings.size();
             }
@@ -117,7 +117,7 @@ import net.minecraft.world.level.storage.TagValueInput;
     boolean prev_was_obfuscated = false;
 
     while (iter.hasNext()) {
-        IChatBaseComponent c = (IChatBaseComponent) iter.next();
+        Component c = (Component) iter.next();
         net.minecraft.network.chat.Style modi = c.getStyle();
 
         // Place reset character when too many style flags are active
@@ -200,11 +200,11 @@ import net.minecraft.world.level.storage.TagValueInput;
     return out.toString();
 }
 
-#require net.minecraft.network.chat.Component public static String[] formatLinesAsLegacyStrings(IChatBaseComponent[] lines) {
+#require net.minecraft.network.chat.Component public static String[] formatLinesAsLegacyStrings(Component[] lines) {
     int numLines = lines.length;
     String[] legacyLines = new String[numLines];
     for (int i = 0; i < numLines; i++) {
-        IChatBaseComponent component = lines[i];
+        Component component = lines[i];
         legacyLines[i] = (component == null) ? "" : component#formatAsLegacyString();
     }
     return legacyLines;

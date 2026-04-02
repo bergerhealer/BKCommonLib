@@ -12,22 +12,22 @@ class VoxelShape {
 
 #if version >= 1.18
     public static (VoxelShapeHandle) VoxelShape empty() {
-        return VoxelShapes.empty();
+        return Shapes.empty();
     }
 
     public static (Object) VoxelShape createRawFromAABB((Object) List<AABB> handles) {
         if (handles.isEmpty()) {
-            return VoxelShapes.empty();
+            return Shapes.empty();
         } else {
             VoxelShape shape = null;
             java.util.Iterator iter = handles.iterator();
             while (iter.hasNext()) {
                 AABB aabb = (AABB) iter.next();
-                VoxelShape aabb_shape = VoxelShapes.create(aabb);
+                VoxelShape aabb_shape = Shapes.create(aabb);
                 if (shape == null) {
                     shape = aabb_shape;
                 } else {
-                    shape = VoxelShapes.or(shape, aabb_shape); // OR
+                    shape = Shapes.or(shape, aabb_shape); // OR
                 }
             }
             return shape;
@@ -35,15 +35,15 @@ class VoxelShape {
     }
 
     public static (VoxelShapeHandle) VoxelShape fromAABB((AABBHandle) AABB aabb) {
-        return VoxelShapes.create(aabb);
+        return Shapes.create(aabb);
     }
 
     public static (VoxelShapeHandle) VoxelShape mergeOnlyFirst((VoxelShapeHandle) VoxelShape a, (VoxelShapeHandle) VoxelShape b) {
-        return VoxelShapes.join(a, b, OperatorBoolean.ONLY_FIRST);
+        return Shapes.join(a, b, BooleanOp.ONLY_FIRST);
     }
 
     public static (VoxelShapeHandle) VoxelShape merge((VoxelShapeHandle) VoxelShape a, (VoxelShapeHandle) VoxelShape b) {
-        return VoxelShapes.or(a, b);
+        return Shapes.or(a, b);
     }
 
     public (AABBHandle) AABB getBoundingBox:bounds();
@@ -51,22 +51,22 @@ class VoxelShape {
 
 #elseif version >= 1.13
     public static (VoxelShapeHandle) VoxelShape empty() {
-        return VoxelShapes.a();
+        return Shapes.a();
     }
 
     public static (Object) VoxelShape createRawFromAABB((Object) List<AABB> handles) {
         if (handles.isEmpty()) {
-            return VoxelShapes.a();
+            return Shapes.a();
         } else {
             VoxelShape shape = null;
             java.util.Iterator iter = handles.iterator();
             while (iter.hasNext()) {
                 AABB aabb = (AABB) iter.next();
-                VoxelShape aabb_shape = VoxelShapes.a(aabb);
+                VoxelShape aabb_shape = Shapes.a(aabb);
                 if (shape == null) {
                     shape = aabb_shape;
                 } else {
-                    shape = VoxelShapes.a(shape, aabb_shape); // OR
+                    shape = Shapes.a(shape, aabb_shape); // OR
                 }
             }
             return shape;
@@ -74,15 +74,15 @@ class VoxelShape {
     }
 
     public static (VoxelShapeHandle) VoxelShape fromAABB((AABBHandle) AABB aabb) {
-        return VoxelShapes.a(aabb);
+        return Shapes.a(aabb);
     }
 
     public static (VoxelShapeHandle) VoxelShape mergeOnlyFirst((VoxelShapeHandle) VoxelShape a, (VoxelShapeHandle) VoxelShape b) {
-        return VoxelShapes.b(a, b, OperatorBoolean.ONLY_FIRST);
+        return Shapes.b(a, b, BooleanOp.ONLY_FIRST);
     }
 
     public static (VoxelShapeHandle) VoxelShape merge((VoxelShapeHandle) VoxelShape a, (VoxelShapeHandle) VoxelShape b) {
-        return VoxelShapes.a(a, b);
+        return Shapes.a(a, b);
     }
 
   #if methodexists net.minecraft.world.phys.shapes.VoxelShape public net.minecraft.world.phys.AABB getBoundingBox()
@@ -145,7 +145,7 @@ class VoxelShape {
 #if version >= 1.18
         // Now uses an Iterable rather than stream - but iterates only once
         // Easiest is to just do the for loop in here
-        //return VoxelShapes.collide(axis, boundingBox, voxels, coordinate);
+        //return Shapes.collide(axis, boundingBox, voxels, coordinate);
 
         VoxelShape voxelshape;
         for (java.util.Iterator iterator = voxels.iterator(); iterator.hasNext(); coordinate = voxelshape.collide(axis, boundingBox, coordinate)) {
@@ -158,13 +158,13 @@ class VoxelShape {
         return coordinate;
 #elseif version >= 1.13.1
         // Official API as of 1.13.1
-        return VoxelShapes.a(axis, boundingBox, voxels, coordinate);
+        return Shapes.a(axis, boundingBox, voxels, coordinate);
 #elseif version >= 1.13
         // Call the method for every item in the stream
         java.util.Iterator iter = voxels.iterator();
         while (iter.hasNext()) {
             VoxelShape voxel = (VoxelShape) iter.next();
-            coordinate = VoxelShapes.a(axis, boundingBox, voxel, coordinate);
+            coordinate = Shapes.a(axis, boundingBox, voxel, coordinate);
 
             // Shortcut, see implementation of 1.13.1
             if (Math.abs(coordinate) <= 1.0E-7D) {

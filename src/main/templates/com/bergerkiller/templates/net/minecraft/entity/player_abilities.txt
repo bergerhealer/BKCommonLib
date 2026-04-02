@@ -52,5 +52,5 @@ class Abilities {
     public float walkSpeed;
 #endif
 
-    public (AbilitiesHandle) PlayerAbilities();
+    public (AbilitiesHandle) Abilities();
 }

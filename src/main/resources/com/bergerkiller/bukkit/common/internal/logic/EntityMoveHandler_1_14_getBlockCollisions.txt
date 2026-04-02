@@ -1,4 +1,4 @@
-// package: net.minecraft.world.level.World;
+// package: net.minecraft.world.level.Level;
 
 // If the entity is not inside the World Border, call the normal Block Collision handler
 // This bypasses our custom collision handler

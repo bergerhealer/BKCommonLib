@@ -253,16 +253,16 @@ class ServerboundInteractPacket extends Packet {
     private int usedEntityId:a;
 #endif
 
-    // Since 1.17 the enum is a property of an interface that houses the action (Action -> getType() -> ActionEnum)
-    // ActionEnum is a custom name to handle this situation better
+    // Since 1.17 the enum is a property of an interface that houses the action (Action -> getType() -> ActionType)
+    // ActionType is the internal enum name in mojmap, this handles the situation better
 #if version >= 1.18
-    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.Action public abstract (Enum) net.minecraft.network.protocol.game.ServerboundInteractPacket.ActionEnum getType();
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.Action public abstract (Enum) net.minecraft.network.protocol.game.ServerboundInteractPacket.ActionType getType();
 #elseif version >= 1.17
-    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.Action public abstract (Enum) net.minecraft.network.protocol.game.ServerboundInteractPacket.ActionEnum getType:a();
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.Action public abstract (Enum) net.minecraft.network.protocol.game.ServerboundInteractPacket.ActionType getType:a();
 #elseif version >= 1.13
-    #require net.minecraft.network.protocol.game.ServerboundInteractPacket public ServerboundInteractPacket.ActionEnum getType:b();
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket public ServerboundInteractPacket.ActionType getType:b();
 #else
-    #require net.minecraft.network.protocol.game.ServerboundInteractPacket public ServerboundInteractPacket.ActionEnum getType:a();
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket public ServerboundInteractPacket.ActionType getType:a();
 #endif
 
 #if version >= 1.17
@@ -589,10 +589,10 @@ class ServerboundUseItemOnPacket extends Packet {
 
 #if version >= 1.14
   #if version >= 1.17
-    #require net.minecraft.world.phys.MovingObjectPosition protected final net.minecraft.world.phys.Vec3 position:location;
+    #require net.minecraft.world.phys.HitResult protected final net.minecraft.world.phys.Vec3 position:location;
     #require net.minecraft.world.phys.BlockHitResult private final net.minecraft.core.BlockPos blockPosition:blockPos;
   #else
-    #require net.minecraft.world.phys.MovingObjectPosition protected final net.minecraft.world.phys.Vec3 position:pos;
+    #require net.minecraft.world.phys.HitResult protected final net.minecraft.world.phys.Vec3 position:pos;
     #require net.minecraft.world.phys.BlockHitResult private final net.minecraft.core.BlockPos blockPosition:c;
   #endif
     public (IntVector3) BlockPos getPosition() {
@@ -1779,7 +1779,7 @@ class ClientboundCustomSoundPacket extends Packet {
 
 #if version >= 1.19.3
     // Note: is ClientboundSoundPacket
-    public static (ClientboundCustomSoundPacketHandle) ClientboundCustomSoundPacket createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.core.Holder<net.minecraft.sounds.SoundEffect> soundEffect, (String) SoundSource category, double x, double y, double z, float volume, float pitch, long randomSeed) {
+    public static (ClientboundCustomSoundPacketHandle) ClientboundCustomSoundPacket createNew((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.core.Holder<net.minecraft.sounds.SoundEvent> soundEffect, (String) SoundSource category, double x, double y, double z, float volume, float pitch, long randomSeed) {
         return new ClientboundCustomSoundPacket(soundEffect, category, x, y, z, volume, pitch, randomSeed);
     }
 #elseif version >= 1.13

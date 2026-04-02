@@ -1,5 +1,7 @@
 package net.minecraft.world.level;
 
+import net.minecraft.world.level.ClipContext;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
@@ -364,7 +366,7 @@ class Level extends BlockGetter {
 #if version >= 1.14
     // Fallback...
     public (HitResultHandle) HitResult rayTrace((org.bukkit.util.Vector) Vec3 point1, (org.bukkit.util.Vector) Vec3 point2) {
-        RayTrace rayTrace = new RayTrace(point1, point2, RayTrace$BlockCollisionOption.OUTLINE, RayTrace$FluidCollisionOption.NONE, null);
+        ClipContext rayTrace = new ClipContext(point1, point2, ClipContext$Block.OUTLINE, ClipContext$Fluid.NONE, null);
   #if version >= 1.18
         HitResult result = instance.clip(rayTrace);
   #else

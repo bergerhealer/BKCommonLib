@@ -8,6 +8,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 
+import net.minecraft.world.item.crafting.Ingredient;
+
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeManagerHandle;
@@ -33,12 +35,12 @@ class Recipe {
 
             //TODO: Recipes could change depending on inputs
             RecipeInput input;
-            if (instance instanceof RecipeTippedArrow || instance instanceof DecoratedPotRecipe) {
+            if (instance instanceof TippedArrowRecipe || instance instanceof DecoratedPotRecipe) {
                 // These recipes cannot operate with an empty input
                 return ItemStack.EMPTY;
-            } else if (instance instanceof RecipeCrafting) {
+            } else if (instance instanceof CraftingRecipe) {
                 input = CraftingInput.EMPTY;
-            } else if (instance instanceof RecipeSingleItem) {
+            } else if (instance instanceof SingleItemRecipe) {
                 input = new SingleRecipeInput(ItemStack.EMPTY);
             } else if (instance instanceof SmithingRecipe) {
                 // record SmithingRecipeInput(ItemStack template, ItemStack base, ItemStack addition);
@@ -68,9 +70,9 @@ class Recipe {
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:b();
 #endif
 
-    public abstract (List<CraftInputSlot>) List<RecipeItemStack> getIngredients() {
-        if (instance instanceof ShapedRecipes) {
-            ShapedRecipes s = (ShapedRecipes) instance;
+    public abstract (List<CraftInputSlot>) List<Ingredient> getIngredients() {
+        if (instance instanceof ShapedRecipe) {
+            ShapedRecipe s = (ShapedRecipe) instance;
 #select version >=
 #case 1.21.2:   java.util.List optionalIngredients = s.getIngredients();
                 java.util.List ingredients = new java.util.ArrayList(optionalIngredients.size());
@@ -85,19 +87,19 @@ class Recipe {
 #case 1.14:     return s.a();
 #case 1.13:     return s.e();
 #case 1.12.1:   return s.d();
-#case else:     #require net.minecraft.world.item.crafting.ShapedRecipes private final NonNullList<RecipeItemStack> items;
+#case else:     #require net.minecraft.world.item.crafting.ShapedRecipe private final NonNullList<Ingredient> items;
                 return instance#items;
 #endselect
-        } else if (instance instanceof ShapelessRecipes) {
-            ShapelessRecipes s = (ShapelessRecipes) instance;
+        } else if (instance instanceof ShapelessRecipe) {
+            ShapelessRecipe s = (ShapelessRecipe) instance;
 #select version >=
-#case 1.21.2:   #require net.minecraft.world.item.crafting.ShapelessRecipes final java.util.List<RecipeItemStack> shapelessIngredients:ingredients;
+#case 1.21.2:   #require net.minecraft.world.item.crafting.ShapelessRecipe final java.util.List<Ingredient> shapelessIngredients:ingredients;
                 return s#shapelessIngredients;
 #case 1.18:     return s.getIngredients();
 #case 1.14:     return s.a();
 #case 1.13:     return s.e();
 #case 1.12.1:   return s.d();
-#case else:     #require net.minecraft.world.item.crafting.ShapelessRecipes private final NonNullList<RecipeItemStack> ingredients;
+#case else:     #require net.minecraft.world.item.crafting.ShapelessRecipe private final NonNullList<Ingredient> ingredients;
                 return instance#ingredients;
 #endselect
 
@@ -108,11 +110,11 @@ class Recipe {
             // crafting a flight 3 firework:
             // Shapeless(1 paper + 3 gunpowder) -> Flight 3 firework
   #if version >= 1.18
-            RecipeItemStack paper = RecipeItemStack.of(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.PAPER });
-            RecipeItemStack gunpowder = RecipeItemStack.of(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.GUNPOWDER });
+            Ingredient paper = Ingredient.of(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.PAPER });
+            Ingredient gunpowder = Ingredient.of(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.GUNPOWDER });
   #else
-            RecipeItemStack paper = RecipeItemStack.a(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.PAPER });
-            RecipeItemStack gunpowder = RecipeItemStack.a(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.GUNPOWDER });
+            Ingredient paper = RecipeItemStack.a(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.PAPER });
+            Ingredient gunpowder = Ingredient.a(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.GUNPOWDER });
   #endif
 
             java.util.List ingredients = new java.util.ArrayList(4);
@@ -288,11 +290,11 @@ class RecipeManager {
             // This removes furnace recipes, stone cutting, etc. Which is not intended to be 'seen' here.
             // TODO: In future, we probably do want to have an api accessible for such recipes?
   #if version >= 1.14
-            if (!(recipe instanceof RecipeCrafting)) {
+            if (!(recipe instanceof CraftingRecipe)) {
                 continue;
             }
   #else
-            if (!(recipe instanceof ShapedRecipes || recipe instanceof ShapelessRecipes || recipe instanceof CustomRecipe)) {
+            if (!(recipe instanceof ShapedRecipe || recipe instanceof ShapelessRecipe || recipe instanceof CustomRecipe)) {
                 continue;
             }
   #endif
@@ -301,7 +303,7 @@ class RecipeManager {
             // One is shapeless, the other is complex
             // Correct for this and only keep the complex one!
   #if version >= 1.21.2
-            if (recipe instanceof ShapelessRecipes && ((Recipe) recipe).assemble(emptyCraftingInput, registry).getItem() == Items.FIREWORK_ROCKET) {
+            if (recipe instanceof ShapelessRecipe && ((Recipe) recipe).assemble(emptyCraftingInput, registry).getItem() == Items.FIREWORK_ROCKET) {
                 continue;
             }
   #elseif version >= 1.19.4

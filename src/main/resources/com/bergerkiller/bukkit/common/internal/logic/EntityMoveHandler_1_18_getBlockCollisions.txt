@@ -1,4 +1,4 @@
-// package: net.minecraft.world.level.World;
+// package: net.minecraft.world.level.Level;
 
 // If the entity is not inside the World Border, call the normal Block Collision handler
 // This bypasses our custom collision handler
@@ -56,7 +56,7 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
                             if (!Shapes.joinIsNotEmpty(voxelshape, voxelshape6, BooleanOp.AND)) {
                                 continue;
                             }
-#if exists org.bukkit.craftbukkit.block.CraftBlock public static CraftBlock at(net.minecraft.world.level.GeneratorAccess world, net.minecraft.core.BlockPos position);
+#if version >= 1.19 || exists org.bukkit.craftbukkit.block.CraftBlock public static CraftBlock at(net.minecraft.world.level.LevelAccessor world, net.minecraft.core.BlockPos position);
                             org.bukkit.craftbukkit.block.CraftBlock cb_block = org.bukkit.craftbukkit.block.CraftBlock.at(this, blockposition_b.immutable());
 #else
                             org.bukkit.craftbukkit.block.CraftBlock cb_block = new org.bukkit.craftbukkit.block.CraftBlock(this, blockposition_b.immutable());

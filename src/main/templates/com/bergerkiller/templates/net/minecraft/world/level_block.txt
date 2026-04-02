@@ -15,7 +15,10 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParameterSet
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.Vec3;
+
+import net.minecraft.world.level.block.EntityBlock;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.bases.IntVector3
@@ -267,13 +270,13 @@ class Block {
     public boolean canSupportOnFace((BlockStateHandle) BlockState iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block, (org.bukkit.block.BlockFace) Direction direction) {
         BlockGetter iblockaccess = block.getCraftWorld().getHandle();
         BlockPos blockposition = block.getPosition();
-        return iblockaccess.getBlockState(blockposition).isFaceSturdy(iblockaccess, blockposition, direction, EnumBlockSupport.RIGID);
+        return iblockaccess.getBlockState(blockposition).isFaceSturdy(iblockaccess, blockposition, direction, SupportType.RIGID);
     }
 #elseif version >= 1.16.2
     public boolean canSupportOnFace((BlockStateHandle) BlockState iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block, (org.bukkit.block.BlockFace) Direction direction) {
         BlockGetter iblockaccess = block.getCraftWorld().getHandle();
         BlockPos blockposition = block.getPosition();
-        return iblockaccess.getType(blockposition).a(iblockaccess, blockposition, direction, EnumBlockSupport.RIGID);
+        return iblockaccess.getType(blockposition).a(iblockaccess, blockposition, direction, SupportType.RIGID);
     }
 #elseif version >= 1.14
     public boolean canSupportOnFace((BlockStateHandle) BlockState iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block, (org.bukkit.block.BlockFace) Direction direction) {
@@ -291,7 +294,7 @@ class Block {
         BlockGetter iblockaccess = block.getCraftWorld().getHandle();
         BlockPos blockposition = block.getPosition();
         VoxelShape shape = iblockdata.getCollisionShape(iblockaccess, blockposition);
-        return !VoxelShapes.c(shape.a(direction), checkShape, BooleanOp.ONLY_SECOND);
+        return !Shapes.c(shape.a(direction), checkShape, BooleanOp.ONLY_SECOND);
     }
 
 #elseif version >= 1.12
@@ -397,7 +400,7 @@ class Block {
 
         boolean isTileEntity;
   #if version >= 1.17
-        isTileEntity = (block instanceof ITileEntity);
+        isTileEntity = (block instanceof EntityBlock);
   #else
         isTileEntity = block.isTileEntity();
   #endif

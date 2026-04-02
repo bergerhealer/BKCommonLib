@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
-import net.minecraft.world.level.ChunkCoordIntPair;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.ForcedChunksSavedData;
 import net.minecraft.world.level.Level;
@@ -252,20 +252,20 @@ class ServerLevel extends Level {
     public (org.bukkit.Chunk) LevelChunk getChunkIfLoaded(int cx, int cz) {
 #if version >= 1.14
   #if version >= 1.18
-        long key = ChunkCoordIntPair.asLong(cx, cz);
+        long key = ChunkPos.asLong(cx, cz);
   #else
-        long key = ChunkCoordIntPair.pair(cx, cz);
+        long key = ChunkPos.pair(cx, cz);
   #endif
         ChunkMap playerChunkMap = instance#getPlayerChunkMap();
 
   #if exists net.minecraft.server.level.ChunkMap public ChunkHolder getVisibleChunkIfPresent(long key);
-        ChunkHolder chunk = (PlayerChunk) playerChunkMap.getVisibleChunkIfPresent(key);
+        ChunkHolder chunk = (ChunkHolder) playerChunkMap.getVisibleChunkIfPresent(key);
   #elseif exists net.minecraft.server.level.ChunkMap public ChunkHolder getVisibleChunk(long key);
-        ChunkHolder chunk = (PlayerChunk) playerChunkMap.getVisibleChunk(key);
+        ChunkHolder chunk = (ChunkHolder) playerChunkMap.getVisibleChunk(key);
   #elseif version >= 1.17
-        ChunkHolder chunk = (PlayerChunk) playerChunkMap.visibleChunkMap.get(key);
+        ChunkHolder chunk = (ChunkHolder) playerChunkMap.visibleChunkMap.get(key);
   #else
-        ChunkHolder chunk = (PlayerChunk) playerChunkMap.visibleChunks.get(key);
+        ChunkHolder chunk = (ChunkHolder) playerChunkMap.visibleChunks.get(key);
   #endif
 
         if (chunk != null) {
@@ -291,7 +291,7 @@ class ServerLevel extends Level {
         // Note: suffers server crash bug on earlier versions of Spigot
         // return instance.getChunkAt(cx, cz, ChunkStatus.FULL, false);
 #elseif version >= 1.13.1
-        long key = ChunkCoordIntPair.a(cx, cz);
+        long key = ChunkPos.a(cx, cz);
         ServerChunkCache cps = instance#getChunkProviderServer();
         return (Chunk) cps.chunks.get(key);
 
@@ -326,7 +326,7 @@ class ServerLevel extends Level {
         Ticket ticket = new Ticket(TicketType.PLUGIN_TICKET, ticketLevel, (Object) plugin);
   #endif
 
-        ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(x, z);
+        ChunkPos chunkCoord = new ChunkPos(x, z);
 
         if (loaded) {
             ticketStorage.addTicket(ticket, chunkCoord);
@@ -348,7 +348,7 @@ class ServerLevel extends Level {
         chunkDistanceManager = chunkMap.u;
   #endif
 
-        ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(x, z);
+        ChunkPos chunkCoord = new ChunkPos(x, z);
   #if version >= 1.21.5
           if (loaded) {
               chunkDistanceManager.addRegionTicket(TicketType.PLUGIN_TICKET, chunkCoord, radius, plugin);
@@ -377,9 +377,9 @@ class ServerLevel extends Level {
         ForcedChunksSavedData forcedchunk = (ForcedChunksSavedData) getForcedChunkMethod.invoke(instance);
 
   #if version >= 1.14
-        long key = ChunkCoordIntPair.pair(x, z);
+        long key = ChunkPos.pair(x, z);
   #else
-        long key = ChunkCoordIntPair.a(x, z);
+        long key = ChunkPos.a(x, z);
   #endif
 
         boolean changed;
@@ -392,7 +392,7 @@ class ServerLevel extends Level {
 
   #if version >= 1.14
         if (changed) {
-            ChunkCoordIntPair chunkcoordintpair = new ChunkCoordIntPair(x, z);
+            ChunkPos chunkcoordintpair = new ChunkPos(x, z);
             instance.getChunkProvider().a(chunkcoordintpair, loaded);
         }
   #endif

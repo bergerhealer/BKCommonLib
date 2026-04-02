@@ -12,7 +12,7 @@ import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.TypedEntityData;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.network.chat.Component;
-import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.LongTag;
@@ -61,7 +61,7 @@ class ItemStack {
     #require net.minecraft.world.item.ItemStack public net.minecraft.nbt.CompoundTag getDisplayTag() {
         net.minecraft.nbt.CompoundTag tag = instance.getTag();
         if (tag != null) {
-            net.minecraft.nbt.NBTBase displayTag = tag.get("display");
+            net.minecraft.nbt.Tag displayTag = tag.get("display");
             if (displayTag instanceof net.minecraft.nbt.CompoundTag) {
                 return (net.minecraft.nbt.CompoundTag) displayTag;
             }
@@ -164,7 +164,7 @@ class ItemStack {
         // getHoverName() doesn't return null if none is set...
         // Serializer fromJson returns null if parsing the string fails
         CompoundTag displayTag = instance#getDisplayTag();
-        NBTBase nameTag;
+        Tag nameTag;
         if (displayTag != null && (nameTag = displayTag.get("Name")) instanceof StringTag) {
             String jsonContent = ((StringTag) nameTag).getAsString();
             return net.minecraft.network.chat.Component$Serializer.fromJson(jsonContent);
@@ -176,13 +176,13 @@ class ItemStack {
         // getName() doesn't return null if none is set...
         CompoundTag displayTag = instance#getDisplayTag();
         if (displayTag != null) {
-            NBTBase nameTag;
+            Tag nameTag;
             if ((nameTag = displayTag.get("Name")) instanceof StringTag) {
                 return ((StringTag) nameTag).getAsString();
             }
 
   #if version >= 1.11
-            NBTBase locName;
+            Tag locName;
             if ((locName = displayTag.get("LocName")) instanceof StringTag) {
                 String localeKey = ((StringTag) locName).getAsString();
                 return net.minecraft.locale.LocaleI18n.get(localeKey);
@@ -451,7 +451,7 @@ class ItemStack {
             return java.util.Collections.emptyList();
         }
 
-        NBTBase loreListBase = displayTag.get("Lore");
+        Tag loreListBase = displayTag.get("Lore");
         if (!(loreListBase instanceof ListTag)) {
             return java.util.Collections.emptyList();
         }
@@ -460,7 +460,7 @@ class ItemStack {
         int loreCount = loreList.size();
         java.util.List result = new java.util.ArrayList(loreCount);
         for (int i = 0; i < loreCount; i++) {
-            NBTBase loreLine = loreList.get(i);
+            Tag loreLine = loreList.get(i);
             if (loreLine instanceof StringTag) {
                 String line = ((StringTag) loreLine).getAsString();
                 Component lineComponent;
@@ -488,13 +488,13 @@ class ItemStack {
     public void addLore((ChatText) Component line) {
         // All this to retrieve the list of lore line tags
         CompoundTag tag = instance#getOrCreateTag();
-        NBTBase displayBase = tag.get("display");
+        Tag displayBase = tag.get("display");
         if (!(displayBase instanceof CompoundTag)) {
             displayBase = new CompoundTag();
             tag.put("display", displayBase);
         }
         CompoundTag display = (CompoundTag) displayBase;
-        NBTBase loreListBase = display.get("Lore");
+        Tag loreListBase = display.get("Lore");
         if (!(loreListBase instanceof ListTag)) {
             loreListBase = new ListTag();
             display.put("Lore", loreListBase);
@@ -507,9 +507,9 @@ class ItemStack {
             String json = net.minecraft.network.chat.Component$Serializer.toJson(line);
             if (json != null) {
     #if version >= 1.15
-                loreList.add((NBTBase) StringTag.valueOf(json));
+                loreList.add((Tag) StringTag.valueOf(json));
     #else
-                loreList.add((NBTBase) new StringTag(json));
+                loreList.add((Tag) new StringTag(json));
     #endif
             }
         }
@@ -518,7 +518,7 @@ class ItemStack {
         // Use ChatText for this as it contains a lot of hacky crap
         ChatText text = ChatText.fromComponent(line);
         if (text != null) {
-            loreList.add((NBTBase) new StringTag(text.getMessage()));
+            loreList.add((Tag) new StringTag(text.getMessage()));
         }
   #endif
     }
@@ -526,7 +526,7 @@ class ItemStack {
     public void clearLores() {
         CompoundTag tag = instance.getTag();
         if (tag != null) {
-            NBTBase displayBase = tag.get("display");
+            Tag displayBase = tag.get("display");
             if (displayBase instanceof CompoundTag) {
                 CompoundTag display = (CompoundTag) displayBase;
                 display.remove("Lore");
@@ -573,7 +573,7 @@ class ItemStack {
 #else
         CompoundTag tag = instance.getTag();
         if (tag != null) {
-            NBTBase unbreakable = tag.get("Unbreakable");
+            Tag unbreakable = tag.get("Unbreakable");
             if (unbreakable instanceof ByteTag) {
                 return ((ByteTag) unbreakable).getAsByte() != 0;
             }
@@ -639,7 +639,7 @@ class ItemStack {
 #else
         CompoundTag displayTag = instance#getDisplayTag();
         if (displayTag != null) {
-            NBTBase color = displayTag.get("MapColor");
+            Tag color = displayTag.get("MapColor");
             if (color instanceof IntTag) {
                 return ((IntTag) color).getAsInt();
             }
@@ -657,7 +657,7 @@ class ItemStack {
 #else
         if (rgb != -1) {
             CompoundTag tag = instance#getOrCreateTag();
-            NBTBase displayTag = tag.get("display");
+            Tag displayTag = tag.get("display");
             if (!(displayTag instanceof CompoundTag)) {
                 displayTag = new CompoundTag();
                 tag.put("display", displayTag);
@@ -666,7 +666,7 @@ class ItemStack {
         } else {
             CompoundTag tag = instance.getTag();
             if (tag != null) {
-                NBTBase baseDisplayTag = tag.get("display");
+                Tag baseDisplayTag = tag.get("display");
                 if (baseDisplayTag instanceof CompoundTag) {
                     CompoundTag displayTag = (CompoundTag) baseDisplayTag;
                     displayTag.remove("MapColor");
@@ -691,7 +691,7 @@ class ItemStack {
 #else
         CompoundTag displayTag = instance#getDisplayTag();
         if (displayTag != null) {
-            NBTBase color = displayTag.get("color");
+            Tag color = displayTag.get("color");
             if (color instanceof IntTag) {
                 rgb = ((IntTag) color).getAsInt();
             }
@@ -712,7 +712,7 @@ class ItemStack {
 #else
         CompoundTag tag = instance.getTag();
         if (tag != null) {
-            NBTBase potionColor = tag.get("CustomPotionColor");
+            Tag potionColor = tag.get("CustomPotionColor");
             if (potionColor instanceof IntTag) {
                 return ((IntTag) potionColor).getAsInt();
             }
@@ -734,9 +734,9 @@ class ItemStack {
 #else
         CompoundTag tag = instance.getTag();
         if (tag != null) {
-            NBTBase fireworksTagBase = tag.get("Fireworks");
+            Tag fireworksTagBase = tag.get("Fireworks");
             if (fireworksTagBase instanceof CompoundTag) {
-                NBTBase flightDurBase = ((CompoundTag) fireworksTagBase).get("Flight");
+                Tag flightDurBase = ((CompoundTag) fireworksTagBase).get("Flight");
                 if (flightDurBase instanceof ByteTag) {
                     return (int) ((ByteTag) flightDurBase).getAsByte() & 0XFF;
                 }
@@ -762,7 +762,7 @@ class ItemStack {
 #else
         if (duration > 0) {
             CompoundTag tag = instance#getOrCreateTag();
-            NBTBase fireworksTagBase = tag.get("Fireworks");
+            Tag fireworksTagBase = tag.get("Fireworks");
             if (!(fireworksTagBase instanceof CompoundTag)) {
                 fireworksTagBase = new CompoundTag();
                 tag.put("Fireworks", fireworksTagBase);
@@ -771,7 +771,7 @@ class ItemStack {
         } else {
             CompoundTag tag = instance.getTag();
             if (tag != null) {
-                NBTBase fireworksTagBase = tag.get("Fireworks");
+                Tag fireworksTagBase = tag.get("Fireworks");
                 if (fireworksTagBase instanceof CompoundTag) {
                     tag.remove("Fireworks");
                     instance#removeTagIfEmpty();
@@ -796,7 +796,7 @@ class ItemStack {
         if (tag == null) {
             return null;
         }
-        NBTBase serializedProfileBase = tag.get("SkullOwner");
+        Tag serializedProfileBase = tag.get("SkullOwner");
         if (!(serializedProfileBase instanceof CompoundTag)) {
             return null;
         }
@@ -830,7 +830,7 @@ class ItemStack {
   #else
             CompoundTag serializedProfile = NbtUtils.serialize(new CompoundTag(), profile);
   #endif
-            tag.put("SkullOwner", (NBTBase) serializedProfile);
+            tag.put("SkullOwner", (Tag) serializedProfile);
     #if version < 1.13
             instance#durabilityField = 3;
     #endif
@@ -992,7 +992,7 @@ class ItemStack {
     public (com.bergerkiller.bukkit.common.wrappers.CustomModelData) net.minecraft.world.item.component.CustomModelData getCustomModelData() {
         CompoundTag tag = instance.getTag();
         if (tag != null) {
-            NBTBase cmd = tag.get("CustomModelData");
+            Tag cmd = tag.get("CustomModelData");
             if (cmd instanceof IntTag) {
                 int value = ((IntTag) cmd).getAsInt();
                 return new net.minecraft.world.item.component.CustomModelData(value);
@@ -1004,7 +1004,7 @@ class ItemStack {
     public int getCustomModelDataValue() {
         CompoundTag tag = instance.getTag();
         if (tag != null) {
-            NBTBase cmd = tag.get("CustomModelData");
+            Tag cmd = tag.get("CustomModelData");
             if (cmd instanceof IntTag) {
                 return ((IntTag) cmd).getAsInt();
             }
@@ -1170,11 +1170,11 @@ class ItemStack {
 #else
         CompoundTag fullTag = instance.getTag();
         if (fullTag == null) return null;
-        NBTBase tagBase = fullTag.get("EntityTag");
+        Tag tagBase = fullTag.get("EntityTag");
         if (!(tagBase instanceof CompoundTag)) return null;
         CompoundTag tag = (CompoundTag) tagBase;
 #endif
-        NBTBase tagVariant = tag.get("variant");
+        Tag tagVariant = tag.get("variant");
         if (!(tagVariant instanceof StringTag)) return null;
         return ((StringTag) tagVariant).getAsString();
     }
@@ -1203,7 +1203,7 @@ class ItemStack {
         if (name == null) {
             CompoundTag tag = instance.getTag();
             if (tag == null) return;
-            NBTBase entityTagBase = tag.get("EntityTag");
+            Tag entityTagBase = tag.get("EntityTag");
             if (!(entityTagBase instanceof CompoundTag)) return;
             CompoundTag entityTag = (CompoundTag) entityTagBase;
             entityTag.remove("variant");
@@ -1213,7 +1213,7 @@ class ItemStack {
             instance#removeTagIfEmpty();
         } else {
             CompoundTag tag = instance#getOrCreateTag();
-            NBTBase entityTagBase = tag.get("EntityTag");
+            Tag entityTagBase = tag.get("EntityTag");
             if (!(entityTagBase instanceof CompoundTag)) {
                 entityTagBase = new CompoundTag();
                 tag.put("EntityTag", entityTagBase);

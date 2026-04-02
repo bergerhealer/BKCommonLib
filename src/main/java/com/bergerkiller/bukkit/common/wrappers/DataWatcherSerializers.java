@@ -46,9 +46,17 @@ class DataWatcherSerializers {
         // This MUST be done first, or we get bootstrap errors!
         CommonBootstrap.initServer();
 
-        Class<?> registryClass = CommonUtil.getClass("net.minecraft.network.syncher.DataWatcherRegistry");
-        Class<?> serializerClass = CommonUtil.getClass("net.minecraft.network.syncher.DataWatcherSerializer");
-        if (registryClass != null && serializerClass != null) {
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
+            Class<?> registryClass = CommonUtil.getClass("net.minecraft.network.syncher.EntityDataSerializers");
+            if (registryClass == null) {
+                throw new IllegalStateException("Failed to find EntityDataSerializers class. DataWatcher serializers cannot be registered!");
+            }
+
+            Class<?> serializerClass = CommonUtil.getClass("net.minecraft.network.syncher.EntityDataSerializer");
+            if (serializerClass == null) {
+                throw new IllegalStateException("Failed to find EntityDataSerializer class. DataWatcher serializers cannot be registered!");
+            }
+
             // Since MC 1.9
             for (Field f : registryClass.getDeclaredFields()) {
                 if (f.getType().equals(serializerClass) && Modifier.isStatic(f.getModifiers())) {

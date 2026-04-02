@@ -352,7 +352,7 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
 
         /*
          * <CREATE_ENTRY>
-         * public static Object createEntry((Object) PlayerChunkMap playerChunkMap, (Object) Entity entity) {
+         * public static Object createEntry((Object) ChunkMap playerChunkMap, (Object) Entity entity) {
          * #if version >= 1.18
          *     EntityType entitytypes = entity.getType();
          *     int i = entitytypes.clientTrackingRange() * 16;
@@ -373,7 +373,7 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *     boolean trackDeltas = entitytypes.isDeltaTracking();
          * #endif
          * 
-         *     return new PlayerChunkMap$EntityTracker(playerChunkMap, entity, i, j, trackDeltas);
+         *     return new ChunkMap$TrackedEntity(playerChunkMap, entity, i, j, trackDeltas);
          * }
          */
         @Template.Generated("%CREATE_ENTRY%")

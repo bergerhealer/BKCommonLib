@@ -79,7 +79,7 @@ class DamageSource {
         return DamageSourceHandle.createHandle(source);
     }
 
-    public static DamageSourceHandle byName((org.bukkit.World) net.minecraft.world.level.World world, String name) {
+    public static DamageSourceHandle byName((org.bukkit.World) net.minecraft.world.level.Level world, String name) {
         DamageSources sources = world.damageSources();
         return sources#lookupDamageSource(name);
     }

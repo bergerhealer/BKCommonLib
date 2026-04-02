@@ -1,5 +1,7 @@
 package net.minecraft.server.level;
 
+import net.minecraft.server.level.ServerLevel;
+
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.VecDeltaCodec;
@@ -87,7 +89,7 @@ class EntityTracker {
     #require net.minecraft.server.level.EntityTracker private final Set<EntityTrackerEntry> trackedEntitiesSet:c;
   #endif
 
-    public (org.bukkit.World) WorldServer getWorld() {
+    public (org.bukkit.World) ServerLevel getWorld() {
   #if exists net.minecraft.server.level.EntityTracker private final net.minecraft.server.level.ServerLevel world;
         #require net.minecraft.server.level.EntityTracker private final net.minecraft.server.level.ServerLevel world;
         return instance#world;
@@ -104,7 +106,7 @@ class EntityTracker {
   #endif
     }
 
-    public void setWorld((org.bukkit.World) WorldServer world) {
+    public void setWorld((org.bukkit.World) ServerLevel world) {
   #if exists net.minecraft.server.level.EntityTracker private final net.minecraft.server.level.ServerLevel world;
         #require net.minecraft.server.level.EntityTracker private final net.minecraft.server.level.ServerLevel world;
         instance#world = world;
@@ -356,11 +358,11 @@ class EntityTrackerEntry {
   #else
         // Spigot / old paper
     #if version >= 1.20
-        WorldServer world = (WorldServer) entity.level();
+        ServerLevel world = (ServerLevel) entity.level();
     #elseif version >= 1.17
-        WorldServer world = (WorldServer) entity.level;
+        ServerLevel world = (ServerLevel) entity.level;
     #else
-        WorldServer world = (WorldServer) entity.world;
+        ServerLevel world = (ServerLevel) entity.world;
     #endif
     #if version >= 1.18
         java.util.List playersOnWorld = world.players();
@@ -398,7 +400,7 @@ class EntityTrackerEntry {
         Entity entity = instance#entity;
 
         // Spigot / old paper
-        WorldServer world = (WorldServer) entity.world;
+        ServerLevel world = (ServerLevel) entity.world;
         java.util.List playersOnWorld = world.players;
   #if exists net.minecraft.server.level.EntityTrackerEntry public void scanPlayers(java.util.List<net.minecraft.server.ServerPlayer> players);
         instance.scanPlayers(playersOnWorld);

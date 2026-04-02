@@ -145,7 +145,7 @@ class EntityMoveHandler_1_13 extends EntityMoveHandler {
 
                 /*
                 if (axisalignedbb1 != null && axisalignedbb1.c(axisalignedbb)) {
-                    voxelshape1 = VoxelShapes.b(voxelshape1, VoxelShapes.a(axisalignedbb1), OperatorBoolean.OR);
+                    voxelshape1 = Shapes.b(voxelshape1, VoxelShapes.a(axisalignedbb1), OperatorBoolean.OR);
                     if (flag) {
                         break;
                     }
@@ -153,7 +153,7 @@ class EntityMoveHandler_1_13 extends EntityMoveHandler {
 
                 axisalignedbb1 = entity.j(entity1);
                 if (axisalignedbb1 != null && axisalignedbb1.c(axisalignedbb)) {
-                    voxelshape1 = VoxelShapes.b(voxelshape1, VoxelShapes.a(axisalignedbb1), OperatorBoolean.OR);
+                    voxelshape1 = Shapes.b(voxelshape1, VoxelShapes.a(axisalignedbb1), OperatorBoolean.OR);
                     if (flag) {
                         break;
                     }

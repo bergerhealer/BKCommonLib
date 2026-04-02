@@ -13,6 +13,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 
+import net.minecraft.world.level.block.entity.Hopper;
+
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -253,11 +255,11 @@ class AbstractFurnaceBlockEntity extends BlockEntity {
 
 class HopperBlockEntity extends BlockEntity {
 #if version >= 1.18
-    public static boolean suckItems:suckInItems((org.bukkit.World) Level world, (Object) IHopper ihopper);
+    public static boolean suckItems:suckInItems((org.bukkit.World) Level world, (Object) Hopper ihopper);
 #elseif version >= 1.17
-    public static boolean suckItems:a((org.bukkit.World) Level world, (Object) IHopper ihopper);
+    public static boolean suckItems:a((org.bukkit.World) Level world, (Object) Hopper ihopper);
 #else
-    public static boolean suckItems((org.bukkit.World) Level world, (Object) IHopper ihopper) {
+    public static boolean suckItems((org.bukkit.World) Level world, (Object) Hopper ihopper) {
         return HopperBlockEntity.a(ihopper);
     }
 #endif

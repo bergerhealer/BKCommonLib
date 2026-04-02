@@ -257,7 +257,7 @@ public class CommonEntityType {
         if (nmsType != null) {
             boolean hasConstructor = false;
             try {
-                nmsType.getConstructor(CommonUtil.getClass("net.minecraft.world.level.World"), double.class, double.class, double.class);
+                nmsType.getConstructor(CommonUtil.getClass("net.minecraft.world.level.Level"), double.class, double.class, double.class);
                 hasConstructor = true;
             } catch (Throwable t) {
             }

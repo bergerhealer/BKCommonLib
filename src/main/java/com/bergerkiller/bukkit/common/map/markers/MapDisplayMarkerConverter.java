@@ -8,12 +8,12 @@ import java.util.List;
  * Computes the MapIcon value for markers assigned to a map display tile
  */
 @Template.Package("net.minecraft.world.level.saveddata.maps")
-@Template.Import("net.minecraft.network.chat.IChatBaseComponent")
+@Template.Import("net.minecraft.network.chat.Component")
 @Template.Import("com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMapItemDataPacketHandle.Builder")
 @Template.Import("com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkerTile")
 @Template.Import("com.bergerkiller.bukkit.common.map.MapMarker")
 @Template.Import("com.bergerkiller.bukkit.common.wrappers.ChatText")
-@Template.InstanceType("net.minecraft.world.level.saveddata.maps.MapIcon")
+@Template.InstanceType("net.minecraft.world.level.saveddata.maps.MapDecoration")
 public abstract class MapDisplayMarkerConverter extends Template.Class<Template.Handle> {
     /*
      * <MAP_ENCODE_MARKERS>
@@ -36,16 +36,16 @@ public abstract class MapDisplayMarkerConverter extends Template.Class<Template.
      * 
      * #if version >= 1.13
      *         ChatText caption_ct = marker.getFormattedCaption();
-     *         IChatBaseComponent caption = (caption_ct==null)?null:((IChatBaseComponent) caption_ct.clone().getRawHandle());
+     *         Component caption = (caption_ct==null)?null:((Component) caption_ct.clone().getRawHandle());
      * #endif
      * 
-     *         // Create MapIcon and assign to list
+     *         // Create MapDecoration and assign to list
      * #if version >= 1.13
-     *         cursors.add(new MapIcon(type, x, y, rot, caption));
+     *         cursors.add(new MapDecoration(type, x, y, rot, caption));
      * #elseif version >= 1.11
-     *         cursors.add(new MapIcon(type, x, y, rot));
+     *         cursors.add(new MapDecoration(type, x, y, rot));
      * #else
-     *         cursors.add(new MapIcon(marker.getType().id(), x, y, rot));
+     *         cursors.add(new MapDecoration(marker.getType().id(), x, y, rot));
      * #endif
      *     }
      *

@@ -151,7 +151,7 @@ public abstract class EntityMoveHandler {
         resolver.addImport("net.minecraft.world.level.border.WorldBorder");
         resolver.addImport("net.minecraft.world.level.BlockGetter"); // IBlockAccess
         resolver.addImport(MathUtil.class.getName());
-        resolver.setDeclaredClassName("net.minecraft.world.level.World");
+        resolver.setDeclaredClassName("net.minecraft.world.level.Level");
         return resolver;
     }
 

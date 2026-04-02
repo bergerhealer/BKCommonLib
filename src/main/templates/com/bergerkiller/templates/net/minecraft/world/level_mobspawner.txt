@@ -9,6 +9,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 
+import net.minecraft.world.level.SpawnData;
+
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
@@ -64,10 +66,10 @@ class BaseSpawner {
 
         // Note: spawnPotentials is private on some forge servers
   #if version >= 1.21.5
-        #require BaseSpawner private net.minecraft.util.random.WeightedList<MobSpawnerData> spawnPotentials;
+        #require BaseSpawner private net.minecraft.util.random.WeightedList<SpawnData> spawnPotentials;
         instance#spawnPotentials = net.minecraft.util.random.WeightedList.of();
   #else
-        #require BaseSpawner private net.minecraft.util.random.SimpleWeightedRandomList<MobSpawnerData> spawnPotentials;
+        #require BaseSpawner private net.minecraft.util.random.SimpleWeightedRandomList<SpawnData> spawnPotentials;
         instance#spawnPotentials = net.minecraft.util.random.SimpleWeightedRandomList.empty();
   #endif
     }

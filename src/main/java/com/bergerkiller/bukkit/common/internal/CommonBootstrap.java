@@ -574,6 +574,7 @@ public class CommonBootstrap {
             // Identifier moved, though spigot still maps it to the same location. Definitely moved on 26.1+
             remappings.put("net.minecraft.resources.Identifier", "net.minecraft.resources.ResourceLocation");
             remappings.put("net.minecraft.IdentifierException", "net.minecraft.ResourceLocationException");
+            remappings.put("net.minecraft.commands.arguments.IdentifierArgument", "net.minecraft.commands.arguments.ResourceLocationArgument");
 
             // Util (SystemUtils) was moved to a util sub-package
             remappings.put("net.minecraft.util.Util", "net.minecraft.Util");
@@ -661,6 +662,10 @@ public class CommonBootstrap {
         if (evaluateMCVersion("<", "1.20.3")) {
             // Before 1.20.3 the score reset was handled by the ClientboundSetScorePacket with an 'action' field
             remappings.put("net.minecraft.network.protocol.game.ClientboundResetScorePacket", "net.minecraft.network.protocol.game.ClientboundSetScorePacket");
+
+            // PlainTextContents was referred to as LiteralContents in MojMap, just like the spigot name
+            // But the spigot name did not change when mojang renamed it. So we handle a remap to the old name here.
+            remappings.put("net.minecraft.network.chat.contents.PlainTextContents", "net.minecraft.network.chat.contents.LiteralContents");
         }
 
         /* ======== Mojang remapping changes for 1.20.2 ======== */

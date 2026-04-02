@@ -35,7 +35,7 @@ class CommonClasses {
         /*
         loadRef("BlockState", "ChunkProviderServer", "CraftScheduler", "CraftServer", "CraftTask", "EntityMinecart", "EntityPlayer");
         loadRef("Entity", "EntityTrackerEntry", "EntityTracker", "EntityTypes", "LongHashMapEntry", "LongHashSet", "LongHashMap");
-        loadRef("NetworkManager", "PlayerChunk", "PlayerChunkMap", "PluginDescriptionFile", "RegionFileCache", "ChunkRegionLoader");
+        loadRef("NetworkManager", "ChunkHolder", "PlayerChunkMap", "PluginDescriptionFile", "RegionFileCache", "ChunkRegionLoader");
         loadRef("Recipe", "NBT", "RegionFile", "TileEntity", "ChunkSection", "Block", "Chunk", "World", "WorldServer");
         loadRef("EnumGamemode", "EnumProtocol");
         */

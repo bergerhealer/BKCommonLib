@@ -41,7 +41,7 @@ public class SpigotMappingTest {
     public void testVisualizeMappings() {
         SpigotMappings mappings = loadMappings();
 
-        mappings.visualizeMapping("HoverEvent");
+        mappings.visualizeMapping("CompletionProviders");
 
         //mappings.visualizeMappingsForSpigotClass("net.minecraft.server.DataPackResources");
 
@@ -63,9 +63,13 @@ public class SpigotMappingTest {
 
         //mappings.renameKey("old.path.to.Class", "new.path.to.Class");
 
-        mappings.storeAppendForVersionRange("1.13", "1.15.2",
-                "net.minecraft.server.packs.repository.Pack$PackConstructor",
-                "net.minecraft.server.packs.repository.ResourcePackLoader$b");
+        mappings.storeAppendForVersionRange("1.8","1.21.11",
+                "net.minecraft.network.protocol.game.ServerboundInteractPacket$ActionEnum",
+                null);
+
+        mappings.storeAppendForVersionRange("1.8","1.16.2",
+                "net.minecraft.network.protocol.game.ServerboundInteractPacket$ActionType",
+                "net.minecraft.network.protocol.game.PacketPlayInUseEntity$EnumEntityUseAction");
 
         saveMappings(mappings);
     }

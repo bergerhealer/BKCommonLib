@@ -108,25 +108,25 @@ public class SoundEffectParser<C> implements ArgumentParser<C, ResourceKey<Sound
      */
     public static void registerBrigadier(CloudBrigadierManager<?, ?> brig) throws Exception {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClassName("net.minecraft.commands.synchronization.CompletionProviders"); // SuggestionProviders
-        resolver.addImport("net.minecraft.commands.arguments.ArgumentMinecraftKeyRegistered"); // ResourceLocationArgument
+        resolver.setDeclaredClassName("net.minecraft.commands.synchronization.SuggestionProviders");
+        resolver.addImport("net.minecraft.commands.arguments.IdentifierArgument");
         resolver.addImport("com.mojang.brigadier.suggestion.SuggestionProvider");
         resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
 
-        // Get a method that can produce a new ResourceLocationArgument instance
-        final FastMethod<Object> createResourceLocationArgument;
+        // Get a method that can produce a new IdentifierArgument instance
+        final FastMethod<Object> createIdentifierArgument;
         {
-            MethodDeclaration createResourceLocationArgumentMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess("" +
-                            "public static ArgumentMinecraftKeyRegistered createArgument() {\n" +
+            MethodDeclaration createIdentifierArgumentMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess("" +
+                            "public static IdentifierArgument createIdentifierArgument() {\n" +
                             "#if version >= 1.18\n" +
-                            "    return ArgumentMinecraftKeyRegistered.id();\n" +
+                            "    return IdentifierArgument.id();\n" +
                             "#else\n" +
-                            "    return ArgumentMinecraftKeyRegistered.a();\n" +
+                            "    return IdentifierArgument.a();\n" +
                             "#endif\n" +
                             "}",
                     resolver));
-            createResourceLocationArgument = new FastMethod<>(createResourceLocationArgumentMethod);
-            createResourceLocationArgument.forceInitialization();
+            createIdentifierArgument = new FastMethod<>(createIdentifierArgumentMethod);
+            createIdentifierArgument.forceInitialization();
         }
 
         // Get the AVAILABLE_SOUNDS SuggestionProvider instance
@@ -135,9 +135,9 @@ public class SoundEffectParser<C> implements ArgumentParser<C, ResourceKey<Sound
             MethodDeclaration createSuggestionProviderMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess("" +
                             "public static SuggestionProvider getSoundSuggestions() {\n" +
                             "#if version >= 1.17\n" +
-                            "    return CompletionProviders.AVAILABLE_SOUNDS;\n" +
+                            "    return SuggestionProviders.AVAILABLE_SOUNDS;\n" +
                             "#else\n" +
-                            "    return CompletionProviders.c;\n" +
+                            "    return SuggestionProviders.c;\n" +
                             "#endif\n" +
                             "}",
                     resolver));
@@ -159,7 +159,7 @@ public class SoundEffectParser<C> implements ArgumentParser<C, ResourceKey<Sound
                 new TypeToken<com.bergerkiller.bukkit.common.cloud.parsers.SoundEffectParser<CommandSender>>() {
                 },
                 (Consumer<BrigadierMappingBuilder<?, ?>>) builder -> {
-                    builderTo.invoke(builder, (Function<Object, Object>) o -> createResourceLocationArgument.invoke(null));
+                    builderTo.invoke(builder, (Function<Object, Object>) o -> createIdentifierArgument.invoke(null));
                     builder.suggestedBy(LogicUtil.unsafeCast(suggestionProvider));
                 }
         );

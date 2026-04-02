@@ -72,7 +72,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 #endselect
 
 #select version >=
-#case 1.19.4:  #remap net.minecraft.world.entity.Entity public net.minecraft.world.entity.EntityLiving getControllingPassenger();
+#case 1.19.4:  #remap net.minecraft.world.entity.Entity public net.minecraft.world.entity.LivingEntity getControllingPassenger();
 #case 1.18:    #remap net.minecraft.world.entity.Entity public Entity getControllingPassenger();
 #case 1.14:    #remap net.minecraft.world.entity.Entity public Entity getControllingPassenger:getRidingPassenger();
 #case 1.13:    #remap net.minecraft.world.entity.Entity public Entity getControllingPassenger:bO();
