@@ -70,9 +70,13 @@ Mojang-style `Serverbound...Packet` / `Clientbound...Packet` names.
 | PacketPlayOutStopSoundHandle                               | ClientboundStopSoundPacketHandle               |
 | PacketPlayOutPlayerListHeaderFooterHandle                  | ClientboundTabListPacketHandle                 |
 | PacketPlayOutCollectHandle                                 | ClientboundTakeItemEntityPacketHandle          |
-| PacketPlayOutEntityTeleportHandle                          | ClientboundTeleportEntityPacketHandle          |
+| PacketPlayOutEntityTeleportHandle                          | ClientboundEntityPositionSyncPacket          |
 | PacketPlayOutAdvancementsHandle                            | ClientboundUpdateAdvancementsPacketHandle      |
 | PacketPlayOutEntityEffectHandle                            | ClientboundUpdateMobEffectPacketHandle         |
+
+Notes:
+- `PacketPlayOutEntityTeleport` became ClientboundEntityPositionSync` instead of `ClientboundTeleportEntity` because the
+  interpolation logic differs greatly between the two, and sync is closer to what the old teleport packet did.
 
 ### Serverbound (client -> server) packet renames
 
