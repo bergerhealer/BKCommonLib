@@ -112,33 +112,34 @@ Some packets were moved from `net.minecraft.network.protocol.game` into `net.min
 
 The migration renamed many entity-related Handle classes. These are commonly used for DataWatcher/entity metadata access; update references accordingly.
 
-| Old (Spigot-style) | New (Mojang-style) |
-|---|---|
-| EntityLivingHandle | LivingEntityHandle |
-| EntityInsentientHandle | MobHandle |
-| EntityAgeableHandle | AgeableMobHandle |
-| EntityBatHandle | BatHandle |
-| EntityEnderCrystalHandle | EndCrystalHandle |
-| EntityArmorStandHandle | ArmorStandHandle |
-| EntityHangingHandle | HangingEntityHandle |
-| EntityItemFrameHandle | ItemFrameHandle |
-| EntityItemHandle | ItemEntityHandle |
-| EntityShulkerHandle | ShulkerHandle |
-| EntitySlimeHandle | SlimeHandle |
-| EntityHumanHandle | PlayerHandle |
-| PlayerAbilitiesHandle | AbilitiesHandle |
-| PlayerInventoryHandle | InventoryHandle |
-| EntityFishingHookHandle | FishingHookHandle |
-| EntityBoatHandle | BoatHandle |
-| EntityMinecartAbstractHandle | AbstractMinecartHandle |
-| EntityMinecartTNTHandle | MinecartTNTHandle |
-| EntityMinecartFurnaceHandle | MinecartFurnaceHandle |
-| EntityMinecartHopperHandle | MinecartHopperHandle |
-| EntityMinecartMobSpawnerHandle | MinecartSpawnerHandle |
+| Old (Spigot-style)               | New (Mojang-style) |
+|----------------------------------|---|
+| EntityLivingHandle               | LivingEntityHandle |
+| EntityInsentientHandle           | MobHandle |
+| EntityAgeableHandle              | AgeableMobHandle |
+| EntityBatHandle                  | BatHandle |
+| EntityEnderCrystalHandle         | EndCrystalHandle |
+| EntityArmorStandHandle           | ArmorStandHandle |
+| EntityHangingHandle              | HangingEntityHandle |
+| EntityItemFrameHandle            | ItemFrameHandle |
+| EntityItemHandle                 | ItemEntityHandle |
+| EntityShulkerHandle              | ShulkerHandle |
+| EntitySlimeHandle                | SlimeHandle |
+| EntityPlayerHandle               | ServerPlayerHandle |
+| EntityHumanHandle                | PlayerHandle |
+| PlayerAbilitiesHandle            | AbilitiesHandle |
+| PlayerInventoryHandle            | InventoryHandle |
+| EntityFishingHookHandle          | FishingHookHandle |
+| EntityBoatHandle                 | BoatHandle |
+| EntityMinecartAbstractHandle     | AbstractMinecartHandle |
+| EntityMinecartTNTHandle          | MinecartTNTHandle |
+| EntityMinecartFurnaceHandle      | MinecartFurnaceHandle |
+| EntityMinecartHopperHandle       | MinecartHopperHandle |
+| EntityMinecartMobSpawnerHandle   | MinecartSpawnerHandle |
 | EntityMinecartCommandBlockHandle | MinecartCommandBlockHandle |
-| EntityTypesHandle | EntityTypeHandle |
-| EntityDisplayHandle | DisplayHandle |
-| EntityVehicleHandle | VehicleEntityHandle |
+| EntityTypesHandle                | EntityTypeHandle |
+| EntityDisplayHandle              | DisplayHandle |
+| EntityVehicleHandle              | VehicleEntityHandle |
 
 ## Miscellaneous Handle classes
 
@@ -183,6 +184,10 @@ The table below contains other notable Handle classes in `src/main/generated/com
 | EnumMoveTypeHandle         | MoverTypeHandle                  |
 | EnumMainHandHandle         | HumanoidArmHandle                |
 | EnumItemSlotHandle         | EquipmentSlotHandle              |
+| AttributeMapBaseHandle     | AttributeMapHandle               |
+| AttributeModifiableHandle  | AttributeInstanceHandle          |
+| MobEffectHandle            | MobEffectInstanceHandle         |
+| MobEffectListHandle        | MobEffectHandle                  |
 
 There may have been some package location changes too, as the new names closely resemble where Mojang classes exist as of 1.21.11.
 
