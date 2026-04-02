@@ -90,7 +90,9 @@ Notes:
 | PacketPlayInWindowClickHandle                           | ServerboundContainerClickPacketHandle          |
 | PacketPlayInCloseWindowHandle                           | ServerboundContainerClosePacketHandle          |
 | PacketPlayInUseEntityHandle                             | ServerboundInteractPacketHandle                |
-| PacketPlayInArmAnimationHandle                          | ServerboundSwingPacketHandle                  |
+| PacketPlayInBlockPlaceHandle                            | ServerboundUseItemPacketHandle                 |
+| PacketPlayInUseItemHandle                               | ServerboundUseItemOnPacketHandle               |
+| PacketPlayInArmAnimationHandle                          | ServerboundSwingPacketHandle                   |
 | PacketPlayInFlyingHandle                                | ServerboundMovePlayerPacketHandle              |
 | PacketPlayInFlyingHandle.PacketPlayInPositionHandle     | ServerboundMovePlayerPacketHandle.PosHandle    |
 | PacketPlayInFlyingHandle.PacketPlayInLookHandle         | ServerboundMovePlayerPacketHandle.RotHandle    |
@@ -103,8 +105,7 @@ Notes:
 | PacketPlayInSteerVehicleHandle                          | ServerboundPlayerInputPacketHandle             |
 | PacketPlayInEnchantItemHandle                           | ServerboundSetCreativeModeSlotPacketHandle     |
 | PacketPlayInSetCreativeSlotHandle                       | ServerboundSetCreativeModeSlotPacketHandle     |
-| PacketPlayInUseItemHandle                               | ServerboundUseItemPacketHandle                 |
-| PacketPlayInUseItemOnHandle                             | ServerboundUseItemOnPacketHandle               |
+
 
 ### Protocol.common packet moves
 
