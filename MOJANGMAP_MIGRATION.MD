@@ -70,7 +70,7 @@ Mojang-style `Serverbound...Packet` / `Clientbound...Packet` names.
 | PacketPlayOutStopSoundHandle                                   | ClientboundStopSoundPacketHandle               |
 | PacketPlayOutPlayerListHeaderFooterHandle                      | ClientboundTabListPacketHandle                 |
 | PacketPlayOutCollectHandle                                     | ClientboundTakeItemEntityPacketHandle          |
-| PacketPlayOutEntityTeleportHandle                              | ClientboundEntityPositionSyncPacket          |
+| PacketPlayOutEntityTeleportHandle                              | ClientboundEntityPositionSyncPacketHandle          |
 | PacketPlayOutAdvancementsHandle                                | ClientboundUpdateAdvancementsPacketHandle      |
 | PacketPlayOutEntityEffectHandle                                | ClientboundUpdateMobEffectPacketHandle         |
 | PacketPlayOutUpdateAttributesHandle                            | ClientboundUpdateAttributesPacketHandle |
@@ -156,50 +156,51 @@ The migration renamed many entity-related Handle classes. These are commonly use
 
 The table below contains other notable Handle classes in `src/main/generated/com/bergerkiller/generated` that were renamed:
 
-| Old (Spigot-style)         | New (Mojang-style)               |
-|----------------------------|----------------------------------|
-| IBlockDataHandle           | BlockStateHandle                 |
-| IBlockStateHandle          | PropertyHandle                   |
-| NibbleArrayHandle          | DataLayerHandle                  |
-| WorldHandle                | LevelHandle                      |
-| WorldServerHandle          | ServerLevelHandle                |
-| DataWatcherHandle | SynchedEntityDataHandle |
-| DataWatcherObjectHandle | EntityDataAccessorHandle |
-| DataWatcherRegistryHandle | EntityDataSerializersHandle |
-| EnumGamemodeHandle         | GameTypeHandle                   |
-| CraftingManagerHandle      | RecipeManagerHandle              |
-| FurnaceRecipeHandle        | SmeltingRecipeHandle             |
-| MobSpawnerAbstractHandle   | BaseSpawnerHandle                |
-| ForcedChunkHandle          | ForcedChunksSavedDataHandle      |
-| ChunkCoordIntPairHandle    | ChunkPosHandle                   |
-| IBlockAccessHandle         | BlockGetterHandle                |
-| BlockFenceHandle           | FenceBlockHandle                 |
-| BlockFenceGateHandle       | FenceGateBlockHandle             |
-| BlockCobbleWallHandle      | WallBlockHandle                  |
-| TileEntityFurnaceHandle    | AbstractFurnaceBlockEntityHandle |
-| TileEntityHandle           | BlockEntityHandle                |
-| TileEntityTypesHandle      | BlockEntityTypeHandle            |
-| TileEntityHopperHandle     | HopperBlockEntityHandle          |
-| TileEntitySignHandle       | SignBlockEntityHandle            |
-| ChunkHandle                | LevelChunkHandle                 |
-| ChunkSectionHandle         | LevelChunkSectionHandle          |
-| DataPaletteBlockHandle     | PalettedContainerHandle          |
-| DimensionManagerHandle     | DimensionTypeHandle              |
-| HeightMapHandle            | HeightmapHandle                  |
-| MapIconHandle              | MapDecorationHandle              |
-| AxisAlignedBBHandle        | AABBHandle                       |
-| MovingObjectPositionHandle | HitResultHandle                  |
-| Vec3DHandle                | Vec3Handle                       |
-| EnumSkyBlockHandle         | LightLayerHandle                 |
-| SoundEffectTypeHandle      | SoundTypeHandle                  |
-| EnumMoveTypeHandle         | MoverTypeHandle                  |
-| EnumMainHandHandle         | HumanoidArmHandle                |
-| EnumItemSlotHandle         | EquipmentSlotHandle              |
-| AttributeMapBaseHandle     | AttributeMapHandle               |
-| AttributeModifiableHandle  | AttributeInstanceHandle          |
-| MobEffectHandle            | MobEffectInstanceHandle         |
-| MobEffectListHandle        | MobEffectHandle                  |
-| EnumHandHandle |        | InteractionHandHandle            |
+| Old (Spigot-style)         | New (Mojang-style)                 |
+|----------------------------|------------------------------------|
+| IBlockDataHandle           | BlockStateHandle                   |
+| IBlockStateHandle          | PropertyHandle                     |
+| NibbleArrayHandle          | DataLayerHandle                    |
+| WorldHandle                | LevelHandle                        |
+| WorldServerHandle          | ServerLevelHandle                  |
+| DataWatcherHandle | SynchedEntityDataHandle            |
+| DataWatcherObjectHandle | EntityDataAccessorHandle           |
+| DataWatcherRegistryHandle | EntityDataSerializersHandle        |
+| EnumGamemodeHandle         | GameTypeHandle                     |
+| CraftingManagerHandle      | RecipeManagerHandle                |
+| FurnaceRecipeHandle        | SmeltingRecipeHandle               |
+| MobSpawnerAbstractHandle   | BaseSpawnerHandle                  |
+| ForcedChunkHandle          | ForcedChunksSavedDataHandle        |
+| ChunkCoordIntPairHandle    | ChunkPosHandle                     |
+| IBlockAccessHandle         | BlockGetterHandle                  |
+| BlockFenceHandle           | FenceBlockHandle                   |
+| BlockFenceGateHandle       | FenceGateBlockHandle               |
+| BlockCobbleWallHandle      | WallBlockHandle                    |
+| TileEntityFurnaceHandle    | AbstractFurnaceBlockEntityHandle   |
+| TileEntityHandle           | BlockEntityHandle                  |
+| TileEntityTypesHandle      | BlockEntityTypeHandle              |
+| TileEntityHopperHandle     | HopperBlockEntityHandle            |
+| TileEntitySignHandle       | SignBlockEntityHandle              |
+| ChunkHandle                | LevelChunkHandle                   |
+| ChunkSectionHandle         | LevelChunkSectionHandle            |
+| DataPaletteBlockHandle     | PalettedContainerHandle            |
+| DimensionManagerHandle     | DimensionTypeHandle                |
+| HeightMapHandle            | HeightmapHandle                    |
+| MapIconHandle              | MapDecorationHandle                |
+| AxisAlignedBBHandle        | AABBHandle                         |
+| MovingObjectPositionHandle | HitResultHandle                    |
+| Vec3DHandle                | Vec3Handle                         |
+| EnumSkyBlockHandle         | LightLayerHandle                   |
+| SoundEffectTypeHandle      | SoundTypeHandle                    |
+| EnumMoveTypeHandle         | MoverTypeHandle                    |
+| EnumMainHandHandle         | HumanoidArmHandle                  |
+| EnumItemSlotHandle         | EquipmentSlotHandle                |
+| AttributeMapBaseHandle     | AttributeMapHandle                 |
+| AttributeModifiableHandle  | AttributeInstanceHandle            |
+| MobEffectHandle            | MobEffectInstanceHandle            |
+| MobEffectListHandle        | MobEffectHandle                    |
+| EnumHandHandle | InteractionHandHandle              |
+| PlayerConnectionHandle | ServerGamePacketListenerImplHandle |
 
 There may have been some package location changes too, as the new names closely resemble where Mojang classes exist as of 1.21.11.
 
