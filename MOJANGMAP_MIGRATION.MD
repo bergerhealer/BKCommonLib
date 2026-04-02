@@ -14,85 +14,91 @@ Mojang-style `Serverbound...Packet` / `Clientbound...Packet` names.
 
 ### Clientbound (server -> client) packet renames
 
-| Old (Spigot-style) | New (Mojang-style) |
-|---|---|
-| PacketPlayOutSpawnEntityHandle | ClientboundAddEntityPacketHandle |
-| PacketPlayOutSpawnEntityExperienceOrbHandle | ClientboundAddExperienceOrbPacketHandle |
-| PacketPlayOutSpawnEntityLivingHandle | ClientboundAddMobPacketHandle |
-| PacketPlayOutSpawnEntityPaintingHandle | ClientboundAddPaintingPacketHandle |
-| PacketPlayOutNamedEntitySpawnHandle | ClientboundAddPlayerPacketHandle |
-| PacketPlayOutAnimationHandle | ClientboundAnimatePacketHandle |
-| PacketPlayOutBlockBreakAnimationHandle | ClientboundBlockDestructionPacketHandle |
-| PacketPlayOutTileEntityDataHandle | ClientboundBlockEntityDataPacketHandle |
-| PacketPlayOutBlockActionHandle | ClientboundBlockEventPacketHandle |
-| PacketPlayOutBlockChangeHandle | ClientboundBlockUpdatePacketHandle |
-| PacketPlayOutServerDifficultyHandle | ClientboundChangeDifficultyPacketHandle |
-| PacketPlayOutCloseWindowHandle | ClientboundContainerClosePacketHandle |
-| PacketPlayOutWindowItemsHandle | ClientboundContainerSetContentPacketHandle |
-| PacketPlayOutWindowDataHandle | ClientboundContainerSetDataPacketHandle |
-| PacketPlayOutSetSlotHandle | ClientboundContainerSetSlotPacketHandle |
-| PacketPlayOutSetCooldownHandle | ClientboundCooldownPacketHandle |
-| PacketPlayOutCustomSoundEffectHandle | ClientboundCustomSoundPacketHandle |
-| PacketPlayOutEntityStatusHandle | ClientboundEntityEventPacketHandle |
-| PacketPlayOutUnloadChunkHandle | ClientboundForgetLevelChunkPacketHandle |
-| PacketPlayOutMapChunkHandle | ClientboundLevelChunkWithLightPacketHandle |
-| PacketPlayOutWorldEventHandle | ClientboundLevelEventPacketHandle |
-| PacketPlayOutWorldParticlesHandle | ClientboundLevelParticlesPacketHandle |
-| PacketPlayOutLoginHandle | ClientboundLoginPacketHandle |
-| PacketPlayOutMapHandle | ClientboundMapItemDataPacketHandle |
-| PacketPlayOutEntityHandle | ClientboundMoveEntityPacketHandle |
-| PacketPlayOutVehicleMoveHandle | ClientboundMoveVehiclePacketHandle |
-| PacketPlayOutOpenWindowHandle | ClientboundOpenScreenPacketHandle |
-| PacketPlayOutOpenSignEditorHandle | ClientboundOpenSignEditorPacketHandle |
-| PacketPlayOutAbilitiesHandle | ClientboundPlayerAbilitiesPacketHandle |
-| PacketPlayOutPositionHandle | ClientboundPlayerPositionPacketHandle |
-| PacketPlayOutEntityDestroyHandle | ClientboundRemoveEntitiesPacketHandle |
-| PacketPlayOutRespawnHandle | ClientboundRespawnPacketHandle |
-| PacketPlayOutEntityHeadRotationHandle | ClientboundRotateHeadPacketHandle |
-| PacketPlayOutCameraHandle | ClientboundSetCameraPacketHandle |
-| PacketPlayOutScoreboardDisplayObjectiveHandle | ClientboundSetDisplayObjectivePacketHandle |
-| PacketPlayOutEntityMetadataHandle | ClientboundSetEntityDataPacketHandle |
-| PacketPlayOutAttachEntityHandle | ClientboundSetEntityLinkPacketHandle |
-| PacketPlayOutEntityVelocityHandle | ClientboundSetEntityMotionPacketHandle |
-| PacketPlayOutEntityEquipmentHandle | ClientboundSetEquipmentPacketHandle |
-| PacketPlayOutExperienceHandle | ClientboundSetExperiencePacketHandle |
-| PacketPlayOutUpdateHealthHandle | ClientboundSetHealthPacketHandle |
-| PacketPlayOutHeldItemSlotHandle | ClientboundSetHeldSlotPacketHandle |
-| PacketPlayOutScoreboardObjectiveHandle | ClientboundSetObjectivePacketHandle |
-| PacketPlayOutMountHandle | ClientboundSetPassengersPacketHandle |
-| PacketPlayOutScoreboardTeamHandle | ClientboundSetPlayerTeamPacketHandle |
-| PacketPlayOutScoreboardScoreHandle | ClientboundSetScorePacketHandle |
-| PacketPlayOutUpdateTimeHandle | ClientboundSetTimePacketHandle |
-| PacketPlayOutNamedSoundEffectHandle | ClientboundSoundPacketHandle |
-| PacketPlayOutStopSoundHandle | ClientboundStopSoundPacketHandle |
-| PacketPlayOutPlayerListHeaderFooterHandle | ClientboundTabListPacketHandle |
-| PacketPlayOutCollectHandle | ClientboundTakeItemEntityPacketHandle |
-| PacketPlayOutEntityTeleportHandle | ClientboundTeleportEntityPacketHandle |
-| PacketPlayOutAdvancementsHandle | ClientboundUpdateAdvancementsPacketHandle |
-| PacketPlayOutEntityEffectHandle | ClientboundUpdateMobEffectPacketHandle |
+| Old (Spigot-style)                                         | New (Mojang-style)                             |
+|------------------------------------------------------------|------------------------------------------------|
+| PacketPlayOutSpawnEntityHandle                             | ClientboundAddEntityPacketHandle               |
+| PacketPlayOutSpawnEntityExperienceOrbHandle                | ClientboundAddExperienceOrbPacketHandle        |
+| PacketPlayOutSpawnEntityLivingHandle                       | ClientboundAddMobPacketHandle                  |
+| PacketPlayOutSpawnEntityPaintingHandle                     | ClientboundAddPaintingPacketHandle             |
+| PacketPlayOutNamedEntitySpawnHandle                        | ClientboundAddPlayerPacketHandle               |
+| PacketPlayOutAnimationHandle                               | ClientboundAnimatePacketHandle                 |
+| PacketPlayOutBlockBreakAnimationHandle                     | ClientboundBlockDestructionPacketHandle        |
+| PacketPlayOutTileEntityDataHandle                          | ClientboundBlockEntityDataPacketHandle         |
+| PacketPlayOutBlockActionHandle                             | ClientboundBlockEventPacketHandle              |
+| PacketPlayOutBlockChangeHandle                             | ClientboundBlockUpdatePacketHandle             |
+| PacketPlayOutServerDifficultyHandle                        | ClientboundChangeDifficultyPacketHandle        |
+| PacketPlayOutCloseWindowHandle                             | ClientboundContainerClosePacketHandle          |
+| PacketPlayOutWindowItemsHandle                             | ClientboundContainerSetContentPacketHandle     |
+| PacketPlayOutWindowDataHandle                              | ClientboundContainerSetDataPacketHandle        |
+| PacketPlayOutSetSlotHandle                                 | ClientboundContainerSetSlotPacketHandle        |
+| PacketPlayOutSetCooldownHandle                             | ClientboundCooldownPacketHandle                |
+| PacketPlayOutCustomSoundEffectHandle                       | ClientboundCustomSoundPacketHandle             |
+| PacketPlayOutEntityStatusHandle                            | ClientboundEntityEventPacketHandle             |
+| PacketPlayOutUnloadChunkHandle                             | ClientboundForgetLevelChunkPacketHandle        |
+| PacketPlayOutMapChunkHandle                                | ClientboundLevelChunkWithLightPacketHandle     |
+| PacketPlayOutWorldEventHandle                              | ClientboundLevelEventPacketHandle              |
+| PacketPlayOutWorldParticlesHandle                          | ClientboundLevelParticlesPacketHandle          |
+| PacketPlayOutLoginHandle                                   | ClientboundLoginPacketHandle                   |
+| PacketPlayOutMapHandle                                     | ClientboundMapItemDataPacketHandle             |
+| PacketPlayOutEntityHandle                                  | ClientboundMoveEntityPacketHandle              |
+| PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle | ClientboundMoveEntityPacketHandle.PosHandle    |
+| PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle          | ClientboundMoveEntityPacketHandle.RotHandle    |
+| PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle   | ClientboundMoveEntityPacketHandle.PosRotHandle |
+| PacketPlayOutVehicleMoveHandle                             | ClientboundMoveVehiclePacketHandle             |
+| PacketPlayOutOpenWindowHandle                              | ClientboundOpenScreenPacketHandle              |
+| PacketPlayOutOpenSignEditorHandle                          | ClientboundOpenSignEditorPacketHandle          |
+| PacketPlayOutAbilitiesHandle                               | ClientboundPlayerAbilitiesPacketHandle         |
+| PacketPlayOutPositionHandle                                | ClientboundPlayerPositionPacketHandle          |
+| PacketPlayOutEntityDestroyHandle                           | ClientboundRemoveEntitiesPacketHandle          |
+| PacketPlayOutRespawnHandle                                 | ClientboundRespawnPacketHandle                 |
+| PacketPlayOutEntityHeadRotationHandle                      | ClientboundRotateHeadPacketHandle              |
+| PacketPlayOutCameraHandle                                  | ClientboundSetCameraPacketHandle               |
+| PacketPlayOutScoreboardDisplayObjectiveHandle              | ClientboundSetDisplayObjectivePacketHandle     |
+| PacketPlayOutEntityMetadataHandle                          | ClientboundSetEntityDataPacketHandle           |
+| PacketPlayOutAttachEntityHandle                            | ClientboundSetEntityLinkPacketHandle           |
+| PacketPlayOutEntityVelocityHandle                          | ClientboundSetEntityMotionPacketHandle         |
+| PacketPlayOutEntityEquipmentHandle                         | ClientboundSetEquipmentPacketHandle            |
+| PacketPlayOutExperienceHandle                              | ClientboundSetExperiencePacketHandle           |
+| PacketPlayOutUpdateHealthHandle                            | ClientboundSetHealthPacketHandle               |
+| PacketPlayOutHeldItemSlotHandle                            | ClientboundSetHeldSlotPacketHandle             |
+| PacketPlayOutScoreboardObjectiveHandle                     | ClientboundSetObjectivePacketHandle            |
+| PacketPlayOutMountHandle                                   | ClientboundSetPassengersPacketHandle           |
+| PacketPlayOutScoreboardTeamHandle                          | ClientboundSetPlayerTeamPacketHandle           |
+| PacketPlayOutScoreboardScoreHandle                         | ClientboundSetScorePacketHandle                |
+| PacketPlayOutUpdateTimeHandle                              | ClientboundSetTimePacketHandle                 |
+| PacketPlayOutNamedSoundEffectHandle                        | ClientboundSoundPacketHandle                   |
+| PacketPlayOutStopSoundHandle                               | ClientboundStopSoundPacketHandle               |
+| PacketPlayOutPlayerListHeaderFooterHandle                  | ClientboundTabListPacketHandle                 |
+| PacketPlayOutCollectHandle                                 | ClientboundTakeItemEntityPacketHandle          |
+| PacketPlayOutEntityTeleportHandle                          | ClientboundTeleportEntityPacketHandle          |
+| PacketPlayOutAdvancementsHandle                            | ClientboundUpdateAdvancementsPacketHandle      |
+| PacketPlayOutEntityEffectHandle                            | ClientboundUpdateMobEffectPacketHandle         |
 
 ### Serverbound (client -> server) packet renames
 
-| Old (Spigot-style) | New (Mojang-style) |
-|---|---|
-| PacketPlayInTeleportAcceptHandle | ServerboundAcceptTeleportationPacketHandle |
-| PacketPlayInChatHandle | ServerboundChatPacketHandle |
-| PacketPlayInClientCommandHandle | ServerboundClientCommandPacketHandle |
-| PacketPlayInEnchantItemHandle | ServerboundContainerButtonClickPacketHandle |
-| PacketPlayInWindowClickHandle | ServerboundContainerClickPacketHandle |
-| PacketPlayInCloseWindowHandle | ServerboundContainerClosePacketHandle |
-| PacketPlayInUseEntityHandle | ServerboundInteractPacketHandle |
-| PacketPlayInFlyingHandle | ServerboundMovePlayerPacketHandle |
-| PacketPlayInVehicleMoveHandle | ServerboundMoveVehiclePacketHandle |
-| PacketPlayInBoatMoveHandle | ServerboundPaddleBoatPacketHandle |
-| PacketPlayInAbilitiesHandle | ServerboundPlayerAbilitiesPacketHandle |
-| PacketPlayInBlockDigHandle | ServerboundPlayerActionPacketHandle |
-| PacketPlayInEntityActionHandle | ServerboundPlayerCommandPacketHandle |
-| PacketPlayInSteerVehicleHandle | ServerboundPlayerInputPacketHandle |
-| PacketPlayInEnchantItemHandle | ServerboundSetCreativeModeSlotPacketHandle |
-| PacketPlayInSetCreativeSlotHandle | ServerboundSetCreativeModeSlotPacketHandle |
-| PacketPlayInUseItemHandle | ServerboundUseItemPacketHandle |
-| PacketPlayInUseItemOnHandle | ServerboundUseItemOnPacketHandle |
+| Old (Spigot-style)                                      | New (Mojang-style)                             |
+|---------------------------------------------------------|------------------------------------------------|
+| PacketPlayInTeleportAcceptHandle                        | ServerboundAcceptTeleportationPacketHandle     |
+| PacketPlayInChatHandle                                  | ServerboundChatPacketHandle                    |
+| PacketPlayInClientCommandHandle                         | ServerboundClientCommandPacketHandle           |
+| PacketPlayInEnchantItemHandle                           | ServerboundContainerButtonClickPacketHandle    |
+| PacketPlayInWindowClickHandle                           | ServerboundContainerClickPacketHandle          |
+| PacketPlayInCloseWindowHandle                           | ServerboundContainerClosePacketHandle          |
+| PacketPlayInUseEntityHandle                             | ServerboundInteractPacketHandle                |
+| PacketPlayInFlyingHandle                                | ServerboundMovePlayerPacketHandle              |
+| PacketPlayInFlyingHandle.PacketPlayInLookHandle         | ServerboundMovePlayerPacketHandle.PosHandle    |
+| PacketPlayInFlyingHandle.PacketPlayInPositionHandle     | ServerboundMovePlayerPacketHandle.RotHandle    |
+| PacketPlayInFlyingHandle.PacketPlayInPositionLookHandle | ServerboundMovePlayerPacketHandle.PosRotHandle |
+| PacketPlayInVehicleMoveHandle                           | ServerboundMoveVehiclePacketHandle             |
+| PacketPlayInBoatMoveHandle                              | ServerboundPaddleBoatPacketHandle              |
+| PacketPlayInAbilitiesHandle                             | ServerboundPlayerAbilitiesPacketHandle         |
+| PacketPlayInBlockDigHandle                              | ServerboundPlayerActionPacketHandle            |
+| PacketPlayInEntityActionHandle                          | ServerboundPlayerCommandPacketHandle           |
+| PacketPlayInSteerVehicleHandle                          | ServerboundPlayerInputPacketHandle             |
+| PacketPlayInEnchantItemHandle                           | ServerboundSetCreativeModeSlotPacketHandle     |
+| PacketPlayInSetCreativeSlotHandle                       | ServerboundSetCreativeModeSlotPacketHandle     |
+| PacketPlayInUseItemHandle                               | ServerboundUseItemPacketHandle                 |
+| PacketPlayInUseItemOnHandle                             | ServerboundUseItemOnPacketHandle               |
 
 ### Protocol.common packet moves
 
