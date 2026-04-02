@@ -272,10 +272,10 @@ class LivingEntity extends Entity {
 
 #if version >= 1.21.5
   #if exists net.minecraft.world.entity.LivingEntity public net.minecraft.world.entity.EntityEquipment equipment;
-    #require EntityLiving public EntityEquipment equipment;
+    #require LivingEntity public EntityEquipment equipment;
   #else
     // Paper yay!
-    #require EntityLiving protected EntityEquipment equipment;
+    #require LivingEntity protected EntityEquipment equipment;
   #endif
 #endif
 
@@ -507,51 +507,51 @@ class LivingEntity extends Entity {
 #endif
 
 #if version >= 1.17
-        #require EntityLiving public readonly float moveIntentX:xxa;
-        #require EntityLiving public readonly float moveIntentY:yya;
-        #require EntityLiving public readonly float moveIntentZ:yya;
+        #require LivingEntity public readonly float moveIntentX:xxa;
+        #require LivingEntity public readonly float moveIntentY:yya;
+        #require LivingEntity public readonly float moveIntentZ:yya;
 #elseif version >= 1.16.2
-        #require EntityLiving public readonly float moveIntentX:aR;
-        #require EntityLiving public readonly float moveIntentY:aS;
-        #require EntityLiving public readonly float moveIntentZ:aT;
+        #require LivingEntity public readonly float moveIntentX:aR;
+        #require LivingEntity public readonly float moveIntentY:aS;
+        #require LivingEntity public readonly float moveIntentZ:aT;
 #elseif version >= 1.16
-        #require EntityLiving public readonly float moveIntentX:aY;
-        #require EntityLiving public readonly float moveIntentY:aZ;
-        #require EntityLiving public readonly float moveIntentZ:ba;
+        #require LivingEntity public readonly float moveIntentX:aY;
+        #require LivingEntity public readonly float moveIntentY:aZ;
+        #require LivingEntity public readonly float moveIntentZ:ba;
 #elseif version >= 1.15
-        #require EntityLiving public readonly float moveIntentX:aZ;
-        #require EntityLiving public readonly float moveIntentY:ba;
-        #require EntityLiving public readonly float moveIntentZ:bb;
+        #require LivingEntity public readonly float moveIntentX:aZ;
+        #require LivingEntity public readonly float moveIntentY:ba;
+        #require LivingEntity public readonly float moveIntentZ:bb;
 #elseif version >= 1.14
-        #require EntityLiving public readonly float moveIntentX:bb;
-        #require EntityLiving public readonly float moveIntentY:bc;
-        #require EntityLiving public readonly float moveIntentZ:bd;
+        #require LivingEntity public readonly float moveIntentX:bb;
+        #require LivingEntity public readonly float moveIntentY:bc;
+        #require LivingEntity public readonly float moveIntentZ:bd;
 #elseif version >= 1.13
-        #require EntityLiving public readonly float moveIntentX:bh;
-        #require EntityLiving public readonly float moveIntentY:bi;
-        #require EntityLiving public readonly float moveIntentZ:bj;
+        #require LivingEntity public readonly float moveIntentX:bh;
+        #require LivingEntity public readonly float moveIntentY:bi;
+        #require LivingEntity public readonly float moveIntentZ:bj;
 #elseif version >= 1.12
-        #require EntityLiving public readonly float moveIntentX:be;
-        #require EntityLiving public readonly float moveIntentY:bf;
-        #require EntityLiving public readonly float moveIntentZ:bg;
+        #require LivingEntity public readonly float moveIntentX:be;
+        #require LivingEntity public readonly float moveIntentY:bf;
+        #require LivingEntity public readonly float moveIntentZ:bg;
 #elseif version >= 1.11
-        #require EntityLiving public readonly float moveIntentX:be;
-        #require EntityLiving public readonly float moveIntentZ:bf;
+        #require LivingEntity public readonly float moveIntentX:be;
+        #require LivingEntity public readonly float moveIntentZ:bf;
 #elseif version >= 1.10.2
-        #require EntityLiving public readonly float moveIntentX:bf;
-        #require EntityLiving public readonly float moveIntentZ:bg;
+        #require LivingEntity public readonly float moveIntentX:bf;
+        #require LivingEntity public readonly float moveIntentZ:bg;
 #elseif version >= 1.9.4
-        #require EntityLiving public readonly float moveIntentX:be;
-        #require EntityLiving public readonly float moveIntentZ:bf;
+        #require LivingEntity public readonly float moveIntentX:be;
+        #require LivingEntity public readonly float moveIntentZ:bf;
 #elseif version >= 1.9
-        #require EntityLiving public readonly float moveIntentX:bd;
-        #require EntityLiving public readonly float moveIntentZ:be;
+        #require LivingEntity public readonly float moveIntentX:bd;
+        #require LivingEntity public readonly float moveIntentZ:be;
 #elseif version >= 1.8.3
-        #require EntityLiving public readonly float moveIntentX:aZ;
-        #require EntityLiving public readonly float moveIntentZ:ba;
+        #require LivingEntity public readonly float moveIntentX:aZ;
+        #require LivingEntity public readonly float moveIntentZ:ba;
 #else
-        #require EntityLiving public readonly float moveIntentX:aX;
-        #require EntityLiving public readonly float moveIntentZ:aY;
+        #require LivingEntity public readonly float moveIntentX:aX;
+        #require LivingEntity public readonly float moveIntentZ:aY;
 #endif
 
         float x = instance#moveIntentX;
