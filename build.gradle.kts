@@ -111,7 +111,10 @@ dependencies {
     //
 
     // Required for interpreting the annotations that Cloud's implementation uses
-    implementation(libs.brigadier)
+    // Brigadier is only needed internally by Cloud's implementation and should not be
+    // exported as a dependency in the generated Maven POM. Use the shadedImplementation
+    // configuration so it's available for shading but not added to published POMs.
+    shadedImplementation(libs.brigadier)
 
     shadedImplementation("org.incendo:cloud-paper")
     shadedImplementation("org.incendo:cloud-annotations")
