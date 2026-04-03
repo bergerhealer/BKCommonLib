@@ -938,37 +938,54 @@ public class CommonBootstrap {
     }
 
     /**
-     * Forces all template classes to initialize. Inspects the BKCommonLib jar file to find all template classes
-     * to pull this off.
+     * Gets a List of all classes generated in BKCommonLib's com.bergerkiller.generated
+     * package. This method will work both when running from a jar file and when running from the classes build folder under test.
+     * The returned class names start with "com.bergerkiller.generated.".
      *
-     * @param classLoaderOrderRandom If non-null, randomizes the order of classes using this Random.
-     *                               This can be used to identify load orders that cause deadlocks or
-     *                               other issues by brute force.
+     * @return List of class names in the com.bergerkiller.generated package.
+     *         The returned list is mutable (new ArrayList) and sorted alphabetically.
+     * @throws IOException If an unexpected I/O error occurs while reading the jar file or classes directory
      */
-    public static void preloadTemplateClasses(Random classLoaderOrderRandom) {
-        List<String> classNames;
-        if (Common.IS_TEST_MODE) {
+    public static List<String> getGeneratedClassNames() throws IOException {
+        final boolean isRunFromBuildDirectory;
+        try {
+            if (Common.IS_TEST_MODE) {
+                URL codeSource = CommonBootstrap.class.getProtectionDomain().getCodeSource().getLocation();
+                if (codeSource == null) {
+                    throw new IOException("Unable to determine code source location for BKCommonLib");
+                }
+
+                Path locationPath = java.nio.file.Paths.get(codeSource.toURI());
+                isRunFromBuildDirectory = Files.isDirectory(locationPath);
+            } else {
+                isRunFromBuildDirectory = false;
+            }
+        } catch (java.net.URISyntaxException e) {
+            throw new IOException("Failed to resolve code source location", e);
+        }
+
+        List<String> tmpClassNames = new ArrayList<>();
+        if (isRunFromBuildDirectory) {
+            // If run from a build directory (BKCommonLib unit tests), then list the .class files in there
+            // This should never ever run on production, hence the extra IS_TEST_MODE guard.
+
             // List the .class files in the "classes" build folder of BKCommonLib
             String bkclClassesDir = System.getProperty("main.classes.dir");
             if (bkclClassesDir == null || bkclClassesDir.isEmpty()) {
-                throw new IllegalStateException("Run under test without main.classes.dir set (gradle error?)");
+                throw new IOException("Run under test without main.classes.dir set (gradle error?)");
             }
 
             final Path bkclClassesPath = (new File(bkclClassesDir)).toPath();
             try (Stream<Path> bkclClassFiles = Files.walk(bkclClassesPath)) {
-                classNames = bkclClassFiles
+                tmpClassNames = bkclClassFiles
                         .filter(Files::isRegularFile)
                         .map(bkclClassesPath::relativize)
                         .map(Path::toString)
-                        .collect(Collectors.toCollection(ArrayList::new));
-            } catch (IOException ex) {
-                Logging.LOGGER.log(Level.WARNING, "Failed to pre-load template classes: listing failed", ex);
-                return;
+                        .collect(Collectors.toList());
             }
         } else {
             // List the .class files in the jar zip file of BKCommonLib
-            classNames = new ArrayList<String>();
-            URLClassLoader loader = (URLClassLoader) CommonClasses.class.getClassLoader();
+            URLClassLoader loader = (URLClassLoader) CommonBootstrap.class.getClassLoader();
             File jarFile = null;
             for (URL url : loader.getURLs()) {
                 jarFile = new File(url.getFile());
@@ -977,31 +994,20 @@ public class CommonBootstrap {
                 }
             }
             if (jarFile == null) {
-                Logging.LOGGER.log(Level.WARNING, "Failed to figure out the jar file of BKCommonLib. No template classes pre-loaded.");
-                return;
+                throw new IOException("Unable to determine the jar file of BKCommonLib");
             }
 
-            try {
-                try (ZipInputStream zip = new ZipInputStream(new FileInputStream(jarFile))) {
-                    for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
-                        if (!entry.isDirectory()) {
-                            classNames.add(entry.getName());
-                        }
+            // Note: can't use stream/iterator api because getNextEntry() throws
+            try (ZipInputStream zip = new ZipInputStream(new FileInputStream(jarFile))) {
+                for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+                    if (!entry.isDirectory()) {
+                        tmpClassNames.add(entry.getName());
                     }
                 }
-            } catch (IOException ex) {
-                Logging.LOGGER.log(Level.WARNING, "Failed to pre-load template classes: listing failed", ex);
-                return;
             }
         }
 
-        // For debugging class loading deadlocks, randomize the order of the classes
-        // Some random shuffle seeds can more reliably reproduce such deadlocks
-        if (classLoaderOrderRandom != null) {
-            Collections.shuffle(classNames, classLoaderOrderRandom);
-        }
-
-        classNames.parallelStream()
+        return tmpClassNames.stream()
                 // Omit / prefix for more reliable matching
                 .map(className -> {
                     if (className.startsWith("/")) {
@@ -1013,7 +1019,37 @@ public class CommonBootstrap {
                 .filter(name -> name.startsWith("com/bergerkiller/generated") && name.endsWith(".class"))
                 // Turn into a loadable class name
                 .map(name -> name.substring(0, name.length()-6).replace('/', '.'))
-                // Load all these classes
+                // Alphabetical for reliable logic
+                .sorted()
+                // Turn into a mutable list
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    /**
+     * Forces all template classes to initialize. Inspects the BKCommonLib jar file to find all template classes
+     * to pull this off.
+     *
+     * @param classLoaderOrderRandom If non-null, randomizes the order of classes using this Random.
+     *                               This can be used to identify load orders that cause deadlocks or
+     *                               other issues by brute force.
+     */
+    public static void preloadTemplateClasses(Random classLoaderOrderRandom) {
+        List<String> classNames;
+        try {
+            classNames = getGeneratedClassNames();
+        } catch (IOException ex) {
+            Logging.LOGGER.log(Level.WARNING, "Failed to pre-load template classes: listing failed", ex);
+            return;
+        }
+
+        // For debugging class loading deadlocks, randomize the order of the classes
+        // Some random shuffle seeds can more reliably reproduce such deadlocks
+        if (classLoaderOrderRandom != null) {
+            Collections.shuffle(classNames, classLoaderOrderRandom);
+        }
+
+        classNames.parallelStream()
+                // Load all these classes in parallel
                 .map(className -> {
                     try {
                         // The below code loads the class and calls the static initializer on it

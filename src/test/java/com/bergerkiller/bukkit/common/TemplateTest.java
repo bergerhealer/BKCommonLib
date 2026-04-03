@@ -2,9 +2,9 @@ package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -15,7 +15,6 @@ import java.util.logging.Level;
 import com.bergerkiller.bukkit.common.utils.DebugUtil;
 import com.bergerkiller.generated.net.minecraft.core.DirectionHandle;
 import com.bergerkiller.generated.net.minecraft.core.RotationsHandle;
-import com.bergerkiller.generated.net.minecraft.nbt.TagHandle;
 import com.bergerkiller.generated.net.minecraft.network.syncher.SynchedEntityDataHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.MinecartHandle;
 import org.bukkit.Bukkit;
@@ -35,7 +34,6 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.Clientboun
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.decoration.ArmorStandHandle;
-import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 public class TemplateTest {
@@ -47,136 +45,37 @@ public class TemplateTest {
     }
 
     @Test
-    public void testTemplate() {
-        // Some remappings required to find the handle class name from the NMS template class name
-        // Build up a mapping of fixes for this.
-        Map<String, String> fixes = new HashMap<>();
-
-        // NBT classes have been moved
-        for (String typeName : new String[] {
-                "StringTagHandle", "ByteTagHandle", "ShortTagHandle", "IntTagHandle",
-                "LongTagHandle", "FloatTagHandle", "DoubleTagHandle",
-                "ByteArrayTagHandle", "IntArrayTagHandle", "LongArrayTagHandle"
-        }) {
-            fixes.put("com.bergerkiller.generated.net.minecraft.nbt." + typeName,
-                    "com.bergerkiller.generated.net.minecraft.nbt.TagHandle." + typeName);
-        }
-
-        // MC 1.8 class translation fixes
-        fixes.put("com.bergerkiller.generated.net.minecraft.core.AxisHandle",
-                "com.bergerkiller.generated.net.minecraft.core.DirectionHandle.AxisHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityMobSpawnerDataHandle",
-                "com.bergerkiller.generated.net.minecraft.world.level.MobSpawnerDataHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.network.syncher.WatchableObjectHandle",
-                "com.bergerkiller.generated.net.minecraft.network.syncher.SynchedEntityDataHandle.ItemHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.world.level.block.StepSoundHandle",
-                "com.bergerkiller.generated.net.minecraft.world.level.block.SoundTypeHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.world.level.biome.SpawnRateHandle",
-                "com.bergerkiller.generated.net.minecraft.world.level.biome.BiomeSettingsMobsHandle.SpawnRateHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.util.WeightedRandomChoiceHandle",
-                "com.bergerkiller.generated.net.minecraft.util.WeightedRandomHandle.WeightedRandomChoiceHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.server.EnumScoreboardActionHandle",
-                "com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetScorePacketHandle.EnumScoreboardActionHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.network.protocol.game.RotHandle",
-                "com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMoveEntityPacketHandle.RotHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.network.protocol.game.PosRotHandle",
-                "com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMoveEntityPacketHandle.PosRotHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.network.protocol.game.PosHandle",
-                "com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMoveEntityPacketHandle.PosHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.network.protocol.game.EnumTitleActionHandle",
-                "com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTitleHandle.EnumTitleActionHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.network.protocol.game.ChunkMapHandle",
-                "com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacketHandle.ChunkMapHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.network.protocol.game.EnumPlayerDigTypeHandle",
-                "com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundPlayerActionPacketHandle.EnumPlayerDigTypeHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.network.protocol.game.EnumEntityUseActionHandle",
-                "com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundInteractPacketHandle.EnumEntityUseActionHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.network.protocol.game.EntryHandle",
-                "com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPlayerInfoHandle.EntryHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.network.protocol.game.ActionHandle",
-                "com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPlayerInfoHandle.ActionHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle",
-                "com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle");
-        fixes.put("com.bergerkiller.generated.com.bergerkiller.bukkit.common.internal.logic.LongHashSet_pre_1_13_2Handle",
-                "com.bergerkiller.generated.com.bergerkiller.bukkit.common.internal.LongHashSetHandle");
-
-        // <= MC 1.9 class translation fixes
-        fixes.put("com.bergerkiller.generated.net.minecraft.server.WorldSettingsHandle.GameTypeHandle",
-                "com.bergerkiller.generated.net.minecraft.server.GameTypeHandle");
-
-        // Internal proxy classes (<NMSType>Proxy) handled separately in code logic
-
-        // MC 1.8.9 class translation fixes
-        fixes.put("com.bergerkiller.generated.net.minecraft.server.BaseSpawnerHandle.a",
-                "com.bergerkiller.generated.net.minecraft.server.MobSpawnerDataHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.server.SynchedEntityDataHandle.WatchableObjectHandle",
-                "com.bergerkiller.generated.net.minecraft.server.SynchedEntityDataHandle.ItemHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.server.ChunkMapHandle.ChunkHolderHandle",
-                "com.bergerkiller.generated.net.minecraft.server.ChunkHolderHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.server.BlockHandle.StepSoundHandle",
-                "com.bergerkiller.generated.net.minecraft.server.SoundTypeHandle");
-
-        // MC <= 1.12.2 HeightMap proxy
-        fixes.put("com.bergerkiller.generated.net.minecraft.server.HeightMapProxy_1_12_2Handle",
-                "com.bergerkiller.generated.net.minecraft.server.HeightmapHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.server.HeightMapProxy_1_12_2Handle.TypeHandle",
-                "com.bergerkiller.generated.net.minecraft.server.HeightmapHandle.TypeHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.server.VoxelShapeProxyHandle",
-                "com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle");
-
-        // MC 1.13 class translation fixes
-        fixes.put("com.bergerkiller.generated.net.minecraft.server.ScoreboardServerHandle.ActionHandle",
-                "com.bergerkiller.generated.net.minecraft.server.ClientboundSetScorePacketHandle.EnumScoreboardActionHandle");
-
-        // MC 1.14 class translation fixes
-        fixes.put("com.bergerkiller.generated.org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectMapHandle",
-                "com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle");
-        fixes.put("com.bergerkiller.generated.org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectMapHandle.EntryHandle",
-                "com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle.IntHashMapEntryHandle");
-        fixes.put("com.bergerkiller.generated.org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.LongSetHandle",
-                "com.bergerkiller.generated.com.bergerkiller.bukkit.common.internal.LongHashSetHandle");
-        fixes.put("com.bergerkiller.generated.org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.Long2ObjectMapHandle",
-                "com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongObjectHashMapHandle");
-        fixes.put("com.bergerkiller.generated.net.minecraft.server.ChunkMapHandle.EntityTrackerHandle",
-                "com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle");
+    public void testTemplate() throws IOException {
+        List<String> handleClassNames = CommonBootstrap.getGeneratedClassNames();
 
         boolean fullySuccessful = true;
         ArrayList<Template.Class<?>> classes = new ArrayList<Template.Class<?>>();
-        for (ClassDeclaration dec : Common.TEMPLATE_RESOLVER.all()) {
-            String genClassPath = "com.bergerkiller.generated";
-
-            for (String part : dec.type.typePath.split("\\.")) {
-                if (Character.isUpperCase(part.charAt(0))) {
-                    genClassPath += "." + part + "Handle";
-                } else {
-                    genClassPath += "." + part;
-                }
-            }
-
-            genClassPath = trimAfter(genClassPath, "org.bukkit.craftbukkit.");
-            genClassPath = trimAfter(genClassPath, "net.minecraft.server.");
-            genClassPath = fixes.getOrDefault(genClassPath, genClassPath);
-            Class<?> genClass = CommonUtil.getClass(genClassPath, true);
+        for (String className : handleClassNames) {
+            Class<?> genClass = CommonUtil.getClass(className, true);
             if (genClass == null) {
-                System.out.println("Error occurred testing handle for " + dec.type.typePath);
-                fail("Failed to find generated class at " + genClassPath);
+                System.out.println("Error occurred loading generated class " + className);
+                fail("Failed to load generated class at " + className);
             }
+            if (!Template.Handle.class.isAssignableFrom(genClass)) {
+                continue; // Skip things that are not handled
+            }
+
             try {
                 java.lang.reflect.Field f = genClass.getField("T");
                 if (f == null) {
-                    fail("Failed to find template field in type " + genClassPath);
+                    fail("Failed to find template field in type " + className);
                 }
                 Template.Class<?> c = (Template.Class<?>) f.get(null);
                 classes.add(c);
                 if (c == null) {
-                    fail("Failed to initialize template class " + genClassPath);
+                    fail("Failed to initialize template class " + className);
                 }
                 if (!c.isValid() && !c.isOptional()) {
-                    System.err.println("Failed to fully load template class " + genClassPath);
+                    System.err.println("Failed to fully load template class " + className);
                     fullySuccessful = false;
                 }
             } catch (Throwable t) {
-                throw new RuntimeException("Failed to test class "+  genClassPath, t);
+                throw new RuntimeException("Failed to test class "+  className, t);
             }
         }
 
@@ -185,7 +84,7 @@ public class TemplateTest {
             try {
                 templateClass.forceInitialization();
             } catch (Throwable t) {
-                Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to run forceInitialization()", t);
+                Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to run forceInitialization() for " + templateClass.getType(), t);
                 fullySuccessful = false;
             }
         }
