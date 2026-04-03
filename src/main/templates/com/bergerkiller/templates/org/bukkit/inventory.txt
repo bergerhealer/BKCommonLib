@@ -70,13 +70,13 @@ class PlayerInventory extends Inventory {
         }
     }
 #elseif version >= 1.16
-    public boolean isEquipmentSlotSupported(EquipmentSlot slot) {
+    #require org.bukkit.inventory.PlayerInventory public boolean isEquipmentSlotSupported(EquipmentSlot slot) {
         return true; // All slots always work
     }
     public void setItem(EquipmentSlot slot, ItemStack item);
     public ItemStack getItem(EquipmentSlot slot);
 #else
-    public boolean isEquipmentSlotSupported(EquipmentSlot slot) {
+    #require org.bukkit.inventory.PlayerInventory public boolean isEquipmentSlotSupported(EquipmentSlot slot) {
         return true; // All slots always work
     }
     public void setItem(EquipmentSlot slot, ItemStack item) {

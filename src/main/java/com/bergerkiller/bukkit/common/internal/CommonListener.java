@@ -39,6 +39,7 @@ import java.util.logging.Level;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -75,6 +76,11 @@ public class CommonListener implements Listener {
      */
     private static final List<WeakReference<ImmutableCachedSet<Player>>> CACHED_IMMUTABLE_PLAYER_SETS = new ArrayList<>();
     /**
+     * Tracks what sign blocks a player opened a sign edit dialog for.
+     * See {@link CommonSignOpenListenerBukkit}, is always empty if unused.
+     */
+    private static final Map<Player, Block> editedSignBlocks = new HashMap<>();
+    /**
      * Reach deep into our own code!
      */
     private static final FastField<PluginLoaderHandler> pluginLoaderHandlerField = new FastField<>();
@@ -92,11 +98,9 @@ public class CommonListener implements Listener {
         }
     }
 
-    /**
-     * Tracks what sign blocks a player opened a sign edit dialog for.
-     * See {@link CommonSignOpenListenerBukkit}, is always empty if unused.
-     */
-    protected static final Map<Player, Block> editedSignBlocks = new HashMap<>();
+    public static void storeEditedSign(Player player, Sign sign) {
+        editedSignBlocks.put(player, sign.getBlock());
+    }
 
     @EventHandler(priority = EventPriority.MONITOR)
     protected void onPluginEnable(final PluginEnableEvent event) {

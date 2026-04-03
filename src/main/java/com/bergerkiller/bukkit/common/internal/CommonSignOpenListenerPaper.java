@@ -57,6 +57,6 @@ class CommonSignOpenListenerPaper implements Listener, EventExecutor {
 
         Player player = ((PlayerEvent) event).getPlayer();
         Sign sign = getSignMethod.invoke(event);
-        CommonListener.editedSignBlocks.put(player, sign.getBlock());
+        CommonListener.storeEditedSign(player, sign);
     }
 }

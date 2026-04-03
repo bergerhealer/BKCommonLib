@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.resources.ResourceCategory;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
@@ -43,6 +44,11 @@ public class PlayerRespawnPointTest {
 
     @Test
     public void testNearBlockNBTSerialization() {
+        // This stuff requires a loaded World to work before 1.21.5
+        if (!CommonCapabilities.IS_RESPAWN_POINT_PACKED) {
+            return;
+        }
+
         ResourceKey<World> dimensionKey = ResourceCategory.dimension.createKey("testworld");
         PlayerRespawnPoint rawPoint = PlayerRespawnPoint.create(dimensionKey, 1, 2, 3, 30.0f, true);
         PlayerRespawnPointNearBlock nearBlock = (PlayerRespawnPointNearBlock) rawPoint;

@@ -51,6 +51,12 @@ public class ItemMaterialTest {
 
     @Test
     public void generateIdToMaterialMappings() {
+        int dataVersion = CraftMagicNumbersHandle.getDataVersion();
+        if (dataVersion < 4325) {
+            // No mappings are stored for before 1.21.5
+            return;
+        }
+
         ItemStackDeserializerIdToMaterialMapper mappings = new ItemStackDeserializerIdToMaterialMapper();
 
         File mappingsFile = new File("src/main/resources/com/bergerkiller/bukkit/common/internal/resources/id_to_material_mappings.dat");

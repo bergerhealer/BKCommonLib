@@ -197,15 +197,15 @@ class Component {
         return net.minecraft.network.Utf8String.read(tmpByteBuf, Integer.MAX_VALUE);
 
 #elseif version >= 1.21.5
-        return Component$ChatSerializer.toJson(chatComponent,
+        return Component$Serializer.toJson(chatComponent,
                 org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry());
 
 #elseif version >= 1.20.5
-        return Component$ChatSerializer.toJson(chatComponent,
+        return Component$Serializer.toJson(chatComponent,
                 net.minecraft.server.MinecraftServer.getDefaultRegistryAccess());
 
 #else
-        return Component$ChatSerializer.toJson(chatComponent);
+        return Component$Serializer.toJson(chatComponent);
 #endif
     }
 
@@ -227,15 +227,15 @@ class Component {
             .orElse(null);
 
 #elseif version >= 1.21.5
-        return Component$ChatSerializer.fromJson(jsonString,
+        return Component$Serializer.fromJson(jsonString,
                 org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry());
 
 #elseif version >= 1.20.5
-        return Component$ChatSerializer.fromJson(jsonString,
+        return Component$Serializer.fromJson(jsonString,
                 net.minecraft.server.MinecraftServer.getDefaultRegistryAccess());
 
 #else
-        return Component$ChatSerializer.fromJson(jsonString);
+        return Component$Serializer.fromJson(jsonString);
 #endif
     }
 
@@ -256,10 +256,10 @@ class Component {
         if (nbt instanceof StringTag) {
             String jsonString = ((StringTag) nbt).getAsString();
   #if version >= 1.20.5
-            return Component$ChatSerializer.fromJson(jsonString,
+            return Component$Serializer.fromJson(jsonString,
                     net.minecraft.server.MinecraftServer.getDefaultRegistryAccess());
   #else
-            return Component$ChatSerializer.fromJson(jsonString);
+            return Component$Serializer.fromJson(jsonString);
   #endif
         } else {
   #if version >= 1.19
@@ -279,10 +279,10 @@ class Component {
 #else
         // Serialize to json and return that as a StringTag
   #if version >= 1.20.5
-        String jsonString = Component$ChatSerializer.toJson(chatComponent,
+        String jsonString = Component$Serializer.toJson(chatComponent,
                                     net.minecraft.server.MinecraftServer.getDefaultRegistryAccess());
   #else
-        String jsonString = Component$ChatSerializer.toJson(chatComponent);
+        String jsonString = Component$Serializer.toJson(chatComponent);
   #endif
   #if version >= 1.15
         return StringTag.valueOf(jsonString);

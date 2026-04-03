@@ -29,13 +29,13 @@ public class EntityRegistryTest {
         }
 
         Class<?>[] input_types = new Class<?>[] {
-                CommonUtil.getClass("net.minecraft.world.entity.monster.EntityCreeper"),
-                CommonUtil.getClass("net.minecraft.world.entity.monster.EntityGhast"),
-                CommonUtil.getClass("net.minecraft.world.entity.vehicle.minecart.EntityMinecartRideable")
+                CommonUtil.getClass("net.minecraft.world.entity.monster.Creeper"),
+                CommonUtil.getClass("net.minecraft.world.entity.monster.Ghast"),
+                CommonUtil.getClass("net.minecraft.world.entity.vehicle.minecart.Minecart")
         };
         for (Class<?> input_type : input_types) {
             Object type = HandleConversion.toEntityTypesHandleFromEntityClass(input_type);
-            assertNotNull(type);
+            assertNotNull("EntityType is null for " + input_type, type);
             Class<?> output_type = WrapperConversion.entityClassFromEntityTypes(type);
             assertNotNull(output_type);
             assertEquals(input_type, output_type);

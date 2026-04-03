@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.io.VersionedMappingsFileIO;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
@@ -60,7 +61,7 @@ public class ItemStackDeserializerIdToMaterialMapper extends VersionedMappingsFi
      */
     public boolean storeCurrentDataVersion() {
         try {
-            Method getKeyMethod = Material.class.getMethod("getKeyOrNull");
+            Method getKeyMethod = Material.class.getMethod(CommonBootstrap.evaluateMCVersion(">=", "1.21.5") ? "getKeyOrNull" : "getKey");
             String dataVersion = Integer.toString(CraftMagicNumbersHandle.getDataVersion());
             Map<String, String> newMappings = new HashMap<>();
             for (Material material : MaterialUtil.getAllMaterials()) {

@@ -28,7 +28,7 @@ public class ChatTextTest {
             nbt = CommonTag.createForData("cool");
         } else {
             // JSON String
-            nbt = CommonTag.createForData("{\"text\":\"cool\"");
+            nbt = CommonTag.createForData("{\"text\":\"cool\"}");
         }
 
         ChatText text = ChatText.fromNBT(nbt);
@@ -169,6 +169,8 @@ public class ChatTextTest {
 
         Set<String> allowed = new HashSet<String>();
         allowed.add("{\"extra\":[{\"color\":\"red\",\"text\":\"\"}],\"text\":\"\"}");
+        allowed.add("{\"text\":\"\",\"extra\":[{\"text\":\"\",\"color\":\"red\"}],\"obfuscated\":false,\"italic\":false,\"underlined\":false,\"strikethrough\":false,\"color\":\"red\",\"bold\":false}");
+        allowed.add("{\"bold\":false,\"italic\":false,\"underlined\":false,\"strikethrough\":false,\"obfuscated\":false,\"color\":\"red\",\"extra\":[{\"color\":\"red\",\"text\":\"\"}],\"text\":\"\"}");
         if (Common.evaluateMCVersion(">=", "1.21.11")) {
             // Bleh!
             allowed.add("{\"text\":\"\",\"extra\":[{\"text\":\"\",\"color\":\"red\"}],\"color\":\"red\",\"bold\":false,\"italic\":false,\"underlined\":false,\"strikethrough\":false,\"obfuscated\":false}");

@@ -32,7 +32,7 @@ class BlockDataSerializer_1_19 extends BlockDataSerializer {
                 "public static BlockState deserialize(String text) {\n" +
                 "    BlockStateParser$BlockResult block;\n" +
                 "    try {\n" +
-                "#if version >= 1.21.2n\n" +
+                "#if version >= 1.21.2\n" +
                 "        block = BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK, text, true);\n" +
                 "#elseif version >= 1.19.3\n" +
                 "        block = BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK.asLookup(), text, true);\n" +

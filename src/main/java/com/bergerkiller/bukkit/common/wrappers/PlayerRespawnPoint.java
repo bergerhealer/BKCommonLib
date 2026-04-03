@@ -297,7 +297,7 @@ public abstract class PlayerRespawnPoint {
         World world = null;
 
         // Read the new packed format as of 1.21.5
-        if (CommonCapabilities.PLAYER_SPAWN_WORLD_IS_DIMENSION_KEY) {
+        if (CommonCapabilities.IS_RESPAWN_POINT_PACKED) {
             ServerPlayerHandle.RespawnConfigHandle respawnConfig = ServerPlayerHandle.RespawnConfigHandle.codecFromNBT(nbt);
             if (respawnConfig != null) {
                 return new PlayerRespawnPointNearBlock(respawnConfig);

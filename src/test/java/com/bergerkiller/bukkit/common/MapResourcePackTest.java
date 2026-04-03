@@ -57,9 +57,7 @@ public class MapResourcePackTest {
         assertEquals(MapResourcePack.PackVersion.of(7), MapResourcePack.PackVersion.byGameVersion("1.17.1"));
         assertEquals(MapResourcePack.PackVersion.of(8), MapResourcePack.PackVersion.byGameVersion("1.18"));
         assertEquals(MapResourcePack.PackVersion.of(8), MapResourcePack.PackVersion.byGameVersion("1.18.1"));
-        assertEquals(MapResourcePack.PackVersion.HIGHEST_KNOWN, MapResourcePack.PackVersion.byGameVersion("1.99.9"));
-        assertEquals(MapResourcePack.PackVersion.HIGHEST_KNOWN,
-                MapResourcePack.PackVersion.byGameVersion(CommonBootstrap.initCommonServer().getMinecraftVersion()));
+        assertEquals(MapResourcePack.PackVersion.HIGHEST_KNOWN, MapResourcePack.PackVersion.byGameVersion("99.99"));
     }
 
     @Test

@@ -812,7 +812,11 @@ public class CommonPlugin extends PluginBase {
                 getLogger().log(Level.SEVERE, "Failed to listen for paper's open sign event", t);
             }
         } else if (CommonCapabilities.HAS_SIGN_OPEN_EVENT) {
-            register(new CommonSignOpenListenerBukkit());
+            try {
+                CommonSignOpenListenerBukkit.register(this);
+            } catch (Throwable t) {
+                getLogger().log(Level.SEVERE, "Failed to listen for bukkit's open sign event", t);
+            }
         }
 
         // NO LONGER USED!!!

@@ -646,6 +646,9 @@ public class CommonBootstrap {
             // Before this version the ClientboundEntityPositionSyncPacket doesn't exist
             // It is emulated with the ClientboundTeleportEntityPacket (PacketPlayOutEntityTeleport) instead which behaves identically
             remappings.put("net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket", "net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket");
+
+            // Packet was renamed to ClientboundSetHeldSlotPacket
+            remappings.put("net.minecraft.network.protocol.game.ClientboundSetHeldSlotPacket", "net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket");
         }
 
         /* ======== Mojang remapping changes for 1.20.5 ======== */
@@ -656,6 +659,9 @@ public class CommonBootstrap {
             remappings.put("org.bukkit.craftbukkit.inventory.SerializableMeta", "org.bukkit.craftbukkit.inventory.CraftMetaItem$SerializableMeta");
             // CustomModelData was introduced. Map to our proxy class on older versions.
             remappings.put("net.minecraft.world.item.component.CustomModelData", "com.bergerkiller.bukkit.common.internal.proxy.CustomModelData_pre_1_20_5");
+            // MapDecorationType(s) was an enum subclass of MapDecoration instead of a registry
+            remappings.put("net.minecraft.world.level.saveddata.maps.MapDecorationType", "net.minecraft.world.level.saveddata.maps.MapDecoration$Type");
+            remappings.put("net.minecraft.world.level.saveddata.maps.MapDecorationTypes", "net.minecraft.world.level.saveddata.maps.MapDecoration$Type");
         }
 
         /* ======== Mojang remapping changes for 1.20.3 ======== */
