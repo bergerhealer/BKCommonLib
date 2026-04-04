@@ -317,7 +317,6 @@ public class ItemStackDeserializerItemMetaMigrator extends ItemStackDeserializer
                                 UUID uuid = new UUID(most, least);
                                 skullProfileNbt.putValue("Id", uuid.toString());
                                 mapping.put("internal", nbt.toBase64String());
-                                System.out.println("STORED AS ID STRING: " + nbt);
                             }
                         }
                     }
