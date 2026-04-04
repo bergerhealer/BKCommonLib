@@ -29,6 +29,14 @@ class CraftItemStack {
         return SerializableMeta.deserialize(values);
     }
 
+#if version >= 1.18.1
+    public static optional Object deserializeSkullOwner(java.util.Map<String, Object> values) {
+        return org.bukkit.craftbukkit.profile.CraftPlayerProfile.deserialize(values);
+    }
+#else
+    public static optional Object deserializeSkullOwner:###(java.util.Map<String, Object> values);
+#endif
+
 #if version >= 1.21.4
     public static optional Object deserializeCustomModelData(java.util.Map<String, Object> values) {
         return new org.bukkit.craftbukkit.inventory.components.CraftCustomModelDataComponent(values);

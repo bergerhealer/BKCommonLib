@@ -10,20 +10,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
-import com.bergerkiller.bukkit.common.internal.proxy.PlayerProfile_1_8_to_1_18;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
-import com.bergerkiller.bukkit.common.nbt.CommonTagList;
-import com.google.common.collect.MapMaker;
 import org.bukkit.Material;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
@@ -41,8 +35,7 @@ import org.bukkit.inventory.meta.ItemMeta;
  * and double -> integer conversion, to add support for deserialization from JSON.
  */
 public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMigrator implements Function<Map<String, Object>, ItemStack> {
-    private static final boolean IS_ENTITY_TAG_META_SUPPORTED = CommonBootstrap.evaluateMCVersion(">=", "1.16.2");
-    private final ItemMetaDeserializer metaDeserializer = new ItemMetaDeserializer();
+    private final ItemStackDeserializerItemMetaMigrator metaDeserializer = new ItemStackDeserializerItemMetaMigrator(this);
 
     ItemStackDeserializerMigratorBukkit() {
         // All data versions where the ItemStack YAML had a change that requires conversion
@@ -322,7 +315,7 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
         this.setMaximumDataVersion(4671); // MC 1.21.11
     }
 
-    public ItemMetaDeserializer getItemMetaDeserializer() {
+    public ItemStackDeserializerItemMetaMigrator getItemMetaDeserializer() {
         return metaDeserializer;
     }
 
@@ -432,241 +425,6 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
         metaDeserializer.cleanupArgsUsedForMeta(meta);
         metaArgs.put("internal", newInternalData);
         args.put("meta", metaDeserializer.applyWithoutFixes(metaArgs));
-    }
-
-    private static ConfigurationSerializable deserializeFireworkEffect(java.util.Map<String, Object> values) {
-        replaceListOfMapsInMap(values, "colors", ItemStackDeserializerMigratorBukkit::deserializeColor);
-        replaceListOfMapsInMap(values, "fade-colors", ItemStackDeserializerMigratorBukkit::deserializeColor);
-        return org.bukkit.FireworkEffect.deserialize(values);
-    }
-
-    private static org.bukkit.Color deserializeColor(java.util.Map<String, Object> values) {
-        convertNumberToIntegerInMapValues(values);
-        return org.bukkit.Color.deserialize(values);
-    }
-
-    // >= 1.21.4
-    public static Object deserializeCustomModelData(java.util.Map<String, Object> values) {
-        convertNumberListToFloatInMap(values, "floats");
-        replaceListOfMapsInMap(values, "colors", ItemStackDeserializerMigratorBukkit::deserializeColor);
-        return CraftItemStackHandle.T.deserializeCustomModelData.invoke(values);
-    }
-
-    public class ItemMetaDeserializer implements Function<Map<String, Object>, ItemMeta> {
-        /** Caches the input args to ItemMeta deserialize(), mapped to the object it produced */
-        private final Map<ItemMeta, Map<String, Object>> itemMetaToArgs = new MapMaker().weakKeys().concurrencyLevel(4).makeMap();
-
-        /**
-         * ItemMeta de-serializer that migrates double to integer where required for GSON decoding.<br>
-         * <br>
-         * On versions before 1.13 it also stores some original Map contents that created an
-         * ItemMeta so that it can be restored when deserializing the ItemStack later. This migrates
-         * the "Damage" value to the ItemStack's "damage" field.
-         *
-         * @param mapping Mapping
-         */
-        @Override
-        public ItemMeta apply(Map<String, Object> mapping) {
-            // Migrate double -> integer, this is required for loading items from GSON
-
-            // Custom model data can be of the format of a dict when it stores the different types of fields.
-            // Or it can be a single number, which translates to just a float[] {number}
-            // Fix this format. This same logic is also used for the Paper NBT migrator
-            // On old versions of the server that does not support custom model data, decode only the floats as a number
-            {
-                Object value = mapping.get("custom-model-data");
-                if (value instanceof Number) {
-                    mapping.put("custom-model-data", ((Number) value).intValue());
-                } else if (value instanceof Map) {
-                    Map<String, Object> cmdValues = (Map<String, Object>) value;
-                    if (CraftItemStackHandle.T.deserializeCustomModelData.isAvailable()) {
-                        mapping.put("custom-model-data", deserializeCustomModelData(cmdValues));
-                    } else {
-                        Object rawFloats = cmdValues.get("floats");
-                        if (rawFloats instanceof List) {
-                            List<?> floats = (List<?>) rawFloats;
-                            if (!floats.isEmpty() && floats.get(0) instanceof Number) {
-                                mapping.put("custom-model-data", ((Number) floats.get(0)).intValue());
-                            } else {
-                                mapping.remove("custom-model-data");
-                            }
-                        } else {
-                            mapping.remove("custom-model-data");
-                        }
-                    }
-                }
-            }
-
-            convertNumberToIntegerInMap(mapping, "repair-cost");
-            convertNumberToIntegerInMap(mapping, "Damage");
-            convertNumberToIntegerInMap(mapping, "max-damage");
-            convertNumberToIntegerInMap(mapping, "max-stack-size");
-            convertNumberToIntegerInMap(mapping, "generation");
-            convertNumberToIntegerInMap(mapping, "power");
-            convertNumberToIntegerInMap(mapping, "map-id");
-            convertNumberToIntegerInMap(mapping, "fish-variant");
-            convertNumberToIntegerInMapValues(mapping, "enchants");
-            replaceMapInMap(mapping, "color", ItemStackDeserializerMigratorBukkit::deserializeColor);
-            replaceMapInMap(mapping, "display-map-color", ItemStackDeserializerMigratorBukkit::deserializeColor);
-            replaceMapInMap(mapping, "custom-color", ItemStackDeserializerMigratorBukkit::deserializeColor);
-            replaceMapInMap(mapping, "firework-effect", ItemStackDeserializerMigratorBukkit::deserializeFireworkEffect);
-            replaceListOfMapsInMap(mapping, "firework-effects", ItemStackDeserializerMigratorBukkit::deserializeFireworkEffect);
-            replaceListOfMapsInMap(mapping, "patterns", org.bukkit.block.banner.Pattern::new);
-            replaceListOfMapsInMap(mapping, "charged-projectiles", ItemStackDeserializerMigratorBukkit.this);
-            replaceListOfMapsInMap(mapping, "custom-effects", potionEffect -> {
-                convertNumberToIntegerInMap(potionEffect, "amplifier");
-                convertNumberToIntegerInMap(potionEffect, "duration");
-                return new org.bukkit.potion.PotionEffect(potionEffect);
-            });
-
-            // If meta-type is ENTITY_TAG but this is not supported, switch it UNSPECIFIC to still allow it to work
-            // This preserves the original NBT but just falls back to the default CraftMetaItem type
-            if (!IS_ENTITY_TAG_META_SUPPORTED && "ENTITY_TAG".equals(mapping.get("meta-type"))) {
-                mapping.put("meta-type", "UNSPECIFIC");
-            }
-
-            // If meta-type is SKULL and a skull-owner is set that is a MCommonCapabilities.HAS_BUKKIT_PLAYER_PROFILE
-            if (!CommonCapabilities.HAS_BUKKIT_PLAYER_PROFILE && "SKULL".equals(mapping.get("meta-type"))) {
-                Object skullOwnerRaw = mapping.get("skull-owner");
-                if (skullOwnerRaw instanceof PlayerProfile_1_8_to_1_18) {
-                    Map<String, Object> skullOwnerMeta = ((PlayerProfile_1_8_to_1_18) skullOwnerRaw).meta;
-
-                    /*
-                    Convert:
-                    {
-                      ===PlayerProfile
-                      uniqueId=04049c90-d3e9-4621-9caf-0000aaa58540,
-                      name=HeadDatabase,
-                      properties=[
-                        {
-                          name=textures,
-                          value=eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjllNzVlMDQxNTFlN2NkZThlN2YxNDlkYWU5MmYwYzE0ZWY1ZjNmZjQ1Y2QzMjM5NTc4NzZiMGFkZDJjNDk0OSJ9fX0=
-                        }
-                      ]
-                    }
-
-                    To:
-                    TagCompound: 1 entries {
-                      SkullProfile = TagCompound: 3 entries {
-                        Id = int[]: [67411088, -739686879, -1666252800, -1431993024]
-                        Properties = TagCompound: 1 entries {
-                          textures = TagList: 1 entries [
-                            TagCompound: 1 entries {
-                              Value = String: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjllNzVlMDQxNTFlN2NkZThlN2YxNDlkYWU5MmYwYzE0ZWY1ZjNmZjQ1Y2QzMjM5NTc4NzZiMGFkZDJjNDk0OSJ9fX0=
-                            }
-                          ]
-                        }
-                        Name = String: HeadDatabase
-                      }
-                    }
-
-                    And encode as "internal" string string for the ItemMeta metadata.
-                    The NBT Name property is put as the new skull-owner value.
-                     */
-
-                    CommonTagCompound skullProfileNbt = new CommonTagCompound();
-
-                    // uniqueId
-                    {
-                        String uniqueIdStr = LogicUtil.tryCast(skullOwnerMeta.get("uniqueId"), String.class);
-                        if (uniqueIdStr != null) {
-                            try {
-                                UUID uuid = UUID.fromString(uniqueIdStr);
-                                long most = uuid.getMostSignificantBits();
-                                long least = uuid.getLeastSignificantBits();
-                                skullProfileNbt.putValue("Id", new int[] {
-                                        (int) (most >> 32),
-                                        (int) (most & 0xFFFFFFFFL),
-                                        (int) (least >> 32),
-                                        (int) (least & 0xFFFFFFFFL)
-                                });
-                            } catch (IllegalArgumentException ex) {
-                                // Invalid UUID string, ignore
-                            }
-                        }
-                    }
-
-                    // name
-                    {
-                        String name = LogicUtil.tryCast(skullOwnerMeta.get("name"), String.class);
-                        if (name != null) {
-                            skullProfileNbt.putValue("Name", name);
-                            mapping.put("skull-owner", name);
-                        } else {
-                            mapping.remove("skull-owner");
-                        }
-                    }
-
-                    // properties
-                    {
-                        Object propertiesRaw = skullOwnerMeta.get("properties");
-                        if (propertiesRaw instanceof List) {
-                            List<?> propertiesList = (List<?>) propertiesRaw;
-                            CommonTagCompound propertiesNbt = new CommonTagCompound();
-                            for (Object propertyObj : propertiesList) {
-                                if (propertyObj instanceof Map) {
-                                    Map<String, Object> propertyMap = (Map<String, Object>) propertyObj;
-                                    String propName = LogicUtil.tryCast(propertyMap.get("name"), String.class);
-                                    if (propName != null) {
-                                        Object propValue = propertyMap.get("value");
-                                        if (propValue instanceof String) {
-                                            CommonTagCompound propNbt = new CommonTagCompound();
-                                            propNbt.putValue("Value", (String) propValue);
-
-                                            CommonTagList propValues = propertiesNbt.get(propName, CommonTagList.class);
-                                            if (propValues != null) {
-                                                propValues.add(propNbt);
-                                            } else {
-                                                propValues = new CommonTagList();
-                                                propValues.add(propNbt);
-                                                propertiesNbt.put(propName, propValues);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            skullProfileNbt.put("Properties", propertiesNbt);
-                        }
-                    }
-
-                    CommonTagCompound internalNBT = new CommonTagCompound();
-                    internalNBT.put("SkullProfile", skullProfileNbt);
-                    String internalStr = internalNBT.toBase64String();
-
-                    mapping.put("internal", internalStr);
-                }
-            }
-
-            return applyWithoutFixes(mapping);
-        }
-
-        public ItemMeta applyWithoutFixes(Map<String, Object> mapping) {
-            ItemMeta meta = CraftItemStackHandle.deserializeItemMeta(mapping);
-            itemMetaToArgs.put(meta, mapping);
-            return meta;
-        }
-
-        /**
-         * Gets the original (cleaned up) arguments used for deserializing an ItemMeta object.
-         * These arguments are kept around for as long the ItemMeta is not garbage-collected,
-         * or {@link #cleanupArgsUsedForMeta(ItemMeta)} is called.
-         *
-         * @param meta ItemMeta
-         * @return Map args, or null if the ItemMeta was not deserialized by this deserializer
-         */
-        public Map<String, Object> getArgsUsedForMeta(ItemMeta meta) {
-            return itemMetaToArgs.get(meta);
-        }
-
-        /**
-         * Cleans up the args mapped to an ItemMeta instance, so that this data can be garbage
-         * collected earlier.
-         *
-         * @param meta ItemMeta
-         */
-        public void cleanupArgsUsedForMeta(ItemMeta meta) {
-            itemMetaToArgs.remove(meta);
-        }
     }
 
     private static class Helper {

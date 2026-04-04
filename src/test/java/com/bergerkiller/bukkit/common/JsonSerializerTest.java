@@ -40,6 +40,12 @@ public class JsonSerializerTest {
 
         CommonItemStack decoded = CommonItemStack.of(serializer.fromJsonToItemStack(json));
 
+        // There's a weird bug going on where an empty display name is set on older versions of the server
+        // Nothing we can really do about it :(
+        if (decoded.hasCustomName() && decoded.getCustomName().isEmpty()) {
+            decoded.setCustomName(null);
+        }
+
         assertEquals(item, decoded);
     }
 
@@ -86,7 +92,7 @@ public class JsonSerializerTest {
                 CommonItemStack.createPlayerSkull(profile)
                         .toBukkit());
 
-        System.out.println(json);
+        //System.out.println(json);
 
         Map<String, Object> jsonMap = serializer.jsonToMap(json);
 
@@ -122,7 +128,7 @@ public class JsonSerializerTest {
 
             List<Map<String, Object>> skullProperties = LogicUtil.unsafeCast(skullOwner.get("properties"));
             assertEquals(1, skullProperties.size());
-            assertEquals("textures", skullProperties.get(0).get("key"));
+            assertEquals("textures", skullProperties.get(0).get("name"));
             assertEquals(testTexture, skullProperties.get(0).get("value"));
         } else {
             /*

@@ -15,6 +15,7 @@ import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializer;
 import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializerMigratorBukkit;
+import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializerUtils;
 import com.bergerkiller.bukkit.common.internal.proxy.PlayerProfile_1_8_to_1_18;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
@@ -405,7 +406,7 @@ public class YamlDeserializer {
 
             // Fix deserializing custom model data with colors having the wrong data type
             if (CraftItemStackHandle.T.deserializeCustomModelData.isAvailable()) {
-                this.register("CustomModelData", ItemStackDeserializerMigratorBukkit::deserializeCustomModelData);
+                this.register("CustomModelData", ItemStackDeserializerUtils::deserializeCustomModelData);
             }
 
             // Fix deserializing profiles with invalid name causing errors to be logged
