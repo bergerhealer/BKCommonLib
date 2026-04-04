@@ -78,38 +78,43 @@ class SynchedEntityData {
     #set datawatcher_storage array
     #require SynchedEntityData private final SynchedEntityData.DataItem<?>[] itemsById;
 #elseif version >= 1.17
-  #if exists net.minecraft.network.syncher.SynchedEntityData private final java.util.Map<Integer, SynchedEntityData.DataItem<?>> itemsById;
+  #if exists net.minecraft.network.syncher.SynchedEntityData private final java.util.Map<Integer, net.minecraft.network.syncher.SynchedEntityData.DataItem<?>> itemsById;
     // Forge hybrids (Arclight 1.17?)
     #set datawatcher_storage java_map
-    #require SynchedEntityData private final java.util.Map<Integer, SynchedEntityData.DataItem<?>> itemsById;
+    #require SynchedEntityData private final java.util.Map<Integer, net.minecraft.network.syncher.SynchedEntityData.DataItem<?>> itemsById;
   #else
     #set datawatcher_storage fastutil_map
-    #require SynchedEntityData private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<SynchedEntityData.DataItem<?>> itemsById;
+    #require SynchedEntityData private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<net.minecraft.network.syncher.SynchedEntityData.DataItem<?>> itemsById;
   #endif
 #elseif version >= 1.14
-  #if exists net.minecraft.network.syncher.SynchedEntityData private final java.util.Map<Integer, SynchedEntityData.DataItem<?>> entries;
+  #if exists net.minecraft.network.syncher.SynchedEntityData private final java.util.Map<Integer, net.minecraft.network.syncher.SynchedEntityData.DataItem<?>> entries;
     // Forge hybrids (Arclight 1.16)
     #set datawatcher_storage java_map
-    #require SynchedEntityData private final java.util.Map<Integer, SynchedEntityData.DataItem<?>> itemsById:entries;
-  #else
+    #require SynchedEntityData private final java.util.Map<Integer, net.minecraft.network.syncher.SynchedEntityData.DataItem<?>> itemsById:entries;
+  #elseif exists net.minecraft.network.syncher.SynchedEntityData private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<net.minecraft.network.syncher.SynchedEntityData.DataItem<?>> entries;
+    // Spigot introduced this change in 1.14.4
     #set datawatcher_storage fastutil_map
-    #require SynchedEntityData private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<SynchedEntityData.DataItem<?>> itemsById:entries;
+    #require SynchedEntityData private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<net.minecraft.network.syncher.SynchedEntityData.DataItem<?>> itemsById:entries;
+  #else
+    // Obfuscated original field name
+    #set datawatcher_storage java_map
+    #require SynchedEntityData private final java.util.Map<Integer, net.minecraft.network.syncher.SynchedEntityData.DataItem<?>> itemsById:d;
   #endif
-#elseif exists net.minecraft.network.syncher.SynchedEntityData private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<SynchedEntityData.DataItem<?>> dataValues;
+#elseif exists net.minecraft.network.syncher.SynchedEntityData private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<net.minecraft.network.syncher.SynchedEntityData.DataItem<?>> dataValues;
     // Some server forks (1.8) do this
     #set datawatcher_storage fastutil_map
-    #require SynchedEntityData private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<SynchedEntityData.DataItem<?>> itemsById:dataValues;
-#elseif exists net.minecraft.network.syncher.SynchedEntityData private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<SynchedEntityData.DataItem<?>> dataValues;
+    #require SynchedEntityData private final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<net.minecraft.network.syncher.SynchedEntityData.DataItem<?>> itemsById:dataValues;
+#elseif exists net.minecraft.network.syncher.SynchedEntityData private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<net.minecraft.network.syncher.SynchedEntityData.DataItem<?>> dataValues;
     // Some server forks (1.8) might also do this
     #set datawatcher_storage fastutil_map
-    #require SynchedEntityData private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<SynchedEntityData.DataItem<?>> itemsById:dataValues;
+    #require SynchedEntityData private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<net.minecraft.network.syncher.SynchedEntityData.DataItem<?>> itemsById:dataValues;
 #elseif exists net.minecraft.network.syncher.SynchedEntityData private final gnu.trove.map.TIntObjectMap dataValues;
     // This is on 1.8 usually
     #set datawatcher_storage trove_map
     #require SynchedEntityData private final gnu.trove.map.TIntObjectMap itemsById:dataValues;
 #else
     #set datawatcher_storage java_map
-    #if exists net.minecraft.network.syncher.SynchedEntityData private final java.util.Map<Integer, net.minecraft.network.syncher.SynchedEntityData.DataItem> itemsById:d;
+    #if exists net.minecraft.network.syncher.SynchedEntityData private final java.util.Map<Integer, net.minecraft.network.syncher.SynchedEntityData.DataItem<?>> itemsById:d;
         // Azurite server
         #require SynchedEntityData private final java.util.Map<Integer, SynchedEntityData.DataItem<?>> itemsById:d;
     #elseif version >= 1.10.2

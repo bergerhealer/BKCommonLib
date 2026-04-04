@@ -90,6 +90,27 @@ class Recipe {
 #case else:     #require net.minecraft.world.item.crafting.ShapedRecipe private final NonNullList<Ingredient> items;
                 return instance#items;
 #endselect
+
+        } else if (instance instanceof FireworkRocketRecipe) {
+            // Fireworks are a 'complex' recipe with many possible options
+            // To sort of work properly rather than not at all, default to
+            // crafting a flight 3 firework:
+            // Shapeless(1 paper + 3 gunpowder) -> Flight 3 firework
+  #if version >= 1.18
+            Ingredient paper = Ingredient.of(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.PAPER });
+            Ingredient gunpowder = Ingredient.of(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.GUNPOWDER });
+  #else
+            Ingredient paper = Ingredient.a(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.PAPER });
+            Ingredient gunpowder = Ingredient.a(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.GUNPOWDER });
+  #endif
+
+            java.util.List ingredients = new java.util.ArrayList(4);
+            ingredients.add(paper);
+            ingredients.add(gunpowder);
+            ingredients.add(gunpowder);
+            ingredients.add(gunpowder);
+            return ingredients;
+
         } else if (instance instanceof ShapelessRecipe) {
             ShapelessRecipe s = (ShapelessRecipe) instance;
 #select version >=
@@ -103,27 +124,6 @@ class Recipe {
                 return instance#ingredients;
 #endselect
 
-#if version >= 1.15
-        } else if (instance instanceof FireworkRocketRecipe) {
-            // Fireworks are a 'complex' recipe with many possible options
-            // To sort of work properly rather than not at all, default to
-            // crafting a flight 3 firework:
-            // Shapeless(1 paper + 3 gunpowder) -> Flight 3 firework
-  #if version >= 1.18
-            Ingredient paper = Ingredient.of(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.PAPER });
-            Ingredient gunpowder = Ingredient.of(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.GUNPOWDER });
-  #else
-            Ingredient paper = RecipeItemStack.a(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.PAPER });
-            Ingredient gunpowder = Ingredient.a(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.GUNPOWDER });
-  #endif
-
-            java.util.List ingredients = new java.util.ArrayList(4);
-            ingredients.add(paper);
-            ingredients.add(gunpowder);
-            ingredients.add(gunpowder);
-            ingredients.add(gunpowder);
-            return ingredients;
-#endif
         } else {
             return null;
         }

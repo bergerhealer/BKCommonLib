@@ -53,7 +53,7 @@ class PlayerList {
     public void sendRawPacketNearby((org.bukkit.World) ServerLevel world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
         instance.sendPacketNearby((net.minecraft.world.entity.player.Player) null, x, y, z, radius, world.getDimensionKey(), packet);
     }
-#elseif version >= 1.14.1
+#elseif version >= 1.14
     public void sendRawPacketNearby((org.bukkit.World) ServerLevel world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
         instance.sendPacketNearby((net.minecraft.world.entity.player.Player) null, x, y, z, radius, world.worldProvider.getDimensionManager().getType(), packet);
     }

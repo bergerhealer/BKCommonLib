@@ -31,3 +31,15 @@
 #elseif version >= 1.17
   #remap net.minecraft.network.chat.TextColor public int getValue:a();
 #endif
+
+#if version < 1.19
+  #if version >= 1.14.4
+    #remap net.minecraft.network.chat.TranslatableComponent public String getKey();
+  #elseif version >= 1.13.1
+    #remap net.minecraft.network.chat.TranslatableComponent public String getKey:k();
+  #elseif version >= 1.13
+    #remap net.minecraft.network.chat.TranslatableComponent public String getKey:h();
+  #else
+    #remap net.minecraft.network.chat.TranslatableComponent public String getKey:i();
+  #endif
+#endif
