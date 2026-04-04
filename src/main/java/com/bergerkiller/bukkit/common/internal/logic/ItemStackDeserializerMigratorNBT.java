@@ -147,8 +147,8 @@ public class ItemStackDeserializerMigratorNBT extends ItemStackDeserializerMigra
                     s.put("==", "Color");
                     s.put("ALPHA", (argb >> 24) & 0xFF);
                     s.put("RED", (argb >> 16) & 0xFF);
-                    s.put("BLUE", (argb >> 8) & 0xFF);
-                    s.put("GREEN", argb & 0xFF);
+                    s.put("GREEN", (argb >> 8) & 0xFF);
+                    s.put("BLUE", argb & 0xFF);
                     return s;
                 }));
                 prepareMetadata(result).put("custom-model-data", cmd);
