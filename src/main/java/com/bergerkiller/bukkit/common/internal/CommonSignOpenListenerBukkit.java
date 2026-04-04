@@ -33,7 +33,7 @@ class CommonSignOpenListenerBukkit implements Listener, EventExecutor {
         resolver.addImport(CommonListener.class.getName());
         MethodDeclaration callbackMethod = new MethodDeclaration(resolver, "" +
                 "public static void callback(PlayerSignOpenEvent event) {\n" +
-                "    if (event.getCause() != PlayerSignOpenEvent.Cause.PLACE) {\n" +
+                "    if (event.getCause() != PlayerSignOpenEvent$Cause.PLACE) {\n" +
                 "        CommonListener.storeEditedSign(event.getPlayer(), event.getSign());\n" +
                 "    }\n" +
                 "}"

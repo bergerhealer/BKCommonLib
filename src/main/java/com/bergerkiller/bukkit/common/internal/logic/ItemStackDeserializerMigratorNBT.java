@@ -138,17 +138,17 @@ public class ItemStackDeserializerMigratorNBT extends ItemStackDeserializerMigra
             this.componentMappers.put("minecraft:custom_model_data", (result, nbtData) -> {
                 Map<String, Object> cmd = new LinkedHashMap<>();
                 cmd.put("==", "CustomModelData");
-                cmd.put("floats", parseList(nbtData, "floats", o -> o instanceof Number ? ((Number) o).doubleValue() : 0.0f));
+                cmd.put("floats", parseList(nbtData, "floats", o -> o instanceof Number ? ((Number) o).floatValue() : 0.0f));
                 cmd.put("flags", parseList(nbtData, "flags", o -> o instanceof Number && ((Number) o).intValue() != 0));
                 cmd.put("strings", parseList(nbtData, "strings", o -> (o != null) ? o.toString() : ""));
                 cmd.put("colors", parseList(nbtData, "colors", o -> {
-                    Color color = o instanceof Number ? Color.fromARGB(((Number) o).intValue()) : Color.BLACK;
+                    int argb = (o instanceof Number) ? ((Number) o).intValue() : 0;
                     Map<String, Object> s = new LinkedHashMap<>(5);
                     s.put("==", "Color");
-                    s.put("ALPHA", color.getAlpha());
-                    s.put("RED", color.getRed());
-                    s.put("BLUE", color.getBlue());
-                    s.put("GREEN", color.getGreen());
+                    s.put("ALPHA", (argb >> 24) & 0xFF);
+                    s.put("RED", (argb >> 16) & 0xFF);
+                    s.put("BLUE", (argb >> 8) & 0xFF);
+                    s.put("GREEN", argb & 0xFF);
                     return s;
                 }));
                 prepareMetadata(result).put("custom-model-data", cmd);

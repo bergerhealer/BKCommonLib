@@ -3,6 +3,7 @@
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.network.chat.TranslatableComponent;
 
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
@@ -57,7 +58,41 @@ import net.minecraft.world.level.storage.TagValueInput;
             return "";
         }
     }
+#else
+    #require net.minecraft.network.chat.Component public String getComponentText() {
+        if (instance instanceof TranslatableComponent) {
+            TranslatableComponent trans = (TranslatableComponent) instance;
+            String key = trans.getKey();
+            if (key == null) {
+                return "null";
+            }
+            int namespaceOffset = 0;
+            if (key.startsWith("block.minecraft.")) {
+                namespaceOffset = 16;
+            } else if (key.startsWith("item.minecraft.")) {
+                namespaceOffset = 15;
+            }
+            key = key.substring(namespaceOffset);
+            if (namespaceOffset > 0) {
+                // Replace _ with " ", capitalize first letter
+                key = key.replace('_', ' ');
+                if (!key.isEmpty()) {
+                    key = key.substring(0, 1).toUpperCase(java.util.Locale.ENGLISH) + key.substring(1);
+                }
+            }
+            return key;
+        } else {
+  #if version >= 1.18
+            return instance.getContents();
+  #else
+            return instance.getText();
+  #endif
+        }
+    }
+#endif
 
+// Gets whether the text content of a component is empty and yields no legacy text at all - so can be ignored
+#if version >= 1.19
     #require net.minecraft.network.chat.Component public boolean isComponentContentEmpty() {
         net.minecraft.network.chat.ComponentContents contents = instance.getContents();
         if (contents instanceof net.minecraft.network.chat.contents.PlainTextContents) {
@@ -67,12 +102,10 @@ import net.minecraft.world.level.storage.TagValueInput;
         }
     }
 #elseif version >= 1.18
-    #require net.minecraft.network.chat.Component public abstract String getComponentText:getContents();
     #require net.minecraft.network.chat.Component public boolean isComponentContentEmpty() {
         return instance.getContents().isEmpty();
     }
 #else
-    #require net.minecraft.network.chat.Component public abstract String getComponentText:getText();
     #require net.minecraft.network.chat.Component public boolean isComponentContentEmpty() {
         return instance.getText().isEmpty();
     }

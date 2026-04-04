@@ -754,6 +754,9 @@ public class CommonBootstrap {
         } else {
             // Uses a normal java.util.Random on older versions
             remappings.put("net.minecraft.util.RandomSource", "java.util.Random");
+            // PaintingVariant(s) class came to exist on 1.19, before it pointed to Motive (spigot: EntityPainting.EnumArt / decoration.Paintings)
+            remappings.put("net.minecraft.world.entity.decoration.painting.PaintingVariant", "net.minecraft.world.entity.decoration.Motive");
+            remappings.put("net.minecraft.world.entity.decoration.painting.PaintingVariants", "net.minecraft.world.entity.decoration.Motive");
         }
 
         /* ======== Mojang remapping changes for 1.18.2 ======== */

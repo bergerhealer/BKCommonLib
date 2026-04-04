@@ -67,55 +67,55 @@ class CraftArt {
     }
 
 #else
-    public static org.bukkit.Art NotchToBukkit((Object) Paintings art);
-    public static (Object) Paintings BukkitToNotch(org.bukkit.Art art);
+    public static org.bukkit.Art NotchToBukkit((Object) PaintingVariant art);
+    public static (Object) PaintingVariant BukkitToNotch(org.bukkit.Art art);
 
-    public static (Object) Paintings NotchFromInternalId(int internalId) {
+    public static (Object) PaintingVariant NotchFromInternalId(int internalId) {
   #if version >= 1.18
-        return (Paintings) BuiltInRegistries.MOTIVE.byId(internalId);
+        return (PaintingVariant) BuiltInRegistries.MOTIVE.byId(internalId);
   #elseif version >= 1.13.1
-        return (Paintings) BuiltInRegistries.MOTIVE.fromId(internalId);
+        return (PaintingVariant) BuiltInRegistries.MOTIVE.fromId(internalId);
   #elseif version >= 1.13
-        return (Paintings) Motive.a.getId(internalId);
+        return (PaintingVariant) PaintingVariants.a.getId(internalId);
   #else
-        Paintings[] values = Motive.values();
+        PaintingVariant[] values = PaintingVariants.values();
         if (internalId >= 0 && internalId < values.length) {
             return values[internalId];
         }
-        return Motive.KEBAB;
+        return PaintingVariants.KEBAB;
   #endif
     }
 
-    public static int NotchToInternalId((Object) Paintings art) {
+    public static int NotchToInternalId((Object) PaintingVariant art) {
   #if version >= 1.17
         return BuiltInRegistries.MOTIVE.getId((Object) art);
   #elseif version >= 1.13.1
         return BuiltInRegistries.MOTIVE.a((Object) art);
   #elseif version >= 1.13
-        return Motive.a.a((Object) art);
+        return PaintingVariants.a.a((Object) art);
   #else
         return art.ordinal();
   #endif
     }
 
-    public static (Object) Paintings NotchFromInternalName(String internalName) {
+    public static (Object) PaintingVariant NotchFromInternalName(String internalName) {
         net.minecraft.resources.Identifier key = #parseIdentifier(internalName);
   #if version >= 1.13.1
-        return (Paintings) BuiltInRegistries.MOTIVE.get(key);
+        return (PaintingVariant) BuiltInRegistries.MOTIVE.get(key);
   #elseif version >= 1.13
-        return (Paintings) Motive.a.get(key);
+        return (PaintingVariant) PaintingVariants.a.get(key);
   #else
-        Paintings[] values = Motive.values();
+        PaintingVariant[] values = PaintingVariants.values();
         for (int i = 0; i < values.length; i++) {
             if (values[i].B.equals(internalName)) {
                 return values[i];
             }
         }
-        return Motive.KEBAB;
+        return PaintingVariants.KEBAB;
   #endif
     }
 
-    public static String NotchToInternalName((Object) Paintings art) {
+    public static String NotchToInternalName((Object) PaintingVariant art) {
   #if version >= 1.18
         net.minecraft.resources.Identifier key = (net.minecraft.resources.Identifier) BuiltInRegistries.MOTIVE.getKey((Object) art);
         return (key == null) ? null : key.getPath();
@@ -123,7 +123,7 @@ class CraftArt {
         net.minecraft.resources.Identifier key = (net.minecraft.resources.Identifier) BuiltInRegistries.MOTIVE.getKey((Object) art);
         return (key == null) ? null : key.getKey();
   #elseif version >= 1.13
-        net.minecraft.resources.Identifier key = (net.minecraft.resources.Identifier) Motive.a.b(art);
+        net.minecraft.resources.Identifier key = (net.minecraft.resources.Identifier) PaintingVariants.a.b(art);
         return (key == null) ? null : key.getKey();
   #else
         return art.B;

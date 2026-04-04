@@ -156,6 +156,9 @@ public class CommonItemStackTest {
     @Test
     public void testDisplayName() {
         CommonItemStack item = CommonItemStack.create(getFirst("OAK_PLANKS", "LEGACY_WOOD"), 1);
+
+        // Note: if this is wrong, it could also be due to TranslatableComponent -> String message being wrong!
+        // In that case, see global.txt getComponentText macro
         assertEquals("Oak planks", item.getDisplayNameMessage());
 
         item.setCustomNameMessage("Fake planks");
