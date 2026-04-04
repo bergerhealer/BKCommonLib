@@ -4,7 +4,6 @@ import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.cdn.MojangMappings;
 import com.bergerkiller.bukkit.common.internal.cdn.MojangRemapper;
 import com.bergerkiller.bukkit.common.internal.cdn.SpigotMappings;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -16,7 +15,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 
 import static org.junit.Assert.assertEquals;
@@ -41,7 +39,7 @@ public class SpigotMappingTest {
     public void testVisualizeMappings() {
         SpigotMappings mappings = loadMappings();
 
-        mappings.visualizeMapping("CompletionProviders");
+        mappings.visualizeMapping("net.minecraft.network.syncher.SynchedEntityData$DataValue");
 
         //mappings.visualizeMappingsForSpigotClass("net.minecraft.server.DataPackResources");
 
@@ -63,13 +61,9 @@ public class SpigotMappingTest {
 
         //mappings.renameKey("old.path.to.Class", "new.path.to.Class");
 
-        mappings.storeAppendForVersionRange("1.8","1.21.11",
-                "net.minecraft.network.protocol.game.ServerboundInteractPacket$ActionEnum",
-                null);
-
-        mappings.storeAppendForVersionRange("1.8","1.16.2",
-                "net.minecraft.network.protocol.game.ServerboundInteractPacket$ActionType",
-                "net.minecraft.network.protocol.game.PacketPlayInUseEntity$EnumEntityUseAction");
+        mappings.storeAppendForVersionRange("1.9","1.15.2",
+                "net.minecraft.core.BlockPos$PooledBlockPosition",
+                "net.minecraft.core.BlockPosition$PooledBlockPosition");
 
         saveMappings(mappings);
     }
@@ -197,7 +191,7 @@ public class SpigotMappingTest {
         List<MojangMappings.MethodSignature> matches = new ArrayList<>();
         {
             MojangMappings mappings = MojangMappings.fromCacheOrDownload(versionFrom);
-            mappings = mappings.translateClassNames(SpigotMappings.fromCacheOrDownload(versionFrom)::toSpigot);
+            mappings = mappings.translateClassNames(SpigotMappings.forVersion(versionFrom)::toSpigot);
 
             if (methodName.isEmpty()) {
                 // Just list them all
@@ -225,7 +219,7 @@ public class SpigotMappingTest {
         System.out.println("Method matches for '" + methodName + "' on MC " + versionFrom + ", for MC " + versionTo + ":");
         {
             MojangMappings mappings = MojangMappings.fromCacheOrDownload(versionTo);
-            mappings = mappings.translateClassNames(SpigotMappings.fromCacheOrDownload(versionTo)::toSpigot);
+            mappings = mappings.translateClassNames(SpigotMappings.forVersion(versionTo)::toSpigot);
             List<MojangMappings.MethodSignature> newSignatures = mappings.forClassIfExists(className).methods;
 
             for (MojangMappings.MethodSignature sig : matches) {

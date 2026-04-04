@@ -342,7 +342,7 @@ class ServerLevel extends Level {
         chunkDistanceManager = chunkMap.getDistanceManager();
   #elseif version >= 1.17
         chunkDistanceManager = chunkMap.distanceManager;
-  #elseif exists net.minecraft.server.level.ChunkMap private net.minecraft.server.level.ChunkMap.a chunkDistanceManager;
+  #elseif exists net.minecraft.server.level.ChunkMap public final net.minecraft.server.level.ChunkMap.DistanceManager chunkDistanceManager;
         chunkDistanceManager = chunkMap.chunkDistanceManager;
   #else
         chunkDistanceManager = chunkMap.u;

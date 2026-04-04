@@ -107,6 +107,11 @@ public class InternalLogicInitializeTest {
 
     @Test
     public void testNullPacketDataSerializer() {
+        // Only used on 1.17+, so skip test on older server versions
+        if (CommonBootstrap.evaluateMCVersion("<", "1.17")) {
+            return;
+        }
+
         NullPacketDataSerializerInit.initialize();
         assertTrue(NullPacketDataSerializerInit.is_initialized);
 

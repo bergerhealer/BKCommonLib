@@ -161,7 +161,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
     }
 
     @Template.Optional
-    @Template.Import("net.minecraft.core.Vec3")
+    @Template.Import("net.minecraft.world.phys.Vec3")
     @Template.Import("net.minecraft.core.BlockPos")
     @Template.Import("net.minecraft.core.BlockPos$MutableBlockPos")
     @Template.Import("net.minecraft.core.Direction")

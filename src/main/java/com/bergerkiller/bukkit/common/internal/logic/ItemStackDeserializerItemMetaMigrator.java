@@ -33,6 +33,20 @@ public class ItemStackDeserializerItemMetaMigrator extends ItemStackDeserializer
      */
     private static final boolean IS_LEGACY_SKULL_DECODING_BUSTED = CommonBootstrap.evaluateMCVersion(">=", "1.20.5");
 
+    /**
+     * Before Minecraft 1.16 the game profile was encoded to NBT with the user uuid encoded as a String tag.
+     * After, it was an IntArray tag with 4 elements.
+     */
+    private static final boolean IS_SKULL_PROFILE_ID_STRING = CommonBootstrap.evaluateMCVersion("<", "1.16");
+
+    /**
+     * Since Minecraft 1.16 the game profile user unique id was encoded as an int[] for the first time.
+     * A server bug existed between Minecraft 1.16 and 1.16.3 where the previous uuid string was incorrectly
+     * decoded, and so the game profile user uuid got mangled.
+     * We add an extra logic to re-encode the uuid string as the correct 4 ints to stop this bug from happening.
+     */
+    private static final boolean IS_SKULL_PROFILE_STRING_ID_MANGLED = CommonBootstrap.evaluateMCVersion(">=", "1.16") && CommonBootstrap.evaluateMCVersion("<=", "1.16.3");
+
     public ItemStackDeserializerItemMetaMigrator(ItemStackDeserializerMigratorBukkit itemStackMigrator) {
         this.itemStackMigrator = itemStackMigrator;
 
@@ -230,8 +244,11 @@ public class ItemStackDeserializerItemMetaMigrator extends ItemStackDeserializer
 
                 // uniqueId
                 {
-                    int[] idInts = skullProfileNbt.getValue("Id", int[].class);
-                    if (idInts != null && idInts.length == 4) {
+                    Object idValue = skullProfileNbt.getValue("Id");
+                    if (idValue instanceof String) {
+                        skullOwnerMeta.put("uniqueId", idValue);
+                    } else if (idValue instanceof int[] && ((int[]) idValue).length == 4) {
+                        int[] idInts = (int[]) idValue;
                         long most = ((long) idInts[0] << 32) | (idInts[1] & 0xFFFFFFFFL);
                         long least = ((long) idInts[2] << 32) | (idInts[3] & 0xFFFFFFFFL);
                         UUID uuid = new UUID(most, least);
@@ -276,6 +293,70 @@ public class ItemStackDeserializerItemMetaMigrator extends ItemStackDeserializer
                 // Deserialize into skull owner and store it
                 mapping.put("skull-owner", deserializeSkullOwner(skullOwnerMeta));
                 mapping.remove("internal");
+            });
+        }
+
+        // If only String tag for game profile id is supported, migrate an Int Array tag to a String tag for skull owner meta
+        // Technically the older code also supported int[] but it corrupted the unique ID so we cannot use it.
+        if (IS_SKULL_PROFILE_ID_STRING) {
+            migrators.add((mapping, metaType) -> {
+                if (!"SKULL".equals(metaType)) {
+                    return;
+                }
+
+                CommonTagCompound nbt = CommonTagCompound.fromBase64String(LogicUtil.tryCast(mapping.get("internal"), String.class));
+                if (nbt != null) {
+                    CommonTagCompound skullProfileNbt = nbt.get("SkullProfile", CommonTagCompound.class);
+                    if (skullProfileNbt != null) {
+                        Object idRaw = skullProfileNbt.getValue("Id");
+                        if (idRaw instanceof int[]) {
+                            int[] idInts = (int[]) idRaw;
+                            if (idInts.length == 4) {
+                                long most = ((long) idInts[0] << 32) | (idInts[1] & 0xFFFFFFFFL);
+                                long least = ((long) idInts[2] << 32) | (idInts[3] & 0xFFFFFFFFL);
+                                UUID uuid = new UUID(most, least);
+                                skullProfileNbt.putValue("Id", uuid.toString());
+                                mapping.put("internal", nbt.toBase64String());
+                                System.out.println("STORED AS ID STRING: " + nbt);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Rewrite the UUID String as the correct int[] format to prevent the mangled UUID bug on 1.16
+        if (IS_SKULL_PROFILE_STRING_ID_MANGLED) {
+            migrators.add((mapping, metaType) -> {
+                if (!"SKULL".equals(metaType)) {
+                    return;
+                }
+
+                CommonTagCompound nbt = CommonTagCompound.fromBase64String(LogicUtil.tryCast(mapping.get("internal"), String.class));
+                if (nbt == null) {
+                    return;
+                }
+
+                CommonTagCompound skullProfileNbt = nbt.get("SkullProfile", CommonTagCompound.class);
+                if (skullProfileNbt == null) {
+                    return;
+                }
+
+                Object idRaw = skullProfileNbt.getValue("Id");
+                if (idRaw instanceof String) {
+                    try {
+                        UUID uuid = UUID.fromString((String) idRaw);
+                        long most = uuid.getMostSignificantBits();
+                        long least = uuid.getLeastSignificantBits();
+                        skullProfileNbt.putValue("Id", new int[] {
+                                (int) (most >> 32),
+                                (int) (most & 0xFFFFFFFFL),
+                                (int) (least >> 32),
+                                (int) (least & 0xFFFFFFFFL)
+                        });
+                        mapping.put("internal", nbt.toBase64String());
+                    } catch (IllegalArgumentException ex) { /* ignore */ }
+                }
             });
         }
     }

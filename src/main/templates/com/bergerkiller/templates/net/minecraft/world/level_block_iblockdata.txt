@@ -418,7 +418,7 @@ interface BlockState {
 #case 1.18: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:getValues();
 #case 1.17: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:getStateMap();
 #case 1.13.2
-  #if methodexists net.minecraft.world.level.block.state.BlockStateHolder public abstract com.google.common.collect.ImmutableMap<Property<?>, Comparable<?>> getStateMap();
+  #if methodexists net.minecraft.world.level.block.state.StateHolder public abstract com.google.common.collect.ImmutableMap<net.minecraft.world.level.block.state.properties.Property<?>, Comparable<?>> getStateMap();
       public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:getStateMap();
   #else
       public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:b();

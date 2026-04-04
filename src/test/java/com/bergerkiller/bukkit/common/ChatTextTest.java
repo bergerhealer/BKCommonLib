@@ -147,6 +147,12 @@ public class ChatTextTest {
     }
 
     @Test
+    public void testFromInvalidGson() {
+        ChatText text = ChatText.fromJson("{BROKEN}");
+        assertNull(text);
+    }
+
+    @Test
     public void testSuffixStyle() {
         // Test that a String with a suffix chat style character preserves the style
         String msg = "Prefix" + ChatColor.RED.toString();

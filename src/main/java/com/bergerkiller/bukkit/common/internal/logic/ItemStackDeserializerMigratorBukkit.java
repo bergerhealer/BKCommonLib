@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -149,7 +150,29 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
         this.register(2580, ConverterFunction.NO_CONVERSION);
 
         // From MC 1.16.5 to MC 1.16.4
-        this.register(2584, ConverterFunction.NO_CONVERSION);
+        this.register(2584, map -> {
+            // The display name became a JSON text component since MC 1.16.5
+            // Make this a legacy plaintext string when loading that on an older version of the server
+            ItemMeta meta = LogicUtil.tryCast(map.get("meta"), ItemMeta.class);
+            if (meta != null && meta.hasDisplayName()) {
+                // Retrieve the original metadata that was used to decode this metadata
+                // If the display-name field used json, correct it and re-deserialize
+                Map<String, Object> metaArgs = metaDeserializer.getArgsUsedForMeta(meta);
+                if (metaArgs != null) {
+                    String displayName = LogicUtil.tryCast(metaArgs.get("display-name"), String.class);
+                    if (displayName != null && displayName.startsWith("{") && displayName.endsWith("}")) {
+                        ChatText text = ChatText.fromJson(displayName);
+                        if (text != null) {
+                            metaArgs.put("display-name", text.getMessage());
+                            meta = metaDeserializer.apply(metaArgs);
+                            map.put("meta", meta);
+                        }
+                    }
+                }
+            }
+
+            return true;
+        });
 
         // From MC 1.17 to MC 1.16.5
         this.register(2586, map -> {

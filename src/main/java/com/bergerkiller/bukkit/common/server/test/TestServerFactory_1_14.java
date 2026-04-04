@@ -51,6 +51,16 @@ class TestServerFactory_1_14 extends TestServerFactory {
         setField(mc_server, iAsyncTaskHandlerClass, "d", createFromCode(minecraftServerType, 
                 "return com.google.common.collect.Queues.newConcurrentLinkedQueue();"));
 
+        // Assign authlib GameProfileRepository a no-op dummy that never calls the callback (does not find profiles)
+        Class<?> gameProfileRepositoryType = resolveClass("com.mojang.authlib.GameProfileRepository");
+        setField(mc_server, minecraftServerType, "gameProfileRepository", Proxy.newProxyInstance(
+                TestServerFactory.class.getClassLoader(),
+                new Class<?>[]{gameProfileRepositoryType},
+                (proxy, method, args) -> null));
+
+        // Assign processQueue, which seems to receive tasks due to TileEntitySkull scheduling shit...
+        setField(mc_server, minecraftServerType, "processQueue", new java.util.concurrent.ConcurrentLinkedQueue<Runnable>());
+
         // Assign logger, nms Server instance and primary thread (current thread) to avoid NPE's during test
         setField(server, "logger",  MountiplexUtil.LOGGER);
         setField(server, "console", mc_server);

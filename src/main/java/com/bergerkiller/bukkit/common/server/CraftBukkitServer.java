@@ -178,7 +178,7 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
 
         if (!isUnobfuscatedMojangMapJar) {
             // We must remap all requested Mojang classes to the Spigot class names.
-            mojangToSpigotClassRemapper = SpigotMappings.fromCacheOrDownload(MC_VERSION);
+            mojangToSpigotClassRemapper = SpigotMappings.forVersion(MC_VERSION);
 
             // Initialize the field/method mappings on Minecraft 1.17 and later
             if (HAS_MOJANG_FIELD_MAPPINGS || HAS_MOJANG_METHOD_MAPPINGS) {

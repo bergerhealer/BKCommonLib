@@ -487,7 +487,7 @@ public class CommonBootstrap {
                 craftLegacyIsInUtil = true;
             } else if (evaluateMCVersion("==", "1.15.2")) {
                 try {
-                    Class.forName(server.getCBRoot() + ".legacy.CraftLegacy");
+                    Class.forName(server.getCBRoot() + ".legacy.CraftLegacy", false, CommonBootstrap.class.getClassLoader());
                     craftLegacyIsInUtil = false;
                 } catch (Throwable t) {
                     craftLegacyIsInUtil = true;

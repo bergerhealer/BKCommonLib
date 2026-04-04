@@ -348,7 +348,7 @@ class LevelChunk {
     }
 #elseif version >= 1.14
     public (BlockData) BlockState getBlockDataAtCoord(int x, int y, int z) {
-        BlockPos$PooledBlockPosition blockPos = BlockPos$PooledBlockPosition.f(x, y, z);
+        net.minecraft.core.BlockPos$PooledBlockPosition blockPos = net.minecraft.core.BlockPos$PooledBlockPosition.f(x, y, z);
         try {
             return instance.getType((BlockPos) blockPos);
         } finally {

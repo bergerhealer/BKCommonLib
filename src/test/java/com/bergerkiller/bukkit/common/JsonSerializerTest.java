@@ -172,10 +172,32 @@ public class JsonSerializerTest {
     }
 
     @Test
-    public void testItemStackFromJsonPlayerHeadLegacy() throws JsonSerializer.JsonSyntaxException {
+    public void testItemStackFromJsonPlayerHeadLegacy_1_8_to_1_15_2() throws JsonSerializer.JsonSyntaxException {
         JsonSerializer serializer = new JsonSerializer();
 
         // This is the legacy yaml output (< 1.18.1) which has things inline as an internal string
+        // On this version, the game profile id is encoded as a String
+        String json = "{\"v\":2230,\"type\":\"PLAYER_HEAD\",\"meta\":{\"meta-type\":\"SKULL\",\"internal\":\"H4sIAAAAAAAA/03KQW6CQBQA0N+mTSjxGN2SfBBoWXTRlFohMooiOrMbYQzCRw1CC5yrB+y2b/10AB0mm6ojWjWX44mUBvdBDs9oo+1lHhr5VHmG7Vqm4WXyaCAiSimdV8dGHfRVc7mqpj2p2xNorerbrlE3HQDuNHhMJXUKftUQotgXmO9DyobAVUOYbJCWQXl9Cc7pcPgI3KAuMJ+/u4vB+3edVu4c4tOwEOe4O9QpLqZrUvO1mdXbb1ESsTGlyI97lsyIWawSSUHM4j3zqeK7rRPV/IePnyh23BQlq0UZm9yKx6iMHJZkNhvFKfqaVcIPS+ZXuNyE3nGPbwAaPDBZK5jMlcx92cqDvCmAP+InGWYxAQAA\",\"skull-owner\":\"HeadDatabase\",\"==\":\"ItemMeta\"}}";
+        CommonItemStack itemStack = CommonItemStack.of(serializer.fromJsonToItemStack(json));
+
+        assertEquals(CommonItemMaterials.SKULL, itemStack.getType());
+        assertEquals(1, itemStack.getAmount());
+
+        GameProfileHandle profile = itemStack.getSkullProfile();
+        assertNotNull(profile);
+        assertEquals(UUID.fromString("04049c90-d3e9-4621-9caf-0000aaa58540"), profile.getId());
+        for (PropertyHandle prop : profile.getProperties("textures")) {
+            assertEquals("textures", prop.getName());
+            assertTrue(prop.getValue().length() > 10);
+        }
+    }
+
+    @Test
+    public void testItemStackFromJsonPlayerHeadLegacy_1_16_to_1_18() throws JsonSerializer.JsonSyntaxException {
+        JsonSerializer serializer = new JsonSerializer();
+
+        // This is the legacy yaml output (< 1.18.1) which has things inline as an internal string
+        // On this version, the game profile id is encoded as an int array tag instead of a string tag
         String json = "{\"v\":2730,\"type\":\"PLAYER_HEAD\",\"meta\":{\"meta-type\":\"SKULL\",\"internal\":\"H4sIAAAAAAAA/03KTU6DQBgA0E+DCWIv4Q2GVmq6MNGItUzKtLQUmNlNYRp+PtqGghb27j1At27cuPEmnsJbuPWtnwFgQG9ZNIjzarfJUF3BuZMAgKZpp/ef3/H16Qvg8+Pt3gBjXu32qqozdbgEvVbHuqnUwQCAMx0uAomNgm/VUiKilCQRxbh1hqql/pLgzMn3t842aNePztApU5JMHobTdvTvWrUMLeQDmoqt16zLgEwHC1SThRmXqxeRI7IuQNf2jswfI+uzQvgpsj4/MhsLHq4st+SvvHsiIuSmyFkpcs/kfa9zc9difnzDOpG5z+NC2DRndkFmSzraROQOQAeNyVJBb6JkYstaruVBAfwBfYh8MR8BAAA=\",\"skull-owner\":\"HeadDatabase\",\"==\":\"ItemMeta\"}}";
         CommonItemStack itemStack = CommonItemStack.of(serializer.fromJsonToItemStack(json));
 
@@ -192,7 +214,7 @@ public class JsonSerializerTest {
     }
 
     @Test
-    public void testItemStackFromJsonPlayerHeadModern() throws JsonSerializer.JsonSyntaxException {
+    public void testItemStackFromJsonPlayerHeadModern_1_18_1() throws JsonSerializer.JsonSyntaxException {
         JsonSerializer serializer = new JsonSerializer();
 
         // This is the modern yaml output (1.18.1+) which has a PlayerProfile

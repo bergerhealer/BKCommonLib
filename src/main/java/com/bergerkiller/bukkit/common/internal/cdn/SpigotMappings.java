@@ -131,13 +131,12 @@ public class SpigotMappings extends VersionedMappingsFileIO<SpigotMappings.Class
 
     /**
      * Loads the spigot&lt;&gt;mojang class name mappings for a certain version of Minecraft, by reading
-     * from the jar-included cache file. If missing or corrupted, or lacks support for this version
-     * of Minecraft, downloads the spigot mappings from the spigotmc hub.
+     * from the jar-included cache file.
      *
-     * @param minecraftVersion
+     * @param minecraftVersion Minecraft game version
      * @return Class mappings
      */
-    public static SpigotMappings.ClassMappings fromCacheOrDownload(String minecraftVersion) {
+    public static SpigotMappings.ClassMappings forVersion(String minecraftVersion) {
         // Retrieve Spigot-Mojang class name mappings
         // We need this to properly remap the mojang field and method names later
         SpigotMappings spigotMappings = new SpigotMappings();
@@ -147,21 +146,11 @@ public class SpigotMappings extends VersionedMappingsFileIO<SpigotMappings.Class
                 spigotMappings.read(in);
             }
         } catch (IOException ex) {
-            Logging.LOGGER.log(Level.SEVERE, "Failed to read class mappings (corrupted jar?)", ex);
+            throw new IllegalStateException("Failed to read class mappings (corrupted BKCommonLib jar?)");
         }
 
-        // Read the required mappings, or downloads it if missing for some weird reason
-        if (!spigotMappings.byVersion.containsKey(minecraftVersion)) {
-            Logging.LOGGER.log(Level.WARNING, "[Developer] Class mappings file has no mappings for this Minecraft version. Build problem?");
-            try {
-                spigotMappings.downloadMappings(MojangMappings.fromCacheOrDownload(minecraftVersion), minecraftVersion);
-            } catch (IOException ex) {
-                throw new IllegalStateException("Failed to download Spigot-Mojang class name mappings");
-            }
-        }
-
-        return spigotMappings.get(minecraftVersion)
-                .orElseThrow(() -> new IllegalStateException("Version has no mappings"));
+        return spigotMappings.getOrOlder(minecraftVersion)
+                .orElseThrow(() -> new IllegalStateException("Version " + minecraftVersion + " has no mappings"));
     }
 
     /**

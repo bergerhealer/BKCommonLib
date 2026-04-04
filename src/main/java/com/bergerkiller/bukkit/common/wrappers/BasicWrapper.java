@@ -72,7 +72,7 @@ public class BasicWrapper<T extends Template.Handle> {
 
     @Override
     public String toString() {
-        return handle.toString();
+        return handle == null ? "{NULL}" : handle.toString();
     }
 
     @Override

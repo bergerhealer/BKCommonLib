@@ -212,9 +212,14 @@ class Component {
     public static (ComponentHandle) Component jsonToChatComponent(String jsonString) {
 #if version >= 1.21.6
         // Decode json string into JsonElement
-        JsonElement jsonelement = com.google.gson.JsonParser.parseString(jsonString);
-        if (jsonelement == null) {
-            return null;
+        JsonElement jsonelement;
+        try {
+            jsonelement = com.google.gson.JsonParser.parseString(jsonString);
+            if (jsonelement == null) {
+                return null; // Invalid json string (?)
+            }
+        } catch (com.google.gson.JsonParseException e) {
+            return null; // Invalid json string
         }
 
         // Deserialize into Component
@@ -226,16 +231,20 @@ class Component {
             .result()
             .orElse(null);
 
-#elseif version >= 1.21.5
-        return Component$Serializer.fromJson(jsonString,
-                org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry());
-
-#elseif version >= 1.20.5
-        return Component$Serializer.fromJson(jsonString,
-                net.minecraft.server.MinecraftServer.getDefaultRegistryAccess());
-
 #else
-        return Component$Serializer.fromJson(jsonString);
+        try {
+  #if version >= 1.21.5
+            return Component$Serializer.fromJson(jsonString,
+                    org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry());
+  #elseif version >= 1.20.5
+            return Component$Serializer.fromJson(jsonString,
+                    net.minecraft.server.MinecraftServer.getDefaultRegistryAccess());
+  #else
+            return Component$Serializer.fromJson(jsonString);
+  #endif
+        } catch (com.google.gson.JsonParseException e) {
+            return null; // Invalid json string
+        }
 #endif
     }
 

@@ -27,7 +27,7 @@ public final class ChatText extends BasicWrapper<ComponentHandle> implements Clo
      * Sends this chat text as a message to a player.
      * 
      * @param player The player to send to
-     * @see PlayerUtil#sendMessage(player, message)
+     * @see PlayerUtil#sendMessage(Player, ChatText)
      */
     public final void sendTo(Player player) {
         PlayerUtil.sendMessage(player, this);
@@ -95,7 +95,12 @@ public final class ChatText extends BasicWrapper<ComponentHandle> implements Clo
      * @param jsonText to set to
      */
     public final void setJson(String jsonText) {
-        handle = ComponentHandle.jsonToChatComponent(jsonText);
+        ComponentHandle jsonHandle = ComponentHandle.jsonToChatComponent(jsonText);
+        if (jsonHandle != null) {
+            handle = jsonHandle;
+        } else {
+            handle = ComponentHandle.empty();
+        }
     }
 
     /**
@@ -404,14 +409,20 @@ public final class ChatText extends BasicWrapper<ComponentHandle> implements Clo
      * Decodes JSON-encoded chat messages into a Chat Text component
      * 
      * @param jsonText Input json (Mojangson) message data
-     * @return ChatText
+     * @return ChatText, or <i>null</i> if the input was not valid json text
      */
     public static ChatText fromJson(String jsonText) {
         if (jsonText == null) {
             return null;
         }
+
+        ComponentHandle handle = ComponentHandle.jsonToChatComponent(jsonText);
+        if (handle == null) {
+            return null;
+        }
+
         ChatText text = new ChatText();
-        text.setJson(jsonText);
+        text.setHandle(handle);
         return text;
     }
 
