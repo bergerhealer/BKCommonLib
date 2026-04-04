@@ -36,14 +36,20 @@ public class ParticleType {
         }
   #if version >= 1.21.2
         return (ParticleType) BuiltInRegistries.PARTICLE_TYPE.getValue(key);
-  #else
+  #elseif version >= 1.13.1
         return (ParticleType) BuiltInRegistries.PARTICLE_TYPE.get(key);
+  #else
+        return (ParticleType) ParticleType.REGISTRY.get(key);
   #endif
     }
 
     public static java.util.List<?> values() {
         java.util.ArrayList values = new java.util.ArrayList();
+  #if version >= 1.13.1
         java.util.Iterator iter = BuiltInRegistries.PARTICLE_TYPE.iterator();
+  #else
+        java.util.Iterator iter = ParticleType.REGISTRY.iterator();
+  #endif
         while (iter.hasNext())
             values.add(iter.next());
         return values;

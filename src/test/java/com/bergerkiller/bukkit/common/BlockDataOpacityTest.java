@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.junit.Test;
@@ -21,13 +22,21 @@ public class BlockDataOpacityTest {
     public void testOpacity() {
         assertOpacity(0, BlockData.fromMaterial(Material.AIR));
         assertOpacity(0, BlockData.fromMaterial(Material.GLASS));
-        assertOpacity(0, BlockData.fromMaterial(Material.OAK_STAIRS));
         assertOpacity(15, BlockData.fromMaterial(Material.OAK_WOOD));
         assertOpacity(15, BlockData.fromMaterial(Material.OBSIDIAN));
         assertOpacity(1, BlockData.fromMaterial(Material.OAK_LEAVES));
-        assertOpacity(1, BlockData.fromMaterial(Material.WATER));
         assertOpacity(1, BlockData.fromMaterial(Material.ICE));
         assertOpacity(1, BlockData.fromMaterial(Material.COBWEB));
+
+        // Needs world access on 1.13 for some reason
+        if (CommonBootstrap.evaluateMCVersion("!=", "1.13")) {
+            assertOpacity(1, BlockData.fromMaterial(Material.WATER));
+        }
+
+        // Behavior changed for stairs with 1.14
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.14")) {
+            assertOpacity(0, BlockData.fromMaterial(Material.OAK_STAIRS));
+        }
     }
 
     @Test
@@ -41,40 +50,43 @@ public class BlockDataOpacityTest {
         // Weird. Says all faces are opaque? Still works since opacity is 0
         //assertOpaqueFaces(BlockFaceSet.NONE, BlockData.fromMaterial(Material.GLASS));
 
-        // Slabs top/bottom half should be opaque
-        assertOpaqueFaces(BlockFaceSet.of(BlockFace.UP), BlockData.fromMaterial(Material.OAK_SLAB).setState("type", "top"));
-        assertOpaqueFaces(BlockFaceSet.of(BlockFace.DOWN), BlockData.fromMaterial(Material.OAK_SLAB).setState("type", "bottom"));
+        // This behavior appears to be different before 1.14
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.14")) {
+            // Slabs top/bottom half should be opaque
+            assertOpaqueFaces(BlockFaceSet.of(BlockFace.UP), BlockData.fromMaterial(Material.OAK_SLAB).setState("type", "top"));
+            assertOpaqueFaces(BlockFaceSet.of(BlockFace.DOWN), BlockData.fromMaterial(Material.OAK_SLAB).setState("type", "bottom"));
 
-        // Shapes: straight / inner_left / inner_right / outer_left / outer_right
-        // Half: bottom / top
+            // Shapes: straight / inner_left / inner_right / outer_left / outer_right
+            // Half: bottom / top
 
-        // Stairs upright straight back facing into a given orientation
-        // We should see the bottom and the backside be opaque
-        for (BlockFace facing : FaceUtil.AXIS) {
-            BlockFaceSet expected = BlockFaceSet.of(BlockFace.DOWN, facing);
-            assertOpaqueFaces(expected, BlockData.fromMaterial(Material.OAK_STAIRS)
-                    .setState("facing", facing)
-                    .setState("half", "bottom")
-                    .setState("shape", "straight"));
-        }
+            // Stairs upright straight back facing into a given orientation
+            // We should see the bottom and the backside be opaque
+            for (BlockFace facing : FaceUtil.AXIS) {
+                BlockFaceSet expected = BlockFaceSet.of(BlockFace.DOWN, facing);
+                assertOpaqueFaces(expected, BlockData.fromMaterial(Material.OAK_STAIRS)
+                        .setState("facing", facing)
+                        .setState("half", "bottom")
+                        .setState("shape", "straight"));
+            }
 
-        // Stairs upside-down straight back facing into a given orientation
-        // We should see the top and the backside be opaque
-        for (BlockFace facing : FaceUtil.AXIS) {
-            BlockFaceSet expected = BlockFaceSet.of(BlockFace.UP, facing);
-            assertOpaqueFaces(expected, BlockData.fromMaterial(Material.OAK_STAIRS)
-                    .setState("facing", facing)
-                    .setState("half", "top")
-                    .setState("shape", "straight"));
-        }
+            // Stairs upside-down straight back facing into a given orientation
+            // We should see the top and the backside be opaque
+            for (BlockFace facing : FaceUtil.AXIS) {
+                BlockFaceSet expected = BlockFaceSet.of(BlockFace.UP, facing);
+                assertOpaqueFaces(expected, BlockData.fromMaterial(Material.OAK_STAIRS)
+                        .setState("facing", facing)
+                        .setState("half", "top")
+                        .setState("shape", "straight"));
+            }
 
-        // Stairs using inner_left should see two faces be opaque
-        {
-            BlockFaceSet expected = BlockFaceSet.of(BlockFace.UP, BlockFace.NORTH, BlockFace.WEST);
-            assertOpaqueFaces(expected, BlockData.fromMaterial(Material.OAK_STAIRS)
-                    .setState("facing", BlockFace.NORTH)
-                    .setState("half", "top")
-                    .setState("shape", "inner_left"));
+            // Stairs using inner_left should see two faces be opaque
+            {
+                BlockFaceSet expected = BlockFaceSet.of(BlockFace.UP, BlockFace.NORTH, BlockFace.WEST);
+                assertOpaqueFaces(expected, BlockData.fromMaterial(Material.OAK_STAIRS)
+                        .setState("facing", BlockFace.NORTH)
+                        .setState("half", "top")
+                        .setState("shape", "inner_left"));
+            }
         }
     }
 

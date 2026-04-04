@@ -283,6 +283,11 @@ public class YamlTest {
 
     @Test
     public void testPaperNBTItemStackCustomModelDataSimple() {
+        // Custom model data doesn't exist before 1.14, so skip this test on older versions
+        if (CommonBootstrap.evaluateMCVersion("<", "1.14")) {
+            return;
+        }
+
         String yamlInputString = "" +
                 "key:\n" +
                 "  ==: org.bukkit.inventory.ItemStack\n" +

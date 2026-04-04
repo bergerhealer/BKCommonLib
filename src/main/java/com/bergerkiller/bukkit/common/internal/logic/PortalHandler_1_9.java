@@ -153,7 +153,7 @@ class PortalHandler_1_9 extends PortalHandler {
          * <IS_MAIN_END_WORLD>
          * public static boolean isMainEndWorld(org.bukkit.World world) {
          *     ServerLevel world = (ServerLevel) ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
-         * #if version >= 1.13
+         * #if version >= 1.13.1
          *     return world.dimension == DimensionType.THE_END;
          * #else
          *     return world.dimension == 1;

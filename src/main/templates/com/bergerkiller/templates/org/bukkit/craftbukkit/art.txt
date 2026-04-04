@@ -5,6 +5,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.decoration.painting.PaintingVariant;
+import net.minecraft.world.entity.decoration.painting.PaintingVariants;
 
 class CraftArt {
 #if version >= 1.19

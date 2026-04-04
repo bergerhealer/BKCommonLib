@@ -7,6 +7,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.EmptyBlockGetter;
 
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -56,17 +57,6 @@ interface BlockState {
     }
     </code>
 
-    // World access require check
-#if version >= 1.18
-    #require net.minecraft.world.level.block.Block public boolean isWorldAccessRequired:hasDynamicShape();
-#elseif version >= 1.16
-    #require net.minecraft.world.level.block.Block public boolean isWorldAccessRequired:o();
-#elseif version >= 1.15
-    #require net.minecraft.world.level.block.Block public boolean isWorldAccessRequired:q();
-#elseif version >= 1.14
-    #require net.minecraft.world.level.block.Block public boolean isWorldAccessRequired:p();
-#endif
-
     // Returns null when the opaque faces aren't cached
     public BlockFaceSet getCachedOpaqueFaces() {
         Block block = instance.getBlock();
@@ -92,14 +82,13 @@ interface BlockState {
         }
 
         // Check world access isn't required (see: Block)
-        boolean worldAccessRequired = block#isWorldAccessRequired();
-        if (worldAccessRequired) {
+        if (block.hasDynamicShape()) {
             return null;
         }
 
         // Query all 6 faces and produce a mask
         int mask = 0;
-        BlockGetter emptyBlockAccess = net.minecraft.world.level.EmptyBlockGetter.INSTANCE;
+        BlockGetter emptyBlockAccess = EmptyBlockGetter.INSTANCE;
   #if version >= 1.18
         if (instance.isFaceSturdy(emptyBlockAccess, BlockPos.ZERO, Direction.NORTH)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_NORTH;
@@ -194,24 +183,21 @@ interface BlockState {
         // There isn't even a method to get the light level that makes use of a block position / world access
         return instance.getLightBlock();
     }
-#elseif version >= 1.14
+#elseif version >= 1.13
     public int getCachedOpacity() {
         // Check world access isn't required (see: Block)
         Block block = instance.getBlock();
-        boolean worldAccessRequired = block#isWorldAccessRequired();
-        if (worldAccessRequired) {
+        if (block.hasDynamicShape()) {
             return -1;
         } else {
   #if version >= 1.18
-            return instance.getLightBlock((BlockGetter) net.minecraft.world.level.EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+            return instance.getLightBlock((BlockGetter) EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+  #elseif version >= 1.14
+            return instance.b((BlockGetter) EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
   #else
-            return instance.b((BlockGetter) net.minecraft.world.level.EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+            return instance.b((BlockGetter) EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
   #endif
         }
-    }
-#elseif version >= 1.13
-    public int getCachedOpacity() {
-        return -1;
     }
 #elseif version >= 1.9
     public int getCachedOpacity:c();
@@ -285,8 +271,10 @@ interface BlockState {
         VoxelShape shape = instance.getShape(iblockaccess, blockposition);
   #elseif version >= 1.14
         VoxelShape shape = instance.a(iblockaccess, blockposition, CollisionContext.a());
-  #else
+  #elseif version >= 1.13.2
         VoxelShape shape = instance.getShape(iblockaccess, blockposition);
+  #else
+        VoxelShape shape = instance.g(iblockaccess, blockposition);
   #endif
   #if version >= 1.13.2
         if (shape == null || shape.isEmpty()) {
@@ -336,8 +324,10 @@ interface BlockState {
         VoxelShape shape = instance.getCollisionShape(iblockaccess, blockposition);
   #elseif version >= 1.14
         VoxelShape shape = instance.getCollisionShape(iblockaccess, blockposition);
-  #else
+  #elseif version >= 1.13.2
         VoxelShape shape = instance.getCollisionShape(iblockaccess, blockposition);
+  #else
+        VoxelShape shape = instance.h(iblockaccess, blockposition);
   #endif
   #if version >= 1.13.2
         if (shape == null || shape.isEmpty()) {

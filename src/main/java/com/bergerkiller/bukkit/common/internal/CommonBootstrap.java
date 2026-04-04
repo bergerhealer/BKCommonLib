@@ -29,6 +29,7 @@ import com.bergerkiller.bukkit.common.conversion.type.MapConversion;
 import com.bergerkiller.bukkit.common.conversion.type.ScoreboardDisplaySlotConversion;
 import com.bergerkiller.bukkit.common.conversion.type.SerializedEnumConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
+import com.bergerkiller.bukkit.common.internal.logic.EmptyBlockGetterInit;
 import com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporterInit;
 import com.bergerkiller.bukkit.common.internal.logic.UnsetDataWatcherItemInit;
 import com.bergerkiller.bukkit.common.wrappers.Brightness;
@@ -790,6 +791,9 @@ public class CommonBootstrap {
         if (evaluateMCVersion("<", "1.14")) {
             remappings.put("net.minecraft.server.level.EntityTracker", "net.minecraft.server.level.EntityTracker");
             remappings.put("net.minecraft.server.level.EntityTrackerEntry", "net.minecraft.server.level.ServerEntity");
+
+            // Empty block getter doesn't exist, so we made our own implementation for it
+            remappings.put("net.minecraft.world.level.EmptyBlockGetter", EmptyBlockGetterInit.CLASS_NAME);
         }
 
         /* ======== Mojang remapping changes for 1.13 ======== */
@@ -852,6 +856,7 @@ public class CommonBootstrap {
 
         // Initialize this one right away, as it's used in generated code
         NullPacketDataSerializerInit.initialize();
+        EmptyBlockGetterInit.initialize();
         ScopedProblemReporterInit.initialize();
         UnsetDataWatcherItemInit.initialize();
 

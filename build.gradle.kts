@@ -61,6 +61,7 @@ dependencies {
     // Log4j that is used inside the server
     compileOnly(libs.log4j.api)
     compileOnly(libs.log4j.core)
+    implementation(libs.asm)
 
     //
     // Publish a BKCommonLib-bom that tells projects using this library what versions of cloud to bring in

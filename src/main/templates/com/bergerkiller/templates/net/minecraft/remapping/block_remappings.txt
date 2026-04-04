@@ -1,0 +1,8 @@
+
+#select version >=
+#case 1.18:  #remap net.minecraft.world.level.block.Block public boolean hasDynamicShape();
+#case 1.16:  #remap net.minecraft.world.level.block.Block public boolean hasDynamicShape:o();
+#case 1.15:  #remap net.minecraft.world.level.block.Block public boolean hasDynamicShape:q();
+#case 1.14:  #remap net.minecraft.world.level.block.Block public boolean hasDynamicShape:p();
+#case 1.13:  #remap net.minecraft.world.level.block.Block public boolean hasDynamicShape:s();
+#endselect

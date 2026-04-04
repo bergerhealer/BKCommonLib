@@ -46,11 +46,14 @@ class LongObjectHashMap {
     // Doesn't exist, must be implemented
     public V merge(long key, V value, java.util.function.BiFunction<?, ?, ?> remappingFunction) {
         Object oldValue = instance.get(key);
+        Object newValue;
         if (oldValue == null) {
-            instance.put(key, value);
+            newValue = value;
         } else {
-            instance.put(key, remappingFunction.apply(oldValue, value));
+            newValue = remappingFunction.apply(oldValue, value);
         }
+        instance.put(key, newValue);
+        return newValue;
     }
     public V computeIfAbsent(long key, java.util.function.LongFunction<?> mappingFunction) {
         Object value = instance.get(key);

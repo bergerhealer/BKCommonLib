@@ -22,7 +22,7 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
 #if classexists net.minecraft.core.BlockPos$PooledBlockPosition
     BlockPos$PooledBlockPosition blockposition_b = BlockPos$PooledBlockPosition.r();
 #else
-    BlockPos$MutableBlockPosition blockposition_b = BlockPos$MutableBlockPosition.r();
+    BlockPos$MutableBlockPos blockposition_b = new BlockPos$MutableBlockPos();
 #endif
     Throwable throwable = null;
 
@@ -111,6 +111,7 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
     } catch (Throwable throwable1) {
         throwable = throwable1;
         throw throwable1;
+#if classexists net.minecraft.core.BlockPos$PooledBlockPosition
     } finally {
         if (blockposition_b != null) {
             if (throwable != null) {
@@ -125,6 +126,9 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
         }
 
     }
+#else
+    }
+#endif
 
     if (flag) {
         return java.util.stream.Stream.empty();
