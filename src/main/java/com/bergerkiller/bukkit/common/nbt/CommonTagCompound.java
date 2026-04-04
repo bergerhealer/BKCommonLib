@@ -104,50 +104,50 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
     }
 
     // implements get/put/remove with a simplified single implementation function
-    private final <T> T putGetRemove(PutGetRemoveOp op, String key, Class<T> type, T value) {
+    private final <T> T putGetRemove(PutGetRemoveOp op, String key, Class<T> type, T value, boolean returnValue) {
         Object rawNBTResult = null;
         if (type == UUID.class) {
             // == UUID ==
             UUID uuid = (UUID) value;
-            Long uuidMost = putGetRemove(op, key + "UUIDMost", Long.class, (uuid == null) ? null : uuid.getMostSignificantBits());
-            Long uuidLeast = putGetRemove(op, key + "UUIDLeast", Long.class, (uuid == null) ? null : uuid.getLeastSignificantBits());
+            Long uuidMost = putGetRemove(op, key + "UUIDMost", Long.class, (uuid == null) ? null : uuid.getMostSignificantBits(), returnValue);
+            Long uuidLeast = putGetRemove(op, key + "UUIDLeast", Long.class, (uuid == null) ? null : uuid.getLeastSignificantBits(), returnValue);
             if (uuidMost != null && uuidLeast != null) {
                 return (T) new UUID(uuidMost.longValue(), uuidLeast.longValue());
             }
         } else if (type == BlockLocation.class) {
             // == BlockLocation ==
             BlockLocation pos = (BlockLocation) value;
-            String world = putGetRemove(op, key + "World", String.class, (pos == null) ? null : pos.world);
-            Integer x = putGetRemove(op, key + "X", Integer.class, (pos == null) ? null : pos.x);
-            Integer y = putGetRemove(op, key + "Y", Integer.class, (pos == null) ? null : pos.y);
-            Integer z = putGetRemove(op, key + "Z", Integer.class,  (pos == null) ? null : pos.z);
+            String world = putGetRemove(op, key + "World", String.class, (pos == null) ? null : pos.world, returnValue);
+            Integer x = putGetRemove(op, key + "X", Integer.class, (pos == null) ? null : pos.x, returnValue);
+            Integer y = putGetRemove(op, key + "Y", Integer.class, (pos == null) ? null : pos.y, returnValue);
+            Integer z = putGetRemove(op, key + "Z", Integer.class,  (pos == null) ? null : pos.z, returnValue);
             if (world != null && !world.isEmpty() && x != null && y != null && z != null) {
                 return (T) new BlockLocation(world, x.intValue(), y.intValue(), z.intValue());
             }
         } else if (type == IntVector3.class) {
             // == IntVector3 ==
             IntVector3 pos = (IntVector3) value;
-            Integer x = putGetRemove(op, key + "X", Integer.class, (pos == null) ? null : pos.x);
-            Integer y = putGetRemove(op, key + "Y", Integer.class, (pos == null) ? null : pos.y);
-            Integer z = putGetRemove(op, key + "Z", Integer.class, (pos == null) ? null : pos.z);
+            Integer x = putGetRemove(op, key + "X", Integer.class, (pos == null) ? null : pos.x, returnValue);
+            Integer y = putGetRemove(op, key + "Y", Integer.class, (pos == null) ? null : pos.y, returnValue);
+            Integer z = putGetRemove(op, key + "Z", Integer.class, (pos == null) ? null : pos.z, returnValue);
             if (x != null && y != null && z != null) {
                 return (T) new IntVector3(x.intValue(), y.intValue(), z.intValue());
             }
         } else if (type == IdentifierHandle.class) {
             // == IdentifierHandle ==
-            String v = putGetRemove(op, key, String.class, (value == null) ? null : ((IdentifierHandle) value).toString());
+            String v = putGetRemove(op, key, String.class, (value == null) ? null : ((IdentifierHandle) value).toString(), returnValue);
             if (v != null) {
                 return (T) IdentifierHandle.createNew(v);
             }
         } else if (type == ChatText.class) {
             // Encoded / decodes NBT data
-            CommonTag result = putGetRemove(op, key, CommonTag.class, (value == null) ? null : ((ChatText) value).getNBT());
+            CommonTag result = putGetRemove(op, key, CommonTag.class, (value == null) ? null : ((ChatText) value).getNBT(), returnValue);
             if (result != null) {
                 return (T) ChatText.fromNBT(result);
             }
         } else if (type == boolean.class || type == Boolean.class) {
             // == Booleans (serialized as Byte) ==
-            Byte v = putGetRemove(op, key, Byte.class, (value == null) ? null : ((Boolean) value) ? (byte) 1 : (byte) 0);
+            Byte v = putGetRemove(op, key, Byte.class, (value == null) ? null : ((Boolean) value) ? (byte) 1 : (byte) 0, returnValue);
             if (v != null) {
                 return (T) ((v.byteValue() != (byte) 0) ? Boolean.TRUE : Boolean.FALSE);
             }
@@ -163,6 +163,11 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
             assertWritable();
             Object putValueNBT = TagHandle.createRawHandleForData(value);
             rawNBTResult = CompoundTagHandle.T.put.raw.invoke(getRawHandle(), key, putValueNBT);
+        }
+
+        // If no return value was requested, don't compute one either.
+        if (!returnValue) {
+            return null;
         }
 
         // Failure fallback + convert raw NBT tags to their converted values
@@ -212,7 +217,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @return value of the tag at the key, null if not contained
      */
     public <T> T removeValue(String key, Class<T> type) {
-        return putGetRemove(PutGetRemoveOp.REMOVE, key, type, null);
+        return putGetRemove(PutGetRemoveOp.REMOVE, key, type, null, true);
     }
 
     /**
@@ -231,7 +236,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @param value to assign to this key, null to remove it
      */
     public <T> T putValue(String key, Class<T> type, T value) {
-        return putGetRemove(PutGetRemoveOp.PUT, key, type, value);
+        return putGetRemove(PutGetRemoveOp.PUT, key, type, value, true);
     }
 
     /**
@@ -251,7 +256,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @param value to assign to this key
      */
     public void putValue(String key, Object value) {
-        putGetRemove(PutGetRemoveOp.PUT, key, (value == null) ? null : (Class<Object>) value.getClass(), value);
+        putGetRemove(PutGetRemoveOp.PUT, key, (value == null) ? null : (Class<Object>) value.getClass(), value, false);
     }
 
     /**
@@ -283,7 +288,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @return value of the tag at the key
      */
     public <T> T getValue(String key, Class<T> type) {
-        return putGetRemove(PutGetRemoveOp.GET, key, type, null);
+        return putGetRemove(PutGetRemoveOp.GET, key, type, null, true);
     }
 
     /**
@@ -298,7 +303,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @return value of the tag at the key
      */
     public Object getValue(String key) {
-        return putGetRemove(PutGetRemoveOp.GET, key, null, null);
+        return putGetRemove(PutGetRemoveOp.GET, key, null, null, true);
     }
 
     /**
@@ -317,7 +322,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @return value of the tag at the key
      */
     public <T> T getValue(String key, Class<T> type, T def) {
-        T result = putGetRemove(PutGetRemoveOp.GET, key, type, def);
+        T result = putGetRemove(PutGetRemoveOp.GET, key, type, def, true);
         return (result == null) ? def : result;
     }
 
@@ -525,7 +530,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
 
     @Override
     public CommonTag put(String key, CommonTag value) {
-        return putGetRemove(PutGetRemoveOp.PUT, key, CommonTag.class, value);
+        return putGetRemove(PutGetRemoveOp.PUT, key, CommonTag.class, value, true);
     }
 
     @Override

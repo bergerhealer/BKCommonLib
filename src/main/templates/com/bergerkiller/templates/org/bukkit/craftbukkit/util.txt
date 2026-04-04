@@ -168,11 +168,8 @@ class CraftChatMessage {
         if (components.length == 1) {
             Component singleComponent = components[0];
             java.util.List siblings = singleComponent.getSiblings();
-            if (siblings.size() == 1 && singleComponent.getStyle().isEmpty()) {
-                String text = singleComponent#getComponentText();
-                if (text.isEmpty()) {
-                    components[0] = (Component) siblings.get(0);
-                }
+            if ( siblings.size() == 1 && singleComponent.getStyle().isEmpty() && singleComponent#isComponentContentEmpty() ) {
+                components[0] = (Component) siblings.get(0);
             }
         }
 

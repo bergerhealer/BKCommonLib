@@ -730,7 +730,7 @@ public final class CommonItemStack implements Cloneable {
     }
 
     /**
-     * Gets the name of the painting set on this painting item. This name can be taken
+     * Sets the name of the painting set on this painting item. This name can be taken
      * over in the entity data of the item. If null, clears the data.
      *
      * @param name Painting name to set, or <i>null</i> to clear it

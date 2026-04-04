@@ -39,7 +39,7 @@ public class SpigotMappingTest {
     public void testVisualizeMappings() {
         SpigotMappings mappings = loadMappings();
 
-        mappings.visualizeMapping("net.minecraft.network.syncher.SynchedEntityData$DataValue");
+        mappings.visualizeMapping("net.minecraft.world.entity.player.ChatVisiblity");
 
         //mappings.visualizeMappingsForSpigotClass("net.minecraft.server.DataPackResources");
 
@@ -61,9 +61,13 @@ public class SpigotMappingTest {
 
         //mappings.renameKey("old.path.to.Class", "new.path.to.Class");
 
-        mappings.storeAppendForVersionRange("1.9","1.15.2",
-                "net.minecraft.core.BlockPos$PooledBlockPosition",
-                "net.minecraft.core.BlockPosition$PooledBlockPosition");
+        mappings.storeAppendForVersionRange("1.8.1","1.13.2",
+                "net.minecraft.world.entity.player.ChatVisiblity",
+                "net.minecraft.world.entity.player.EntityHuman$EnumChatVisibility");
+
+        mappings.storeAppendForVersionRange("1.14","1.15.1",
+                "net.minecraft.world.entity.player.ChatVisiblity",
+                "net.minecraft.world.entity.player.EnumChatVisibility");
 
         saveMappings(mappings);
     }

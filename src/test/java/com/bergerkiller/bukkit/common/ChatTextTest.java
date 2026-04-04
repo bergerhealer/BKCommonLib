@@ -174,6 +174,7 @@ public class ChatTextTest {
         ChatText text = ChatText.fromMessage(msg);
 
         Set<String> allowed = new HashSet<String>();
+        allowed.add("{\"color\":\"red\",\"extra\":[{\"color\":\"red\",\"text\":\"\"}],\"text\":\"\"}");
         allowed.add("{\"extra\":[{\"color\":\"red\",\"text\":\"\"}],\"text\":\"\"}");
         allowed.add("{\"text\":\"\",\"extra\":[{\"text\":\"\",\"color\":\"red\"}],\"obfuscated\":false,\"italic\":false,\"underlined\":false,\"strikethrough\":false,\"color\":\"red\",\"bold\":false}");
         allowed.add("{\"bold\":false,\"italic\":false,\"underlined\":false,\"strikethrough\":false,\"obfuscated\":false,\"color\":\"red\",\"extra\":[{\"color\":\"red\",\"text\":\"\"}],\"text\":\"\"}");
@@ -208,7 +209,8 @@ public class ChatTextTest {
         for (ChatColor color : ChatColor.values()) {
             ChatText text = ChatText.fromMessage(color.toString());
             if (color == ChatColor.RESET) {
-                assertEquals("", text.getMessage());
+                String msg = text.getMessage();
+                assertTrue("Invalid message for RESET: " + msg, msg.isEmpty() || msg.equals(color.toString()));
             } else {
                 assertEquals(color.toString(), text.getMessage());
             }

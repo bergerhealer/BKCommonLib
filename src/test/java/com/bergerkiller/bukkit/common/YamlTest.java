@@ -58,29 +58,12 @@ public class YamlTest {
 
     @Test
     public void testPaintingWithoutIdInEntityTag() {
-        /*
-        // You can decode the internal data string with this code:
-        String dataStr = "H4sIAAAAAAAA/+NiYOBi4HTNK8ksqQxJTOdgYC9LLMpMzCth4M3NzEtNLkpMK7EqTk3kYGDKTGEQQogVJGbmlWTmpTMwAACqs3tqQwAAAA==";
-        byte[] compressedBytes = Base64.getDecoder().decode(dataStr);
-        ByteArrayInputStream byteStream = new ByteArrayInputStream(compressedBytes);
-        CommonTagCompound nbt = CommonTagCompound.readFromStream(byteStream, true);
-         */
-
-        /*
-        // You can encode the internal data string with this code:
-        CommonTagCompound nbt = new CommonTagCompound();
-        CommonTagCompound entityTag = nbt.createCompound("EntityTag");
-        entityTag.putValue("id", "minecraft:painting");
-        entityTag.putValue("variant", "minecraft:sea");
-        try {
-            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-            nbt.writeToStream(outStream, true);
-            String newStr = Base64.getEncoder().encodeToString(outStream.toByteArray());
-            System.out.println(newStr);
-        } catch (java.io.IOException ex) {
-            throw new IllegalStateException("Unexpected IOException", ex);
+        // This entire mechanism is busted before 1.16 because of how CraftBukkit deserializes EntityTag
+        // The tag is part of handled tags (for spawn egg) but it does not actually keep the painting motive
+        // There is no real way to restore this data :(
+        if (CommonBootstrap.evaluateMCVersion("<", "1.16")) {
+            return;
         }
-        */
 
         String inputYaml = "" +
                 "item:\n" +
@@ -102,6 +85,13 @@ public class YamlTest {
 
     @Test
     public void testPaintingWithIdInEntityTag() {
+        // This entire mechanism is busted before 1.16 because of how CraftBukkit deserializes EntityTag
+        // The tag is part of handled tags (for spawn egg) but it does not actually keep the painting motive
+        // There is no real way to restore this data :(
+        if (CommonBootstrap.evaluateMCVersion("<", "1.16")) {
+            return;
+        }
+
         String inputYaml = "" +
                 "item:\n" +
                 "  ==: org.bukkit.inventory.ItemStack\n" +
