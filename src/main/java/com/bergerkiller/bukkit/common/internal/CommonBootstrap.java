@@ -774,6 +774,12 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket", "net.minecraft.network.protocol.game.ClientboundLevelChunkPacket");
         }
 
+        /* ======== Mojang remapping changes for 1.17.1 ======== */
+        if (evaluateMCVersion("<", "1.17.1")) {
+            // Before 1.17.1 the destroy packet only destroyed a single entity
+            remappings.put("net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket", "net.minecraft.network.protocol.game.ClientboundRemoveEntityPacket");
+        }
+
         /* ======== Mojang remapping changes for 1.16 ======== */
         if (evaluateMCVersion("<", "1.16")) {
             // Maps nms ResourceKey to the internal proxy class replacement pre-1.16

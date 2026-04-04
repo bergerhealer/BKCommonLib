@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -11,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -18,7 +18,9 @@ import java.util.stream.Stream;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.internal.proxy.PlayerProfile_1_8_to_1_18;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.google.common.collect.MapMaker;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -395,25 +397,8 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
             return; // Corrupted entirely?
         }
 
-        String internalData = LogicUtil.tryCast(metaArgs.get("internal"), String.class);
-        if (internalData == null) {
-            return; // What?
-        }
-
-        CommonTagCompound nbt;
-        try {
-            byte[] compressedBytes = Base64.getDecoder().decode(internalData);
-            try (ByteArrayInputStream byteStream = new ByteArrayInputStream(compressedBytes)) {
-                nbt = CommonTagCompound.readFromStream(byteStream, true);
-                if (nbt == null) {
-                    return; // What?
-                }
-            }
-        } catch (IllegalArgumentException ex) {
-            // Not base64?
-            return;
-        } catch (Exception ex) {
-            // Corrupted internal data, just throw whatever comes from that...
+        CommonTagCompound nbt = CommonTagCompound.fromBase64String(LogicUtil.tryCast(metaArgs.get("internal"), String.class));
+        if (nbt == null) {
             return;
         }
 
@@ -538,6 +523,118 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
             // This preserves the original NBT but just falls back to the default CraftMetaItem type
             if (!IS_ENTITY_TAG_META_SUPPORTED && "ENTITY_TAG".equals(mapping.get("meta-type"))) {
                 mapping.put("meta-type", "UNSPECIFIC");
+            }
+
+            // If meta-type is SKULL and a skull-owner is set that is a MCommonCapabilities.HAS_BUKKIT_PLAYER_PROFILE
+            if (!CommonCapabilities.HAS_BUKKIT_PLAYER_PROFILE && "SKULL".equals(mapping.get("meta-type"))) {
+                Object skullOwnerRaw = mapping.get("skull-owner");
+                if (skullOwnerRaw instanceof PlayerProfile_1_8_to_1_18) {
+                    Map<String, Object> skullOwnerMeta = ((PlayerProfile_1_8_to_1_18) skullOwnerRaw).meta;
+
+                    /*
+                    Convert:
+                    {
+                      ===PlayerProfile
+                      uniqueId=04049c90-d3e9-4621-9caf-0000aaa58540,
+                      name=HeadDatabase,
+                      properties=[
+                        {
+                          name=textures,
+                          value=eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjllNzVlMDQxNTFlN2NkZThlN2YxNDlkYWU5MmYwYzE0ZWY1ZjNmZjQ1Y2QzMjM5NTc4NzZiMGFkZDJjNDk0OSJ9fX0=
+                        }
+                      ]
+                    }
+
+                    To:
+                    TagCompound: 1 entries {
+                      SkullProfile = TagCompound: 3 entries {
+                        Id = int[]: [67411088, -739686879, -1666252800, -1431993024]
+                        Properties = TagCompound: 1 entries {
+                          textures = TagList: 1 entries [
+                            TagCompound: 1 entries {
+                              Value = String: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjllNzVlMDQxNTFlN2NkZThlN2YxNDlkYWU5MmYwYzE0ZWY1ZjNmZjQ1Y2QzMjM5NTc4NzZiMGFkZDJjNDk0OSJ9fX0=
+                            }
+                          ]
+                        }
+                        Name = String: HeadDatabase
+                      }
+                    }
+
+                    And encode as "internal" string string for the ItemMeta metadata.
+                    The NBT Name property is put as the new skull-owner value.
+                     */
+
+                    CommonTagCompound skullProfileNbt = new CommonTagCompound();
+
+                    // uniqueId
+                    {
+                        String uniqueIdStr = LogicUtil.tryCast(skullOwnerMeta.get("uniqueId"), String.class);
+                        if (uniqueIdStr != null) {
+                            try {
+                                UUID uuid = UUID.fromString(uniqueIdStr);
+                                long most = uuid.getMostSignificantBits();
+                                long least = uuid.getLeastSignificantBits();
+                                skullProfileNbt.putValue("Id", new int[] {
+                                        (int) (most >> 32),
+                                        (int) (most & 0xFFFFFFFFL),
+                                        (int) (least >> 32),
+                                        (int) (least & 0xFFFFFFFFL)
+                                });
+                            } catch (IllegalArgumentException ex) {
+                                // Invalid UUID string, ignore
+                            }
+                        }
+                    }
+
+                    // name
+                    {
+                        String name = LogicUtil.tryCast(skullOwnerMeta.get("name"), String.class);
+                        if (name != null) {
+                            skullProfileNbt.putValue("Name", name);
+                            mapping.put("skull-owner", name);
+                        } else {
+                            mapping.remove("skull-owner");
+                        }
+                    }
+
+                    // properties
+                    {
+                        Object propertiesRaw = skullOwnerMeta.get("properties");
+                        if (propertiesRaw instanceof List) {
+                            List<?> propertiesList = (List<?>) propertiesRaw;
+                            CommonTagCompound propertiesNbt = new CommonTagCompound();
+                            for (Object propertyObj : propertiesList) {
+                                if (propertyObj instanceof Map) {
+                                    Map<String, Object> propertyMap = (Map<String, Object>) propertyObj;
+                                    String propName = LogicUtil.tryCast(propertyMap.get("name"), String.class);
+                                    if (propName != null) {
+                                        Object propValue = propertyMap.get("value");
+                                        if (propValue instanceof String) {
+                                            CommonTagCompound propNbt = new CommonTagCompound();
+                                            propNbt.putValue("Value", (String) propValue);
+
+                                            CommonTagList propValues = propertiesNbt.get(propName, CommonTagList.class);
+                                            if (propValues != null) {
+                                                propValues.add(propNbt);
+                                            } else {
+                                                propValues = new CommonTagList();
+                                                propValues.add(propNbt);
+                                                propertiesNbt.put(propName, propValues);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            skullProfileNbt.put("Properties", propertiesNbt);
+                        }
+                    }
+
+                    CommonTagCompound internalNBT = new CommonTagCompound();
+                    internalNBT.put("SkullProfile", skullProfileNbt);
+                    String internalStr = internalNBT.toBase64String();
+
+                    mapping.put("internal", internalStr);
+                }
             }
 
             return applyWithoutFixes(mapping);

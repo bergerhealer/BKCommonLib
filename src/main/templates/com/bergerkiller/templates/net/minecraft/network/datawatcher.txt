@@ -390,7 +390,7 @@ class SynchedEntityData {
   #if version >= 1.18
         #require net.minecraft.network.syncher.SynchedEntityData private void register:define(EntityDataAccessor<T> key, Object defaultValue);
   #elseif version >= 1.9
-        #require net.minecraft.network.syncher.SynchedEntityData private void register:registerObject(EntityDataAccessor<T> key, Object defaultValue);
+        #require net.minecraft.network.syncher.SynchedEntityData public void register:register(EntityDataAccessor<T> key, Object defaultValue);
   #else
         #require net.minecraft.network.syncher.SynchedEntityData private void register:a((EntityDataAccessor<T>) int key, Object defaultValue);
   #endif

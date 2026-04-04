@@ -12,8 +12,10 @@ import java.util.function.Function;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializer;
 import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializerMigratorBukkit;
+import com.bergerkiller.bukkit.common.internal.proxy.PlayerProfile_1_8_to_1_18;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.SafeField;
@@ -407,7 +409,7 @@ public class YamlDeserializer {
             }
 
             // Fix deserializing profiles with invalid name causing errors to be logged
-            if (CommonBootstrap.evaluateMCVersion(">=", "1.18.1")) {
+            if (CommonCapabilities.HAS_BUKKIT_PLAYER_PROFILE) {
                 try {
                     Class<?> craftPlayerProfileType = CommonUtil.getClass("org.bukkit.craftbukkit.profile.CraftPlayerProfile");
                     final FastMethod<Object> deserializeMethod = new FastMethod<>(
@@ -432,6 +434,12 @@ public class YamlDeserializer {
                 } catch (Throwable t) {
                     Logging.LOGGER_CONFIG.log(Level.SEVERE, "Failed to register player profile deserializer", t);
                 }
+            } else {
+                // PlayerProfile does not exist before 1.18.1. We basically store a proxy class to store the original
+                // fields stored in YAML so that they can be migrated under the ItemMeta in later migration steps.
+                // This avoids a deserializer error on older game versions when deserializing newer YAML.
+                this.register("org.bukkit.profile.PlayerProfile", PlayerProfile_1_8_to_1_18::new);
+                this.register("PlayerProfile", PlayerProfile_1_8_to_1_18::new);
             }
         }
 

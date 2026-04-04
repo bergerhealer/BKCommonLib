@@ -670,6 +670,51 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
     }
 
     /**
+     * Attempts to decode a legacy base64-encoded NBT compound from the "internal" string format.
+     * This format was used in the serialized ItemStack yaml output.
+     *
+     * @param internal ItemStack "internal" string
+     * @return Decoded compound, or null if the string was null or not in the expected format or could not be decoded
+     */
+    public static CommonTagCompound fromBase64String(String internal) {
+        if (internal == null) {
+            return null;
+        }
+
+        CommonTagCompound nbt;
+        try {
+            byte[] compressedBytes = Base64.getDecoder().decode(internal);
+            try (ByteArrayInputStream byteStream = new ByteArrayInputStream(compressedBytes)) {
+                return CommonTagCompound.readFromStream(byteStream, true);
+            }
+        } catch (IllegalArgumentException ex) {
+            // Not base64?
+            return null;
+        } catch (Exception ex) {
+            // Corrupted internal data, just throw whatever comes from that...
+            return null;
+        }
+    }
+
+    /**
+     * Encodes this NBT compound to the base64 "internal" string format.
+     * This format was used in the serialized ItemStack yaml output.
+     *
+     * @return Serialized base64 internal String
+     */
+    public String toBase64String() {
+        try {
+            try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream()) {
+                writeToStream(byteStream, true);
+                byteStream.flush();
+                return Base64.getEncoder().encodeToString(byteStream.toByteArray());
+            }
+        } catch (IOException ex) {
+            throw new IllegalStateException("Failed to write NBT data to byte stream", ex);
+        }
+    }
+
+    /**
      * Reads a CommonTagCompound from the file specified. If compressed, the
      * data is expected to be compressed with the GZIP format.
      *

@@ -247,6 +247,11 @@ public class CommonCapabilities {
     public static final boolean MOJANGMAP_METHODS = CommonBootstrap.evaluateMCVersion(">=", "1.18");
 
     /**
+     * Since Minecraft 1.18.1 Bukkit has a PlayerProfile API, which is also written into YAML
+     */
+    public static final boolean HAS_BUKKIT_PLAYER_PROFILE = CommonBootstrap.evaluateMCVersion(">=", "1.18.1");
+
+    /**
      * Since Minecraft 1.19 the living/painting entity spawn packets were removed and replaced with
      * the generic spawn entity packet.
      */

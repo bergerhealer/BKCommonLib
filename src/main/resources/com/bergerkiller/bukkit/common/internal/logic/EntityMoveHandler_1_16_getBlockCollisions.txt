@@ -9,12 +9,12 @@
 // flag = always false
 
 public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler handler, VoxelShape voxelshape, VoxelShape voxelshape1, boolean flag) {
-    int i = Mth.floor(voxelshape.b(Direction$Axis.X)) - 1;
-    int j = Mth.ceil(voxelshape.c(Direction$Axis.X)) + 1;
-    int k = Mth.floor(voxelshape.b(Direction$Axis.Y)) - 1;
-    int l = Mth.ceil(voxelshape.c(Direction$Axis.Y)) + 1;
-    int i1 = Mth.floor(voxelshape.b(Direction$Axis.Z)) - 1;
-    int j1 = Mth.ceil(voxelshape.c(Direction$Axis.Z)) + 1;
+    int i = MathUtil.floor(voxelshape.b(Direction$Axis.X)) - 1;
+    int j = MathUtil.ceil(voxelshape.c(Direction$Axis.X)) + 1;
+    int k = MathUtil.floor(voxelshape.b(Direction$Axis.Y)) - 1;
+    int l = MathUtil.ceil(voxelshape.c(Direction$Axis.Y)) + 1;
+    int i1 = MathUtil.floor(voxelshape.b(Direction$Axis.Z)) - 1;
+    int j1 = MathUtil.ceil(voxelshape.c(Direction$Axis.Z)) + 1;
     WorldBorder worldborder = this.getWorldBorder();
     VoxelShape voxelshape2 = Shapes.a();
 

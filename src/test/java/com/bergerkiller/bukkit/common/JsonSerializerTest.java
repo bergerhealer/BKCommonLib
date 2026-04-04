@@ -1,8 +1,12 @@
 package com.bergerkiller.bukkit.common;
 
 import com.bergerkiller.bukkit.common.config.JsonSerializer;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.inventory.CommonItemMaterials;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.nbt.CommonTagList;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.CustomModelData;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
@@ -13,6 +17,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -57,34 +62,6 @@ public class JsonSerializerTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void testItemStackToJsonPlayerHead() throws JsonSerializer.JsonSyntaxException {
-        JsonSerializer serializer = new JsonSerializer();
-
-        GameProfileHandle profile = GameProfileHandle.createNew(
-                UUID.fromString("04049c90-d3e9-4621-9caf-0000aaa58540"),
-                "HeadDatabase");
-        profile = profile.withPropertyPut("textures", PropertyHandle.createNew("textures",
-                        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjllNzVlMDQxNTFlN2NkZThlN2YxNDlkYWU5MmYwYzE0ZWY1ZjNmZjQ1Y2QzMjM5NTc4NzZiMGFkZDJjNDk0OSJ9fX0="));
-
-        String json = serializer.itemStackToJson(
-                CommonItemStack.createPlayerSkull(profile)
-                        .toBukkit());
-
-        //System.out.println(json);
-
-        Map<String, Object> jsonMap = serializer.jsonToMap(json);
-
-        // Just a rough check all the info is in there
-        assertEquals(dataVersion, ((Number) jsonMap.get("v")).intValue());
-        assertEquals("PLAYER_HEAD", jsonMap.get("type"));
-        Map<String, Object> meta = (Map<String, Object>) jsonMap.get("meta");
-        assertEquals("SKULL", meta.get("meta-type"));
-        Map<String, Object> skullOwner = (Map<String, Object>) meta.get("skull-owner");
-        assertEquals("04049c90-d3e9-4621-9caf-0000aaa58540", skullOwner.get("uniqueId"));
-    }
-
-    @Test
     public void testItemStackFromJsonStick() throws JsonSerializer.JsonSyntaxException {
         JsonSerializer serializer = new JsonSerializer();
         String json = "{\"v\":3953,\"type\":\"STICK\"}";
@@ -95,9 +72,124 @@ public class JsonSerializerTest {
     }
 
     @Test
-    public void testItemStackFromJsonPlayerHead() throws JsonSerializer.JsonSyntaxException {
+    @SuppressWarnings("unchecked")
+    public void testItemStackToJsonPlayerHead() throws JsonSerializer.JsonSyntaxException {
         JsonSerializer serializer = new JsonSerializer();
 
+        final String testTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjllNzVlMDQxNTFlN2NkZThlN2YxNDlkYWU5MmYwYzE0ZWY1ZjNmZjQ1Y2QzMjM5NTc4NzZiMGFkZDJjNDk0OSJ9fX0=";
+        GameProfileHandle profile = GameProfileHandle.createNew(
+                UUID.fromString("04049c90-d3e9-4621-9caf-0000aaa58540"),
+                "HeadDatabase");
+        profile = profile.withPropertyPut("textures", PropertyHandle.createNew("textures", testTexture));
+
+        String json = serializer.itemStackToJson(
+                CommonItemStack.createPlayerSkull(profile)
+                        .toBukkit());
+
+        System.out.println(json);
+
+        Map<String, Object> jsonMap = serializer.jsonToMap(json);
+
+        // Just a rough check all the info is in there (differs per version that yaml is generated)
+        assertEquals(dataVersion, ((Number) jsonMap.get("v")).intValue());
+        assertEquals("PLAYER_HEAD", jsonMap.get("type"));
+        Map<String, Object> meta = (Map<String, Object>) jsonMap.get("meta");
+        assertEquals("SKULL", meta.get("meta-type"));
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.18.1")) {
+            /*
+            {
+              v=2865.0,
+              type=PLAYER_HEAD,
+              meta={
+                ===ItemMeta,
+                meta-type=SKULL,
+                skull-owner={
+                  ===PlayerProfile,
+                  uniqueId=04049c90-d3e9-4621-9caf-0000aaa58540,
+                  name=HeadDatabase,
+                  properties=[
+                    {
+                      name=textures,
+                      value=eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjllNzVlMDQxNTFlN2NkZThlN2YxNDlkYWU5MmYwYzE0ZWY1ZjNmZjQ1Y2QzMjM5NTc4NzZiMGFkZDJjNDk0OSJ9fX0=
+                    }
+                  ]
+                }
+              }
+             */
+
+            Map<String, Object> skullOwner = (Map<String, Object>) meta.get("skull-owner");
+            assertEquals("04049c90-d3e9-4621-9caf-0000aaa58540", skullOwner.get("uniqueId"));
+
+            List<Map<String, Object>> skullProperties = LogicUtil.unsafeCast(skullOwner.get("properties"));
+            assertEquals(1, skullProperties.size());
+            assertEquals("textures", skullProperties.get(0).get("key"));
+            assertEquals(testTexture, skullProperties.get(0).get("value"));
+        } else {
+            /*
+            {
+              v=2724.0,
+              type=PLAYER_HEAD,
+              meta={
+                ===ItemMeta
+                meta-type=SKULL,
+                internal=H4sIAAAAAAAA/03KTU6DQBgA0E+DCWIv4Q2GVmq6MNGItUzKtLQUmNlNYRp+PtqGghb27j1At27cuPEmnsJbuPWtnwFgQG9ZNIjzarfJUF3BuZMAgKZpp/ef3/H16Qvg8+Pt3gBjXu32qqozdbgEvVbHuqnUwQCAMx0uAomNgm/VUiKilCQRxbh1hqql/pLgzMn3t842aNePztApU5JMHobTdvTvWrUMLeQDmoqt16zLgEwHC1SThRmXqxeRI7IuQNf2jswfI+uzQvgpsj4/MhsLHq4st+SvvHsiIuSmyFkpcs/kfa9zc9difnzDOpG5z+NC2DRndkFmSzraROQOQAeNyVJBb6JkYstaruVBAfwBfYh8MR8BAAA=,
+                skull-owner=HeadDatabase,
+              }
+            }
+             */
+
+            assertEquals("HeadDatabase", meta.get("skull-owner"));
+
+            /*
+            TagCompound: 1 entries {
+              SkullProfile = TagCompound: 3 entries {
+                Id = int[]: [67411088, -739686879, -1666252800, -1431993024]
+                Properties = TagCompound: 1 entries {
+                  textures = TagList: 1 entries [
+                    TagCompound: 1 entries {
+                      Value = String: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjllNzVlMDQxNTFlN2NkZThlN2YxNDlkYWU5MmYwYzE0ZWY1ZjNmZjQ1Y2QzMjM5NTc4NzZiMGFkZDJjNDk0OSJ9fX0=
+                    }
+                  ]
+                }
+                Name = String: HeadDatabase
+              }
+            }
+             */
+            CommonTagCompound nbt = CommonTagCompound.fromBase64String((String) meta.get("internal"));
+
+            CommonTagCompound skullProfile = nbt.getCompoundOrEmpty("SkullProfile");
+            CommonTagCompound properties = skullProfile.getCompoundOrEmpty("Properties");
+            CommonTagList textures = properties.getListOrEmpty("textures");
+            assertEquals(1, textures.size());
+            assertEquals(testTexture, textures.getValue(0, CommonTagCompound.class).getValue("Value", String.class));
+        }
+    }
+
+    @Test
+    public void testItemStackFromJsonPlayerHeadLegacy() throws JsonSerializer.JsonSyntaxException {
+        JsonSerializer serializer = new JsonSerializer();
+
+        // This is the legacy yaml output (< 1.18.1) which has things inline as an internal string
+        String json = "{\"v\":2730,\"type\":\"PLAYER_HEAD\",\"meta\":{\"meta-type\":\"SKULL\",\"internal\":\"H4sIAAAAAAAA/03KTU6DQBgA0E+DCWIv4Q2GVmq6MNGItUzKtLQUmNlNYRp+PtqGghb27j1At27cuPEmnsJbuPWtnwFgQG9ZNIjzarfJUF3BuZMAgKZpp/ef3/H16Qvg8+Pt3gBjXu32qqozdbgEvVbHuqnUwQCAMx0uAomNgm/VUiKilCQRxbh1hqql/pLgzMn3t842aNePztApU5JMHobTdvTvWrUMLeQDmoqt16zLgEwHC1SThRmXqxeRI7IuQNf2jswfI+uzQvgpsj4/MhsLHq4st+SvvHsiIuSmyFkpcs/kfa9zc9difnzDOpG5z+NC2DRndkFmSzraROQOQAeNyVJBb6JkYstaruVBAfwBfYh8MR8BAAA=\",\"skull-owner\":\"HeadDatabase\",\"==\":\"ItemMeta\"}}";
+        CommonItemStack itemStack = CommonItemStack.of(serializer.fromJsonToItemStack(json));
+
+        assertEquals(CommonItemMaterials.SKULL, itemStack.getType());
+        assertEquals(1, itemStack.getAmount());
+
+        GameProfileHandle profile = itemStack.getSkullProfile();
+        assertNotNull(profile);
+        assertEquals(UUID.fromString("04049c90-d3e9-4621-9caf-0000aaa58540"), profile.getId());
+        for (PropertyHandle prop : profile.getProperties("textures")) {
+            assertEquals("textures", prop.getName());
+            assertTrue(prop.getValue().length() > 10);
+        }
+    }
+
+    @Test
+    public void testItemStackFromJsonPlayerHeadModern() throws JsonSerializer.JsonSyntaxException {
+        JsonSerializer serializer = new JsonSerializer();
+
+        // This is the modern yaml output (1.18.1+) which has a PlayerProfile
         String json = "{\"v\":3953,\"type\":\"PLAYER_HEAD\",\"meta\":{\"meta-type\":\"SKULL\",\"skull-owner\":{\"uniqueId\":\"04049c90-d3e9-4621-9caf-0000aaa58540\",\"name\":\"HeadDatabase\",\"properties\":[{\"name\":\"textures\",\"value\":\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjllNzVlMDQxNTFlN2NkZThlN2YxNDlkYWU5MmYwYzE0ZWY1ZjNmZjQ1Y2QzMjM5NTc4NzZiMGFkZDJjNDk0OSJ9fX0=\"}],\"==\":\"PlayerProfile\"},\"==\":\"ItemMeta\"}}";
         CommonItemStack itemStack = CommonItemStack.of(serializer.fromJsonToItemStack(json));
 
