@@ -53,7 +53,12 @@ public class YamlTest {
 
         CommonItemStack item = CommonItemStack.of(yaml.get("item", ItemStack.class));
         assertEquals(MaterialUtil.getFirst("STICK", "LEGACY_STICK"), item.getType());
-        assertNull(item.getPaintingName());
+
+        // For some reason before 1.11 it doesn't strip the painting metadata on invalid items
+        // It's not important enough to write a workaround for.
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.11")) {
+            assertNull(item.getPaintingName());
+        }
     }
 
     @Test

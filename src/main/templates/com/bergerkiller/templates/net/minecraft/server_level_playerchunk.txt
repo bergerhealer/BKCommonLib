@@ -121,7 +121,7 @@ class ChunkHolder {
 #elseif exists net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket public ClientboundLevelChunkWithLightPacket(net.minecraft.world.level.chunk.LevelChunk chunk, int sectionsMask);
         ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(chunk, 0x1FFFF);
 #else
-        boolean flag = !WorldHandle.createHandle(chunk.getWorld()).getDimensionType().hasSkyLight();
+        boolean flag = !LevelHandle.createHandle(chunk.getWorld()).getDimensionType().hasSkyLight();
         ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(chunk, flag, 0x1FFFF);
 #endif
 

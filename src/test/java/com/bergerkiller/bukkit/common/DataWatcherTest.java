@@ -83,7 +83,7 @@ public class DataWatcherTest {
         final DataWatcher.Prototype myPrototype = DataWatcher.Prototype.build()
                 .setClientByteDefault(EntityHandle.DATA_FLAGS, 0)
                 .setFlag(EntityHandle.DATA_FLAGS, EntityHandle.DATA_FLAG_INVISIBLE, true)
-                .set(EntityHandle.DATA_NO_GRAVITY, true)
+                .set(EntityHandle.DATA_AIR_TICKS, 5)
                 .create();
 
         // Create a new instance and verify all is correct inside
@@ -92,9 +92,9 @@ public class DataWatcherTest {
             assertFalse(dataWatcher.isChanged());
             assertFalse(dataWatcher.isEmpty());
             assertEquals(EntityHandle.DATA_FLAG_INVISIBLE, dataWatcher.getByte(EntityHandle.DATA_FLAGS));
-            assertEquals(true, dataWatcher.get(EntityHandle.DATA_NO_GRAVITY));
+            assertEquals(5, (int) dataWatcher.get(EntityHandle.DATA_AIR_TICKS));
             assertFalse(dataWatcher.getItem(EntityHandle.DATA_FLAGS).isChanged());
-            assertFalse(dataWatcher.getItem(EntityHandle.DATA_NO_GRAVITY).isChanged());
+            assertFalse(dataWatcher.getItem(EntityHandle.DATA_AIR_TICKS).isChanged());
 
             // Should include both keys as non-defaults, since the flag was changed from the 0 client default
             assertEquals(2, dataWatcher.packNonDefaults().size());
@@ -111,9 +111,10 @@ public class DataWatcherTest {
             assertFalse(dataWatcher.isChanged());
             assertFalse(dataWatcher.isEmpty());
             assertEquals(0, dataWatcher.getByte(EntityHandle.DATA_FLAGS));
-            assertEquals(true, dataWatcher.get(EntityHandle.DATA_NO_GRAVITY));
+            assertEquals(5, (int) dataWatcher.get(EntityHandle.DATA_AIR_TICKS));
+
             assertFalse(dataWatcher.getItem(EntityHandle.DATA_FLAGS).isChanged());
-            assertFalse(dataWatcher.getItem(EntityHandle.DATA_NO_GRAVITY).isChanged());
+            assertFalse(dataWatcher.getItem(EntityHandle.DATA_AIR_TICKS).isChanged());
 
             // Should include only no_gravity as non-defaults, since the flag is 0
             // This only applies on MC 1.19.3 and beyond when this default logic was added
@@ -130,9 +131,9 @@ public class DataWatcherTest {
             assertFalse(dataWatcher.isChanged());
             assertFalse(dataWatcher.isEmpty());
             assertEquals(EntityHandle.DATA_FLAG_INVISIBLE, dataWatcher.getByte(EntityHandle.DATA_FLAGS));
-            assertEquals(true, dataWatcher.get(EntityHandle.DATA_NO_GRAVITY));
+            assertEquals(5, (int) dataWatcher.get(EntityHandle.DATA_AIR_TICKS));
             assertFalse(dataWatcher.getItem(EntityHandle.DATA_FLAGS).isChanged());
-            assertFalse(dataWatcher.getItem(EntityHandle.DATA_NO_GRAVITY).isChanged());
+            assertFalse(dataWatcher.getItem(EntityHandle.DATA_AIR_TICKS).isChanged());
 
             // Should include both keys as non-defaults, since the flag was changed from the 0 client default
             assertEquals(2, dataWatcher.packNonDefaults().size());
