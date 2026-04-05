@@ -167,7 +167,7 @@ class EntityType {
     }
 
     public static String getEntityInternalName(Class<?> entityType) {
-        ResourceLocation key = EntityType.getName(entityType);
+        Identifier key = EntityType.getName(entityType);
         if (key == null) {
             return null;
         } else {

@@ -12,6 +12,7 @@ import com.bergerkiller.bukkit.common.wrappers.CustomModelData;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.com.mojang.authlib.properties.PropertyHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
+import org.bukkit.Material;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -63,7 +64,9 @@ public class JsonSerializerTest {
         JsonSerializer serializer = new JsonSerializer();
         String json = serializer.itemStackToJson(CommonItemStack.create(CommonItemMaterials.STICK, 1).toBukkit());
         Map<String, Object> jsonMap = serializer.jsonToMap(json);
-        assertEquals(dataVersion, ((Number) jsonMap.get("v")).intValue());
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
+            assertEquals(dataVersion, ((Number) jsonMap.get("v")).intValue());
+        }
         assertEquals("STICK", jsonMap.get("type"));
     }
 
@@ -97,10 +100,17 @@ public class JsonSerializerTest {
         Map<String, Object> jsonMap = serializer.jsonToMap(json);
 
         // Just a rough check all the info is in there (differs per version that yaml is generated)
-        assertEquals(dataVersion, ((Number) jsonMap.get("v")).intValue());
-        assertEquals("PLAYER_HEAD", jsonMap.get("type"));
+
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
+            assertEquals(dataVersion, ((Number) jsonMap.get("v")).intValue());
+            assertEquals("PLAYER_HEAD", jsonMap.get("type"));
+        } else {
+            assertEquals("SKULL_ITEM", jsonMap.get("type"));
+        }
+
         Map<String, Object> meta = (Map<String, Object>) jsonMap.get("meta");
         assertEquals("SKULL", meta.get("meta-type"));
+
         if (CommonBootstrap.evaluateMCVersion(">=", "1.18.1")) {
             /*
             {

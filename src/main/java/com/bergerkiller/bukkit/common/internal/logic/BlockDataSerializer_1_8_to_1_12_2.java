@@ -24,12 +24,19 @@ class BlockDataSerializer_1_8_to_1_12_2 extends BlockDataSerializer {
     public void enable() {
         ClassResolver resolver = new ClassResolver();
         resolver.setDeclaredClassName("net.minecraft.world.level.block.Block");
+        resolver.addImport("net.minecraft.world.level.block.Blocks");
         resolver.addImport("net.minecraft.world.level.block.state.BlockState");
         resolver.addImport("net.minecraft.world.level.block.state.properties.Property");
         resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
-        findBlockByNameMethod.init(new MethodDeclaration(resolver,
+        findBlockByNameMethod.init(new MethodDeclaration(resolver, "" +
                 "public static Object findBlockByName(net.minecraft.resources.Identifier minecraftKey) {\n" +
-                "    return Block.REGISTRY.get((Object)minecraftKey);\n" +
+                "    Block block = Block.REGISTRY.get((Object)minecraftKey);\n" +
+                "    if (block == Blocks.AIR) {\n" +
+                "        if (!Block.REGISTRY.d((Object)minecraftKey)) {\n" +
+                "            return null;\n" +
+                "        }\n" +
+                "    }\n" +
+                "    return block;\n" +
                 "}"));
         createLegacyBlockDataMethod.init(new MethodDeclaration(resolver,
                 "public static BlockState createLegacyBlockData(Block block, int legacyData) {\n" +

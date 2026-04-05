@@ -805,6 +805,8 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.level.block.entity.BlockEntityType", "com.bergerkiller.bukkit.common.internal.proxy.TileEntityTypesProxy_1_8_to_1_12_2");
             // Stop sound works using an MC|StopSound custom message
             remappings.put("net.minecraft.network.protocol.game.ClientboundStopSoundPacket", "net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket");
+            // ItemLike (IMaterial) was added 1.13
+            remappings.put("net.minecraft.world.level.ItemLike", "net.minecraft.world.item.Item");
         }
 
         /* ======== Mojang remapping changes for 1.11 ======== */

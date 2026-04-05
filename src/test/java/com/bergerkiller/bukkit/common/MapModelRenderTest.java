@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.junit.Ignore;
@@ -115,11 +116,11 @@ class Pseudo3DImagePanel extends JPanel
 
         System.out.println("Yaw=" + yaw + " Pitch=" + pitch);
 
-        BlockRenderOptions opt = BlockData.fromMaterial(Material.PLAYER_HEAD).getDefaultRenderOptions();
+        BlockRenderOptions opt = BlockData.fromMaterial(MaterialUtil.getFirst("PLAYER_HEAD", "LEGACY_SKULL")).getDefaultRenderOptions();
 
         System.out.println(opt);
 
-        CommonItemStack item = CommonItemStack.create(Material.GOLDEN_PICKAXE, 15);
+        CommonItemStack item = CommonItemStack.create(MaterialUtil.getFirst("GOLDEN_PICKAXE", "LEGACY_GOLD_PICKAXE"), 15);
         item.setDamage(1);
         item.setUnbreakable(true);
         Model model = textures.getBlockModel(opt);

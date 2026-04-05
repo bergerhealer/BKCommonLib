@@ -200,14 +200,16 @@ interface BlockState {
         }
     }
 #elseif version >= 1.9
-    public int getCachedOpacity:c();
+    public int getCachedOpacity() {
+        return Math.min(15, instance.c());
+    }
 #else
     // BlockState has no properties, delegate to Block
     public int getCachedOpacity() {
   #if version >= 1.8.3
-        return instance.getBlock().p();
+        return Math.min(15, instance.getBlock().p());
   #else
-        return instance.getBlock().n();
+        return Math.min(15, instance.getBlock().n());
   #endif
     }
 #endif

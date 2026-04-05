@@ -205,9 +205,9 @@ class Block {
     public int getOpacity((BlockStateHandle) BlockState iblockdata, (org.bukkit.World) Level world, int x, int y, int z) {
   #if exists net.minecraft.world.level.block.Block public int getLightOpacity(BlockState data, BlockGetter world, BlockPos pos);
         // Forge
-        return instance.getLightOpacity(iblockdata, (BlockGetter) world, new BlockPos(x, y, z));
+        return Math.min(15, instance.getLightOpacity(iblockdata, (BlockGetter) world, new BlockPos(x, y, z)));
   #else
-        return instance.m(iblockdata);
+        return Math.min(15, instance.m(iblockdata));
   #endif
     }
     public int getEmission((BlockStateHandle) BlockState iblockdata, (org.bukkit.World) Level world, int x, int y, int z) {
@@ -234,11 +234,11 @@ class Block {
     public int getOpacity((BlockStateHandle) BlockState iblockdata, (org.bukkit.World) Level world, int x, int y, int z) {
   #if exists net.minecraft.world.level.block.Block public int getLightOpacity(BlockState data, BlockGetter world, BlockPos pos);
         // Forge
-        return instance.getLightOpacity(iblockdata, (BlockGetter) world, new BlockPos(x, y, z));
+        return Math.min(15, instance.getLightOpacity(iblockdata, (BlockGetter) world, new BlockPos(x, y, z)));
   #elseif version >= 1.8.3
-        return instance.p();
+        return Math.min(15, instance.p());
   #else
-        return instance.n();
+        return Math.min(15, instance.n());
   #endif
     }
 

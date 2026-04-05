@@ -31,10 +31,24 @@ class TestServerFactory_1_8 extends TestServerFactory {
 
     @Override
     protected void init(ServerEnvironment env) throws Throwable {
+        // Some versions have a SpigotConfig disabledAdvancements list field
+        // If this is null, bootstrap fails, so we got to set it to something
+        try {
+            Class<?> spigotConfigClass = Class.forName("org.spigotmc.SpigotConfig");
+            Field f = spigotConfigClass.getDeclaredField("disabledAdvancements");
+            f.setAccessible(true);
+            f.set(null, Collections.emptyList());
+        } catch (Throwable t) { /* ignore */ }
+
         // Bootstrap is required
         Class<?> dispenserRegistryClass = resolveClass("net.minecraft.server.Bootstrap");
         Method dispenserRegistryBootstrapMethod = dispenserRegistryClass.getMethod("c");
         dispenserRegistryBootstrapMethod.invoke(null);
+
+        // DataFixers class must be created before the server instance to avoid issues
+        Class<?> dataConverterRegistryClass = resolveClass("net.minecraft.util.datafix.DataFixers");
+        Method dataConverterRegistryInitMethod = dataConverterRegistryClass.getMethod("a");
+        Object dataConverterManager = dataConverterRegistryInitMethod.invoke(null);
 
         // Create some stuff by null-constructing them (not calling initializer)
         // This prevents loads of extra server logic executing during test
@@ -71,11 +85,8 @@ class TestServerFactory_1_8 extends TestServerFactory {
         setField(mc_server, "propertyManager", propertyManager);
         setField(propertyManager, "properties", new java.util.Properties());
 
-        // Create data converter registry manager object - used for serialization/deserialization
+        // Assign data converter registry manager object - used for serialization/deserialization
         // Only used >= MC 1.10.2
-        Class<?> dataConverterRegistryClass = resolveClass("net.minecraft.util.datafix.DataFixers");
-        Method dataConverterRegistryInitMethod = dataConverterRegistryClass.getMethod("a");
-        Object dataConverterManager = dataConverterRegistryInitMethod.invoke(null);
         setField(mc_server, "dataConverterManager", dataConverterManager);
 
         // Create CraftingManager instance and load recipes for >= MC 1.13

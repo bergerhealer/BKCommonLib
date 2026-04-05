@@ -191,11 +191,11 @@ class VoxelShape {
                 coordinate = voxel.traceZAxis(boundingBoxHandle, coordinate);
             }
   #else
-            if (axis == Direction$Axis.X) {
+            if (axis == net.minecraft.core.Direction$Axis.X) {
                 coordinate = voxel.traceXAxis(boundingBoxHandle, coordinate);
-            } else if (axis == Direction$Axis.Y) {
+            } else if (axis == net.minecraft.core.Direction$Axis.Y) {
                 coordinate = voxel.traceYAxis(boundingBoxHandle, coordinate);
-            } else if (axis == Direction$Axiss.Z) {
+            } else if (axis == net.minecraft.core.Direction$Axis.Z) {
                 coordinate = voxel.traceZAxis(boundingBoxHandle, coordinate);
             }
   #endif

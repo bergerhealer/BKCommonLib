@@ -18,8 +18,6 @@ import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeHandle
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.SmeltingRecipeHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 
-#if version >= 1.12
-
 class Recipe {
 #if version >= 1.15
     public (org.bukkit.inventory.ItemStack) ItemStack getOutput() {
@@ -67,29 +65,39 @@ class Recipe {
 #elseif version >= 1.13
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:d();
 #else
-    public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:b();
+    public (org.bukkit.inventory.ItemStack) ItemStack getOutput() {
+        if (instance instanceof FireworkRocketRecipe) {
+            // Special case (see getIngredients code)
+            net.minecraft.world.item.ItemStack itemstack = new ItemStack(net.minecraft.world.item.Items.FIREWORKS, 3);
+            ItemStackHandle.T.setFireworksFlightDuration.invoke(itemstack, Integer.valueOf(3));
+            return itemstack;
+        } else {
+            return instance.b();
+        }
+    }
 #endif
 
     public abstract (List<CraftInputSlot>) List<Ingredient> getIngredients() {
+#if version >= 1.12
         if (instance instanceof ShapedRecipe) {
             ShapedRecipe s = (ShapedRecipe) instance;
-#select version >=
-#case 1.21.2:   java.util.List optionalIngredients = s.getIngredients();
-                java.util.List ingredients = new java.util.ArrayList(optionalIngredients.size());
-                for (java.util.Iterator iter = optionalIngredients.iterator(); iter.hasNext();) {
-                    java.util.Optional opt = (java.util.Optional) iter.next();
-                    if (opt.isPresent()) {
-                        ingredients.add(opt.get());
-                    }
-                }
-                return ingredients;
-#case 1.18:     return s.getIngredients();
-#case 1.14:     return s.a();
-#case 1.13:     return s.e();
-#case 1.12.1:   return s.d();
-#case else:     #require net.minecraft.world.item.crafting.ShapedRecipe private final NonNullList<Ingredient> items;
-                return instance#items;
-#endselect
+  #select version >=
+  #case 1.21.2:   java.util.List optionalIngredients = s.getIngredients();
+                  java.util.List ingredients = new java.util.ArrayList(optionalIngredients.size());
+                  for (java.util.Iterator iter = optionalIngredients.iterator(); iter.hasNext();) {
+                      java.util.Optional opt = (java.util.Optional) iter.next();
+                      if (opt.isPresent()) {
+                          ingredients.add(opt.get());
+                      }
+                  }
+                  return ingredients;
+  #case 1.18:     return s.getIngredients();
+  #case 1.14:     return s.a();
+  #case 1.13:     return s.e();
+  #case 1.12.1:   return s.d();
+  #case else:     #require net.minecraft.world.item.crafting.ShapedRecipe private final NonNullList<Ingredient> items;
+                  return instance#items;
+  #endselect
 
         } else if (instance instanceof FireworkRocketRecipe) {
             // Fireworks are a 'complex' recipe with many possible options
@@ -113,31 +121,26 @@ class Recipe {
 
         } else if (instance instanceof ShapelessRecipe) {
             ShapelessRecipe s = (ShapelessRecipe) instance;
-#select version >=
-#case 1.21.2:   #require net.minecraft.world.item.crafting.ShapelessRecipe final java.util.List<Ingredient> shapelessIngredients:ingredients;
-                return s#shapelessIngredients;
-#case 1.18:     return s.getIngredients();
-#case 1.14:     return s.a();
-#case 1.13:     return s.e();
-#case 1.12.1:   return s.d();
-#case else:     #require net.minecraft.world.item.crafting.ShapelessRecipe private final NonNullList<Ingredient> ingredients;
-                return instance#ingredients;
-#endselect
+  #select version >=
+  #case 1.21.2:   #require net.minecraft.world.item.crafting.ShapelessRecipe final java.util.List<Ingredient> shapelessIngredients:ingredients;
+                  return s#shapelessIngredients;
+  #case 1.18:     return s.getIngredients();
+  #case 1.14:     return s.a();
+  #case 1.13:     return s.e();
+  #case 1.12.1:   return s.d();
+  #case else:     #require net.minecraft.world.item.crafting.ShapelessRecipe private final NonNullList<Ingredient> ingredients;
+                  return instance#ingredients;
+  #endselect
 
         } else {
             return null;
         }
+#else
+        // < 1.12
+        return instance.getIngredients();
+#endif
     }
 }
-
-#else
-
-interface Recipe {
-    public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:b();
-    public abstract (List<CraftInputSlot>) List<ItemStack> getIngredients();
-}
-
-#endif
 
 // >= MC 1.12
 optional class Ingredient {

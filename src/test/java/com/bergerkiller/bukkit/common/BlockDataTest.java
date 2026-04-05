@@ -7,6 +7,7 @@ import java.util.Map;
 
 import static com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials.*;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.material.MaterialData;
@@ -70,7 +71,7 @@ public class BlockDataTest {
 
     @Test
     public void testLever() {
-        BlockData d = BlockData.fromMaterial(MaterialsByName.getMaterial("LEVER"));
+        BlockData d = BlockData.fromMaterial(MaterialUtil.getFirst("LEVER", "LEGACY_LEVER"));
 
         // Attached face
         for (String face : new String[] { "ceiling", "floor", "wall" }) {
@@ -297,8 +298,8 @@ public class BlockDataTest {
             testSignMaterial(MaterialUtil.getMaterial("SPRUCE_WALL_SIGN"), true);
         } else {
             // These material names were used on 1.13 - 1.13.2
-            testSignMaterial(MaterialUtil.getMaterial("SIGN"), false);
-            testSignMaterial(MaterialUtil.getMaterial("WALL_SIGN"), true);
+            testSignMaterial(MaterialUtil.getFirst("SIGN", "LEGACY_SIGN_POST"), false);
+            testSignMaterial(MaterialUtil.getFirst("WALL_SIGN", "LEGACY_WALL_SIGN"), true);
         }
     }
 
@@ -332,24 +333,74 @@ public class BlockDataTest {
 
     @Test
     public void testSerialize() {
-        // Retrieve some complicated BlockData
-        BlockData blockData = BlockData.fromMaterial(Material.FURNACE)
-                .setState("lit", true)
-                .setState("facing", BlockFace.EAST);
-        // Serialize
-        String output = BlockDataSerializer.INSTANCE.serialize(blockData);
-        assertEquals("minecraft:furnace[facing=east,lit=true]", output);
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
+            // Lit was a block state
+            // Retrieve some complicated BlockData
+            BlockData blockData = BlockData.fromMaterial(Material.FURNACE)
+                    .setState("lit", true)
+                    .setState("facing", BlockFace.EAST);
+            // Serialize
+            String output = BlockDataSerializer.INSTANCE.serialize(blockData);
+            assertEquals("minecraft:furnace[facing=east,lit=true]", output);
+        } else {
+            // Lit was a type of material
+
+            // Off
+            {
+                // Retrieve some complicated BlockData
+                BlockData blockData = BlockData.fromMaterial(Material.FURNACE)
+                        .setState("facing", BlockFace.EAST);
+                // Serialize
+                String output = BlockDataSerializer.INSTANCE.serialize(blockData);
+                assertEquals("minecraft:furnace[facing=east]", output);
+            }
+
+            // On
+            {
+                // Retrieve some complicated BlockData
+                BlockData blockData = BlockData.fromMaterial(MaterialUtil.getMaterial("LEGACY_BURNING_FURNACE"))
+                        .setState("facing", BlockFace.EAST);
+                // Serialize
+                String output = BlockDataSerializer.INSTANCE.serialize(blockData);
+                assertEquals("minecraft:lit_furnace[facing=east]", output);
+            }
+        }
     }
 
     @Test
     public void testDeserialize() {
-        // Uses output of Serialize
-        String input = "minecraft:furnace[facing=east,lit=true]";
-        // Deserialize
-        BlockData blockData = BlockDataSerializer.INSTANCE.deserialize(input);
-        assertEquals(Material.FURNACE, blockData.getType());
-        assertTrue(blockData.getState("lit", Boolean.class));
-        assertEquals(BlockFace.EAST, blockData.getState("facing", BlockFace.class));
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
+            // Lit was a block state
+            // Uses output of Serialize
+            String input = "minecraft:furnace[facing=east,lit=true]";
+            // Deserialize
+            BlockData blockData = BlockDataSerializer.INSTANCE.deserialize(input);
+            assertEquals(Material.FURNACE, blockData.getType());
+            assertTrue(blockData.getState("lit", Boolean.class));
+            assertEquals(BlockFace.EAST, blockData.getState("facing", BlockFace.class));
+        } else {
+            // Lit was a type of material
+
+            // Off
+            {
+                // Uses output of Serialize
+                String input = "minecraft:furnace[facing=east]";
+                // Deserialize
+                BlockData blockData = BlockDataSerializer.INSTANCE.deserialize(input);
+                assertEquals(Material.FURNACE, blockData.getType());
+                assertEquals(BlockFace.EAST, blockData.getState("facing", BlockFace.class));
+            }
+
+            // On
+            {
+                // Uses output of Serialize
+                String input = "minecraft:lit_furnace[facing=east]";
+                // Deserialize
+                BlockData blockData = BlockDataSerializer.INSTANCE.deserialize(input);
+                assertEquals(MaterialUtil.getMaterial("LEGACY_BURNING_FURNACE"), blockData.getType());
+                assertEquals(BlockFace.EAST, blockData.getState("facing", BlockFace.class));
+            }
+        }
     }
 
     @Test

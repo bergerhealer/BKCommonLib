@@ -59,7 +59,7 @@ class MinecraftVersionDiscovery {
 
         if (typeMinecraftServer != null) {
             try {
-                getVersionMethod = Resolver.resolveAndGetDeclaredMethod(typeMinecraftServer, "getVersion");
+                getVersionMethod = typeMinecraftServer.getDeclaredMethod("getVersion");
                 if (!getVersionMethod.getReturnType().equals(String.class)) {
                     getVersionMethod = null; // Invalid return type
                 }

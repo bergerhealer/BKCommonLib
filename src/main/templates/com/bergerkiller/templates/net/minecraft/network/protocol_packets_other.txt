@@ -2537,7 +2537,7 @@ class ClientboundLevelParticlesPacket extends Packet {
 #elseif version >= 1.13
         return new ClientboundLevelParticlesPacket((ParticleOptions) null, false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1);
 #else
-        return new ClientboundLevelParticlesPacket((Particle) null, false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, new int[0]);
+        return new ClientboundLevelParticlesPacket((ParticleType) null, false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, new int[0]);
 #endif
     }
 

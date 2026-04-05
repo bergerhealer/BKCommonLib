@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.inventory.CommonItemMaterials;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
@@ -48,7 +49,11 @@ public class CommonItemStackTest {
     public void testVanillaDisplayName() {
         // Note: display name is a translatable, which we decode into English.
         CommonItemStack item = CommonItemStack.create(MaterialUtil.getFirst("DIAMOND_SWORD", "LEGACY_DIAMOND_SWORD"), 1);
-        assertEquals("Diamond sword", item.getDisplayNameMessage());
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
+            assertEquals("Diamond sword", item.getDisplayNameMessage());
+        } else {
+            assertEquals("Diamond Sword", item.getDisplayNameMessage());
+        }
     }
 
     @Test
@@ -157,15 +162,25 @@ public class CommonItemStackTest {
     public void testDisplayName() {
         CommonItemStack item = CommonItemStack.create(getFirst("OAK_PLANKS", "LEGACY_WOOD"), 1);
 
-        // Note: if this is wrong, it could also be due to TranslatableComponent -> String message being wrong!
-        // In that case, see global.txt getComponentText macro
-        assertEquals("Oak planks", item.getDisplayNameMessage());
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
+            // Note: if this is wrong, it could also be due to TranslatableComponent -> String message being wrong!
+            // In that case, see global.txt getComponentText macro
+            assertEquals("Oak planks", item.getDisplayNameMessage());
 
-        item.setCustomNameMessage("Fake planks");
-        assertEquals("Fake planks", item.getDisplayNameMessage());
+            item.setCustomNameMessage("Fake planks");
+            assertEquals("Fake planks", item.getDisplayNameMessage());
 
-        item.setCustomNameMessage(null);
-        assertEquals("Oak planks", item.getDisplayNameMessage());
+            item.setCustomNameMessage(null);
+            assertEquals("Oak planks", item.getDisplayNameMessage());
+        } else {
+            assertEquals("Oak Wood Planks", item.getDisplayNameMessage());
+
+            item.setCustomNameMessage("Fake planks");
+            assertEquals("Fake planks", item.getDisplayNameMessage());
+
+            item.setCustomNameMessage(null);
+            assertEquals("Oak Wood Planks", item.getDisplayNameMessage());
+        }
     }
 
     @Test
