@@ -608,6 +608,16 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.entity.projectile.hurtingprojectile.DragonFireball", "net.minecraft.world.entity.projectile.DragonFireball");
             remappings.put("net.minecraft.world.entity.projectile.hurtingprojectile.AbstractHurtingProjectile", "net.minecraft.world.entity.projectile.AbstractHurtingProjectile");
 
+            // Throwable item projectiles were moved to a throwableitemprojectile sub-package
+            remappings.put("net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownSplashPotion", "net.minecraft.world.entity.projectile.ThrownSplashPotion");
+            remappings.put("net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownExperienceBottle", "net.minecraft.world.entity.projectile.ThrownExperienceBottle");
+            remappings.put("net.minecraft.world.entity.projectile.throwableitemprojectile.AbstractThrownPotion", "net.minecraft.world.entity.projectile.AbstractThrownPotion");
+            remappings.put("net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile", "net.minecraft.world.entity.projectile.ThrowableItemProjectile");
+            remappings.put("net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownLingeringPotion", "net.minecraft.world.entity.projectile.ThrownLingeringPotion");
+            remappings.put("net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnderpearl", "net.minecraft.world.entity.projectile.ThrownEnderpearl");
+            remappings.put("net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEgg", "net.minecraft.world.entity.projectile.ThrownEgg");
+            remappings.put("net.minecraft.world.entity.projectile.throwableitemprojectile.Snowball", "net.minecraft.world.entity.projectile.Snowball");
+
             // Boat classes were moved to a boat sub-package
             remappings.put("net.minecraft.world.entity.vehicle.boat.Boat", "net.minecraft.world.entity.vehicle.Boat");
             remappings.put("net.minecraft.world.entity.vehicle.boat.ChestBoat", "net.minecraft.world.entity.vehicle.ChestBoat");
@@ -628,6 +638,9 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.entity.vehicle.minecart.MinecartHopper", "net.minecraft.world.entity.vehicle.MinecartHopper");
             remappings.put("net.minecraft.world.entity.vehicle.minecart.MinecartFurnace", "net.minecraft.world.entity.vehicle.MinecartFurnace");
             remappings.put("net.minecraft.world.entity.vehicle.minecart.MinecartChest", "net.minecraft.world.entity.vehicle.MinecartChest");
+
+            // Moved
+            remappings.put("net.minecraft.world.entity.boss.enderdragon.EnderDragonPart", "net.minecraft.world.entity.boss.EnderDragonPart");
         }
 
         /* ======== Mojang remapping changes for 1.21.6 ======== */
@@ -643,6 +656,13 @@ public class CommonBootstrap {
         if (evaluateMCVersion("<", "1.21.5")) {
             // RespawnConfig record class was added in 1.21.5, use a proxy on versions prior to hold this data
             remappings.put("net.minecraft.server.level.ServerPlayer$RespawnConfig", "com.bergerkiller.bukkit.common.internal.proxy.PlayerRespawnConfig_pre_1_21_5");
+        }
+
+        /* ======== Mojang remapping changes for 1.21.4 ======== */
+        if (evaluateMCVersion("<", "1.21.4")) {
+            // Different potion entities did not exist before 1.21.4, so we remap them to the combined entity type there
+            remappings.put("net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownLingeringPotion", "net.minecraft.world.entity.projectile.ThrownPotion");
+            remappings.put("net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownSplashPotion", "net.minecraft.world.entity.projectile.ThrownPotion");
         }
 
         /* ======== Mojang remapping changes for 1.21.2 ======== */

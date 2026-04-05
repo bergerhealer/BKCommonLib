@@ -186,7 +186,7 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
         return true;
     }
 
-    @HookMethodCondition("version <= 1.14.4")
+    @HookMethodCondition("version >= 1.11 && version <= 1.14.4")
     @HookMethod(value="public abstract boolean isNotEmptyOpt:???()")
     public boolean isNotEmpty() {
         return true;

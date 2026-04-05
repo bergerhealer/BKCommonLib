@@ -164,7 +164,7 @@ public class CommonEntityType {
             } else if (entityTypeEnumName.equals("WEATHER")) {
                 nmsName = "net.minecraft.world.entity.EntityWeather";
             } else if (entityTypeEnumName.equals("COMPLEX_PART")) {
-                nmsName = "net.minecraft.world.entity.boss.EntityComplexPart";
+                nmsName = "net.minecraft.world.entity.boss.enderdragon.EnderDragonPart";
             }
 
             // <= 1.10.2 (now removed)
@@ -173,14 +173,14 @@ public class CommonEntityType {
             } else if (entityTypeEnumName.equals("AREA_EFFECT_CLOUD")) {
                 nmsName = "net.minecraft.world.entity.AreaEffectCloud";
             } else if (entityTypeEnumName.equals("SPLASH_POTION")) {
-                nmsName = "net.minecraft.world.entity.projectile.throwableitemprojectile.AbstractThrownPotion";
+                nmsName = "net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownSplashPotion";
             }
 
             // Added in >= 1.10.2
             if (entityTypeEnumName.equals("TIPPED_ARROW")) {
-                nmsName = "net.minecraft.world.entity.projectile.arrow.EntityTippedArrow";
+                nmsName = "net.minecraft.world.entity.projectile.arrow.Arrow";
             } else if (entityTypeEnumName.equals("LINGERING_POTION")) {
-                nmsName = "net.minecraft.world.entity.projectile.throwableitemprojectile.AbstractThrownPotion";
+                nmsName = "net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownLingeringPotion";
             }
 
             // Added in >= 1.19.3
