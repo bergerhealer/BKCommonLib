@@ -245,7 +245,7 @@ interface BlockState {
   #endif
     }
 #else
-    public (SoundTypeHandle) net.minecraft.world.level.block.Block.StepSound getSoundType() {
+    public (SoundTypeHandle) net.minecraft.world.level.block.SoundType getSoundType() {
         return instance.getBlock().stepSound;
     }
 #endif

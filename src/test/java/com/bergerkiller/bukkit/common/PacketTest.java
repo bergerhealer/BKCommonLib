@@ -79,6 +79,11 @@ public class PacketTest {
 
     @Test
     public void testPacketMountCreateNew() {
+        // Mount packet is unavailable before 1.9
+        if (CommonBootstrap.evaluateMCVersion("<", "1.9")) {
+            return;
+        }
+
         assertNotNull(ClientboundSetPassengersPacketHandle.createNew());
         assertNotNull(PacketType.OUT_MOUNT.newInstance());
     }
@@ -108,10 +113,19 @@ public class PacketTest {
         ClientboundSetPlayerTeamPacketHandle packet = ClientboundSetPlayerTeamPacketHandle.createNew();
         assertNotNull(packet);
 
-        packet.setCollisionRule("pushOtherTeams");
-        assertEquals("pushOtherTeams", packet.getCollisionRule());
+        // Collision rule is since 1.9. After, we do expect a stable no-op API
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
+            packet.setCollisionRule("pushOtherTeams");
+            assertEquals("pushOtherTeams", packet.getCollisionRule());
 
-        packet.setCollisionRule("never");
-        assertEquals("never", packet.getCollisionRule());
+            packet.setCollisionRule("never");
+            assertEquals("never", packet.getCollisionRule());
+        } else {
+            packet.setCollisionRule("pushOtherTeams");
+            assertEquals("always", packet.getCollisionRule());
+
+            packet.setCollisionRule("never");
+            assertEquals("always", packet.getCollisionRule());
+        }
     }
 }

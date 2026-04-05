@@ -29,7 +29,8 @@ public class JsonSerializerTest {
 
     @Test
     public void testItemStackFromToJsonCMD() throws JsonSerializer.JsonSyntaxException {
-        CommonItemStack item = CommonItemStack.create(MaterialUtil.getFirst("DIAMOND_SWORD", "LEGACY_DIAMOND_SWORD"), 1)
+        Material itemType = MaterialUtil.getFirst("DIAMOND_SWORD", "LEGACY_DIAMOND_SWORD");
+        CommonItemStack item = CommonItemStack.create(itemType, 1)
                 .setCustomModelDataComponents(CustomModelData.EMPTY
                         .withColors(Arrays.asList(1, 2, 3))
                         .withFlags(Arrays.asList(true, false, true))
@@ -47,7 +48,12 @@ public class JsonSerializerTest {
             decoded.setCustomName(null);
         }
 
-        assertEquals(item, decoded);
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.8.3")) {
+            assertEquals(item, decoded);
+        } else {
+            // On 1.8 it omits the emoty Item Meta field
+            assertEquals(item.getType(), decoded.getType());
+        }
     }
 
     @Test
@@ -83,6 +89,11 @@ public class JsonSerializerTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testItemStackToJsonPlayerHead() throws JsonSerializer.JsonSyntaxException {
+        // This was bugged in CraftMetaSkull before 1.8.8 where it did not preserve profile details
+        if (CommonBootstrap.evaluateMCVersion("<", "1.8.8")) {
+            return;
+        }
+
         JsonSerializer serializer = new JsonSerializer();
 
         final String testTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjllNzVlMDQxNTFlN2NkZThlN2YxNDlkYWU5MmYwYzE0ZWY1ZjNmZjQ1Y2QzMjM5NTc4NzZiMGFkZDJjNDk0OSJ9fX0=";
@@ -183,6 +194,11 @@ public class JsonSerializerTest {
 
     @Test
     public void testItemStackFromJsonPlayerHeadLegacy_1_8_to_1_15_2() throws JsonSerializer.JsonSyntaxException {
+        // This was bugged in CraftMetaSkull before 1.8.8 where it did not preserve profile details
+        if (CommonBootstrap.evaluateMCVersion("<", "1.8.8")) {
+            return;
+        }
+
         JsonSerializer serializer = new JsonSerializer();
 
         // This is the legacy yaml output (< 1.18.1) which has things inline as an internal string
@@ -204,6 +220,11 @@ public class JsonSerializerTest {
 
     @Test
     public void testItemStackFromJsonPlayerHeadLegacy_1_16_to_1_18() throws JsonSerializer.JsonSyntaxException {
+        // This was bugged in CraftMetaSkull before 1.8.8 where it did not preserve profile details
+        if (CommonBootstrap.evaluateMCVersion("<", "1.8.8")) {
+            return;
+        }
+
         JsonSerializer serializer = new JsonSerializer();
 
         // This is the legacy yaml output (< 1.18.1) which has things inline as an internal string
@@ -225,6 +246,11 @@ public class JsonSerializerTest {
 
     @Test
     public void testItemStackFromJsonPlayerHeadModern_1_18_1() throws JsonSerializer.JsonSyntaxException {
+        // This was bugged in CraftMetaSkull before 1.8.8 where it did not preserve profile details
+        if (CommonBootstrap.evaluateMCVersion("<", "1.8.8")) {
+            return;
+        }
+
         JsonSerializer serializer = new JsonSerializer();
 
         // This is the modern yaml output (1.18.1+) which has a PlayerProfile

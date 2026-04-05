@@ -23,6 +23,8 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 
+import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
+
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeMapHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeInstanceHandle;
@@ -321,10 +323,10 @@ class LivingEntity extends Entity {
             if (!ItemStack.matches(itemstack1, itemstack)) {
   #if version >= 1.14
                 ((net.minecraft.server.level.ServerLevel) instance.world).getChunkProvider().broadcast((Entity) instance,
-                    new net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket(instance.getId(), enumitemslot, itemstack1));
+                    new ClientboundSetEquipmentPacket(instance.getId(), enumitemslot, itemstack1));
   #else
                 ((net.minecraft.server.level.ServerLevel) instance.world).getTracker().a((Entity) instance,
-                    new net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket(instance.getId(), enumitemslot, itemstack1));
+                    new ClientboundSetEquipmentPacket(instance.getId(), enumitemslot, itemstack1));
   #endif
 
                 if (!itemstack.isEmpty()) {
@@ -386,7 +388,7 @@ class LivingEntity extends Entity {
 
             if (!ItemStack.matches(itemstack1, itemstack)) {
                 ((net.minecraft.server.level.ServerLevel) instance.world).getTracker().a((Entity) instance,
-                    new net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket(instance.getId(), enumitemslot, itemstack1));
+                    new ClientboundSetEquipmentPacket(instance.getId(), enumitemslot, itemstack1));
 
                 if (itemstack != null) {
                     instance.getAttributeMap().a(itemstack.a(enumitemslot));

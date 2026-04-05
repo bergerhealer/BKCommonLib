@@ -222,7 +222,7 @@ public class ChatTextTest {
         // Test empty chat text
         ChatText text = ChatText.empty();
         assertEquals("", text.getMessage());
-        if (Common.evaluateMCVersion(">=", "1.20.3")) {
+        if (Common.evaluateMCVersion(">=", "1.20.3") || Common.evaluateMCVersion("<", "1.9")) {
             // Optimized so it just has a "" as output
             assertEquals("\"\"", text.getJson());
         } else {

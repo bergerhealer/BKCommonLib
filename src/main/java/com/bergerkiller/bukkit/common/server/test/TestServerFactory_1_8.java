@@ -46,9 +46,16 @@ class TestServerFactory_1_8 extends TestServerFactory {
         dispenserRegistryBootstrapMethod.invoke(null);
 
         // DataFixers class must be created before the server instance to avoid issues
-        Class<?> dataConverterRegistryClass = resolveClass("net.minecraft.util.datafix.DataFixers");
-        Method dataConverterRegistryInitMethod = dataConverterRegistryClass.getMethod("a");
-        Object dataConverterManager = dataConverterRegistryInitMethod.invoke(null);
+        // Does not exist before 1.9
+        Class<?> dataConverterRegistryClass = null;
+        Object dataConverterManager = null;
+        try {
+            dataConverterRegistryClass = resolveClass("net.minecraft.util.datafix.DataFixers");
+        } catch (RuntimeException ex) { /* ignore */ }
+        if (dataConverterRegistryClass != null) {
+            Method dataConverterRegistryInitMethod = dataConverterRegistryClass.getMethod("a");
+            dataConverterManager = dataConverterRegistryInitMethod.invoke(null);
+        }
 
         // Create some stuff by null-constructing them (not calling initializer)
         // This prevents loads of extra server logic executing during test
@@ -86,8 +93,10 @@ class TestServerFactory_1_8 extends TestServerFactory {
         setField(propertyManager, "properties", new java.util.Properties());
 
         // Assign data converter registry manager object - used for serialization/deserialization
-        // Only used >= MC 1.10.2
-        setField(mc_server, "dataConverterManager", dataConverterManager);
+        // Only used >= MC 1.10.2, only set >= MC 1.9
+        if (dataConverterManager != null) {
+            setField(mc_server, "dataConverterManager", dataConverterManager);
+        }
 
         // Create CraftingManager instance and load recipes for >= MC 1.13
         boolean hasLocalCraftingManager = false;

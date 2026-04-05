@@ -244,7 +244,8 @@ public class DataWatcherTest {
 
     @Test
     public void testEnderCrystalBeamTarget() {
-        if (!EndCrystalHandle.T.isAvailable()) {
+        // Beam target metadata did not exist before 1.9
+        if (CommonBootstrap.evaluateMCVersion("<" , "1.9")) {
             return;
         }
 

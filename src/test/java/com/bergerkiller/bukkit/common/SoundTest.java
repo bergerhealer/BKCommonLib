@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 import org.junit.Test;
 
@@ -39,7 +40,7 @@ public class SoundTest {
         if (CommonCapabilities.KEYED_EFFECTS) {
             assertEquals("minecraft:block.grass.step", stepName.getPath());
         } else {
-            assertEquals("minecraft:dig.grass", stepName.getPath());
+            assertEquals("minecraft:step.grass", stepName.getPath());
         }
     }
 
@@ -57,7 +58,16 @@ public class SoundTest {
     @Test
     public void testBukkitSoundConversion() {
         CommonBootstrap.initServer();
-        ResourceKey<SoundEffect> soundName = CraftSoundHandle.getSoundEffect(org.bukkit.Sound.BLOCK_ANVIL_STEP);
-        assertEquals("minecraft:block.anvil.step", soundName.getPath());
+
+        org.bukkit.Sound sound;
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
+            sound = ParseUtil.parseEnum(org.bukkit.Sound.class, "BLOCK_ANVIL_LAND", null);
+            ResourceKey<SoundEffect> soundName = CraftSoundHandle.getSoundEffect(sound);
+            assertEquals("minecraft:block.anvil.land", soundName.getPath());
+        } else {
+            sound = ParseUtil.parseEnum(org.bukkit.Sound.class, "ANVIL_LAND", null);
+            ResourceKey<SoundEffect> soundName = CraftSoundHandle.getSoundEffect(sound);
+            assertEquals("minecraft:random.anvil_land", soundName.getPath());
+        }
     }
 }

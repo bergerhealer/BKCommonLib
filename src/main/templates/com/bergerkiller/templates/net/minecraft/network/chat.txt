@@ -242,7 +242,11 @@ class Component {
   #else
             return Component$Serializer.fromJson(jsonString);
   #endif
+  #if exists org.bukkit.craftbukkit.libs.com.google.gson.JsonParseException
+        } catch (org.bukkit.craftbukkit.libs.com.google.gson.JsonParseException e) {
+  #else
         } catch (com.google.gson.JsonParseException e) {
+  #endif
             return null; // Invalid json string
         }
 #endif

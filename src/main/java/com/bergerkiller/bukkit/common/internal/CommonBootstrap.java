@@ -856,6 +856,7 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.level.chunk.PalettedContainer", "com.bergerkiller.bukkit.common.internal.proxy.DataPaletteBlock");
             remappings.put("net.minecraft.sounds.SoundEvent", "com.bergerkiller.bukkit.common.internal.proxy.SoundEffect_1_8_8");
             remappings.put("net.minecraft.world.level.dimension.DimensionType", "com.bergerkiller.bukkit.common.internal.proxy.DimensionManager_1_8_8");
+            remappings.put("net.minecraft.network.syncher.EntityDataAccessor", "com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject");
         }
 
         // Register the remappings with the server if it supports it, otherwise register a class resolver to do it
