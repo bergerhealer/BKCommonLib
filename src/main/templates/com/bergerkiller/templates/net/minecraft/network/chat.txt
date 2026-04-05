@@ -430,7 +430,7 @@ class Component {
 #if version >= 1.12
                 ChatFormatting format = org.bukkit.craftbukkit.util.CraftChatMessage.getColor(color);
 #else
-                #require org.bukkit.craftbukkit.util.CraftChatMessage.StringMessage private static final java.util.Map<Character, net.minecraft.server.ChatFormatting> formatMap;
+                #require org.bukkit.craftbukkit.util.CraftChatMessage.StringMessage private static final java.util.Map<Character, net.minecraft.ChatFormatting> formatMap;
                 java.util.Map formats = #formatMap;
                 ChatFormatting format = (ChatFormatting) formats.get(Character.valueOf(color.getChar()));
 #endif

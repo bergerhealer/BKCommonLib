@@ -215,8 +215,17 @@ public class CommonBootstrap {
             try {
                 CommonServer server = null;
                 if (isTestMode()) {
-                    // Use our own logger to speed up initialization under test
-                    CommonLog4jTestLogging.initLog4j();
+                    // If test mode and log4j exists, initialize that to speed up initialization under test
+                    boolean log4jExists;
+                    try {
+                        Class.forName("org.apache.logging.log4j.spi.ExtendedLogger");
+                        log4jExists = true;
+                    } catch (ClassNotFoundException ex) {
+                        log4jExists = false;
+                    }
+                    if (log4jExists) {
+                        CommonLog4jTestLogging.initLog4j();
+                    }
 
                     // Always Spigot server
                     server = new SpigotServer();
@@ -807,6 +816,12 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.network.protocol.game.ClientboundStopSoundPacket", "net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket");
             // ItemLike (IMaterial) was added 1.13
             remappings.put("net.minecraft.world.level.ItemLike", "net.minecraft.world.item.Item");
+        }
+
+        /* ======== Mojang remapping changes for 1.12 ======== */
+        if (evaluateMCVersion("<", "1.12")) {
+            // Ingredient class doesn't exist yet, in place it uses a normal ItemStack
+            remappings.put("net.minecraft.world.item.crafting.Ingredient", "net.minecraft.world.item.ItemStack");
         }
 
         /* ======== Mojang remapping changes for 1.11 ======== */

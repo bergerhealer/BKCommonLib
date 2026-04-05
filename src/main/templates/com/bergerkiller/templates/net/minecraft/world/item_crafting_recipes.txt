@@ -78,6 +78,32 @@ class Recipe {
 #endif
 
     public abstract (List<CraftInputSlot>) List<Ingredient> getIngredients() {
+        // Firework recipe must be handled by BKCommonLib for it to work at all
+        // It's a special case as people frequently want this to work as part of automation
+        if (instance instanceof FireworkRocketRecipe) {
+            // Fireworks are a 'complex' recipe with many possible options
+            // To sort of work properly rather than not at all, default to
+            // crafting a flight 3 firework:
+            // Shapeless(1 paper + 3 gunpowder) -> Flight 3 firework
+  #if version >= 1.18
+            Ingredient paper = Ingredient.of(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.PAPER });
+            Ingredient gunpowder = Ingredient.of(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.GUNPOWDER });
+  #elseif version >= 1.12
+            Ingredient paper = Ingredient.a(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.PAPER });
+            Ingredient gunpowder = Ingredient.a(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.GUNPOWDER });
+  #else
+            Ingredient paper = new Ingredient(net.minecraft.world.item.Items.PAPER);
+            Ingredient gunpowder = new Ingredient(net.minecraft.world.item.Items.GUNPOWDER);
+  #endif
+
+            java.util.List ingredients = new java.util.ArrayList(4);
+            ingredients.add(paper);
+            ingredients.add(gunpowder);
+            ingredients.add(gunpowder);
+            ingredients.add(gunpowder);
+            return ingredients;
+        }
+
 #if version >= 1.12
         if (instance instanceof ShapedRecipe) {
             ShapedRecipe s = (ShapedRecipe) instance;
@@ -99,26 +125,6 @@ class Recipe {
                   return instance#items;
   #endselect
 
-        } else if (instance instanceof FireworkRocketRecipe) {
-            // Fireworks are a 'complex' recipe with many possible options
-            // To sort of work properly rather than not at all, default to
-            // crafting a flight 3 firework:
-            // Shapeless(1 paper + 3 gunpowder) -> Flight 3 firework
-  #if version >= 1.18
-            Ingredient paper = Ingredient.of(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.PAPER });
-            Ingredient gunpowder = Ingredient.of(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.GUNPOWDER });
-  #else
-            Ingredient paper = Ingredient.a(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.PAPER });
-            Ingredient gunpowder = Ingredient.a(new net.minecraft.world.level.ItemLike[] { net.minecraft.world.item.Items.GUNPOWDER });
-  #endif
-
-            java.util.List ingredients = new java.util.ArrayList(4);
-            ingredients.add(paper);
-            ingredients.add(gunpowder);
-            ingredients.add(gunpowder);
-            ingredients.add(gunpowder);
-            return ingredients;
-
         } else if (instance instanceof ShapelessRecipe) {
             ShapelessRecipe s = (ShapelessRecipe) instance;
   #select version >=
@@ -137,7 +143,36 @@ class Recipe {
         }
 #else
         // < 1.12
-        return instance.getIngredients();
+        java.util.List ingredients = instance.getIngredients();
+
+        // Some recipes are messed up and the ingredients have item counts on them
+        // But these counts are not used in practise
+        // To fix, we got to clone the item and set count to 1.
+        boolean clonedList = false;
+        int targetIndex = 0;
+        for (java.util.Iterator iter = ingredients.iterator(); iter.hasNext();) {
+            ItemStack item = (ItemStack) iter.next();
+  #if version >= 1.11
+            if (item.getCount() > 1) {
+  #else
+            if (item.count > 1) {
+  #endif
+                if (!clonedList) {
+                    ingredients = new java.util.ArrayList(ingredients); // Clone list to avoid modifying original
+                    clonedList = true;
+                }
+                item = item.cloneItemStack();
+  #if version >= 1.11
+                item.setCount(1);
+  #else
+                item.count = 1;
+  #endif
+                ingredients.set(targetIndex, item);
+            }
+            targetIndex++;
+        }
+
+        return ingredients;
 #endif
     }
 }
@@ -178,12 +213,16 @@ optional class Ingredient {
     public (List<org.bukkit.inventory.ItemStack>) ItemStack[] getChoices:getItems();
 #elseif version >= 1.17
     public (List<org.bukkit.inventory.ItemStack>) ItemStack[] getChoices:a();
-#else
+#elseif version >= 1.12
     public (List<org.bukkit.inventory.ItemStack>) ItemStack[] getChoices() {
   #if version >= 1.13
         instance.buildChoices();
   #endif
         return instance.choices;
+    }
+#else
+    public (List<org.bukkit.inventory.ItemStack>) List<ItemStack> getChoices() {
+        return java.util.Collections.singletonList(instance);
     }
 #endif
 
@@ -199,7 +238,7 @@ optional class Ingredient {
         choices = new ArrayList(choices); // Safe copy / avoid conversion stuff sticking around
         instance#choicesRecipeItemStack = choices;
   #endif
-#else
+#elseif version >= 1.12
 
   #if version >= 1.17
         #require net.minecraft.world.item.crafting.Ingredient private ItemStack[] choicesRecipeItemStack:itemStacks;
@@ -208,10 +247,13 @@ optional class Ingredient {
   #endif
         ItemStack[] choicesArr = (ItemStack[]) choices.toArray(new ItemStack[0]);
         instance#choicesRecipeItemStack = choicesArr;
+#else
+        throw new UnsupportedOperationException("Ingredient class does not exist before Minecraft 1.12, use an ItemStack directly");
 #endif
     }
 
     <code>
+    // Note: only 1.12+
     public static Object createRawRecipeItemStack(List<org.bukkit.inventory.ItemStack> choices) {
         Object raw = T.newInstanceNull();
         T.setChoices.invoke(raw, choices);

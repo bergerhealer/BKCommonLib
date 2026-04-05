@@ -1,6 +1,8 @@
 package org.bukkit.craftbukkit.util;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 
 import com.bergerkiller.generated.net.minecraft.network.chat.ComponentHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongObjectHashMapHandle;
@@ -149,6 +151,23 @@ class CraftMagicNumbers {
         return true;
 #endif
     }
+
+    public static Object advancementHandleToBukkit(Object advancement_or_holder) {
+#if version >= 1.20.2
+  #if exists net.minecraft.advancements.AdvancementHolder public final org.bukkit.advancement.Advancement toBukkit();
+        return ((AdvancementHolder) advancement_or_holder).toBukkit();
+  #elseif exists org.bukkit.craftbukkit.advancement.CraftAdvancement public CraftAdvancement(net.minecraft.advancements.AdvancementHolder handle);
+        return new org.bukkit.craftbukkit.advancement.CraftAdvancement((AdvancementHolder) advancement_or_holder);
+  #else
+        #error No conversion from AdvancementHolder to CraftAdvancement detected
+  #endif
+#elseif version >= 1.12
+        return ((Advancement) advancement_or_holder).bukkit;
+#else
+        throw new UnsupportedOperationException("Bukkit Advancements API does not exist before Minecraft 1.12");
+#endif
+    }
+
 }
 
 class CraftChatMessage {

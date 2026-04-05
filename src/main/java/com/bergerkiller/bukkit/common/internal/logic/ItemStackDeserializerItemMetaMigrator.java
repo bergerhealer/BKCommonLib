@@ -47,6 +47,12 @@ public class ItemStackDeserializerItemMetaMigrator extends ItemStackDeserializer
      */
     private static final boolean IS_SKULL_PROFILE_STRING_ID_MANGLED = CommonBootstrap.evaluateMCVersion(">=", "1.16") && CommonBootstrap.evaluateMCVersion("<=", "1.16.3");
 
+    /**
+     * Before Minecraft 1.12 the ItemStack ItemFlags was stored in yaml as a Set of them rather than a List/Array.
+     * If we encounter a List of values for this field, change it to a Set.
+     */
+    private static final boolean IS_ITEM_FLAGS_SET = CommonBootstrap.evaluateMCVersion("<", "1.12");
+
     public ItemStackDeserializerItemMetaMigrator(ItemStackDeserializerMigratorBukkit itemStackMigrator) {
         this.itemStackMigrator = itemStackMigrator;
 
@@ -59,6 +65,20 @@ public class ItemStackDeserializerItemMetaMigrator extends ItemStackDeserializer
                 if ("ENTITY_TAG".equals(metaType)) {
                     mapping.put("meta-type", "UNSPECIFIC");
                 }
+            });
+        }
+
+        // ItemFlags List -> Set logic
+        if (IS_ITEM_FLAGS_SET) {
+            migrators.add((mapping, metaType) -> {
+                mapping.computeIfPresent("ItemFlags", (key, value) -> {
+                    if (value instanceof List) {
+                        List<?> itemFlagsList = (List<?>) value;
+                        return new java.util.HashSet<>(itemFlagsList);
+                    } else {
+                        return value;
+                    }
+                });
             });
         }
 

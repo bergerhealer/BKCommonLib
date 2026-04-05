@@ -2164,14 +2164,14 @@ class Entity {
 #endif
 
     // Since MC 1.11.2
-#if version >= 1.11.2 && version < 1.16
+#if version >= 1.11 && version < 1.16
     public optional boolean onInteractBy_1_11_2:b((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.MainHand) InteractionHand enumhand);
 #else
     public optional boolean onInteractBy_1_11_2:###((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.MainHand) InteractionHand enumhand);
 #endif
 
     // Since MC 1.9
-#if version >= 1.9 && version < 1.11.2
+#if version >= 1.9 && version < 1.11
     public optional boolean onInteractBy_1_9:a((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (org.bukkit.inventory.MainHand) InteractionHand enumhand);
 #else
     public optional boolean onInteractBy_1_9:###((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (org.bukkit.inventory.MainHand) InteractionHand enumhand);

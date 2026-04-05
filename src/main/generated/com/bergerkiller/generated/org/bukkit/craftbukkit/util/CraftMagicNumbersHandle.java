@@ -44,6 +44,10 @@ public abstract class CraftMagicNumbersHandle extends Template.Handle {
         return T.isItemMaterial.invoker.invoke(null,material);
     }
 
+    public static Object advancementHandleToBukkit(Object advancement_or_holder) {
+        return T.advancementHandleToBukkit.invoker.invoke(null,advancement_or_holder);
+    }
+
     public static com.bergerkiller.generated.net.minecraft.world.level.block.state.BlockStateHandle getBlockDataFromMaterial(org.bukkit.Material material) {
         return com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle.T.getBlockData.invoke(getBlockFromMaterial(material));
     }
@@ -58,6 +62,7 @@ public abstract class CraftMagicNumbersHandle extends Template.Handle {
         public final Template.StaticMethod<Object> getBlockFromMaterial = new Template.StaticMethod<Object>();
         public final Template.StaticMethod<Integer> getDataVersion = new Template.StaticMethod<Integer>();
         public final Template.StaticMethod<Boolean> isItemMaterial = new Template.StaticMethod<Boolean>();
+        public final Template.StaticMethod<Object> advancementHandleToBukkit = new Template.StaticMethod<Object>();
 
     }
 

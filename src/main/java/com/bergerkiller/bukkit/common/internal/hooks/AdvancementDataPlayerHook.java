@@ -8,7 +8,7 @@ import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.generated.net.minecraft.advancements.AdvancementHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
@@ -61,26 +61,27 @@ public class AdvancementDataPlayerHook extends ClassHook<AdvancementDataPlayerHo
     @HookMethodCondition("version < 1.18")
     @HookMethod("public boolean grantCriteria(Advancement advancement, String s)")
     public boolean award_pre_1_18(Object rawAdvancement, String s) {
-        Advancement advancement = AdvancementHandle.toBukkit(rawAdvancement);
-        return fireEvent(advancement, s) && base.award_pre_1_18(rawAdvancement, s);
+        Object bukkitAdvancement = CraftMagicNumbersHandle.advancementHandleToBukkit(rawAdvancement);
+        return fireEvent(bukkitAdvancement, s) && base.award_pre_1_18(rawAdvancement, s);
     }
 
     @HookMethodCondition("version >= 1.18 && version < 1.20.2")
     @HookMethod("public boolean award(Advancement advancement, String s)")
     public boolean award_1_18_to_1_20_1(Object rawAdvancement, String s) {
-        Advancement advancement = AdvancementHandle.toBukkit(rawAdvancement);
-        return fireEvent(advancement, s) && base.award_1_18_to_1_20_1(rawAdvancement, s);
+        Object bukkitAdvancement = CraftMagicNumbersHandle.advancementHandleToBukkit(rawAdvancement);
+        return fireEvent(bukkitAdvancement, s) && base.award_1_18_to_1_20_1(rawAdvancement, s);
     }
 
     @HookMethodCondition("version >= 1.20.2")
     @HookMethod("public boolean award(AdvancementHolder advancement, String s)")
     public boolean award_1_20_2(Object rawAdvancementHolder, String s) {
-        Advancement advancement = AdvancementHandle.toBukkit(rawAdvancementHolder);
-        return fireEvent(advancement, s) && base.award_1_20_2(rawAdvancementHolder, s);
+        Object bukkitAdvancement = CraftMagicNumbersHandle.advancementHandleToBukkit(rawAdvancementHolder);
+        return fireEvent(bukkitAdvancement, s) && base.award_1_20_2(rawAdvancementHolder, s);
     }
 
-    private boolean fireEvent(Advancement advancement, String criteria) {
-        PlayerAdvancementProgressEvent event = new PlayerAdvancementProgressEvent(player, advancement, criteria);
+    private boolean fireEvent(Object bukkitAdvancement, String criteria) {
+        PlayerAdvancementProgressEvent event = new PlayerAdvancementProgressEvent(player,
+                (org.bukkit.advancement.Advancement) bukkitAdvancement, criteria);
         Bukkit.getPluginManager().callEvent(event);
         return !event.isCancelled();
     }
