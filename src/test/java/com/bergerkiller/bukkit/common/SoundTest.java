@@ -5,8 +5,8 @@ import static org.junit.Assert.assertTrue;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
-import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
+import com.bergerkiller.mountiplex.MountiplexUtil;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
@@ -15,6 +15,8 @@ import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.world.level.block.SoundTypeHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftSoundHandle;
+
+import java.lang.reflect.Field;
 
 /**
  * Tests various sound resource key API's
@@ -60,14 +62,20 @@ public class SoundTest {
         CommonBootstrap.initServer();
 
         org.bukkit.Sound sound;
-        if (CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
-            sound = ParseUtil.parseEnum(org.bukkit.Sound.class, "BLOCK_ANVIL_LAND", null);
-            ResourceKey<SoundEffect> soundName = CraftSoundHandle.getSoundEffect(sound);
-            assertEquals("minecraft:block.anvil.land", soundName.getPath());
-        } else {
-            sound = ParseUtil.parseEnum(org.bukkit.Sound.class, "ANVIL_LAND", null);
-            ResourceKey<SoundEffect> soundName = CraftSoundHandle.getSoundEffect(sound);
-            assertEquals("minecraft:random.anvil_land", soundName.getPath());
+        try {
+            Field anvilField = org.bukkit.Sound.class.getField(CommonBootstrap.evaluateMCVersion(">=", "1.9")
+                    ? "BLOCK_ANVIL_LAND"
+                    : "ANVIL_LAND");
+            sound = (org.bukkit.Sound) anvilField.get(null);
+        } catch (Throwable t) {
+            throw MountiplexUtil.uncheckedRethrow(t);
         }
+
+        ResourceKey<SoundEffect> soundName = CraftSoundHandle.getSoundEffect(sound);
+
+        assertEquals(CommonBootstrap.evaluateMCVersion(">=", "1.9")
+                ? "minecraft:block.anvil.land"
+                : "minecraft:random.anvil_land",
+                soundName.getPath());
     }
 }
