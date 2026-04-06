@@ -30,7 +30,9 @@ public abstract class TestServerFactory {
         }
 
         TestServerFactory factory;
-        if (CommonBootstrap.evaluateMCVersion(">=", "1.21.2")) {
+        if (CommonBootstrap.evaluateMCVersion(">=", "26.1")) {
+            factory = new TestServerFactory_26_1();
+        } else if (CommonBootstrap.evaluateMCVersion(">=", "1.21.2")) {
             factory = new TestServerFactory_1_21_2();
         } else if (CommonBootstrap.evaluateMCVersion(">=", "1.20.2")) {
             factory = new TestServerFactory_1_20_2();

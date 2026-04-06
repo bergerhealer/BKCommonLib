@@ -126,8 +126,22 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
             Object worldDataConfiguration = createFromCode(resolveClass("net.minecraft.world.level.WorldDataConfiguration"),
                                                            "return net.minecraft.world.level.WorldDataConfiguration.DEFAULT;");
 
-            Object worldSettings = NullInstantiator.of(resolveClass("net.minecraft.world.level.LevelSettings")).create();
-            setField(worldSettings, "dataConfiguration", worldDataConfiguration);
+            Object worldSettings;
+            if (CommonBootstrap.evaluateMCVersion(">=", "26.1")) {
+                //public record LevelSettings(String levelName, GameType gameType, LevelSettings.DifficultySettings difficultySettings, boolean allowCommands, WorldDataConfiguration dataConfiguration) {
+                worldSettings = createFromCode(resolveClass("net.minecraft.world.level.LevelSettings"), "" +
+                        "return new net.minecraft.world.level.LevelSettings(\n" +
+                        "    \"\",\n" + /* String levelName */
+                        "    net.minecraft.world.level.GameType.SURVIVAL,\n" + /* GameType gameType */
+                        "    LevelSettings$DifficultySettings.DEFAULT,\n" + /* LevelSettings.DifficultySettings difficultySettings */
+                        "    true,\n" + /* boolean allowCommands */
+                        "    arg0\n" + /* WorldDataConfiguration dataConfiguration */
+                        ");",
+                        worldDataConfiguration);
+            } else {
+                worldSettings = NullInstantiator.of(resolveClass("net.minecraft.world.level.LevelSettings")).create();
+                setField(worldSettings, "dataConfiguration", worldDataConfiguration);
+            }
 
             Object worldData = NullInstantiator.of(resolveClass("net.minecraft.world.level.storage.PrimaryLevelData")).create();
             setField(worldData, "settings", worldSettings);
@@ -306,11 +320,20 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
                 // Retrieve it, using get(). May throw if problems occur.
                 datapackresources = futureDPLoaded.get();
 
-                // Call updateStaticRegistryTags() on the result - which calls bind() on the tags
-                {
-                    Class<?> datapackresourceType = resolveClass("net.minecraft.server.ReloadableServerResources");
-                    Resolver.resolveAndGetDeclaredMethod(datapackresourceType, "updateStaticRegistryTags")
-                            .invoke(datapackresources);
+                if (CommonBootstrap.evaluateMCVersion(">=", "26.1")) {
+                    // Call updateStaticRegistryTags() on the result - which calls bind() on the tags
+                    {
+                        Class<?> datapackresourceType = resolveClass("net.minecraft.server.ReloadableServerResources");
+                        Resolver.resolveAndGetDeclaredMethod(datapackresourceType, "updateComponentsAndStaticRegistryTags")
+                                .invoke(datapackresources);
+                    }
+                } else {
+                    // Call updateStaticRegistryTags() on the result - which calls bind() on the tags
+                    {
+                        Class<?> datapackresourceType = resolveClass("net.minecraft.server.ReloadableServerResources");
+                        Resolver.resolveAndGetDeclaredMethod(datapackresourceType, "updateStaticRegistryTags")
+                                .invoke(datapackresources);
+                    }
                 }
             } else if (CommonBootstrap.evaluateMCVersion(">=", "1.21.2")) {
                 /*
