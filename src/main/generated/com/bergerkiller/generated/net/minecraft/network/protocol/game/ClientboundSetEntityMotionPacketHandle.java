@@ -31,13 +31,9 @@ public abstract class ClientboundSetEntityMotionPacketHandle extends PacketHandl
     }
 
     public abstract Vector getMotVector();
-    public abstract void setMotVector(Vector movement);
     public abstract double getMotX();
     public abstract double getMotY();
     public abstract double getMotZ();
-    public abstract void setMotX(double x);
-    public abstract void setMotY(double y);
-    public abstract void setMotZ(double z);
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
         return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_VELOCITY;
@@ -56,13 +52,9 @@ public abstract class ClientboundSetEntityMotionPacketHandle extends PacketHandl
         public final Template.StaticMethod.Converted<ClientboundSetEntityMotionPacketHandle> createNew = new Template.StaticMethod.Converted<ClientboundSetEntityMotionPacketHandle>();
 
         public final Template.Method.Converted<Vector> getMotVector = new Template.Method.Converted<Vector>();
-        public final Template.Method.Converted<Void> setMotVector = new Template.Method.Converted<Void>();
         public final Template.Method<Double> getMotX = new Template.Method<Double>();
         public final Template.Method<Double> getMotY = new Template.Method<Double>();
         public final Template.Method<Double> getMotZ = new Template.Method<Double>();
-        public final Template.Method<Void> setMotX = new Template.Method<Void>();
-        public final Template.Method<Void> setMotY = new Template.Method<Void>();
-        public final Template.Method<Void> setMotZ = new Template.Method<Void>();
 
     }
 

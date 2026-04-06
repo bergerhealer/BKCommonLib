@@ -851,7 +851,7 @@ class Entity {
         }
 
         // Read the x/y/z long chunk coordinates from the entry
-        #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private long currentSectionKey;
+        #require net.minecraft.world.level.entity.PersistentEntitySectionManager$Callback private long currentSectionKey;
         long coordKey = callback#currentSectionKey;
 
         // Convert to chunk x/z coordinates

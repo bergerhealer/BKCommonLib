@@ -401,34 +401,16 @@ class ClientboundSetEntityMotionPacket extends Packet {
 
     public (ClientboundSetEntityMotionPacketHandle) ClientboundSetEntityMotionPacket((org.bukkit.entity.Entity) Entity entity);
 
-#if version >= 1.21.9
-    #require ClientboundSetEntityMotionPacket private final Vec3 movement;
-
+#if version >= 26.1
+    public (org.bukkit.util.Vector) Vec3 getMotVector:movement();
+    public double getMotX() { return instance.movement().x; }
+    public double getMotY() { return instance.movement().y; }
+    public double getMotZ() { return instance.movement().z; }
+#elseif version >= 1.21.9
     public (org.bukkit.util.Vector) Vec3 getMotVector:getMovement();
-
-    public void setMotVector((org.bukkit.util.Vector) Vec3 movement) {
-        instance#movement = movement;
-    }
-
     public double getMotX() { return instance.getMovement().x; }
     public double getMotY() { return instance.getMovement().y; }
     public double getMotZ() { return instance.getMovement().z; }
-
-    public void setMotX(double x) {
-        Vec3 movement = instance.getMovement();
-        Vec3 updated = new Vec3(x, movement.y, movement.z);
-        instance#movement = updated;
-    }
-    public void setMotY(double y) {
-        Vec3 movement = instance.getMovement();
-        Vec3 updated = new Vec3(movement.x, y, movement.z);
-        instance#movement = updated;
-    }
-    public void setMotZ(double z) {
-        Vec3 movement = instance.getMovement();
-        Vec3 updated = new Vec3(movement.x, movement.y, z);
-        instance#movement = updated;
-    }
 #else
   #if version >= 1.17
     #require ClientboundSetEntityMotionPacket private int motX_raw:xa;
@@ -449,15 +431,6 @@ class ClientboundSetEntityMotionPacket extends Packet {
                           com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motZ_raw) );
     }
 
-    public void setMotVector((org.bukkit.util.Vector) Vec3 movement) {
-        int motX_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(movement.x);
-        int motY_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(movement.y);
-        int motZ_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(movement.z);
-        instance#motX_raw = motX_raw;
-        instance#motY_raw = motY_raw;
-        instance#motZ_raw = motZ_raw;
-    }
-
     public double getMotX() {
         int motX_raw = instance#motX_raw;
         return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motX_raw);
@@ -471,21 +444,6 @@ class ClientboundSetEntityMotionPacket extends Packet {
     public double getMotZ() {
         int motZ_raw = instance#motZ_raw;
         return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(motZ_raw);
-    }
-
-    public void setMotX(double x) {
-        int motX_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(x);
-        instance#motX_raw = motX_raw;
-    }
-
-    public void setMotY(double y) {
-        int motY_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(y);
-        instance#motY_raw = motY_raw;
-    }
-
-    public void setMotZ(double z) {
-        int motZ_raw = com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(z);
-        instance#motZ_raw = motZ_raw;
     }
 #endif
 

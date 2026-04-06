@@ -1292,6 +1292,10 @@ public class NMSPacketClasses {
         }
     }
 
+    /**
+     * @deprecated Packet is immutable, use {@link ClientboundSetEntityMotionPacketHandle} instead
+     */
+    @Deprecated
     public static class NMSClientboundSetEntityMotionPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = ClientboundSetEntityMotionPacketHandle.T.entityId.toFieldAccessor();
@@ -1303,8 +1307,7 @@ public class NMSPacketClasses {
 
             @Override
             public boolean set(Object o, Vector vector) {
-                ClientboundSetEntityMotionPacketHandle.T.setMotVector.invoke(o, vector);
-                return true;
+                return false;
             }
         };
 
