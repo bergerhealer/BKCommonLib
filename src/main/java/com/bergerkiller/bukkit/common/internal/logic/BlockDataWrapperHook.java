@@ -20,9 +20,12 @@ public abstract class BlockDataWrapperHook implements LibraryComponent {
             .runFirst(CommonBootstrap::initServer)
             .setDefaultComponent(BlockDataWrapperHook_Fallback::new)
             .addWhen("Paper 1.21.2",
-                    a -> CommonBootstrap.evaluateMCVersion(">=", "1.21.2") && CommonBootstrap.isPaperServer(),
+                    a -> CommonBootstrap.evaluateMCVersion(">=", "1.21.2")
+                            && CommonBootstrap.evaluateMCVersion("<=", "1.21.11")
+                            && CommonBootstrap.isPaperServer(),
                     BlockDataWrapperHook_Impl_Paper_1_21_2::new)
-            .addVersionOption("1.8", null, BlockDataWrapperHook_Impl_Default::new)
+            .addVersionOption("1.8", "1.21.11", BlockDataWrapperHook_Impl_Default::new)
+            .addVersionOption("26.1", null, BlockDataWrapperHook_Impl_26_1::new)
             .update();
 
     /**

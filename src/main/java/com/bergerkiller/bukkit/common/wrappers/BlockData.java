@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import java.util.Map;
+import java.util.Collection;
 
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
@@ -236,63 +236,56 @@ public abstract class BlockData extends BlockDataRegistry {
     }
 
     /**
-     * Changes a state of this BlockData, returning the BlockData with the state updated.
+     * Changes a property of this BlockData, returning the BlockData with the property updated.
      * 
-     * @param key Name of the state to change
-     * @param value to set the state to
+     * @param key Name of the property to change
+     * @param value to set the property to
      * @return updated block data
      */
-    public abstract BlockData setState(String key, Object value);
+    public abstract BlockData setProperty(String key, Object value);
 
     /**
-     * Changes a state of this BlockData, returning the BlockData with the state updated.
+     * Changes a property of this BlockData, returning the BlockData with the property updated.
      * 
-     * @param stateKey Key of the state to change
-     * @param value to set the state to
+     * @param propertyKey Key of the property to change
+     * @param value to set the property to
      * @return updated block data
      */
-    public abstract BlockData setState(BlockDataStateKey<?> stateKey, Object value);
-
-    /**
-     * @deprecated Use {@link #setState(BlockDataStateKey, Object)} instead
-     */
-    @Deprecated
-    public abstract BlockData setState(BlockState<?> stateKey, Object value);
+    public abstract BlockData setProperty(BlockProperty<?> propertyKey, Object value);
 
     /**
      * Reads a state from this BlockData
      * 
-     * @param key Name of the state to get
+     * @param key Name of the property to get
      * @param type to turn the state value into (auto conversion)
-     * @return state value
+     * @return property value
      */
-    public abstract <T> T getState(String key, Class<T> type);
+    public abstract <T> T getProperty(String key, Class<T> type);
 
     /**
-     * Reads a state from this BlockData
+     * Reads a property of this BlockData
      * 
-     * @param stateKey Key of the state to get
-     * @return state value
+     * @param propertyKey Key of the property value to get
+     * @return property value
      */
-    public abstract <T extends Comparable<?>> T getState(BlockDataStateKey<T> stateKey);
+    public abstract <T extends Comparable<?>> T getProperty(BlockProperty<T> propertyKey);
 
     /**
-     * Gets a mapping of all possible block states of this block, and their
-     * current state value.
+     * Gets all properties that this block data supports in the get and set property operations.
      *
-     * @return block states map
+     * @return Collection of valid block properties
      */
-    public abstract Map<BlockDataStateKey<?>, Comparable<?>> getStates();
+    public abstract Collection<BlockProperty<?>> getProperties();
 
     /**
      * Gets the state key that can be used to update a BlockState using
-     * {@link #setState(BlockDataStateKey, Object)} or get it using
-     * {@link #getState(BlockDataStateKey)}
+     * {@link #setProperty(String, Object)} or get it using
+     * {@link #getProperty(BlockProperty)}
      *
      * @param key Name of the state
      * @return BlockState key, or <i>null</i> if not found
      */
-    public abstract BlockDataStateKey<?> getStateKey(String key);
+    public abstract BlockProperty<?> getPropertyKey(String key);
 
     /**
      * Gets whether this BlockData is of a certain Material type.

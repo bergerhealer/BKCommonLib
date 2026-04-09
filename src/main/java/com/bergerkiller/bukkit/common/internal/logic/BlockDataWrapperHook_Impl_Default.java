@@ -97,8 +97,50 @@ class BlockDataWrapperHook_Impl_Default extends BlockDataWrapperHook {
         values.init(valuesField);
         values.forceInitialization();
 
-        // Initialize IBlockData getValues() method, we already refer to it in templates
-        Method getValuesMethod = BlockStateHandle.T.getStates.raw.toJavaMethod();
+        // Initialize BlockState getStates() method
+        /*
+        #select version >=
+        #case 1.20.5: public (Map<PropertyHandle, Comparable<?>>) java.util.Map<Property<?>, Comparable<?>> getStates:getValues();
+        #case 1.18: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:getValues();
+        #case 1.17: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:getStateMap();
+        #case 1.13.2
+          #if methodexists net.minecraft.world.level.block.state.StateHolder public abstract com.google.common.collect.ImmutableMap<net.minecraft.world.level.block.state.properties.Property<?>, Comparable<?>> getStateMap();
+             public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:getStateMap();
+          #else
+             public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:b();
+          #endif
+        #case 1.13: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:b();
+        #case 1.12: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:t();
+        #case 1.11: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:u();
+        #case 1.9:  public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:s();
+        #case else: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property, Comparable> getStates:b();
+        #endselect
+         */
+
+        Method getValuesMethod;
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.20.5")) {
+            getValuesMethod = Resolver.resolveAndGetDeclaredMethod(stateHolderType, "getValues");
+        } else if (CommonBootstrap.evaluateMCVersion(">=", "1.18")) {
+            getValuesMethod = Resolver.resolveAndGetDeclaredMethod(stateHolderType, "getValues");
+        } else if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
+            getValuesMethod = Resolver.resolveAndGetDeclaredMethod(stateHolderType, "getStateMap");
+        } else if (CommonBootstrap.evaluateMCVersion(">=", "1.13.2")) {
+            try {
+                getValuesMethod = Resolver.resolveAndGetDeclaredMethod(stateHolderType, "getStateMap");
+            } catch (NoSuchMethodException ex) {
+                getValuesMethod = Resolver.resolveAndGetDeclaredMethod(stateHolderType, "b");
+            }
+        } else if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
+            getValuesMethod = Resolver.resolveAndGetDeclaredMethod(stateHolderType, "b");
+        } else if (CommonBootstrap.evaluateMCVersion(">=", "1.12")) {
+            getValuesMethod = Resolver.resolveAndGetDeclaredMethod(stateHolderType, "t");
+        } else if (CommonBootstrap.evaluateMCVersion(">=", "1.11")) {
+            getValuesMethod = Resolver.resolveAndGetDeclaredMethod(stateHolderType, "u");
+        } else if (CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
+            getValuesMethod = Resolver.resolveAndGetDeclaredMethod(stateHolderType, "s");
+        } else {
+            getValuesMethod = Resolver.resolveAndGetDeclaredMethod(stateHolderType, "b");
+        }
         getValues.init(getValuesMethod);
         getValues.forceInitialization();
 

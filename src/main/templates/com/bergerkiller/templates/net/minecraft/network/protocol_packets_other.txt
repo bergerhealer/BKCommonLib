@@ -388,7 +388,9 @@ class ServerboundInteractPacket extends Packet {
         return true;
     }
 
-  #if version >= 1.18
+  #if version >= 26.1
+    public boolean isUsingSecondaryAction:usingSecondaryAction();
+  #elseif version >= 1.18
     public boolean isUsingSecondaryAction();
   #else
     public boolean isUsingSecondaryAction:b();
@@ -2453,10 +2455,12 @@ class ServerboundContainerClickPacket extends Packet {
     //private (org.bukkit.inventory.ItemStack) ItemStack item;
 #endif
 
-#if version >= 1.17
-    private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) net.minecraft.world.inventory.ClickType mode:clickType;
+#if version >= 26.1
+    private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) net.minecraft.world.inventory.ContainerInput mode:containerInput;
+#elseif version >= 1.17
+    private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) net.minecraft.world.inventory.ContainerInput mode:clickType;
 #elseif version >= 1.9
-    private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) net.minecraft.world.inventory.ClickType mode:shift;
+    private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) net.minecraft.world.inventory.ContainerInput mode:shift;
 #else
     private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) int mode:shift;
 #endif

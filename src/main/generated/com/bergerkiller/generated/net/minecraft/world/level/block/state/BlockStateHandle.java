@@ -8,7 +8,7 @@ import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.SoundTypeHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.PropertyHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
-import java.util.Map;
+import java.util.Collection;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.world.level.block.state.BlockState</b>.
@@ -37,28 +37,28 @@ public abstract class BlockStateHandle extends Template.Handle {
     public abstract AABBHandle getBoundingBox(BlockGetterHandle iblockaccess, IntVector3 blockposition);
     public abstract Object get(PropertyHandle state);
     public abstract BlockStateHandle set(PropertyHandle state, Object value);
-    public abstract Map<PropertyHandle, Comparable<?>> getStates();
-    public void logStates() {
-        for (java.util.Map.Entry<PropertyHandle, Comparable<?>> entry : getStates().entrySet()) {
-            com.bergerkiller.bukkit.common.Logging.LOGGER.info(entry.getKey() + " = " + entry.getValue());
+    public abstract Collection<PropertyHandle> getProperties();
+    public void logProperties() {
+        for (PropertyHandle property : getProperties()) {
+            com.bergerkiller.bukkit.common.Logging.LOGGER.info(property + " = " + get(property));
         }
     }
 
-    public PropertyHandle findState(String key) {
-        for (PropertyHandle blockState : getStates().keySet()) {
-            if (blockState.getKeyToken().equals(key)) {
-                return blockState;
+    public PropertyHandle findProperty(String key) {
+        for (PropertyHandle property : getProperties()) {
+            if (property.getKeyToken().equals(key)) {
+                return property;
             }
         }
         return null;
     }
 
     public BlockStateHandle set(String key, Object value) {
-        return set(findState(key), value);
+        return set(findProperty(key), value);
     }
 
     public <T> T get(String key, Class<T> type) {
-        return get(findState(key), type);
+        return get(findProperty(key), type);
     }
 
     public <T> T get(PropertyHandle state, Class<T> type) {
@@ -79,7 +79,7 @@ public abstract class BlockStateHandle extends Template.Handle {
         public final Template.Method.Converted<AABBHandle> getBoundingBox = new Template.Method.Converted<AABBHandle>();
         public final Template.Method.Converted<Object> get = new Template.Method.Converted<Object>();
         public final Template.Method.Converted<BlockStateHandle> set = new Template.Method.Converted<BlockStateHandle>();
-        public final Template.Method.Converted<Map<PropertyHandle, Comparable<?>>> getStates = new Template.Method.Converted<Map<PropertyHandle, Comparable<?>>>();
+        public final Template.Method.Converted<Collection<PropertyHandle>> getProperties = new Template.Method.Converted<Collection<PropertyHandle>>();
 
     }
 

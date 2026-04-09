@@ -7,6 +7,7 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -47,9 +48,6 @@ import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.PropertyHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
-import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
-import com.bergerkiller.mountiplex.conversion.util.ConvertingMap;
-import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 
 @SuppressWarnings("deprecation")
 class BlockDataImpl extends BlockData {
@@ -419,11 +417,11 @@ class BlockDataImpl extends BlockData {
             options = new BlockRenderOptions(this, new HashMap<String, String>(0));
         } else {
             // Serialize all tokens into String key-value pairs
-            Map<PropertyHandle, Comparable<?>> states = BlockStateHandle.T.getStates.invoke(stateData);
-            Map<String, String> statesStr = new HashMap<String, String>(states.size());
-            for (Map.Entry<PropertyHandle, Comparable<?>> state : states.entrySet()) {
-                String key = state.getKey().getKeyToken();
-                String value = state.getKey().getValueToken(state.getValue());
+            Collection<PropertyHandle> properties = BlockStateHandle.T.getProperties.invoke(stateData);
+            Map<String, String> statesStr = new HashMap<String, String>(properties.size());
+            for (PropertyHandle property : properties) {
+                String key = property.getKeyToken();
+                String value = property.getValueToken((Comparable<?>) BlockStateHandle.T.get.invoke(stateData, property));
                 statesStr.put(key, value);
             }
             options = new BlockRenderOptions(this, statesStr);
@@ -638,55 +636,36 @@ class BlockDataImpl extends BlockData {
     }
 
     @Override
-    public BlockData setState(String key, Object value) {
+    public BlockData setProperty(String key, Object value) {
         BlockStateHandle updated_data = this.data.set(key, value);
         return BlockDataRegistry.fromBlockData(updated_data.getRaw());
     }
 
     @Override
-    public BlockData setState(BlockDataStateKey<?> stateKey, Object value) {
+    public BlockData setProperty(BlockProperty<?> stateKey, Object value) {
         BlockStateHandle updated_data = this.data.set(stateKey.getBackingHandle(), value);
         return BlockDataRegistry.fromBlockData(updated_data.getRaw());
     }
 
     @Override
-    @Deprecated
-    public BlockData setState(BlockState<?> stateKey, Object value) {
-        BlockStateHandle updated_data = this.data.set(stateKey.getBackingHandle(), value);
-        return BlockDataRegistry.fromBlockData(updated_data.getRaw());
-    }
-
-    @Override
-    public <T> T getState(String key, Class<T> type) {
+    public <T> T getProperty(String key, Class<T> type) {
         return this.data.get(key, type);
     }
 
     @Override
-    public <T extends Comparable<?>> T getState(BlockDataStateKey<T> stateKey) {
+    public <T extends Comparable<?>> T getProperty(BlockProperty<T> stateKey) {
         return LogicUtil.unsafeCast(this.data.get(stateKey.getBackingHandle()));
     }
 
     @Override
-    public Map<BlockDataStateKey<?>, Comparable<?>> getStates() {
-        DuplexConverter<PropertyHandle, BlockDataStateKey<?>> keyConverter = new DuplexConverter<PropertyHandle, BlockDataStateKey<?>>(PropertyHandle.class, BlockDataStateKey.class) {
-            @Override
-            public BlockDataStateKey<?> convertInput(PropertyHandle value) {
-                return new BlockDataStateKey<Comparable<?>>(value);
-            }
-
-            @Override
-            public PropertyHandle convertOutput(BlockDataStateKey<?> value) {
-                return value.getBackingHandle();
-            }
-        };
-        DuplexConverter<Comparable<?>, Comparable<?>> valueConverter = DuplexConverter.createNull(TypeDeclaration.fromClass(Comparable.class));
-        return new ConvertingMap<BlockDataStateKey<?>, Comparable<?>>(this.data.getStates(), keyConverter, valueConverter);
+    public Collection<BlockProperty<?>> getProperties() {
+        return List.of();
     }
 
     @Override
-    public BlockDataStateKey<?> getStateKey(String key) {
-        PropertyHandle handle = this.data.findState(key);
-        return (handle == null) ? null : new BlockDataStateKey<>(handle);
+    public BlockProperty<?> getPropertyKey(String key) {
+        PropertyHandle handle = this.data.findProperty(key);
+        return (handle == null) ? null : new BlockProperty<>(handle);
     }
 
     @Override

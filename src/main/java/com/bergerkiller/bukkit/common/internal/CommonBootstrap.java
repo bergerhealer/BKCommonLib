@@ -577,6 +577,12 @@ public class CommonBootstrap {
         ****************************************************************************************************************
         */
 
+        /* ======== Mojang remapping changes for 26.1 ======== */
+        if (evaluateMCVersion("<", "26.1")) {
+            // Class renamed
+            remappings.put("net.minecraft.world.inventory.ContainerInput", "net.minecraft.world.inventory.ClickType");
+        }
+
         /* ======== Mojang remapping changes for 1.21.11 ======== */
         if (evaluateMCVersion("<", "1.21.11")) {
             // A lot of classes were moved to new packages. These remap it back to the old path for older versions.

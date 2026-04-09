@@ -192,7 +192,7 @@ public abstract class SignEditDialog {
         IntVector3 coordinates = IntVector3.coordinatesOf(metadata.signBlock);
 
         // Send a block change packet for a sign at the sign coordinates
-        metadata.sendBlock(BlockData.fromMaterial(signType).setState("facing", backDirection));
+        metadata.sendBlock(BlockData.fromMaterial(signType).setProperty("facing", backDirection));
 
         // Update the lines of text on this sign client-sided
         metadata.player.sendSignChange(metadata.signBlock.getLocation(), lines);

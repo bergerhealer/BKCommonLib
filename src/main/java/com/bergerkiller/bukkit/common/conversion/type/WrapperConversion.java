@@ -657,7 +657,7 @@ public class WrapperConversion {
         return new MobSpawner(nmsMobSpawnerAbstractHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.world.inventory.ClickType", optional=true)
+    @ConverterMethod(input="net.minecraft.world.inventory.ContainerInput", optional=true)
     public static InventoryClickType inventoryClickTypeFromHandle(Object nmsInventoryClickType) {
         return InventoryClickType.byId(((Enum<?>) nmsInventoryClickType).ordinal());
     }

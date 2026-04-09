@@ -1,21 +1,24 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import java.util.Collection;
+
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.PropertyHandle;
 
-import java.util.Collection;
-
 /**
- * Deprecated class! This will be removed in the near future! Use
- * {@link BlockDataStateKey} instead.
- *
- * @param <T> Value type
+ * A single property of a block's BlockData. Not to be confused with Bukkit's BlockState,
+ * which is more about block entity metadata. Acts as a key for changing block
+ * data values like facing and redstone power state.
  */
-@Deprecated
-public abstract class BlockState<T extends Comparable<?>> extends BasicWrapper<PropertyHandle> {
+public class BlockProperty<T extends Comparable<?>> extends BasicWrapper<PropertyHandle> {
+
+    public BlockProperty(PropertyHandle handle) {
+        setHandle(handle);
+    }
+
     /**
      * Name identifying this state
-     *
+     * 
      * @return name
      */
     public String name() {
@@ -24,7 +27,7 @@ public abstract class BlockState<T extends Comparable<?>> extends BasicWrapper<P
 
     /**
      * The possible values this state can have
-     *
+     * 
      * @return values
      */
     public Collection<T> values() {
@@ -33,7 +36,7 @@ public abstract class BlockState<T extends Comparable<?>> extends BasicWrapper<P
 
     /**
      * Gets a String representation of a value returned by {@link #values()}
-     *
+     * 
      * @param value
      * @return value name
      */

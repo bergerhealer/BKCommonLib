@@ -75,17 +75,17 @@ public class BlockDataTest {
 
         // Attached face
         for (String face : new String[] { "ceiling", "floor", "wall" }) {
-            d = d.setState("face", face);
+            d = d.setProperty("face", face);
 
             // Facing (rotation when ceiling/floor)
             for (BlockFace facing : new BlockFace[] { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST }) {
-                d = d.setState("facing", facing);
+                d = d.setProperty("facing", facing);
 
-                d = d.setState("powered", false);
+                d = d.setProperty("powered", false);
                 assertFalse("isPowered()==false failed for " + facing,
                         ((org.bukkit.material.Lever) d.getMaterialData()).isPowered());
 
-                d = d.setState("powered", true);
+                d = d.setProperty("powered", true);
                 assertTrue("isPowered()==true failed for " + facing,
                         ((org.bukkit.material.Lever) d.getMaterialData()).isPowered());
             }
@@ -110,19 +110,19 @@ public class BlockDataTest {
             // Facing
             for (BlockFace facing : FaceUtil.BLOCK_SIDES) {
                 if (facing == BlockFace.UP) {
-                    d = d.setState("face", "ceiling");
+                    d = d.setProperty("face", "ceiling");
                 } else if (facing == BlockFace.DOWN) {
-                    d = d.setState("face", "floor");
+                    d = d.setProperty("face", "floor");
                 } else {
-                    d = d.setState("face", "wall");
-                    d = d.setState("facing", facing);
+                    d = d.setProperty("face", "wall");
+                    d = d.setProperty("facing", facing);
                 }
 
-                d = d.setState("powered", false);
+                d = d.setProperty("powered", false);
                 assertFalse("isPowered()==false failed for " + facing + " material " + material,
                         ((org.bukkit.material.Button) d.getMaterialData()).isPowered());
 
-                d = d.setState("powered", true);
+                d = d.setProperty("powered", true);
                 assertTrue("isPowered()==true failed for " + facing + " material " + material,
                         ((org.bukkit.material.Button) d.getMaterialData()).isPowered());
             }
@@ -153,21 +153,21 @@ public class BlockDataTest {
         for (boolean waterlogged : new boolean[] { false, true }) {
             material = MaterialUtil.getMaterial("RAIL");
             d = BlockData.fromMaterial(material);
-            d = d.setState("waterlogged", waterlogged);
+            d = d.setProperty("waterlogged", waterlogged);
 
             for (String railMaterialName : new String[] {
                     "RAIL", "DETECTOR_RAIL", "POWERED_RAIL", "ACTIVATOR_RAIL"
             }) {
                 material = MaterialUtil.getMaterial(railMaterialName);
                 d = BlockData.fromMaterial(material);
-                d = d.setState("waterlogged", waterlogged);
+                d = d.setProperty("waterlogged", waterlogged);
 
                 // Skip curve values for non-curvable rails
                 int shapeLim = railMaterialName.equals("RAIL") ? shapes.length : (shapes.length - 4);
 
                 // Check all possible shapes
                 for (int i = 0; i < shapeLim; i++) {
-                    d = d.setState("shape", shapes[i]);
+                    d = d.setProperty("shape", shapes[i]);
                     org.bukkit.material.Rails rail = (org.bukkit.material.Rails) d.getMaterialData();
                     assertEquals("BlockData " + d + " expected direction = " + directions[i] +
                             " but was " + rail.getDirection(), directions[i], rail.getDirection());
@@ -226,12 +226,12 @@ public class BlockDataTest {
         Material mat = MaterialUtil.getFirst("OAK_STAIRS", "LEGACY_WOOD_STAIRS");
         BlockData data = BlockData.fromMaterial(mat);
 
-        data = data.setState("facing", BlockFace.EAST);
-        assertEquals(BlockFace.EAST, data.getState("facing", BlockFace.class));
+        data = data.setProperty("facing", BlockFace.EAST);
+        assertEquals(BlockFace.EAST, data.getProperty("facing", BlockFace.class));
         assertTrue(data.isType(mat));
 
-        data = data.setState("facing", BlockFace.SOUTH);
-        assertEquals(BlockFace.SOUTH, data.getState("facing", BlockFace.class));
+        data = data.setProperty("facing", BlockFace.SOUTH);
+        assertEquals(BlockFace.SOUTH, data.getProperty("facing", BlockFace.class));
         assertTrue(data.isType(mat));
     }
 
@@ -337,8 +337,8 @@ public class BlockDataTest {
             // Lit was a block state
             // Retrieve some complicated BlockData
             BlockData blockData = BlockData.fromMaterial(Material.FURNACE)
-                    .setState("lit", true)
-                    .setState("facing", BlockFace.EAST);
+                    .setProperty("lit", true)
+                    .setProperty("facing", BlockFace.EAST);
             // Serialize
             String output = BlockDataSerializer.INSTANCE.serialize(blockData);
             assertEquals("minecraft:furnace[facing=east,lit=true]", output);
@@ -349,7 +349,7 @@ public class BlockDataTest {
             {
                 // Retrieve some complicated BlockData
                 BlockData blockData = BlockData.fromMaterial(Material.FURNACE)
-                        .setState("facing", BlockFace.EAST);
+                        .setProperty("facing", BlockFace.EAST);
                 // Serialize
                 String output = BlockDataSerializer.INSTANCE.serialize(blockData);
                 assertEquals("minecraft:furnace[facing=east]", output);
@@ -359,7 +359,7 @@ public class BlockDataTest {
             {
                 // Retrieve some complicated BlockData
                 BlockData blockData = BlockData.fromMaterial(MaterialUtil.getMaterial("LEGACY_BURNING_FURNACE"))
-                        .setState("facing", BlockFace.EAST);
+                        .setProperty("facing", BlockFace.EAST);
                 // Serialize
                 String output = BlockDataSerializer.INSTANCE.serialize(blockData);
                 assertEquals("minecraft:lit_furnace[facing=east]", output);
@@ -376,8 +376,8 @@ public class BlockDataTest {
             // Deserialize
             BlockData blockData = BlockDataSerializer.INSTANCE.deserialize(input);
             assertEquals(Material.FURNACE, blockData.getType());
-            assertTrue(blockData.getState("lit", Boolean.class));
-            assertEquals(BlockFace.EAST, blockData.getState("facing", BlockFace.class));
+            assertTrue(blockData.getProperty("lit", Boolean.class));
+            assertEquals(BlockFace.EAST, blockData.getProperty("facing", BlockFace.class));
         } else {
             // Lit was a type of material
 
@@ -388,7 +388,7 @@ public class BlockDataTest {
                 // Deserialize
                 BlockData blockData = BlockDataSerializer.INSTANCE.deserialize(input);
                 assertEquals(Material.FURNACE, blockData.getType());
-                assertEquals(BlockFace.EAST, blockData.getState("facing", BlockFace.class));
+                assertEquals(BlockFace.EAST, blockData.getProperty("facing", BlockFace.class));
             }
 
             // On
@@ -398,7 +398,7 @@ public class BlockDataTest {
                 // Deserialize
                 BlockData blockData = BlockDataSerializer.INSTANCE.deserialize(input);
                 assertEquals(MaterialUtil.getMaterial("LEGACY_BURNING_FURNACE"), blockData.getType());
-                assertEquals(BlockFace.EAST, blockData.getState("facing", BlockFace.class));
+                assertEquals(BlockFace.EAST, blockData.getProperty("facing", BlockFace.class));
             }
         }
     }

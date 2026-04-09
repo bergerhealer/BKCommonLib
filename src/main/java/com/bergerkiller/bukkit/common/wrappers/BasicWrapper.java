@@ -71,6 +71,11 @@ public class BasicWrapper<T extends Template.Handle> {
     }
 
     @Override
+    public int hashCode() {
+        return handle == null ? 0 : handle.hashCode();
+    }
+
+    @Override
     public String toString() {
         return handle == null ? "{NULL}" : handle.toString();
     }

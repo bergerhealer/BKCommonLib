@@ -29,27 +29,27 @@ interface BlockState {
     public abstract (BlockHandle) Block getBlock();
 
     <code>
-    public void logStates() {
-        for (java.util.Map.Entry<PropertyHandle, Comparable<?>> entry : getStates().entrySet()) {
-            com.bergerkiller.bukkit.common.Logging.LOGGER.info(entry.getKey() + " = " + entry.getValue());
+    public void logProperties() {
+        for (PropertyHandle property : getProperties()) {
+            com.bergerkiller.bukkit.common.Logging.LOGGER.info(property + " = " + get(property));
         }
     }
 
-    public PropertyHandle findState(String key) {
-        for (PropertyHandle blockState : getStates().keySet()) {
-            if (blockState.getKeyToken().equals(key)) {
-                return blockState;
+    public PropertyHandle findProperty(String key) {
+        for (PropertyHandle property : getProperties()) {
+            if (property.getKeyToken().equals(key)) {
+                return property;
             }
         }
         return null;
     }
 
     public BlockStateHandle set(String key, Object value) {
-        return set(findState(key), value);
+        return set(findProperty(key), value);
     }
 
     public <T> T get(String key, Class<T> type) {
-        return get(findState(key), type);
+        return get(findProperty(key), type);
     }
 
     public <T> T get(PropertyHandle state, Class<T> type) {
@@ -153,7 +153,9 @@ interface BlockState {
         // When this happens, it would make transparent blocks block all light
         // We obviously don't want that!
         if (mask == com.bergerkiller.bukkit.common.collections.BlockFaceSet.ALL.mask()) {
-  #if version >= 1.21.2
+  #if version >= 26.1
+            int opacity = instance.getLightDampening();
+  #elseif version >= 1.21.2
             int opacity = instance.getLightBlock();
   #elseif version >= 1.18
             int opacity = instance.getLightBlock(emptyBlockAccess, BlockPos.ZERO);
@@ -181,7 +183,11 @@ interface BlockState {
     public int getCachedOpacity() {
         // World access is never required - it is always cached
         // There isn't even a method to get the light level that makes use of a block position / world access
+  #if version >= 26.1
+        return instance.getLightDampening();
+  #else
         return instance.getLightBlock();
+  #endif
     }
 #elseif version >= 1.13
     public int getCachedOpacity() {
@@ -405,21 +411,26 @@ interface BlockState {
         return instance;
     }
 
-#select version >=
-#case 1.20.5: public (Map<PropertyHandle, Comparable<?>>) java.util.Map<Property<?>, Comparable<?>> getStates:getValues();
-#case 1.18: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:getValues();
-#case 1.17: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:getStateMap();
-#case 1.13.2
-  #if methodexists net.minecraft.world.level.block.state.StateHolder public abstract com.google.common.collect.ImmutableMap<net.minecraft.world.level.block.state.properties.Property<?>, Comparable<?>> getStateMap();
-      public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:getStateMap();
-  #else
-      public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:b();
-  #endif
-#case 1.13: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:b();
-#case 1.12: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:t();
-#case 1.11: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:u();
-#case 1.9:  public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property<?>, Comparable<?>> getStates:s();
-#case else: public abstract (Map<PropertyHandle, Comparable<?>>) ImmutableMap<Property, Comparable> getStates:b();
-#endselect
-
+#if version >= 1.18
+    public (Collection<PropertyHandle>) Collection<Property<?>> getProperties();
+#elseif version >= 1.17
+    public (Collection<PropertyHandle>) Collection<Property<?>> getProperties:s();
+#elseif version >= 1.16
+    public (Collection<PropertyHandle>) Collection<Property<?>> getProperties:r();
+#elseif methodexists net.minecraft.world.level.block.state.StateHolder public abstract com.google.common.collect.ImmutableMap<net.minecraft.world.level.block.state.properties.Property<?>, Comparable<?>> getStateMap();
+    // 1.13 some versions it is called getStateMap()
+    public (Collection<PropertyHandle>) Collection<Property<?>> getProperties() {
+        return instance.getStateMap().keySet();
+    }
+#else
+    public (Collection<PropertyHandle>) Collection<Property<?>> getProperties() {
+  #select version >=
+  #case 1.13:  return instance.b().keySet();
+  #case 1.12:  return instance.t().keySet();
+  #case 1.11:  return instance.u().keySet();
+  #case 1.9:   return instance.s().keySet();
+  #case else:  return instance.b().keySet();
+  #endselect
+    }
+#endif
 }

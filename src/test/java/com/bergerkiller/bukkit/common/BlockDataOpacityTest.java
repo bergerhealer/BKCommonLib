@@ -61,8 +61,8 @@ public class BlockDataOpacityTest {
         // This behavior appears to be different before 1.14
         if (CommonBootstrap.evaluateMCVersion(">=", "1.14")) {
             // Slabs top/bottom half should be opaque
-            assertOpaqueFaces(BlockFaceSet.of(BlockFace.UP), BlockData.fromMaterial(MaterialUtil.getFirst("OAK_SLAB", "LEGACY_WOOD_STEP")).setState("type", "top"));
-            assertOpaqueFaces(BlockFaceSet.of(BlockFace.DOWN), BlockData.fromMaterial(MaterialUtil.getFirst("OAK_SLAB", "LEGACY_WOOD_STEP")).setState("type", "bottom"));
+            assertOpaqueFaces(BlockFaceSet.of(BlockFace.UP), BlockData.fromMaterial(MaterialUtil.getFirst("OAK_SLAB", "LEGACY_WOOD_STEP")).setProperty("type", "top"));
+            assertOpaqueFaces(BlockFaceSet.of(BlockFace.DOWN), BlockData.fromMaterial(MaterialUtil.getFirst("OAK_SLAB", "LEGACY_WOOD_STEP")).setProperty("type", "bottom"));
 
             // Shapes: straight / inner_left / inner_right / outer_left / outer_right
             // Half: bottom / top
@@ -72,9 +72,9 @@ public class BlockDataOpacityTest {
             for (BlockFace facing : FaceUtil.AXIS) {
                 BlockFaceSet expected = BlockFaceSet.of(BlockFace.DOWN, facing);
                 assertOpaqueFaces(expected, BlockData.fromMaterial(MaterialUtil.getFirst("OAK_STAIRS", "LEGACY_STAIRS"))
-                        .setState("facing", facing)
-                        .setState("half", "bottom")
-                        .setState("shape", "straight"));
+                        .setProperty("facing", facing)
+                        .setProperty("half", "bottom")
+                        .setProperty("shape", "straight"));
             }
 
             // Stairs upside-down straight back facing into a given orientation
@@ -82,18 +82,18 @@ public class BlockDataOpacityTest {
             for (BlockFace facing : FaceUtil.AXIS) {
                 BlockFaceSet expected = BlockFaceSet.of(BlockFace.UP, facing);
                 assertOpaqueFaces(expected, BlockData.fromMaterial(MaterialUtil.getFirst("OAK_STAIRS", "LEGACY_STAIRS"))
-                        .setState("facing", facing)
-                        .setState("half", "top")
-                        .setState("shape", "straight"));
+                        .setProperty("facing", facing)
+                        .setProperty("half", "top")
+                        .setProperty("shape", "straight"));
             }
 
             // Stairs using inner_left should see two faces be opaque
             {
                 BlockFaceSet expected = BlockFaceSet.of(BlockFace.UP, BlockFace.NORTH, BlockFace.WEST);
                 assertOpaqueFaces(expected, BlockData.fromMaterial(MaterialUtil.getFirst("OAK_STAIRS", "LEGACY_STAIRS"))
-                        .setState("facing", BlockFace.NORTH)
-                        .setState("half", "top")
-                        .setState("shape", "inner_left"));
+                        .setProperty("facing", BlockFace.NORTH)
+                        .setProperty("half", "top")
+                        .setProperty("shape", "inner_left"));
             }
         }
     }
