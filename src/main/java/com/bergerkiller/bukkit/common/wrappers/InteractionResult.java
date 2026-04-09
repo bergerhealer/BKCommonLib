@@ -5,7 +5,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 
 /**
- * Wrapper class for EnumInteractionResult introduced in Minecraft 1.9.
+ * Wrapper class for net.minecraft.world.InteractionResult introduced in Minecraft 1.9.
  * Is officially used since Minecraft 1.16 when handling entity interactions.
  * Before that, the constant is simply turned into a truthy value.
  */
@@ -39,10 +39,10 @@ public enum InteractionResult {
             String name = this.name();
             try {
                 this._handle = Resolver.resolveAndGetDeclaredField(
-                        CommonUtil.getClass("net.minecraft.world.EnumInteractionResult"),
+                        CommonUtil.getClass("net.minecraft.world.InteractionResult"),
                         name).get(null);
             } catch (Throwable t) {
-                throw new IllegalStateException("EnumInteractionResult missing constant: " + name, t);
+                throw new IllegalStateException("InteractionResult missing constant: " + name, t);
             }
         } else if (CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
             // Enum
@@ -50,13 +50,13 @@ public enum InteractionResult {
             if (name.equals("CONSUME") && !CommonBootstrap.evaluateMCVersion(">=", "1.15")) {
                 name = "SUCCESS";
             }
-            for (Enum<?> enumConstant : (Enum[]) CommonUtil.getClass("net.minecraft.world.EnumInteractionResult").getEnumConstants()) {
+            for (Enum<?> enumConstant : (Enum[]) CommonUtil.getClass("net.minecraft.world.InteractionResult").getEnumConstants()) {
                 if (enumConstant.name().equals(name)) {
                     this._handle = enumConstant;
                     return;
                 }
             }
-            throw new IllegalStateException("EnumInteractionResult missing constant: " + name);
+            throw new IllegalStateException("InteractionResult missing constant: " + name);
         } else {
             // True/False
             this._handle = null;
@@ -64,7 +64,7 @@ public enum InteractionResult {
     }
 
     /**
-     * Gets the raw underlying EnumInteractionResult handle
+     * Gets the raw underlying InteractionResult handle
      * 
      * @return handle
      */
