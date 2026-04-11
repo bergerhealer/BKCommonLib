@@ -85,7 +85,6 @@ public class ReflectionTest {
             loadClass(CBCraftItemStack.class);
             loadClass(CBCraftBlockState.class);
             loadClass(CBCraftServer.class);
-            loadClass(CBCraftInventory.class);
             loadClass(CBCraftTask.class);
             loadClass(CBCraftScheduler.class);
 
