@@ -25,8 +25,14 @@ class Item {
 
     public void setMaxStackSize(int maxStackSize) {
         // Read current item components
+  #if version >= 26.1
+        net.minecraft.core.Holder$Reference itemRegistryRef = instance.builtInRegistryHolder();
+        #require net.minecraft.core.Holder.Reference private DataComponentMap components;
+        DataComponentMap components = itemRegistryRef#components;
+  #else
         #require Item private final DataComponentMap components;
         DataComponentMap components = instance#components;
+  #endif
 
         // Make writable and modify the max stack size
         PatchedDataComponentMap writable = (components instanceof PatchedDataComponentMap)
@@ -40,7 +46,13 @@ class Item {
         // Make read-only again and set it in the item
         // TODO: Is there a way to make a read-only version?
         components = writable.isEmpty() ? DataComponentMap.EMPTY : writable;
+
+        // Re-apply
+  #if version >= 26.1
+        itemRegistryRef#components = components;
+  #else
         instance#components = components;
+  #endif
     }
 #else
     public int getMaxStackSize();
