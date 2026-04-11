@@ -199,7 +199,7 @@ class LevelChunk {
         int chunkX = instance.getPos().x();
         int chunkZ = instance.getPos().z();
   #else
-        int chunkX = instance.getPos().x
+        int chunkX = instance.getPos().x;
         int chunkZ = instance.getPos().z;
   #endif
 
