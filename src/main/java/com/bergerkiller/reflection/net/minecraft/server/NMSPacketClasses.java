@@ -331,6 +331,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> buttonId = ServerboundContainerButtonClickPacketHandle.T.buttonId.toFieldAccessor();
     }
 
+    /** Note: is for commands targeting the player entity such as starting to sprint, not chat commands */
     public static class NMSServerboundPlayerCommandPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> playerId = ServerboundPlayerCommandPacketHandle.T.playerId.toFieldAccessor();

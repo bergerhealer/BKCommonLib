@@ -27,7 +27,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.Clientboun
  * The MOUNT packet is used.
  */
 public class VehicleMountHandler_1_16 extends VehicleMountHandler_1_9_to_1_15_2 {
-    public static final PacketType[] LISTENED_PACKETS = {PacketType.IN_ENTITY_ACTION, PacketType.IN_STEER_VEHICLE,
+    public static final PacketType[] LISTENED_PACKETS = {PacketType.IN_PLAYER_COMMAND, PacketType.IN_STEER_VEHICLE,
             PacketType.IN_POSITION, PacketType.IN_POSITION_LOOK, PacketType.OUT_MOUNT, PacketType.OUT_CAMERA,
             PacketType.OUT_ENTITY_TELEPORT, PacketType.OUT_ENTITY_MOVE, PacketType.OUT_ENTITY_MOVE_LOOK,
             PacketType.OUT_POSITION};
@@ -67,8 +67,8 @@ public class VehicleMountHandler_1_16 extends VehicleMountHandler_1_9_to_1_15_2 
                 // In 3 ticks, re-mount the player in the vehicle
                 this.remount_sync = _currentTick + 4;
             }
-        } else if (packet.getType() == PacketType.IN_ENTITY_ACTION) {
-            String actionId = ((Enum<?>) packet.read(PacketType.IN_ENTITY_ACTION.action)).name();
+        } else if (packet.getType() == PacketType.IN_PLAYER_COMMAND) {
+            String actionId = ((Enum<?>) packet.read(PacketType.IN_PLAYER_COMMAND.action)).name();
             if (actionId.equals("PRESS_SHIFT_KEY")) {
                 if (!this._is_sneaking) {
                     this.remount_sync = _currentTick + 2;

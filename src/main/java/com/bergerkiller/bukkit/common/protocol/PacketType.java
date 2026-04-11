@@ -153,7 +153,8 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSServerboundChatPacket IN_CHAT = new NMSServerboundChatPacket();
     public static final NMSServerboundClientCommandPacket IN_CLIENT_COMMAND = new NMSServerboundClientCommandPacket();
     public static final NMSServerboundCustomPayloadPacket IN_CUSTOM_PAYLOAD = new NMSServerboundCustomPayloadPacket();
-    public static final NMSServerboundPlayerCommandPacket IN_ENTITY_ACTION = new NMSServerboundPlayerCommandPacket();
+    /** Note: is for commands targeting the player entity such as starting to sprint, not chat commands */
+    public static final NMSServerboundPlayerCommandPacket IN_PLAYER_COMMAND = new NMSServerboundPlayerCommandPacket();
     public static final NMSServerboundMovePlayerPacketRot IN_LOOK = new NMSServerboundMovePlayerPacketRot();
     public static final NMSServerboundMovePlayerPacketPos IN_POSITION = new NMSServerboundMovePlayerPacketPos();
     public static final NMSServerboundMovePlayerPacketPosRot IN_POSITION_LOOK = new NMSServerboundMovePlayerPacketPosRot();
