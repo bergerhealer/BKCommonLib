@@ -19,6 +19,14 @@ repositories {
     // - Myles ViaVersion
     maven("https://ci.mg-dev.eu/plugin/repository/everything/")
 
+    // Used for cloud-minecraft snapshots. Can be dropped once a release is out
+    maven {
+        url = uri("https://central.sonatype.com/repository/maven-snapshots/")
+        content {
+            includeGroup("org.incendo")
+        }
+    }
+
     // Used to access a server JAR for testing
     // TODO Use Paperclip instead
     mavenLocal {
