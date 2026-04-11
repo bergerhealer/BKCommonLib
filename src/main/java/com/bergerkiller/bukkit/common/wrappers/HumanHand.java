@@ -1,19 +1,56 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
+import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
-
-import com.bergerkiller.generated.net.minecraft.world.InteractionHandHandle;
-import com.bergerkiller.generated.org.bukkit.entity.HumanEntityHandle;
-import com.bergerkiller.generated.org.bukkit.inventory.MainHandHandle;
-import com.bergerkiller.generated.org.bukkit.inventory.PlayerInventoryHandle;
 
 /**
  * HumanHand is a mirror of Bukkit's {@link org.bukkit.inventory.MainHand}.
  * It is here for backwards compatibility with MC 1.8.9.
+ * This defines a player-relative left or right hand, and provides utility methods for using it
+ * to update/query equipment or to convert it to other API/internal types.
  */
 public enum HumanHand {
     LEFT, RIGHT;
+
+    private final Object bukkitMainHand;
+    private final Object nmsHumanoidArm;
+
+    HumanHand() {
+        if (CommonCapabilities.PLAYER_OFF_HAND) {
+            try {
+                Class<?> mainHandType = CommonUtil.getClass("org.bukkit.inventory.MainHand");
+                this.bukkitMainHand = mainHandType.getField(this.name()).get(null);
+            } catch (Throwable t) {
+                throw new UnsupportedOperationException("Failed to initialize bukkit main hand for HumanHand enum constant " + name(), t);
+            }
+            try {
+                Class<?> humanoidArmType = CommonUtil.getClass("net.minecraft.world.entity.HumanoidArm");
+                this.nmsHumanoidArm = humanoidArmType.getField(this.name()).get(null);
+            } catch (Throwable t) {
+                throw new UnsupportedOperationException("Failed to initialize nms humanoid arm for HumanHand enum constant " + name(), t);
+            }
+        } else {
+            this.bukkitMainHand = null;
+            this.nmsHumanoidArm = null;
+        }
+    }
+
+    private static final FastMethod<Object> getBukkitMainHandMethod = LogicUtil.tryCreate(() -> {
+        if (CommonCapabilities.PLAYER_OFF_HAND) {
+            FastMethod<Object> method = new FastMethod<>(HumanEntity.class.getMethod("getMainHand"));
+            method.forceInitialization();
+            return method;
+        } else {
+            return null;
+        }
+    }, t -> {
+        throw new UnsupportedOperationException("Failed to initialize the HumanEntity getMainHand method", t);
+    });
 
     /**
      * Gets the opposite hand (LEFT -> RIGHT, RIGHT->LEFT)
@@ -22,16 +59,6 @@ public enum HumanHand {
      */
     public final HumanHand opposite() {
         return (this == LEFT) ? RIGHT : LEFT;
-    }
-
-    /**
-     * Converts this HumanHand to Bukkit's MainHand. This method always returns null
-     * on versions before and including 1.8.9.
-     *
-     * @return {@link org.bukkit.inventory.MainHand} as a safe Object
-     */
-    public Object toMainHand() {
-        return toMainHand(this);
     }
 
     /**
@@ -44,8 +71,8 @@ public enum HumanHand {
      * @param humanEntity to query for main hand information
      * @return <i>net.minecraft.server.EnumHand</i>
      */
-    public Object toNMSEnumHand(HumanEntity humanEntity) {
-        return toNMSEnumHand(humanEntity, this);
+    public Object toNMSInteractionHand(HumanEntity humanEntity) {
+        return toNMSInteractionHand(humanEntity, this);
     }
 
     /**
@@ -56,17 +83,79 @@ public enum HumanHand {
      * @param mainHand The Bukkit {@link org.bukkit.inventory.MainHand} MainHand) of the human
      * @return HumanHand
      */
-    public static HumanHand fromMainHand(Object mainHand) {
-        if (!MainHandHandle.T.isAvailable()) {
+    @ConverterMethod(input = "org.bukkit.inventory.MainHand")
+    public static HumanHand fromBukkitMainHand(Object mainHand) {
+        if (!CommonCapabilities.PLAYER_OFF_HAND) {
             return RIGHT;
-        } else if (MainHandHandle.T.isAssignableFrom(mainHand)) {
-            if (MainHandHandle.LEFT.getRaw() == mainHand) {
-                return LEFT;
-            } else {
+        } else if (mainHand != null) {
+            if (RIGHT.bukkitMainHand == mainHand) {
                 return RIGHT;
+            } else if (LEFT.bukkitMainHand == mainHand) {
+                return LEFT;
             }
+        }
+        return null;
+    }
+
+    /**
+     * Converts a HumanHand to Bukkit's MainHand. This method always returns null
+     * on versions before and including MC 1.8.9.
+     *
+     * @param hand to convert
+     * @return {@link org.bukkit.inventory.MainHand} as a safe Object
+     */
+    @ConverterMethod(output = "org.bukkit.inventory.MainHand")
+    public static Object toBukkitMainHand(HumanHand hand) {
+        return hand == null ? null : hand.bukkitMainHand;
+    }
+
+    /**
+     * Converts a <i>net.minecraft.world.entity.HumanoidArm</i> into a HumanHand.
+     * This wrapper is required for backwards compatibility with MC 1.8.9,
+     * and will always return RIGHT on versions before and including MC 1.8.9.
+     *
+     * @param nmsHumanoidArm to convert into a HumanHand
+     * @return HumanHand
+     */
+    @ConverterMethod(input = "net.minecraft.world.entity.HumanoidArm")
+    public static HumanHand fromNMSHumanoidArm(Object nmsHumanoidArm) {
+        if (!CommonCapabilities.PLAYER_OFF_HAND) {
+            return RIGHT;
+        } else if (nmsHumanoidArm != null) {
+            if (RIGHT.nmsHumanoidArm == nmsHumanoidArm) {
+                return RIGHT;
+            } else if (LEFT.nmsHumanoidArm == nmsHumanoidArm) {
+                return LEFT;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Converts a HumanHand into a <i>net.minecraft.world.entity.HumanoidArm</i>.
+     * Only works since MC 1.9, and will return <i>null</i> on versions before and including MC 1.8.9.
+     *
+     * @param hand to convert
+     * @return Humanoid arm as a safe Object
+     */
+    @ConverterMethod(output = "net.minecraft.world.entity.HumanoidArm")
+    public static Object toNMSHumanoidArm(HumanHand hand) {
+        return hand == null ? null : hand.nmsHumanoidArm;
+    }
+
+    /**
+     * Gets the HumanHandRole of a given hand for a human entity. This is determined by the player's main hand setting.
+     * On versions before and including MC 1.8.9, this method will always return MAIN for RIGHT and OFF for LEFT,
+     * regardless of the player's actual main hand setting.
+     *
+     * @param humanEntity to get the hand role for
+     * @return HumanHandRole of the given hand for the given human entity
+     */
+    public HumanHandRole getRoleOf(HumanEntity humanEntity) {
+        if (this == getMainHand(humanEntity)) {
+            return HumanHandRole.MAIN;
         } else {
-            return null;
+            return HumanHandRole.OFF;
         }
     }
 
@@ -74,12 +163,16 @@ public enum HumanHand {
      * Gets the main hand in use by a human. This will always return RIGHT on versions before
      * and including MC 1.8.9. When <i>null</i> is used for the {@code humanEntity} parameter,
      * this method will always return RIGHT as well.
-     * 
+     *
      * @param humanEntity to get the main hand for
      * @return main human hand
      */
     public static HumanHand getMainHand(HumanEntity humanEntity) {
-        return HumanEntityHandle.T.getMainHumanHand.invoke(humanEntity);
+        if (humanEntity != null && getBukkitMainHandMethod != null) {
+            return fromBukkitMainHand(getBukkitMainHandMethod.invoke(humanEntity));
+        } else {
+            return RIGHT;
+        }
     }
 
     /**
@@ -95,44 +188,20 @@ public enum HumanHand {
     }
 
     /**
-     * Converts a HumanHand to Bukkit's MainHand. This method always returns null
-     * on versions before and including MC 1.8.9.
-     * 
-     * @param hand to convert
-     * @return {@link org.bukkit.inventory.MainHand}
-     */
-    public static Object toMainHand(HumanHand hand) {
-        if (hand == null) {
-            return null;
-        }
-        if (MainHandHandle.T.isAvailable()) {
-            return (hand == LEFT) ? MainHandHandle.LEFT.getRaw() : MainHandHandle.RIGHT.getRaw();
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Converts a <i>net.minecraft.server.EnumHand</i> into a HumanHand, keeping in mind
+     * Converts a <i>net.minecraft.server.InteractionHand</i> into a HumanHand, keeping in mind
      * whether LEFT/RIGHT is the MAIN or OFF hand. When <i>null</i> is used for {@code humanEntity}
      * it is assumed the player's main hand is RIGHT.<br>
      * <br>
      * On versions before and including MC 1.8.9 this method always returns <i>null</i>.
      * 
      * @param humanEntity to query for main hand information
-     * @param nmsEnumHand to convert into a HumanHand
+     * @param nmsInteractionHand to convert into a HumanHand
      * @return HumanHand
+     * @see HumanHandRole#fromNMSInteractionHand
      */
-    public static HumanHand fromNMSEnumHand(HumanEntity humanEntity, Object nmsEnumHand) {
-        if (nmsEnumHand != null && InteractionHandHandle.T.isAvailable()) {
-            HumanHand hand = (nmsEnumHand == InteractionHandHandle.OFF_HAND.getRaw()) ? LEFT : RIGHT;
-            if (getMainHand(humanEntity) == LEFT) {
-                hand = (hand == RIGHT) ? LEFT : RIGHT;
-            }
-            return hand;
-        } else {
-            return null;
-        }
+    public static HumanHand fromNMSInteractionHand(HumanEntity humanEntity, Object nmsInteractionHand) {
+        HumanHandRole role = HumanHandRole.fromNMSInteractionHand(nmsInteractionHand);
+        return role == null ? null : role.getHandOf(humanEntity);
     }
 
     /**
@@ -145,17 +214,11 @@ public enum HumanHand {
      * @param humanEntity to query for main hand information
      * @param humanHand to convert
      * @return <i>net.minecraft.server.EnumHand</i>
+     * @see #getRoleOf(HumanEntity)
+     * @see HumanHandRole#toNMSInteractionHand(HumanHandRole) 
      */
-    public static Object toNMSEnumHand(HumanEntity humanEntity, HumanHand humanHand) {
-        if (InteractionHandHandle.T.isAvailable()) {
-            if (getMainHand(humanEntity) == humanHand) {
-                return InteractionHandHandle.MAIN_HAND.getRaw();
-            } else {
-                return InteractionHandHandle.OFF_HAND.getRaw();
-            }
-        } else {
-            return null;
-        }
+    public static Object toNMSInteractionHand(HumanEntity humanEntity, HumanHand humanHand) {
+        return HumanHandRole.toNMSInteractionHand(humanHand.getRoleOf(humanEntity));
     }
 
     /**
@@ -172,11 +235,7 @@ public enum HumanHand {
         if (humanEntity == null) {
             throw new IllegalArgumentException("humanEntity can not be null");
         }
-        if (humanHand == getMainHand(humanEntity)) {
-            return getItemInMainHand(humanEntity);
-        } else {
-            return getItemInOffHand(humanEntity);
-        }
+        return humanHand.getRoleOf(humanEntity).getHeldItem(humanEntity);
     }
 
     /**
@@ -193,11 +252,7 @@ public enum HumanHand {
         if (humanEntity == null) {
             throw new IllegalArgumentException("humanEntity can not be null");
         }
-        if (humanHand == getMainHand(humanEntity)) {
-            setItemInMainHand(humanEntity, item);
-        } else {
-            setItemInOffHand(humanEntity, item);
-        }
+        humanHand.getRoleOf(humanEntity).setHeldItem(humanEntity, item);
     }
 
     /**
@@ -205,9 +260,10 @@ public enum HumanHand {
      * 
      * @param humanEntity to get the main hand held item
      * @return held item
+     * @see HumanHandRole#getHeldItem(HumanEntity)
      */
     public static ItemStack getItemInMainHand(HumanEntity humanEntity) {
-        return PlayerInventoryHandle.T.getItemInMainHand.invoke(humanEntity.getInventory());
+        return HumanHandRole.MAIN.getHeldItem(humanEntity);
     }
 
     /**
@@ -216,9 +272,10 @@ public enum HumanHand {
      * 
      * @param humanEntity to get the off hand held item
      * @return held item
+     * @see HumanHandRole#getHeldItem(HumanEntity)
      */
     public static ItemStack getItemInOffHand(HumanEntity humanEntity) {
-        return PlayerInventoryHandle.T.getItemInOffHand.invoke(humanEntity.getInventory());
+        return HumanHandRole.OFF.getHeldItem(humanEntity);
     }
 
     /**
@@ -226,18 +283,10 @@ public enum HumanHand {
      * 
      * @param humanEntity to set the main hand held item
      * @param item to set to
+     * @see HumanHandRole#setHeldItem(HumanEntity, ItemStack)
      */
     public static void setItemInMainHand(HumanEntity humanEntity, ItemStack item) {
-        if (humanEntity == null) {
-            throw new IllegalArgumentException("humanEntity can not be null");
-        }
-        if (PlayerInventoryHandle.T.setItemInMainHand.isAvailable()) {
-            PlayerInventoryHandle.T.setItemInMainHand.invoke(humanEntity.getInventory(), item);
-        } else if (PlayerInventoryHandle.T.setItemInHand.isAvailable()) {
-            PlayerInventoryHandle.T.setItemInHand.invoke(humanEntity.getInventory(), item);
-        } else {
-            // Silently fail
-        }
+        HumanHandRole.MAIN.setHeldItem(humanEntity, item);
     }
 
     /**
@@ -246,15 +295,9 @@ public enum HumanHand {
      * 
      * @param humanEntity to set the off hand held item
      * @param item to set to
+     * @see HumanHandRole#setHeldItem(HumanEntity, ItemStack)
      */
     public static void setItemInOffHand(HumanEntity humanEntity, ItemStack item) {
-        if (humanEntity == null) {
-            throw new IllegalArgumentException("humanEntity can not be null");
-        }
-        if (PlayerInventoryHandle.T.setItemInOffHand.isAvailable()) {
-            PlayerInventoryHandle.T.setItemInOffHand.invoke(humanEntity.getInventory(), item);
-        } else {
-            // Silent fail, No OFF hand item holding <= MC 1.8.9
-        }
+        HumanHandRole.OFF.setHeldItem(humanEntity, item);
     }
 }

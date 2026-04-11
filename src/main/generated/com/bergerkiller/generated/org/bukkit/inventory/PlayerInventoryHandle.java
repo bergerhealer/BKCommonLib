@@ -22,7 +22,9 @@ public abstract class PlayerInventoryHandle extends InventoryHandle {
     /* ============================================================================== */
 
     public abstract ItemStack getItemInMainHand();
+    public abstract void setItemInMainHand(ItemStack item);
     public abstract ItemStack getItemInOffHand();
+    public abstract void setItemInOffHand(ItemStack item);
     public abstract void setItem(EquipmentSlot slot, ItemStack item);
     public abstract ItemStack getItem(EquipmentSlot slot);
     /**
@@ -30,16 +32,10 @@ public abstract class PlayerInventoryHandle extends InventoryHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PlayerInventoryClass extends Template.Class<PlayerInventoryHandle> {
-        @Template.Optional
-        public final Template.Method<Void> setItemInMainHand = new Template.Method<Void>();
-        @Template.Optional
-        public final Template.Method<Void> setItemInOffHand = new Template.Method<Void>();
-        @Template.Optional
-        public final Template.Method<ItemStack> getItemInHand = new Template.Method<ItemStack>();
-        @Template.Optional
-        public final Template.Method<Void> setItemInHand = new Template.Method<Void>();
         public final Template.Method<ItemStack> getItemInMainHand = new Template.Method<ItemStack>();
+        public final Template.Method<Void> setItemInMainHand = new Template.Method<Void>();
         public final Template.Method<ItemStack> getItemInOffHand = new Template.Method<ItemStack>();
+        public final Template.Method<Void> setItemInOffHand = new Template.Method<Void>();
         public final Template.Method<Void> setItem = new Template.Method<Void>();
         public final Template.Method<ItemStack> getItem = new Template.Method<ItemStack>();
 

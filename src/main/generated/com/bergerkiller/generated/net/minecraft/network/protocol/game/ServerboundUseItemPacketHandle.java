@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.HumanHandRole;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 
 /**
@@ -24,6 +25,8 @@ public abstract class ServerboundUseItemPacketHandle extends PacketHandle {
     public abstract float getPitch();
     public abstract void setYaw(float yaw);
     public abstract void setPitch(float pitch);
+    public abstract HumanHandRole getHandRole();
+    public abstract void setHandRole(HumanHandRole handRole);
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
         return com.bergerkiller.bukkit.common.protocol.PacketType.IN_BLOCK_PLACE;
@@ -36,11 +39,11 @@ public abstract class ServerboundUseItemPacketHandle extends PacketHandle {
     }
 
     public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
-        return internalGetHand(T.enumHand, humanEntity);
+        return getHandRole().getHandOf(humanEntity);
     }
 
     public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
-        internalSetHand(T.enumHand, humanEntity, hand);
+        setHandRole(hand.getRoleOf(humanEntity));
     }
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.ServerboundUseItemPacket</b>.
@@ -48,14 +51,14 @@ public abstract class ServerboundUseItemPacketHandle extends PacketHandle {
      */
     public static final class ServerboundUseItemPacketClass extends Template.Class<ServerboundUseItemPacketHandle> {
         @Template.Optional
-        public final Template.Field.Converted<Object> enumHand = new Template.Field.Converted<Object>();
-        @Template.Optional
         public final Template.Field.Long timestamp = new Template.Field.Long();
 
         public final Template.Method<Float> getYaw = new Template.Method<Float>();
         public final Template.Method<Float> getPitch = new Template.Method<Float>();
         public final Template.Method<Void> setYaw = new Template.Method<Void>();
         public final Template.Method<Void> setPitch = new Template.Method<Void>();
+        public final Template.Method.Converted<HumanHandRole> getHandRole = new Template.Method.Converted<HumanHandRole>();
+        public final Template.Method.Converted<Void> setHandRole = new Template.Method.Converted<Void>();
 
     }
 

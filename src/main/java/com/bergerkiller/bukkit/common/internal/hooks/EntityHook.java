@@ -80,12 +80,12 @@ public class EntityHook extends ClassHook<EntityHook> {
     public InteractionResult base_onInteractBy(HumanEntity humanEntity, HumanHand humanHand) {
         Object entityHumanHandle = HandleConversion.toEntityHandle(humanEntity);
         if (EntityHandle.T.onInteractBy_1_16.isAvailable()) {
-            return InteractionResult.fromHandle(base.onInteractBy_1_16(entityHumanHandle, humanHand.toNMSEnumHand(humanEntity)));
+            return InteractionResult.fromHandle(base.onInteractBy_1_16(entityHumanHandle, humanHand.toNMSInteractionHand(humanEntity)));
         } else if (EntityHandle.T.onInteractBy_1_11_2.isAvailable()) {
-            return InteractionResult.fromTruthy(base.onInteractBy_1_11_2(entityHumanHandle, humanHand.toNMSEnumHand(humanEntity)));
+            return InteractionResult.fromTruthy(base.onInteractBy_1_11_2(entityHumanHandle, humanHand.toNMSInteractionHand(humanEntity)));
         } else if (EntityHandle.T.onInteractBy_1_9.isAvailable()) {
             Object item = HandleConversion.toItemStackHandle(HumanHand.getHeldItem(humanEntity, humanHand));
-            return InteractionResult.fromTruthy(base.onInteractBy_1_10_2(entityHumanHandle, item, humanHand.toNMSEnumHand(humanEntity)));
+            return InteractionResult.fromTruthy(base.onInteractBy_1_10_2(entityHumanHandle, item, humanHand.toNMSInteractionHand(humanEntity)));
         } else if (EntityHandle.T.onInteractBy_1_8_8.isAvailable()) {
             return InteractionResult.fromTruthy(base.onInteractBy_1_8_8(entityHumanHandle));
         } else {
@@ -129,7 +129,7 @@ public class EntityHook extends ClassHook<EntityHook> {
     @HookMethod(value="public boolean onInteractBy_1_11_2:???(net.minecraft.world.entity.player.Player entityhuman, InteractionHand enumhand)")
     public boolean onInteractBy_1_11_2(Object entityHuman, Object enumHand) {
         HumanEntity humanEntity = (HumanEntity) WrapperConversion.toEntity(entityHuman);
-        return onInteractBy(humanEntity, HumanHand.fromNMSEnumHand(humanEntity, enumHand)).isTruthy();
+        return onInteractBy(humanEntity, HumanHand.fromNMSInteractionHand(humanEntity, enumHand)).isTruthy();
     }
 
     @Deprecated
@@ -137,7 +137,7 @@ public class EntityHook extends ClassHook<EntityHook> {
     @HookMethod(value="public InteractionResult onInteractBy_1_16:???(net.minecraft.world.entity.player.Player entityhuman, InteractionHand enumhand)")
     public Object onInteractBy_1_16(Object entityHuman, Object enumHand) {
         HumanEntity humanEntity = (HumanEntity) WrapperConversion.toEntity(entityHuman);
-        return onInteractBy(humanEntity, HumanHand.fromNMSEnumHand(humanEntity, enumHand)).getRawHandle();
+        return onInteractBy(humanEntity, HumanHand.fromNMSInteractionHand(humanEntity, enumHand)).getRawHandle();
     }
 
     @HookMethodCondition("version >= 1.17")

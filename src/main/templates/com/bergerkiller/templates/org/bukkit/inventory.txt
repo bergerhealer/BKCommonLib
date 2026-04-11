@@ -1,7 +1,5 @@
 package org.bukkit.inventory;
 
-import com.bergerkiller.generated.org.bukkit.inventory.MainHandHandle;
-
 class Inventory {
 
     // These functions were introduced since 1.10.2
@@ -28,26 +26,22 @@ class InventoryView {
     public abstract void setItem(int index, org.bukkit.inventory.ItemStack item);
 }
 
-optional class MainHand {
-    enum (MainHandHandle) MainHand LEFT;
-    enum (MainHandHandle) MainHand RIGHT;
-}
-
 class PlayerInventory extends Inventory {
-    public optional abstract void setItemInMainHand(ItemStack item);
-    public optional abstract void setItemInOffHand(ItemStack item)
-
-    // Deprecated <= 1.8.9
-    public optional abstract ItemStack getItemInHand()
-    public optional abstract void setItemInHand(ItemStack stack)
-
 #if version >= 1.9
     public ItemStack getItemInMainHand();
+    public void setItemInMainHand(ItemStack item);
+
     public ItemStack getItemInOffHand();
+    public void setItemInOffHand(ItemStack item);
 #else
     public ItemStack getItemInMainHand:getItemInHand();
+    public void setItemInMainHand:setItemInHand(ItemStack item);
+
+    // Off hand isn't supported on 1.8, so do nothing
     public ItemStack getItemInOffHand() {
         return null;
+    }
+    public void setItemInOffHand(ItemStack item) {
     }
 #endif
 

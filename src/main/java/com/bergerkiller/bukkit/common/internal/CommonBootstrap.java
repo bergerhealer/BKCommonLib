@@ -33,6 +33,8 @@ import com.bergerkiller.bukkit.common.internal.logic.EmptyBlockGetterInit;
 import com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporterInit;
 import com.bergerkiller.bukkit.common.internal.logic.UnsetDataWatcherItemInit;
 import com.bergerkiller.bukkit.common.wrappers.Brightness;
+import com.bergerkiller.bukkit.common.wrappers.HumanHand;
+import com.bergerkiller.bukkit.common.wrappers.HumanHandRole;
 import com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode;
 import com.bergerkiller.bukkit.common.wrappers.RelativeFlags;
 import com.bergerkiller.generated.net.minecraft.nbt.CompoundTagHandle;
@@ -581,6 +583,8 @@ public class CommonBootstrap {
         if (evaluateMCVersion("<", "26.1")) {
             // Class renamed
             remappings.put("net.minecraft.world.inventory.ContainerInput", "net.minecraft.world.inventory.ClickType");
+            // Attack is handled by the interact packet
+            remappings.put("net.minecraft.network.protocol.game.ServerboundAttackPacket", "net.minecraft.network.protocol.game.ServerboundInteractPacket");
         }
 
         /* ======== Mojang remapping changes for 1.21.11 ======== */
@@ -928,6 +932,10 @@ public class CommonBootstrap {
         }
         if (evaluateMCVersion("<", "1.9")) {
             Conversion.registerConverters(MC1_8_8_Conversion.class);
+        }
+        if (evaluateMCVersion(">=", "1.9")) {
+            Conversion.registerConverters(HumanHandRole.class);
+            Conversion.registerConverters(HumanHand.class);
         }
         if (evaluateMCVersion(">=", "1.14")) {
             Conversion.registerConverters(EntityPoseConversion.class);

@@ -32,6 +32,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.InteractionResult;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.wrappers.HumanHandRole;
 
 import com.bergerkiller.generated.net.minecraft.CrashReportCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
@@ -2156,25 +2157,25 @@ class Entity {
 
     // Since MC 1.16
 #if version >= 1.18
-    public optional (InteractionResult) net.minecraft.world.InteractionResult onInteractBy_1_16:interact((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.MainHand) InteractionHand enumhand);
+    public optional (InteractionResult) net.minecraft.world.InteractionResult onInteractBy_1_16:interact((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (HumanHandRole) InteractionHand enumhand);
 #elseif version >= 1.16
-    public optional (InteractionResult) net.minecraft.world.InteractionResult onInteractBy_1_16:a((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.MainHand) InteractionHand enumhand);
+    public optional (InteractionResult) net.minecraft.world.InteractionResult onInteractBy_1_16:a((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (HumanHandRole) InteractionHand enumhand);
 #else
-    public optional (InteractionResult) net.minecraft.world.InteractionResult onInteractBy_1_16:###((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.MainHand) InteractionHand enumhand);
+    public optional (InteractionResult) net.minecraft.world.InteractionResult onInteractBy_1_16:###((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (HumanHandRole) InteractionHand enumhand);
 #endif
 
     // Since MC 1.11.2
 #if version >= 1.11 && version < 1.16
-    public optional boolean onInteractBy_1_11_2:b((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.MainHand) InteractionHand enumhand);
+    public optional boolean onInteractBy_1_11_2:b((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (HumanHandRole) InteractionHand enumhand);
 #else
-    public optional boolean onInteractBy_1_11_2:###((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.MainHand) InteractionHand enumhand);
+    public optional boolean onInteractBy_1_11_2:###((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (HumanHandRole) InteractionHand enumhand);
 #endif
 
     // Since MC 1.9
 #if version >= 1.9 && version < 1.11
-    public optional boolean onInteractBy_1_9:a((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (org.bukkit.inventory.MainHand) InteractionHand enumhand);
+    public optional boolean onInteractBy_1_9:a((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (HumanHandRole) InteractionHand enumhand);
 #else
-    public optional boolean onInteractBy_1_9:###((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (org.bukkit.inventory.MainHand) InteractionHand enumhand);
+    public optional boolean onInteractBy_1_9:###((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (HumanHandRole) InteractionHand enumhand);
 #endif
 
     // Since MC 1.8.9

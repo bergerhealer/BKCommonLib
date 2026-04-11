@@ -327,4 +327,9 @@ public class CommonCapabilities {
      * Since Minecraft 1.21.5 the Minecart displayed block and whether it is displayed is in a single (Optional) BlockData key instead.
      */
     public static final boolean IS_MINECART_BLOCK_COMBINED_KEY = CommonBootstrap.evaluateMCVersion(">=", "1.21.5");
+
+    /**
+     * Since Minecraft 26.1 the interact packet was split into attack and interact
+     */
+    public static final boolean INTERACT_PACKET_ATTACK_SPLIT = CommonBootstrap.evaluateMCVersion(">=", "26.1");
 }

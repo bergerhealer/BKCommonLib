@@ -131,9 +131,7 @@ public class NMSPacketClasses {
          * @param humanHand to set to
          */
         public final void setHand(CommonPacket packet, HumanEntity humanEntity, HumanHand humanHand) {
-            if (ServerboundSwingPacketHandle.T.enumHand.isAvailable()) {
-                ServerboundSwingPacketHandle.T.enumHand.set(packet.getHandle(), humanHand.toNMSEnumHand(humanEntity));
-            }
+            ServerboundSwingPacketHandle.createHandle(packet.getHandle()).setHand(humanEntity, humanHand);
         }
 
         /**
@@ -144,12 +142,7 @@ public class NMSPacketClasses {
          * @return humanHand
          */
         public final HumanHand getHand(CommonPacket packet, HumanEntity humanEntity) {
-            if (ServerboundSwingPacketHandle.T.enumHand.isAvailable()) {
-                Object enumHand = ServerboundSwingPacketHandle.T.enumHand.get(packet.getHandle());
-                return HumanHand.fromNMSEnumHand(humanEntity, enumHand);
-            } else {
-                return HumanHand.RIGHT;
-            }
+            return ServerboundSwingPacketHandle.createHandle(packet.getHandle()).getHand(humanEntity);
         }
     }
 
@@ -192,9 +185,7 @@ public class NMSPacketClasses {
          * @param humanHand to set to
          */
         public final void setHand(CommonPacket packet, HumanEntity humanEntity, HumanHand humanHand) {
-            if (ServerboundUseItemPacketHandle.T.enumHand.isAvailable()) {
-                ServerboundUseItemPacketHandle.T.enumHand.set(packet.getHandle(), humanHand.toNMSEnumHand(humanEntity));
-            }
+            ServerboundUseItemPacketHandle.createHandle(packet.getHandle()).setHand(humanEntity, humanHand);
         }
 
         /**
@@ -205,12 +196,7 @@ public class NMSPacketClasses {
          * @return humanHand
          */
         public final HumanHand getHand(CommonPacket packet, HumanEntity humanEntity) {
-            if (ServerboundUseItemPacketHandle.T.enumHand.isAvailable()) {
-                Object enumHand = ServerboundUseItemPacketHandle.T.enumHand.get(packet.getHandle());
-                return HumanHand.fromNMSEnumHand(humanEntity, enumHand);
-            } else {
-                return HumanHand.RIGHT;
-            }
+            return ServerboundUseItemPacketHandle.createHandle(packet.getHandle()).getHand(humanEntity);
         }
     }
 
@@ -297,7 +283,7 @@ public class NMSPacketClasses {
          * @param humanHand to set to
          */
         public final void setHand(CommonPacket packet, HumanEntity humanEntity, HumanHand humanHand) {
-            ServerboundUseItemOnPacketHandle.T.setHand.invoke(packet.getHandle(), humanEntity, humanHand);
+            ServerboundUseItemOnPacketHandle.createHandle(packet.getHandle()).setHand(humanEntity, humanHand);
         }
 
         /**
@@ -308,7 +294,7 @@ public class NMSPacketClasses {
          * @return humanHand
          */
         public final HumanHand getHand(CommonPacket packet, HumanEntity humanEntity) {
-            return ServerboundUseItemOnPacketHandle.T.getHand.invoke(packet.getHandle(), humanEntity);
+            return ServerboundUseItemOnPacketHandle.createHandle(packet.getHandle()).getHand(humanEntity);
         }
     }
 
@@ -573,17 +559,17 @@ public class NMSPacketClasses {
      */
     @Deprecated
     public static class NMSServerboundInteractPacket extends NMSPacket {
-        public final FieldAccessor<Integer> clickedEntityId = ServerboundInteractPacketHandle.T.usedEntityId.toFieldAccessor();
+        public final FieldAccessor<Integer> clickedEntityId = new SafeDirectField<Integer>() {
+            @Override
+            public Integer get(Object instance) {
+                return ServerboundInteractPacketHandle.createHandle(instance).getUsedEntityId();
+            }
 
-        /**
-         * Sets the hand that interacted with the entity
-         *
-         * @param packet to write to
-         * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
-         * @param humanHand to set to
-         */
-        public final void setHand(CommonPacket packet, HumanEntity humanEntity, HumanHand humanHand) {
-        }
+            @Override
+            public boolean set(Object instance, Integer value) {
+                return false;
+            }
+        };
 
         /**
          * Gets the hand that interacted with the entity
@@ -593,7 +579,27 @@ public class NMSPacketClasses {
          * @return humanHand
          */
         public final HumanHand getHand(CommonPacket packet, HumanEntity humanEntity) {
-            return ServerboundInteractPacketHandle.createHandle(packet.getHandle()).getInteractHand(humanEntity);
+            return ServerboundInteractPacketHandle.createHandle(packet.getHandle()).getHand(humanEntity);
+        }
+
+        @Override
+        public boolean matchPacket(Object packetHandle) {
+            if (CommonCapabilities.INTERACT_PACKET_ATTACK_SPLIT) {
+                return true;
+            } else {
+                return !ServerboundAttackPacketHandle.isAttackInteractionPacket(packetHandle);
+            }
+        }
+    }
+
+    public static class NMSServerboundAttackPacket extends NMSPacket {
+        @Override
+        public boolean matchPacket(Object packetHandle) {
+            if (CommonCapabilities.INTERACT_PACKET_ATTACK_SPLIT) {
+                return true;
+            } else {
+                return ServerboundAttackPacketHandle.isAttackInteractionPacket(packetHandle);
+            }
         }
     }
 

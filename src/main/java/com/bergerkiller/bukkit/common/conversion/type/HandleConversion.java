@@ -39,7 +39,6 @@ import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
-import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.bukkit.common.wrappers.InteractionResult;
 import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
@@ -56,7 +55,6 @@ import com.bergerkiller.generated.net.minecraft.world.DifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectInstanceHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.HumanoidArmHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.IngredientHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.ChunkPosHandle;
@@ -214,30 +212,6 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.world.level.GameType")
     public static Object toEnumGamemodeHandle(org.bukkit.GameMode gameMode) {
         return GameTypeHandle.T.getById.raw.invoke(gameMode.getValue());
-    }
-
-    @ConverterMethod(input="org.bukkit.inventory.MainHand", output="net.minecraft.world.InteractionHand", optional=true)
-    public static Object mainHandToEnumHandHandle(Object mainHand) {
-        return HumanHand.fromMainHand(mainHand).toNMSEnumHand(null);
-    }
-
-    @ConverterMethod(output="net.minecraft.world.InteractionHand", optional=true)
-    public static Object humanHandToEnumHandHandle(HumanHand hand) {
-        return hand.toNMSEnumHand(null);
-    }
-
-    @ConverterMethod(output="org.bukkit.inventory.MainHand", optional=true)
-    public static Object humanHandToMainHandHandle(HumanHand hand) {
-        return hand.toMainHand();
-    }
-
-    @ConverterMethod(output="net.minecraft.world.entity.HumanoidArm", optional=true)
-    public static Object humanHandToEnumMainHandHandle(HumanHand hand) {
-        if (hand == HumanHand.LEFT) {
-            return HumanoidArmHandle.LEFT.getRaw();
-        } else {
-            return HumanoidArmHandle.RIGHT.getRaw();
-        }
     }
 
     @ConverterMethod(output="T extends net.minecraft.network.protocol.Packet")

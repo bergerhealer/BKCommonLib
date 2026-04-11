@@ -2,10 +2,9 @@ package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.bukkit.common.wrappers.HumanHand;
+import com.bergerkiller.bukkit.common.wrappers.HumanHandRole;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.HumanEntity;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.ServerboundUseItemOnPacket</b>.
@@ -24,8 +23,8 @@ public abstract class ServerboundUseItemOnPacketHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public abstract HumanHand getHand(HumanEntity humanEntity);
-    public abstract void setHand(HumanEntity humanEntity, HumanHand hand);
+    public abstract HumanHandRole getHandRole();
+    public abstract void setHandRole(HumanHandRole handRole);
     public abstract BlockFace getDirection();
     public abstract void setDirection(BlockFace direction);
     public abstract boolean isBlockPlacePacket();
@@ -38,6 +37,14 @@ public abstract class ServerboundUseItemOnPacketHandle extends PacketHandle {
     public abstract void setDeltaX(float dx);
     public abstract void setDeltaY(float dy);
     public abstract void setDeltaZ(float dz);
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
+        return getHandRole().getHandOf(humanEntity);
+    }
+
+    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
+        setHandRole(hand.getRoleOf(humanEntity));
+    }
+
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
         return com.bergerkiller.bukkit.common.protocol.PacketType.IN_USE_ITEM;
@@ -56,8 +63,8 @@ public abstract class ServerboundUseItemOnPacketHandle extends PacketHandle {
         @Template.Optional
         public final Template.Field.Long timestamp = new Template.Field.Long();
 
-        public final Template.Method<HumanHand> getHand = new Template.Method<HumanHand>();
-        public final Template.Method<Void> setHand = new Template.Method<Void>();
+        public final Template.Method.Converted<HumanHandRole> getHandRole = new Template.Method.Converted<HumanHandRole>();
+        public final Template.Method.Converted<Void> setHandRole = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<BlockFace> getDirection = new Template.Method.Converted<BlockFace>();
         public final Template.Method.Converted<Void> setDirection = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> isBlockPlacePacket = new Template.Method<Boolean>();

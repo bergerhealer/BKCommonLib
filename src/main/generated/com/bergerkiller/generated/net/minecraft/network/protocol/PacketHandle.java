@@ -70,20 +70,6 @@ public abstract class PacketHandle extends Template.Handle {
     protected final void setProtocolRotation(Template.Field.Byte field, float rotation) {
         field.setByte(getRaw(), (byte) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeRotation(rotation));
     }
-
-    protected final com.bergerkiller.bukkit.common.wrappers.HumanHand internalGetHand(Template.Field.Converted<Object> field, org.bukkit.entity.HumanEntity humanEntity) {
-        if (field.isAvailable()) {
-            return com.bergerkiller.bukkit.common.wrappers.HumanHand.fromNMSEnumHand(humanEntity, field.get(getRaw()));
-        } else {
-            return com.bergerkiller.bukkit.common.wrappers.HumanHand.RIGHT;
-        }
-    }
-
-    protected final void internalSetHand(Template.Field.Converted<Object> field, org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
-        if (field.isAvailable()) {
-            field.set(getRaw(), com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSEnumHand(humanEntity, hand));
-        }
-    }
     /**
      * Stores class members for <b>net.minecraft.network.protocol.Packet</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

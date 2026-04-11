@@ -57,12 +57,6 @@ class Difficulty {
 #endif
 }
 
-// Since MC 1.9
-optional class InteractionHand {
-    enum (InteractionHandHandle) InteractionHand MAIN_HAND;
-    enum (InteractionHandHandle) InteractionHand OFF_HAND;
-}
-
 package net.minecraft.world.level;
 import com.bergerkiller.generated.net.minecraft.world.level.GameTypeHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.LightLayerHandle;

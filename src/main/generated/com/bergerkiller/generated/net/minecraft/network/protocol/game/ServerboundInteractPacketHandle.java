@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
+import com.bergerkiller.bukkit.common.wrappers.HumanHandRole;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.util.Vector;
@@ -23,39 +24,39 @@ public abstract class ServerboundInteractPacketHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public static ServerboundInteractPacketHandle createNew(int usedEntityId, HumanEntity player, HumanHand hand, boolean isUsingSecondaryAction, Vector atPosition) {
+        return T.createNew.invoke(usedEntityId, player, hand, isUsingSecondaryAction, atPosition);
+    }
+
     public static boolean hasSecondaryActionField() {
         return T.hasSecondaryActionField.invoker.invoke(null);
     }
 
-    public abstract boolean isInteract();
-    public abstract boolean isInteractAt();
-    public abstract boolean isAttack();
-    public abstract HumanHand getInteractHand(HumanEntity humanEntity);
-    public abstract Vector getInteractAtPosition();
-    public abstract void setAttack();
-    public abstract void setInteract(HumanEntity humanEntity, HumanHand hand);
-    public abstract boolean isUsingSecondaryAction();
-    public abstract void setUsingSecondaryAction(boolean using);
     public abstract int getUsedEntityId();
-    public abstract void setUsedEntityId(int value);
+    public abstract HumanHandRole getHandRole();
+    public abstract boolean hasInteractAtPosition();
+    public abstract Vector getInteractAtPosition();
+    public abstract boolean isUsingSecondaryAction();
+    public static ServerboundInteractPacketHandle createNew(int usedEntityId, org.bukkit.entity.HumanEntity player, com.bergerkiller.bukkit.common.wrappers.HumanHand hand, org.bukkit.util.Vector atPosition) {
+        return createNew(usedEntityId, player, hand, false, atPosition);
+    }
+
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
+        return getHandRole().getHandOf(humanEntity);
+    }
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.ServerboundInteractPacket</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ServerboundInteractPacketClass extends Template.Class<ServerboundInteractPacketHandle> {
-        public final Template.Field.Integer usedEntityId = new Template.Field.Integer();
-
+        public final Template.StaticMethod.Converted<ServerboundInteractPacketHandle> createNew = new Template.StaticMethod.Converted<ServerboundInteractPacketHandle>();
         public final Template.StaticMethod<Boolean> hasSecondaryActionField = new Template.StaticMethod<Boolean>();
 
-        public final Template.Method<Boolean> isInteract = new Template.Method<Boolean>();
-        public final Template.Method<Boolean> isInteractAt = new Template.Method<Boolean>();
-        public final Template.Method<Boolean> isAttack = new Template.Method<Boolean>();
-        public final Template.Method<HumanHand> getInteractHand = new Template.Method<HumanHand>();
+        public final Template.Method<Integer> getUsedEntityId = new Template.Method<Integer>();
+        public final Template.Method.Converted<HumanHandRole> getHandRole = new Template.Method.Converted<HumanHandRole>();
+        public final Template.Method<Boolean> hasInteractAtPosition = new Template.Method<Boolean>();
         public final Template.Method.Converted<Vector> getInteractAtPosition = new Template.Method.Converted<Vector>();
-        public final Template.Method<Void> setAttack = new Template.Method<Void>();
-        public final Template.Method<Void> setInteract = new Template.Method<Void>();
         public final Template.Method<Boolean> isUsingSecondaryAction = new Template.Method<Boolean>();
-        public final Template.Method<Void> setUsingSecondaryAction = new Template.Method<Void>();
 
     }
 

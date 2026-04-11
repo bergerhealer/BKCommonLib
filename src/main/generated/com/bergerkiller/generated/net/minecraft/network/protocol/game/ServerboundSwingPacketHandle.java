@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.HumanHandRole;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 
 /**
@@ -20,20 +21,22 @@ public abstract class ServerboundSwingPacketHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public abstract HumanHandRole getHandRole();
+    public abstract void setHandRole(HumanHandRole handRole);
     public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
-        return internalGetHand(T.enumHand, humanEntity);
+        return getHandRole().getHandOf(humanEntity);
     }
 
     public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
-        internalSetHand(T.enumHand, humanEntity, hand);
+        setHandRole(hand.getRoleOf(humanEntity));
     }
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.ServerboundSwingPacket</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ServerboundSwingPacketClass extends Template.Class<ServerboundSwingPacketHandle> {
-        @Template.Optional
-        public final Template.Field.Converted<Object> enumHand = new Template.Field.Converted<Object>();
+        public final Template.Method.Converted<HumanHandRole> getHandRole = new Template.Method.Converted<HumanHandRole>();
+        public final Template.Method.Converted<Void> setHandRole = new Template.Method.Converted<Void>();
 
     }
 

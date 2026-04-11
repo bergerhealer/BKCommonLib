@@ -169,7 +169,8 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSServerboundCommandSuggestionPacket IN_TAB_COMPLETE = new NMSServerboundCommandSuggestionPacket();
     public static final NMSServerboundAcceptTeleportationPacket IN_TELEPORT_ACCEPT = new NMSServerboundAcceptTeleportationPacket();
     public static final NMSServerboundSignUpdatePacket IN_UPDATE_SIGN = new NMSServerboundSignUpdatePacket();
-    public static final NMSServerboundInteractPacket IN_USE_ENTITY = new NMSServerboundInteractPacket();
+    public static final NMSServerboundInteractPacket IN_INTERACT_ENTITY = new NMSServerboundInteractPacket();
+    public static final NMSServerboundAttackPacket IN_ATTACK_ENTITY = new NMSServerboundAttackPacket();
     public static final NMSServerboundUseItemOnPacket IN_USE_ITEM = new NMSServerboundUseItemOnPacket();
     public static final NMSServerboundMoveVehiclePacket IN_VEHICLE_MOVE = new NMSServerboundMoveVehiclePacket();
     public static final NMSServerboundClientTickEndPacket IN_CLIENT_TICK_END = new NMSServerboundClientTickEndPacket();

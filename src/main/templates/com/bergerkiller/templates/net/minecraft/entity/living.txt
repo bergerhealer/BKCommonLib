@@ -595,10 +595,10 @@ class LivingEntity extends Entity {
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) EquipmentSlot paramEnumItemSlot);
 #else
     public (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) EquipmentSlot paramEnumItemSlot) {
-        if (instance instanceof EntityHuman) {
+        if (instance instanceof net.minecraft.world.entity.player.Player) {
             if (paramEnumItemSlot == EquipmentSlot.MAINHAND) {
                 // Technically not supported, we implement a workaround
-                return ((EntityHuman) instance).inventory.getItemInHand();
+                return ((net.minecraft.world.entity.player.Player) instance).inventory.getItemInHand();
             } else {
                 return instance.getEquipment(paramEnumItemSlot.b());
             }

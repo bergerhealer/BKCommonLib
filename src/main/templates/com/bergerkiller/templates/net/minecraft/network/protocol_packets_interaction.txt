@@ -1,0 +1,645 @@
+package net.minecraft.network.protocol.game;
+
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+
+import com.bergerkiller.bukkit.common.wrappers.HumanHand;
+import com.bergerkiller.bukkit.common.wrappers.HumanHandRole;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundInteractPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundInteractPacketHandle.Action;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundAttackPacketHandle;
+
+class ServerboundSwingPacket extends Packet {
+#if version >= 1.9
+  #if version >= 1.17
+    #require ServerboundSwingPacket private InteractionHand handRole:hand;
+  #else
+    #require ServerboundSwingPacket private InteractionHand handRole:a;
+  #endif
+
+    public (HumanHandRole) InteractionHand getHandRole() {
+        return instance#handRole;
+    }
+
+    public void setHandRole((HumanHandRole) InteractionHand handRole) {
+        instance#handRole = handRole;
+    }
+#else
+    public (HumanHandRole) HumanHandRole getHandRole() {
+        return HumanHandRole.MAIN;
+    }
+
+    public void setHandRole((HumanHandRole) HumanHandRole handRole) {
+    }
+#endif
+
+    <code>
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
+        return getHandRole().getHandOf(humanEntity);
+    }
+
+    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
+        setHandRole(hand.getRoleOf(humanEntity));
+    }
+    </code>
+}
+
+// Since 26.1 this is a standalone packet
+// On 1.8 - 1.21.11 this uses the ServerboundInteractPacket (PacketPlayInUseEntity) with Action = ATTACK
+class ServerboundAttackPacket extends Packet {
+#if version >= 26.1
+    public int getEntityId:entityId();
+
+    public static (ServerboundAttackPacketHandle) ServerboundAttackPacket createNew(int attackedEntityId) {
+        return new ServerboundAttackPacket(attackedEntityId);
+    }
+
+    public static boolean isAttackInteractionPacket((Object) ServerboundInteractPacket interactPacket) {
+        return false;
+    }
+#elseif version >= 1.17
+    #require ServerboundInteractPacket static final ServerboundInteractPacket.Action ATTACK_ACTION;
+
+    public int getEntityId() {
+        #require ServerboundAttackPacket private readonly int attackedEntityId:entityId;
+        return instance#attackedEntityId;
+    }
+
+    public static (ServerboundAttackPacketHandle) ServerboundAttackPacket createNew(int attackedEntityId) {
+        #require ServerboundInteractPacket private ServerboundInteractPacket createInteractPacket:<init> (int i, boolean flag, ServerboundInteractPacket.Action action);
+        return #createInteractPacket( attackedEntityId, false, ServerboundInteractPacket#ATTACK_ACTION );
+    }
+
+    public static boolean isAttackInteractionPacket((Object) ServerboundInteractPacket interactPacket) {
+        #require net.minecraft.network.protocol.game.ServerboundInteractPacket private final ServerboundInteractPacket.Action action;
+        return interactPacket#action == ServerboundInteractPacket#ATTACK_ACTION;
+    }
+#else
+    #require ServerboundAttackPacket private int attackedEntityId:a;
+    #require ServerboundAttackPacket ServerboundInteractPacket.ActionType action;
+
+    public int getEntityId() {
+        return instance#attackedEntityId;
+    }
+
+    public static (ServerboundAttackPacketHandle) ServerboundAttackPacket createNew(int attackedEntityId) {
+        ServerboundAttackPacket packet = new ServerboundInteractPacket();
+        packet#attackedEntityId = attackedEntityId;
+        packet#action = ServerboundInteractPacket$ActionType.ATTACK;
+
+  #if version >= 1.9
+        #require ServerboundAttackPacket private net.minecraft.world.InteractionHand hand:d;
+        packet#hand = InteractionHand.MAIN_HAND;
+  #endif
+
+        return packet;
+    }
+
+    public static boolean isAttackInteractionPacket((Object) ServerboundInteractPacket interactPacket) {
+        return interactPacket#action == ServerboundInteractPacket$ActionType.ATTACK;
+    }
+#endif
+}
+
+class ServerboundInteractPacket extends Packet {
+#if version >= 26.1
+    public static (ServerboundInteractPacketHandle) ServerboundInteractPacket createNew(int usedEntityId, org.bukkit.entity.HumanEntity player, com.bergerkiller.bukkit.common.wrappers.HumanHand hand, boolean isUsingSecondaryAction, (org.bukkit.util.Vector) Vec3 atPosition) {
+        if (atPosition == null) {
+            throw new IllegalArgumentException("Since Minecraft 26.1 an interact position is required");
+        }
+
+        InteractionHand nmsHand = (InteractionHand) com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSInteractionHand(player, hand);
+
+        return new ServerboundInteractPacket(usedEntityId, nmsHand, atPosition, isUsingSecondaryAction);
+    }
+
+    public int getUsedEntityId:entityId();
+
+    public (HumanHandRole) InteractionHand getHandRole:hand();
+
+    // Always sends interaction position since 26.1
+    public boolean hasInteractAtPosition() {
+        return true;
+    }
+
+    public (org.bukkit.util.Vector) Vec3 getInteractAtPosition:location();
+
+#elseif version >= 1.17
+    // Since 1.17 the enum is a property of an interface that houses the action (Action -> getType() -> ActionType)
+    // ActionType is the internal enum name in mojmap, this handles the situation better
+    // After 26.1 this is no longer used
+  #if version >= 1.18
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.Action public abstract (Enum) net.minecraft.network.protocol.game.ServerboundInteractPacket.ActionType getType();
+  #else
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.Action public abstract (Enum) net.minecraft.network.protocol.game.ServerboundInteractPacket.ActionType getType:a();
+  #endif
+
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket private readonly int usedEntityId:entityId;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket private final ServerboundInteractPacket.Action action;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.InteractionAction private final readonly net.minecraft.world.InteractionHand interactHand:hand;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.InteractionAtLocationAction private final readonly net.minecraft.world.InteractionHand interactAtHand:hand;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket.InteractionAtLocationAction private final readonly net.minecraft.world.phys.Vec3 interactAtLocation:location;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket public String getActionName() {
+        return instance#action#getType().name();
+    }
+
+    public static (ServerboundInteractPacketHandle) ServerboundInteractPacket createNew(int usedEntityId, org.bukkit.entity.HumanEntity player, com.bergerkiller.bukkit.common.wrappers.HumanHand hand, boolean isUsingSecondaryAction, (org.bukkit.util.Vector) Vec3 atPosition) {
+        #require ServerboundInteractPacket private ServerboundInteractPacket createInteractPacket:<init> (int i, boolean flag, ServerboundInteractPacket.Action action);
+
+        InteractionHand nmsHand = (InteractionHand) com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSInteractionHand(player, hand);
+
+        Object action;
+        if (atPosition != null) {
+            #require net.minecraft.network.protocol.game.ServerboundInteractPacket.InteractionAtLocationAction ServerboundInteractPacket.InteractionAtLocationAction createActionInteractAt:<init>(net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.Vec3 location);
+            action = #createActionInteractAt(nmsHand, atPosition);
+        } else {
+            #require net.minecraft.network.protocol.game.ServerboundInteractPacket.InteractionAction ServerboundInteractPacket.InteractionAction createActionInteract:<init>(net.minecraft.world.InteractionHand hand);
+            action = #createActionInteract(nmsHand);
+        }
+
+        return #createInteractPacket(usedEntityId, isUsingSecondaryAction, action);
+    }
+
+    public int getUsedEntityId() {
+        return instance#usedEntityId;
+    }
+
+    public (HumanHandRole) InteractionHand getHandRole() {
+        Object useAction = instance#action;
+        String name = useAction#getType().name();
+        if (name.equals("INTERACT")) {
+            return useAction#interactHand;
+        } else if (name.equals("INTERACT_AT")) {
+            return useAction#interactAtHand;
+        } else {
+            return null;
+        }
+    }
+
+    public boolean hasInteractAtPosition() {
+        return instance#getActionName().equals("INTERACT_AT");
+    }
+
+    public (org.bukkit.util.Vector) Vec3 getInteractAtPosition() {
+        Object useAction = instance#action;
+        if (useAction#getType().name().equals("INTERACT_AT")) {
+            return useAction#interactAtLocation;
+        } else {
+            return null;
+        }
+    }
+
+    public static boolean hasSecondaryActionField() {
+        return true;
+    }
+
+  #if version >= 26.1
+    public boolean isUsingSecondaryAction:usingSecondaryAction();
+  #elseif version >= 1.18
+    public boolean isUsingSecondaryAction();
+  #else
+    public boolean isUsingSecondaryAction:b();
+  #endif
+
+#else
+    // 1.8 - 1.16.5
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket private readonly int usedEntityId:a;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket private ServerboundInteractPacket.Action action;
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket private net.minecraft.world.phys.Vec3 offset:c;
+  #if version >= 1.9
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket private net.minecraft.world.InteractionHand hand:d;
+  #endif
+  #if version >= 1.13
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket public ServerboundInteractPacket.ActionType getType:b();
+  #else
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket public ServerboundInteractPacket.ActionType getType:a();
+  #endif
+  #if version >= 1.16
+    #require net.minecraft.network.protocol.game.ServerboundInteractPacket private boolean secondaryActionFlag:e;
+  #endif
+
+    public static (ServerboundInteractPacketHandle) ServerboundInteractPacket createNew(int usedEntityId, org.bukkit.entity.HumanEntity player, com.bergerkiller.bukkit.common.wrappers.HumanHand hand, boolean isUsingSecondaryAction, (org.bukkit.util.Vector) Vec3 atPosition) {
+        ServerboundInteractPacket packet = new ServerboundInteractPacket();
+        packet#usedEntityId = usedEntityId;
+        if (atPosition != null) {
+            packet#action = ServerboundInteractPacket$ActionType.INTERACT_AT;
+        } else {
+            packet#action = ServerboundInteractPacket$ActionType.INTERACT;
+        }
+        packet#offset = atPosition;
+  #if version >= 1.16
+        packet#secondaryActionFlag = isUsingSecondaryAction;
+  #endif
+  #if version >= 1.9
+        InteractionHand nmsHand = (InteractionHand) com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSInteractionHand(player, hand);
+        packet#hand = nmsHand;
+  #endif
+        return packet;
+    }
+
+    public int getUsedEntityId() {
+        return instance#usedEntityId;
+    }
+
+  #if version >= 1.13
+    public (HumanHandRole) InteractionHand getHandRole:c();
+  #elseif version >= 1.9
+    public (HumanHandRole) InteractionHand getHandRole:b();
+  #else
+    public (HumanHandRole) HumanHandRole getHandRole() {
+        return HumanHandRole.MAIN;
+    }
+  #endif
+
+    public boolean hasInteractAtPosition() {
+        return instance#getType() == ServerboundInteractPacket$Action.INTERACT_AT;
+    }
+
+  #select version >=
+  #case 1.13: public (org.bukkit.util.Vector) Vec3 getInteractAtPosition:d();
+  #case 1.9:  public (org.bukkit.util.Vector) Vec3 getInteractAtPosition:c();
+  #case else: public (org.bukkit.util.Vector) Vec3 getInteractAtPosition:b();
+  #endselect
+
+  #if version >= 1.16
+    public static boolean hasSecondaryActionField() {
+        return true;
+    }
+
+    public boolean isUsingSecondaryAction:e();
+  #else
+    public static boolean hasSecondaryActionField() {
+        return false;
+    }
+
+    public boolean isUsingSecondaryAction() {
+        return false;
+    }
+  #endif
+#endif
+
+    <code>
+    public static ServerboundInteractPacketHandle createNew(int usedEntityId, org.bukkit.entity.HumanEntity player, com.bergerkiller.bukkit.common.wrappers.HumanHand hand, org.bukkit.util.Vector atPosition) {
+        return createNew(usedEntityId, player, hand, false, atPosition);
+    }
+
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
+        return getHandRole().getHandOf(humanEntity);
+    }
+    </code>
+}
+
+class ServerboundUseItemPacket extends Packet {
+    // Spigot only
+    public optional long timestamp;
+
+#if version >= 1.21
+    #require ServerboundUseItemPacket private final float yRot;
+    #require ServerboundUseItemPacket private final float xRot;
+
+    public float getYaw() { return instance#yRot; }
+    public float getPitch() { return instance#xRot; }
+    public void setYaw(float yaw) { instance#yRot = yaw; }
+    public void setPitch(float pitch) { instance#xRot = pitch; }
+#else
+    public float getYaw() { return 0.0f; }
+    public float getPitch() { return 0.0f; }
+    public void setYaw(float yaw) {}
+    public void setPitch(float pitch) { }
+#endif
+
+#if version >= 1.9
+  #if version >= 1.17
+    #require ServerboundUseItemPacket private InteractionHand handRole:hand;
+  #else
+    #require ServerboundUseItemPacket private InteractionHand handRole:a;
+  #endif
+
+  #if version >= 1.18
+    public (HumanHandRole) InteractionHand getHandRole:getHand();
+  #else
+    public (HumanHandRole) InteractionHand getHandRole() {
+        return instance#handRole;
+    }
+  #endif
+
+    public void setHandRole((HumanHandRole) InteractionHand handRole) {
+        instance#handRole = handRole;
+    }
+#else
+    public (HumanHandRole) HumanHandRole getHandRole() {
+        return HumanHandRole.MAIN;
+    }
+
+    public void setHandRole((HumanHandRole) HumanHandRole handRole) {
+    }
+#endif
+
+    <code>
+    @Override
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.IN_BLOCK_PLACE;
+    }
+
+    public void setTimestamp(long timestamp) {
+        if (T.timestamp.isAvailable()) {
+            T.timestamp.setLong(getRaw(), timestamp);
+        }
+    }
+
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
+        return getHandRole().getHandOf(humanEntity);
+    }
+
+    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
+        setHandRole(hand.getRoleOf(humanEntity));
+    }
+    </code>
+}
+
+// ServerboundUseItemPacket on MC 1.8.9 and before when int direction == 255
+class ServerboundUseItemOnPacket extends Packet {
+    // Hand since 1.9
+#if version >= 1.9
+  #if version >= 1.17
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.world.InteractionHand handRole:hand;
+  #elseif version >= 1.14
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.world.InteractionHand handRole:b;
+  #else
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.world.InteractionHand handRole:c;
+  #endif
+
+  #if version >= 1.18
+    public (HumanHandRole) InteractionHand getHandRole:getHand();
+  #else
+    public (HumanHandRole) InteractionHand getHandRole() {
+        return instance#handRole;
+    }
+  #endif
+
+    public void setHandRole((HumanHandRole) InteractionHand handRole) {
+        instance#handRole = handRole;
+    }
+#else
+    public (HumanHandRole) HumanHandRole getHandRole() {
+        return HumanHandRole.MAIN;
+    }
+
+    public void setHandRole((HumanHandRole) HumanHandRole handRole) {
+    }
+#endif
+
+    <code>
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
+        return getHandRole().getHandOf(humanEntity);
+    }
+
+    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
+        setHandRole(hand.getRoleOf(humanEntity));
+    }
+    </code>
+
+    // Initializes the moving object position block field, when required
+#if version >= 1.18
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket public net.minecraft.world.phys.BlockHitResult getHitResult();
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket public net.minecraft.world.phys.BlockHitResult initMovingObject() {
+        net.minecraft.world.phys.BlockHitResult moving = instance.getHitResult();
+        if (moving != null) {
+            return moving;
+        }
+
+        #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.world.phys.BlockHitResult movingObject:blockHit;
+        moving = net.minecraft.world.phys.BlockHitResult.miss(Vec3.ZERO, Direction.DOWN, BlockPos.ZERO);
+        instance#movingObject = moving;
+        return moving;
+    }
+
+#elseif version >= 1.14
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket public net.minecraft.world.phys.BlockHitResult getHitResult:c();
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket public net.minecraft.world.phys.BlockHitResult initMovingObject() {
+        net.minecraft.world.phys.BlockHitResult moving = instance.c();
+        if (moving != null) {
+            return moving;
+        }
+
+  #if version >= 1.17
+        #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.world.phys.BlockHitResult movingObject:blockHit;
+  #else
+        #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.world.phys.BlockHitResult movingObject:a;
+  #endif
+
+        Vec3 origin = Vec3.ZERO;
+
+        moving = net.minecraft.world.phys.BlockHitResult.a(origin, Direction.DOWN, BlockPos.ZERO);
+        instance#movingObject = moving;
+        return moving;
+    }
+
+#endif
+
+    // Direction
+#if version >= 1.14
+  #if version >= 1.17
+    #require net.minecraft.world.phys.BlockHitResult private final net.minecraft.core.Direction direction_face:direction;
+  #else
+    #require net.minecraft.world.phys.BlockHitResult private final net.minecraft.core.Direction direction_face:b;
+  #endif
+    public (org.bukkit.block.BlockFace) Direction getDirection() {
+        BlockHitResult result = instance#getHitResult();
+        return (result == null) ? null : result.getDirection();
+    }
+    public void setDirection((org.bukkit.block.BlockFace) Direction direction) {
+        instance#initMovingObject()#direction_face = direction;
+    }
+#elseif version >= 1.9
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.core.Direction direction_face:b;
+    public (org.bukkit.block.BlockFace) Direction getDirection() {
+        return instance#direction_face;
+    }
+    public void setDirection((org.bukkit.block.BlockFace) Direction direction) {
+        instance#direction_face = direction;
+    }
+#else
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private int direction_index:c;
+    public (org.bukkit.block.BlockFace) Direction getDirection() {
+        int index = instance#direction_index;
+        return Direction.fromType1(index);
+    }
+    public void setDirection((org.bukkit.block.BlockFace) Direction direction) {
+        instance#direction_index = direction.a();
+    }
+#endif
+
+    // Direction index value of 255 was used for the 'block place' packet on 1.8.9 and before
+#if version >= 1.9
+    public boolean isBlockPlacePacket() {
+        return false;
+    }
+    public void setBlockPlacePacket() {
+    }
+#else
+    public boolean isBlockPlacePacket() {
+        int index = instance#direction_index;
+        return index == 255;
+    }
+    public void setBlockPlacePacket() {
+        instance#direction_index = 255;
+    }
+#endif
+
+#if version >= 1.14
+  #if version >= 1.17
+    #require net.minecraft.world.phys.HitResult protected final net.minecraft.world.phys.Vec3 position:location;
+    #require net.minecraft.world.phys.BlockHitResult private final net.minecraft.core.BlockPos blockPosition:blockPos;
+  #else
+    #require net.minecraft.world.phys.HitResult protected final net.minecraft.world.phys.Vec3 position:pos;
+    #require net.minecraft.world.phys.BlockHitResult private final net.minecraft.core.BlockPos blockPosition:c;
+  #endif
+    public (IntVector3) BlockPos getPosition() {
+        BlockHitResult result = instance#getHitResult();
+  #if version >= 1.18
+        return (result == null) ? null : result.getBlockPos();
+  #else
+        return (result == null) ? null : result.getBlockPosition();
+  #endif
+    }
+    public void setPosition((IntVector3) BlockPos blockPosition) {
+        BlockHitResult result = instance#initMovingObject();
+
+        // Make sure to preserve deltas
+  #if version >= 1.18
+        Vec3 position = result.getLocation();
+        double new_x = position.x - result.getBlockPos().getX() + blockPosition.getX();
+        double new_y = position.y - result.getBlockPos().getY() + blockPosition.getY();
+        double new_z = position.z - result.getBlockPos().getZ() + blockPosition.getZ();
+  #else
+        Vec3 position = result.getPos();
+        double new_x = position.x - result.getBlockPosition().getX() + blockPosition.getX();
+        double new_y = position.y - result.getBlockPosition().getY() + blockPosition.getY();
+        double new_z = position.z - result.getBlockPosition().getZ() + blockPosition.getZ();
+  #endif
+        Vec3 new_pos = new Vec3(new_x, new_y, new_z);
+        result#position = new_pos;
+        result#blockPosition = blockPosition;
+    }
+    public float getDeltaX() {
+        BlockHitResult result = instance#getHitResult();
+        if (result == null) return 0.0f;
+  #if version >= 1.18
+        return (float) (result.getLocation().x - (double) result.getBlockPos().getX());
+  #else
+        return (float) (result.getPos().x - (double) result.getBlockPosition().getX());
+  #endif
+    }
+    public float getDeltaY() {
+        BlockHitResult result = instance#getHitResult();
+        if (result == null) return 0.0f;
+  #if version >= 1.18
+        return (float) (result.getLocation().y - (double) result.getBlockPos().getY());
+  #else
+        return (float) (result.getPos().y - (double) result.getBlockPosition().getY());
+  #endif
+    }
+    public float getDeltaZ() {
+        BlockHitResult result = instance#getHitResult();
+        if (result == null) return 0.0f;
+  #if version >= 1.18
+        return (float) (result.getLocation().z - (double) result.getBlockPos().getZ());
+  #else
+        return (float) (result.getPos().z - (double) result.getBlockPosition().getZ());
+  #endif
+    }
+    public void setDeltaX(float dx) {
+        BlockHitResult result = instance#initMovingObject();
+  #if version >= 1.18
+        Vec3 old_position = result.getLocation();
+        Vec3 new_position = new Vec3((double) dx + result.getBlockPos().getX(), old_position.y, old_position.z);
+  #else
+        Vec3 old_position = result.getPos();
+        Vec3 new_position = new Vec3((double) dx + result.getBlockPosition().getX(), old_position.y, old_position.z);
+  #endif
+        result#position = new_position;
+    }
+    public void setDeltaY(float dy) {
+        BlockHitResult result = instance#initMovingObject();
+  #if version >= 1.18
+        Vec3 old_position = result.getLocation();
+        Vec3 new_position = new Vec3(old_position.x, (double) dy + result.getBlockPos().getY(), old_position.z);
+  #else
+        Vec3 old_position = result.getPos();
+        Vec3 new_position = new Vec3(old_position.x, (double) dy + result.getBlockPosition().getY(), old_position.z);
+  #endif
+        result#position = new_position;
+    }
+    public void setDeltaZ(float dz) {
+        BlockHitResult result = instance#initMovingObject();
+  #if version >= 1.18
+        Vec3 old_position = result.getLocation();
+        Vec3 new_position = new Vec3(old_position.x, old_position.y, (double) dz + result.getBlockPos().getZ());
+  #else
+        Vec3 old_position = result.getPos();
+        Vec3 new_position = new Vec3(old_position.x, old_position.y, (double) dz + result.getBlockPosition().getZ());
+  #endif
+        result#position = new_position;
+    }
+#else
+  #if version >= 1.9
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.core.BlockPos position:a;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private float deltaX:d;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private float deltaY:e;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private float deltaZ:f;
+  #else
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private net.minecraft.core.BlockPos position:b;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private float deltaX:e;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private float deltaY:f;
+    #require net.minecraft.network.protocol.game.ServerboundUseItemOnPacket private float deltaZ:g;
+  #endif
+    public (IntVector3) BlockPos getPosition() {
+        return instance#position;
+    }
+    public void setPosition((IntVector3) BlockPos position) {
+        instance#position = position;
+    }
+    public float getDeltaX() {
+        return instance#deltaX;
+    }
+    public float getDeltaY() {
+        return instance#deltaY;
+    }
+    public float getDeltaZ() {
+        return instance#deltaZ;
+    }
+    public void setDeltaX(float dx) {
+        return instance#deltaX = dx;
+    }
+    public void setDeltaY(float dy) {
+        return instance#deltaY = dy;
+    }
+    public void setDeltaZ(float dz) {
+        return instance#deltaZ = dz;
+    }
+#endif
+
+    // Spigot
+    public optional long timestamp;
+
+    <code>
+    @Override
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.IN_USE_ITEM;
+    }
+
+    public void setTimestamp(long timestamp) {
+        if (T.timestamp.isAvailable()) {
+            T.timestamp.setLong(getRaw(), timestamp);
+        }
+    }
+    </code>
+}

@@ -35,12 +35,6 @@ class EquipmentSlot {
     </code>
 }
 
-// Since MC 1.9
-optional class HumanoidArm {
-    enum (HumanoidArmHandle) HumanoidArm LEFT;
-    enum (HumanoidArmHandle) HumanoidArm RIGHT;
-}
-
 optional class MoverType {
     enum (MoverTypeHandle) MoverType SELF;
     enum (MoverTypeHandle) MoverType PLAYER;
