@@ -49,7 +49,9 @@ class PlayerFileDataHandler_1_21_9 extends PlayerFileDataHandler {
         {
             MethodDeclaration getPlayerFolderOfWorldMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess("" +
                     "public java.io.File getPlayerDir() {\n" +
-                    "#if paper\n" +
+                    "#if version >= 26.1 && paper\n" +
+                    "    return new java.io.File(instance.getChunkSource().chunkMap.getStorageName(), \"playerdata\");\n" +
+                    "#elseif paper\n" +
                     "    return new java.io.File(instance.levelStorageAccess.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
                     "#elseif version >= 26.1\n" +
                     "    return new java.io.File(instance.storageSource.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +

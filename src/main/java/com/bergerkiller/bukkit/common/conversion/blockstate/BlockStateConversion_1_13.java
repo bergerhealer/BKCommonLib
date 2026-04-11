@@ -43,15 +43,26 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
     private final Object proxy_nms_world_ticklist;
     private final Block proxy_block;
     private final Map<Material, NullInstantiator<BlockState>> blockStateInstantiators;
-    private final Invoker<Object> non_instrumented_invokable = (instance, args) -> {
-        String name = instance.getClass().getSuperclass().getSimpleName();
-        throw new UnsupportedOperationException("Method not instrumented by the " + name + " proxy");
-    };
+
+    private static Invoker<Object> makeNonInstrumentedInvoker(Method method) {
+        return (instance, args) -> {
+            String name = instance.getClass().getSuperclass().getSimpleName();
+            throw new UnsupportedOperationException("Method not instrumented by the " + name + " proxy: " + method);
+        };
+    }
 
     public BlockStateConversion_1_13() throws Throwable {
         // Find CraftBlock class
         final Class<?> craftBlock_type = CommonUtil.getClass("org.bukkit.craftbukkit.block.CraftBlock");
-        final java.lang.reflect.Field worldField = craftBlock_type.getDeclaredField("world");
+
+        java.lang.reflect.Field worldField;
+        try {
+            // Paper
+            worldField = craftBlock_type.getDeclaredField("level");
+        } catch (NoSuchFieldException ex) {
+            // Spigot
+            worldField = craftBlock_type.getDeclaredField("world");
+        }
         worldField.setAccessible(true);
 
         // Stores a mapping of CraftBlockState types we have already created, by Block Material
@@ -69,7 +80,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                     return (instance, args) -> null;
                 } else {
                     // All other method calls fail
-                    return non_instrumented_invokable;
+                    return makeNonInstrumentedInvoker(method);
                 }
             }
         }.createInstance(CommonUtil.getClass("net.minecraft.world.ticks.LevelTicks"));
@@ -101,7 +112,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                 }
 
                 // All other method calls fail
-                return non_instrumented_invokable;
+                return makeNonInstrumentedInvoker(method);
             }
         }.createInstance(CraftWorldHandle.T.getType());
 
@@ -131,13 +142,13 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                     return (instance, args) -> input_state.block.getZ();
                 } else if (name.equals("getPosition")) {
                     return (instance, args) -> CraftBlockHandle.getBlockPosition(input_state.block);
-                } else if (name.equals("getNMS")) {
+                } else if (name.equals("getNMS") || name.equals("getBlockState")) {
                     return (instance, args) -> input_state.blockData.getData();
                 } else if (name.equals("getNMSBlock")) {
                     return (instance, args) -> input_state.blockData.getBlockRaw();
                 } else if (name.equals("getState")) {
                     return null; // allow the default implementation to be called
-                } else if (name.equals("getHandle")) {
+                } else if (name.equals("getHandle") || name.equals("getLevel")) {
                     return (instance, args) -> proxy_nms_world;
                 } else if (name.equals("toString")) {
                     // This does a bunch of internal lookups we really do not want to see happen.
@@ -158,7 +169,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                 }
 
                 // All other method calls fail
-                return non_instrumented_invokable;
+                return makeNonInstrumentedInvoker(method);
             }
         }.createInstance(craftBlock_type);
         worldField.set(proxy_block, proxy_nms_world);
@@ -366,7 +377,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
             }
 
             // All other method calls fail
-            return this.conversion.non_instrumented_invokable;
+            return makeNonInstrumentedInvoker(method);
         }
 
         // Note there is also a setBlockData variant with two ints (default of second int is 512)

@@ -3,5 +3,10 @@ package org.bukkit.craftbukkit.block.data;
 optional class CraftBlockData {
     public (com.bergerkiller.bukkit.common.wrappers.BlockData) net.minecraft.world.level.block.state.BlockState getState();
 
+#if exists org.bukkit.craftbukkit.block.data.CraftBlockData public static CraftBlockData createData(net.minecraft.world.level.block.state.BlockState blockState);
+    // Paper
+    public static (Object) CraftBlockData fromData:createData((com.bergerkiller.bukkit.common.wrappers.BlockData) net.minecraft.world.level.block.state.BlockState data);
+#else
     public static (Object) CraftBlockData fromData((com.bergerkiller.bukkit.common.wrappers.BlockData) net.minecraft.world.level.block.state.BlockState data);
+#endif
 }

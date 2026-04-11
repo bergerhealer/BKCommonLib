@@ -90,7 +90,11 @@ class ServerLevel extends Level {
     // ==========================================================================================================
 
     public boolean isLoaded() {
-#if version >= 1.18
+#if version >= 26.1 && paper
+        #require net.minecraft.world.level.storage.SavedDataStorage private boolean closed;
+        net.minecraft.world.level.storage.SavedDataStorage storage = instance.getDataStorage();
+        return !storage#closed;
+#elseif version >= 1.18
         #require net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess final net.minecraft.util.DirectoryLock conv_lock:lock;
   #if version > 1.21.4 && paper
         net.minecraft.util.DirectoryLock lock = instance.levelStorageAccess#conv_lock;

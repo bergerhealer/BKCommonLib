@@ -63,7 +63,18 @@ public class IBlockDataToMaterialData {
                 Class<?> craftLegacyClass = Class.forName(Resolver.resolveClassPath("org.bukkit.craftbukkit.legacy.CraftLegacy"),
                         true, IBlockDataToMaterialData.class.getClassLoader());
 
-                java.lang.reflect.Field f = craftLegacyClass.getDeclaredField("dataToMaterial");
+                java.lang.reflect.Field f;
+                if (CommonBootstrap.evaluateMCVersion(">=", "26.1")) {
+                    try {
+                        // Paper
+                        f = craftLegacyClass.getDeclaredField("stateToMaterial");
+                    } catch (NoSuchFieldException ex) {
+                        // Spigot
+                        f = craftLegacyClass.getDeclaredField("dataToMaterial");
+                    }
+                } else {
+                    f = craftLegacyClass.getDeclaredField("dataToMaterial");
+                }
                 f.setAccessible(true);
                 iblockdataToMaterialdata_map = LogicUtil.unsafeCast(f.get(null));
                 f.setAccessible(false);

@@ -43,10 +43,13 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
     private final World proxy_world;
     private final Chunk proxy_chunk;
     private final Block proxy_block;
-    private static final Invoker<Object> non_instrumented_invokable = (instance, args) -> {
-        String name = instance.getClass().getSuperclass().getSimpleName();
-        throw new UnsupportedOperationException("Method not instrumented by the " + name + " proxy");
-    };
+
+    private static Invoker<Object> makeNonInstrumentedInvoker(Method method) {
+        return (instance, args) -> {
+            String name = instance.getClass().getSuperclass().getSimpleName();
+            throw new UnsupportedOperationException("Method not instrumented by the " + name + " proxy: " + method);
+        };
+    }
 
     public BlockStateConversion_1_12_2() throws Throwable {
         // Find CraftBlock class
@@ -65,7 +68,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
                 }
 
                 // All other method calls fail
-                return non_instrumented_invokable;
+                return makeNonInstrumentedInvoker(method);
             }
         }.createInstance(CraftChunkHandle.T.getType());
 
@@ -91,7 +94,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
                 }
 
                 // All other method calls fail
-                return non_instrumented_invokable;
+                return makeNonInstrumentedInvoker(method);
             }
         }.createInstance(CraftWorldHandle.T.getType());
 
@@ -129,7 +132,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
                 }
 
                 // All other method calls fail
-                return non_instrumented_invokable;
+                return makeNonInstrumentedInvoker(method);
             }
         }.createInstance(craftBlock_type);
         chunkField.set(proxy_block, proxy_chunk);
@@ -245,7 +248,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
         @Override
         protected Invoker<?> getCallback(Class<?> hookedType, Method method) {
             Invoker<?> callback = super.getCallback(hookedType, method);
-            return (callback != null) ? callback : non_instrumented_invokable;
+            return (callback != null) ? callback : makeNonInstrumentedInvoker(method);
         }
 
         @HookMethod("public net.minecraft.world.level.block.entity.BlockEntity getTileEntity(BlockPos blockposition)")

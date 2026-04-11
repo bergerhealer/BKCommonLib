@@ -302,7 +302,6 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
     @Template.Import("it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap")
     @Template.Import("net.minecraft.world.level.entity.EntityTickList")
     @Template.Import("ca.spottedleaf.moonrise.patches.chunk_system.level.entity.ChunkEntitySlices")
-    @Template.Import("ca.spottedleaf.concurrentutil.map.ConcurrentLong2ReferenceChainedHashTable")
     @Template.Import("ca.spottedleaf.moonrise.common.util.WorldUtil")
     @Template.InstanceType("ca.spottedleaf.moonrise.patches.chunk_system.level.entity.EntityLookup")
     public static abstract class AddRemoveHandlerLogic extends Template.Class<Handle> {
@@ -333,8 +332,13 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *     EntityLookup entityLookup = world.moonrise$getEntityLookup();
          *
          *     // Entities by ID lookup table
-         *     #require EntityLookup protected final ConcurrentLong2ReferenceChainedHashTable<Entity> entityById;
-         *     ConcurrentLong2ReferenceChainedHashTable byIdMap = entityLookup#entityById;
+         * #if version >= 26.1
+         *     #require EntityLookup protected final ca.spottedleaf.concurrentutil.map.concurrent.longs.ConcurrentChainedLong2ReferenceHashTable<Entity> entityById;
+         *     ca.spottedleaf.concurrentutil.map.concurrent.longs.ConcurrentChainedLong2ReferenceHashTable byIdMap = entityLookup#entityById;
+         * #else
+         *     #require EntityLookup protected final ca.spottedleaf.concurrentutil.map.ConcurrentLong2ReferenceChainedHashTable<Entity> entityById;
+         *     ca.spottedleaf.concurrentutil.map.ConcurrentLong2ReferenceChainedHashTable byIdMap = entityLookup#entityById;
+         * #endif
          *     if (byIdMap.get((long) entityId) == oldEntity) {
          *         if (newEntity == null) {
          *             byIdMap.remove((long) entityId);

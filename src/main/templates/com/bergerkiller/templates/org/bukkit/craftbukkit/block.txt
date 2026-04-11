@@ -6,13 +6,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.bukkit.craftbukkit.block.CraftBlockEntityState;
 
 class CraftBlockState {
-#if version >= 1.13
-    protected unknown BlockState data;
-#else
-    protected unknown int type;
-    protected unknown org.bukkit.material.MaterialData data;
-#endif
-
 #if exists org.bukkit.craftbukkit.block.CraftBlockState protected int capturedFlags;
     protected int flag:capturedFlags;
 #else
@@ -47,7 +40,12 @@ class CraftBlockState {
         instance#blockState_z = block.getZ();
   #endif
 
+  #if exists org.bukkit.craftbukkit.block.CraftBlockState public void setBlock(net.minecraft.world.level.block.state.BlockState block);
+        instance.setBlock(blockData);
+  #else
         instance.setData(blockData);
+  #endif
+
   #if exists org.bukkit.craftbukkit.block.CraftBlockState public void setFlags(int flags);
         instance.setFlags(3);
   #else
@@ -100,7 +98,10 @@ class CraftBlockState {
 
 class CraftBlock {
 
-#if version >= 1.13.1
+#if exists org.bukkit.craftbukkit.block.CraftBlock public net.minecraft.world.level.block.state.BlockState getBlockState();
+    // Paper
+    public (com.bergerkiller.bukkit.common.wrappers.BlockData) BlockState getBlockData:getBlockState();
+#elseif version >= 1.13.1
     public (com.bergerkiller.bukkit.common.wrappers.BlockData) BlockState getBlockData:getNMS();
 #elseif version >= 1.13
     protected (com.bergerkiller.bukkit.common.wrappers.BlockData) BlockState getBlockData:getNMS();

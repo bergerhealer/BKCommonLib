@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
+import java.lang.reflect.Method;
 import java.util.logging.Level;
 
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.BlockStateHandle;
@@ -92,7 +93,15 @@ public abstract class BlockPhysicsEventDataAccessor {
         public BlockPhysicsEventDataAccessorDefaultModern() throws Throwable {
             Class<?> bd = CommonUtil.getClass("org.bukkit.block.data.BlockData");
             Class<?> cbd = CommonUtil.getClass("org.bukkit.craftbukkit.block.data.CraftBlockData");
-            this.toBukkitBlockData = new FastMethod<Object>(cbd.getDeclaredMethod("fromData", BlockStateHandle.T.getType()));
+
+            Method fromDataMethod;
+            try {
+                fromDataMethod = cbd.getDeclaredMethod("createData", BlockStateHandle.T.getType());
+            } catch (NoSuchMethodException ex) {
+                fromDataMethod = cbd.getDeclaredMethod("fromData", BlockStateHandle.T.getType());
+            }
+
+            this.toBukkitBlockData = new FastMethod<Object>(fromDataMethod);
             this.eventConstructor = new FastConstructor<BlockPhysicsEvent>(BlockPhysicsEvent.class.getConstructor(Block.class, bd));
             this.toBukkitBlockData.forceInitialization();
             this.eventConstructor.forceInitialization();
