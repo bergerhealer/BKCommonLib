@@ -119,6 +119,17 @@ Some packets were moved from `net.minecraft.network.protocol.game` into `net.min
 | PacketPlayOutResourcePackSendHandle       | ClientboundResourcePackPushPacketHandle |
 | PacketPlayOutPlayerListHeaderFooterHandle | ClientboundTabListPacketHandle          |
 
+### PacketType constant renames
+Some constants were renamed:
+
+| Old (Spigot-style)             | New (Mojang-style)                            |
+|--------------------------------|-----------------------------------------------|
+| PacketType.IN_BLOCK_PLACE      | PacketType.IN_USE_ITEM                        |
+| PacketType.IN_USE_ITEM         | PacketType.IN_USE_ITEM_ON                     |
+| PacketType.IN_BLOCK_DIG        | PacketType.IN_PLAYER_ACTION                   |
+| PacketType.IN_ENTITY_ACTION    | PacketType.IN_PLAYER_COMMAND                  |
+| PacketType.IN_ENTITY_ANIMATION | PacketType.IN_SWING                           |
+| PacketType.IN_USE_ENTITY       | PacketType.IN_INTERACT & PacketType.IN_ATTACK |
 ---
 
 ## Entity handle renames
