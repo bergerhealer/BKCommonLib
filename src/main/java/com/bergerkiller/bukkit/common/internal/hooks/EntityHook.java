@@ -34,7 +34,7 @@ import com.bergerkiller.mountiplex.reflection.ClassHook;
 import org.bukkit.util.Vector;
 
 @ClassHook.HookPackage("net.minecraft.server")
-@ClassHook.HookImport("net.minecraft.core.Vec3")
+@ClassHook.HookImport("net.minecraft.world.phys.Vec3")
 @ClassHook.HookImport("net.minecraft.world.entity.Entity")
 @ClassHook.HookImport("net.minecraft.world.entity.Entity.MoveFunction")
 @ClassHook.HookImport("net.minecraft.world.InteractionHand")
