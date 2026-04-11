@@ -63,8 +63,14 @@ public class ItemStackDeserializerMigratorNBT extends ItemStackDeserializerMigra
         // 1.21.10 -> 1.21.11
         this.register(4556, ConverterFunction.NO_CONVERSION);
 
+        // 1.21.11 -> 26.1
+        this.register(4671, ConverterFunction.NO_CONVERSION);
+
+        // 26.1 -> 26.1.2
+        this.register(4786, ConverterFunction.NO_CONVERSION);
+
         // Maximum supported data version
-        this.setMaximumDataVersion(4671); // MC 1.21.11
+        this.setMaximumDataVersion(4790); // MC 26.1.2
     }
 
     /**

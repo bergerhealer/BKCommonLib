@@ -334,8 +334,17 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
         // From MC 1.21.10 to 1.21.11
         this.register(4556, ConverterFunction.NO_CONVERSION);
 
+        // From MC 1.21.11 to 26.1
+        this.register(4671, map -> {
+            Object type = map.get("type");
+            return !Helper.ADDED_MC_26_1.contains(type);
+        });
+
+        // From 26.1 to 26.1.2
+        this.register(4786, ConverterFunction.NO_CONVERSION);
+
         // Maximum supported data version
-        this.setMaximumDataVersion(4671); // MC 1.21.11
+        this.setMaximumDataVersion(4790); // MC 26.1.2
     }
 
     public ItemStackDeserializerItemMetaMigrator getItemMetaDeserializer() {
@@ -857,6 +866,13 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
                         "COPPER_HELMET", "COPPER_CHESTPLATE", "COPPER_LEGGINGS",
                         "COPPER_BOOTS", "COPPER_GOLEM_SPAWN_EGG",
                         "COPPER_HORSE_ARMOR", "COPPER_NUGGET"
+                )
+        );
+
+        // All material names (Material enum) added Minecraft 1.21.1 -> 26.1
+        public static final Set<String> ADDED_MC_26_1 = makeSet(
+                Arrays.asList(
+                        "GOLDEN_DANDELION", "POTTED_GOLDEN_DANDELION"
                 )
         );
     }

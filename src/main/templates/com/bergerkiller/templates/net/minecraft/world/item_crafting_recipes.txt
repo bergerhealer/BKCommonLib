@@ -30,7 +30,7 @@ class Recipe {
   #if version >= 26.1
               //TODO: Recipes could change depending on inputs
               RecipeInput input;
-              if (instance instanceof DecoratedPotRecipe) {
+              if (instance instanceof ImbueRecipe || instance instanceof DecoratedPotRecipe) {
                   // These recipes cannot operate with an empty input
                   return ItemStack.EMPTY;
               } else if (instance instanceof CraftingRecipe) {

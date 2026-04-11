@@ -32,8 +32,8 @@ class ItemVariantListHandler_1_19_3 extends ItemVariantListHandler {
     public void enable() throws Throwable {
         handler.forceInitialization();
         registerHandler("InstrumentItem", handler::getInstrumentItemVariants);
-        registerHandler("ItemPotion", handler::getPotionVariants);
-        registerHandler("ItemTippedArrow", handler::getTippedArrowVariants);
+        registerHandler("PotionItem", handler::getPotionVariants);
+        registerHandler("TippedArrowItem", handler::getTippedArrowVariants);
 
         handlersByItem.put(null, nmsItem -> new ArrayList<>(0)); // Protection
 
