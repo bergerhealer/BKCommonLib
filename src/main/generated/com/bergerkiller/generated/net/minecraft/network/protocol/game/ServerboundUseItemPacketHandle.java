@@ -29,7 +29,7 @@ public abstract class ServerboundUseItemPacketHandle extends PacketHandle {
     public abstract void setHandRole(HumanHandRole handRole);
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
-        return com.bergerkiller.bukkit.common.protocol.PacketType.IN_BLOCK_PLACE;
+        return com.bergerkiller.bukkit.common.protocol.PacketType.IN_USE_ITEM;
     }
 
     public void setTimestamp(long timestamp) {

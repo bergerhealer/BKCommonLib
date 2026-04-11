@@ -345,7 +345,7 @@ class ServerboundUseItemPacket extends Packet {
     <code>
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
-        return com.bergerkiller.bukkit.common.protocol.PacketType.IN_BLOCK_PLACE;
+        return com.bergerkiller.bukkit.common.protocol.PacketType.IN_USE_ITEM;
     }
 
     public void setTimestamp(long timestamp) {
@@ -633,7 +633,7 @@ class ServerboundUseItemOnPacket extends Packet {
     <code>
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
-        return com.bergerkiller.bukkit.common.protocol.PacketType.IN_USE_ITEM;
+        return com.bergerkiller.bukkit.common.protocol.PacketType.IN_USE_ITEM_ON;
     }
 
     public void setTimestamp(long timestamp) {

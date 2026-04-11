@@ -64,7 +64,7 @@ public class PacketTest {
         assertFalse(PacketType.IN_CHAT.isOutGoing());
         assertFalse(PacketType.IN_STEER_VEHICLE.isOutGoing());
         assertFalse(PacketType.IN_POSITION_LOOK.isOutGoing());
-        assertFalse(PacketType.IN_ENTITY_ANIMATION.isOutGoing());
+        assertFalse(PacketType.IN_SWING.isOutGoing());
         assertTrue(PacketType.OUT_BLOCK_CHANGE.isOutGoing());
         assertTrue(PacketType.OUT_ENTITY_MOVE.isOutGoing());
         assertTrue(PacketType.OUT_MAP.isOutGoing());

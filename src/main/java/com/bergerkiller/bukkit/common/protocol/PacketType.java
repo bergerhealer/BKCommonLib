@@ -149,9 +149,6 @@ public class PacketType extends ClassTemplate<Object> {
      * ========================
      */
     public static final NMSServerboundPlayerAbilitiesPacket IN_ABILITIES = new NMSServerboundPlayerAbilitiesPacket();
-    public static final NMSServerboundSwingPacket IN_ENTITY_ANIMATION = new NMSServerboundSwingPacket();
-    public static final NMSServerboundPlayerActionPacket IN_BLOCK_DIG = new NMSServerboundPlayerActionPacket();
-    public static final NMSServerboundUseItemPacket IN_BLOCK_PLACE = new NMSServerboundUseItemPacket();
     public static final NMSServerboundPaddleBoatPacket IN_BOAT_MOVE = new NMSServerboundPaddleBoatPacket();
     public static final NMSServerboundChatPacket IN_CHAT = new NMSServerboundChatPacket();
     public static final NMSServerboundClientCommandPacket IN_CLIENT_COMMAND = new NMSServerboundClientCommandPacket();
@@ -169,9 +166,12 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSServerboundCommandSuggestionPacket IN_TAB_COMPLETE = new NMSServerboundCommandSuggestionPacket();
     public static final NMSServerboundAcceptTeleportationPacket IN_TELEPORT_ACCEPT = new NMSServerboundAcceptTeleportationPacket();
     public static final NMSServerboundSignUpdatePacket IN_UPDATE_SIGN = new NMSServerboundSignUpdatePacket();
-    public static final NMSServerboundInteractPacket IN_INTERACT_ENTITY = new NMSServerboundInteractPacket();
-    public static final NMSServerboundAttackPacket IN_ATTACK_ENTITY = new NMSServerboundAttackPacket();
-    public static final NMSServerboundUseItemOnPacket IN_USE_ITEM = new NMSServerboundUseItemOnPacket();
+    public static final NMSServerboundPlayerActionPacket IN_PLAYER_ACTION = new NMSServerboundPlayerActionPacket();
+    public static final NMSServerboundSwingPacket IN_SWING = new NMSServerboundSwingPacket();
+    public static final NMSServerboundInteractPacket IN_INTERACT = new NMSServerboundInteractPacket();
+    public static final NMSServerboundAttackPacket IN_ATTACK = new NMSServerboundAttackPacket();
+    public static final NMSServerboundUseItemPacket IN_USE_ITEM = new NMSServerboundUseItemPacket();
+    public static final NMSServerboundUseItemOnPacket IN_USE_ITEM_ON = new NMSServerboundUseItemOnPacket();
     public static final NMSServerboundMoveVehiclePacket IN_VEHICLE_MOVE = new NMSServerboundMoveVehiclePacket();
     public static final NMSServerboundClientTickEndPacket IN_CLIENT_TICK_END = new NMSServerboundClientTickEndPacket();
 

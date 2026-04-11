@@ -47,7 +47,7 @@ public abstract class ServerboundUseItemOnPacketHandle extends PacketHandle {
 
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
-        return com.bergerkiller.bukkit.common.protocol.PacketType.IN_USE_ITEM;
+        return com.bergerkiller.bukkit.common.protocol.PacketType.IN_USE_ITEM_ON;
     }
 
     public void setTimestamp(long timestamp) {
