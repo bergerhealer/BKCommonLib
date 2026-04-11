@@ -63,16 +63,23 @@ class Heightmap {
 
         ChunkAccess ichunkaccess = instance#chunk;
         int databits_index = 0;
+  #if version >= 26.1
+        int chunkX = ((LevelChunk) ichunkaccess).getPos().x();
+        int chunkZ = ((LevelChunk) ichunkaccess).getPos().z();
+  #else
+        int chunkX = ((LevelChunk) ichunkaccess).getPos().x;
+        int chunkZ = ((LevelChunk) ichunkaccess).getPos().z;
+  #endif
   #if version >= 1.18
         org.bukkit.World world = ((LevelChunk) ichunkaccess).getLevel().getWorld();
-        int startX = ((LevelChunk) ichunkaccess).getPos().x << 4;
+        int startX = chunkX << 4;
         int startY = ichunkaccess.getHighestSectionPosition() + 15;
-        int startZ = ((LevelChunk) ichunkaccess).getPos().z << 4;
+        int startZ = chunkZ << 4;
   #else
         org.bukkit.World world = ((LevelChunk) ichunkaccess).getWorld().getWorld();
-        int startX = ((LevelChunk) ichunkaccess).getPos().x << 4;
+        int startX = chunkX << 4;
         int startY = ichunkaccess.b() + 15;
-        int startZ = ((LevelChunk) ichunkaccess).getPos().z << 4;
+        int startZ = chunkZ << 4;
   #endif
         BlockPos$MutableBlockPos blockposition = new BlockPos$MutableBlockPos();
         for (int z = 0; z < 16; ++z) {

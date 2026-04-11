@@ -129,6 +129,12 @@ class ServerboundInteractPacket extends Packet {
 
     public (org.bukkit.util.Vector) Vec3 getInteractAtPosition:location();
 
+    public static boolean hasSecondaryActionField() {
+        return true;
+    }
+
+    public boolean isUsingSecondaryAction:usingSecondaryAction();
+
 #elseif version >= 1.17
     // Since 1.17 the enum is a property of an interface that houses the action (Action -> getType() -> ActionType)
     // ActionType is the internal enum name in mojmap, this handles the situation better
@@ -196,9 +202,7 @@ class ServerboundInteractPacket extends Packet {
         return true;
     }
 
-  #if version >= 26.1
-    public boolean isUsingSecondaryAction:usingSecondaryAction();
-  #elseif version >= 1.18
+  #if version >= 1.18
     public boolean isUsingSecondaryAction();
   #else
     public boolean isUsingSecondaryAction:b();

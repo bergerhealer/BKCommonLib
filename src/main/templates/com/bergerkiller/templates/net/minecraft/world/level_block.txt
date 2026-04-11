@@ -93,7 +93,10 @@ class Block {
 
 #if version >= 1.18
     public int getOpacity((BlockStateHandle) BlockState iblockdata, (org.bukkit.World) Level world, int x, int y, int z) {
-  #if version >= 1.21.2
+  #if version >= 26.1
+        // Note: not really called, as the getCachedOpacity() always succeeds
+        return iblockdata.getLightDampening();
+  #elseif version >= 1.21.2
         // Note: not really called, as the getCachedOpacity() always succeeds
         return iblockdata.getLightBlock();
   #else

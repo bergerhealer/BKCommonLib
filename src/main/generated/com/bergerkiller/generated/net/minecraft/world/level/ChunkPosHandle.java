@@ -28,14 +28,12 @@ public abstract class ChunkPosHandle extends Template.Handle {
         return T.fromIntVector2Raw.invoker.invoke(null,vector);
     }
 
+    public abstract int x();
+    public abstract int z();
     public abstract IntVector2 toIntVector2();
     public static ChunkPosHandle fromIntVector2(com.bergerkiller.bukkit.common.bases.IntVector2 vector) {
         return createHandle(fromIntVector2Raw(vector));
     }
-    public abstract int getX();
-    public abstract void setX(int value);
-    public abstract int getZ();
-    public abstract void setZ(int value);
     /**
      * Stores class members for <b>net.minecraft.world.level.ChunkPos</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -43,11 +41,10 @@ public abstract class ChunkPosHandle extends Template.Handle {
     public static final class ChunkPosClass extends Template.Class<ChunkPosHandle> {
         public final Template.Constructor.Converted<ChunkPosHandle> constr_x_z = new Template.Constructor.Converted<ChunkPosHandle>();
 
-        public final Template.Field.Integer x = new Template.Field.Integer();
-        public final Template.Field.Integer z = new Template.Field.Integer();
-
         public final Template.StaticMethod<Object> fromIntVector2Raw = new Template.StaticMethod<Object>();
 
+        public final Template.Method<Integer> x = new Template.Method<Integer>();
+        public final Template.Method<Integer> z = new Template.Method<Integer>();
         public final Template.Method<IntVector2> toIntVector2 = new Template.Method<IntVector2>();
 
     }

@@ -50,6 +50,8 @@ class PlayerFileDataHandler_1_16_to_1_21_5 extends PlayerFileDataHandler {
                     "    return new java.io.File(instance.levelStorageAccess.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
                     "#elseif version == 1.21.4 && paper && exists net.minecraft.server.level.ServerLevel public final net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess levelStorageAccess;\n" +
                     "    return new java.io.File(instance.levelStorageAccess.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
+                    "#elseif version >= 26.1\n" +
+                    "    return new java.io.File(instance.storageSource.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
                     "#elseif version >= 1.18\n" +
                     "    return new java.io.File(instance.convertable.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
                     "#else\n" +

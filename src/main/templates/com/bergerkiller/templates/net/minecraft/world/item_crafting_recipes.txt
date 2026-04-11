@@ -27,10 +27,26 @@ class Recipe {
             ItemStackHandle.T.setFireworksFlightDuration.invoke(itemstack, Integer.valueOf(3));
             return itemstack;
         } else {
-  #if version >= 1.21.2
-            //TODO: Technically could support world-specific recipes!
-            RegistryAccess$Frozen registry = MinecraftServer.getServer().registryAccess();
+  #if version >= 26.1
+              //TODO: Recipes could change depending on inputs
+              RecipeInput input;
+              if (instance instanceof DecoratedPotRecipe) {
+                  // These recipes cannot operate with an empty input
+                  return ItemStack.EMPTY;
+              } else if (instance instanceof CraftingRecipe) {
+                  input = CraftingInput.EMPTY;
+              } else if (instance instanceof SingleItemRecipe) {
+                  input = new SingleRecipeInput(ItemStack.EMPTY);
+              } else if (instance instanceof SmithingRecipe) {
+                  // record SmithingRecipeInput(ItemStack template, ItemStack base, ItemStack addition);
+                  input = new SmithingRecipeInput(ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY);
+              } else {
+                  // Unknown recipe type. Fail.
+                  throw new IllegalStateException("Unknown recipe type: " + instance.getClass().getName());
+              }
 
+              return instance.assemble((RecipeInput) input);
+  #elseif version >= 1.21.2
             //TODO: Recipes could change depending on inputs
             RecipeInput input;
             if (instance instanceof TippedArrowRecipe || instance instanceof DecoratedPotRecipe) {
@@ -48,6 +64,7 @@ class Recipe {
                 throw new IllegalStateException("Unknown recipe type: " + instance.getClass().getName());
             }
 
+            RegistryAccess$Frozen registry = MinecraftServer.getServer().registryAccess();
             return instance.assemble((RecipeInput) input, registry);
   #elseif version >= 1.19.4
             //TODO: Technically could support world-specific recipes!
@@ -318,7 +335,7 @@ class RecipeManager {
   #endif
         java.util.List filteredResult = new java.util.ArrayList();
 
-  #if version >= 1.19.4
+  #if version >= 1.19.4 && version < 26.1
         RegistryAccess$Frozen registry = MinecraftServer.getServer().registryAccess();
   #endif
   #if version >= 1.21.2
@@ -347,7 +364,11 @@ class RecipeManager {
             // Since Minecraft 1.17 the fireworks recipe exists twice
             // One is shapeless, the other is complex
             // Correct for this and only keep the complex one!
-  #if version >= 1.21.2
+  #if version >= 26.1
+            if (recipe instanceof ShapelessRecipe && ((Recipe) recipe).assemble(emptyCraftingInput).getItem() == Items.FIREWORK_ROCKET) {
+                continue;
+            }
+  #elseif version >= 1.21.2
             if (recipe instanceof ShapelessRecipe && ((Recipe) recipe).assemble(emptyCraftingInput, registry).getItem() == Items.FIREWORK_ROCKET) {
                 continue;
             }

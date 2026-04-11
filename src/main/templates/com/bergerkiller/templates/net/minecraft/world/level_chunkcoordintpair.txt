@@ -3,14 +3,23 @@ package net.minecraft.world.level;
 import com.bergerkiller.generated.net.minecraft.world.level.ChunkPosHandle;
 
 class ChunkPos {
-    public final int x;
-    public final int z;
-
     public (ChunkPosHandle) ChunkPos(int x, int z);
+
+#if version >= 26.1
+    public int x();
+    public int z();
+
+    public com.bergerkiller.bukkit.common.bases.IntVector2 toIntVector2() {
+        return new com.bergerkiller.bukkit.common.bases.IntVector2(instance.x(), instance.z());
+    }
+#else
+    public int x() { return instance.x; }
+    public int z() { return instance.z; }
 
     public com.bergerkiller.bukkit.common.bases.IntVector2 toIntVector2() {
         return new com.bergerkiller.bukkit.common.bases.IntVector2(instance.x, instance.z);
     }
+#endif
 
     <code>
     public static ChunkPosHandle fromIntVector2(com.bergerkiller.bukkit.common.bases.IntVector2 vector) {

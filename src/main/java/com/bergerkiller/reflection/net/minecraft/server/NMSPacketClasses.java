@@ -2362,7 +2362,7 @@ public class NMSPacketClasses {
     public static class NMSClientboundSetTimePacket extends NMSPacket {
 
         public final FieldAccessor<Long> age = ClientboundSetTimePacketHandle.T.gameTime.toFieldAccessor();
-        public final FieldAccessor<Long> timeOfDay = ClientboundSetTimePacketHandle.T.dayTime.toFieldAccessor();
+        //public final FieldAccessor<Long> timeOfDay = ClientboundSetTimePacketHandle.T.dayTime.toFieldAccessor();
     }
 
     public static class NMSClientboundMoveVehiclePacket extends NMSPacket {

@@ -22,15 +22,12 @@ public abstract class ClientboundSetTimePacketHandle extends PacketHandle {
 
     public abstract long getGameTime();
     public abstract void setGameTime(long value);
-    public abstract long getDayTime();
-    public abstract void setDayTime(long value);
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.ClientboundSetTimePacket</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ClientboundSetTimePacketClass extends Template.Class<ClientboundSetTimePacketHandle> {
         public final Template.Field.Long gameTime = new Template.Field.Long();
-        public final Template.Field.Long dayTime = new Template.Field.Long();
 
     }
 

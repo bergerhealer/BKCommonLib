@@ -2155,8 +2155,17 @@ class Entity {
     public optional void remove:###(net.minecraft.world.entity.Entity.RemovalReason removalReason);
 #endif
 
+    // Since MC 26.1
+#if version >= 26.1
+    public optional (InteractionResult) net.minecraft.world.InteractionResult onInteractBy_26_1:interact((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (HumanHandRole) InteractionHand enumhand, (org.bukkit.util.Vector) Vec3 location);
+#else
+    public optional (InteractionResult) net.minecraft.world.InteractionResult onInteractBy_26_1:###((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (HumanHandRole) InteractionHand enumhand, (org.bukkit.util.Vector) Vec3 location);
+#endif
+
     // Since MC 1.16
-#if version >= 1.18
+#if version >= 26.1
+    public optional (InteractionResult) net.minecraft.world.InteractionResult onInteractBy_1_16:###((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (HumanHandRole) InteractionHand enumhand);
+#elseif version >= 1.18
     public optional (InteractionResult) net.minecraft.world.InteractionResult onInteractBy_1_16:interact((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (HumanHandRole) InteractionHand enumhand);
 #elseif version >= 1.16
     public optional (InteractionResult) net.minecraft.world.InteractionResult onInteractBy_1_16:a((org.bukkit.entity.HumanEntity) net.minecraft.world.entity.player.Player human, (HumanHandRole) InteractionHand enumhand);

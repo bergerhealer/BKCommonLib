@@ -96,6 +96,8 @@ class ServerLevel extends Level {
         net.minecraft.util.DirectoryLock lock = instance.levelStorageAccess#conv_lock;
   #elseif version == 1.21.4 && paper && exists net.minecraft.server.level.ServerLevel public final net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess levelStorageAccess;
         net.minecraft.util.DirectoryLock lock = instance.levelStorageAccess#conv_lock;
+  #elseif version >= 26.1
+        net.minecraft.util.DirectoryLock lock = instance.storageSource#conv_lock;
   #else
         net.minecraft.util.DirectoryLock lock = instance.convertable#conv_lock;
   #endif
@@ -251,7 +253,9 @@ class ServerLevel extends Level {
 
     public (org.bukkit.Chunk) LevelChunk getChunkIfLoaded(int cx, int cz) {
 #if version >= 1.14
-  #if version >= 1.18
+  #if version >= 26.1
+        long key = ChunkPos.pack(cx, cz);
+  #elseif version >= 1.18
         long key = ChunkPos.asLong(cx, cz);
   #else
         long key = ChunkPos.pair(cx, cz);

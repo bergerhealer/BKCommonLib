@@ -454,7 +454,10 @@ class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          *     #require net.minecraft.server.level.ServerLevel private final net.minecraft.world.level.entity.PersistentEntitySectionManager entityManager;
          * #endif
          *     PersistentEntitySectionManager manager = world#entityManager;
-         * #if version >= 1.18
+         * #if version >= 26.1
+         *     long key = ChunkPos.pack(cx, cz);
+         *     return manager.areEntitiesLoaded(key);
+         * #elseif version >= 1.18
          *     long key = ChunkPos.asLong(cx, cz);
          *     return manager.areEntitiesLoaded(key);
          * #else

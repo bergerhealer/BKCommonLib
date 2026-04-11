@@ -333,7 +333,11 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          * 
          *     // Random field
          * #if version >= 1.19
+         *   #if version >= 26.1
+         *     #require net.minecraft.world.level.Level protected final net.minecraft.util.RandomSource random;
+         *   #else
          *     #require net.minecraft.world.level.Level public final net.minecraft.util.RandomSource random;
+         *   #endif
          *     net.minecraft.util.RandomSource newRandom = net.minecraft.util.RandomSource.create();
          *     worldserver#random = newRandom;
          * #else

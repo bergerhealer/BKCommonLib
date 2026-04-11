@@ -60,16 +60,15 @@ public class NMSVector {
     }
 
     public static IntVector2 getPair(Object chunkCoordIntPair) {
-        return new IntVector2(ChunkPosHandle.T.x.getInteger(chunkCoordIntPair),
-                ChunkPosHandle.T.z.getInteger(chunkCoordIntPair));
+        return ChunkPosHandle.T.toIntVector2.invoke(chunkCoordIntPair);
     }
 
     public static int getPairX(Object chunkCoordIntPair) {
-        return ChunkPosHandle.T.x.getInteger(chunkCoordIntPair);
+        return ChunkPosHandle.T.x.invoke(chunkCoordIntPair);
     }
 
     public static int getPairZ(Object chunkCoordIntPair) {
-        return ChunkPosHandle.T.z.getInteger(chunkCoordIntPair);
+        return ChunkPosHandle.T.z.invoke(chunkCoordIntPair);
     }
 
     public static boolean isPair(Object chunkCoordIntPair) {

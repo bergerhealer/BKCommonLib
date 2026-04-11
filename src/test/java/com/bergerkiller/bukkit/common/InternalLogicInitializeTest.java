@@ -122,7 +122,7 @@ public class InternalLogicInitializeTest {
             fail("Runtime-generated NullPacketDataSerializer not found: " + NullPacketDataSerializerInit.CLASS_NAME);
         }
 
-        Class<?> serializerType = Resolver.loadClass("net.minecraft.network.PacketDataSerializer", false);
+        Class<?> serializerType = Resolver.loadClass("net.minecraft.network.FriendlyByteBuf", false);
         assertNotNull(serializerType);
 
         java.lang.reflect.Field instanceField = null;

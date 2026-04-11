@@ -173,10 +173,11 @@ public class TemplateTest {
 
     @Test
     public void testEntityInteractFunction() {
-        assertTrue(EntityHandle.T.onInteractBy_1_16.isAvailable() ||
-                   EntityHandle.T.onInteractBy_1_11_2.isAvailable() ||
-                   EntityHandle.T.onInteractBy_1_9.isAvailable() ||
-                   EntityHandle.T.onInteractBy_1_8_8.isAvailable());
+        assertTrue(EntityHandle.T.onInteractBy_26_1.isAvailable()
+                || EntityHandle.T.onInteractBy_1_16.isAvailable()
+                || EntityHandle.T.onInteractBy_1_11_2.isAvailable()
+                || EntityHandle.T.onInteractBy_1_9.isAvailable()
+                || EntityHandle.T.onInteractBy_1_8_8.isAvailable());
     }
 
     private static void testChatColor(ChatColor expectedColor, int expectedIndex) {

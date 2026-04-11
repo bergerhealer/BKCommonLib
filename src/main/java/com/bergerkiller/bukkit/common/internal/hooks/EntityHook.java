@@ -34,6 +34,7 @@ import com.bergerkiller.mountiplex.reflection.ClassHook;
 import org.bukkit.util.Vector;
 
 @ClassHook.HookPackage("net.minecraft.server")
+@ClassHook.HookImport("net.minecraft.core.Vec3")
 @ClassHook.HookImport("net.minecraft.world.entity.Entity")
 @ClassHook.HookImport("net.minecraft.world.entity.Entity.MoveFunction")
 @ClassHook.HookImport("net.minecraft.world.InteractionHand")
@@ -77,15 +78,19 @@ public class EntityHook extends ClassHook<EntityHook> {
                 "onPositionPassenger", Entity.class, EntityPositionApplier.class);
     }
 
-    public InteractionResult base_onInteractBy(HumanEntity humanEntity, HumanHand humanHand) {
+    public InteractionResult base_onInteractBy(HumanEntity humanEntity, HumanHand humanHand, Vector location) {
         Object entityHumanHandle = HandleConversion.toEntityHandle(humanEntity);
-        if (EntityHandle.T.onInteractBy_1_16.isAvailable()) {
-            return InteractionResult.fromHandle(base.onInteractBy_1_16(entityHumanHandle, humanHand.toNMSInteractionHand(humanEntity)));
+        Object interactionHandHandle = humanHand.toNMSInteractionHand(humanEntity);
+        if (EntityHandle.T.onInteractBy_26_1.isAvailable()) {
+            Object locationVec = Vec3Handle.fromBukkitRaw(location);
+            return InteractionResult.fromHandle(base.onInteractBy_26_1(entityHumanHandle, interactionHandHandle, locationVec));
+        } else if (EntityHandle.T.onInteractBy_1_16.isAvailable()) {
+            return InteractionResult.fromHandle(base.onInteractBy_1_16(entityHumanHandle, interactionHandHandle));
         } else if (EntityHandle.T.onInteractBy_1_11_2.isAvailable()) {
-            return InteractionResult.fromTruthy(base.onInteractBy_1_11_2(entityHumanHandle, humanHand.toNMSInteractionHand(humanEntity)));
+            return InteractionResult.fromTruthy(base.onInteractBy_1_11_2(entityHumanHandle, interactionHandHandle));
         } else if (EntityHandle.T.onInteractBy_1_9.isAvailable()) {
             Object item = HandleConversion.toItemStackHandle(HumanHand.getHeldItem(humanEntity, humanHand));
-            return InteractionResult.fromTruthy(base.onInteractBy_1_10_2(entityHumanHandle, item, humanHand.toNMSInteractionHand(humanEntity)));
+            return InteractionResult.fromTruthy(base.onInteractBy_1_10_2(entityHumanHandle, item, interactionHandHandle));
         } else if (EntityHandle.T.onInteractBy_1_8_8.isAvailable()) {
             return InteractionResult.fromTruthy(base.onInteractBy_1_8_8(entityHumanHandle));
         } else {
@@ -114,7 +119,7 @@ public class EntityHook extends ClassHook<EntityHook> {
     @HookMethodCondition("version < 1.9")
     @HookMethod(value="public boolean onInteractBy_1_8_8:???(net.minecraft.world.entity.player.Player entityhuman)")
     public boolean onInteractBy_1_8_8(Object entityHuman) {
-        return onInteractBy((HumanEntity) WrapperConversion.toEntity(entityHuman), HumanHand.RIGHT).isTruthy();
+        return onInteractBy((HumanEntity) WrapperConversion.toEntity(entityHuman), HumanHand.RIGHT, null).isTruthy();
     }
 
     @Deprecated
@@ -129,15 +134,24 @@ public class EntityHook extends ClassHook<EntityHook> {
     @HookMethod(value="public boolean onInteractBy_1_11_2:???(net.minecraft.world.entity.player.Player entityhuman, InteractionHand enumhand)")
     public boolean onInteractBy_1_11_2(Object entityHuman, Object enumHand) {
         HumanEntity humanEntity = (HumanEntity) WrapperConversion.toEntity(entityHuman);
-        return onInteractBy(humanEntity, HumanHand.fromNMSInteractionHand(humanEntity, enumHand)).isTruthy();
+        return onInteractBy(humanEntity, HumanHand.fromNMSInteractionHand(humanEntity, enumHand), null).isTruthy();
     }
 
     @Deprecated
-    @HookMethodCondition("version >= 1.16")
+    @HookMethodCondition("version >= 1.16 && version < 26.1")
     @HookMethod(value="public InteractionResult onInteractBy_1_16:???(net.minecraft.world.entity.player.Player entityhuman, InteractionHand enumhand)")
     public Object onInteractBy_1_16(Object entityHuman, Object enumHand) {
         HumanEntity humanEntity = (HumanEntity) WrapperConversion.toEntity(entityHuman);
-        return onInteractBy(humanEntity, HumanHand.fromNMSInteractionHand(humanEntity, enumHand)).getRawHandle();
+        return onInteractBy(humanEntity, HumanHand.fromNMSInteractionHand(humanEntity, enumHand), null).getRawHandle();
+    }
+
+    @Deprecated
+    @HookMethodCondition("version >= 26.1")
+    @HookMethod(value="public InteractionResult onInteractBy_26_1:???(net.minecraft.world.entity.player.Player entityhuman, InteractionHand enumhand, Vec3 location)")
+    public Object onInteractBy_26_1(Object entityHuman, Object enumHand, Object location) {
+        HumanEntity humanEntity = (HumanEntity) WrapperConversion.toEntity(entityHuman);
+        Vector bukkitLocation = Vec3Handle.T.toBukkit.invoke(location);
+        return onInteractBy(humanEntity, HumanHand.fromNMSInteractionHand(humanEntity, enumHand), bukkitLocation).getRawHandle();
     }
 
     @HookMethodCondition("version >= 1.17")
@@ -149,12 +163,12 @@ public class EntityHook extends ClassHook<EntityHook> {
         return true;
     }
 
-    public InteractionResult onInteractBy(HumanEntity humanEntity, HumanHand humanHand) {
+    public InteractionResult onInteractBy(HumanEntity humanEntity, HumanHand humanHand, Vector location) {
         try {
             if (checkController()) {
-                return controller.onInteractBy(humanEntity, humanHand);
+                return controller.onInteractBy(humanEntity, humanHand, location);
             } else {
-                return base_onInteractBy(humanEntity, humanHand);
+                return base_onInteractBy(humanEntity, humanHand, location);
             }
         } catch (Throwable t) {
             Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity onInteractBy callback", t);

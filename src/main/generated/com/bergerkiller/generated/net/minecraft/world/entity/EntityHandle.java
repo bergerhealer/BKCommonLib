@@ -416,6 +416,8 @@ public abstract class EntityHandle extends Template.Handle {
         @Template.Optional
         public final Template.Method<Void> remove = new Template.Method<Void>();
         @Template.Optional
+        public final Template.Method.Converted<InteractionResult> onInteractBy_26_1 = new Template.Method.Converted<InteractionResult>();
+        @Template.Optional
         public final Template.Method.Converted<InteractionResult> onInteractBy_1_16 = new Template.Method.Converted<InteractionResult>();
         @Template.Optional
         public final Template.Method.Converted<Boolean> onInteractBy_1_11_2 = new Template.Method.Converted<Boolean>();

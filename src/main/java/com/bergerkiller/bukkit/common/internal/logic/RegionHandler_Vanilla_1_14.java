@@ -342,7 +342,9 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
         /*
          * <FIND_REGION_FILE_AT>
          * public static RegionFile findRegionFileAt(Long2ObjectLinkedOpenHashMap cache, int rx, int rz) {
-         * #if version >= 1.18
+         * #if version >= 26.1
+         *     long coord = ChunkPos.pack(rx, rz);
+         * #elseif version >= 1.18
          *     long coord = ChunkPos.asLong(rx, rz);
          * #else
          *     long coord = ChunkPos.pair(rx, rz);

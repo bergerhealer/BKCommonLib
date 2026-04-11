@@ -90,10 +90,11 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
      *
      * @param interacter that interacted
      * @param hand that is used
+     * @param location that was interacted at, can be <i>null</i> on Minecraft versions before 26.1
      * @return True if interaction occurred, False if not
      */
-    public InteractionResult onInteractBy(HumanEntity interacter, HumanHand hand) {
-        return this.hook.base_onInteractBy(interacter, hand);
+    public InteractionResult onInteractBy(HumanEntity interacter, HumanHand hand, Vector location) {
+        return this.hook.base_onInteractBy(interacter, hand, location);
     }
 
     /**

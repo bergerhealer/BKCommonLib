@@ -898,10 +898,10 @@ class ClientboundSetExperiencePacket extends Packet {
 class ClientboundSetTimePacket extends Packet {
 #if version >= 1.17
     private long gameTime;
-    private long dayTime;
+    //private long dayTime; // Broke 26.1
 #else
     private long gameTime:a;
-    private long dayTime:b;
+    //private long dayTime:b;
 #endif
 }
 
@@ -1127,7 +1127,15 @@ class ClientboundLevelChunkWithLightPacket extends Packet {
 
 // Only >= MC 1.9 (MC 1.8.9 relies on clients themselves to unload as needed, for some reason)
 optional class ClientboundForgetLevelChunkPacket extends Packet {
-#if version >= 1.20.2
+#if version >= 26.1
+    public int getCx() { return instance.pos().x(); }
+    public int getCz() { return instance.pos().z(); }
+    public void setChunk(int cx, int cz) {
+        #require ClientboundForgetLevelChunkPacket private final net.minecraft.world.level.ChunkPos pos;
+        net.minecraft.world.level.ChunkPos pair = new net.minecraft.world.level.ChunkPos(cx, cz);
+        instance#pos = pair;
+    }
+#elseif version >= 1.20.2
     public int getCx() { return instance.pos().x; }
     public int getCz() { return instance.pos().z; }
     public void setChunk(int cx, int cz) {
@@ -2059,7 +2067,11 @@ class ClientboundLevelParticlesPacket extends Packet {
         } else if (options instanceof org.bukkit.inventory.ItemStack) {
             net.minecraft.world.item.ItemStack itemstack = (net.minecraft.world.item.ItemStack) com.bergerkiller.bukkit.common.conversion.type.HandleConversion
                     .toItemStackHandle((org.bukkit.inventory.ItemStack) options);
+  #if version >= 26.1
+            param = new net.minecraft.core.particles.ItemParticleOption(particleType, itemstack.getItem());
+  #else
             param = new net.minecraft.core.particles.ItemParticleOption(particleType, itemstack);
+  #endif
 
   #if version >= 1.19
         } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$SculkChargeOptions) {

@@ -37,22 +37,15 @@ class LevelChunk {
     public (LevelHandle) Level getWorld();
 #endif
 
-#if version >= 1.14
-    public int getLocX() {
-        return instance.getPos().x;
-    }
-
-    public int getLocZ() {
-        return instance.getPos().z;
-    }
+#if version >= 26.1
+    public int getLocX() { return instance.getPos().x(); }
+    public int getLocZ() { return instance.getPos().z(); }
+#elseif version >= 1.14
+    public int getLocX() { return instance.getPos().x; }
+    public int getLocZ() { return instance.getPos().z; }
 #else
-    public int getLocX() {
-        return instance.locX;
-    }
-
-    public int getLocZ() {
-        return instance.locZ;
-    }
+    public int getLocX() { return instance.locX; }
+    public int getLocZ() { return instance.locZ; }
 #endif
 
     public java.util.List<Integer> getLoadedSectionCoordinates() {
@@ -202,13 +195,21 @@ class LevelChunk {
     </code>
 
     public (List<org.bukkit.entity.Entity>) List<Entity> getEntities() {
+  #if version >= 26.1
+        int chunkX = instance.getPos().x();
+        int chunkZ = instance.getPos().z();
+  #else
+        int chunkX = instance.getPos().x
+        int chunkZ = instance.getPos().z;
+  #endif
+
 #if version >= 1.21 && exists ca.spottedleaf.moonrise.patches.chunk_system.level.entity.ChunkEntitySlices
         // New 1.21 Paper chunk system patches system
         ServerLevel world = (ServerLevel) instance#getChunkWorld();
         ca.spottedleaf.moonrise.patches.chunk_system.level.entity.EntityLookup entityLookup;
         entityLookup = world.moonrise$getEntityLookup();
         ca.spottedleaf.moonrise.patches.chunk_system.level.entity.ChunkEntitySlices slices;
-        slices = entityLookup.getChunk(instance.getPos().x, instance.getPos().z);
+        slices = entityLookup.getChunk(chunkX, chunkZ);
         if (slices == null) {
             return java.util.Collections.emptyList();
         }
@@ -235,11 +236,11 @@ class LevelChunk {
     #if exists io.papermc.paper.chunk.system.entity.EntityLookup
         // New Paper Chunk System
         io.papermc.paper.chunk.system.entity.EntityLookup entityLookup = world.getEntityLookup();
-        io.papermc.paper.world.ChunkEntitySlices slices = entityLookup.getChunk(instance.getPos().x, instance.getPos().z);
+        io.papermc.paper.world.ChunkEntitySlices slices = entityLookup.getChunk(chunkX, chunkZ);
     #else
         #require net.minecraft.world.level.Level protected final io.papermc.paper.world.EntitySliceManager entitySliceManager;
         io.papermc.paper.world.EntitySliceManager manager = world#entitySliceManager;
-        io.papermc.paper.world.ChunkEntitySlices slices = manager.getChunk(instance.getPos().x, instance.getPos().z);
+        io.papermc.paper.world.ChunkEntitySlices slices = manager.getChunk(chunkX, chunkZ);
     #endif
         if (slices == null) {
             return java.util.Collections.emptyList();
@@ -279,11 +280,11 @@ class LevelChunk {
 
         // Iterate a subset of the sectionIds LongSet to find all vertical slices of this chunk storing entities
   #if version >= 1.18
-        long sectionIdsStart = SectionPos.asLong(instance.getPos().x, 0, instance.getPos().z);
-        long sectionIdsEnd = SectionPos.asLong(instance.getPos().x, -1, instance.getPos().z) + 1;
+        long sectionIdsStart = SectionPos.asLong(chunkX, 0, chunkZ);
+        long sectionIdsEnd = SectionPos.asLong(chunkX, -1, chunkZ) + 1;
   #else
-        long sectionIdsStart = SectionPos.b(instance.getPos().x, 0, instance.getPos().z);
-        long sectionIdsEnd = SectionPos.b(instance.getPos().x, -1, instance.getPos().z) + 1;
+        long sectionIdsStart = SectionPos.b(chunkX, 0, chunkZ);
+        long sectionIdsEnd = SectionPos.b(chunkX, -1, chunkZ) + 1;
   #endif
 
         it.unimi.dsi.fastutil.longs.LongBidirectionalIterator iterator = sectionIds.subSet(sectionIdsStart, sectionIdsEnd).iterator();

@@ -404,7 +404,17 @@ class ChunkMap {
     //    private boolean shouldUnload:a(int i, int j, int k, int l, int i1);
 
 #if version >= 1.14
-  #if version >= 1.18
+  #if version >= 26.1
+    #require net.minecraft.server.level.ChunkMap protected (Object) ChunkHolder getVisibleChunk_1_14:getVisibleChunkIfPresent(long i);
+    #require net.minecraft.server.level.ChunkMap protected (Object) ChunkHolder getUpdatingChunk_1_14:getUpdatingChunkIfPresent(long i);
+
+    public (ChunkHolderHandle) ChunkHolder getVisibleChunk(int x, int z) {
+        return (ChunkHolder) instance#getVisibleChunk_1_14(ChunkPos.pack(x, z));
+    }
+    public (ChunkHolderHandle) ChunkHolder getUpdatingChunk(int x, int z) {
+        return (ChunkHolder) instance#getUpdatingChunk_1_14(ChunkPos.pack(x, z));
+    }
+  #elseif version >= 1.18
     #require net.minecraft.server.level.ChunkMap protected (Object) ChunkHolder getVisibleChunk_1_14:getVisibleChunkIfPresent(long i);
     #require net.minecraft.server.level.ChunkMap protected (Object) ChunkHolder getUpdatingChunk_1_14:getUpdatingChunkIfPresent(long i);
 
@@ -454,7 +464,9 @@ class ChunkMap {
 
 #if version >= 1.14
     public boolean isChunkEntered((ServerPlayerHandle) ServerPlayer entityplayer, int chunkX, int chunkZ) {
-  #if version >= 1.18
+  #if version >= 26.1
+        long key = ChunkPos.pack(chunkX, chunkZ);
+  #elseif version >= 1.18
         long key = ChunkPos.asLong(chunkX, chunkZ);
   #else
         long key = ChunkPos.pair(chunkX, chunkZ);

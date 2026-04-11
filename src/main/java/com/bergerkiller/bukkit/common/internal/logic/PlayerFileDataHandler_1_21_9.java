@@ -51,6 +51,8 @@ class PlayerFileDataHandler_1_21_9 extends PlayerFileDataHandler {
                     "public java.io.File getPlayerDir() {\n" +
                     "#if paper\n" +
                     "    return new java.io.File(instance.levelStorageAccess.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
+                    "#elseif version >= 26.1\n" +
+                    "    return new java.io.File(instance.storageSource.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
                     "#else\n" +
                     "    return new java.io.File(instance.convertable.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
                     "#endif\n" +
