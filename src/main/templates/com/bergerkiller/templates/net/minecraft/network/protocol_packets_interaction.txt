@@ -110,14 +110,12 @@ class ServerboundAttackPacket extends Packet {
 
 class ServerboundInteractPacket extends Packet {
 #if version >= 26.1
-    public static (ServerboundInteractPacketHandle) ServerboundInteractPacket createNew(int usedEntityId, org.bukkit.entity.HumanEntity player, com.bergerkiller.bukkit.common.wrappers.HumanHand hand, boolean isUsingSecondaryAction, (org.bukkit.util.Vector) Vec3 atPosition) {
+    public static (ServerboundInteractPacketHandle) ServerboundInteractPacket createNew(int usedEntityId, (HumanHandRole) InteractionHand handRole, boolean isUsingSecondaryAction, (org.bukkit.util.Vector) Vec3 atPosition) {
         if (atPosition == null) {
             throw new IllegalArgumentException("Since Minecraft 26.1 an interact position is required");
         }
 
-        InteractionHand nmsHand = (InteractionHand) com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSInteractionHand(player, hand);
-
-        return new ServerboundInteractPacket(usedEntityId, nmsHand, atPosition, isUsingSecondaryAction);
+        return new ServerboundInteractPacket(usedEntityId, handRole, atPosition, isUsingSecondaryAction);
     }
 
     public int getUsedEntityId:entityId();
@@ -150,18 +148,16 @@ class ServerboundInteractPacket extends Packet {
         return instance#action#getType().name();
     }
 
-    public static (ServerboundInteractPacketHandle) ServerboundInteractPacket createNew(int usedEntityId, org.bukkit.entity.HumanEntity player, com.bergerkiller.bukkit.common.wrappers.HumanHand hand, boolean isUsingSecondaryAction, (org.bukkit.util.Vector) Vec3 atPosition) {
+    public static (ServerboundInteractPacketHandle) ServerboundInteractPacket createNew(int usedEntityId, (HumanHandRole) InteractionHand handRole, boolean isUsingSecondaryAction, (org.bukkit.util.Vector) Vec3 atPosition) {
         #require ServerboundInteractPacket private ServerboundInteractPacket createInteractPacket:<init> (int i, boolean flag, ServerboundInteractPacket.Action action);
-
-        InteractionHand nmsHand = (InteractionHand) com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSInteractionHand(player, hand);
 
         Object action;
         if (atPosition != null) {
             #require net.minecraft.network.protocol.game.ServerboundInteractPacket.InteractionAtLocationAction ServerboundInteractPacket.InteractionAtLocationAction createActionInteractAt:<init>(net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.Vec3 location);
-            action = #createActionInteractAt(nmsHand, atPosition);
+            action = #createActionInteractAt(handRole, atPosition);
         } else {
             #require net.minecraft.network.protocol.game.ServerboundInteractPacket.InteractionAction ServerboundInteractPacket.InteractionAction createActionInteract:<init>(net.minecraft.world.InteractionHand hand);
-            action = #createActionInteract(nmsHand);
+            action = #createActionInteract(handRole);
         }
 
         return #createInteractPacket(usedEntityId, isUsingSecondaryAction, action);
@@ -225,7 +221,24 @@ class ServerboundInteractPacket extends Packet {
     #require net.minecraft.network.protocol.game.ServerboundInteractPacket private boolean secondaryActionFlag:e;
   #endif
 
-    public static (ServerboundInteractPacketHandle) ServerboundInteractPacket createNew(int usedEntityId, org.bukkit.entity.HumanEntity player, com.bergerkiller.bukkit.common.wrappers.HumanHand hand, boolean isUsingSecondaryAction, (org.bukkit.util.Vector) Vec3 atPosition) {
+  #if version >= 1.9
+    public static (ServerboundInteractPacketHandle) ServerboundInteractPacket createNew(int usedEntityId, (HumanHandRole) InteractionHand handRole, boolean isUsingSecondaryAction, (org.bukkit.util.Vector) Vec3 atPosition) {
+        ServerboundInteractPacket packet = new ServerboundInteractPacket();
+        packet#usedEntityId = usedEntityId;
+        packet#hand = handRole;
+        if (atPosition != null) {
+            packet#action = ServerboundInteractPacket$ActionType.INTERACT_AT;
+        } else {
+            packet#action = ServerboundInteractPacket$ActionType.INTERACT;
+        }
+        packet#offset = atPosition;
+    #if version >= 1.16
+        packet#secondaryActionFlag = isUsingSecondaryAction;
+    #endif
+        return packet;
+    }
+  #else
+    public static (ServerboundInteractPacketHandle) ServerboundInteractPacket createNew(int usedEntityId, (HumanHandRole) HumanHandRole handRole, boolean isUsingSecondaryAction, (org.bukkit.util.Vector) Vec3 atPosition) {
         ServerboundInteractPacket packet = new ServerboundInteractPacket();
         packet#usedEntityId = usedEntityId;
         if (atPosition != null) {
@@ -234,15 +247,9 @@ class ServerboundInteractPacket extends Packet {
             packet#action = ServerboundInteractPacket$ActionType.INTERACT;
         }
         packet#offset = atPosition;
-  #if version >= 1.16
-        packet#secondaryActionFlag = isUsingSecondaryAction;
-  #endif
-  #if version >= 1.9
-        InteractionHand nmsHand = (InteractionHand) com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSInteractionHand(player, hand);
-        packet#hand = nmsHand;
-  #endif
         return packet;
     }
+  #endif
 
     public int getUsedEntityId() {
         return instance#usedEntityId;
@@ -262,11 +269,17 @@ class ServerboundInteractPacket extends Packet {
         return instance#getType() == ServerboundInteractPacket$Action.INTERACT_AT;
     }
 
+    public (org.bukkit.util.Vector) Vec3 getInteractAtPosition() {
+        if (instance#getType() == ServerboundInteractPacket$Action.INTERACT_AT) {
   #select version >=
-  #case 1.13: public (org.bukkit.util.Vector) Vec3 getInteractAtPosition:d();
-  #case 1.9:  public (org.bukkit.util.Vector) Vec3 getInteractAtPosition:c();
-  #case else: public (org.bukkit.util.Vector) Vec3 getInteractAtPosition:b();
+  #case 1.13: return instance.d();
+  #case 1.9:  return instance.c();
+  #case else: return instance.b();
   #endselect
+        } else {
+            return null;
+        }
+    }
 
   #if version >= 1.16
     public static boolean hasSecondaryActionField() {
@@ -286,12 +299,20 @@ class ServerboundInteractPacket extends Packet {
 #endif
 
     <code>
-    public static ServerboundInteractPacketHandle createNew(int usedEntityId, org.bukkit.entity.HumanEntity player, com.bergerkiller.bukkit.common.wrappers.HumanHand hand, org.bukkit.util.Vector atPosition) {
-        return createNew(usedEntityId, player, hand, false, atPosition);
-    }
-
     public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
         return getHandRole().getHandOf(humanEntity);
+    }
+
+    public static ServerboundInteractPacketHandle createNew(int usedEntityId, com.bergerkiller.bukkit.common.wrappers.HumanHandRole handRole, org.bukkit.util.Vector atPosition) {
+        return createNew(usedEntityId, handRole, false, atPosition);
+    }
+
+    public static ServerboundInteractPacketHandle withUsingSecondaryAction(ServerboundInteractPacketHandle packet, boolean isUsingSecondaryAction) {
+        return createNew(packet.getUsedEntityId(), packet.getHandRole(), isUsingSecondaryAction, packet.getInteractAtPosition());
+    }
+
+    public static ServerboundInteractPacketHandle withUsedEntityId(ServerboundInteractPacketHandle packet, int usedEntityId) {
+        return createNew(usedEntityId, packet.getHandRole(), packet.isUsingSecondaryAction(), packet.getInteractAtPosition());
     }
     </code>
 }

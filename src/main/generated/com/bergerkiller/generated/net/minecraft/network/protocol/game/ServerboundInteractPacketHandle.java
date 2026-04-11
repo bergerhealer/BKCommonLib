@@ -1,10 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.HumanHandRole;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.util.Vector;
 
 /**
@@ -24,8 +22,8 @@ public abstract class ServerboundInteractPacketHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public static ServerboundInteractPacketHandle createNew(int usedEntityId, HumanEntity player, HumanHand hand, boolean isUsingSecondaryAction, Vector atPosition) {
-        return T.createNew.invoke(usedEntityId, player, hand, isUsingSecondaryAction, atPosition);
+    public static ServerboundInteractPacketHandle createNew(int usedEntityId, HumanHandRole handRole, boolean isUsingSecondaryAction, Vector atPosition) {
+        return T.createNew.invoke(usedEntityId, handRole, isUsingSecondaryAction, atPosition);
     }
 
     public static boolean hasSecondaryActionField() {
@@ -37,12 +35,20 @@ public abstract class ServerboundInteractPacketHandle extends PacketHandle {
     public abstract boolean hasInteractAtPosition();
     public abstract Vector getInteractAtPosition();
     public abstract boolean isUsingSecondaryAction();
-    public static ServerboundInteractPacketHandle createNew(int usedEntityId, org.bukkit.entity.HumanEntity player, com.bergerkiller.bukkit.common.wrappers.HumanHand hand, org.bukkit.util.Vector atPosition) {
-        return createNew(usedEntityId, player, hand, false, atPosition);
-    }
-
     public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
         return getHandRole().getHandOf(humanEntity);
+    }
+
+    public static ServerboundInteractPacketHandle createNew(int usedEntityId, com.bergerkiller.bukkit.common.wrappers.HumanHandRole handRole, org.bukkit.util.Vector atPosition) {
+        return createNew(usedEntityId, handRole, false, atPosition);
+    }
+
+    public static ServerboundInteractPacketHandle withUsingSecondaryAction(ServerboundInteractPacketHandle packet, boolean isUsingSecondaryAction) {
+        return createNew(packet.getUsedEntityId(), packet.getHandRole(), isUsingSecondaryAction, packet.getInteractAtPosition());
+    }
+
+    public static ServerboundInteractPacketHandle withUsedEntityId(ServerboundInteractPacketHandle packet, int usedEntityId) {
+        return createNew(usedEntityId, packet.getHandRole(), packet.isUsingSecondaryAction(), packet.getInteractAtPosition());
     }
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.ServerboundInteractPacket</b>.
