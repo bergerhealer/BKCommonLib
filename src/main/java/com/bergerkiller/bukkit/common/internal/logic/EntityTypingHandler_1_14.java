@@ -245,7 +245,11 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *     org.spigotmc.SpigotConfig.config.set(spigotConfigVerboseKey, Boolean.FALSE);
          *     try {
          *         #require net.minecraft.world.level.Level public final org.spigotmc.SpigotWorldConfig spigotConfig;
+         *   #if exists org.spigotmc.SpigotWorldConfig public SpigotWorldConfig(String legacyWorldName, net.kyori.adventure.key.Key key);
+         *         spigotConfig = new org.spigotmc.SpigotWorldConfig(dummyWorldName, net.kyori.adventure.key.Key.key(dummyWorldName));
+         *   #else
          *         spigotConfig = new org.spigotmc.SpigotWorldConfig(dummyWorldName);
+         *   #endif
          *         worldserver#spigotConfig = spigotConfig;
          *     } finally {
          *         // Restore
