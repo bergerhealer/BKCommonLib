@@ -293,7 +293,9 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          * #if fieldexists net.minecraft.world.level.Level public final org.purpurmc.purpur.PurpurWorldConfig purpurConfig;
          *     #require net.minecraft.world.level.Level public final org.purpurmc.purpur.PurpurWorldConfig purpurConfig;
          *     org.purpurmc.purpur.PurpurWorldConfig purpurConfig;
-         *   #if exists org.purpurmc.purpur.PurpurWorldConfig public PurpurWorldConfig(net.minecraft.server.level.ServerLevel level, String worldName, org.bukkit.World.Environment environment);
+         *   #if exists org.purpurmc.purpur.PurpurWorldConfig public PurpurWorldConfig(String legacyWorldName, org.bukkit.World.Environment environment, net.kyori.adventure.key.Key worldKey);
+         *     purpurConfig = new org.purpurmc.purpur.PurpurWorldConfig(dummyWorldName, org.bukkit.World$Environment.NORMAL, net.kyori.adventure.key.Key.key(dummyWorldName));
+         *   #elseif exists org.purpurmc.purpur.PurpurWorldConfig public PurpurWorldConfig(net.minecraft.server.level.ServerLevel level, String worldName, org.bukkit.World.Environment environment);
          *     purpurConfig = new org.purpurmc.purpur.PurpurWorldConfig(worldserver, dummyWorldName, org.bukkit.World$Environment.NORMAL);
          *   #elseif exists org.purpurmc.purpur.PurpurWorldConfig public PurpurWorldConfig(String worldName, org.bukkit.World.Environment environment);
          *     purpurConfig = new org.purpurmc.purpur.PurpurWorldConfig(dummyWorldName, org.bukkit.World$Environment.NORMAL);
