@@ -63,7 +63,7 @@ public class MagmaServerLegacy extends SpigotServer implements FieldNameResolver
     }
 
     @Override
-    public Collection<String> getLoadableWorlds() {
+    public Collection<String> getLoadableWorldsLegacy() {
         return ForgeSupport.bukkit().getLoadableWorlds();
     }
 

@@ -1,19 +1,28 @@
 package com.bergerkiller.bukkit.common.server;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.offline.OfflineWorld;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
+import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.bukkit.common.world.LoadableWorld;
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
 import com.bergerkiller.mountiplex.reflection.util.asm.ASMUtil;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Locale;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class CommonServerBase implements CommonServer {
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -40,71 +49,93 @@ public abstract class CommonServerBase implements CommonServer {
     }
 
     @Override
-    public Collection<String> getLoadableWorlds() {
-        String[] subDirs = Bukkit.getWorldContainer().list();
-        Collection<String> rval = new ArrayList<String>(subDirs.length);
-        for (String worldName : subDirs) {
-            if (isLoadableWorld(worldName)) {
-                rval.add(worldName);
-            }
+    public LoadableWorld getLoadableWorld(World world) {
+        if (world == null) {
+            throw new IllegalArgumentException("World cannot be null");
         }
-        return rval;
+
+        File worldFolder = StreamUtil.getFileIgnoreCase(Bukkit.getWorldContainer(), world.getName());
+        if (WorldUtil.isLoaded(world)) {
+            return new SpigotLoadableWorld(world.getName(), worldFolder, OfflineWorld.of(world));
+        } else {
+            return new SpigotLoadableWorld(world.getName(), worldFolder, null);
+        }
     }
 
     @Override
-    public File getWorldFolder(String worldName) {
-        return StreamUtil.getFileIgnoreCase(Bukkit.getWorldContainer(), worldName);
-    }
+    public LoadableWorld findLoadableWorld(String worldName) {
+        World world = Bukkit.getWorld(worldName);
+        if (world != null) {
+            return getLoadableWorld(world);
+        }
 
-    @Override
-    public File getWorldLevelFile(String worldName) {
-        return new File(getWorldFolder(worldName), "level.dat");
+        return getLoadableWorlds().stream()
+                .filter(l -> l.getNames().contains(worldName))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
     public boolean isLoadableWorld(String worldName) {
-        if (Bukkit.getWorld(worldName) != null) {
-            return true;
+        return findLoadableWorld(worldName) != null;
+    }
+
+    @Override
+    public Collection<LoadableWorld> getLoadableWorlds() {
+        File[] subFolders = Bukkit.getWorldContainer().listFiles();
+        if (subFolders == null) {
+            return Collections.emptyList();
         }
-        File worldFolder = getWorldFolder(worldName);
-        if (!worldFolder.isDirectory()) {
-            return false;
+
+        List<LoadableWorld> loadableWorlds = new ArrayList<LoadableWorld>(subFolders.length);
+        Set<String> loadedWorldNames = new HashSet<String>();
+        for (World world : Bukkit.getWorlds()) {
+            loadedWorldNames.add(world.getName());
+            loadableWorlds.add(getLoadableWorld(world));
         }
-        if (new File(worldFolder, "level.dat").exists()) {
-            return true;
-        }
-        // Check whether there are any valid region files in the folder
-        File regionFolder = getWorldRegionFolder(worldName);
-        if (regionFolder != null) {
-            for (String fileName : regionFolder.list()) {
-                if (fileName.toLowerCase(Locale.ENGLISH).endsWith(".mca")) {
-                    return true;
-                }
+        for (File folder : subFolders) {
+            if (loadedWorldNames.contains(folder.getName())) {
+                continue;
             }
+            if (!(new File(folder, "level.dat").exists())) {
+                continue;
+            }
+            loadableWorlds.add(new SpigotLoadableWorld(folder.getName(), folder, null));
         }
-        return false;
+        return loadableWorlds;
+    }
+
+    @Override
+    public Collection<String> getLoadableWorldsLegacy() {
+        return getLoadableWorlds().stream()
+                .map(LoadableWorld::getDisplayName)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public File getWorldFolder(String worldName) {
+        LoadableWorld world = findLoadableWorld(worldName);
+        if (world == null) {
+            throw new IllegalArgumentException("Invalid world name: " + worldName);
+        } else {
+            return world.getDimensionFolder();
+        }
+    }
+
+    @Override
+    public File getWorldLevelFile(String worldName) {
+        LoadableWorld world = findLoadableWorld(worldName);
+        if (world == null) {
+            throw new IllegalArgumentException("Invalid world name: " + worldName);
+        } else {
+            return world.getLevelFile();
+        }
     }
 
     @Override
     public File getWorldRegionFolder(String worldName) {
-        File mainFolder = getWorldFolder(worldName);
-        // Overworld
-        File tmp = new File(mainFolder, "region");
-        if (tmp.exists()) {
-            return tmp;
-        }
-        // Nether
-        tmp = new File(mainFolder, "DIM-1" + File.separator + "region");
-        if (tmp.exists()) {
-            return tmp;
-        }
-        // The End
-        tmp = new File(mainFolder, "DIM1" + File.separator + "region");
-        if (tmp.exists()) {
-            return tmp;
-        }
-        // Unknown???
-        return null;
+        LoadableWorld world = findLoadableWorld(worldName);
+        return world == null ? null : world.getRegionFolder();
     }
 
     @Override
@@ -156,5 +187,105 @@ public abstract class CommonServerBase implements CommonServer {
 
     @Override
     public void disable(CommonPlugin plugin) {
+    }
+
+    /**
+     * Spigot format, where every world sits in the "world container" root folder, and the folder
+     * name is what the world name is.
+     */
+    protected static class SpigotLoadableWorld implements LoadableWorld {
+        private final String worldName;
+        private final File worldFolder;
+        private OfflineWorld world;
+
+        public SpigotLoadableWorld(String worldName, File worldFolder, OfflineWorld world) {
+            this.worldName = worldName;
+            this.worldFolder = worldFolder;
+            this.world = world;
+        }
+
+        @Override
+        public String getDisplayName() {
+            return worldName;
+        }
+
+        @Override
+        public Collection<String> getNames() {
+            return Collections.singletonList(worldName);
+        }
+
+        @Override
+        public Format getFormat() {
+            return Format.SPIGOT;
+        }
+
+        @Override
+        public World getWorld() {
+            // Look up by name for the first time. Next time we can do it by UUID efficiently using the
+            // OfflineWorld API.
+            if (world == null) {
+                World loadedWorld = Bukkit.getWorld(worldName);
+                if (loadedWorld != null) {
+                    world = OfflineWorld.of(loadedWorld);
+                    return loadedWorld;
+                } else {
+                    return null;
+                }
+            }
+
+            return world.getLoadedWorld();
+        }
+
+        @Override
+        public File getRootFolder() {
+            return worldFolder;
+        }
+
+        @Override
+        public File getDimensionFolder() {
+            return getRootFolder();
+        }
+
+        @Override
+        public File getLevelFile() {
+            return new File(getRootFolder(), "level.dat");
+        }
+
+        @Override
+        public File getRegionFolder() {
+            File mainFolder = getDimensionFolder();
+            // Overworld
+            File tmp = new File(mainFolder, "region");
+            if (tmp.exists()) {
+                return tmp;
+            }
+            // Nether
+            tmp = new File(mainFolder, "DIM-1" + File.separator + "region");
+            if (tmp.exists()) {
+                return tmp;
+            }
+            // The End
+            tmp = new File(mainFolder, "DIM1" + File.separator + "region");
+            if (tmp.exists()) {
+                return tmp;
+            }
+            // Unknown???
+            return null;
+        }
+
+        @Override
+        public WorldCreator getWorldCreator() {
+            return new WorldCreator(worldName);
+        }
+
+        @Override
+        public String toString() {
+            return "SpigotLoadableWorld{" +
+                    "format=" + getFormat() +
+                    ", displayName='" + getDisplayName() + '\'' +
+                    ", name='" + worldName + '\'' +
+                    ", world=" + getWorld() +
+                    '}';
+        }
     }
 }

@@ -25,6 +25,7 @@ public abstract class IdentifierHandle extends Template.Handle {
 
     public abstract String getName();
     public abstract String getNamespace();
+    public abstract Object toBukkit();
     public static final String DEFAULT_NAMESPACE = "minecraft";
 
     public boolean isDefaultNamespace() {
@@ -84,6 +85,7 @@ public abstract class IdentifierHandle extends Template.Handle {
 
         public final Template.Method<String> getName = new Template.Method<String>();
         public final Template.Method<String> getNamespace = new Template.Method<String>();
+        public final Template.Method<Object> toBukkit = new Template.Method<Object>();
 
     }
 

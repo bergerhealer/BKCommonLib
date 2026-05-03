@@ -85,6 +85,14 @@ class Identifier {
     }
 #endif
 
+    public Object toBukkit() {
+#if version >= 1.12
+        return org.bukkit.craftbukkit.util.CraftNamespacedKey.fromMinecraft(instance);
+#else
+        throw new UnsupportedOperationException("Bukkit NamespacedKey does not exist before Minecraft 1.12");
+#endif
+    }
+
     <code>
     public static final String DEFAULT_NAMESPACE = "minecraft";
 

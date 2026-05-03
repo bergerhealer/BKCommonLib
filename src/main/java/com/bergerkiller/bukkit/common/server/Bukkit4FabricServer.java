@@ -67,7 +67,7 @@ public class Bukkit4FabricServer extends SpigotServer implements FieldNameResolv
     }
 
     @Override
-    public Collection<String> getLoadableWorlds() {
+    public Collection<String> getLoadableWorldsLegacy() {
         return ForgeSupport.bukkit().getLoadableWorlds();
     }
 

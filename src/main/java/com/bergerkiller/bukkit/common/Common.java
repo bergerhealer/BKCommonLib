@@ -84,7 +84,8 @@ public class Common {
             "Common:EntityController:isPlayerTakeable",
             "Common:Block:RayTraceUtilImprovements",
             "Common:BlockData:GetInteractableBox",
-            "Common:MapResourcePack:OpenResource"
+            "Common:MapResourcePack:OpenResource",
+            "Common:LoadableWorld"
     ).collect(Collectors.toSet());
 
     /**

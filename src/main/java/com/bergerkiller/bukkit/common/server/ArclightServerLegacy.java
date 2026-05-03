@@ -77,7 +77,7 @@ public class ArclightServerLegacy extends SpigotServer implements FieldNameResol
     }
 
     @Override
-    public Collection<String> getLoadableWorlds() {
+    public Collection<String> getLoadableWorldsLegacy() {
         return ForgeSupport.bukkit().getLoadableWorlds();
     }
 

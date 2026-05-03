@@ -1,7 +1,9 @@
 package com.bergerkiller.bukkit.common.server;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.world.LoadableWorld;
 import com.bergerkiller.templates.TemplateResolver;
+import org.bukkit.World;
 
 import java.io.File;
 import java.util.Collection;
@@ -120,6 +122,41 @@ public interface CommonServer {
     public boolean evaluateMCVersion(String operand, String version);
 
     /**
+     * Gets the loadable world information for a world that is already loaded. This provides
+     * information about where the files for this world are located.
+     *
+     * @param world World to get the loadable world information for
+     * @return Loadable world information
+     * @throws IllegalArgumentException If the world argument is null
+     */
+    LoadableWorld getLoadableWorld(World world);
+
+    /**
+     * Gets the loadable world information for a world by name. This provides information
+     * about where the files for this world are located, and a means to load the world
+     * if it isn't already loaded. If multiple worlds somehow match the same name (spigot and paper dimension
+     * with the same name), then that name will not match that world anymore. Instead, the full
+     * name to the world (including namespace) must be provided.
+     *
+     * @param worldName Unique world name
+     * @return LoadableWorld, or <i>null</i> if no world with the given name exists or can be loaded
+     * @see LoadableWorld#getNames()
+     */
+    LoadableWorld findLoadableWorld(String worldName);
+
+    /**
+     * Gets a Collection of all loadable worlds that are loaded, or can be loaded. This provides
+     * information about where the files for these worlds are located, and a means to load
+     * the world.<br>
+     * <br>
+     * Performs a search in the server "world container" folder to look for other worlds with a
+     * valid level.dat file, and handles sub-dimensions gracefully.
+     *
+     * @return Collection of loadable worlds on the server
+     */
+    Collection<LoadableWorld> getLoadableWorlds();
+
+    /**
      * Gets the File Location where the regions of a world are contained
      *
      * @param worldName to get the regions folder for
@@ -147,7 +184,7 @@ public interface CommonServer {
      *
      * @return Loadable world names
      */
-    public Collection<String> getLoadableWorlds();
+    public Collection<String> getLoadableWorldsLegacy();
 
     /**
      * Checks whether the World name specified contains a folder and can be

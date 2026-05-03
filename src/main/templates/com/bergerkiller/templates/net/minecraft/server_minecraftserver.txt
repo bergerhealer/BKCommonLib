@@ -1,6 +1,7 @@
 package net.minecraft.server;
 
 import net.minecraft.server.dedicated.DedicatedServer;
+import net.minecraft.server.dedicated.DedicatedServerProperties;
 import net.minecraft.server.dedicated.Settings;
 
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
@@ -31,6 +32,17 @@ class MinecraftServer {
         return ((Settings) dedicatedServer.getDedicatedServerProperties()).properties.getProperty(key, defaultValue);
 #else
         return dedicatedServer.getPropertyManager().properties.getProperty(key, defaultValue);
+#endif
+    }
+
+    public String getLevelName() {
+        DedicatedServer dedicatedServer = (DedicatedServer) instance;
+#if version >= 1.18
+        return dedicatedServer.getProperties().levelName;
+#elseif version >= 1.14
+        return dedicatedServer.getDedicatedServerProperties().levelName;
+#else
+        return dedicatedServer.getPropertyManager().properties.getProperty("level-name", "world");
 #endif
     }
 

@@ -19,6 +19,7 @@ import com.bergerkiller.bukkit.common.lighting.LightingHandler;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
+import com.bergerkiller.bukkit.common.world.LoadableWorld;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
@@ -403,7 +404,9 @@ public class WorldUtil extends ChunkUtil {
      *
      * @param world (can not be null)
      * @return world folder
+     * @deprecated Use {@link LoadableWorld#of(World)} API instead, and then use {@link LoadableWorld#getDimensionFolder()} on the result
      */
+    @Deprecated
     public static File getWorldFolder(org.bukkit.World world) {
         return getWorldFolder(world.getName());
     }
@@ -413,7 +416,9 @@ public class WorldUtil extends ChunkUtil {
      *
      * @param world (can not be null)
      * @return level.dat file
+     * @deprecated Use {@link LoadableWorld#of(World)} API instead, and then use {@link LoadableWorld#getLevelFile()} on the result
      */
+    @Deprecated
     public static File getWorldLevelFile(org.bukkit.World world) {
         return getWorldLevelFile(world.getName());
     }
@@ -423,7 +428,9 @@ public class WorldUtil extends ChunkUtil {
      *
      * @param worldName to check
      * @return True if the world at this world name is loadable, False if not
+     * @deprecated Use {@link LoadableWorld#find(String)} API instead, and check if the result is non-null
      */
+    @Deprecated
     public static boolean isLoadableWorld(String worldName) {
         return Common.SERVER.isLoadableWorld(worldName);
     }
@@ -433,7 +440,9 @@ public class WorldUtil extends ChunkUtil {
      *
      * @param worldName (can not be null)
      * @return world folder
+     * @deprecated Use {@link LoadableWorld#find(String)} API instead, and then use {@link LoadableWorld#getDimensionFolder()} on the result
      */
+    @Deprecated
     public static File getWorldFolder(String worldName) {
         return Common.SERVER.getWorldFolder(worldName);
     }
@@ -443,7 +452,9 @@ public class WorldUtil extends ChunkUtil {
      *
      * @param worldName (can not be null)
      * @return level.dat file
+     * @deprecated Use {@link LoadableWorld#find(String)} API instead, and then use {@link LoadableWorld#getLevelFile()} on the result
      */
+    @Deprecated
     public static File getWorldLevelFile(String worldName) {
         return Common.SERVER.getWorldLevelFile(worldName);
     }
@@ -453,7 +464,9 @@ public class WorldUtil extends ChunkUtil {
      *
      * @param worldName to get the regions folder for
      * @return Region folder
+     * @deprecated Use {@link LoadableWorld#find(String)} API instead, and then use {@link LoadableWorld#getRegionFolder()} on the result
      */
+    @Deprecated
     public static File getWorldRegionFolder(String worldName) {
         return Common.SERVER.getWorldRegionFolder(worldName);
     }
@@ -463,9 +476,11 @@ public class WorldUtil extends ChunkUtil {
      * it
      *
      * @return Loadable worlds
+     * @deprecated Use {@link LoadableWorld#listAll()} API instead.
      */
+    @Deprecated
     public static Collection<String> getLoadableWorlds() {
-        return Common.SERVER.getLoadableWorlds();
+        return Common.SERVER.getLoadableWorldsLegacy();
     }
 
     /**
