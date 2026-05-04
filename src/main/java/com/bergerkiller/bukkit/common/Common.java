@@ -85,7 +85,8 @@ public class Common {
             "Common:Block:RayTraceUtilImprovements",
             "Common:BlockData:GetInteractableBox",
             "Common:MapResourcePack:OpenResource",
-            "Common:LoadableWorld"
+            "Common:LoadableWorld",
+            "Common:DamageSource:CreateVehicleDamageEvent"
     ).collect(Collectors.toSet());
 
     /**

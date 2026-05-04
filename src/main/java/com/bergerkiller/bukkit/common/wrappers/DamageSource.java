@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 import com.bergerkiller.generated.net.minecraft.world.damagesource.DamageSourceHandle;
 
 import org.bukkit.entity.Entity;
+import org.bukkit.event.vehicle.VehicleDamageEvent;
 
 public class DamageSource extends BasicWrapper<DamageSourceHandle> {
 
@@ -13,6 +14,14 @@ public class DamageSource extends BasicWrapper<DamageSourceHandle> {
 
     protected DamageSource(DamageSourceHandle damageSourceHandle) {
         setHandle(damageSourceHandle);
+    }
+
+    public VehicleDamageEvent createVehicleDamageEvent(org.bukkit.entity.Vehicle vehicle, org.bukkit.entity.Entity attacker, double damage) {
+        return handle.createVehicleDamageEvent(vehicle, attacker, damage);
+    }
+
+    public VehicleDamageEvent createVehicleDamageEvent(org.bukkit.entity.Vehicle vehicle, double damage) {
+        return handle.createVehicleDamageEvent(vehicle, damage);
     }
 
     public boolean isFireDamage() {

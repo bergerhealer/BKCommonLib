@@ -6,6 +6,8 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Vehicle;
+import org.bukkit.event.vehicle.VehicleDamageEvent;
 import java.util.Map;
 
 /**
@@ -71,8 +73,14 @@ public abstract class DamageSourceHandle extends Template.Handle {
 
     public abstract String getTranslationIndex();
     public abstract Entity getEntity();
+    public abstract Object toBukkit();
+    public abstract VehicleDamageEvent createVehicleDamageEvent(Vehicle vehicle, Entity attacker, double damage);
     public abstract boolean isExplosion();
     public abstract boolean isFireDamage();
+    public VehicleDamageEvent createVehicleDamageEvent(org.bukkit.entity.Vehicle vehicle, double damage) {
+        return createVehicleDamageEvent(vehicle, getEntity(), damage);
+    }
+
     public static final java.util.Map<String, Object> INTERNAL_NAME_TO_KEY = new java.util.HashMap<>();
     static {
         try {
@@ -134,6 +142,8 @@ public abstract class DamageSourceHandle extends Template.Handle {
 
         public final Template.Method<String> getTranslationIndex = new Template.Method<String>();
         public final Template.Method.Converted<Entity> getEntity = new Template.Method.Converted<Entity>();
+        public final Template.Method<Object> toBukkit = new Template.Method<Object>();
+        public final Template.Method<VehicleDamageEvent> createVehicleDamageEvent = new Template.Method<VehicleDamageEvent>();
         public final Template.Method<Boolean> isExplosion = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isFireDamage = new Template.Method<Boolean>();
 
