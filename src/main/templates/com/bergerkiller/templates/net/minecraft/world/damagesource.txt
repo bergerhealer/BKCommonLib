@@ -1,12 +1,13 @@
 package net.minecraft.world.damagesource;
 
-import org.bukkit.event.vehicle.VehicleDamageEvent;
-
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 
 import net.minecraft.resources.ResourceKey;
+
+import org.bukkit.event.vehicle.VehicleDamageEvent;
+import org.bukkit.event.vehicle.VehicleDestroyEvent;
 
 import com.bergerkiller.generated.net.minecraft.world.damagesource.DamageSourceHandle;
 
@@ -33,6 +34,15 @@ class DamageSource {
 #endif
     }
 
+    public VehicleDestroyEvent createVehicleDestroyEvent(org.bukkit.entity.Vehicle vehicle, org.bukkit.entity.Entity attacker) {
+#if exists org.bukkit.event.vehicle.VehicleDestroyEvent public VehicleDestroyEvent(org.bukkit.entity.Vehicle vehicle, org.bukkit.damage.DamageSource damageSource, org.bukkit.entity.Entity attacker);
+        org.bukkit.damage.DamageSource damageSource = new org.bukkit.craftbukkit.damage.CraftDamageSource(instance);
+        return new VehicleDestroyEvent(vehicle, damageSource, attacker);
+#else
+        return new VehicleDestroyEvent(vehicle, attacker);
+#endif
+    }
+
     public VehicleDamageEvent createVehicleDamageEvent(org.bukkit.entity.Vehicle vehicle, org.bukkit.entity.Entity attacker, double damage) {
 #if exists org.bukkit.event.vehicle.VehicleDamageEvent public VehicleDamageEvent(org.bukkit.entity.Vehicle vehicle, org.bukkit.damage.DamageSource damageSource, org.bukkit.entity.Entity attacker, double damage);
         org.bukkit.damage.DamageSource damageSource = new org.bukkit.craftbukkit.damage.CraftDamageSource(instance);
@@ -43,6 +53,10 @@ class DamageSource {
     }
 
 <code>
+    public VehicleDestroyEvent createVehicleDestroyEvent(org.bukkit.entity.Vehicle vehicle) {
+        return createVehicleDestroyEvent(vehicle, getEntity());
+    }
+
     public VehicleDamageEvent createVehicleDamageEvent(org.bukkit.entity.Vehicle vehicle, double damage) {
         return createVehicleDamageEvent(vehicle, getEntity(), damage);
     }

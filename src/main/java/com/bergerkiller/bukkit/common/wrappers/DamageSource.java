@@ -4,6 +4,7 @@ import com.bergerkiller.generated.net.minecraft.world.damagesource.DamageSourceH
 
 import org.bukkit.entity.Entity;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
+import org.bukkit.event.vehicle.VehicleDestroyEvent;
 
 public class DamageSource extends BasicWrapper<DamageSourceHandle> {
 
@@ -14,6 +15,14 @@ public class DamageSource extends BasicWrapper<DamageSourceHandle> {
 
     protected DamageSource(DamageSourceHandle damageSourceHandle) {
         setHandle(damageSourceHandle);
+    }
+
+    public VehicleDestroyEvent createVehicleDestroyEvent(org.bukkit.entity.Vehicle vehicle, org.bukkit.entity.Entity attacker) {
+        return handle.createVehicleDestroyEvent(vehicle, attacker);
+    }
+
+    public VehicleDestroyEvent createVehicleDestroyEvent(org.bukkit.entity.Vehicle vehicle) {
+        return handle.createVehicleDestroyEvent(vehicle);
     }
 
     public VehicleDamageEvent createVehicleDamageEvent(org.bukkit.entity.Vehicle vehicle, org.bukkit.entity.Entity attacker, double damage) {
