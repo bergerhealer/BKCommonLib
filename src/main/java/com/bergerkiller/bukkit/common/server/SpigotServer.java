@@ -221,8 +221,8 @@ public class SpigotServer extends CraftBukkitServer {
             this.dimensionNamespace = identifier.getNamespace();
             this.dimensionName = identifier.getName();
             this.dimensionFolder = new File(worldFolder,
-                    "dimensions" + File.pathSeparator +
-                            dimensionNamespace + File.pathSeparator +
+                    "dimensions" + File.separator +
+                            dimensionNamespace + File.separator +
                             dimensionName);
             this.names = new ArrayList<>(4);
 
