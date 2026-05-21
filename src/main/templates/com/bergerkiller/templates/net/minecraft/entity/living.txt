@@ -191,7 +191,14 @@ class LivingEntity extends Entity {
         //
         // [MyWorlds] To reproduce, give yourself armor, then teleport between worlds where inventory is shared.
         // Your armor slots will go away when you go to the other world despite still wearing armor.
-  #if version >= 1.21.5
+  #if exists net.minecraft.world.entity.LivingEntity private final net.minecraft.world.item.ItemStack[] lastEquipmentItems;
+        // Some 1.17+ odd fork defines it as an array (performance?)
+        #require net.minecraft.world.entity.LivingEntity private final ItemStack[] lastEquipmentItems;
+        ItemStack[] lastEquipmentItems = instance#lastEquipmentItems;
+        for (int i = 0; i < lastEquipmentItems.length; i++) {
+            lastEquipmentItems[i] = ItemStack.EMPTY;
+        }
+  #elseif version >= 1.21.5
         #require net.minecraft.world.entity.LivingEntity private final Map<EquipmentSlot, ItemStack> lastEquipmentItems;
         Map lastEquipmentItems = instance#lastEquipmentItems;
 
