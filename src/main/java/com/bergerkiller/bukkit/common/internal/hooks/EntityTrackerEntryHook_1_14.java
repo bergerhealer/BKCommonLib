@@ -96,7 +96,34 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
             }
         }
 
-        @HookMethod("public void removePairing:???(ServerPlayer entityPlayer)")
+        @HookMethodCondition("version < 1.18")
+        @HookMethod("public void removePairing:a(ServerPlayer entityPlayer)")
+        public void removePairing_pre_1_18(Object entityplayer) {
+            removePairing(entityplayer);
+        }
+
+        @HookMethodCondition("version < 1.18")
+        @HookMethod("public void addPairing:b(ServerPlayer entityPlayer)")
+        public void addPairing_pre_1_18(Object entityplayer) {
+            addPairing(entityplayer);
+        }
+
+        @HookMethodCondition("version >= 1.18 && exists net.minecraft.server.level.EntityTrackerEntryState public boolean removePairing(net.minecraft.server.level.ServerPlayer viewer);")
+        @HookMethod("public boolean removePairing(ServerPlayer entityPlayer)")
+        public boolean removePairing_universe_spigot(Object entityplayer) {
+            removePairing(entityplayer);
+            return true;
+        }
+
+        @HookMethodCondition("version >= 1.18 && exists net.minecraft.server.level.EntityTrackerEntryState public boolean addPairing(net.minecraft.server.level.ServerPlayer viewer);")
+        @HookMethod("public boolean addPairing(ServerPlayer entityPlayer)")
+        public boolean addPairing_universe_spigot(Object entityplayer) {
+            addPairing(entityplayer);
+            return true;
+        }
+
+        @HookMethodCondition("version >= 1.18 && !exists net.minecraft.server.level.EntityTrackerEntryState public boolean removePairing(net.minecraft.server.level.ServerPlayer viewer);")
+        @HookMethod("public void removePairing(ServerPlayer entityPlayer)")
         public void removePairing(Object entityplayer) {
             try {
                 Player viewer = (Player) WrapperConversion.toEntity(entityplayer);
@@ -106,7 +133,8 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
             }
         }
 
-        @HookMethod("public void addPairing:???(ServerPlayer entityPlayer)")
+        @HookMethodCondition("version >= 1.18 && !exists net.minecraft.server.level.EntityTrackerEntryState public boolean addPairing(net.minecraft.server.level.ServerPlayer viewer);")
+        @HookMethod("public void addPairing(ServerPlayer entityPlayer)")
         public void addPairing(Object entityplayer) {
             try {
                 Player viewer = (Player) WrapperConversion.toEntity(entityplayer);

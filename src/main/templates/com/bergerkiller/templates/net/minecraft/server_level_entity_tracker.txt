@@ -743,18 +743,6 @@ class EntityTrackerEntryState {
     }
     </code>
 
-    // These are needed for correct remapping of the state hook
-#if version >= 1.18
-    public optional void removePairing((Object) ServerPlayer viewer);
-    public optional void addPairing((Object) ServerPlayer viewer);
-#elseif version >= 1.14
-    public optional void removePairing:a((Object) ServerPlayer viewer);
-    public optional void addPairing:b((Object) ServerPlayer viewer);
-#else
-    public optional void removePairing:###((Object) ServerPlayer viewer);
-    public optional void addPairing:###((Object) ServerPlayer viewer);
-#endif
-
 #if version >= 1.14
     // On Minecraft 1.14 this resync distance check is no longer done
     public boolean checkTrackNeeded() {
