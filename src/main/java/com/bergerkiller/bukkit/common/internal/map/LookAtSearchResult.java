@@ -42,4 +42,9 @@ class LookAtSearchResult {
         }
         return event;
     }
+
+    @Override
+    public String toString() {
+        return "{display=" + display + ", lookPosition=" + lookPosition +"}";
+    }
 }

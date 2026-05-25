@@ -1373,6 +1373,11 @@ public final class CommonMapController implements PacketListener, Listener {
         if (!this.isFrameDisplaysEnabled || !(event.getRightClicked() instanceof ItemFrame)) {
             return;
         }
+
+        if (event instanceof PlayerInteractAtEntityEvent) {
+            lastClickOffset = ((PlayerInteractAtEntityEvent) event).getClickedPosition();
+        }
+
         ItemFrame itemFrame = (ItemFrame) event.getRightClicked();
         boolean cancelled;
         if (lastClickOffset != null) {
