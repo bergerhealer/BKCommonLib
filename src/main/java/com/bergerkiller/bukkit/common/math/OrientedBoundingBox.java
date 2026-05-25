@@ -216,6 +216,25 @@ public class OrientedBoundingBox {
         cachedVertices = null;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        } else if (o instanceof OrientedBoundingBox) {
+            OrientedBoundingBox other = (OrientedBoundingBox) o;
+            return this.orientation.equals(other.orientation) &&
+                    this.position.equals(other.position) &&
+                    this.radius.equals(other.radius);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "OBB{pos=" + position + ", size=" + radius.clone().multiply(2.0) + ", ori=" + orientation + "}";
+    }
+
     /**
      * Tests whether a point vector is inside this bounding box. Equivalent to testing
      * {@link #distanceToPoint(Vector)} is inside.

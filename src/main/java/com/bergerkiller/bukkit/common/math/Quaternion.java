@@ -507,7 +507,7 @@ public class Quaternion implements Rotatable, Cloneable {
 
     @Override
     public String toString() {
-        return "{" + this.x + ", " + this.y + ", " + this.z + ", " + this.w + "}";
+        return "{x=" + this.x + ", y=" + this.y + ", z=" + this.z + ", w=" + this.w + "}";
     }
 
     /**
