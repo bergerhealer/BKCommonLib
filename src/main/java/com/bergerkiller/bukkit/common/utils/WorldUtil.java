@@ -12,7 +12,6 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.logic.BlockPhysicsEventDataAccessor;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
-import com.bergerkiller.bukkit.common.internal.logic.PlayerFileDataHandler;
 import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.lighting.LightingHandler;
@@ -626,16 +625,6 @@ public class WorldUtil extends ChunkUtil {
      */
     public static boolean isMainEndWorld(World world) {
         return PortalHandler.INSTANCE.isMainEndWorld(world);
-    }
-
-    /**
-     * Gets the folder where player data of a certain world is saved in
-     *
-     * @param world (can not be null)
-     * @return players folder
-     */
-    public static File getPlayersFolder(org.bukkit.World world) {
-        return PlayerFileDataHandler.INSTANCE.getPlayerDataFolder(world);
     }
 
     /**
