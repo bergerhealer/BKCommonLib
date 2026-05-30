@@ -27,8 +27,6 @@ public abstract class PlayerFileDataHandler implements LazyInitializedObject, Li
     public abstract Hook mock(PlayerDataController controller);
     public abstract void unhook(Hook hook, PlayerDataController controller);
 
-    public abstract File getPlayerDataFolder(World world);
-
     public abstract CommonTagCompound migratePlayerData(CommonTagCompound playerProfileData);
 
     public static interface Hook {

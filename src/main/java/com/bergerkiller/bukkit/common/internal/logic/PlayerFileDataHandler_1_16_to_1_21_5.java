@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
-import java.io.File;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.Logging;
@@ -9,7 +8,6 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.controller.PlayerDataController;
@@ -19,11 +17,8 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.players.PlayerListHandle;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
-import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
-import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
-import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -32,7 +27,6 @@ import org.bukkit.entity.Player;
  * Handler for Minecraft 1.16 and later
  */
 class PlayerFileDataHandler_1_16_to_1_21_5 extends PlayerFileDataHandler {
-    private final FastMethod<File> getPlayerFolderOfWorld = new FastMethod<File>();
     private final FastField<Object> playerListFileDataField;
 
     public PlayerFileDataHandler_1_16_to_1_21_5() {
@@ -43,23 +37,6 @@ class PlayerFileDataHandler_1_16_to_1_21_5 extends PlayerFileDataHandler {
             resolver.setVariable("paper", "true");
         }
 
-        {
-            MethodDeclaration getPlayerFolderOfWorldMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess("" +
-                    "public java.io.File getPlayerDir() {\n" +
-                    "#if version > 1.21.4 && paper\n" +
-                    "    return new java.io.File(instance.levelStorageAccess.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
-                    "#elseif version == 1.21.4 && paper && exists net.minecraft.server.level.ServerLevel public final net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess levelStorageAccess;\n" +
-                    "    return new java.io.File(instance.levelStorageAccess.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
-                    "#elseif version >= 26.1\n" +
-                    "    return new java.io.File(instance.storageSource.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
-                    "#elseif version >= 1.18\n" +
-                    "    return new java.io.File(instance.convertable.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
-                    "#else\n" +
-                    "    return new java.io.File(instance.convertable.a(instance.getDimensionKey()), \"playerdata\");\n" +
-                    "#endif\n" +
-                    "}", resolver));
-            getPlayerFolderOfWorld.init(getPlayerFolderOfWorldMethod);  
-        }
         String fieldName = CommonBootstrap.evaluateMCVersion(">=", "1.17") ? "playerIo" : "playerFileData";
         Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.PlayerDataStorage");
         String realFieldName = Resolver.resolveFieldName(PlayerListHandle.T.getType(), fieldName);
@@ -76,7 +53,6 @@ class PlayerFileDataHandler_1_16_to_1_21_5 extends PlayerFileDataHandler {
 
     @Override
     public void forceInitialization() {
-        getPlayerFolderOfWorld.forceInitialization();
         playerListFileDataField.forceInitialization();
     }
 
@@ -108,11 +84,6 @@ class PlayerFileDataHandler_1_16_to_1_21_5 extends PlayerFileDataHandler {
                 update(HookAction.UNHOOK);
             }
         }
-    }
-
-    @Override
-    public File getPlayerDataFolder(World world) {
-        return getPlayerFolderOfWorld.invoke(HandleConversion.toWorldHandle(world));
     }
 
     @Override

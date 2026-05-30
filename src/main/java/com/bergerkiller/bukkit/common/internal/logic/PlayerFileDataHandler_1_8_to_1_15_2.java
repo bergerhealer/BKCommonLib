@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
-import java.io.File;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.Logging;
@@ -9,7 +8,6 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.controller.PlayerDataController;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
@@ -18,10 +16,7 @@ import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.generated.net.minecraft.server.players.PlayerListHandle;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
-import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
-import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
-import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -30,21 +25,12 @@ import org.bukkit.entity.Player;
  * Handler for Minecraft 1.8 to Minecraft 1.15.2
  */
 class PlayerFileDataHandler_1_8_to_1_15_2 extends PlayerFileDataHandler {
-    private final FastMethod<File> getPlayerFolderOfWorld = new FastMethod<File>();
     private final FastField<Object> playerListFileDataField;
 
     public PlayerFileDataHandler_1_8_to_1_15_2() {
         ClassResolver resolver = new ClassResolver();
         resolver.setPackage("net.minecraft.server");
         resolver.setDeclaredClass(ServerLevelHandle.T.getType());
-
-        {
-            MethodDeclaration getPlayerFolderOfWorldMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
-                    "public java.io.File getPlayerDir() {\n" +
-                    "    return ((net.minecraft.world.level.storage.PlayerDataStorage) instance.getDataManager()).getPlayerDir();\n" +
-                    "}"));
-            getPlayerFolderOfWorld.init(getPlayerFolderOfWorldMethod);  
-        }
 
         Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.IPlayerFileData");
         playerListFileDataField = LogicUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), "playerFileData", playerFileDataType).getFastField());
@@ -60,7 +46,6 @@ class PlayerFileDataHandler_1_8_to_1_15_2 extends PlayerFileDataHandler {
 
     @Override
     public void forceInitialization() {
-        this.getPlayerFolderOfWorld.forceInitialization();
         this.playerListFileDataField.forceInitialization();
     }
 
@@ -92,11 +77,6 @@ class PlayerFileDataHandler_1_8_to_1_15_2 extends PlayerFileDataHandler {
                 update(HookAction.UNHOOK);
             }
         }
-    }
-
-    @Override
-    public File getPlayerDataFolder(World world) {
-        return getPlayerFolderOfWorld.invoke(HandleConversion.toWorldHandle(world));
     }
 
     public CommonTagCompound migratePlayerData(CommonTagCompound playerProfileData) {

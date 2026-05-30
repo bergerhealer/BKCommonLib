@@ -21,18 +21,15 @@ import com.bergerkiller.mountiplex.reflection.util.FastField;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
-import java.io.File;
 import java.util.logging.Level;
 
 /**
  * Handler for Minecraft 1.21.6 and later
  */
 class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
-    private final FastMethod<File> getPlayerFolderOfWorld = new FastMethod<File>();
     private final FastMethod<Object> getServerRegistryAccess = new FastMethod<>();
     private final FastField<Object> playerListFileDataField;
 
@@ -42,19 +39,6 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
         resolver.setVariable("version", Common.MC_VERSION);
         if (Common.IS_PAPERSPIGOT_SERVER) {
             resolver.setVariable("paper", "true");
-        }
-
-        {
-            MethodDeclaration getPlayerFolderOfWorldMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess("" +
-                    "public java.io.File getPlayerDir() {\n" +
-                    "#if paper\n" +
-                    "    return new java.io.File(instance.levelStorageAccess.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
-                    "#else\n" +
-                    "    return new java.io.File(instance.convertable.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
-                    "#endif\n" +
-                    "}", resolver));
-            getPlayerFolderOfWorld.init(getPlayerFolderOfWorldMethod);
-            getPlayerFolderOfWorld.forceInitialization();
         }
 
         {
@@ -82,7 +66,6 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
 
     @Override
     public void forceInitialization() {
-        getPlayerFolderOfWorld.forceInitialization();
         playerListFileDataField.forceInitialization();
     }
 
@@ -114,11 +97,6 @@ class PlayerFileDataHandler_1_21_6 extends PlayerFileDataHandler {
                 update(HookAction.UNHOOK);
             }
         }
-    }
-
-    @Override
-    public File getPlayerDataFolder(World world) {
-        return getPlayerFolderOfWorld.invoke(HandleConversion.toWorldHandle(world));
     }
 
     @Override

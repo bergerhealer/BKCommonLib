@@ -12,19 +12,15 @@ import com.bergerkiller.generated.net.minecraft.server.players.PlayerListHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
-import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
-import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastConstructor;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
-import java.io.File;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -32,7 +28,6 @@ import java.util.logging.Level;
  * Handler for Minecraft 1.21.9 and later
  */
 class PlayerFileDataHandler_1_21_9 extends PlayerFileDataHandler {
-    private final FastMethod<File> getPlayerFolderOfWorld = new FastMethod<File>();
     private final FastField<Object> playerListFileDataField;
     private final FastMethod<UUID> nameAndId_getId = new FastMethod<>();
     private final FastMethod<String> nameAndId_getName = new FastMethod<>();
@@ -44,23 +39,6 @@ class PlayerFileDataHandler_1_21_9 extends PlayerFileDataHandler {
         resolver.setVariable("version", Common.MC_VERSION);
         if (Common.IS_PAPERSPIGOT_SERVER) {
             resolver.setVariable("paper", "true");
-        }
-
-        {
-            MethodDeclaration getPlayerFolderOfWorldMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess("" +
-                    "public java.io.File getPlayerDir() {\n" +
-                    "#if version >= 26.1 && paper\n" +
-                    "    return new java.io.File(instance.getChunkSource().chunkMap.getStorageName(), \"playerdata\");\n" +
-                    "#elseif paper\n" +
-                    "    return new java.io.File(instance.levelStorageAccess.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
-                    "#elseif version >= 26.1\n" +
-                    "    return new java.io.File(instance.storageSource.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
-                    "#else\n" +
-                    "    return new java.io.File(instance.convertable.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
-                    "#endif\n" +
-                    "}", resolver));
-            getPlayerFolderOfWorld.init(getPlayerFolderOfWorldMethod);
-            getPlayerFolderOfWorld.forceInitialization();
         }
 
         String fieldName = "playerIo";
@@ -88,7 +66,6 @@ class PlayerFileDataHandler_1_21_9 extends PlayerFileDataHandler {
 
     @Override
     public void forceInitialization() {
-        getPlayerFolderOfWorld.forceInitialization();
         playerListFileDataField.forceInitialization();
     }
 
@@ -120,11 +97,6 @@ class PlayerFileDataHandler_1_21_9 extends PlayerFileDataHandler {
                 update(HookAction.UNHOOK);
             }
         }
-    }
-
-    @Override
-    public File getPlayerDataFolder(World world) {
-        return getPlayerFolderOfWorld.invoke(HandleConversion.toWorldHandle(world));
     }
 
     @Override
