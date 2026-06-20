@@ -585,6 +585,8 @@ public class CommonBootstrap {
             // Since 26.2 all of the EntityTypes constants live in the EntityTypes class, instead of EntityType
             // This remapping rule makes the same work on versions prior
             remappings.put("net.minecraft.world.entity.EntityTypes", "net.minecraft.world.entity.EntityType");
+            // Moved
+            remappings.put("net.minecraft.world.entity.monster.cubemob.Slime", "net.minecraft.world.entity.monster.Slime");
         }
 
         /* ======== Mojang remapping changes for 26.1 ======== */
