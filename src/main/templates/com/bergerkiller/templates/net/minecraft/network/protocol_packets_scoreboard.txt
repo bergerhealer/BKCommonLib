@@ -75,6 +75,22 @@ class ClientboundSetPlayerTeamPacket extends Packet {
 #if version >= 1.17
     // All properties grouped in a container class
 
+    // Pre-26.2 we have to access all of the fields using reflection
+  #if version < 26.2
+        #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final Component displayName;
+        #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final Component prefix:playerPrefix;
+        #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final Component suffix:playerSuffix;
+    #if version >= 1.21.5
+        #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final net.minecraft.world.scores.Team.Visibility visibility:nametagVisibility;
+        #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final net.minecraft.world.scores.Team.CollisionRule collisionRule;
+    #else
+        #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final String visibility:nametagVisibility;
+        #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final String collisionRule;
+    #endif
+        #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final ChatFormatting color;
+        #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final int teamOptionFlags:options;
+  #endif
+
     #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket private final Optional<ClientboundSetPlayerTeamPacket.Parameters> parameters;
     #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket public void setParameters(ClientboundSetPlayerTeamPacket.Parameters parameters) {
         instance#parameters = java.util.Optional.of(parameters);
@@ -109,21 +125,6 @@ class ClientboundSetPlayerTeamPacket extends Packet {
                 (byte)0 // options
         );
   #else
-
-      // Fields are all final and hidden inside the class, and must be modified using reflection
-      #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final Component displayName;
-      #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final Component prefix:playerPrefix;
-      #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final Component suffix:playerSuffix;
-    #if version >= 1.21.5
-      #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final net.minecraft.world.scores.Team.Visibility visibility:nametagVisibility;
-      #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final net.minecraft.world.scores.Team.CollisionRule collisionRule;
-    #else
-      #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final String visibility:nametagVisibility;
-      #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final String collisionRule;
-    #endif
-      #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final ChatFormatting color;
-      #require net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket.Parameters private final int teamOptionFlags:options;
-
     #if version >= 1.20.5
         // It does a bunch of byte stream reading now for NBT, which is incompatible with our null serializer
         // Create a new scoreboard team, which seems to work ok. Will need a null instantiator otherwise though.
