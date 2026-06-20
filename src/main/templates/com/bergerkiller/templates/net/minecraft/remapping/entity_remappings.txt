@@ -11,6 +11,32 @@ import net.minecraft.world.level.storage.ValueOutput;
     #remap net.minecraft.world.entity.Entity private int remainingFireTicks:fireTicks;
 #endif
 
+#if version >= 1.17
+    #remap net.minecraft.world.entity.Entity public boolean horizontalMovementBlocked:horizontalCollision;
+#else
+    #remap net.minecraft.world.entity.Entity public boolean horizontalMovementBlocked:positionChanged;
+#endif
+
+#select version >=
+#case 1.17:   #remap net.minecraft.world.entity.Entity public boolean verticalMovementBlocked:verticalCollision;
+#case 1.15:   #remap net.minecraft.world.entity.Entity public boolean verticalMovementBlocked:v;
+#case 1.14:   #remap net.minecraft.world.entity.Entity public boolean verticalMovementBlocked:y;
+#case 1.13:   #remap net.minecraft.world.entity.Entity public boolean verticalMovementBlocked:C;
+#case 1.9:     #remap net.minecraft.world.entity.Entity public boolean verticalMovementBlocked:B;
+#case else:   #remap net.minecraft.world.entity.Entity public boolean verticalMovementBlocked:E;
+#endselect
+
+ // On 1.15 and before there is an extra movementBlocked field (and OR of horizontal and vertical movement blocked)
+#if version < 1.16
+  #select version >=
+  #case 1.15:  #remap net.minecraft.world.entity.Entity public boolean movementBlocked:w;
+  #case 1.14:  #remap net.minecraft.world.entity.Entity public boolean movementBlocked:z;
+  #case 1.13:  #remap net.minecraft.world.entity.Entity public boolean movementBlocked:D;
+  #case 1.9:    #remap net.minecraft.world.entity.Entity public boolean movementBlocked:C;
+  #case else:  #remap net.minecraft.world.entity.Entity public boolean movementBlocked:F;
+  #endselect
+#endif
+
 // Portal handling fields exist in Entity from MC 1.8 to 1.20.6
 #if version < 1.21
   #select version >=

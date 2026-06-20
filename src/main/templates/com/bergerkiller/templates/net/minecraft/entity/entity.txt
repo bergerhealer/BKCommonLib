@@ -565,96 +565,26 @@ class Entity {
     public boolean onGround;
 #endif
 
-#if version >= 1.17
-    public readonly boolean horizontalMovementBlocked:horizontalCollision;
-#else
-    public readonly boolean horizontalMovementBlocked:positionChanged;
-#endif
+    public readonly boolean horizontalMovementBlocked;
+    public readonly boolean verticalMovementBlocked;
 
-#if version >= 1.17
-    public readonly boolean verticalMovementBlocked:verticalCollision;
-
+#if version >= 1.16
     public void setHorizontalMovementBlocked(boolean blocked) {
-        instance.horizontalCollision = blocked;
+        instance.horizontalMovementBlocked = blocked;
     }
 
     public void setVerticalMovementBlocked(boolean blocked) {
-        instance.verticalCollision = blocked;
-    }
-#elseif version >= 1.16
-    public readonly boolean verticalMovementBlocked:v;
-
-    public void setHorizontalMovementBlocked(boolean blocked) {
-        instance.positionChanged = blocked;
-    }
-
-    public void setVerticalMovementBlocked(boolean blocked) {
-        instance.v = blocked;
-    }
-#elseif version >= 1.15
-    public readonly boolean verticalMovementBlocked:v;
-    public unknown boolean movementBlocked:w;
-
-    public void setHorizontalMovementBlocked(boolean blocked) {
-        instance.positionChanged = blocked;
-        instance.w = instance.positionChanged || instance.v;
-    }
-
-    public void setVerticalMovementBlocked(boolean blocked) {
-        instance.v = blocked;
-        instance.w = instance.positionChanged || instance.v;
-    }
-#elseif version >= 1.14
-    public readonly boolean verticalMovementBlocked:y;
-    public unknown boolean movementBlocked:z;
-
-    public void setHorizontalMovementBlocked(boolean blocked) {
-        instance.positionChanged = blocked;
-        instance.z = instance.positionChanged || instance.y;
-    }
-
-    public void setVerticalMovementBlocked(boolean blocked) {
-        instance.y = blocked;
-        instance.z = instance.positionChanged || instance.y;
-    }
-#elseif version >= 1.13
-    public readonly boolean verticalMovementBlocked:C;
-    public unknown boolean movementBlocked:D;
-
-    public void setHorizontalMovementBlocked(boolean blocked) {
-        instance.positionChanged = blocked;
-        instance.D = instance.positionChanged || instance.C;
-    }
-
-    public void setVerticalMovementBlocked(boolean blocked) {
-        instance.C = blocked;
-        instance.D = instance.positionChanged || instance.C;
-    }
-#elseif version >= 1.9
-    public readonly boolean verticalMovementBlocked:B;
-    public unknown boolean movementBlocked:C;
-
-    public void setHorizontalMovementBlocked(boolean blocked) {
-        instance.positionChanged = blocked;
-        instance.C = instance.positionChanged || instance.B;
-    }
-
-    public void setVerticalMovementBlocked(boolean blocked) {
-        instance.B = blocked;
-        instance.C = instance.positionChanged || instance.B;
+        instance.verticalMovementBlocked = blocked;
     }
 #else
-    public readonly boolean verticalMovementBlocked:E;
-    public unknown boolean movementBlocked:F;
-
     public void setHorizontalMovementBlocked(boolean blocked) {
-        instance.positionChanged = blocked;
-        instance.F = instance.positionChanged || instance.E;
+        instance.horizontalMovementBlocked = blocked;
+        instance.movementBlocked = instance.verticalMovementBlocked || blocked;
     }
 
     public void setVerticalMovementBlocked(boolean blocked) {
-        instance.E = blocked;
-        instance.F = instance.positionChanged || instance.E;
+        instance.verticalMovementBlocked = blocked;
+        instance.movementBlocked = instance.horizontalMovementBlocked || blocked;
     }
 #endif
 
@@ -1674,6 +1604,62 @@ class Entity {
 #else
     public boolean isOutsideWorldBorder:aS();
     public void setOutsideWorldBorder:h(boolean outside);
+#endif
+
+#if version >= 26.2
+    private void restituteMovementAfterCollisions((com.bergerkiller.bukkit.common.wrappers.BlockData) BlockState effectState, boolean xCollision, boolean zCollision, (org.bukkit.util.Vector) Vec3 movement);
+#elseif version >= 1.14
+    private void restituteMovementAfterCollisions((com.bergerkiller.bukkit.common.wrappers.BlockData) BlockState effectState, boolean xCollision, boolean zCollision, (org.bukkit.util.Vector) Vec3 movement) {
+        Vec3 mot = instance.getDeltaMovement();
+        if (xCollision) {
+            mot = new Vec3(0.0, mot.y, mot.z);
+        }
+        if (zCollision) {
+            mot = new Vec3(mot.x, mot.y, 0.0);
+        }
+        instance.setDeltaMovement(mot);
+
+        // Call the related vertical fall-on method on the Block
+        if (instance.verticalMovementBlocked) {
+            net.minecraft.world.level.block.Block block = effectState.getBlock();
+            net.minecraft.world.level.Level world;
+  #if version >= 1.20
+            world = instance.level();
+  #elseif version >= 1.17
+            world = instance.level;
+  #else
+            world = instance.world;
+  #endif
+
+  #if version >= 1.21.2
+            block.updateEntityMovementAfterFallOn((net.minecraft.world.level.BlockGetter) world, instance);
+  #elseif version >= 1.18
+            block.updateEntityAfterFallOn((net.minecraft.world.level.BlockGetter) world, instance);
+  #else
+            block.a((net.minecraft.world.level.BlockGetter) world, instance);
+  #endif
+        }
+    }
+#else
+    private void restituteMovementAfterCollisions((com.bergerkiller.bukkit.common.wrappers.BlockData) BlockState effectState, boolean xCollision, boolean zCollision, (org.bukkit.util.Vector) Vec3 movement) {
+        if (xCollision) {
+            instance.motX = 0.0;
+        }
+        if (zCollision) {
+            instance.motZ = 0.0;
+        }
+
+        // Call the related vertical fall-on method on the Block
+        if (instance.verticalMovementBlocked) {
+            net.minecraft.world.level.block.Block block = effectState.getBlock();
+            net.minecraft.world.level.Level world = instance.world;
+  #if version >= 1.13
+            block.a((net.minecraft.world.level.BlockGetter) world, instance);
+  #else
+            block.a(world, instance);
+  #endif
+        }
+    }
 #endif
 
     /*

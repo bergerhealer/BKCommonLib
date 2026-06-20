@@ -14,6 +14,8 @@ public class EntityRegistryTest {
 
     @Test
     public void loadCommonEntityTypes() {
+        CommonBootstrap.initServer();
+
         // Initialize the entity lists first
         CommonUtil.loadClass(CommonEntityType.class);
     }

@@ -47,16 +47,6 @@ class Block {
     public static final rawtype (Iterable) net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap<BlockState> REGISTRY_ID:d;
 #endif
 
-#if version >= 1.21.2
-    public void entityHitVertical:updateEntityMovementAfterFallOn((LevelHandle) BlockGetter world, (EntityHandle) Entity entity);
-#elseif version >= 1.18
-    public void entityHitVertical:updateEntityAfterFallOn((LevelHandle) BlockGetter world, (EntityHandle) Entity entity);
-#elseif version >= 1.13
-    public void entityHitVertical:a((LevelHandle) BlockGetter world, (EntityHandle) Entity entity);
-#else
-    public void entityHitVertical:a((LevelHandle) Level world, (EntityHandle) Entity entity);
-#endif
-
 #select version >=
 #case 1.18: public String getTitle:getDescriptionId();
 #case 1.17: public String getTitle:h();

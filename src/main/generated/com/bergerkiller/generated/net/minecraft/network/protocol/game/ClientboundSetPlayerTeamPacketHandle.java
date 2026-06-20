@@ -69,10 +69,10 @@ public abstract class ClientboundSetPlayerTeamPacketHandle extends PacketHandle 
         public final Template.Method.Converted<Void> setPrefix = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<ChatText> getSuffix = new Template.Method.Converted<ChatText>();
         public final Template.Method.Converted<Void> setSuffix = new Template.Method.Converted<Void>();
-        public final Template.Method<String> getVisibility = new Template.Method<String>();
-        public final Template.Method<Void> setVisibility = new Template.Method<Void>();
-        public final Template.Method<String> getCollisionRule = new Template.Method<String>();
-        public final Template.Method<Void> setCollisionRule = new Template.Method<Void>();
+        public final Template.Method.Converted<String> getVisibility = new Template.Method.Converted<String>();
+        public final Template.Method.Converted<Void> setVisibility = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<String> getCollisionRule = new Template.Method.Converted<String>();
+        public final Template.Method.Converted<Void> setCollisionRule = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<ChatColor> getColor = new Template.Method.Converted<ChatColor>();
         public final Template.Method.Converted<Void> setColor = new Template.Method.Converted<Void>();
         public final Template.Method<Integer> getTeamOptionFlags = new Template.Method<Integer>();

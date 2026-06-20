@@ -115,6 +115,11 @@ public class AdvancementDataPlayerHook extends ClassHook<AdvancementDataPlayerHo
         }
 
         private void registerCritereonFields() throws Throwable {
+            // Since 26.2 criterion data is no longer stored in the trigger
+            if (CommonBootstrap.evaluateMCVersion(">=", "26.2")) {
+                return;
+            }
+
             // Paper made a patch to store this data in the AdvancementDataPlayer class instead
             // Detect presence of this patch and if it exists, don't register these triggers
             try {
@@ -178,7 +183,9 @@ public class AdvancementDataPlayerHook extends ClassHook<AdvancementDataPlayerHo
         private void registerCritereonField(String criterionClassName, String fieldName) throws Throwable {
 
             String fullCriterionClassName;
-            if (CommonBootstrap.evaluateMCVersion(">=", "1.21.11")) {
+            if (CommonBootstrap.evaluateMCVersion(">=", "26.2")) {
+                fullCriterionClassName = "net.minecraft.advancements.triggers." + criterionClassName;
+            } else  if (CommonBootstrap.evaluateMCVersion(">=", "1.21.11")) {
                 fullCriterionClassName = "net.minecraft.advancements.criterion." + criterionClassName;
             } else {
                 fullCriterionClassName = "net.minecraft.advancements.critereon." + criterionClassName;

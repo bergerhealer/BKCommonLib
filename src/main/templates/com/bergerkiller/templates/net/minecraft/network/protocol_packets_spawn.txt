@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.phys.Vec3;
 
 import com.bergerkiller.bukkit.common.internal.logic.ProtocolMath;
@@ -429,7 +430,7 @@ class ClientboundAddPlayerPacket extends Packet {
         #require net.minecraft.network.protocol.game.ClientboundAddPlayerPacket private ClientboundAddPlayerPacket createSpawnPacket:<init>(net.minecraft.network.RegistryFriendlyByteBuf serializer);
         ClientboundAddPlayerPacket packet = #createSpawnPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
         #require ClientboundAddPlayerPacket private final EntityType<?> type;
-        packet#type = EntityType.PLAYER;
+        packet#type = EntityTypes.PLAYER;
   #if version >= 1.21.9
         packet#movement = Vec3.ZERO;
   #endif
@@ -437,7 +438,7 @@ class ClientboundAddPlayerPacket extends Packet {
 #elseif version >= 1.20.2
         ClientboundAddPlayerPacket packet = new ClientboundAddPlayerPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
         #require ClientboundAddPlayerPacket private final EntityType<?> type;
-        packet#type = EntityType.PLAYER;
+        packet#type = EntityTypes.PLAYER;
         return packet;
 #elseif version >= 1.17
         return new ClientboundAddPlayerPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);

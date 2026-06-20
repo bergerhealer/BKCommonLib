@@ -2,8 +2,6 @@ package com.bergerkiller.generated.net.minecraft.world.level.block;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.BlockStateHandle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -41,7 +39,6 @@ public abstract class BlockHandle extends Template.Handle {
         return T.getCombinedId.invoke(iblockdata);
     }
 
-    public abstract void entityHitVertical(LevelHandle world, EntityHandle entity);
     public abstract String getTitle();
     public abstract boolean isFaceOpaque(BlockStateHandle iblockdata, World world, int x, int y, int z, BlockFace direction);
     public abstract int getOpacity(BlockStateHandle iblockdata, World world, int x, int y, int z);
@@ -66,7 +63,6 @@ public abstract class BlockHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<BlockStateHandle> getByCombinedId = new Template.StaticMethod.Converted<BlockStateHandle>();
         public final Template.StaticMethod.Converted<Integer> getCombinedId = new Template.StaticMethod.Converted<Integer>();
 
-        public final Template.Method.Converted<Void> entityHitVertical = new Template.Method.Converted<Void>();
         public final Template.Method<String> getTitle = new Template.Method<String>();
         public final Template.Method.Converted<Boolean> isFaceOpaque = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Integer> getOpacity = new Template.Method.Converted<Integer>();

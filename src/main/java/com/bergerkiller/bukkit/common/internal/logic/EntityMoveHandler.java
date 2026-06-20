@@ -492,17 +492,8 @@ public abstract class EntityMoveHandler {
 
             that.updateFalling(d1, that.isOnGround(), iblockdata, blockposition);
 
-            if (d7 != d0) {
-                that.setMotX(0.0);
-            }
-
-            if (d9 != d2) {
-                that.setMotZ(0.0);
-            }
-
-            if (d8 != d1) {
-                iblockdata.getBlock().entityHitVertical(world, that);
-            }
+            // This function sets motion along an axis to 0 when colliding with blocks
+            that.restituteMovementAfterCollisions(iblockdata, d7 != d0, d9 != d2, new Vector());
 
             // CraftBukkit start
             if (that.isHorizontalMovementBlocked() && that.getBukkitEntity() instanceof Vehicle) {

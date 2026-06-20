@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.conversion.type.TeamColorConversion;
 import com.bergerkiller.bukkit.common.utils.DebugUtil;
 import com.bergerkiller.generated.net.minecraft.core.DirectionHandle;
 import com.bergerkiller.generated.net.minecraft.core.RotationsHandle;
@@ -169,6 +170,19 @@ public class TemplateTest {
         testChatColor(ChatColor.BLACK, 0);
         testChatColor(ChatColor.RED, 12);
         testChatColor(ChatColor.RESET, -1);
+    }
+
+    @Test
+    public void testTeamColorConversion() {
+        if (CommonBootstrap.evaluateMCVersion("<", "26.2")) {
+            return;
+        }
+
+        assertTrue(TeamColorConversion.isInitialized());
+        Object redTeamColor = TeamColorConversion.fromBukkit(ChatColor.RED);
+        assertNotNull(redTeamColor);
+        ChatColor backConv = TeamColorConversion.toBukkit(redTeamColor);
+        assertEquals(ChatColor.RED, backConv);
     }
 
     @Test

@@ -343,8 +343,14 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
         // From 26.1 to 26.1.2
         this.register(4786, ConverterFunction.NO_CONVERSION);
 
+        // From 26.1.2 to 26.2
+        this.register(4790, map -> {
+            Object type = map.get("type");
+            return !Helper.ADDED_MC_26_2.contains(type);
+        });
+
         // Maximum supported data version
-        this.setMaximumDataVersion(4790); // MC 26.1.2
+        this.setMaximumDataVersion(4903); // MC 26.2
     }
 
     public ItemStackDeserializerItemMetaMigrator getItemMetaDeserializer() {
@@ -873,6 +879,23 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
         public static final Set<String> ADDED_MC_26_1 = makeSet(
                 Arrays.asList(
                         "GOLDEN_DANDELION", "POTTED_GOLDEN_DANDELION"
+                )
+        );
+
+        // All material names (Material enum) added Minecraft 26.1.2 -> 26.2
+        public static final Set<String> ADDED_MC_26_2 = makeSet(
+                Arrays.asList(
+                        "TUFF_BRICK_WALL", "CHISELED_TUFF_BRICKS", "SULFUR", "POTENT_SULFUR",
+                        "SULFUR_SLAB", "SULFUR_STAIRS", "SULFUR_WALL", "POLISHED_SULFUR",
+                        "POLISHED_SULFUR_SLAB", "POLISHED_SULFUR_STAIRS", "POLISHED_SULFUR_WALL",
+                        "SULFUR_BRICKS", "SULFUR_BRICK_SLAB", "SULFUR_BRICK_STAIRS",
+                        "SULFUR_BRICK_WALL", "CHISELED_SULFUR", "CINNABAR", "CINNABAR_SLAB",
+                        "CINNABAR_STAIRS", "CINNABAR_WALL", "POLISHED_CINNABAR",
+                        "POLISHED_CINNABAR_SLAB", "POLISHED_CINNABAR_STAIRS", "POLISHED_CINNABAR_WALL",
+                        "CINNABAR_BRICKS", "CINNABAR_BRICK_SLAB", "CINNABAR_BRICK_STAIRS",
+                        "CINNABAR_BRICK_WALL", "CHISELED_CINNABAR", "DRIPSTONE_BLOCK",
+                        "SULFUR_CUBE_BUCKET", "SULFUR_CUBE_SPAWN_EGG",
+                        "MUSIC_DISC_BOUNCE", "SULFUR_SPIKE"
                 )
         );
     }

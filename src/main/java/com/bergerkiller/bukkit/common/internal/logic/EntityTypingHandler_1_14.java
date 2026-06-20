@@ -1,12 +1,16 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.IdentityHashMap;
 import java.util.logging.Level;
 
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypeHandle;
+import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
+import com.bergerkiller.mountiplex.reflection.util.fast.ConstantReturningInvoker;
+import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
 import org.bukkit.entity.Entity;
 
 import com.bergerkiller.bukkit.common.Common;
@@ -20,10 +24,8 @@ import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryH
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.ServerLevelHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
-import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
-import com.bergerkiller.mountiplex.reflection.util.NullInstantiator;
 import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 
 /**
@@ -33,31 +35,45 @@ import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
  */
 class EntityTypingHandler_1_14 extends EntityTypingHandler {
     private final IdentityHashMap<Object, Class<?>> _cache = new IdentityHashMap<Object, Class<?>>();
+    /** EntityTypes class holds the static EntityType constants */
+    private final Class<?> entityTypesClass;
     private final Handler _handler;
-    private final Object nmsWorldHandle;
+    private Object nmsWorldHandle;
 
     // Initialize findEntityTypesClass which is a fallback for types we did not pre-register
     public EntityTypingHandler_1_14() {
+        this.entityTypesClass = CommonUtil.getClass("net.minecraft.world.entity.EntityTypes");
         this._handler = Template.Class.create(Handler.class, Common.TEMPLATE_RESOLVER);
-        this.nmsWorldHandle = ServerLevelHandle.T.newInstanceNull();
     }
 
     @Override
     public void enable() {
         this._handler.forceInitialization();
 
+        // Check
+        if (entityTypesClass == null) {
+            throw new IllegalStateException("net.minecraft.world.entity.EntityTypes class not found");
+        }
+
         // Initialize a dummy field with the sole purpose of constructing an entity without errors
         {
-            // Create WorldData instance by null-constructing it
-            Object nmsWorldData;
-            Class<?> worldDataServerType = CommonUtil.getClass("net.minecraft.world.level.storage.PrimaryLevelData");
-            if (Common.evaluateMCVersion(">=", "1.16")) {
-                nmsWorldData = NullInstantiator.of(worldDataServerType).create();
-            } else {
-                nmsWorldData = ClassTemplate.create(worldDataServerType).getConstructor().newInstance();
-            }
+            // Implement and override ServerLevel. On 26.2+, we got to hook getNextEntityId() to avoid problems
+            ClassInterceptor interceptor = new ClassInterceptor() {
+                @Override
+                protected Invoker<?> getCallback(Method method) {
+                    if (method.getName().equals("getNextEntityId")) {
+                        return ConstantReturningInvoker.of(1);
+                    } else if (method.getName().equals("getSeaLevel")) {
+                        return ConstantReturningInvoker.of(64);
+                    }
+                    return null;
+                }
+            };
+            this.nmsWorldHandle = interceptor.hook(ServerLevelHandle.T.newInstanceNull());
 
-            this._handler.initWorldServer(this.nmsWorldHandle, nmsWorldData);
+            Object primaryLevelData = this._handler.createPrimaryLevelData();
+
+            this._handler.initWorldServer(this.nmsWorldHandle, primaryLevelData);
         }
 
         // Pre-register certain classes that cause events to be fired when constructing
@@ -105,10 +121,10 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
     }
 
     private void registerEntityTypes(String name, String nmsClassName) {
-        String realName = Resolver.resolveFieldName(EntityTypeHandle.T.getType(), name);
+        String realName = Resolver.resolveFieldName(entityTypesClass, name);
         String s = name.equals(realName) ? name : (name + ":" + realName);
         try {
-            java.lang.reflect.Field field = MPLType.getDeclaredField(EntityTypeHandle.T.getType(), realName);
+            java.lang.reflect.Field field = MPLType.getDeclaredField(entityTypesClass, realName);
             if ((field.getModifiers() & Modifier.STATIC) == 0) {
                 throw new IllegalStateException("EntityType field " + s + " is not static");
             }
@@ -167,11 +183,19 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
     @Template.Package("net.minecraft.server.level")
     @Template.Import("net.minecraft.world.entity.EntityType")
     @Template.Import("net.minecraft.server.level.ServerLevel")
+    @Template.Import("net.minecraft.world.level.LevelSettings")
     @Template.Import("net.minecraft.world.level.storage.PrimaryLevelData")
     @Template.Import("net.minecraft.world.entity.Entity")
     @Template.Import("net.minecraft.world.level.Level")
     @Template.Import("net.minecraft.core.registries.BuiltInRegistries")
+    @Template.Import("net.minecraft.core.RegistryAccess")
     @Template.Import("net.minecraft.resources.Identifier")
+    @Template.Import("net.minecraft.world.attribute.EnvironmentAttributeSystem")
+    @Template.Import("net.minecraft.world.level.dimension.DimensionType")
+    @Template.Import("net.minecraft.world.clock.ServerClockManager")
+    @Template.Import("com.bergerkiller.bukkit.common.utils.CommonUtil")
+    @Template.Import("com.bergerkiller.mountiplex.reflection.ClassTemplate")
+    @Template.Import("com.bergerkiller.mountiplex.reflection.util.NullInstantiator")
     public static abstract class Handler extends Template.Class<Template.Handle> {
 
         /*
@@ -197,7 +221,11 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *
          *         // Look the same entity type object up again by this same key
          *         // If this returns a different object, try with that instead
+         * #if version >= 26.2
+         *         EntityType entityTypesAlter = (EntityType) BuiltInRegistries.ENTITY_TYPE.getValue(name);
+         * #else
          *         EntityType entityTypesAlter = (EntityType) BuiltInRegistries.ENTITY_TYPE.get(name);
+         * #endif
          *         if (entityTypes == entityTypesAlter || entityTypesAlter == null) {
          *             throw new IllegalStateException("Failed to construct entity of type " + name, t);
          *         }
@@ -228,11 +256,74 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
         public abstract Class<?> findClassFromEntityTypes(Object entityTypes, Object world);
 
         /*
+         * <CREATE_PRIMARY_LEVEL_DATA>
+         * public static Object createPrimaryLevelData() {
+         *     // Create WorldData instance by null-constructing it
+         *     PrimaryLevelData primaryLevelData;
+         *     Class worldDataServerType = CommonUtil.getClass("net.minecraft.world.level.storage.PrimaryLevelData");
+         * #if version >= 1.16
+         *     primaryLevelData = (PrimaryLevelData) NullInstantiator.of(worldDataServerType).create();
+         * #else
+         *     primaryLevelData = (PrimaryLevelData) ClassTemplate.create(worldDataServerType).getConstructor().newInstance();
+         * #endif
+         *
+         *     // Also assign the LevelSettings, required on 26.2+
+         * #if version >= 26.1
+         *     net.minecraft.world.level.LevelSettings$DifficultySettings difficultySettings = new net.minecraft.world.level.LevelSettings$DifficultySettings(
+         *             net.minecraft.world.Difficulty.NORMAL, false, false);
+         *     LevelSettings levelSettings = new LevelSettings(
+         *             "zzdummyzz", // levelName
+         *             net.minecraft.world.level.GameType.SURVIVAL,
+         *             difficultySettings,
+         *             false, // allowCommands
+         *             net.minecraft.world.level.WorldDataConfiguration.DEFAULT
+         *     );
+         *     #require PrimaryLevelData public LevelSettings settings;
+         *     primaryLevelData#settings = levelSettings;
+         *     return primaryLevelData;
+         * }
+         */
+        @Template.Generated("%CREATE_PRIMARY_LEVEL_DATA%")
+        public abstract Object createPrimaryLevelData();
+
+        /*
          * <INIT_WORLD>
          * public static void initWorldServer((Object) ServerLevel worldserver, (Object) PrimaryLevelData worldData) {
          *     String dummyWorldName = "zzdummyzz";
-         * 
-         * // Spigot World configuration
+         *
+         *     // Ensure dimensionTypeRegistration is initialized, environment attributes init needs this
+         * #if version >= 1.21.11
+         *     net.minecraft.core.RegistryAccess$Frozen registry = net.minecraft.server.MinecraftServer.getServer().registryAccess();
+         *     net.minecraft.core.Registry dimensionRegistry = registry.lookupOrThrow(net.minecraft.core.registries.Registries.DIMENSION_TYPE);
+         *     DimensionType dimensionType = (DimensionType) dimensionRegistry.getValue(net.minecraft.world.level.dimension.BuiltinDimensionTypes.OVERWORLD);
+         *     net.minecraft.core.Holder dimensionTypeHolder = dimensionRegistry.wrapAsHolder(dimensionType);
+         *     #require net.minecraft.world.level.Level  private final net.minecraft.core.Holder<net.minecraft.world.level.dimension.DimensionType> dimensionTypeRegistration;
+         *     worldserver#dimensionTypeRegistration = dimensionTypeHolder;
+         * #endif
+         *
+         *     // Ensure registryAccess is initialized, some entities call this in the constructor to lookup stuff
+         * #if version >= 1.21.6
+         *     RegistryAccess registryAccess = org.bukkit.craftbukkit.CraftRegistry.getMinecraftRegistry();
+         *     #require net.minecraft.world.level.Level private final net.minecraft.core.RegistryAccess registryAccess;
+         *     worldserver#registryAccess = registryAccess;
+         * #endif
+         *
+         *     // Ensure ServerClockManager is initialized, EnvironmentAttributeSystem depends on this
+         * #if version >= 26.2
+         *     ServerClockManager serverClockManager = (ServerClockManager) ServerClockManager.TYPE.constructor().get();
+         *     serverClockManager.init(worldserver);
+         *     #require ServerLevel private final ServerClockManager clockManager;
+         *     worldserver#clockManager = serverClockManager;
+         * #endif
+         *
+         *     // Ensure EnvironmentAttributes is initialized, entities use it in their 'Brain' AI logic
+         * #if version >= 1.21.11
+         *     EnvironmentAttributeSystem environmentAttributes = EnvironmentAttributeSystem.builder().addDefaultLayers(worldserver).build();
+         *     #require ServerLevel private EnvironmentAttributeSystem environmentAttributes;
+         *     worldserver#environmentAttributes = environmentAttributes;
+         * #endif
+         *
+         *     // Spigot World configuration
          * #if fieldexists net.minecraft.world.level.Level public final org.spigotmc.SpigotWorldConfig spigotConfig;
          *     org.spigotmc.SpigotWorldConfig spigotConfig;
          * 

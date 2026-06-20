@@ -1,4 +1,4 @@
-package net.minecraft.world.entity.monster;
+package net.minecraft.world.entity.monster.cubemob;
 
 import net.minecraft.world.entity.Mob;
 

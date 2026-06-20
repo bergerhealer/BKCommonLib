@@ -28,6 +28,7 @@ import com.bergerkiller.bukkit.common.conversion.type.JOMLConversion;
 import com.bergerkiller.bukkit.common.conversion.type.MapConversion;
 import com.bergerkiller.bukkit.common.conversion.type.ScoreboardDisplaySlotConversion;
 import com.bergerkiller.bukkit.common.conversion.type.SerializedEnumConversion;
+import com.bergerkiller.bukkit.common.conversion.type.TeamColorConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.internal.logic.EmptyBlockGetterInit;
 import com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporterInit;
@@ -579,6 +580,13 @@ public class CommonBootstrap {
         ****************************************************************************************************************
         */
 
+        /* ======== Mojang remapping changes for 26.2 ======== */
+        if (evaluateMCVersion("<", "26.1")) {
+            // Since 26.2 all of the EntityTypes constants live in the EntityTypes class, instead of EntityType
+            // This remapping rule makes the same work on versions prior
+            remappings.put("net.minecraft.world.entity.EntityTypes", "net.minecraft.world.entity.EntityType");
+        }
+
         /* ======== Mojang remapping changes for 26.1 ======== */
         if (evaluateMCVersion("<", "26.1")) {
             // Class renamed
@@ -956,6 +964,9 @@ public class CommonBootstrap {
         if (evaluateMCVersion(">=", "1.18.2")) {
             MC1_18_2_Conversion.init();
             Conversion.registerConverters(MC1_18_2_Conversion.class);
+        }
+        if (evaluateMCVersion(">=", "26.2")) {
+            Conversion.registerConverters(TeamColorConversion.class);
         }
 
         // Scoreboard DisplaySlot conversions

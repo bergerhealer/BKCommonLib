@@ -4,7 +4,14 @@ import com.bergerkiller.generated.net.minecraft.ChatFormattingHandle;
 class ChatFormatting {
     enum (ChatFormattingHandle) ChatFormatting RESET;
 
-#if version >= 1.18
+#if version >= 26.2
+    public int getId() {
+        // I don't think this is in practical use at all on 26.2 and later
+        // But implement something just so it doesn't error at runtime
+        int ord = instance.ordinal();
+        return ord < 16 ? ord : -1;
+    }
+#elseif version >= 1.18
     public int getId();
 #else
     public int getId:b();

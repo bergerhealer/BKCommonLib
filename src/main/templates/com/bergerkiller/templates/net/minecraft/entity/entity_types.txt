@@ -95,7 +95,9 @@ class EntityType {
 
   #if version >= 1.14
     public static Class<?> getEntityClass(String internalEntityName) {
-    #if version >= 1.18
+    #if version >= 26.2
+        java.util.Optional opt = BuiltInRegistries.ENTITY_TYPE.getOptional(Identifier.tryParse(internalEntityName));
+    #elseif version >= 1.18
         java.util.Optional opt = EntityType.byString(internalEntityName);
     #else
         java.util.Optional opt = EntityType.a(internalEntityName);
