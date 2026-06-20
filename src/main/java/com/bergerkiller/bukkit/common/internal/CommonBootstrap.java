@@ -581,7 +581,7 @@ public class CommonBootstrap {
         */
 
         /* ======== Mojang remapping changes for 26.2 ======== */
-        if (evaluateMCVersion("<", "26.1")) {
+        if (evaluateMCVersion("<", "26.2")) {
             // Since 26.2 all of the EntityTypes constants live in the EntityTypes class, instead of EntityType
             // This remapping rule makes the same work on versions prior
             remappings.put("net.minecraft.world.entity.EntityTypes", "net.minecraft.world.entity.EntityType");
