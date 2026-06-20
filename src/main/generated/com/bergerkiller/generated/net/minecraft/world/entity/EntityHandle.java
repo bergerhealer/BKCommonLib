@@ -26,7 +26,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.world.entity.Entity</b>.
@@ -44,6 +43,10 @@ public abstract class EntityHandle extends Template.Handle {
     }
 
     /* ============================================================================== */
+
+    public static int incrementEntityCounter() {
+        return T.incrementEntityCounter.invoker.invoke(null);
+    }
 
     public abstract void setTrackerEntry(EntityTrackerEntryHandle tracker);
     public abstract List<EntityHandle> getPassengers();
@@ -255,10 +258,6 @@ public abstract class EntityHandle extends Template.Handle {
      */
     public static final class EntityClass extends Template.Class<EntityHandle> {
         @Template.Optional
-        public final Template.StaticField<AtomicInteger> opt_atomic_entityCount = new Template.StaticField<AtomicInteger>();
-        @Template.Optional
-        public final Template.StaticField.Integer opt_int_entityCount = new Template.StaticField.Integer();
-        @Template.Optional
         public final Template.StaticField.Converted<Key<Byte>> DATA_FLAGS = new Template.StaticField.Converted<Key<Byte>>();
         @Template.Optional
         public final Template.StaticField.Converted<Key<Integer>> DATA_AIR_TICKS = new Template.StaticField.Converted<Key<Integer>>();
@@ -306,6 +305,8 @@ public abstract class EntityHandle extends Template.Handle {
         @Template.Optional
         public final Template.Field.Long move_SomeState = new Template.Field.Long();
         public final Template.Field.Boolean valid = new Template.Field.Boolean();
+
+        public final Template.StaticMethod<Integer> incrementEntityCounter = new Template.StaticMethod<Integer>();
 
         public final Template.Method.Converted<Void> setTrackerEntry = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<List<EntityHandle>> getPassengers = new Template.Method.Converted<List<EntityHandle>>();

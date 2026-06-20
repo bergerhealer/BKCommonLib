@@ -243,28 +243,31 @@ class ClientboundSetPlayerTeamPacket extends Packet {
 #endif
     }
 
+#if version >= 1.21.5
+    // Field is of type Team.Visibility / Team.CollisionRule, not String
+
     public (String) Team.Visibility getVisibility() {
         ClientboundSetPlayerTeamPacket$Parameters parameters = instance#getParameters();
         if (parameters == null) {
             return Team$Visibility.ALWAYS;
         } else {
-#if version >= 26.2
+  #if version >= 26.2
             return parameters.nameTagVisibility();
-#else
+  #else
             return parameters#visibility;
-#endif
+  #endif
         }
     }
 
     public void setVisibility((String) Team.Visibility visibility) {
         ClientboundSetPlayerTeamPacket$Parameters parameters = instance#getParametersOrDefault();
-#if version >= 26.2
+  #if version >= 26.2
         #require ClientboundSetPlayerTeamPacket.Parameters ClientboundSetPlayerTeamPacket.Parameters change_visibility:<record_changer>(Team.Visibility nameTagVisibility);
         parameters = parameters#change_visibility(visibility);
         instance#setParameters(parameters);
-#else
+  #else
         parameters#visibility = visibility;
-#endif
+  #endif
     }
 
     public (String) Team.CollisionRule getCollisionRule() {
@@ -272,24 +275,56 @@ class ClientboundSetPlayerTeamPacket extends Packet {
         if (parameters == null) {
             return Team$CollisionRule.ALWAYS;
         } else {
-#if version >= 26.2
+  #if version >= 26.2
             return parameters.collisionRule();
-#else
+  #else
             return parameters#collisionRule;
-#endif
+  #endif
         }
     }
 
     public void setCollisionRule((String) Team.CollisionRule rule) {
         ClientboundSetPlayerTeamPacket$Parameters parameters = instance#getParametersOrDefault();
-#if version >= 26.2
+  #if version >= 26.2
         #require ClientboundSetPlayerTeamPacket.Parameters ClientboundSetPlayerTeamPacket.Parameters change_collision_rule:<record_changer>(Team.CollisionRule collisionRule);
         parameters = parameters#change_collision_rule(rule);
         instance#setParameters(parameters);
-#else
+  #else
         parameters#collisionRule = rule;
-#endif
+  #endif
     }
+
+#else
+    // Field is of type String
+
+    public (String) String getVisibility() {
+        ClientboundSetPlayerTeamPacket$Parameters parameters = instance#getParameters();
+        if (parameters == null) {
+            return Team$Visibility.ALWAYS.name;
+        } else {
+            return parameters#visibility;
+        }
+    }
+
+    public void setVisibility((String) String visibility) {
+        ClientboundSetPlayerTeamPacket$Parameters parameters = instance#getParametersOrDefault();
+        parameters#visibility = visibility;
+    }
+
+    public (String) String getCollisionRule() {
+        ClientboundSetPlayerTeamPacket$Parameters parameters = instance#getParameters();
+        if (parameters == null) {
+            return Team$CollisionRule.ALWAYS.name;
+        } else {
+            return parameters#collisionRule;
+        }
+    }
+
+    public void setCollisionRule((String) String rule) {
+        ClientboundSetPlayerTeamPacket$Parameters parameters = instance#getParametersOrDefault();
+        parameters#collisionRule = rule;
+    }
+#endif
 
 #if version >= 26.2
     public (org.bukkit.ChatColor) TeamColor getColor() {

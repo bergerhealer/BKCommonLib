@@ -59,16 +59,25 @@ class Entity {
 #endif
     }
 
-#if version >= 1.17
-    private static optional java.util.concurrent.atomic.AtomicInteger opt_atomic_entityCount:ENTITY_COUNTER;
-    private static optional int opt_int_entityCount:###;
-#elseif version >= 1.14
-    private static optional java.util.concurrent.atomic.AtomicInteger opt_atomic_entityCount:entityCount;
-    private static optional int opt_int_entityCount:###;
+    public static int incrementEntityCounter() {
+#if version >= 1.14
+  #if version >= 26.2
+        #require ServerLevel private static java.util.concurrent.atomic.AtomicInteger ENTITY_COUNTER;
+  #elseif version >= 1.17
+        #require Entity private static java.util.concurrent.atomic.AtomicInteger ENTITY_COUNTER;
+  #else
+        #require Entity private static java.util.concurrent.atomic.AtomicInteger ENTITY_COUNTER:entityCount;
+  #endif
+
+        java.util.concurrent.atomic.AtomicInteger entityCount = #ENTITY_COUNTER;
+        return entityCount.incrementAndGet();
 #else
-    private static optional java.util.concurrent.atomic.AtomicInteger opt_atomic_entityCount:###;
-    private static optional int opt_int_entityCount:entityCount;
+        #require Entity private static int entityCount;
+        int id = Entity#entityCount;
+        Entity#entityCount = id+1;
+        return id;
 #endif
+    }
 
     private int idField:id;
 
@@ -380,7 +389,10 @@ class Entity {
 #endif
 
 
-#if version >= 1.18
+#if version >= 1.14
+    // motX/Y/Z is private 'mot' field on 1.14+
+    // For performance reasons, use the getMot/setMot methods
+    // Reflection to access the private mot Vec3 is likely slower.
     public org.bukkit.util.Vector getMot() {
         Vec3 mot = instance.getDeltaMovement();
         return new org.bukkit.util.Vector(mot.x, mot.y, mot.z);
@@ -432,63 +444,6 @@ class Entity {
 
     public double getMotZ() {
         return instance.getDeltaMovement().z;
-    }
-
-#elseif version >= 1.14
-    // motX/Y/Z is private 'mot' field on 1.14
-    // For performance reasons, use the getMot/setMot methods
-    // Reflection to access the private mot Vec3 is likely slower.
-    public org.bukkit.util.Vector getMot() {
-        Vec3 mot = instance.getMot();
-        return new org.bukkit.util.Vector(mot.x, mot.y, mot.z);
-    }
-
-    public void setMotVector(org.bukkit.util.Vector mot) {
-        instance.setMot(new Vec3(mot.getX(), mot.getY(), mot.getZ()));
-    }
-
-    public void setMot(double x, double y, double z) {
-        instance.setMot(new Vec3(x, y, z));
-    }
-
-    public void fixMotNaN() {
-        Vec3 mot = instance.getMot();
-        if (Double.isNaN(mot.x) || Double.isNaN(mot.y) || Double.isNaN(mot.z)) {
-            double x = mot.x;
-            double y = mot.y;
-            double z = mot.z;
-            if (Double.isNaN(x)) x = 0.0;
-            if (Double.isNaN(y)) y = 0.0;
-            if (Double.isNaN(z)) z = 0.0;
-            instance.setMot(new Vec3(x, y, z));
-        }
-    }
-
-    public void setMotX(double x) {
-        Vec3 mot = instance.getMot();
-        instance.setMot(new Vec3(x, mot.y, mot.z));
-    }
-
-    public void setMotY(double y) {
-        Vec3 mot = instance.getMot();
-        instance.setMot(new Vec3(mot.x, y, mot.z));
-    }
-
-    public void setMotZ(double z) {
-        Vec3 mot = instance.getMot();
-        instance.setMot(new Vec3(mot.x, mot.y, z));
-    }
-
-    public double getMotX() {
-        return instance.getMot().x;
-    }
-
-    public double getMotY() {
-        return instance.getMot().y;
-    }
-
-    public double getMotZ() {
-        return instance.getMot().z;
     }
 
 #else
@@ -1391,11 +1346,7 @@ class Entity {
             float f = (driver == instance) ? 0.35F : 0.4F;
 
   #if version >= 1.14
-    #if version >= 1.18
             Vec3 mot = instance.getDeltaMovement();
-    #else
-            Vec3 mot = instance.getMot();
-    #endif
             double motX = mot.x;
             double motY = mot.y;
             double motZ = mot.z;

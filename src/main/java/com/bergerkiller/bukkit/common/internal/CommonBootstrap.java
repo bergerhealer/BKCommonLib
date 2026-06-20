@@ -29,6 +29,7 @@ import com.bergerkiller.bukkit.common.conversion.type.MapConversion;
 import com.bergerkiller.bukkit.common.conversion.type.ScoreboardDisplaySlotConversion;
 import com.bergerkiller.bukkit.common.conversion.type.SerializedEnumConversion;
 import com.bergerkiller.bukkit.common.conversion.type.TeamColorConversion;
+import com.bergerkiller.bukkit.common.conversion.type.TextColorChatColorConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.internal.logic.EmptyBlockGetterInit;
 import com.bergerkiller.bukkit.common.internal.logic.ScopedProblemReporterInit;
@@ -587,6 +588,8 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.entity.EntityTypes", "net.minecraft.world.entity.EntityType");
             // Moved
             remappings.put("net.minecraft.world.entity.monster.cubemob.Slime", "net.minecraft.world.entity.monster.Slime");
+            // AbstractCubeMob does not yet exist, but only Slime is one, so just map to that
+            remappings.put("net.minecraft.world.entity.monster.cubemob.AbstractCubeMob", "net.minecraft.world.entity.monster.Slime");
         }
 
         /* ======== Mojang remapping changes for 26.1 ======== */
@@ -949,6 +952,9 @@ public class CommonBootstrap {
         }
         if (evaluateMCVersion(">=", "1.14")) {
             Conversion.registerConverters(EntityPoseConversion.class);
+        }
+        if (evaluateMCVersion(">=", "1.16")) {
+            Conversion.registerConverters(TextColorChatColorConversion.class);
         }
         if (evaluateMCVersion(">=", "1.17")) {
             MC1_17_Conversion.init();

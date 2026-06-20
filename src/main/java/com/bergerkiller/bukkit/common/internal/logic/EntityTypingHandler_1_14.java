@@ -264,7 +264,9 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          * #if version >= 1.16
          *     primaryLevelData = (PrimaryLevelData) NullInstantiator.of(worldDataServerType).create();
          * #else
-         *     primaryLevelData = (PrimaryLevelData) ClassTemplate.create(worldDataServerType).getConstructor().newInstance();
+         *     primaryLevelData = (PrimaryLevelData) ClassTemplate.create(worldDataServerType)
+         *             .getConstructor(new Class[0])
+         *             .newInstance(new Object[0]);
          * #endif
          *
          *     // Also assign the LevelSettings, required on 26.2+
@@ -280,6 +282,7 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *     );
          *     #require PrimaryLevelData public LevelSettings settings;
          *     primaryLevelData#settings = levelSettings;
+         * #endif
          *     return primaryLevelData;
          * }
          */
@@ -293,7 +296,8 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *
          *     // Ensure dimensionTypeRegistration is initialized, environment attributes init needs this
          * #if version >= 1.21.11
-         *     net.minecraft.core.RegistryAccess$Frozen registry = net.minecraft.server.MinecraftServer.getServer().registryAccess();
+         *     net.minecraft.server.MinecraftServer minecraftServer = net.minecraft.server.MinecraftServer.getServer();
+         *     net.minecraft.core.RegistryAccess$Frozen registry = minecraftServer.getServer().registryAccess();
          *     net.minecraft.core.Registry dimensionRegistry = registry.lookupOrThrow(net.minecraft.core.registries.Registries.DIMENSION_TYPE);
          *     DimensionType dimensionType = (DimensionType) dimensionRegistry.getValue(net.minecraft.world.level.dimension.BuiltinDimensionTypes.OVERWORLD);
          *     net.minecraft.core.Holder dimensionTypeHolder = dimensionRegistry.wrapAsHolder(dimensionType);
@@ -311,7 +315,11 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *     // Ensure ServerClockManager is initialized, EnvironmentAttributeSystem depends on this
          * #if version >= 26.2
          *     ServerClockManager serverClockManager = (ServerClockManager) ServerClockManager.TYPE.constructor().get();
+         *   #if paper
+         *     serverClockManager.init(minecraftServer, worldserver);
+         *   #else
          *     serverClockManager.init(worldserver);
+         *   #endif
          *     #require ServerLevel private final ServerClockManager clockManager;
          *     worldserver#clockManager = serverClockManager;
          * #endif
@@ -400,7 +408,7 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          * 
          * #if version >= 1.17
          *     // WritableLevelData field
-         *     #require net.minecraft.world.level.Level public final net.minecraft.world.level.storage.WritableLevelData levelData;
+         *     #require net.minecraft.world.level.Level protected final net.minecraft.world.level.storage.WritableLevelData levelData;
          *     worldserver#levelData = worldData;
          * 
          *     // PrimaryLevelData field (on some servers, it uses the WritableLevelData field instead)

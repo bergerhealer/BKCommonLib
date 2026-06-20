@@ -48,9 +48,14 @@ class CraftItemStack {
 #if version >= 1.21.5
     public static optional org.bukkit.inventory.ItemStack deserializeNBT((CommonTagCompound) CompoundTag nbt) {
   #if paper
+    #if version >= 26.2
+        // Use Paper MCUtil API
+        return io.papermc.paper.util.MCUtil.deserializeItem(nbt);
+    #else
         // Use Paper UnsafeValues API
         #require CraftMagicNumbers private org.bukkit.inventory.ItemStack deserializeItem(CompoundTag nbt);
         return CraftMagicNumbers.INSTANCE#deserializeItem(nbt);
+    #endif
   #else
         // Use Spigot/NMS DFU
         final int dataVersion = nbt.getIntOr("DataVersion", 0);

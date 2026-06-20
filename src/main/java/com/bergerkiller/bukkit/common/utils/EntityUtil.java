@@ -155,13 +155,7 @@ public class EntityUtil extends EntityPropertyUtil {
      * @return entity Id
      */
     public static int getUniqueEntityId() {
-        if (EntityHandle.T.opt_atomic_entityCount.isAvailable()) {
-            return EntityHandle.T.opt_atomic_entityCount.get().incrementAndGet();
-        } else {
-            int id = EntityHandle.T.opt_int_entityCount.getInteger();
-            EntityHandle.T.opt_int_entityCount.setInteger(id + 1);
-            return id;
-        }
+        return EntityHandle.incrementEntityCounter();
     }
 
     /**

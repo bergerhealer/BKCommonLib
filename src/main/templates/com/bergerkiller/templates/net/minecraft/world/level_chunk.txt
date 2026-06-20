@@ -198,9 +198,12 @@ class LevelChunk {
   #if version >= 26.1
         int chunkX = instance.getPos().x();
         int chunkZ = instance.getPos().z();
-  #else
+  #elseif version >= 1.14
         int chunkX = instance.getPos().x;
         int chunkZ = instance.getPos().z;
+  #else
+        int chunkX = instance.locX;
+        int chunkZ = instance.locZ;
   #endif
 
 #if version >= 1.21 && exists ca.spottedleaf.moonrise.patches.chunk_system.level.entity.ChunkEntitySlices

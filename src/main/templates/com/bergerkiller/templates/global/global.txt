@@ -1,6 +1,7 @@
 // Global functions and macros that are available in all templates
 // This file is loaded in at the very beginning
 
+import org.bukkit.ChatColor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -142,7 +143,7 @@ import net.minecraft.world.level.storage.TagValueInput;
     StringBuilder out = new StringBuilder();
     java.util.Iterator iter = ((Iterable) component).iterator();
 
-    ChatFormatting prev_color_format = null;
+    ChatColor prev_bukkit_color = null;
     boolean prev_was_bold = false;
     boolean prev_was_italic = false;
     boolean prev_was_underlined = false;
@@ -160,7 +161,7 @@ import net.minecraft.world.level.storage.TagValueInput;
             (prev_was_strikeThrough && !modi.isStrikethrough()) ||
             (prev_was_obfuscated && !modi.isObfuscated()))
         {
-            prev_color_format = null;
+            prev_bukkit_color = null;
             prev_was_bold = false;
             prev_was_italic = false;
             prev_was_underlined = false;
@@ -170,22 +171,24 @@ import net.minecraft.world.level.storage.TagValueInput;
         }
 
         if (modi.getColor() != null) {
+            // Uses TextColorChatColorConversion
 #if version >= 1.16
-            ChatFormatting color_format = modi.getColor().format;
+            #require net.minecraft.network.chat.Style public (ChatColor) net.minecraft.network.chat.TextColor getBukkitChatColor:getColor();
 #else
-            ChatFormatting color_format = modi.getColor();
+            #require net.minecraft.network.chat.Style public (ChatColor) net.minecraft.ChatFormatting getBukkitChatColor:getColor();
 #endif
-            if (color_format != null) {
+
+            ChatColor bukkit_color = modi#getBukkitChatColor();
+            if (bukkit_color != null) {
                 // Track as 16 color format, omit duplicates
-                if (prev_color_format != color_format) {
-                    prev_color_format = color_format;
-                    out.append(color_format);
+                if (prev_bukkit_color != bukkit_color) {
+                    prev_bukkit_color = bukkit_color;
+                    out.append(bukkit_color);
                 }
             }
 
 #if version >= 1.16
-            ChatFormatting color_format = modi.getColor().format;
-            if (color_format == null) {
+            if (bukkit_color == null) {
                 // Get color RGB value
   #if version >= 1.17
                 int rgb = modi.getColor().getValue();
@@ -207,7 +210,7 @@ import net.minecraft.world.level.storage.TagValueInput;
                 }
 
                 // Reset color format
-                prev_color_format = null;
+                prev_bukkit_color = null;
             }
 #endif
         }

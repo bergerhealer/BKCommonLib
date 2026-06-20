@@ -17,6 +17,11 @@ import net.minecraft.world.level.storage.ValueOutput;
     #remap net.minecraft.world.entity.Entity public boolean horizontalMovementBlocked:positionChanged;
 #endif
 
+#if version >= 1.14 && version < 1.18
+    #remap net.minecraft.world.entity.Entity public net.minecraft.world.phys.Vec3 getDeltaMovement:getMot();
+    #remap net.minecraft.world.entity.Entity public void setDeltaMovement:setMot(net.minecraft.world.phys.Vec3 vec3);
+#endif
+
 #select version >=
 #case 1.17:   #remap net.minecraft.world.entity.Entity public boolean verticalMovementBlocked:verticalCollision;
 #case 1.15:   #remap net.minecraft.world.entity.Entity public boolean verticalMovementBlocked:v;
