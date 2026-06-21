@@ -301,8 +301,20 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *     net.minecraft.core.Registry dimensionRegistry = registry.lookupOrThrow(net.minecraft.core.registries.Registries.DIMENSION_TYPE);
          *     DimensionType dimensionType = (DimensionType) dimensionRegistry.getValue(net.minecraft.world.level.dimension.BuiltinDimensionTypes.OVERWORLD);
          *     net.minecraft.core.Holder dimensionTypeHolder = dimensionRegistry.wrapAsHolder(dimensionType);
+         *     if (dimensionType == null || dimensionTypeHolder == null) {
+         *         throw new IllegalStateException("Overworld dimension type not found");
+         *     }
+         *     if (dimensionTypeHolder.value() == null) {
+         *         throw new IllegalStateException("DimensionType wrapasholder returned a holder with a null value");
+         *     }
          *     #require net.minecraft.world.level.Level  private final net.minecraft.core.Holder<net.minecraft.world.level.dimension.DimensionType> dimensionTypeRegistration;
          *     worldserver#dimensionTypeRegistration = dimensionTypeHolder;
+         *
+         *     // Universe Spigot
+         *   #if exists net.minecraft.world.level.Level private net.minecraft.world.level.dimension.DimensionType cachedDimensionType
+         *     #require net.minecraft.world.level.Level private net.minecraft.world.level.dimension.DimensionType cachedDimensionType;
+         *     worldserver#cachedDimensionType = dimensionType;
+         *   #endif
          * #endif
          *
          *     // Ensure registryAccess is initialized, some entities call this in the constructor to lookup stuff
