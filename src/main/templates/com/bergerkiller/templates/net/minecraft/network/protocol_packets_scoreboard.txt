@@ -374,8 +374,8 @@ class ClientboundSetPlayerTeamPacket extends Packet {
     public void setTeamOptionFlags(int teamOptionFlags) {
         ClientboundSetPlayerTeamPacket$Parameters parameters = instance#getParametersOrDefault();
   #if version >= 26.2
-        #require ClientboundSetPlayerTeamPacket.Parameters ClientboundSetPlayerTeamPacket.Parameters change_options:<record_changer>(int options);
-        parameters = parameters#change_options(teamOptionFlags);
+        #require ClientboundSetPlayerTeamPacket.Parameters ClientboundSetPlayerTeamPacket.Parameters change_options:<record_changer>(byte options);
+        parameters = parameters#change_options((byte)teamOptionFlags);
         instance#setParameters(parameters);
   #else
         parameters#teamOptionFlags = teamOptionFlags;
