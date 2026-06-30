@@ -26,7 +26,7 @@ public class TeamColorConversion {
         if (ord < teamColorValues.length) {
             return teamColorValues[ord];
         } else {
-            throw new IllegalArgumentException("Invalid team color: " + color.name());
+            return null;
         }
     }
 
