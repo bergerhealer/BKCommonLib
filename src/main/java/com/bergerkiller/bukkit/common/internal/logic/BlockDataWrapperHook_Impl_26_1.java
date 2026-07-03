@@ -11,6 +11,8 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 
+import java.lang.reflect.Method;
+
 import static org.objectweb.asm.Opcodes.*;
 
 /**
@@ -29,10 +31,16 @@ class BlockDataWrapperHook_Impl_26_1 extends BlockDataWrapperHook {
     protected void baseEnable() throws Throwable {
         final Class<?> blockStateBaseType = getClassVerify("net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase");
         final Class<?> statePredicateType = getClassVerify("net.minecraft.world.level.block.state.BlockBehaviour$StatePredicate");
+        final Class<?> nmsBlockStateType = getClassVerify("net.minecraft.world.level.block.state.BlockState");
+        final Class<?> nmsBlockGetterType = getClassVerify("net.minecraft.world.level.BlockGetter");
+        final Class<?> nmsBlockPosType = getClassVerify("net.minecraft.core.BlockPos");
 
         // Hook the field that is likely to be called less. All it adds is a field redirection but it's still good to be mindful.
         statePredicateField.init(Resolver.resolveAndGetDeclaredField(blockStateBaseType, "isSuffocating"));
         statePredicateField.forceInitialization();
+
+        // Resolve the actual lambda method - it's important it actually exists or we could break the server
+        final Method testMethod = Resolver.resolveAndGetDeclaredMethod(statePredicateType, "test", nmsBlockStateType, nmsBlockGetterType, nmsBlockPosType);
 
         // Generate a new class that implements the StatePredicate interface and calls the original method on the original value
         Class<?> type;
@@ -44,9 +52,6 @@ class BlockDataWrapperHook_Impl_26_1 extends BlockDataWrapperHook {
                     .build();
             final String blockDataDesc = MPLType.getDescriptor(BlockData.class);
             final String statePredicateDesc = MPLType.getDescriptor(statePredicateType);
-            final String nmsBlockStateDesc = MPLType.getDescriptor(getClassVerify("net.minecraft.world.level.block.state.BlockState"));
-            final String nmsBlockGetterDesc = MPLType.getDescriptor(getClassVerify("net.minecraft.world.level.BlockGetter"));
-            final String nmsBlockPosDesc = MPLType.getDescriptor(getClassVerify("net.minecraft.core.BlockPos"));
 
             // Add the fields holding the original value and the BlockData to be stored
             {
@@ -80,16 +85,17 @@ class BlockDataWrapperHook_Impl_26_1 extends BlockDataWrapperHook {
 
             //boolean test(BlockState state, BlockGetter level, BlockPos pos);
             {
-                final String testMethodDesc =  "(" + nmsBlockStateDesc + nmsBlockGetterDesc + nmsBlockPosDesc + ")Z";
+                final String testMethodName = MPLType.getName(testMethod);
+                final String testMethodDesc = MPLType.getMethodDescriptor(testMethod);
 
-                MethodVisitor mv =  cw.visitMethod(ACC_PUBLIC, "test", testMethodDesc, null, null);
+                MethodVisitor mv =  cw.visitMethod(ACC_PUBLIC, testMethodName, testMethodDesc, null, null);
                 mv.visitCode();
                 mv.visitVarInsn(ALOAD, 0);
                 mv.visitFieldInsn(GETFIELD, cw.getInternalName(), "base", statePredicateDesc);
                 mv.visitVarInsn(ALOAD, 1);
                 mv.visitVarInsn(ALOAD, 2);
                 mv.visitVarInsn(ALOAD, 3);
-                mv.visitMethodInsn(INVOKEINTERFACE, MPLType.getInternalName(statePredicateType), "test", testMethodDesc, true);
+                mv.visitMethodInsn(INVOKEINTERFACE, MPLType.getInternalName(statePredicateType), testMethodName, testMethodDesc, true);
                 mv.visitInsn(IRETURN);
                 mv.visitMaxs(4, 4);
                 mv.visitEnd();
