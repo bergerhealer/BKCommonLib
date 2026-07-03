@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
@@ -30,7 +31,7 @@ public enum HumanHand {
             }
             try {
                 Class<?> humanoidArmType = CommonUtil.getClass("net.minecraft.world.entity.HumanoidArm");
-                this.nmsHumanoidArm = humanoidArmType.getField(this.name()).get(null);
+                this.nmsHumanoidArm = Resolver.resolveAndGetDeclaredField(humanoidArmType, this.name()).get(null);
             } catch (Throwable t) {
                 throw new UnsupportedOperationException("Failed to initialize nms humanoid arm for HumanHand enum constant " + name(), t);
             }

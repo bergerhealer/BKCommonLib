@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.org.bukkit.inventory.PlayerInventoryHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 
@@ -30,7 +31,7 @@ public enum HumanHandRole {
         if (CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
             try {
                 Class<?> interactionHandType = CommonUtil.getClass("net.minecraft.world.InteractionHand");
-                this.nmsInteractionHand = interactionHandType.getField(enumName).get(null);
+                this.nmsInteractionHand = Resolver.resolveAndGetDeclaredField(interactionHandType, enumName).get(null);
             } catch (Throwable t) {
                 throw new UnsupportedOperationException("Failed to initialize HumanHandRole enum constants for " + name(), t);
             }
