@@ -86,7 +86,8 @@ public class Common {
             "Common:BlockData:GetInteractableBox",
             "Common:MapResourcePack:OpenResource",
             "Common:LoadableWorld",
-            "Common:DamageSource:CreateVehicleDamageEvent"
+            "Common:DamageSource:CreateVehicleDamageEvent",
+            "Common:ServerboundAttackPacket:HasSecondaryAction"
     ).collect(Collectors.toSet());
 
     /**
@@ -95,7 +96,7 @@ public class Common {
      * <b>Use getVersion() instead if you want the actual, current version!
      * Constants get inlined when compiling!</b>
      */
-    public static final int VERSION = 20001;
+    public static final int VERSION = 20002;
     /**
      * Defines the Minecraft version that runs on the server.
      */

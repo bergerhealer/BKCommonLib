@@ -57,11 +57,19 @@ class ServerboundAttackPacket extends Packet {
 #if version >= 26.1
     public int getEntityId:entityId();
 
-    public static (ServerboundAttackPacketHandle) ServerboundAttackPacket createNew(int attackedEntityId) {
+    public static (ServerboundAttackPacketHandle) ServerboundAttackPacket createNew(int attackedEntityId, boolean isUsingSecondaryAction) {
         return new ServerboundAttackPacket(attackedEntityId);
     }
 
     public static boolean isAttackInteractionPacket((Object) ServerboundInteractPacket interactPacket) {
+        return false;
+    }
+
+    public static boolean hasSecondaryActionField() {
+        return false;
+    }
+
+    public boolean isUsingSecondaryAction() {
         return false;
     }
 #elseif version >= 1.17
@@ -72,27 +80,44 @@ class ServerboundAttackPacket extends Packet {
         return instance#attackedEntityId;
     }
 
-    public static (ServerboundAttackPacketHandle) ServerboundAttackPacket createNew(int attackedEntityId) {
+    public static (ServerboundAttackPacketHandle) ServerboundAttackPacket createNew(int attackedEntityId, boolean isUsingSecondaryAction) {
         #require ServerboundInteractPacket private ServerboundInteractPacket createInteractPacket:<init> (int i, boolean flag, ServerboundInteractPacket.Action action);
-        return #createInteractPacket( attackedEntityId, false, ServerboundInteractPacket#ATTACK_ACTION );
+        return #createInteractPacket( attackedEntityId, isUsingSecondaryAction, ServerboundInteractPacket#ATTACK_ACTION );
     }
 
     public static boolean isAttackInteractionPacket((Object) ServerboundInteractPacket interactPacket) {
         #require net.minecraft.network.protocol.game.ServerboundInteractPacket private final ServerboundInteractPacket.Action action;
         return interactPacket#action == ServerboundInteractPacket#ATTACK_ACTION;
     }
+
+    public static boolean hasSecondaryActionField() {
+        return true;
+    }
+
+  #if version >= 1.18
+    public boolean isUsingSecondaryAction();
+  #else
+    public boolean isUsingSecondaryAction:b();
+  #endif
 #else
     #require ServerboundAttackPacket private int attackedEntityId:a;
     #require ServerboundAttackPacket ServerboundInteractPacket.ActionType action;
+  #if version >= 1.16
+    #require ServerboundAttackPacket private boolean secondaryActionFlag:e;
+  #endif
 
     public int getEntityId() {
         return instance#attackedEntityId;
     }
 
-    public static (ServerboundAttackPacketHandle) ServerboundAttackPacket createNew(int attackedEntityId) {
+    public static (ServerboundAttackPacketHandle) ServerboundAttackPacket createNew(int attackedEntityId, boolean isUsingSecondaryAction) {
         ServerboundAttackPacket packet = new ServerboundInteractPacket();
         packet#attackedEntityId = attackedEntityId;
         packet#action = ServerboundInteractPacket$ActionType.ATTACK;
+
+  #if version >= 1.16
+        packet#secondaryActionFlag = isUsingSecondaryAction;
+  #endif
 
   #if version >= 1.9
         #require ServerboundAttackPacket private net.minecraft.world.InteractionHand hand:d;
@@ -105,7 +130,29 @@ class ServerboundAttackPacket extends Packet {
     public static boolean isAttackInteractionPacket((Object) ServerboundInteractPacket interactPacket) {
         return interactPacket#action == ServerboundInteractPacket$ActionType.ATTACK;
     }
+
+  #if version >= 1.16
+    public static boolean hasSecondaryActionField() {
+        return true;
+    }
+
+    public boolean isUsingSecondaryAction:e();
+  #else
+    public static boolean hasSecondaryActionField() {
+        return false;
+    }
+
+    public boolean isUsingSecondaryAction() {
+        return false;
+    }
+  #endif
 #endif
+
+    <code>
+    public static ServerboundAttackPacketHandle createNew(int attackedEntityId) {
+        return createNew(attackedEntityId, false);
+    }
+    </code>
 }
 
 class ServerboundInteractPacket extends Packet {

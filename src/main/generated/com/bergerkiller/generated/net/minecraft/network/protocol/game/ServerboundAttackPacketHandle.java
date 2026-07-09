@@ -20,15 +20,23 @@ public abstract class ServerboundAttackPacketHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public static ServerboundAttackPacketHandle createNew(int attackedEntityId) {
-        return T.createNew.invoke(attackedEntityId);
+    public static ServerboundAttackPacketHandle createNew(int attackedEntityId, boolean isUsingSecondaryAction) {
+        return T.createNew.invoke(attackedEntityId, isUsingSecondaryAction);
     }
 
     public static boolean isAttackInteractionPacket(Object interactPacket) {
         return T.isAttackInteractionPacket.invoke(interactPacket);
     }
 
+    public static boolean hasSecondaryActionField() {
+        return T.hasSecondaryActionField.invoker.invoke(null);
+    }
+
     public abstract int getEntityId();
+    public abstract boolean isUsingSecondaryAction();
+    public static ServerboundAttackPacketHandle createNew(int attackedEntityId) {
+        return createNew(attackedEntityId, false);
+    }
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.ServerboundAttackPacket</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -36,8 +44,10 @@ public abstract class ServerboundAttackPacketHandle extends PacketHandle {
     public static final class ServerboundAttackPacketClass extends Template.Class<ServerboundAttackPacketHandle> {
         public final Template.StaticMethod.Converted<ServerboundAttackPacketHandle> createNew = new Template.StaticMethod.Converted<ServerboundAttackPacketHandle>();
         public final Template.StaticMethod.Converted<Boolean> isAttackInteractionPacket = new Template.StaticMethod.Converted<Boolean>();
+        public final Template.StaticMethod<Boolean> hasSecondaryActionField = new Template.StaticMethod<Boolean>();
 
         public final Template.Method<Integer> getEntityId = new Template.Method<Integer>();
+        public final Template.Method<Boolean> isUsingSecondaryAction = new Template.Method<Boolean>();
 
     }
 
