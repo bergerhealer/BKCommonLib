@@ -366,7 +366,8 @@ class EntityTrackerEntry {
     #endif
     #if version >= 1.18
         java.util.List playersOnWorld = world.players();
-        instance.updatePlayers(playersOnWorld);
+        #require net.minecraft.server.level.ChunkMap$TrackedEntity private final void updatePlayers(java.util.List<net.minecraft.server.level.ServerPlayer> players);
+        instance#updatePlayers(playersOnWorld);
     #else
         java.util.List playersOnWorld = world.getPlayers();
         instance.track(playersOnWorld);
