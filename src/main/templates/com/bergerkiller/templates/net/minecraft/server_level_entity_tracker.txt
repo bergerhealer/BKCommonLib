@@ -349,9 +349,9 @@ class EntityTrackerEntry {
 
     public void updateViewers() {
         Entity entity = instance#entity;
-  #if exists net.minecraft.server.level.ChunkMap$TrackedEntity final void updatePlayers(com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<net.minecraft.server.level.ServerPlayer> newTrackerCandidates);
+  #if exists net.minecraft.server.level.ChunkMap$TrackedEntity private final void updatePlayers(com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<net.minecraft.server.level.ServerPlayer> newTrackerCandidates);
         // Paper after some optimizations were made to tracking
-        #require net.minecraft.server.level.ChunkMap$TrackedEntity final void paperUpdatePlayers:updatePlayers(com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<net.minecraft.server.level.ServerPlayer> newTrackerCandidates);
+        #require net.minecraft.server.level.ChunkMap$TrackedEntity private final void paperUpdatePlayers:updatePlayers(com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<net.minecraft.server.level.ServerPlayer> newTrackerCandidates);
         #require Entity com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<net.minecraft.server.level.ServerPlayer> getPlayersInTrackRange();
         com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet players = entity#getPlayersInTrackRange();
         instance#paperUpdatePlayers(players);
