@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import org.bukkit.ChatColor;
 
 import java.lang.reflect.Method;
@@ -28,9 +29,9 @@ public class TextColorChatColorConversion {
                 Class<?> textColorClass = CommonUtil.getClass("net.minecraft.network.chat.TextColor");
                 Class<?> chatFormattingClass = CommonUtil.getClass("net.minecraft.ChatFormatting");
 
-                Method getChatColor = craftChatMessageClass.getDeclaredMethod("getColor", chatFormattingClass);
+                Method getChatColor =  Resolver.resolveAndGetDeclaredMethod(craftChatMessageClass, "getColor", chatFormattingClass);
 
-                Method fromLegacyFormat = textColorClass.getDeclaredMethod(
+                Method fromLegacyFormat = Resolver.resolveAndGetDeclaredMethod(textColorClass,
                         CommonBootstrap.evaluateMCVersion(">=", "1.18") ? "fromLegacyFormat" : "a",
                         chatFormattingClass);
 
