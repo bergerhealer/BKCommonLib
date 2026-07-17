@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.server;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.offline.OfflineWorld;
 import com.bergerkiller.bukkit.common.resources.ResourceCategory;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
@@ -20,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -120,7 +122,7 @@ public class SpigotServer extends CraftBukkitServer {
         File[] namespaceFolders = dimensionsFolder.listFiles();
         if (namespaceFolders != null) {
             for (File namespaceFolder : namespaceFolders) {
-                String namespace = namespaceFolder.getName();
+                String namespace = makeNameKeySafe(namespaceFolder.getName());
                 File[] dimensionFolders = namespaceFolder.listFiles();
                 if (dimensionFolders == null) {
                     continue;
@@ -130,7 +132,7 @@ public class SpigotServer extends CraftBukkitServer {
                     if (!dimensionFolder.isDirectory()) {
                         continue;
                     }
-                    String dimension = dimensionFolder.getName();
+                    String dimension = makeNameKeySafe(dimensionFolder.getName());
 
                     // Check not already loaded
                     boolean loaded = false;
@@ -145,7 +147,11 @@ public class SpigotServer extends CraftBukkitServer {
                     }
 
                     ResourceKey<World> dimensionKey = ResourceKey.fromPath(ResourceCategory.dimension, namespace, dimension);
-                    loadableWorlds.add(new PaperLoadableWorld(mainWorldFolder, dimensionKey, null));
+                    if (dimensionKey == null) {
+                        Logging.LOGGER.warning("Dimension folder has an invalid name: " + dimensionFolder);
+                    } else {
+                        loadableWorlds.add(new PaperLoadableWorld(mainWorldFolder, dimensionKey, null));
+                    }
                 }
             }
         }
@@ -191,6 +197,10 @@ public class SpigotServer extends CraftBukkitServer {
         return loadableWorlds;
     }
 
+    private static String makeNameKeySafe(String name) {
+        return name.toLowerCase(Locale.ENGLISH);
+    }
+
     @Override
     public void addVariables(Map<String, String> variables) {
         super.addVariables(variables);
@@ -214,6 +224,10 @@ public class SpigotServer extends CraftBukkitServer {
         private OfflineWorld world;
 
         public PaperLoadableWorld(File worldFolder, ResourceKey<World> dimensionKey, OfflineWorld world) {
+            if (dimensionKey == null) {
+                throw new IllegalArgumentException("Dimension key for world " + worldFolder + " is null");
+            }
+
             this.worldFolder = worldFolder;
 
             this.dimensionKey = dimensionKey;
