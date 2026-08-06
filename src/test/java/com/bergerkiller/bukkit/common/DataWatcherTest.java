@@ -12,6 +12,7 @@ import com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode;
 import com.bergerkiller.generated.net.minecraft.world.entity.DisplayHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.decoration.ItemFrameHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.monster.ShulkerHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.player.PlayerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.AbstractMinecartHandle;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -39,6 +40,20 @@ public class DataWatcherTest {
         DataWatcher dataWatcher = new DataWatcher();
         dataWatcher.set(EntityHandle.DATA_POSE, EntityPose.CROUCHING);
         assertEquals(EntityPose.CROUCHING, dataWatcher.get(EntityHandle.DATA_POSE));
+    }
+
+    @Test
+    public void testPlayerModeCustomization() {
+        if (!CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
+            return; // Not available
+        }
+
+        DataWatcher dataWatcher = new DataWatcher();
+        dataWatcher.set(PlayerHandle.DATA_PLAYER_MODE_CUSTOMISATION, (byte) 0);
+        assertEquals((byte) 0, dataWatcher.getByte(PlayerHandle.DATA_PLAYER_MODE_CUSTOMISATION));
+
+        dataWatcher.set(PlayerHandle.DATA_PLAYER_MODE_CUSTOMISATION, PlayerHandle.DATA_CUSTOMISATION_FLAG_ALL);
+        assertEquals(PlayerHandle.DATA_CUSTOMISATION_FLAG_ALL, dataWatcher.getByte(PlayerHandle.DATA_PLAYER_MODE_CUSTOMISATION));
     }
 
     @Test
