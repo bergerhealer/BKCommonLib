@@ -206,11 +206,12 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
             try {
                 con = currURL.openConnection();
                 con.addRequestProperty("X-Minecraft-Version-ID", Common.MC_VERSION);
+                con.addRequestProperty("X-Minecraft-Pack-Format", MapResourcePack.PackVersion.SERVER.asPackFormatHeader());
                 // X-Minecraft-Pack-Format: 22
                 con.addRequestProperty("X-Minecraft-Version", Common.MC_VERSION);
                 con.addRequestProperty("User-Agent", "Minecraft Java/" + Common.MC_VERSION);
                 con.addRequestProperty("X-Minecraft-Username", "plugin_bkcommonlib");
-                con.addRequestProperty("X-Minecraft-UUID", new UUID(0L, 0L).toString());
+                con.addRequestProperty("X-Minecraft-UUID", "00000000000000000000000000000000");
 
                 con.setReadTimeout(60000);
 
@@ -226,6 +227,14 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
                         log.warning("Redirected to " + redirectURL + "...");
                         ((HttpURLConnection) con).disconnect();
                         continue;
+                    } else if (code == HttpURLConnection.HTTP_NOT_FOUND) {
+                        log.severe("Failed to download resource pack - not found (404): " + currURL);
+                        return null;
+                    } else if (code == HttpURLConnection.HTTP_FORBIDDEN) {
+                        log.severe("Failed to download resource pack - forbidden (403): " + currURL);
+                        return null;
+                    } else if (code != HttpURLConnection.HTTP_OK) {
+                        log.warning("Encountered error code " + code + " while downloading resource pack: " + currURL);
                     }
 
                     //TODO: Should we check for other types of error codes?

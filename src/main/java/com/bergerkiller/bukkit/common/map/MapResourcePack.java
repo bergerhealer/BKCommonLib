@@ -1436,6 +1436,7 @@ public class MapResourcePack {
 
         private static final NavigableMap<TextValueSequence, PackVersion> BY_VERSION = new TreeMap<>();
         static {
+            // https://minecraft.wiki/w/Pack_format
             BY_VERSION.put(TextValueSequence.parse("1.6.1"), of(1));
             BY_VERSION.put(TextValueSequence.parse("1.9"), of(2));
             BY_VERSION.put(TextValueSequence.parse("1.11"), of(3));
@@ -1458,6 +1459,10 @@ public class MapResourcePack {
             BY_VERSION.put(TextValueSequence.parse("1.21.6"), of(63));
             BY_VERSION.put(TextValueSequence.parse("1.21.7"), of(64));
             BY_VERSION.put(TextValueSequence.parse("1.21.9"), of(65));
+            BY_VERSION.put(TextValueSequence.parse("1.21.10"), of(69));
+            BY_VERSION.put(TextValueSequence.parse("1.21.11"), of(75));
+            BY_VERSION.put(TextValueSequence.parse("26.1.2"), of(84));
+            BY_VERSION.put(TextValueSequence.parse("26.2"), of(88));
         }
 
         /**
@@ -1577,6 +1582,15 @@ public class MapResourcePack {
             } else {
                 return false;
             }
+        }
+
+        /**
+         * Encodes this pack version as a header for downloading resource packs
+         *
+         * @return Resource pack download header
+         */
+        public String asPackFormatHeader() {
+            return this.major + "." + (anyMinor ? 0 : this.minor);
         }
 
         @Override
