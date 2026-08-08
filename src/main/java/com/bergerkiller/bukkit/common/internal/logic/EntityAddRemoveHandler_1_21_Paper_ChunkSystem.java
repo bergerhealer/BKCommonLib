@@ -363,11 +363,25 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *         ca.spottedleaf.moonrise.patches.chunk_system.level.entity.server.ServerEntityLookup serverEntityLookup;
          *         serverEntityLookup = (ca.spottedleaf.moonrise.patches.chunk_system.level.entity.server.ServerEntityLookup) entityLookup;
          *
+         * #if version < 26.2 || exists ca.spottedleaf.moonrise.patches.chunk_system.level.entity.server.ServerEntityLookup public final ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.world.entity.Entity> trackerEntities;
          *         if (serverEntityLookup.trackerEntities.remove(oldEntity)) {
          *             if (newEntity != null) {
          *                 serverEntityLookup.trackerEntities.add(newEntity);
          *             }
          *         }
+         * #elseif version > 26.2 || exists net.minecraft.server.level.ChunkMap private ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.world.entity.Entity> trackerEntities;
+         *         net.minecraft.server.level.ServerChunkCache chunkSource = (net.minecraft.server.level.ServerChunkCache) world.getChunkSource();
+         *         net.minecraft.server.level.ChunkMap chunkMap = chunkSource.chunkMap;
+         *         #require net.minecraft.server.level.ChunkMap private ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.world.entity.Entity> trackerEntities;
+         *         ca.spottedleaf.moonrise.common.list.ReferenceList trackerEntities = chunkMap#trackerEntities;
+         *         if (trackerEntities.remove(oldEntity)) {
+         *             if (newEntity != null) {
+         *                 trackerEntities.add(newEntity);
+         *             }
+         *         }
+         * #else
+         *         #error Paper trackerEntities field not found (26.2)
+         * #endif
          *
          * #if version < 1.21.2
          *         if (serverEntityLookup.trackerUnloadedEntities.remove(oldEntity)) {
