@@ -66,6 +66,7 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
         final T hookedTracker = super.hook(object);
 
         // Also hook the stored State value
+        // This also hooks the synchronizer field on Paper 26.2+ to reference this hooked tracker
         Object state = EntityTrackerEntryHandle.T.getState.raw.invoke(hookedTracker);
         state = this.stateHook.hook(state);
         EntityTrackerEntryHandle.T.setState.raw.invoke(hookedTracker, state);

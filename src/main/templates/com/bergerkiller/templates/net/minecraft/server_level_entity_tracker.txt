@@ -45,15 +45,57 @@ class EntityTracker {
 
     public (EntityTrackerEntryHandle) EntityTrackerEntry putEntry(int entityId, (EntityTrackerEntryHandle) EntityTrackerEntry entry) {
         it.unimi.dsi.fastutil.ints.Int2ObjectMap trackedEntities = instance#trackedEntities;
+        ChunkMap$TrackedEntity prevEntry;
         if (entry == null) {
-            return (ChunkMap$TrackedEntity) trackedEntities.remove(entityId);
+            prevEntry = (ChunkMap$TrackedEntity) trackedEntities.remove(entityId);
         } else if (trackedEntities.getClass() == it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap.class) {
-            return (ChunkMap$TrackedEntity) trackedEntities.put(entityId, entry);
+            prevEntry = (ChunkMap$TrackedEntity) trackedEntities.put(entityId, entry);
         } else {
             // ProtocolSupport (or other hooks): bypass put() callback handler to guarantee it is put
-            trackedEntities.remove(entityId);
-            return (ChunkMap$TrackedEntity) trackedEntities.putIfAbsent(entityId, entry);
+            prevEntry = (ChunkMap$TrackedEntity) trackedEntities.remove(entityId);
+            (ChunkMap$TrackedEntity) trackedEntities.putIfAbsent(entityId, entry);
         }
+
+        // Paper separately tracks the "trackerEntities" List of entities it manages
+        // Ensure this list is updated as well as otherwise the new tracker will not get ticked with the new ticking algorithm
+        // This swapping is also handled when the Entity itself is swapped, but do it here too for when the network controller
+        // is added the first time. Without this extra logic, the list can become desynchronized and the entity will go invisible.
+        //
+        // This specific bug can occur when the player places a new entity + network controller set on spawn. Then the track
+        // is suppressed, and replayed using this method.
+  #if exists ca.spottedleaf.moonrise.patches.chunk_system.level.entity.server.ServerEntityLookup public final ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.world.entity.Entity> trackerEntities;
+        // Get ServerEntityLookup for the world this entity tracker is on
+        final ca.spottedleaf.moonrise.patches.chunk_system.level.entity.server.ServerEntityLookup entityLookup = (ca.spottedleaf.moonrise.patches.chunk_system.level.entity.server.ServerEntityLookup)
+            ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel) instance.level).moonrise$getEntityLookup();
+
+        #require ca.spottedleaf.moonrise.patches.chunk_system.level.entity.server.ServerEntityLookup public final ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.world.entity.Entity> trackerEntities;
+        ca.spottedleaf.moonrise.common.list.ReferenceList trackerEntities = entityLookup#trackerEntities;
+
+        // For accessing the Entity value tied with the tracker entry
+        #require net.minecraft.server.level.ChunkMap$TrackedEntity private final net.minecraft.world.entity.Entity entity;
+
+        if (prevEntry != null) {
+            trackerEntities.remove(prevEntry#entity);
+        }
+        if (entry != null) {
+            trackerEntities.add(entry#entity);
+        }
+  #elseif exists net.minecraft.server.level.ChunkMap private ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.world.entity.Entity> trackerEntities;
+        #require net.minecraft.server.level.ChunkMap private ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.world.entity.Entity> trackerEntities;
+        ca.spottedleaf.moonrise.common.list.ReferenceList trackerEntities = instance#trackerEntities;
+
+        // For accessing the Entity value tied with the tracker entry
+        #require net.minecraft.server.level.ChunkMap$TrackedEntity private final net.minecraft.world.entity.Entity entity;
+
+        if (prevEntry != null) {
+            trackerEntities.remove(prevEntry#entity);
+        }
+        if (entry != null) {
+            trackerEntities.add(entry#entity);
+        }
+  #endif
+
+        return prevEntry;
     }
 
   #if exists net.minecraft.server.level.ChunkMap.ProtectedVisibleChunksMap
@@ -335,6 +377,13 @@ class EntityTrackerEntry {
 
     public optional void setState((EntityTrackerEntryStateHandle) EntityTrackerEntryState state) {
         instance#trackerEntry = state;
+
+        // The synchronizer interface is implemented by EntityTrackerEntry on 26.2+ Paper
+        // When changing the state, the new state also needs to back-reference this entry
+    #if exists net.minecraft.server.level.EntityTrackerEntryState private final net.minecraft.server.level.ServerEntity.Synchronizer synchronizer;
+        #require net.minecraft.server.level.EntityTrackerEntryState private final net.minecraft.server.level.ServerEntity.Synchronizer synchronizer;
+        state#synchronizer = instance;
+    #endif
     }
 
     public (EntityHandle) Entity getEntity() {
