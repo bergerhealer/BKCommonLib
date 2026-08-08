@@ -7,6 +7,7 @@
 #include /net/minecraft/remapping/datawatcher_remappings.txt
 #include /net/minecraft/remapping/entity_remappings.txt
 #include /net/minecraft/remapping/block_remappings.txt
+#include /net/minecraft/remapping/container_remappings.txt
 
 // Global macros
 #include /global/global.txt

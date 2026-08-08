@@ -19,7 +19,9 @@ import com.bergerkiller.mountiplex.reflection.ClassHook;
 
 /**
  * Redirects all IInventory function calls to the appropriate method in a 
- * org.bukkit.inventory.Inventory object.
+ * org.bukkit.inventory.Inventory object.<br>
+ * <br>
+ * Note: relies on remapping performed in <i>container_remappings.txt</i>
  */
 @ClassHook.HookPackage("net.minecraft.server")
 @ClassHook.HookImport("org.bukkit.craftbukkit.entity.CraftHumanEntity")
@@ -128,8 +130,8 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
 
     /* The below are NOP because they don't make sense for an Inventory 'Base' not representing anything */
 
-    @HookMethod("public abstract void update:???()")
-    public void update() {
+    @HookMethod("public abstract void setChanged()")
+    public void setChanged() {
     }
 
     @HookMethod("public abstract void onOpen(CraftHumanEntity paramCraftHumanEntity)")
@@ -140,8 +142,14 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
     public void onClose(Object entity) {
     }
 
-    @HookMethod("public abstract void startOpen:???(net.minecraft.world.entity.player.Player paramEntityHuman)")
-    public void startOpen(Object entityHuman) {
+    @HookMethodCondition("version < 1.21.9")
+    @HookMethod("public abstract void startOpen(net.minecraft.world.entity.player.Player paramEntityHuman)")
+    public void startOpenV1(Object entityHuman) {
+    }
+
+    @HookMethodCondition("version >= 1.21.9")
+    @HookMethod("public abstract void startOpen(net.minecraft.world.entity.ContainerUser containerUser)")
+    public void startOpenV2(Object containerUser) {
     }
 
     @HookMethodCondition("version < 1.18")
@@ -160,34 +168,34 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
     }
 
     @HookMethodCondition("version <= 1.13.2")
-    @HookMethod(value="public abstract int getProperty:???(int key)")
+    @HookMethod(value="public abstract int getProperty(int key)")
     public int getProperty(int key) {
         return 0;
     }
 
     @HookMethodCondition("version <= 1.13.2")
-    @HookMethod(value="public abstract void setProperty:???(int key, int value)")
+    @HookMethod(value="public abstract void setProperty(int key, int value)")
     public void setProperty(int key, int value) {
     }
 
     @HookMethodCondition("version <= 1.13.2")
-    @HookMethod(value="public abstract int someFunction:???()")
+    @HookMethod(value="public abstract int someFunction()")
     public int someFunction() {
         return 0;
     }
 
-    @HookMethod("public abstract boolean canOpen:???(net.minecraft.world.entity.player.Player paramEntityHuman)")
-    public boolean canOpen(Object human) {
+    @HookMethod("public abstract boolean stillValid(net.minecraft.world.entity.player.Player paramEntityHuman)")
+    public boolean stillValid(Object human) {
         return true;
     }
 
-    @HookMethod("public abstract boolean canStoreItem:???(int paramInt, ItemStack paramItemStack)")
+    @HookMethod("public abstract boolean canPlaceItem(int paramInt, ItemStack paramItemStack)")
     public boolean canStoreItem(int paramInt, Object paramItemStack) {
         return true;
     }
 
     @HookMethodCondition("version >= 1.11 && version <= 1.14.4")
-    @HookMethod(value="public abstract boolean isNotEmptyOpt:???()")
+    @HookMethod(value="public abstract boolean isNotEmpty()")
     public boolean isNotEmpty() {
         return true;
     }

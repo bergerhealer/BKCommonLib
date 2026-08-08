@@ -1,0 +1,62 @@
+// Remappings for net.minecraft.world.Container
+// They're done here so that the names used in hooks (InventoryBase) and in templates use the same method names,
+// without littering both places with name remaps.
+
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+
+#if version >= 1.18
+    #remap net.minecraft.world.Container public abstract ItemStack removeItem(int i, int j);
+    #remap net.minecraft.world.Container public abstract ItemStack removeItemNoUpdate(int i);
+    #remap net.minecraft.world.Container public abstract int getContainerSize();
+    #remap net.minecraft.world.Container public abstract void setChanged();
+    #remap net.minecraft.world.Container public abstract boolean stillValid(Player player);
+    #remap net.minecraft.world.Container public abstract boolean canPlaceItem(int index, ItemStack itemstack);
+    #remap net.minecraft.world.Container public abstract void clearContent();
+    #remap net.minecraft.world.Clearable public abstract void clearContent();
+#else
+    #remap net.minecraft.world.Container public abstract ItemStack removeItem:splitStack(int i, int j);
+    #remap net.minecraft.world.Container public abstract ItemStack removeItemNoUpdate:splitWithoutUpdate(int i);
+    #remap net.minecraft.world.Container public abstract int getContainerSize:getSize();
+    #remap net.minecraft.world.Container public abstract void setChanged:update();
+    #remap net.minecraft.world.Container public abstract boolean stillValid:a(Player player);
+    #remap net.minecraft.world.Container public abstract boolean canPlaceItem:b(int index, ItemStack itemstack);
+  #if version >= 1.11
+    #remap net.minecraft.world.Container public abstract void clearContent:clear();
+  #else
+    #remap net.minecraft.world.Container public abstract void clearContent:l();
+  #endif
+  #if version >= 1.14
+    #remap net.minecraft.world.Clearable public abstract void clearContent:clear();
+  #endif
+#endif
+
+// Old versions with obfuscation, only used by hooks
+#if version < 1.13
+    #remap net.minecraft.world.Container public abstract int getProperty(int key);
+
+  #if version >= 1.9
+    #remap net.minecraft.world.Container public abstract void setProperty(int key, int value);
+  #else
+    #remap net.minecraft.world.Container public abstract void setProperty:b(int key, int value);
+  #endif
+
+  #if version >= 1.11
+    #remap net.minecraft.world.Container public abstract int someFunction:h();
+  #else
+    #remap net.minecraft.world.Container public abstract int someFunction:g();
+  #endif
+#endif
+
+// Old versions had an isNotEmpty() method
+#if version < 1.15.2 && version >= 1.11
+  #if version >= 1.14
+    #remap net.minecraft.world.Container public abstract boolean isNotEmpty();
+  #elseif version >= 1.13
+    #remap net.minecraft.world.Container public abstract boolean isNotEmpty:P_();
+  #elseif version >= 1.12
+    #remap net.minecraft.world.Container public abstract boolean isNotEmpty:x_();
+  #else
+    #remap net.minecraft.world.Container public abstract boolean isNotEmpty:w_();
+  #endif
+#endif
