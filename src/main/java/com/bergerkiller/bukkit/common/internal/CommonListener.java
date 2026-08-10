@@ -394,9 +394,8 @@ public class CommonListener implements Listener {
         // Placed a new sign or did we edit an existing sign?
         SignEditTextEvent.EditReason editReason = SignEditTextEvent.EditReason.PLACE;
         {
-            Block editedSign = editedSignBlocks.remove(event.getPlayer());
-
             // On 1.20.2+ there is an event fired when the dialog is opened, and we can use that
+            Block editedSign = editedSignBlocks.remove(event.getPlayer());
             if (event.getBlock().equals(editedSign)) {
                 editReason = SignEditTextEvent.EditReason.EDIT;
             }

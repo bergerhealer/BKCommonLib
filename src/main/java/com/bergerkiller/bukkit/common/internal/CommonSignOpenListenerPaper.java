@@ -51,10 +51,15 @@ class CommonSignOpenListenerPaper implements Listener, EventExecutor {
         if (((Cancellable) event).isCancelled()){
             return;
         }
-        if (getCauseMethod.invoke(event) != PLACE_CAUSE) {
+
+        // If already place mode, no need to track this sign block as having been edited
+        // Mode place is already the default mode for the sign change event
+        // Plugin-caused edit dialog opening is assumed to be edit mode too
+        if (getCauseMethod.invoke(event) == PLACE_CAUSE) {
             return;
         }
 
+        // Store that this sign was edited (not placed) by the player
         Player player = ((PlayerEvent) event).getPlayer();
         Sign sign = getSignMethod.invoke(event);
         CommonListener.storeEditedSign(player, sign);

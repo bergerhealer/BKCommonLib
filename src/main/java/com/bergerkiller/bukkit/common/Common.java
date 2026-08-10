@@ -87,7 +87,8 @@ public class Common {
             "Common:MapResourcePack:OpenResource",
             "Common:LoadableWorld",
             "Common:DamageSource:CreateVehicleDamageEvent",
-            "Common:ServerboundAttackPacket:HasSecondaryAction"
+            "Common:ServerboundAttackPacket:HasSecondaryAction",
+            "Common:Fixes:PaperSignEditNotInverted"
     ).collect(Collectors.toSet());
 
     /**
