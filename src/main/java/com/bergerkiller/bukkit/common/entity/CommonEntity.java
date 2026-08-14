@@ -153,6 +153,8 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     public void setNetworkController(EntityNetworkController controller) {
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(this.handle.getRaw(), "CommonEntity:setNetworkController - begin");
+
         if (getWorld() == null) {
             throw new RuntimeException("Can not set the network controller when no world is known! (need to spawn it?)");
         }
@@ -190,6 +192,8 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             storedEntry.removeViewer(previousViewer);
         }
 
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(this.handle.getRaw(), "CommonEntity:setNetworkController - remove-viewers");
+
         // Remove this entity from all the viewer's "removeNextTick" lists
         // This prevents the spawned entity despawning again the next tick
         // We fire the destroy packet right away to prevent that.
@@ -205,6 +209,8 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             oldController.bind(null, storedEntry.getRaw());
         }
 
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(this.handle.getRaw(), "CommonEntity:setNetworkController - detach-old");
+
         // Purpur: enable or disable legacy tracking logic when controllers are/not used
         if (EntityHandle.T.setLegacyTrackingEntity.isAvailable()) {
             if (controller instanceof DefaultEntityNetworkController) {
@@ -212,6 +218,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             } else {
                 EntityHandle.T.setLegacyTrackingEntity.invoker.invoke(getHandle(), Boolean.TRUE);
             }
+            com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(this.handle.getRaw(), "CommonEntity:setNetworkController - set-legacy-tracking");
         }
 
         final EntityTrackerEntryHandle newEntry;
@@ -252,11 +259,12 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         // Attach the entry to the controller
         controller.bind(this, newEntry.getRaw());
 
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(this.handle.getRaw(), "CommonEntity:setNetworkController - bind");
         // Attach (new?) entry to the world
         if (Handle.getRaw(storedEntry) != Handle.getRaw(newEntry)) {
             tracker.setEntry(entity, newEntry);
         }
-
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(this.handle.getRaw(), "CommonEntity:setNetworkController - set-tracker-entry");
         // Make the new controller visible to the previous viewers
         // If this is a new entry entirely, perform a scan
         if (storedEntry != null) {
@@ -266,7 +274,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         } else {
             newEntry.updateViewers();
         }
-
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(this.handle.getRaw(), "CommonEntity:setNetworkController - end");
         // Check for places we've missed when replacing the previously stored entry
         // com.bergerkiller.bukkit.common.utils.DebugUtil.logInstances(storedEntry.getRaw());
     }
@@ -433,6 +441,8 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
     @SuppressWarnings("unchecked")
     private void replaceEntity(final EntityHandle newInstance) {
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(this.handle.getRaw(), "CommonEntity:replaceEntity - begin");
+
         final EntityHandle oldInstance = this.handle;
         if (oldInstance.getRaw() == newInstance.getRaw()) {
             throw new RuntimeException("Can not replace an entity with itself!");
@@ -456,6 +466,8 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         oldInstance.setBukkitEntityField(CraftEntityHandle.createCraftEntity(Bukkit.getServer(), oldInstance));
         this.handle = newInstance;
 
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(this.handle.getRaw(), "CommonEntity:replaceEntity - bukkit");
+
         // *** Replace entity in passenger and vehicle fields ***
         EntityHandle vehicle = newInstance.getVehicle();
         if (vehicle != null) {
@@ -469,15 +481,21 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             }
         }
 
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(this.handle.getRaw(), "CommonEntity:replaceEntity - passengers");
+
         // *** Replace data that is stored in the entity itself ***
         newInstance.assignEntityReference();
 
         // *** Perform further replacement all over the place in the server ***
         EntityAddRemoveHandler.INSTANCE.replace(oldInstance, newInstance);
 
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(this.handle.getRaw(), "CommonEntity:replaceEntity - hotswap");
+
         // *** Reset entity state ***
         oldInstance.setRemovedPassive();
         newInstance.setValid(true);
+
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(this.handle.getRaw(), "CommonEntity:replaceEntity - set-old-removed");
 
         // *** Repeat the replacement in the server the next tick to make sure nothing lingers ***
         CommonUtil.nextTick(() -> EntityAddRemoveHandler.INSTANCE.replace(oldInstance, newInstance));
@@ -486,7 +504,10 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         if (this.isHooked()) {
             DefaultEntityController controller = new DefaultEntityController();
             controller.bind(this, true);
+            com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(this.handle.getRaw(), "CommonEntity:replaceEntity - bind-controller");
         }
+
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(this.handle.getRaw(), "CommonEntity:replaceEntity - end");
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -690,6 +711,8 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static final CommonEntity spawn(EntityType entityType, Location location, EntityController controller, EntityNetworkController networkController) {
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(location, "CommonEntity:spawn - begin (location)");
+
         CommonEntityType type = CommonEntityType.byEntityType(entityType);
         if (type == CommonEntityType.UNKNOWN) {
             throw new IllegalArgumentException("The Entity Type '" + entityType + "' is invalid!");
@@ -715,15 +738,17 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             hook.ignoredEntities.add(entity.getHandle());
 
             try {
+                com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(entity.getHandle(), "CommonEntity:spawn - before-add");
                 // Spawn the entity. This will not create an entity tracker entry.
                 EntityUtil.addEntity(entity.getEntity());
-
+                com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(entity.getHandle(), "CommonEntity:spawn - after-add");
                 // This is why we use bind(entity, false)!
                 // Fire onAttached after having added the Entity to the world
                 entity.getController().onAttached();
-
+                com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(entity.getHandle(), "CommonEntity:spawn - attach");
                 // Set the network controller
                 entity.setNetworkController(networkController);
+                com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(entity.getHandle(), "CommonEntity:spawn - track-network");
                 // entity.getNetworkController().onAttached(); // Not needed, the setNetworkController() above does this
             } finally {
                 // Remove the entity from the ignore list, restore Entity Tracker entry if last entity
@@ -733,13 +758,17 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
 
         } else {
+            com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(entity.getHandle(), "CommonEntity:spawn - normal");
             // Simply spawn. No special things to do here.
             EntityUtil.addEntity(entity.getEntity());
-
+            com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(entity.getHandle(), "CommonEntity:spawn - added");
             // This is why we use bind(entity, false)!
             // Fire onAttached after having added the Entity to the world
             entity.getController().onAttached();
+            com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(entity.getHandle(), "CommonEntity:spawn - attached");
         }
+
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(entity.getHandle(), "CommonEntity:spawn - end");
 
         return entity;
     }

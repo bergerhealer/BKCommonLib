@@ -302,6 +302,8 @@ class Entity {
     public void assignEntityReference() {
         //TODO: Migrate more from CommonEntity to here
 
+       com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(instance, "assignEntityReference - begin");
+
         // -- DataWatcher Owner field --
 #if version >= 1.18
         net.minecraft.network.syncher.SynchedEntityData dw = instance.getEntityData();
@@ -364,6 +366,8 @@ class Entity {
   #endif
         }
 #endif
+
+       com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(instance, "assignEntityReference - end");
     }
 
 #if version >= 1.18

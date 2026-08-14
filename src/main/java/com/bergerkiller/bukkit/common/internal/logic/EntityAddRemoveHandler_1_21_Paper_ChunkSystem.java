@@ -198,6 +198,8 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
 
     @Override
     public void replace(EntityHandle oldEntity, EntityHandle newEntity) {
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity.getRaw(), "replace - begin");
+
         ServerLevelHandle world = oldEntity.getWorldServer();
         if (newEntity == null) {
             if (world != null) {
@@ -205,6 +207,8 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
                 world.getEntityTracker().stopTracking(oldEntity.getBukkitEntity());
             }
         }
+
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity.getRaw(), "replace - stop-tracking");
 
         // *** EntityTrackerEntry ***
         if (newEntity == null) {
@@ -223,16 +227,22 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
             }
         }
 
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity.getRaw(), "replace - entity-tracker-entry");
+
         Object newEntityRaw = Handle.getRaw(newEntity);
         if (world != null) {
             removeHandler.replaceInWorldStorage(world.getRaw(), oldEntity.getRaw(), newEntityRaw);
         }
+
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity.getRaw(), "replace - world-storage");
 
         removeHandler.replaceInSectionStorage(oldEntity.getRaw(), newEntityRaw);
 
         // See where the object is still referenced to check we aren't missing any places to replace
         // This is SLOW, do not ever have this enabled on a release version!
         // com.bergerkiller.bukkit.common.utils.DebugUtil.logInstances(oldEntity.getRaw());
+
+        com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity.getRaw(), "replace - end");
     }
 
     @Override
@@ -246,11 +256,15 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
         final EntityTracker trackerMap = WorldUtil.getTracker(newEntity.getBukkitWorld());
         EntityTrackerEntryHandle entry = trackerMap.getEntry(entity.getIdField());
         if (entry != null) {
+            com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity.getRaw(), "replaceInEntityTracker - begin");
+
             // PlayerChunkMap$EntityTracker entity
             EntityHandle entryEntity = entry.getEntity();
             if (entryEntity != null && entryEntity.getIdField() == oldEntity.getIdField()) {
                 entry.setEntity(newEntity);
             }
+
+            com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity.getRaw(), "replaceInEntityTracker - TrackedEntity entity");
 
             // EntityTrackerEntry 'tracker' entity
             EntityTrackerEntryStateHandle stateHandle = entry.getState();
@@ -259,9 +273,13 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
                 stateHandle.setEntity(newEntity);
             }
 
+            com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity.getRaw(), "replaceInEntityTracker - ServerEntity entity");
+
             // EntityTrackerEntry List of passengers
             List<Object> statePassengers = (List<Object>) EntityTrackerEntryStateHandle.T.opt_passengers.raw.get(stateHandle.getRaw());
             replaceInList(statePassengers, oldEntity, newEntity);
+
+            com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity.getRaw(), "replaceInEntityTracker - end");
         }
     }
 
@@ -331,6 +349,8 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *
          *     EntityLookup entityLookup = world.moonrise$getEntityLookup();
          *
+         *     com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity, "replaceInWorldStorage - begin");
+         *
          *     // Entities by ID lookup table
          * #if version >= 26.1
          *     #require EntityLookup protected final ca.spottedleaf.concurrentutil.map.concurrent.longs.ConcurrentChainedLong2ReferenceHashTable<Entity> entityById;
@@ -347,6 +367,8 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *         }
          *     }
          *
+         *     com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity, "replaceInWorldStorage - entities-by-id");
+         *
          *     // Entities by UUID lookup table
          *     #require EntityLookup protected final java.util.concurrent.ConcurrentHashMap<UUID, Entity> entityByUUID;
          *     java.util.concurrent.ConcurrentHashMap byUUIDMap = entityLookup#entityByUUID;
@@ -357,6 +379,8 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *             byUUIDMap.put(entityUUID, newEntity);
          *         }
          *     }
+         *
+         *     com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity, "replaceInWorldStorage - entities-by-uuid");
          *
          *     // ReferenceList of tracked entities in moonrise mapping
          *     if (entityLookup instanceof ca.spottedleaf.moonrise.patches.chunk_system.level.entity.server.ServerEntityLookup) {
@@ -392,6 +416,8 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          * #endif
          *     }
          *
+         *     com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity, "replaceInWorldStorage - trackerEntities");
+         *
          *     #require net.minecraft.server.level.ServerLevel final net.minecraft.world.level.entity.EntityTickList entityTickList;
          *     EntityTickList tickList = world#entityTickList;
          *
@@ -402,6 +428,8 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *             set.add(newEntity);
          *         }
          *     }
+         *
+         *     com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity, "replaceInWorldStorage - tickList");
          *
          * #if version >= 1.21.2
          *     final int minSection = WorldUtil.getMinSection(world);
@@ -439,7 +467,9 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *             }
          *         }
          *     }
-         * 
+         *
+         *     com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity, "replaceInWorldStorage - setSectionXYZ");
+         *
          *     // bug: if chunk doesn't exist, error occurs
          *     //entitySliceManager.removeEntity(oldEntity);
          *     ChunkEntitySlices slices = entityLookup.getChunk(oldEntity.moonrise$getSectionX(), oldEntity.moonrise$getSectionZ());
@@ -451,7 +481,9 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *             //entityLookup.removeChunk(oldEntity.moonrise$getSectionX(), oldEntity.moonrise$getSectionZ());
          *         }
          *     }
-         * 
+         *
+         *     com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity, "replaceInWorldStorage - removeFromOldSlices");
+         *
          *     // Add new entity (might not be the same chunk)
          *     // Note: we cannot call addEntity as this initializes the tracker/other logic/events
          *     ChunkEntitySlices sectionOfEntity = null;
@@ -469,7 +501,9 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *         sectionOfEntity = entityLookup.getOrCreateChunk(sectionX, sectionZ);
          *         sectionOfEntity.addEntity(newEntity, sectionY);
          *     }
-         * 
+         *
+         *     com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity, "replaceInWorldStorage - addToNewSlices");
+         *
          *     // Update the "all entities" list
          *     #require EntityLookup private final ca.spottedleaf.moonrise.common.list.EntityList accessibleEntities;
          *     ca.spottedleaf.moonrise.common.list.EntityList lookupAccEntities = entityLookup#accessibleEntities;
@@ -486,7 +520,9 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *             el_entities[index] = newEntity;
          *         }
          *     }
-         * 
+         *
+         *     com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity, "replaceInWorldStorage - accessibleEntities");
+         *
          *     // If isAlwaysTicking() of the old and new entity differs, we may have to stop/start ticking ourselves
          *     // This is because of a bug in the persistent entity section manager that, if isAlwaysTicking() is true,
          *     // the updateStatus function does not work anymore to update this state.
@@ -505,6 +541,8 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *                      false, true, false);
          *         }
          *     }
+         *
+         *     com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity, "replaceInWorldStorage - end");
          * }
          */
         @Template.Generated("%REPLACE_IN_WORLD_STORAGE%")
@@ -513,6 +551,8 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
         /*
          * <REPLACE_IN_SECTION_STORAGE>
          * public static void replaceInSectionStorage(Entity oldEntity, Entity newEntity) {
+         *     com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity, "replaceInSectionStorage - begin");
+         *
          *     #require net.minecraft.world.entity.Entity private net.minecraft.world.level.entity.EntityInLevelCallback levelCallback;
          *     net.minecraft.world.level.entity.EntityInLevelCallback callback = oldEntity#levelCallback;
          *     if (callback != net.minecraft.world.level.entity.EntityInLevelCallback.NULL) {
@@ -525,6 +565,8 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *             }
          *         }
          *     }
+         *
+         *     com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity, "replaceInSectionStorage - end");
          * }
          */
         @Template.Generated("%REPLACE_IN_SECTION_STORAGE%")

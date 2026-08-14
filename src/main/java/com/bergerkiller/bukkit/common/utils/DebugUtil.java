@@ -47,6 +47,10 @@ public class DebugUtil {
                 Material.IRON_ORE, Material.IRON_BLOCK, Material.GOLD_BLOCK, Material.DIAMOND_BLOCK);
     }
 
+    public static void debugEntityReplacement(Object entity, String progression) {
+        Logging.LOGGER_DEBUG.info("Replacing [" + entity + "]: " + progression);
+    }
+
     /**
      * Applies a random material from the list to a block that does not equal
      * the current material
