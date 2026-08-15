@@ -38,7 +38,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -448,19 +449,55 @@ public class CommonUtil {
      * Gets the Jar File where a given Plugin is loaded from. If the plugin is
      * not in a Jar file, null is returned instead.
      *
-     * @param plugin to get the Jar File of
+     * @param plugin Plugin instance to get the Jar File origin of
      * @return the Jar File in which the plugin resides, or null if none found
      */
     public static File getPluginJarFile(Plugin plugin) {
-        final Class<?> pluginClass = plugin.getClass();
-        try {
-            URI uri = pluginClass.getProtectionDomain().getCodeSource().getLocation().toURI();
-            File file = new File(uri);
-            if (file.exists()) {
-                return file;
-            }
-        } catch (Exception e) {
+        if (plugin == null) {
+            return null;
         }
+
+        // Try by class loader
+        return getClassJarFile(plugin.getClass());
+    }
+
+    /**
+     * Gets the Jar File where a given Class is loaded from. If the jar is not
+     * in a Jar file or is not known, null is returned instead.
+     *
+     * @param clazz Loaded Class to get the Jar File origin of
+     * @return
+     */
+    public static File getClassJarFile(Class<?> clazz) {
+        // Try protection domain code source
+        java.security.CodeSource codeSource = clazz.getProtectionDomain().getCodeSource();
+        if (codeSource != null) {
+            URL location = codeSource.getLocation();
+            if (location != null) {
+                try {
+                    File jarFile = new File(location.toURI());
+                    if (jarFile.exists()) {
+                        return jarFile;
+                    }
+                } catch (java.net.URISyntaxException ex) { /* ignore */ }
+            }
+        }
+
+        // Try class loader
+        ClassLoader loader = clazz.getClassLoader();
+        if (loader instanceof URLClassLoader) {
+            URLClassLoader urlLoader = (URLClassLoader) CommonBootstrap.class.getClassLoader();
+            for (URL url : urlLoader.getURLs()) {
+                try {
+                    File jarFile = new File(url.toURI());
+                    if (jarFile.exists()) {
+                        return jarFile;
+                    }
+                } catch (java.net.URISyntaxException ex) { /* ignore */ }
+            }
+        }
+
+        // Failed
         return null;
     }
 

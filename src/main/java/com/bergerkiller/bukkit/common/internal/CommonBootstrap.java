@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -1076,13 +1075,11 @@ public class CommonBootstrap {
             }
         } else {
             // List the .class files in the jar zip file of BKCommonLib
-            URLClassLoader loader = (URLClassLoader) CommonBootstrap.class.getClassLoader();
-            File jarFile = null;
-            for (URL url : loader.getURLs()) {
-                jarFile = new File(url.getFile());
-                if (!jarFile.exists()) {
-                    jarFile = null;
-                }
+            File jarFile;
+            if (CommonPlugin.hasInstance()) {
+                jarFile = CommonUtil.getPluginJarFile(CommonPlugin.getInstance());
+            } else {
+                jarFile = CommonUtil.getClassJarFile(CommonBootstrap.class);
             }
             if (jarFile == null) {
                 throw new IOException("Unable to determine the jar file of BKCommonLib");
