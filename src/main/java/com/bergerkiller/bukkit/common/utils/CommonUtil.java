@@ -466,7 +466,7 @@ public class CommonUtil {
      * in a Jar file or is not known, null is returned instead.
      *
      * @param clazz Loaded Class to get the Jar File origin of
-     * @return
+     * @return the Jar File from which the class was loaded, or null if none found
      */
     public static File getClassJarFile(Class<?> clazz) {
         // Try protection domain code source
