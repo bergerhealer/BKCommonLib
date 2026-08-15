@@ -153,8 +153,8 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     public void setNetworkController(EntityNetworkController controller) {
-        if (getWorld() == null) {
-            throw new RuntimeException("Can not set the network controller when no world is known! (need to spawn it?)");
+        if (!isSpawned()) {
+            throw new RuntimeException("Cannot set the network controller for entities that are not spawned");
         }
         final EntityTracker tracker = WorldUtil.getTracker(getWorld());
         final EntityTrackerEntryHandle storedEntry = tracker.getEntry(entity);
