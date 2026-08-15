@@ -468,7 +468,10 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *         }
          *     }
          *
-         *     com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity, "replaceInWorldStorage - setSectionXYZ");
+         *     if (oldEntity != null)
+         *         com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity, "replaceInWorldStorage - setSectionXYZ - old - " + oldEntity.moonrise$getChunkData());
+         *     if (newEntity != null)
+         *         com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(newEntity, "replaceInWorldStorage - setSectionXYZ - new - " + newEntity.moonrise$getChunkData());
          *
          *     // bug: if chunk doesn't exist, error occurs
          *     //entitySliceManager.removeEntity(oldEntity);
@@ -482,7 +485,10 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *         }
          *     }
          *
-         *     com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity, "replaceInWorldStorage - removeFromOldSlices");
+         *     if (oldEntity != null)
+         *         com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity, "replaceInWorldStorage - removeFromOldSlices - old - " + oldEntity.moonrise$getChunkData());
+         *     if (newEntity != null)
+         *         com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(newEntity, "replaceInWorldStorage - removeFromOldSlices - new - " + newEntity.moonrise$getChunkData());
          *
          *     // Add new entity (might not be the same chunk)
          *     // Note: we cannot call addEntity as this initializes the tracker/other logic/events
@@ -502,7 +508,10 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *         sectionOfEntity.addEntity(newEntity, sectionY);
          *     }
          *
-         *     com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity, "replaceInWorldStorage - addToNewSlices");
+         *     if (oldEntity != null)
+         *         com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(oldEntity, "replaceInWorldStorage - addToNewSlices - old - " + oldEntity.moonrise$getChunkData());
+         *     if (newEntity != null)
+         *         com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(newEntity, "replaceInWorldStorage - addToNewSlices - new - " + newEntity.moonrise$getChunkData());
          *
          *     // Update the "all entities" list
          *     #require EntityLookup private final ca.spottedleaf.moonrise.common.list.EntityList accessibleEntities;

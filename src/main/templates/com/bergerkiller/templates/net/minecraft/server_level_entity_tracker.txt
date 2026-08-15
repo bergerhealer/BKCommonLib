@@ -78,7 +78,9 @@ class EntityTracker {
             trackerEntities.remove(prevEntry#entity);
         }
         if (entry != null) {
-            trackerEntities.add(entry#entity);
+            net.minecraft.world.entity.Entity entity = entry#entity;
+            trackerEntities.add(entity);
+            com.bergerkiller.bukkit.common.utils.DebugUtil.debugEntityReplacement(entity, "putTrackerEntry - " + entity.moonrise$getChunkData());
         }
   #elseif exists net.minecraft.server.level.ChunkMap private ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.world.entity.Entity> trackerEntities;
         #require net.minecraft.server.level.ChunkMap private ca.spottedleaf.moonrise.common.list.ReferenceList<net.minecraft.world.entity.Entity> trackerEntities;
