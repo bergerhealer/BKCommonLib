@@ -413,6 +413,21 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *     final int maxSection = entityLookup#maxSection;
          * #endif
          *
+         *     // This helper function tests whether a ChunkEntitySlices object actually stores an exact identity
+         *     // to an Entity. ChunkEntitySlices uses EntityList, which does a lookup by entity id. That means it
+         *     // does not do identity equality checks. This can risk bugs when removing the old entity when
+         *     // the new entity (with same id) already exists. This is all made worse by this replace() logic executing
+         *     // twice (also a tick delayed), which would cause breakages.
+         *     #require ca.spottedleaf.moonrise.patches.chunk_system.level.entity.ChunkEntitySlices public boolean containsExactEntity(net.minecraft.world.entity.Entity entity) {
+         *         #require ca.spottedleaf.moonrise.patches.chunk_system.level.entity.ChunkEntitySlices private final ca.spottedleaf.moonrise.common.list.EntityList entities;
+         *         ca.spottedleaf.moonrise.common.list.EntityList entities = instance#entities;
+         *         #require ca.spottedleaf.moonrise.common.list.EntityList private final it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap entityToIndex;
+         *         it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap entityToIndex = entities#entityToIndex;
+         *
+         *         final int index = entityToIndex.get(entity.getId());
+         *         return index != Integer.MIN_VALUE && entities.getUnchecked(index) == entity;
+         *     }
+         *
          *     // First check whether the new entity is already stored. If so, no ticking mode changes
          *     boolean isNewEntityStored = false;
          *     if (newEntity != null) {
@@ -425,25 +440,15 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *         newEntity.moonrise$setSectionX(sectionX);
          *         newEntity.moonrise$setSectionY(sectionY);
          *         newEntity.moonrise$setSectionZ(sectionZ);
-         * 
+         *
          *         ChunkEntitySlices slices = entityLookup.getChunk(sectionX, sectionZ);
-         *         if (slices != null) {
-         *             #require ca.spottedleaf.moonrise.patches.chunk_system.level.entity.ChunkEntitySlices private java.util.List<net.minecraft.world.entity.Entity> getAllEntities();
-         *             java.util.List allEntities = slices#getAllEntities();
-         *             java.util.Iterator iter = allEntities.iterator();
-         *             while (iter.hasNext()) {
-         *                 if (iter.next() == newEntity) {
-         *                     isNewEntityStored = true;
-         *                     break;
-         *                 }
-         *             }
-         *         }
+         *         isNewEntityStored = slices != null && slices#containsExactEntity(newEntity);
          *     }
-         * 
+         *
          *     // bug: if chunk doesn't exist, error occurs
          *     //entitySliceManager.removeEntity(oldEntity);
          *     ChunkEntitySlices slices = entityLookup.getChunk(oldEntity.moonrise$getSectionX(), oldEntity.moonrise$getSectionZ());
-         *     if (slices != null) {
+         *     if (slices != null && slices#containsExactEntity(oldEntity)) {
          *         int oldEntitySectionY = oldEntity.moonrise$getSectionY();
          *         slices.removeEntity(oldEntity, oldEntitySectionY);
          *         if (slices.isEmpty()) {
@@ -451,7 +456,7 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *             //entityLookup.removeChunk(oldEntity.moonrise$getSectionX(), oldEntity.moonrise$getSectionZ());
          *         }
          *     }
-         * 
+         *
          *     // Add new entity (might not be the same chunk)
          *     // Note: we cannot call addEntity as this initializes the tracker/other logic/events
          *     ChunkEntitySlices sectionOfEntity = null;
@@ -469,7 +474,7 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *         sectionOfEntity = entityLookup.getOrCreateChunk(sectionX, sectionZ);
          *         sectionOfEntity.addEntity(newEntity, sectionY);
          *     }
-         * 
+         *
          *     // Update the "all entities" list
          *     #require EntityLookup private final ca.spottedleaf.moonrise.common.list.EntityList accessibleEntities;
          *     ca.spottedleaf.moonrise.common.list.EntityList lookupAccEntities = entityLookup#accessibleEntities;
@@ -486,7 +491,7 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *             el_entities[index] = newEntity;
          *         }
          *     }
-         * 
+         *
          *     // If isAlwaysTicking() of the old and new entity differs, we may have to stop/start ticking ourselves
          *     // This is because of a bug in the persistent entity section manager that, if isAlwaysTicking() is true,
          *     // the updateStatus function does not work anymore to update this state.
