@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.PropertyHandle;
+import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 
 /**
  * A single property of a block's BlockData. Not to be confused with Bukkit's BlockState,
@@ -11,6 +12,21 @@ import com.bergerkiller.generated.net.minecraft.world.level.block.state.properti
  * data values like facing and redstone power state.
  */
 public class BlockProperty<T extends Comparable<?>> extends BasicWrapper<PropertyHandle> {
+
+    /** Used for listing block properties */
+    static DuplexConverter<PropertyHandle, BlockProperty<?>> CONVERTER = new DuplexConverter<PropertyHandle, BlockProperty<?>>(
+            PropertyHandle.class, BlockProperty.class
+    ) {
+        @Override
+        public BlockProperty<?> convertInput(PropertyHandle value) {
+            return new BlockProperty<>(value);
+        }
+
+        @Override
+        public PropertyHandle convertOutput(BlockProperty<?> value) {
+            return value.getBackingHandle();
+        }
+    };
 
     public BlockProperty(PropertyHandle handle) {
         setHandle(handle);

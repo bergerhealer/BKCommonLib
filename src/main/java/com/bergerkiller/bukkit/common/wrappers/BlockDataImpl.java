@@ -13,6 +13,7 @@ import java.util.logging.Level;
 
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.BlockStateHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingCollection;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -659,7 +660,7 @@ class BlockDataImpl extends BlockData {
 
     @Override
     public Collection<BlockProperty<?>> getProperties() {
-        return List.of();
+        return new ConvertingCollection<>(this.data.getProperties(), BlockProperty.CONVERTER);
     }
 
     @Override
