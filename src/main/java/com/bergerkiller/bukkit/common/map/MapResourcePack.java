@@ -270,6 +270,11 @@ public class MapResourcePack {
         if (this.baseResourcePack != null) {
             this.baseResourcePack.handleLoad(lazy, true);
         }
+
+        // If this pack has no archive (vanilla/server for example), then use the metadata of the base resource pack if available
+        if (this.archive == null && this.baseResourcePack != null) {
+            this.metadata = this.baseResourcePack.metadata;
+        }
     }
 
     /**
