@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -184,7 +185,9 @@ public class SpigotServer extends CraftBukkitServer {
         // This guarantees a name will never match more than one world
         // If multiple namespaces declare the same world name, then loading the world will require
         // passing that namespace as a prefix.
-        for (LoadableWorld loadableWorld : loadableWorlds) {
+        for (Iterator<LoadableWorld> iter = loadableWorlds.iterator(); iter.hasNext(); ) {
+            LoadableWorld loadableWorld = iter.next();
+
             // Spigot worlds can only be addressed by the legacy spigot name
             if (!(loadableWorld instanceof PaperLoadableWorld)) {
                 continue;
@@ -192,6 +195,12 @@ public class SpigotServer extends CraftBukkitServer {
 
             // Remove names that have a count of more than 1.
             ((PaperLoadableWorld) loadableWorld).names.removeIf(n -> byNameCounts.getOrDefault(n, 0) > 1);
+
+            // Avoid name-less worlds (not addressable), so remove those
+            // Can happen when mixed-case duplicate worlds exist
+            if (((PaperLoadableWorld) loadableWorld).names.isEmpty()) {
+                iter.remove();
+            }
         }
 
         return loadableWorlds;
