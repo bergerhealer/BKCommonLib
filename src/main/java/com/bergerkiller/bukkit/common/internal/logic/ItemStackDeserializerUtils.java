@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
+import com.bergerkiller.bukkit.common.cloud.parsers.UnquotedCharacterFilter;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -62,6 +63,19 @@ public class ItemStackDeserializerUtils {
             } else {
                 return value;
             }
+        });
+    }
+
+    protected static void escapeSNBTStringInMap(java.util.Map<String, Object> map, String key) {
+        map.computeIfPresent(key, (k, value) -> {
+            if (value instanceof String) {
+                String str = (String) value;
+                if (str.isEmpty() || (str.charAt(0) != '"' && str.charAt(0) != '\'')) {
+                    return UnquotedCharacterFilter.STRICT.escapeStringIfNeeded(str);
+                }
+            }
+
+            return value;
         });
     }
 

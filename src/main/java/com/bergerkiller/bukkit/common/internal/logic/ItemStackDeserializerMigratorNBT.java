@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.config.SNBTDeserializer;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -93,6 +94,17 @@ public class ItemStackDeserializerMigratorNBT extends ItemStackDeserializerMigra
         // NBT format has no garbage ItemMeta or anything. We can just feed it directly to deserialize()
         // We can deserialize from GSON, so do ensure number data types are correct
         convertNumberToIntegerInMap(args, "count");
+
+        // There's a bug where yaml is emitted on Paper with the item model name not being SNBT-encoded
+        // This is a bug in ItemStack serialize()
+        // To work around this when reading again, I artificially escape the string to make it valid SNBT.
+        // This is a specific bug for item model names, which commonly feature a namespace: making it invalid SNBT.
+        Object rawComponents = args.get("components");
+        if (rawComponents instanceof Map) {
+            Map<String, Object> components = LogicUtil.unsafeCast(rawComponents);
+            escapeSNBTStringInMap(components, "minecraft:item_model");
+            escapeSNBTStringInMap(components, "item_model");
+        }
     }
 
     @Override

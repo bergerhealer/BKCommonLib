@@ -37,6 +37,63 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
 public class YamlTest {
 
     @Test
+    public void testItemModelPaperFormatUnescaped() {
+        String inputYaml = "" +
+                "  item:\n" +
+                "    ==: org.bukkit.inventory.ItemStack\n" +
+                "    DataVersion: 4671\n" +
+                "    id: minecraft:paper\n" +
+                "    count: 1\n" +
+                "    components:\n" +
+                "      minecraft:item_model: \"ec_roller_coaster:basic_coaster_cart\"\n" +
+                "    schema_version: 1";
+
+        YamlNode yaml = new YamlNode();
+        yaml.loadFromString(inputYaml);
+
+        CommonItemStack item = CommonItemStack.of(yaml.get("item", ItemStack.class));
+        assertEquals("ec_roller_coaster:basic_coaster_cart", item.getItemModel().toString());
+    }
+
+    @Test
+    public void testItemModelPaperFormatEscapedSingle() {
+        String inputYaml = "" +
+                "  item:\n" +
+                "    ==: org.bukkit.inventory.ItemStack\n" +
+                "    DataVersion: 4671\n" +
+                "    id: minecraft:paper\n" +
+                "    count: 1\n" +
+                "    components:\n" +
+                "      minecraft:item_model: \"'ec_roller_coaster:basic_coaster_cart'\"\n" +
+                "    schema_version: 1";
+
+        YamlNode yaml = new YamlNode();
+        yaml.loadFromString(inputYaml);
+
+        CommonItemStack item = CommonItemStack.of(yaml.get("item", ItemStack.class));
+        assertEquals("ec_roller_coaster:basic_coaster_cart", item.getItemModel().toString());
+    }
+
+    @Test
+    public void testItemModelPaperFormatEscapedDouble() {
+        String inputYaml = "" +
+                "  item:\n" +
+                "    ==: org.bukkit.inventory.ItemStack\n" +
+                "    DataVersion: 4671\n" +
+                "    id: minecraft:paper\n" +
+                "    count: 1\n" +
+                "    components:\n" +
+                "      minecraft:item_model: '\"ec_roller_coaster:basic_coaster_cart\"'\n" +
+                "    schema_version: 1";
+
+        YamlNode yaml = new YamlNode();
+        yaml.loadFromString(inputYaml);
+
+        CommonItemStack item = CommonItemStack.of(yaml.get("item", ItemStack.class));
+        assertEquals("ec_roller_coaster:basic_coaster_cart", item.getItemModel().toString());
+    }
+
+    @Test
     public void testPaintingWithoutIdInEntityTagInvalidType() {
         String inputYaml = "" +
                 "item:\n" +
