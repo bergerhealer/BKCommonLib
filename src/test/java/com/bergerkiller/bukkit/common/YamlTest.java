@@ -36,6 +36,57 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
 
 public class YamlTest {
 
+    /**
+     * Verifies that when a node is removed and added again at a different index, the node list is saved
+     * correctly in yaml. And not with the wrong or duplicate child index. This was a bug that occurred
+     * at one point.
+     */
+    @Test
+    public void testReorderIndexedYamlNodeListSerialization() {
+        YamlNode root = new YamlNode();
+        List<YamlNode> nodes = root.getNodeList("nodes", true);
+        {
+            YamlNode nodeOne = new YamlNode();
+            nodeOne.set("key", "value1");
+            nodes.add(nodeOne);
+        }
+        {
+            YamlNode nodeTwo = new YamlNode();
+            nodeTwo.set("key", "value2");
+            nodes.add(nodeTwo);
+        }
+        {
+            YamlNode nodeThree = new YamlNode();
+            nodeThree.set("key", "value3");
+            nodes.add(nodeThree);
+        }
+
+        // Stringify first so that no changes are pending that would hide buggy tracking
+        assertEquals("nodes:\n" +
+                "  0:\n" +
+                "    key: value1\n" +
+                "  1:\n" +
+                "    key: value2\n" +
+                "  2:\n" +
+                "    key: value3\n", root.toString());
+
+        // Remove the third child and insert it in front of the second one.
+        YamlNode moved = nodes.get(2);
+        moved.remove();
+        nodes.add(1, moved);
+
+        // Verify this change is serialized correctly. In the buggy scenario in the past, the
+        // last attachment incorrectly saved with key 1: too, causing it to get lost when reloading.
+        // (yaml can't have the same key twice)
+        assertEquals("nodes:\n" +
+                "  0:\n" +
+                "    key: value1\n" +
+                "  1:\n" +
+                "    key: value3\n" +
+                "  2:\n" +
+                "    key: value2\n", root.toString());
+    }
+
     @Test
     public void testItemModelPaperFormatUnescaped() {
         String inputYaml = "" +

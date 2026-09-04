@@ -100,6 +100,7 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
     private void setPath(YamlRoot root, YamlPath path) {
         root.updateEntryPath(this, path);
         this.path = path;
+        this.markYamlChanged();
         if (this.isAbstractNode()) {
             for (YamlEntry childEntry : this.getAbstractNode()._children) {
                 childEntry.setPath(root, path.child(childEntry.path.name()));
