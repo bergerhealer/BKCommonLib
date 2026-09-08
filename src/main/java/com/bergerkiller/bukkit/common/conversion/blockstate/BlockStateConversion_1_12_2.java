@@ -41,7 +41,6 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
     private TileState input_state;
     private final Object proxy_nms_world;
     private final World proxy_world;
-    private final Chunk proxy_chunk;
     private final Block proxy_block;
 
     private static Invoker<Object> makeNonInstrumentedInvoker(Method method) {
@@ -54,23 +53,6 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
     public BlockStateConversion_1_12_2() throws Throwable {
         // Find CraftBlock class
         final Class<?> craftBlock_type = CommonUtil.getClass("org.bukkit.craftbukkit.block.CraftBlock");
-        final java.lang.reflect.Field chunkField = craftBlock_type.getDeclaredField("chunk");
-        chunkField.setAccessible(true);
-
-        // Create a CraftChunk proxy that only supports the following calls:
-        // - getCraftWorld() -> returns the proxy world (final fallback in getState() requires this)
-        proxy_chunk = (Chunk) new ClassInterceptor() {
-            @Override
-            protected Invoker<?> getCallback(Method method) {
-                // Gets the proxy world
-                if (method.getName().equals("getCraftWorld")) {
-                    return (instance, args) -> proxy_world;
-                }
-
-                // All other method calls fail
-                return makeNonInstrumentedInvoker(method);
-            }
-        }.createInstance(CraftChunkHandle.T.getType());
 
         // Only appears to be used on forge servers, standard Spigot never calls getHandle() in CraftWorld
         proxy_nms_world = new NMSWorldHook().createInstance(ServerLevelHandle.T.getType());
@@ -135,7 +117,29 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
                 return makeNonInstrumentedInvoker(method);
             }
         }.createInstance(craftBlock_type);
-        chunkField.set(proxy_block, proxy_chunk);
+
+        java.lang.reflect.Field chunkField = null;
+        try {
+            chunkField = craftBlock_type.getDeclaredField("chunk");
+        } catch (NoSuchFieldError err) { /* Ignore, CarbonSpigot */ }
+        if (chunkField != null) {
+            // Create a CraftChunk proxy that only supports the following calls:
+            // - getCraftWorld() -> returns the proxy world (final fallback in getState() requires this)
+            Chunk proxy_chunk = (Chunk) new ClassInterceptor() {
+                @Override
+                protected Invoker<?> getCallback(Method method) {
+                    // Gets the proxy world
+                    if (method.getName().equals("getCraftWorld")) {
+                        return (instance, args) -> proxy_world;
+                    }
+
+                    // All other method calls fail
+                    return makeNonInstrumentedInvoker(method);
+                }
+            }.createInstance(CraftChunkHandle.T.getType());
+
+            chunkField.set(proxy_block, proxy_chunk);
+        }
     }
 
     @Override
