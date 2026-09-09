@@ -121,7 +121,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
         java.lang.reflect.Field chunkField = null;
         try {
             chunkField = craftBlock_type.getDeclaredField("chunk");
-        } catch (NoSuchFieldError err) { /* Ignore, CarbonSpigot */ }
+        } catch (NoSuchFieldException err) { /* Ignore, CarbonSpigot */ }
         if (chunkField != null) {
             // Create a CraftChunk proxy that only supports the following calls:
             // - getCraftWorld() -> returns the proxy world (final fallback in getState() requires this)
