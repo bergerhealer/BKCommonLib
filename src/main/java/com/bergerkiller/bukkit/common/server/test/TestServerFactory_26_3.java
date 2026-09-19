@@ -1,25 +1,8 @@
 package com.bergerkiller.bukkit.common.server.test;
 
-import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import java.util.concurrent.Executor;
 
-class TestServerFactory_1_21_2 extends TestServerFactory_1_20_2 {
-
-    @Override
-    protected void init(ServerEnvironment env) throws Throwable {
-        super.init(env);
-
-        // FuelValues used for RecipeUtil (furnace recipe burn times)
-        // No longer used after 26.3, where this was moved to DataComponents.COOKING_FUEL
-        // In MinecraftServer.java:
-        //            this.fuelValues = FuelValues.vanillaBurnTimes(this.registries.compositeAccess(), this.worldData.enabledFeatures());
-        if (CommonBootstrap.evaluateMCVersion("<", "26.3")) {
-            setField(env.mc_server, "fuelValues", createFromCode(env.mc_server_type, "" +
-                    "return net.minecraft.world.level.block.entity.FuelValues.vanillaBurnTimes(\n" +
-                    "    arg0.compositeAccess(),\n" +
-                    "    arg1\n" +
-                    ");", env.registries, env.featureFlagSet));
-        }
-    }
+class TestServerFactory_26_3 extends TestServerFactory_26_1 {
 
     @Override
     protected Object initRegistries(ServerEnvironment env) throws Throwable {
@@ -37,28 +20,32 @@ class TestServerFactory_1_21_2 extends TestServerFactory_1_20_2 {
                     env.resourceManager, registryAccess);
         }
 
-        // Initialize WORLDGEN_REGISTRIES <AND> DIMENSION_REGISTRIES (used for dimension type api)
+        // Initialize WORLD_REGISTRIES <AND> DIMENSION_REGISTRIES (used for dimension type api)
         // In WorldLoader.java:
         //            List<IRegistry.a<?>> list = TagDataPack.loadTagsForExistingRegistries(ireloadableresourcemanager, layeredregistryaccess.getLayer(RegistryLayer.STATIC));
-        //            IRegistryCustom.Dimension iregistrycustom_dimension = layeredregistryaccess.getAccessForLoading(RegistryLayer.WORLDGEN);
+        //            IRegistryCustom.Dimension iregistrycustom_dimension = layeredregistryaccess.getAccessForLoading(RegistryLayer.WORLD);
         //            List<HolderLookup.b<?>> list1 = TagDataPack.buildUpdatedLookups(iregistrycustom_dimension, list);
-        //            IRegistryCustom.Dimension iregistrycustom_dimension1 = RegistryDataLoader.load((IResourceManager) ireloadableresourcemanager, list1, RegistryDataLoader.WORLDGEN_REGISTRIES);
+        //            IRegistryCustom.Dimension iregistrycustom_dimension1 = RegistryDataLoader.load((IResourceManager) ireloadableresourcemanager, list1, RegistryDataLoader.WORLD_REGISTRIES);
         //            List<HolderLookup.b<?>> list2 = Stream.concat(list1.stream(), iregistrycustom_dimension1.listRegistries()).toList();
         //            IRegistryCustom.Dimension iregistrycustom_dimension2 = RegistryDataLoader.load((IResourceManager) ireloadableresourcemanager, list2, RegistryDataLoader.DIMENSION_REGISTRIES);
         {
+            final Executor executor = new SyncExecutor();
             env.registries = createFromCode(env.mc_server_type, "" +
                     "net.minecraft.server.packs.resources.CloseableResourceManager ireloadableresourcemanager = arg0;\n" +
                     "net.minecraft.core.LayeredRegistryAccess layeredregistryaccess = arg1;\n" +
                     "java.util.List list = arg2;\n" +
-                    "net.minecraft.core.RegistryAccess$Frozen iregistrycustom_dimension = layeredregistryaccess.getAccessForLoading(net.minecraft.server.RegistryLayer.WORLDGEN);\n" +
+                    "java.util.concurrent.Executor executor = arg3;\n" +
+                    "net.minecraft.core.RegistryAccess$Frozen iregistrycustom_dimension = layeredregistryaccess.getAccessForLoading(net.minecraft.server.RegistryLayer.WORLD);\n" +
                     "java.util.List list1 = net.minecraft.tags.TagLoader.buildUpdatedLookups(iregistrycustom_dimension, list);\n" +
-                    "net.minecraft.core.RegistryAccess$Frozen iregistrycustom_dimension1 = net.minecraft.resources.RegistryDataLoader.load((net.minecraft.server.packs.resources.ResourceManager) ireloadableresourcemanager, list1, net.minecraft.resources.RegistryDataLoader.WORLDGEN_REGISTRIES);\n" +
+                    "java.util.concurrent.CompletableFuture iregistrycustom_dimension1_future = net.minecraft.resources.RegistryDataLoader.load((net.minecraft.server.packs.resources.ResourceManager) ireloadableresourcemanager, list1, net.minecraft.resources.RegistryDataLoader.WORLD_REGISTRIES, executor);\n" +
+                    "net.minecraft.core.RegistryAccess$Frozen iregistrycustom_dimension1 = (net.minecraft.core.RegistryAccess$Frozen) iregistrycustom_dimension1_future.get();\n" +
                     "java.util.List list2 = java.util.stream.Stream.concat(list1.stream(), iregistrycustom_dimension1.listRegistries()).toList();\n" +
-                    "net.minecraft.core.RegistryAccess$Frozen iregistrycustom_dimension2 = net.minecraft.resources.RegistryDataLoader.load((net.minecraft.server.packs.resources.ResourceManager) ireloadableresourcemanager, list2, net.minecraft.resources.RegistryDataLoader.DIMENSION_REGISTRIES);\n" +
+                    "java.util.concurrent.CompletableFuture iregistrycustom_dimension2_future = net.minecraft.resources.RegistryDataLoader.load((net.minecraft.server.packs.resources.ResourceManager) ireloadableresourcemanager, list2, net.minecraft.resources.RegistryDataLoader.DIMENSION_REGISTRIES, executor);\n" +
+                    "net.minecraft.core.RegistryAccess$Frozen iregistrycustom_dimension2 = (net.minecraft.core.RegistryAccess$Frozen) iregistrycustom_dimension2_future.get();\n" +
                     "\n" +
-                    "return layeredregistryaccess.replaceFrom(net.minecraft.server.RegistryLayer.WORLDGEN, java.util.Collections.singletonList(iregistrycustom_dimension1));",
+                    "return layeredregistryaccess.replaceFrom(net.minecraft.server.RegistryLayer.WORLD, java.util.Collections.singletonList(iregistrycustom_dimension1));",
 
-                    env.resourceManager, registryAccess, env.tagDataPackRegistries);
+                    env.resourceManager, registryAccess, env.tagDataPackRegistries, executor);
         }
 
         return env.registries;
