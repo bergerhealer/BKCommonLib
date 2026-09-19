@@ -15,16 +15,29 @@ optional class ClientboundLevelChunkPacketData {
     //       we need the chunk x/z for deserialization purposes.
 
     optional class ClientboundLevelChunkPacketData.BlockEntityInfo {
-        final (BlockStateType) BlockEntityType<?> type;
-        final (CommonTagCompound) CompoundTag tag;
+        final readonly (BlockStateType) BlockEntityType<?> type;
+
+        public (CommonTagCompound) CompoundTag getTag() {
+#if version >= 26.3
+            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo public java.util.Optional<CompoundTag> tag();
+            java.util.Optional tag = instance#tag();
+            return (CompoundTag) tag.orElse(null);
+#elseif version >= 1.18
+            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo final CompoundTag tag;
+            return instance#tag;
+#endif
+        }
 
         public IntVector3 getPosition(int chunkX, int chunkZ) {
-#if version >= 1.18
+#if version >= 26.3
+            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo final byte packedXZ;
+            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo final short blockEntityY:y;
+#elseif version >= 1.18
             #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo final int packedXZ;
             #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo final int blockEntityY:y;
 #endif
-            int packedXZ = instance#packedXZ;
-            int y = instance#blockEntityY;
+            int packedXZ = (int) instance#packedXZ;
+            int y = (int) instance#blockEntityY;
 
             // Convert relative x/z in the packed value, into absolute x/z
             int x = packedXZ >> 4;
@@ -34,18 +47,50 @@ optional class ClientboundLevelChunkPacketData {
             return new IntVector3(x, y, z);
         }
 
-        public static Object encodeRaw(IntVector3 position, (BlockStateType) BlockEntityType<?> type, (CommonTagCompound) CompoundTag tag) {
-#if version >= 1.18
-            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo private ClientboundLevelChunkPacketData.BlockEntityInfo createData:<init>(int packedXZ, int y, BlockEntityType<?> type, CompoundTag tag);
+#if version >= 26.3
+        #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo private ClientboundLevelChunkPacketData.BlockEntityInfo createData:<init>(byte packedXZ, short y, BlockEntityType<?> type, java.util.Optional<CompoundTag> tag);
+#elseif version >= 1.18
+        #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo private ClientboundLevelChunkPacketData.BlockEntityInfo createData:<init>(int packedXZ, int y, BlockEntityType<?> type, CompoundTag tag);
 #endif
 
+        // Clones this BlockEntityInfo, but with a new tag
+        // Required when updating metadata for block entities that don't include a tag in the change
+        // Call getTag() and check for null before calling this method
+        // Unfortunately it's a private class, so accessing the record properties will require reflection
+        public Object withTag((CommonTagCompound) CompoundTag tag) {
+#if version >= 26.3
+            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo public byte packedXZ();
+            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo public short y();
+            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo public BlockEntityType type();
+            byte packetXZ = instance#packedXZ();
+            short y = instance#y();
+            BlockEntityType type = instance#type();
+            return #createData(packetXZ, y, type, java.util.Optional.ofNullable(tag));
+#elseif version >= 1.18
+            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo private final int packedXZ;
+            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo private final int y;
+            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo private final BlockEntityType<?> type;
+            byte packetXZ = instance#packedXZ;
+            short y = instance#y;
+            BlockEntityType type = instance#type;
+            return #createData(packetXZ, y, type, tag);
+#else
+            return instance;
+#endif
+        }
+
+        public static Object encodeRaw(IntVector3 position, (BlockStateType) BlockEntityType<?> type, (CommonTagCompound) CompoundTag tag) {
             // If tag is empty, make null
             if (tag != null && tag.isEmpty()) {
                 tag = null;
             }
 
             int packedXZ = (SectionPos.sectionRelative(position.x) << 4) | SectionPos.sectionRelative(position.z);
+#if version >= 26.3
+            return #createData((byte) packedXZ, (short) position.y, type, java.util.Optional.ofNullable(tag));
+#elseif version >= 1.18
             return #createData(packedXZ, position.y, type, tag);
+#endif
         }
     }
 }

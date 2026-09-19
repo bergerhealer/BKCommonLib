@@ -39,8 +39,8 @@ class BlockStateChangePacketHandler_1_8_to_1_9_2 extends BlockStateChangePacketH
             });
 
             // Errors are handled upstream
-            if (!listener.onBlockChange(player, BlockStateChange.deferred(
-                   packet.getPosition(), BlockStateType.SIGN, metadataSupplier, () -> true)))
+            if (!listener.onBlockChange(player, BlockStateChange.detachedDeferred(
+                   packet.getPosition(), BlockStateType.SIGN, metadataSupplier)))
             {
                 return false;
             }

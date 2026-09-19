@@ -1,14 +1,13 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
-
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.proxy.TileEntityTypesSerializedIds_1_8_to_1_17_1;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.resources.BlockStateType;
 import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
+
+import java.util.function.Supplier;
 
 /**
  * Represents the change of a Block State's properties
@@ -37,6 +36,13 @@ public abstract class BlockStateChange {
     public abstract CommonTagCompound getMetadata();
 
     /**
+     * Gets the (new) metadata of the Block after this change. Null if no metadata is specified.
+     *
+     * @return New block state metadata, or null if not {@link #hasMetadata()}}
+     */
+    public abstract CommonTagCompound getMetadataIfExists();
+
+    /**
      * Checks whether metadata is contained at all in this change.
      * Some Block states have no metadata, or it is optional, in which
      * case {@link #getMetadata()} returns a (new) empty tag. This method
@@ -52,7 +58,28 @@ public abstract class BlockStateChange {
      * simply returns {@link #getMetadata()}, while on newer versions
      * it will include the required fields.
      */
-    public abstract CommonTagCompound serialize();
+    public CommonTagCompound serialize() {
+        CommonTagCompound serialized = getMetadataIfExists();
+        if (serialized != null) {
+            serialized = serialized.clone();
+        } else {
+            serialized = new CommonTagCompound();
+        }
+
+        if (CommonCapabilities.TILE_ENTITY_LEGACY_NAMES) {
+            serialized.putValue("id", TileEntityTypesSerializedIds_1_8_to_1_17_1.getLegacyName(
+                    getType().getKey()));
+        } else {
+            serialized.putValue("id", getType().getKey().toString());
+        }
+
+        IntVector3 position = getPosition();
+        serialized.putValue("x", position.x);
+        serialized.putValue("y", position.y);
+        serialized.putValue("z", position.z);
+
+        return serialized;
+    }
 
     @Override
     public String toString() {
@@ -97,25 +124,31 @@ public abstract class BlockStateChange {
     }
 
     /**
-     * Creates a BlockStateChange with the change information as specified, deferring
-     * to a supplier for supplying the writable metadata when requested.
-     * When first called, it will initialize writable metadata if required,
-     * but if never called will leave it uninitialized. The metadata field
-     * does not store the position or block state type information, unlike
-     * {@link #fromMetadataPacked(CommonTagCompound)}.
+     * Creates a BlockStateChange with the change information as specified. Note that writing
+     * to this instance will not modify existing packet items when added to them. A conversion
+     * will occur that breaks linkage with this detached state change (copy).
      *
      * @param position Block coordinates of the block whose state changed
      * @param type Type of BlockState that changed
-     * @param metadataSupplier Supplies the writable metadata information of the block.
-     *                         May instantiate new metadata tags when first called.
-     * @param hasMetadataSupplier Supplies whether metadata is currently available
+     * @param metadata Initial metadata tag to assign to this block. Null for none.
      * @return BlockStateChange
      */
-    public static BlockStateChange deferred(IntVector3 position, BlockStateType type,
-            Supplier<CommonTagCompound> metadataSupplier, BooleanSupplier hasMetadataSupplier
-    ) {
-        return new BlockStateChangeMetadataDeferred(position, type, metadataSupplier,
-                hasMetadataSupplier);
+    public static BlockStateChange detached(IntVector3 position, BlockStateType type, CommonTagCompound metadata) {
+        return new BlockStateChangeDetached(position, type, metadata);
+    }
+
+    /**
+     * Creates a BlockStateChange with the change information as specified. Note that writing
+     * to this instance will not modify existing packet items when added to them. A conversion
+     * will occur that breaks linkage with this detached state change (copy).
+     *
+     * @param position Block coordinates of the block whose state changed
+     * @param type Type of BlockState that changed
+     * @param metadataSupplier Initial metadata tag to assign to this block once metadata is requested once.
+     * @return BlockStateChange
+     */
+    public static BlockStateChange detachedDeferred(IntVector3 position, BlockStateType type, Supplier<CommonTagCompound> metadataSupplier) {
+        return new BlockStateChangeDetached(position, type, metadataSupplier);
     }
 
     private static final class BlockStateChangeMetadataPacked extends BlockStateChange {
@@ -154,6 +187,11 @@ public abstract class BlockStateChange {
         }
 
         @Override
+        public CommonTagCompound getMetadataIfExists() {
+            return metadata;
+        }
+
+        @Override
         public CommonTagCompound serialize() {
             return metadata;
         }
@@ -164,19 +202,27 @@ public abstract class BlockStateChange {
         }
     }
 
-    private static final class BlockStateChangeMetadataDeferred extends BlockStateChange {
+    /**
+     * Detached block state change. This is what people can create using API to create brand new block
+     * changes. It will be converted internally.
+     */
+    private static final class BlockStateChangeDetached extends BlockStateChange {
         private final IntVector3 position;
         private final BlockStateType type;
-        private final Supplier<CommonTagCompound> metadataSupplier;
-        private final BooleanSupplier hasMetadataSupplier;
+        private Supplier<CommonTagCompound> deferredMetadataSupplier; // If non-null, call this on first use
+        private CommonTagCompound metadata;
 
-        public BlockStateChangeMetadataDeferred(IntVector3 position, BlockStateType type,
-                Supplier<CommonTagCompound> metadataSupplier, BooleanSupplier hasMetadataSupplier
-        ) {
+        public BlockStateChangeDetached(IntVector3 position, BlockStateType type, CommonTagCompound metadata) {
             this.position = position;
             this.type = type;
-            this.metadataSupplier = metadataSupplier;
-            this.hasMetadataSupplier = hasMetadataSupplier;
+            this.deferredMetadataSupplier = null;
+            this.metadata = metadata;
+        }
+
+        public BlockStateChangeDetached(IntVector3 position, BlockStateType type, Supplier<CommonTagCompound> metadataSupplier) {
+            this.position = position;
+            this.type = type;
+            this.deferredMetadataSupplier = metadataSupplier;
         }
 
         @Override
@@ -191,29 +237,26 @@ public abstract class BlockStateChange {
 
         @Override
         public boolean hasMetadata() {
-            return hasMetadataSupplier.getAsBoolean();
+            return getMetadataIfExists() != null;
+        }
+
+        @Override
+        public CommonTagCompound getMetadataIfExists() {
+            Supplier<CommonTagCompound> supplier = deferredMetadataSupplier;
+            if (supplier != null) {
+                metadata = supplier.get();
+                deferredMetadataSupplier = null;
+            }
+            return metadata;
         }
 
         @Override
         public CommonTagCompound getMetadata() {
-            return metadataSupplier.get();
-        }
-
-        @Override
-        public CommonTagCompound serialize() {
-            CommonTagCompound serialized = hasMetadataSupplier.getAsBoolean()
-                    ? metadataSupplier.get().clone() : new CommonTagCompound();
-
-            if (CommonCapabilities.TILE_ENTITY_LEGACY_NAMES) {
-                serialized.putValue("id", TileEntityTypesSerializedIds_1_8_to_1_17_1.getLegacyName(
-                        type.getKey()));
-            } else {
-                serialized.putValue("id", type.getKey().toString());
+            CommonTagCompound metadata = this.getMetadataIfExists();
+            if (metadata == null) {
+                this.metadata = metadata = new CommonTagCompound();
             }
-            serialized.putValue("x", position.x);
-            serialized.putValue("y", position.y);
-            serialized.putValue("z", position.z);
-            return serialized;
+            return metadata;
         }
     }
 }

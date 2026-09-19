@@ -2,11 +2,9 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.util.Iterator;
 
-import com.bergerkiller.bukkit.common.bases.DeferredSupplier;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.resources.BlockStateType;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockStateChange;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacketHandle;
@@ -33,27 +31,27 @@ class BlockStateChangePacketHandler_1_9_3 extends BlockStateChangePacketHandler 
             CommonTagCompound metadata = packet.getData();
             if (metadata != null) {
                 // There's metadata, nothing special needs to be done
-                BlockStateChange change = BlockStateChange.deferred(packet.getPosition(), tileType,
-                        LogicUtil.constantSupplier(metadata), () -> true);
+                // Mutating it will already mutate the actual NBT in the packet
+                BlockStateChange change = BlockStateChange.detached(packet.getPosition(), tileType,
+                        metadata);
 
                 // Handle it, if false, cancel the packet entirely
                 if (!listener.onBlockChange(player, change)) {
                     return false;
                 }
             } else {
-                // Initialize metadata on first use
-                final DeferredSupplier<CommonTagCompound> metadataSupplier = DeferredSupplier.of(CommonTagCompound::new);
-                BlockStateChange change = BlockStateChange.deferred(packet.getPosition(), tileType,
-                        metadataSupplier, metadataSupplier::isInitialized);
+                // Create a state change without any metadata
+                BlockStateChange change = BlockStateChange.detached(packet.getPosition(), tileType, null);
 
                 // Handle it, if false, cancel the packet entirely
                 if (!listener.onBlockChange(player, change)) {
                     return false;
                 }
 
-                // If metadata was created and it's not empty, apply it to the packet
-                if (metadataSupplier.isInitialized() && !metadataSupplier.get().isEmpty()) {
-                    packet.setData(metadataSupplier.get());
+                // If metadata was created while handling the change, and it's not empty, apply it to the packet
+                CommonTagCompound newMetadata = change.getMetadataIfExists();
+                if (newMetadata != null && !newMetadata.isEmpty()) {
+                    packet.setData(newMetadata);
                 }
             }
 

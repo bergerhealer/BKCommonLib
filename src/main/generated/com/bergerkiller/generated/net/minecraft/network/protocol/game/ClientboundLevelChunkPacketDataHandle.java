@@ -53,22 +53,24 @@ public abstract class ClientboundLevelChunkPacketDataHandle extends Template.Han
             return T.encodeRaw.invoke(position, type, tag);
         }
 
-        public abstract IntVector3 getPosition(int chunkX, int chunkZ);
-        public abstract BlockStateType getType();
-        public abstract void setType(BlockStateType value);
         public abstract CommonTagCompound getTag();
-        public abstract void setTag(CommonTagCompound value);
+        public abstract IntVector3 getPosition(int chunkX, int chunkZ);
+        public abstract Object withTag(CommonTagCompound tag);
+        @Template.Readonly
+        public abstract BlockStateType getType();
         /**
          * Stores class members for <b>net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo</b>.
          * Methods, fields, and constructors can be used without using Handle Objects.
          */
         public static final class BlockEntityInfoClass extends Template.Class<BlockEntityInfoHandle> {
+            @Template.Readonly
             public final Template.Field.Converted<BlockStateType> type = new Template.Field.Converted<BlockStateType>();
-            public final Template.Field.Converted<CommonTagCompound> tag = new Template.Field.Converted<CommonTagCompound>();
 
             public final Template.StaticMethod.Converted<Object> encodeRaw = new Template.StaticMethod.Converted<Object>();
 
+            public final Template.Method.Converted<CommonTagCompound> getTag = new Template.Method.Converted<CommonTagCompound>();
             public final Template.Method<IntVector3> getPosition = new Template.Method<IntVector3>();
+            public final Template.Method.Converted<Object> withTag = new Template.Method.Converted<Object>();
 
         }
 
