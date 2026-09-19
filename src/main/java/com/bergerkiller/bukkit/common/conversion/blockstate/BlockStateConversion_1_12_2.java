@@ -138,6 +138,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
                 }
             }.createInstance(CraftChunkHandle.T.getType());
 
+            chunkField.setAccessible(true);
             chunkField.set(proxy_block, proxy_chunk);
         }
     }
