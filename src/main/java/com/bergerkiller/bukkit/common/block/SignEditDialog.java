@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundSignUpdatePacketHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.entity.BlockEntityHandle;
 import org.bukkit.Location;
@@ -376,7 +377,8 @@ public abstract class SignEditDialog {
                 }
 
                 // At this point we always abort editing. Just don't know yet how it's handled.
-                IntVector3 position = event.getPacket().read(PacketType.IN_UPDATE_SIGN.position);
+                ServerboundSignUpdatePacketHandle packet = ServerboundSignUpdatePacketHandle.createHandle(event.getPacket().getHandle());
+                IntVector3 position = packet.getPosition();
                 if (position == null || !metadata.coordinates.equals(position)) {
                     // Unexpected state - abort. Must do on main thread.
                     CommonUtil.nextTick(() -> {
@@ -388,8 +390,8 @@ public abstract class SignEditDialog {
 
                 event.setCancelled(true); // Don't let the server handle it/cancel editing
 
-                ChatText[] lines_chattext = event.getPacket().read(PacketType.IN_UPDATE_SIGN.lines);
-                if (lines_chattext == null || lines_chattext.length != 4) {
+                List<ChatText> lines_chattext = packet.getLines();
+                if (lines_chattext == null || lines_chattext.size() != 4) {
                     CommonUtil.nextTick(() -> {
                         metadata.dialog.handleAbort(metadata);
                         disableIfNoPlayers();
@@ -397,9 +399,9 @@ public abstract class SignEditDialog {
                     return;
                 }
 
-                final String[] lines = new String[lines_chattext.length];
+                final String[] lines = new String[lines_chattext.size()];
                 for (int i = 0; i < lines.length; i++) {
-                    ChatText ct = lines_chattext[i];
+                    ChatText ct = lines_chattext.get(i);
                     lines[i] = (ct == null) ? "" : ct.getMessage();
                 }
 

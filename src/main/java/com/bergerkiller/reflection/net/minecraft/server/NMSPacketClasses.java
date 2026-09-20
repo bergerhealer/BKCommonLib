@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import com.bergerkiller.bukkit.common.block.SignSide;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeInstanceHandle;
@@ -515,15 +516,46 @@ public class NMSPacketClasses {
 
     public static class NMSServerboundSignUpdatePacket extends NMSPacket {
 
-        public final FieldAccessor<IntVector3> position = ServerboundSignUpdatePacketHandle.T.position.toFieldAccessor();
-        public final FieldAccessor<ChatText[]> lines = ServerboundSignUpdatePacketHandle.T.lines.toFieldAccessor();
+        public final FieldAccessor<IntVector3> position = new FieldAccessor<IntVector3>() {
+            @Override
+            public IntVector3 get(Object instance) {
+                return ServerboundSignUpdatePacketHandle.createHandle(instance).getPosition();
+            }
+
+            @Override
+            public boolean set(Object instance, IntVector3 value) {
+                return false;
+            }
+        };
+        public final FieldAccessor<ChatText[]> lines = new FieldAccessor<ChatText[]>() {
+            @Override
+            public ChatText[] get(Object instance) {
+                return ServerboundSignUpdatePacketHandle.createHandle(instance).getLines().toArray(new ChatText[0]);
+            }
+
+            @Override
+            public boolean set(Object instance, ChatText[] value) {
+                return false;
+            }
+        };
+        public final FieldAccessor<SignSide> side = new FieldAccessor<SignSide>() {
+            @Override
+            public SignSide get(Object instance) {
+                return ServerboundSignUpdatePacketHandle.createHandle(instance).getSide();
+            }
+
+            @Override
+            public boolean set(Object instance, SignSide value) {
+                return false;
+            }
+        };
 
         public Block getBlock(CommonPacket packet, World world) {
             return BlockUtil.getBlock(world, position.get(packet.getHandle()));
         }
 
-        public void setBlock(CommonPacket packet, Block block) {
-            position.set(packet.getHandle(), new IntVector3(block));
+        public static CommonPacket newInstance(IntVector3 position, List<ChatText> lines, SignSide side) {
+            return ServerboundSignUpdatePacketHandle.createNew(position, lines, side).toCommonPacket();
         }
     }
 
@@ -1553,7 +1585,17 @@ public class NMSPacketClasses {
 
     public static class NMSClientboundOpenSignEditorPacket extends NMSPacket {
 
-        public final FieldAccessor<IntVector3> signPosition = ClientboundOpenSignEditorPacketHandle.T.signPosition.toFieldAccessor();
+        public final FieldAccessor<IntVector3> signPosition = new FieldAccessor<IntVector3>() {
+            @Override
+            public IntVector3 get(Object instance) {
+                return ClientboundOpenSignEditorPacketHandle.createHandle(instance).getSignPosition();
+            }
+
+            @Override
+            public boolean set(Object instance, IntVector3 value) {
+                return false;
+            }
+        };
     }
 
     public static class NMSClientboundOpenScreenPacket extends NMSPacket {

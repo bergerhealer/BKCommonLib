@@ -2,13 +2,12 @@ package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
-import com.bergerkiller.bukkit.common.nbt.CommonTagList;
+import com.bergerkiller.mountiplex.conversion.Conversion;
 import org.bukkit.ChatColor;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -19,6 +18,24 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 public class ChatTextTest {
+
+    @Test
+    public void testChatTextLegacyConversion() {
+        // Verifies that the registered converter for ChatText <> String is the legacy-formatted text string
+
+        final String dummyMessage = ChatColor.RED + "Hello";
+        final ChatText dummyMessageChatText = ChatText.fromMessage(dummyMessage);
+
+        // Converting the message text should parse it as message string, preserving the color codes
+        // It should not parse as json or fail on other ways
+        assertEquals(dummyMessage, Conversion.find(ChatText.class, String.class).convert(dummyMessageChatText));
+
+        // Converting a json-encoded string back into ChatText should NOT parse it as json,
+        // but as a plaintext/legacy message string.
+        assertEquals(ChatText.fromMessage(dummyMessageChatText.getJson()),
+                Conversion.find(String.class, ChatText.class).convert(dummyMessageChatText.getJson())
+        );
+    }
 
     @Test
     public void testNBTDeserializationSimple() {

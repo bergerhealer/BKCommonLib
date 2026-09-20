@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.block.SignSide;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 
 /**
@@ -21,28 +22,32 @@ public abstract class ClientboundOpenSignEditorPacketHandle extends PacketHandle
 
     /* ============================================================================== */
 
-    public static ClientboundOpenSignEditorPacketHandle createNew(IntVector3 signPosition, boolean isFrontText) {
-        return T.createNew.invoke(signPosition, isFrontText);
+    public static ClientboundOpenSignEditorPacketHandle createNew(IntVector3 signPosition, SignSide side) {
+        return T.createNew.invoke(signPosition, side);
     }
 
-    public abstract boolean isFrontText();
-    public abstract void setFrontText(boolean front);
-    public static ClientboundOpenSignEditorPacketHandle createNew(IntVector3 signPosition) {
-        return createNew(signPosition, true);
-    }
     public abstract IntVector3 getSignPosition();
-    public abstract void setSignPosition(IntVector3 value);
+    public abstract SignSide getSide();
+    public boolean isFrontText() {
+        return getSide().isFront();
+    }
+
+    public static ClientboundOpenSignEditorPacketHandle createNew(IntVector3 signPosition) {
+        return createNew(signPosition, SignSide.FRONT);
+    }
+
+    public static ClientboundOpenSignEditorPacketHandle createNew(IntVector3 signPosition, boolean isFrontText) {
+        return createNew(signPosition, SignSide.byFront(isFrontText));
+    }
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacket</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ClientboundOpenSignEditorPacketClass extends Template.Class<ClientboundOpenSignEditorPacketHandle> {
-        public final Template.Field.Converted<IntVector3> signPosition = new Template.Field.Converted<IntVector3>();
-
         public final Template.StaticMethod.Converted<ClientboundOpenSignEditorPacketHandle> createNew = new Template.StaticMethod.Converted<ClientboundOpenSignEditorPacketHandle>();
 
-        public final Template.Method<Boolean> isFrontText = new Template.Method<Boolean>();
-        public final Template.Method<Void> setFrontText = new Template.Method<Void>();
+        public final Template.Method.Converted<IntVector3> getSignPosition = new Template.Method.Converted<IntVector3>();
+        public final Template.Method.Converted<SignSide> getSide = new Template.Method.Converted<SignSide>();
 
     }
 

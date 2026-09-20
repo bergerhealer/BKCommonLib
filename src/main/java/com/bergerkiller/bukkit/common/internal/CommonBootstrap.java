@@ -27,6 +27,7 @@ import com.bergerkiller.bukkit.common.conversion.type.JOMLConversion;
 import com.bergerkiller.bukkit.common.conversion.type.MapConversion;
 import com.bergerkiller.bukkit.common.conversion.type.ScoreboardDisplaySlotConversion;
 import com.bergerkiller.bukkit.common.conversion.type.SerializedEnumConversion;
+import com.bergerkiller.bukkit.common.conversion.type.SignTextSlotConversion;
 import com.bergerkiller.bukkit.common.conversion.type.TeamColorConversion;
 import com.bergerkiller.bukkit.common.conversion.type.TextColorChatColorConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
@@ -979,6 +980,9 @@ public class CommonBootstrap {
         }
         if (evaluateMCVersion(">=", "26.2")) {
             Conversion.registerConverters(TeamColorConversion.class);
+        }
+        if (evaluateMCVersion(">=", "26.3")) {
+            Conversion.registerConverters(SignTextSlotConversion.class);
         }
 
         // Scoreboard DisplaySlot conversions

@@ -31,6 +31,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.SignTextSlot;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.level.GameType;
@@ -51,6 +52,7 @@ import com.bergerkiller.bukkit.common.wrappers.Holder;
 import com.bergerkiller.bukkit.common.resources.BlockStateType;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.wrappers.WindowType;
+import com.bergerkiller.bukkit.common.block.SignSide;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
@@ -67,6 +69,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.Serverboun
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundPlayerActionPacketHandle.ActionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundOpenScreenPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundSetCreativeModeSlotPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundSignUpdatePacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetTitlesPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacketHandle;
@@ -1909,18 +1912,93 @@ class ServerboundClientCommandPacket extends Packet {
 }
 
 class ServerboundSignUpdatePacket extends Packet {
-#if version >= 1.17
-    private (IntVector3) BlockPos position:pos;
+#select version >=
+#case 26.3:  public (IntVector3) BlockPos getPosition:pos();
+#case 1.18:   public (IntVector3) BlockPos getPosition:getPos();
+#case 1.13:   public (IntVector3) BlockPos getPosition:b();
+#case else:   public (IntVector3) BlockPos getPosition:a();
+#endselect
+
+    // Lines, stored as plaintext strings. The number of lines must be exactly 4.
+    // This is NOT json-encoded components, and the server normally strips color codes from the text.
+    // Relies on ChatText <> String converting to legacy text, and vice versa.
+#select version >=
+#case 26.3:  public (List<ChatText>) List<String> getLines:lines();
+#case 1.18:   public (List<ChatText>) String[] getLines();
+#case 1.13:   public (List<ChatText>) String[] getLines:c();
+#case 1.9:     public (List<ChatText>) String[] getLines:b();
+#case else:   public (List<ChatText>) Component[] getLines:b();
+#endselect
+
+#if version >= 26.3
+    public (SignSide) SignTextSlot getSide:slot();
+#elseif version >= 1.20
+    public (SignSide) SignSide getSide() {
+        return instance.isFrontText() ? SignSide.FRONT : SignSide.BACK;
+    }
 #else
-    private (IntVector3) BlockPos position:a;
+    public (SignSide) SignSide getSide() {
+        return SignSide.FRONT;
+    }
 #endif
 
-#if version >= 1.17
-    private (ChatText[]) String[] lines;
+#if version >= 26.3
+    public static (ServerboundSignUpdatePacketHandle) ServerboundSignUpdatePacket createNew((IntVector3) BlockPos blockPos, (List<ChatText>) List<String> lines, (SignSide) SignTextSlot side) {
+        if (lines.size() != 4) {
+            throw new IllegalArgumentException("Number of sign lines must be exactly 4");
+        }
+        return new ServerboundSignUpdatePacket(blockPos, lines, side);
+    }
 #elseif version >= 1.9
-    private (ChatText[]) String[] lines:b;
+    public static (ServerboundSignUpdatePacketHandle) ServerboundSignUpdatePacket createNew((IntVector3) BlockPos blockPos, (List<ChatText>) List<String> lines, (SignSide) SignSide side) {
+        if (lines.size() != 4) {
+            throw new IllegalArgumentException("Number of sign lines must be exactly 4");
+        }
+  #if version < 1.20
+        if (side == SignSide.BACK) {
+            throw new IllegalArgumentException("Back side of the sign is not supported on this version of the server");
+        }
+  #endif
+
+  #if version >= 1.20
+        // Now can specify sign side
+        return new ServerboundSignUpdatePacket(
+            blockPos,
+            side.isFront(),
+            (String) lines.get(0), (String) lines.get(1), (String) lines.get(2), (String) lines.get(3)
+        );
+  #elseif version >= 1.17
+        return new ServerboundSignUpdatePacket(
+            blockPos,
+            (String) lines.get(0), (String) lines.get(1), (String) lines.get(2), (String) lines.get(3)
+        );
+  #else
+        #require PacketPlayInUpdateSign private BlockPos blockPos:a;
+        #require PacketPlayInUpdateSign private String[] lines:b;
+        String[] linesArray = lines.toArray(new String[0]);
+        PacketPlayInUpdateSign packet = new PacketPlayInUpdateSign();
+        packet#blockPos = blockPos;
+        packet#lines = linesArray;
+        return packet;
+  #endif
+    }
 #else
-    private (ChatText[]) Component[] lines:b;
+    public static (ServerboundSignUpdatePacketHandle) ServerboundSignUpdatePacket createNew((IntVector3) BlockPos blockPos, (List<ChatText>) List<Component> lines, (SignSide) SignSide side) {
+        if (lines.size() != 4) {
+            throw new IllegalArgumentException("Number of sign lines must be exactly 4");
+        }
+        if (side == SignSide.BACK) {
+            throw new IllegalArgumentException("Back side of the sign is not supported on this version of the server");
+        }
+
+        #require PacketPlayInUpdateSign private BlockPos blockPos:a;
+        #require PacketPlayInUpdateSign private Component[] lines:b;
+        Component[] linesArray = lines.toArray(new Component[0]);
+        PacketPlayInUpdateSign packet = new PacketPlayInUpdateSign();
+        packet#blockPos = blockPos;
+        packet#lines = linesArray;
+        return packet;
+    }
 #endif
 }
 
@@ -2446,44 +2524,64 @@ class ClientboundBlockEntityDataPacket extends Packet {
 }
 
 class ClientboundOpenSignEditorPacket extends Packet {
-#if version >= 1.17
-    private final (IntVector3) BlockPos signPosition:pos;
+
+    // Block coordinates the sign is at
+#if version >= 26.3
+    public (IntVector3) BlockPos getSignPosition:pos();
+#elseif version >= 1.18
+    public (IntVector3) BlockPos getSignPosition:getPos();
+#elseif version >= 1.17
+    public (IntVector3) BlockPos getSignPosition:b();
 #else
-    private (IntVector3) BlockPos signPosition:a;
+    public (IntVector3) BlockPos getSignPosition() {
+        #require ClientboundOpenSignEditorPacket private BlockPos position:a;
+        return instance#position;
+    }
 #endif
 
-    <code>
-    public static ClientboundOpenSignEditorPacketHandle createNew(IntVector3 signPosition) {
-        return createNew(signPosition, true);
+    // Front or back (since 1.20)
+#if version >= 26.3
+    public (SignSide) SignTextSlot getSide:slot();
+#elseif version >= 1.20
+    public (SignSide) SignSide getSide() {
+        return SignSide.byFront(instance.isFrontText());
     }
-    </code>
-
-    public static (ClientboundOpenSignEditorPacketHandle) ClientboundOpenSignEditorPacket createNew((IntVector3) BlockPos signPosition, boolean isFrontText) {
-#if version >= 1.20
-        return new ClientboundOpenSignEditorPacket(signPosition, isFrontText);
 #else
-        if (!isFrontText) {
+    public (SignSide) SignSide getSide() {
+        return SignSide.FRONT;
+    }
+#endif
+
+#if version >= 26.3
+    public static (ClientboundOpenSignEditorPacketHandle) ClientboundOpenSignEditorPacket createNew((IntVector3) BlockPos signPosition, (SignSide) SignTextSlot side) {
+        return new ClientboundOpenSignEditorPacket(signPosition, side);
+    }
+#elseif version >= 1.20
+    public static (ClientboundOpenSignEditorPacketHandle) ClientboundOpenSignEditorPacket createNew((IntVector3) BlockPos signPosition, (SignSide) SignSide side) {
+        return new ClientboundOpenSignEditorPacket(signPosition, side.isFront());
+    }
+#else
+    public static (ClientboundOpenSignEditorPacketHandle) ClientboundOpenSignEditorPacket createNew((IntVector3) BlockPos signPosition, (SignSide) SignSide side) {
+        if (!side.isFront()) {
             throw new UnsupportedOperationException("Back text not supported on this version of Minecraft");
         }
         return new ClientboundOpenSignEditorPacket(signPosition);
-#endif
     }
+#endif
 
-#if version >= 1.20
-    #require ClientboundOpenSignEditorPacket private final boolean isFrontText;
-    public boolean isFrontText() { return instance#isFrontText; }
-    public void setFrontText(boolean front) { instance#isFrontText = front; }
-#else
+    <code>
     public boolean isFrontText() {
-        return true;
+        return getSide().isFront();
     }
 
-    public void setFrontText(boolean front) {
-        if (!front) {
-            throw new UnsupportedOperationException("Back text not supported on this version of Minecraft");
-        }
+    public static ClientboundOpenSignEditorPacketHandle createNew(IntVector3 signPosition) {
+        return createNew(signPosition, SignSide.FRONT);
     }
-#endif
+
+    public static ClientboundOpenSignEditorPacketHandle createNew(IntVector3 signPosition, boolean isFrontText) {
+        return createNew(signPosition, SignSide.byFront(isFrontText));
+    }
+    </code>
 }
 
 class ServerboundPlayerAbilitiesPacket extends Packet {

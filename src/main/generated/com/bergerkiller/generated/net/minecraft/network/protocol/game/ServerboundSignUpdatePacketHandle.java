@@ -2,8 +2,10 @@ package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.block.SignSide;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
+import java.util.List;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.ServerboundSignUpdatePacket</b>.
@@ -22,17 +24,23 @@ public abstract class ServerboundSignUpdatePacketHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public static ServerboundSignUpdatePacketHandle createNew(IntVector3 blockPos, List<ChatText> lines, SignSide side) {
+        return T.createNew.invoke(blockPos, lines, side);
+    }
+
     public abstract IntVector3 getPosition();
-    public abstract void setPosition(IntVector3 value);
-    public abstract ChatText[] getLines();
-    public abstract void setLines(ChatText[] value);
+    public abstract List<ChatText> getLines();
+    public abstract SignSide getSide();
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.ServerboundSignUpdatePacket</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ServerboundSignUpdatePacketClass extends Template.Class<ServerboundSignUpdatePacketHandle> {
-        public final Template.Field.Converted<IntVector3> position = new Template.Field.Converted<IntVector3>();
-        public final Template.Field.Converted<ChatText[]> lines = new Template.Field.Converted<ChatText[]>();
+        public final Template.StaticMethod.Converted<ServerboundSignUpdatePacketHandle> createNew = new Template.StaticMethod.Converted<ServerboundSignUpdatePacketHandle>();
+
+        public final Template.Method.Converted<IntVector3> getPosition = new Template.Method.Converted<IntVector3>();
+        public final Template.Method.Converted<List<ChatText>> getLines = new Template.Method.Converted<List<ChatText>>();
+        public final Template.Method.Converted<SignSide> getSide = new Template.Method.Converted<SignSide>();
 
     }
 
