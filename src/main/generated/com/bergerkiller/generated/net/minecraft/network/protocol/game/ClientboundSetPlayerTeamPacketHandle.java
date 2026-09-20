@@ -4,7 +4,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 import org.bukkit.ChatColor;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket</b>.
@@ -50,8 +50,8 @@ public abstract class ClientboundSetPlayerTeamPacketHandle extends PacketHandle 
     public abstract void setMethod(int value);
     public abstract String getName();
     public abstract void setName(String value);
-    public abstract Collection<String> getPlayers();
-    public abstract void setPlayers(Collection<String> value);
+    public abstract List<String> getPlayers();
+    public abstract void setPlayers(List<String> value);
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -59,7 +59,7 @@ public abstract class ClientboundSetPlayerTeamPacketHandle extends PacketHandle 
     public static final class ClientboundSetPlayerTeamPacketClass extends Template.Class<ClientboundSetPlayerTeamPacketHandle> {
         public final Template.Field.Integer method = new Template.Field.Integer();
         public final Template.Field<String> name = new Template.Field<String>();
-        public final Template.Field<Collection<String>> players = new Template.Field<Collection<String>>();
+        public final Template.Field.Converted<List<String>> players = new Template.Field.Converted<List<String>>();
 
         public final Template.StaticMethod.Converted<ClientboundSetPlayerTeamPacketHandle> createNew = new Template.StaticMethod.Converted<ClientboundSetPlayerTeamPacketHandle>();
 

@@ -45,17 +45,19 @@ class ClientboundSetPlayerTeamPacket extends Packet {
     private String name:a;
 #endif
 
-#if version >= 1.17
-    private final Collection<String> players;
+#if version >= 26.3
+    private final (List<String>) List<String> players;
+#elseif version >= 1.17
+    private final (List<String>) Collection<String> players;
     // method field moved to the top
 #elseif version >= 1.13
-    private final Collection<String> players:h;
+    private final (List<String>) Collection<String> players:h;
     private int method:i;
 #elseif version >= 1.9
-    private final Collection<String> players:h;
+    private final (List<String>) Collection<String> players:h;
     private int method:i;
 #else
-    private final Collection<String> players:g;
+    private final (List<String>) Collection<String> players:g;
     private int method:h;
 #endif
 

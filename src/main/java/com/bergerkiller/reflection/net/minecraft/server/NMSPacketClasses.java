@@ -1888,7 +1888,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<String> visibility = FieldAccessor.wrapMethods(ClientboundSetPlayerTeamPacketHandle.T.getVisibility, ClientboundSetPlayerTeamPacketHandle.T.setVisibility);
         public final FieldAccessor<String> collisionRule = FieldAccessor.wrapMethods(ClientboundSetPlayerTeamPacketHandle.T.getCollisionRule, ClientboundSetPlayerTeamPacketHandle.T.setCollisionRule);
         public final FieldAccessor<ChatColor> color = FieldAccessor.wrapMethods(ClientboundSetPlayerTeamPacketHandle.T.getColor, ClientboundSetPlayerTeamPacketHandle.T.setColor);
-        public final FieldAccessor<Collection<String>> players = ClientboundSetPlayerTeamPacketHandle.T.players.toFieldAccessor();
+        public final FieldAccessor<List<String>> players = ClientboundSetPlayerTeamPacketHandle.T.players.toFieldAccessor();
         public final FieldAccessor<Integer> teamOptionFlags = FieldAccessor.wrapMethods(ClientboundSetPlayerTeamPacketHandle.T.getTeamOptionFlags, ClientboundSetPlayerTeamPacketHandle.T.setTeamOptionFlags);
 
         @Override
