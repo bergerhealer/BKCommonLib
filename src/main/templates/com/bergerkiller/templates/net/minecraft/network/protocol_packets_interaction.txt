@@ -523,6 +523,7 @@ class ServerboundUseItemOnPacket extends Packet {
 
     // Hand since 1.9
 #select version >=
+#case 26.3: public (HumanHandRole) InteractionHand getHandRole:hand();
 #case 1.18:  public (HumanHandRole) InteractionHand getHandRole:getHand();
 #case 1.14:  public (HumanHandRole) InteractionHand getHandRole:b();
 #case 1.13:  public (HumanHandRole) InteractionHand getHandRole:d();
