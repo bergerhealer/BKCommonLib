@@ -543,7 +543,9 @@ class Entity {
     }
 #endif
 
-#if version >= 1.17
+#if version >= 26.3
+    public boolean velocityChanged:syncVelocity;
+#elseif version >= 1.17
     public boolean velocityChanged:hurtMarked;
 #else
     public boolean velocityChanged;
