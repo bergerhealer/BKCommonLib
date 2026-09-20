@@ -15,6 +15,10 @@ public abstract class TagHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static TagHandle createHandle(Object instance) {
+        return T.createHandle.invoker.invoke(null,instance);
+    }
+
     public abstract byte getTypeId();
     public abstract Object raw_clone();
     public com.bergerkiller.bukkit.common.nbt.CommonTag toCommonTag() {
