@@ -28,48 +28,53 @@ public class ParticleTypeTest {
 
     @Test
     public void testPacketParticleTypes() {
-        ClientboundLevelParticlesPacketHandle packet = ClientboundLevelParticlesPacketHandle.createNew();
-        assertEquals(ParticleType.UNKNOWN, packet.getParticleType());
+        ClientboundLevelParticlesPacketHandle packet;
 
-        packet.setParticle(ParticleType.AMBIENT_ENTITY_EFFECT, ParticleType.ColorOptions.create(128, 64, 32));
+        packet = createLevelParticlesPacket(ParticleType.AMBIENT_ENTITY_EFFECT, ParticleType.ColorOptions.create(128, 64, 32));
         assertEquals(ParticleType.AMBIENT_ENTITY_EFFECT, packet.getParticleType());
 
-        packet.setParticle(ParticleType.BLOCK, BlockData.fromMaterial(MaterialUtil.getFirst("OAK_PLANKS", "LEGACY_WOOD")));
+        packet = createLevelParticlesPacket(ParticleType.BLOCK, BlockData.fromMaterial(MaterialUtil.getFirst("OAK_PLANKS", "LEGACY_WOOD")));
         assertEquals(ParticleType.BLOCK, packet.getParticleType());
 
-        packet.setParticle(ParticleType.ITEM, new ItemStack(MaterialUtil.getFirst("OAK_PLANKS", "LEGACY_WOOD")));
+        packet = createLevelParticlesPacket(ParticleType.ITEM, new ItemStack(MaterialUtil.getFirst("OAK_PLANKS", "LEGACY_WOOD")));
         assertEquals(ParticleType.ITEM, packet.getParticleType());
 
-        packet.setParticle(ParticleType.DUST, ParticleType.DustOptions.create(255, 0, 0, 1.0f));
+        packet = createLevelParticlesPacket(ParticleType.DUST, ParticleType.DustOptions.create(255, 0, 0, 1.0f));
         assertEquals(ParticleType.DUST, packet.getParticleType());
 
         if (ParticleType.VIBRATION.exists()) {
-            packet.setParticle(ParticleType.VIBRATION, ParticleType.VibrationOptions.create(
+            packet = createLevelParticlesPacket(ParticleType.VIBRATION, ParticleType.VibrationOptions.create(
                     BlockPositionOption.create(1, 2, 3), BlockPositionOption.create(4, 5, 6), 20));
-            packet.setParticle(ParticleType.VIBRATION, ParticleType.VibrationOptions.create(
+            packet = createLevelParticlesPacket(ParticleType.VIBRATION, ParticleType.VibrationOptions.create(
                     BlockPositionOption.create(1, 2, 3), EntityByIdPositionOption.create(5, 2.0f), 20));
 
             if (CommonBootstrap.evaluateMCVersion(">=", "1.19")) {
-                packet.setParticle(ParticleType.VIBRATION, ParticleType.VibrationOptions.create(
+                packet = createLevelParticlesPacket(ParticleType.VIBRATION, ParticleType.VibrationOptions.create(
                         BlockPositionOption.create(1, 2, 3), EntityByUUIDPositionOption.create(UUID.randomUUID(), 2.0f), 20));
             }
             assertEquals(ParticleType.VIBRATION, packet.getParticleType());
         }
 
         if (ParticleType.DUST_COLOR_TRANSITION.exists()) {
-            packet.setParticle(ParticleType.DUST_COLOR_TRANSITION, ParticleType.DustColorTransitionOptions.create(
+            packet = createLevelParticlesPacket(ParticleType.DUST_COLOR_TRANSITION, ParticleType.DustColorTransitionOptions.create(
                     Color.RED, Color.GREEN, 1.0f));
             assertEquals(ParticleType.DUST_COLOR_TRANSITION, packet.getParticleType());
         }
 
         if (ParticleType.SCULK_CHARGE.exists()) {
-            packet.setParticle(ParticleType.SCULK_CHARGE, ParticleType.SculkChargeOptions.create(20.0f));
+            packet = createLevelParticlesPacket(ParticleType.SCULK_CHARGE, ParticleType.SculkChargeOptions.create(20.0f));
             assertEquals(ParticleType.SCULK_CHARGE, packet.getParticleType());
         }
 
         if (ParticleType.SHRIEK.exists()) {
-            packet.setParticle(ParticleType.SHRIEK, ParticleType.ShriekOptions.create(2));
+            packet = createLevelParticlesPacket(ParticleType.SHRIEK, ParticleType.ShriekOptions.create(2));
             assertEquals(ParticleType.SHRIEK, packet.getParticleType());
         }
+    }
+
+    private static <T> ClientboundLevelParticlesPacketHandle createLevelParticlesPacket(ParticleType<T> particleType, T value) {
+        return ClientboundLevelParticlesPacketHandle.createNew(
+                particleType, value, 0.0, 0.0, 0.0
+        );
     }
 }

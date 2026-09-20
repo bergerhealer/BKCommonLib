@@ -320,10 +320,10 @@ public class PlayerUtil extends EntityUtil {
      * @param color of the particles
      */
     public static void spawnDustParticles(Player player, Vector position, Color color) {
-        ClientboundLevelParticlesPacketHandle packet = ClientboundLevelParticlesPacketHandle.createNew();
-        packet.setParticle(ParticleType.DUST, ParticleType.DustOptions.create(color, 1.0f));
-        packet.setPos(position);
-        PacketUtil.sendPacket(player, packet);
+        PacketUtil.sendPacket(player, ClientboundLevelParticlesPacketHandle.createNew(
+                ParticleType.DUST, ParticleType.DustOptions.create(color, 1.0f),
+                position.getX(), position.getY(), position.getZ()
+        ));
     }
 
     /**

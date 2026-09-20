@@ -38,6 +38,7 @@ import com.bergerkiller.bukkit.common.wrappers.Brightness;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.HumanHandRole;
 import com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode;
+import com.bergerkiller.bukkit.common.wrappers.ParticleRandomization;
 import com.bergerkiller.bukkit.common.wrappers.RelativeFlags;
 import com.bergerkiller.generated.net.minecraft.nbt.CompoundTagHandle;
 import com.bergerkiller.generated.net.minecraft.nbt.ListTagHandle;
@@ -581,6 +582,14 @@ public class CommonBootstrap {
         ****************************************************************************************************************
         */
 
+        /* ======== Mojang remapping changes for 26.3 ======== */
+        if (evaluateMCVersion("<", "26.3")) {
+            // This enum is since 26.3, and is unused on versions prior. This remap just ensures the code still compiles.
+            remappings.put(
+                    "net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket$RandomizationType",
+                    "com.bergerkiller.bukkit.common.wrappers.ParticleRandomization");
+        }
+
         /* ======== Mojang remapping changes for 26.2 ======== */
         if (evaluateMCVersion("<", "26.2")) {
             // Since 26.2 all of the EntityTypes constants live in the EntityTypes class, instead of EntityType
@@ -983,6 +992,7 @@ public class CommonBootstrap {
         }
         if (evaluateMCVersion(">=", "26.3")) {
             Conversion.registerConverters(SignTextSlotConversion.class);
+            Conversion.registerConverters(ParticleRandomization.class);
         }
 
         // Scoreboard DisplaySlot conversions

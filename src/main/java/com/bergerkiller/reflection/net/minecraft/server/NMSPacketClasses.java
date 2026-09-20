@@ -2460,55 +2460,12 @@ public class NMSPacketClasses {
         public final FieldAccessor<Boolean> noRelativeVolume = ClientboundLevelEventPacketHandle.T.globalEvent.toFieldAccessor();
     }
 
+    /**
+     * @deprecated Please use {@link ClientboundLevelParticlesPacketHandle} instead. The packet is now immutable,
+     * so this method of working with the packet plain doesn't work.
+     */
+    @Deprecated
     public static class NMSClientboundLevelParticlesPacket extends NMSPacket {
-
-        public final FieldAccessor<Double> x = new SafeDirectField<Double>() {
-            @Override
-            public Double get(Object instance) {
-                return ClientboundLevelParticlesPacketHandle.T.getPosX.invoke(instance);
-            }
-
-            @Override
-            public boolean set(Object instance, Double value) {
-                ClientboundLevelParticlesPacketHandle.T.setPosX.invoke(instance, value);
-                return true;
-            }
-        };
-        public final FieldAccessor<Double> y = new SafeDirectField<Double>() {
-            @Override
-            public Double get(Object instance) {
-                return ClientboundLevelParticlesPacketHandle.T.getPosY.invoke(instance);
-            }
-
-            @Override
-            public boolean set(Object instance, Double value) {
-                ClientboundLevelParticlesPacketHandle.T.setPosY.invoke(instance, value);
-                return true;
-            }
-        };
-        public final FieldAccessor<Double> z = new SafeDirectField<Double>() {
-            @Override
-            public Double get(Object instance) {
-                return ClientboundLevelParticlesPacketHandle.T.getPosZ.invoke(instance);
-            }
-
-            @Override
-            public boolean set(Object instance, Double value) {
-                ClientboundLevelParticlesPacketHandle.T.setPosZ.invoke(instance, value);
-                return true;
-            }
-        };
-        public final FieldAccessor<Float> randomX = ClientboundLevelParticlesPacketHandle.T.randomX.toFieldAccessor();
-        public final FieldAccessor<Float> randomY = ClientboundLevelParticlesPacketHandle.T.randomY.toFieldAccessor();
-        public final FieldAccessor<Float> randomZ = ClientboundLevelParticlesPacketHandle.T.randomZ.toFieldAccessor();
-        public final FieldAccessor<Float> speed = ClientboundLevelParticlesPacketHandle.T.speed.toFieldAccessor();
-        public final FieldAccessor<Integer> particleCount = ClientboundLevelParticlesPacketHandle.T.count.toFieldAccessor();
-        public final FieldAccessor<Boolean> overrideLimiter = ClientboundLevelParticlesPacketHandle.T.overrideLimiter.toFieldAccessor();
-
-        @Override
-        public CommonPacket newInstance() {
-            return new CommonPacket(ClientboundLevelParticlesPacketHandle.T.createNew.raw.invoke(), this);
-        }
     }
 
     //////////////////////////////////////////////////////////////////////

@@ -6,121 +6,198 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.network.protocol.Packet;
 
+import com.bergerkiller.bukkit.common.wrappers.ParticleRandomization;
+
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundLevelParticlesPacketHandle;
 
 class ClientboundLevelParticlesPacket extends Packet {
-    // TODO: Create a common interface for particle + data
-    // Since 1.13 there is a ParticleOptions with many different types
-    // Best option would be coming up with a proxy similar to this for <= 1.12.2
-#if version >= 1.17
-    #require ClientboundLevelParticlesPacket private double pos_x:x;
-    #require ClientboundLevelParticlesPacket private double pos_y:y;
-    #require ClientboundLevelParticlesPacket private double pos_z:z;
-    private float randomX:xDist;
-    private float randomY:yDist;
-    private float randomZ:zDist;
-    private float speed:maxSpeed;
-    private int count;
-    private boolean overrideLimiter;
-    #require ClientboundLevelParticlesPacket private ParticleOptions particle;
-#elseif version >= 1.15
-    #require ClientboundLevelParticlesPacket private double pos_x:a;
-    #require ClientboundLevelParticlesPacket private double pos_y:b;
-    #require ClientboundLevelParticlesPacket private double pos_z:c;
-    private float randomX:d;
-    private float randomY:e;
-    private float randomZ:f;
-    private float speed:g;
-    private int count:h;
-    private boolean overrideLimiter:i;
+
+    // On older versions of Minecraft, the particle fields are all private and require reflection to access
+    // There are no getter methods for these fields.
+#if version < 1.17
+  #if version >= 1.15
+    #require ClientboundLevelParticlesPacket private double posX:a;
+    #require ClientboundLevelParticlesPacket private double posY:b;
+    #require ClientboundLevelParticlesPacket private double posZ:c;
+    #require ClientboundLevelParticlesPacket private float randomX:d;
+    #require ClientboundLevelParticlesPacket private float randomY:e;
+    #require ClientboundLevelParticlesPacket private float randomZ:f;
+    #require ClientboundLevelParticlesPacket private float speed:g;
+    #require ClientboundLevelParticlesPacket private int count:h;
+    #require ClientboundLevelParticlesPacket private boolean overrideLimiter:i;
     #require net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket private ParticleOptions particle:j;
-#elseif version >= 1.13
-    #require ClientboundLevelParticlesPacket private float pos_x:a;
-    #require ClientboundLevelParticlesPacket private float pos_y:b;
-    #require ClientboundLevelParticlesPacket private float pos_z:c;
-    private float randomX:d;
-    private float randomY:e;
-    private float randomZ:f;
-    private float speed:g;
-    private int count:h;
-    private boolean overrideLimiter:i;
+  #elseif version >= 1.13
+    #require ClientboundLevelParticlesPacket private float posX:a;
+    #require ClientboundLevelParticlesPacket private float posY:b;
+    #require ClientboundLevelParticlesPacket private float posZ:c;
+    #require ClientboundLevelParticlesPacket private float randomX:d;
+    #require ClientboundLevelParticlesPacket private float randomY:e;
+    #require ClientboundLevelParticlesPacket private float randomZ:f;
+    #require ClientboundLevelParticlesPacket private float speed:g;
+    #require ClientboundLevelParticlesPacket private int count:h;
+    #require ClientboundLevelParticlesPacket private boolean overrideLimiter:i;
     #require net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket private ParticleOptions particle:j;
-#else
+  #else
     #require ClientboundLevelParticlesPacket private ParticleType particle:a;
-    #require ClientboundLevelParticlesPacket private float pos_x:b;
-    #require ClientboundLevelParticlesPacket private float pos_y:c;
-    #require ClientboundLevelParticlesPacket private float pos_z:d;
-    private float randomX:e;
-    private float randomY:f;
-    private float randomZ:g;
-    private float speed:h;
-    private int count:i;
-    private boolean overrideLimiter:j;
+    #require ClientboundLevelParticlesPacket private float posX:b;
+    #require ClientboundLevelParticlesPacket private float posY:c;
+    #require ClientboundLevelParticlesPacket private float posZ:d;
+    #require ClientboundLevelParticlesPacket private float randomX:e;
+    #require ClientboundLevelParticlesPacket private float randomY:f;
+    #require ClientboundLevelParticlesPacket private float randomZ:g;
+    #require ClientboundLevelParticlesPacket private float speed:h;
+    #require ClientboundLevelParticlesPacket private int count:i;
+    #require ClientboundLevelParticlesPacket private boolean overrideLimiter:j;
     #require ClientboundLevelParticlesPacket private int[] particleOptions:k;
+  #endif
 #endif
 
-    public static (ClientboundLevelParticlesPacketHandle) ClientboundLevelParticlesPacket createNew() {
-#if version >= 1.21.4
-        return new ClientboundLevelParticlesPacket((ParticleOptions) null, false, false, 0.0, 0.0, 0.0, 0.0f, 0.0f, 0.0f, 0.0f, 1);
-#elseif version >= 1.15
-        return new ClientboundLevelParticlesPacket((ParticleOptions) null, false, 0.0, 0.0, 0.0, 0.0f, 0.0f, 0.0f, 0.0f, 1);
-#elseif version >= 1.13
-        return new ClientboundLevelParticlesPacket((ParticleOptions) null, false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1);
-#else
-        return new ClientboundLevelParticlesPacket((ParticleType) null, false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, new int[0]);
-#endif
-    }
-
-    <code>
-    public void setParticle(com.bergerkiller.bukkit.common.resources.ParticleType<Void> particleType) {
-        setParticle(particleType, null);
-    }
-
-    public <T> void setParticle(com.bergerkiller.bukkit.common.resources.ParticleType<T> particleType, T value) {
-        T.setParticle.invoker.invoke(getRaw(), particleType.getRawHandle(), value);
-    }
-    </code>
-
+    // ParticleType (from options)
+    // It is too difficult to expose the full particle options, but type is still useful.
 #if version >= 1.13
-    // ParticleOptions API
-    public optional void setParticle(ParticleType<?> particleType, Object options) {
-        ParticleOptions param;
+    public (com.bergerkiller.bukkit.common.resources.ParticleType<?>) ParticleType<?> getParticleType() {
+  #if version >= 26.3
+        ParticleOptions param = instance.particle();
+  #elseif version >= 1.18
+        ParticleOptions param = instance.getParticle();
+  #elseif version >= 1.17
+        ParticleOptions param = instance.k();
+  #else
+        ParticleOptions param = instance#particle;
+  #endif
+
+        if (param == null) {
+            return null;
+        }
+
+  #if version >= 1.18
+        return param.getType();
+  #elseif version >= 1.14.4
+        return param.getParticle();
+  #else
+        return param.b();
+  #endif
+    }
+#else
+    public (com.bergerkiller.bukkit.common.resources.ParticleType<?>) ParticleType<?> getParticleType() {
+        return instance#particle;
+    }
+#endif
+
+    // Particle spawn configuration, such as position, speed and spread
+#if version >= 26.3
+    public boolean isOverrideLimiter:overrideLimiter();
+    public double getPosX:x();
+    public double getPosY:y();
+    public double getPosZ:z();
+    public float getRandomX:xDist();
+    public float getRandomY:yDist();
+    public float getRandomZ:zDist();
+    public float getMaxSpeedX:xMaxSpeed();
+    public float getMaxSpeedY:yMaxSpeed();
+    public float getMaxSpeedZ:zMaxSpeed();
+    public int getCount:count();
+#elseif version >= 1.18
+    public boolean isOverrideLimiter();
+    public double getPosX:getX();
+    public double getPosY:getY();
+    public double getPosZ:getZ();
+    public float getRandomX:getXDist();
+    public float getRandomY:getYDist();
+    public float getRandomZ:getZDist();
+    public float getMaxSpeedX:getMaxSpeed();
+    public float getMaxSpeedY:getMaxSpeed();
+    public float getMaxSpeedZ:getMaxSpeed();
+    public int getCount();
+#elseif version >= 1.17
+    public boolean isOverrideLimiter:b();
+    public double getPosX:c();
+    public double getPosY:d();
+    public double getPosZ:e();
+    public float getRandomX:f();
+    public float getRandomY:g();
+    public float getRandomZ:h();
+    public float getMaxSpeedX:i();
+    public float getMaxSpeedY:i();
+    public float getMaxSpeedZ:i();
+    public int getCount:j();
+#else
+    public boolean isOverrideLimiter() { return instance#overrideLimiter; }
+    public double getPosX() { return (double) instance#posX; }
+    public double getPosY() { return (double) instance#posY; }
+    public double getPosZ() { return (double) instance#posZ; }
+    public float getRandomX() { return instance#randomX; }
+    public float getRandomY() { return instance#randomY; }
+    public float getRandomZ() { return instance#randomZ; }
+    public float getMaxSpeedX() { return instance#speed; }
+    public float getMaxSpeedY() { return instance#speed; }
+    public float getMaxSpeedZ() { return instance#speed; }
+    public int getCount() { return instance#count; }
+#endif
+
+#if version >= 1.21.4
+    public boolean isAlwaysShow:alwaysShow();
+#else
+    public boolean isAlwaysShow() { return false; }
+#endif
+
+#if version >= 26.3
+    public (ParticleRandomization) net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket$RandomizationType getRandomization:randomizationType();
+#else
+    public (ParticleRandomization) net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket$RandomizationType getRandomization() {
+        return net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket$RandomizationType.DEFAULT;
+    }
+#endif
+
+    // Encodes ParticleType + options into a ParticleOptions object, which is then assigned to the packet
+#if version >= 1.13
+    #require ClientboundLevelParticlesPacketHandle public static ParticleOptions createParticleOptions(ParticleType<?> particleType, Object options) {
+        // Particle type has no options (is its own options)
         if (particleType instanceof ParticleOptions) {
-            param = (ParticleOptions) particleType;
+            return (ParticleOptions) particleType;
+        }
 
-        } else if (particleType == null) {
-            throw new IllegalArgumentException("Particle type is not supported");
-
-        } else if (options == null) {
+        // No options were specified, but this particle type requires it
+        if (options == null) {
             com.bergerkiller.bukkit.common.resources.ParticleType typeHandle;
             typeHandle = com.bergerkiller.bukkit.common.resources.ParticleType.byNMSParticleHandle(particleType);
             throw new IllegalArgumentException("Particle type " + typeHandle.toString() + " requires extra options, none specified");
+        }
 
-        } else if (options instanceof com.bergerkiller.bukkit.common.wrappers.BlockData) {
-            param = new net.minecraft.core.particles.BlockParticleOption(particleType,
+        // Block state option
+        if (options instanceof com.bergerkiller.bukkit.common.wrappers.BlockData) {
+            return new net.minecraft.core.particles.BlockParticleOption(particleType,
                     (BlockState) ((com.bergerkiller.bukkit.common.wrappers.BlockData) options).getData());
+        }
 
-        } else if (options instanceof org.bukkit.inventory.ItemStack) {
+        // ItemStack option
+        if (options instanceof org.bukkit.inventory.ItemStack) {
             net.minecraft.world.item.ItemStack itemstack = (net.minecraft.world.item.ItemStack) com.bergerkiller.bukkit.common.conversion.type.HandleConversion
                     .toItemStackHandle((org.bukkit.inventory.ItemStack) options);
   #if version >= 26.1
-            param = new net.minecraft.core.particles.ItemParticleOption(particleType, itemstack.getItem());
+            return new net.minecraft.core.particles.ItemParticleOption(particleType, itemstack.getItem());
   #else
-            param = new net.minecraft.core.particles.ItemParticleOption(particleType, itemstack);
+            return new net.minecraft.core.particles.ItemParticleOption(particleType, itemstack);
   #endif
+        }
 
   #if version >= 1.19
-        } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$SculkChargeOptions) {
+        // Sculk charge options
+        if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$SculkChargeOptions) {
             com.bergerkiller.bukkit.common.resources.ParticleType$SculkChargeOptions sc = (com.bergerkiller.bukkit.common.resources.ParticleType$SculkChargeOptions) options;
-            param = new net.minecraft.core.particles.SculkChargeParticleOptions(sc.roll);
+            return new net.minecraft.core.particles.SculkChargeParticleOptions(sc.roll);
+        }
 
-        } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$ShriekOptions) {
+        // Shrieker options
+        if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$ShriekOptions) {
             com.bergerkiller.bukkit.common.resources.ParticleType$ShriekOptions sh = (com.bergerkiller.bukkit.common.resources.ParticleType$ShriekOptions) options;
-            param = new net.minecraft.core.particles.ShriekParticleOption(sh.delay);
+            return new net.minecraft.core.particles.ShriekParticleOption(sh.delay);
+        }
   #endif
 
+        // Dust color transition options
   #if version >= 1.17
-        } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$DustColorTransitionOptions) {
+        if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$DustColorTransitionOptions) {
             com.bergerkiller.bukkit.common.resources.ParticleType$DustColorTransitionOptions ts = (com.bergerkiller.bukkit.common.resources.ParticleType$DustColorTransitionOptions) options;
     #if version >= 1.21.2
             int color = ts.color.asRGB();
@@ -140,9 +217,13 @@ class ClientboundLevelParticlesPacket extends Packet {
                                                                                (float) ts.endColor.getGreen() / 255.0f,
                                                                                (float) ts.endColor.getBlue() / 255.0f);
     #endif
-            param = new net.minecraft.core.particles.DustColorTransitionOptions(color, to_color, ts.scale);
+            return new net.minecraft.core.particles.DustColorTransitionOptions(color, to_color, ts.scale);
+        }
+  #endif
 
-        } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$VibrationOptions) {
+        // Vibration options
+  #if version >= 1.17
+        if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$VibrationOptions) {
     #if version >= 1.19
             #require net.minecraft.world.level.gameevent.EntityPositionSource static EntityPositionSource new_eps:<init>(com.mojang.datafixers.util.Either<net.minecraft.world.entity.Entity, com.mojang.datafixers.util.Either<java.util.UUID, Integer>> either, float f);
     #endif
@@ -170,44 +251,68 @@ class ClientboundLevelParticlesPacket extends Packet {
             }
 
     #if version >= 1.19
-            param = new net.minecraft.core.particles.VibrationParticleOption(source, vo.arrivalInTicks);
+            return new net.minecraft.core.particles.VibrationParticleOption(source, vo.arrivalInTicks);
     #else
             BlockPos origin = new BlockPos(vo.origin.x, vo.origin.y, vo.origin.z);
             net.minecraft.world.level.gameevent.vibrations.VibrationPath path = new net.minecraft.world.level.gameevent.vibrations.VibrationPath(origin, source, vo.arrivalInTicks);
-            param = new net.minecraft.core.particles.VibrationParticleOption(path);
+            return new net.minecraft.core.particles.VibrationParticleOption(path);
     #endif
+        }
   #endif
 
-        } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$ColorOptions) {
+        // Color options
+        if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$ColorOptions) {
             com.bergerkiller.bukkit.common.resources.ParticleType$ColorOptions color = (com.bergerkiller.bukkit.common.resources.ParticleType$ColorOptions) options;
   #if version >= 1.20.5
-            param = net.minecraft.core.particles.ColorParticleOption.create(particleType, color.color.asARGB());
+            return net.minecraft.core.particles.ColorParticleOption.create(particleType, color.color.asARGB());
   #else
             throw new IllegalArgumentException("Incompatible particle options: " + options.getClass().getName());
   #endif
+        }
 
-        } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions) {
+        // Dust options
+        if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions) {
             com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions dust = (com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions) options;
 
   #if version >= 1.21.2
-            param = new net.minecraft.core.particles.DustParticleOptions(dust.color.asRGB(), dust.scale);
+            return new net.minecraft.core.particles.DustParticleOptions(dust.color.asRGB(), dust.scale);
   #else
             float r = (float) dust.color.getRed() / 255.0f;
             float g = (float) dust.color.getGreen() / 255.0f;
             float b = (float) dust.color.getBlue() / 255.0f;
     #if version >= 1.19.3
-            param = new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(r,g,b), dust.scale);
+            return new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(r,g,b), dust.scale);
     #elseif version >= 1.17
-            param = new net.minecraft.core.particles.DustParticleOptions(new com.mojang.math.Vector3fa(r,g,b), dust.scale);
+            return new net.minecraft.core.particles.DustParticleOptions(new com.mojang.math.Vector3fa(r,g,b), dust.scale);
     #else
-            param = new net.minecraft.core.particles.DustParticleOptions(r, g, b, dust.scale);
+            return new net.minecraft.core.particles.DustParticleOptions(r, g, b, dust.scale);
     #endif
   #endif
-
-        } else {
-            throw new IllegalArgumentException("Unknown particle options: " + options.getClass().getName());
         }
-        instance#particle = param;
+
+        throw new IllegalArgumentException("Unknown particle options: " + options.getClass().getName());
+    }
+#endif
+
+    // Marked optional so it is not visible by default
+    public static optional (ClientboundLevelParticlesPacketHandle) ClientboundLevelParticlesPacket createNew((Object) ParticleType<?> particleType, Object options, double posX, double posY, double posZ, float randomX, float randomY, float randomZ, float maxSpeedX, float maxSpeedY, float maxSpeedZ, int count, boolean overrideLimiter, boolean alwaysShow, (ParticleRandomization) net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket$RandomizationType randomization) {
+        // Particle type was not found (conversion error)
+        if (particleType == null) {
+            throw new IllegalArgumentException("Particle type is not supported");
+        }
+
+        // Only one maxSpeed option is available before Minecraft 26.3. Convert it to an average.
+#if version < 26.3
+        float averageMaxSpeed;
+        if (maxSpeedX == maxSpeedY && maxSpeedY == maxSpeedZ) {
+            averageMaxSpeed = maxSpeedX;
+        } else {
+            averageMaxSpeed = (maxSpeedX + maxSpeedY + maxSpeedZ) / 3.0f;
+        }
+#endif
+
+#if version >= 1.13
+        ParticleOptions particleParam = #createParticleOptions(particleType, options);
 
   #if version < 1.20.5
         // Set RGB fields when using the (ambient) entity effect particles and having colors specified
@@ -216,24 +321,21 @@ class ClientboundLevelParticlesPacket extends Packet {
             //TODO: Implement this!
         }
   #endif
-    }
 
-    public (com.bergerkiller.bukkit.common.resources.ParticleType<?>) ParticleType<?> getParticleType() {
-        ParticleOptions param = instance#particle;
-        if (param == null) return null;
-  #if version >= 1.18
-        return param.getType();
-  #elseif version >= 1.14.4
-        return param.getParticle();
+  #if version >= 26.3
+        return new ClientboundLevelParticlesPacket(particleParam, overrideLimiter, alwaysShow, posX, posY, posZ, randomX, randomY, randomZ, maxSpeedX, maxSpeedY, maxSpeedZ, count, randomization);
+  #elseif version >= 1.21.4
+        return new ClientboundLevelParticlesPacket(particleParam, overrideLimiter, alwaysShow, posX, posY, posZ, randomX, randomY, randomZ, averageMaxSpeed, count);
+  #elseif version >= 1.15
+        return new ClientboundLevelParticlesPacket(particleParam, overrideLimiter, posX, posY, posZ, randomX, randomY, randomZ, averageMaxSpeed, count);
   #else
-        return param.b();
+        return new ClientboundLevelParticlesPacket(particleParam, overrideLimiter, (float) posX, (float) posY, (float) posZ, randomX, randomY, randomZ, averageMaxSpeed, count);
   #endif
-    }
 
 #else
-    // ParticleType + int[] args
-    public optional void setParticle(ParticleType particleType, Object options) {
+        // Figure out the int[] data for the particle options.
         int[] data;
+
         if (options instanceof com.bergerkiller.bukkit.common.wrappers.BlockData) {
             data = new int[1];
             data[0] = net.minecraft.world.level.block.Block.getCombinedId(
@@ -249,19 +351,11 @@ class ClientboundLevelParticlesPacket extends Packet {
             com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions dust = (com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions) options;
 
             // rgb is encoded in the random x/y/z of this packet
-            float r = -1.0f + (float) dust.color.getRed() / 255.0f;
-            float g = (float) dust.color.getGreen() / 255.0f;
-            float b = (float) dust.color.getBlue() / 255.0f;
-            #require ClientboundLevelParticlesPacket private float randomX:e;
-            #require ClientboundLevelParticlesPacket private float randomY:f;
-            #require ClientboundLevelParticlesPacket private float randomZ:g;
-            #require ClientboundLevelParticlesPacket private float speed:h;
-            #require ClientboundLevelParticlesPacket private int count:i;
-            instance#randomX = r;
-            instance#randomY = g;
-            instance#randomZ = b;
-            instance#speed = 1.0f;
-            instance#count = 0;
+            randomX = -1.0f + (float) dust.color.getRed() / 255.0f;
+            randomY = (float) dust.color.getGreen() / 255.0f;
+            randomZ = (float) dust.color.getBlue() / 255.0f;
+            averageMaxSpeed = 1.0f;
+            count = 0;
             data = new int[0];
 
         } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$ColorOptions) {
@@ -273,80 +367,102 @@ class ClientboundLevelParticlesPacket extends Packet {
         } else {
             data = new int[0];
         }
-        instance#particle = particleType;
-        instance#particleOptions = data;
+
+        return new ClientboundLevelParticlesPacket(particleType, overrideLimiter, (float) posX, (float) posY, (float) posZ, randomX, randomY, randomZ, averageMaxSpeed, count, data);
+#endif
     }
 
-    public (com.bergerkiller.bukkit.common.resources.ParticleType<?>) ParticleType<?> getParticleType() {
-        return instance#particle;
-    }
+    // Clones this packet with the particle spawn configuration changed.
+    // The spawned particle type and type options are not changed.
+    public (ClientboundLevelParticlesPacketHandle) ClientboundLevelParticlesPacket withConfiguration(double posX, double posY, double posZ, float randomX, float randomY, float randomZ, float maxSpeedX, float maxSpeedY, float maxSpeedZ, int count, boolean overrideLimiter, boolean alwaysShow, (ParticleRandomization) net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket$RandomizationType randomization) {
+        // Only one maxSpeed option is available before Minecraft 26.3. Convert it to an average.
+#if version < 26.3
+        float averageMaxSpeed;
+        if (maxSpeedX == maxSpeedY && maxSpeedY == maxSpeedZ) {
+            averageMaxSpeed = maxSpeedX;
+        } else {
+            averageMaxSpeed = (maxSpeedX + maxSpeedY + maxSpeedZ) / 3.0f;
+        }
 #endif
+
+        // Retrieve old particle options (1.13+)
+#if version >= 26.3
+        ParticleOptions particleParam = instance.particle();
+#elseif version >= 1.18
+        ParticleOptions particleParam = instance.getParticle();
+#elseif version >= 1.17
+        ParticleOptions particleParam = instance.k();
+#elseif version >= 1.13
+        ParticleOptions particleParam = instance#particle;
+#else
+        ParticleType particle = instance#particle;
+        int[] data = instance#particleOptions;
+#endif
+
+#if version >= 26.3
+        return new ClientboundLevelParticlesPacket(particleParam, overrideLimiter, alwaysShow, posX, posY, posZ, randomX, randomY, randomZ, maxSpeedX, maxSpeedY, maxSpeedZ, count, randomization);
+#elseif version >= 1.21.4
+        return new ClientboundLevelParticlesPacket(particleParam, overrideLimiter, alwaysShow, posX, posY, posZ, randomX, randomY, randomZ, averageMaxSpeed, count);
+#elseif version >= 1.15
+        return new ClientboundLevelParticlesPacket(particleParam, overrideLimiter, posX, posY, posZ, randomX, randomY, randomZ, averageMaxSpeed, count);
+#elseif version >= 1.13
+        return new ClientboundLevelParticlesPacket(particleParam, overrideLimiter, (float) posX, (float) posY, (float) posZ, randomX, randomY, randomZ, averageMaxSpeed, count);
+#else
+        return new ClientboundLevelParticlesPacket(particle, overrideLimiter, (float) posX, (float) posY, (float) posZ, randomX, randomY, randomZ, averageMaxSpeed, count, data);
+#endif
+    }
 
     <code>
-    public void setPos(double x, double y, double z) {
-        setPosX(x);
-        setPosY(y);
-        setPosZ(z);
+    public static <T> ClientboundLevelParticlesPacketHandle createNew(com.bergerkiller.bukkit.common.resources.ParticleType<T> particleType, T value, double posX, double posY, double posZ, float randomX, float randomY, float randomZ, float maxSpeedX, float maxSpeedY, float maxSpeedZ, int count, boolean overrideLimiter, boolean alwaysShow, ParticleRandomization randomization) {
+        return T.createNew.invokeVA(particleType.getRawHandle(), value, posX, posY, posZ, randomX, randomY, randomZ, maxSpeedX, maxSpeedY, maxSpeedZ, count, overrideLimiter, alwaysShow, randomization);
     }
 
-    public void setPos(org.bukkit.util.Vector pos) {
-        setPos(pos.getX(), pos.getY(), pos.getZ());
+    public static <T> ClientboundLevelParticlesPacketHandle createNew(com.bergerkiller.bukkit.common.resources.ParticleType<T> particleType, T value, double posX, double posY, double posZ, float randomX, float randomY, float randomZ, float maxSpeedX, float maxSpeedY, float maxSpeedZ, int count) {
+        return createNew(particleType, value, posX, posY, posZ, randomX, randomY, randomZ, maxSpeedX, maxSpeedY, maxSpeedZ, count, false, false, ParticleRandomization.DEFAULT);
     }
 
-    public void setPos(org.bukkit.Location loc) {
-        setPos(loc.getX(), loc.getY(), loc.getZ());
+    public static <T> ClientboundLevelParticlesPacketHandle createNew(com.bergerkiller.bukkit.common.resources.ParticleType<T> particleType, T value, double posX, double posY, double posZ) {
+        return createNew(particleType, value, posX, posY, posZ, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, false, false, ParticleRandomization.DEFAULT);
     }
 
-    public void setRandom(double rx, double ry, double rz) {
-        setRandom((float) rx, (float) ry, (float) rz);
+    public static ClientboundLevelParticlesPacketHandle createNew(com.bergerkiller.bukkit.common.resources.ParticleType<Void> particleType, double posX, double posY, double posZ, float randomX, float randomY, float randomZ, float maxSpeedX, float maxSpeedY, float maxSpeedZ, int count, boolean overrideLimiter, boolean alwaysShow, ParticleRandomization randomization) {
+        return createNew(particleType, null, posX, posY, posZ, randomX, randomY, randomZ, maxSpeedX, maxSpeedY, maxSpeedZ, count, overrideLimiter, alwaysShow, randomization);
     }
 
-    public void setRandom(float rx, float ry, float rz) {
-        setRandomX(rx);
-        setRandomY(ry);
-        setRandomZ(rz);
+    public static ClientboundLevelParticlesPacketHandle createNew(com.bergerkiller.bukkit.common.resources.ParticleType<Void> particleType, double posX, double posY, double posZ, float randomX, float randomY, float randomZ, float maxSpeedX, float maxSpeedY, float maxSpeedZ, int count) {
+        return createNew(particleType, posX, posY, posZ, randomX, randomY, randomZ, maxSpeedX, maxSpeedY, maxSpeedZ, count, false, false, ParticleRandomization.DEFAULT);
     }
 
-    public void setRandom(org.bukkit.util.Vector random) {
-        setRandom(random.getX(), random.getY(), random.getZ());
+    public static ClientboundLevelParticlesPacketHandle createNew(com.bergerkiller.bukkit.common.resources.ParticleType<Void> particleType, double posX, double posY, double posZ) {
+        return createNew(particleType, posX, posY, posZ, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, false, false, ParticleRandomization.DEFAULT);
+    }
+
+    public ClientboundLevelParticlesPacketHandle withRandom(float uniformRandom) {
+        return withRandom(uniformRandom, uniformRandom, uniformRandom);
+    }
+
+    public ClientboundLevelParticlesPacketHandle withRandom(float randomX, float randomY, float randomZ) {
+        return withConfiguration(getPosX(), getPosY(), getPosZ(), randomX, randomY, randomZ, getMaxSpeedX(), getMaxSpeedY(), getMaxSpeedZ(), getCount(), isOverrideLimiter(), isAlwaysShow(), getRandomization());
+    }
+
+    public ClientboundLevelParticlesPacketHandle withMaxSpeed(float maxUniformSpeed) {
+        return withMaxSpeed(maxUniformSpeed, maxUniformSpeed, maxUniformSpeed);
+    }
+
+    public ClientboundLevelParticlesPacketHandle withMaxSpeed(float maxSpeedX, float maxSpeedY, float maxSpeedZ) {
+        return withConfiguration(getPosX(), getPosY(), getPosZ(), getRandomX(), getRandomY(), getRandomZ(), maxSpeedX, maxSpeedY, maxSpeedZ, getCount(), isOverrideLimiter(), isAlwaysShow(), getRandomization());
+    }
+
+    public ClientboundLevelParticlesPacketHandle withOverrideLimiter() {
+        return withConfiguration(getPosX(), getPosY(), getPosZ(), getRandomX(), getRandomY(), getRandomZ(), getMaxSpeedX(), getMaxSpeedY(), getMaxSpeedZ(), getCount(), true, isAlwaysShow(), getRandomization());
+    }
+
+    public ClientboundLevelParticlesPacketHandle withAlwaysShow() {
+        return withConfiguration(getPosX(), getPosY(), getPosZ(), getRandomX(), getRandomY(), getRandomZ(), getMaxSpeedX(), getMaxSpeedY(), getMaxSpeedZ(), getCount(), isOverrideLimiter(), true, getRandomization());
+    }
+
+    public ClientboundLevelParticlesPacketHandle withRandomization(ParticleRandomization randomization) {
+        return withConfiguration(getPosX(), getPosY(), getPosZ(), getRandomX(), getRandomY(), getRandomZ(), getMaxSpeedX(), getMaxSpeedY(), getMaxSpeedZ(), getCount(), isOverrideLimiter(), isAlwaysShow(), randomization);
     }
     </code>
-
-    public double getPosX() {
-        return (double) instance#pos_x;
-    }
-
-    public double getPosY() {
-        return (double) instance#pos_y;
-    }
-
-    public double getPosZ() {
-        return (double) instance#pos_z;
-    }
-
-#if version >= 1.15
-    public void setPosX(double x) {
-        instance#pos_x = x;
-    }
-
-    public void setPosY(double y) {
-        instance#pos_y = y;
-    }
-
-    public void setPosZ(double z) {
-        instance#pos_z = z;
-    }
-#else
-    public void setPosX(double x) {
-        instance#pos_x = (float)x;
-    }
-
-    public void setPosY(double y) {
-        instance#pos_y = (float)y;
-    }
-
-    public void setPosZ(double z) {
-        instance#pos_z = (float)z;
-    }
-#endif
 }
