@@ -514,17 +514,25 @@ class EntityTrackerEntry {
 class EntityTrackerEntryState {
 #if version >= 1.17
     private final (EntityHandle) Entity entity;
-    private final int updateInterval;
     private final boolean isMobile:trackDelta;
 #elseif version >= 1.14
     private final (EntityHandle) Entity entity:tracker;
-    private final int updateInterval:d;
     private final boolean isMobile:e;
 #elseif version >= 1.9
     private final readonly (EntityHandle) Entity entity:tracker;
-    private final int updateInterval:g;
 #else
     public final readonly (EntityHandle) Entity entity:tracker;
+#endif
+
+#if version >= 26.3
+    private final (int) net.minecraft.world.entity.UpdateInterval updateInterval;
+#elseif version >= 1.17
+    private final int updateInterval;
+#elseif version >= 1.14
+    private final int updateInterval:d;
+#elseif version >= 1.9
+    private final int updateInterval:g;
+#else
     public int updateInterval:c;
 #endif
 

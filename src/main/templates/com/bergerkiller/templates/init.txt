@@ -45,6 +45,7 @@
 #include /net/minecraft/core_particles.txt
 #include /net/minecraft/crashreport.txt
 #include /net/minecraft/entity/entity_attributes.txt
+#include /net/minecraft/entity/update_interval.txt
 #include /net/minecraft/entity/bat.txt
 #include /net/minecraft/entity/decoration.txt
 #include /net/minecraft/entity/endercrystal.txt

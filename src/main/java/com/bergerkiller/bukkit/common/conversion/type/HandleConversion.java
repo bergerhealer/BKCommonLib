@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.internal.logic.ChunkHandleTracker;
 import com.bergerkiller.generated.net.minecraft.core.BlockPosHandle;
 import com.bergerkiller.generated.net.minecraft.resources.IdentifierHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypeHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.UpdateIntervalHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.ChatColor;
@@ -516,5 +517,17 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.core.particles.ParticleType")
     public static Object toParticleHandle(ParticleType<?> particleType) {
         return particleType.getRawHandle();
+    }
+
+    // Since 26.3
+    @ConverterMethod(input="net.minecraft.world.entity.UpdateInterval", optional = true)
+    public static int fromIntervalToPeriod(Object updateInterval) {
+        return UpdateIntervalHandle.fromIntervalToPeriod(updateInterval);
+    }
+
+    // Since 26.3
+    @ConverterMethod(output="net.minecraft.world.entity.UpdateInterval", optional = true)
+    public static Object fromPeriodToInterval(int period) {
+        return UpdateIntervalHandle.fromPeriodToInterval(period);
     }
 }

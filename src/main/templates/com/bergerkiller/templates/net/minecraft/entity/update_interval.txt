@@ -1,0 +1,23 @@
+package net.minecraft.world.entity;
+
+// Since 26.3. They added a 'never'. This just encodes that as Integer.MAX_VALUE.
+// If mojang adds more interesting stuff than that to this, adjust.
+optional interface UpdateInterval {
+    public static Object fromPeriodToInterval(int period) {
+        if (period == Integer.MAX_VALUE) {
+            return UpdateInterval.NEVER;
+        } else if (period > 0) {
+            return UpdateInterval.period(period);
+        } else {
+            throw new IllegalArgumentException("Invalid update interval period: " + period);
+        }
+    }
+
+    public static int fromIntervalToPeriod(Object updateInterval) {
+        if (updateInterval == UpdateInterval.NEVER) {
+            return Integer.MAX_VALUE;
+        } else {
+            return ((UpdateInterval) updateInterval).nextInterval(0);
+        }
+    }
+}

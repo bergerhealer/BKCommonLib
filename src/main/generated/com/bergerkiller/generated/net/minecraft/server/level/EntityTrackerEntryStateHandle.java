@@ -123,10 +123,10 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
     }
     public abstract EntityHandle getEntity();
     public abstract void setEntity(EntityHandle value);
-    public abstract int getUpdateInterval();
-    public abstract void setUpdateInterval(int value);
     public abstract boolean isMobile();
     public abstract void setIsMobile(boolean value);
+    public abstract int getUpdateInterval();
+    public abstract void setUpdateInterval(int value);
     public abstract int getTickCounter();
     public abstract void setTickCounter(int value);
     public abstract int getTimeSinceLocationSync();
@@ -137,8 +137,8 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
      */
     public static final class EntityTrackerEntryStateClass extends Template.Class<EntityTrackerEntryStateHandle> {
         public final Template.Field.Converted<EntityHandle> entity = new Template.Field.Converted<EntityHandle>();
-        public final Template.Field.Integer updateInterval = new Template.Field.Integer();
         public final Template.Field.Boolean isMobile = new Template.Field.Boolean();
+        public final Template.Field.Integer updateInterval = new Template.Field.Integer();
         @Template.Optional
         public final Template.Field<Consumer> broadcastMethod = new Template.Field<Consumer>();
         public final Template.Field.Integer tickCounter = new Template.Field.Integer();
