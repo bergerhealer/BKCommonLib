@@ -1,6 +1,7 @@
 package net.minecraft.network.protocol.game;
 
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.core.PositionAndRotation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.phys.Vec3;
@@ -25,7 +26,18 @@ import com.bergerkiller.bukkit.common.wrappers.RelativeFlags;
 
 // Only >= MC 1.9
 optional class ServerboundMoveVehiclePacket extends Packet {
-#if version >= 1.21.4
+#if version >= 26.3
+    public double getPosX() { return instance.movingTo().position().x; }
+    public double getPosY() { return instance.movingTo().position().y; }
+    public double getPosZ() { return instance.movingTo().position().z; }
+    public float getYaw() { return instance.movingTo().yRot(); }
+    public float getPitch() { return instance.movingTo().xRot(); }
+    public boolean isOnGround:onGround();
+
+    public static (ServerboundMoveVehiclePacketHandle) ServerboundMoveVehiclePacket createNew(double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
+        return new ServerboundMoveVehiclePacket(PositionAndRotation.of(new Vec3(posX, posY, posZ), yaw, pitch, onGround));
+    }
+#elseif version >= 1.21.4
     public double getPosX() { return instance.position().x; }
     public double getPosY() { return instance.position().y; }
     public double getPosZ() { return instance.position().z; }
@@ -78,7 +90,17 @@ optional class ServerboundMoveVehiclePacket extends Packet {
 
 // Only >= MC 1.9
 optional class ClientboundMoveVehiclePacket extends Packet {
-#if version >= 1.21.4
+#if version >= 26.3
+    public double getPosX() { return instance.movingTo().position().x; }
+    public double getPosY() { return instance.movingTo().position().y; }
+    public double getPosZ() { return instance.movingTo().position().z; }
+    public float getYaw() { return instance.movingTo().yRot(); }
+    public float getPitch() { return instance.movingTo().xRot(); }
+
+    public static (ClientboundMoveVehiclePacketHandle) ClientboundMoveVehiclePacket createNew(double posX, double posY, double posZ, float yaw, float pitch) {
+        return new ClientboundMoveVehiclePacket(PositionAndRotation.of(new Vec3(posX, posY, posZ), yaw, pitch));
+    }
+#elseif version >= 1.21.4
     public double getPosX() { return instance.position().x; }
     public double getPosY() { return instance.position().y; }
     public double getPosZ() { return instance.position().z; }
