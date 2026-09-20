@@ -13,10 +13,6 @@ public abstract class TagHandle extends Template.Handle {
     public static final TagClass T = Template.Class.create(TagClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
-    public static TagHandle createHandle(Object handleInstance) {
-        return T.createHandle(handleInstance);
-    }
-
     /* ============================================================================== */
 
     public abstract byte getTypeId();

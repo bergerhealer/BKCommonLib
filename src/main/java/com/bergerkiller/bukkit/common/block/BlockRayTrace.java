@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.block;
 
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.BlockHitResultHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.HitResultHandle;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -163,8 +164,10 @@ public final class BlockRayTrace {
 
         private HitResult(BlockRayTrace rayTrace, HitResultHandle mop) {
             this.rayTrace = rayTrace;
-            this.absolutePosition = mop.getPos();
-            this.hitFace = mop.getDirection();
+            this.absolutePosition = mop.getLocation();
+            this.hitFace = (mop instanceof BlockHitResultHandle)
+                    ? ((BlockHitResultHandle) mop).getDirection()
+                    : BlockFace.DOWN;
 
             // Move an infinitely small amount forwards so that we are properly inside the block we hit
             // Avoids the common issue of getting air depending on the direction axis

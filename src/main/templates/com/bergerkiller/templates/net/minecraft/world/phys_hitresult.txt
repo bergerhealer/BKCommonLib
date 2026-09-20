@@ -1,0 +1,123 @@
+package net.minecraft.world.phys;
+
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
+
+import org.bukkit.block.BlockFace;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+
+import com.bergerkiller.generated.net.minecraft.world.phys.HitResultHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.BlockHitResultHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.EntityHitResultHandle;
+
+class HitResult {
+#if version >= 1.18
+    public (org.bukkit.util.Vector) Vec3 getLocation();
+#elseif version >= 1.14
+    public (org.bukkit.util.Vector) Vec3 getLocation:getPos();
+#else
+    public (org.bukkit.util.Vector) Vec3 getLocation() {
+        return instance.pos;
+    }
+#endif
+
+    // Properly converts HitResult into Block/Entity hit result, if it is of that type
+    public static HitResultHandle createHandle((Object) HitResult hitResult) {
+#if version >= 1.14
+        if (hitResult instanceof net.minecraft.world.phys.EntityHitResult && hitResult.getType() == net.minecraft.world.phys.HitResult$Type.ENTITY) {
+            return (EntityHitResultHandle) EntityHitResultHandle.T.createHandle(hitResult);
+        } else if (hitResult instanceof net.minecraft.world.phys.BlockHitResult) {
+            return (BlockHitResultHandle) BlockHitResultHandle.T.createHandle(hitResult);
+        }
+#else
+        if (hitResult.type == net.minecraft.world.phys.HitResult$Type.ENTITY) {
+            return (EntityHitResultHandle) EntityHitResultHandle.T.createHandle(hitResult);
+        } else {
+            return (BlockHitResultHandle) BlockHitResultHandle.T.createHandle(hitResult);
+        }
+#endif
+
+        // Probably never hit, but maybe someone creates a custom HitResult type not covered here.
+        return (HitResultHandle) HitResultHandle.T.createHandle(hitResult);
+    }
+}
+
+class BlockHitResult extends HitResult {
+#if version >= 1.18
+    public (IntVector3) BlockPos getBlockPos();
+#elseif version >= 1.14
+    public (IntVector3) BlockPos getBlockPos:getBlockPosition();
+#elseif version >= 1.13.2 && exists net.minecraft.world.phys.BlockHitResult public net.minecraft.core.BlockPos getBlockPosition();
+    public (IntVector3) BlockPos getBlockPos:getBlockPosition();
+#else
+    public (IntVector3) BlockPos getBlockPos:a();
+#endif
+
+#if version >= 1.14
+    public (BlockFace) Direction getDirection();
+#else
+    public (BlockFace) Direction getDirection() {
+        return instance.direction;
+    }
+#endif
+
+#if version >= 1.18
+    public boolean isInside();
+#elseif version >= 1.14
+    public boolean isInside:d();
+#else
+    public boolean isInside() { return false; }
+#endif
+
+#if version >= 1.21.2
+    public boolean isWorldBorderHit();
+#else
+    public boolean isWorldBorderHit() { return false; }
+#endif
+
+    public boolean isMiss() {
+#if version >= 1.14
+        return instance.getType() == net.minecraft.world.phys.HitResult$Type.MISS;
+#else
+        return instance.type == net.minecraft.world.phys.HitResult$Type.MISS;
+#endif
+    }
+
+#if version >= 1.18
+    public static (BlockHitResultHandle) BlockHitResult createNewMiss:miss((org.bukkit.util.Vector) Vec3 location, (BlockFace) Direction direction, (IntVector3) BlockPos pos);
+#elseif version >= 1.14
+    public static (BlockHitResultHandle) BlockHitResult createNewMiss:a((org.bukkit.util.Vector) Vec3 location, (BlockFace) Direction direction, (IntVector3) BlockPos pos);
+#else
+    public static (BlockHitResultHandle) BlockHitResult createNewMiss((org.bukkit.util.Vector) Vec3 location, (BlockFace) Direction direction, (IntVector3) BlockPos pos) {
+        return new BlockHitResult(net.minecraft.world.phys.HitResult$Type.MISS, location, direction, pos);
+    }
+#endif
+
+    public static (BlockHitResultHandle) BlockHitResult createNew((org.bukkit.util.Vector) Vec3 location, (BlockFace) Direction direction, (IntVector3) BlockPos pos, boolean inside) {
+#if version >= 1.14
+        return new BlockHitResult(location, direction, pos, inside);
+#else
+        return new BlockHitResult(location, direction, pos);
+#endif
+    }
+}
+
+class EntityHitResult extends HitResult {
+#if version >= 1.14
+    public (org.bukkit.entity.Entity) Entity getEntity();
+#else
+    public (org.bukkit.entity.Entity) Entity getEntity() {
+        return instance.entity;
+    }
+#endif
+
+    public static (EntityHitResultHandle) EntityHitResult createNew((org.bukkit.entity.Entity) Entity entity) {
+        return new EntityHitResult(entity);
+    }
+
+    public static (EntityHitResultHandle) EntityHitResult createNewAt((org.bukkit.entity.Entity) Entity entity, (org.bukkit.util.Vector) Vec3 location) {
+        return new EntityHitResult(entity, location);
+    }
+}

@@ -1,7 +1,6 @@
 package com.bergerkiller.generated.net.minecraft.world.phys;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
 
 /**
@@ -15,24 +14,21 @@ public abstract class HitResultHandle extends Template.Handle {
     public static final HitResultClass T = Template.Class.create(HitResultClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
-    public static HitResultHandle createHandle(Object handleInstance) {
-        return T.createHandle(handleInstance);
-    }
-
     /* ============================================================================== */
 
-    public abstract BlockFace getDirection();
-    @Template.Readonly
-    public abstract Vector getPos();
+    public static HitResultHandle createHandle(Object hitResult) {
+        return T.createHandle.invoke(hitResult);
+    }
+
+    public abstract Vector getLocation();
     /**
      * Stores class members for <b>net.minecraft.world.phys.HitResult</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class HitResultClass extends Template.Class<HitResultHandle> {
-        @Template.Readonly
-        public final Template.Field.Converted<Vector> pos = new Template.Field.Converted<Vector>();
+        public final Template.StaticMethod.Converted<HitResultHandle> createHandle = new Template.StaticMethod.Converted<HitResultHandle>();
 
-        public final Template.Method.Converted<BlockFace> getDirection = new Template.Method.Converted<BlockFace>();
+        public final Template.Method.Converted<Vector> getLocation = new Template.Method.Converted<Vector>();
 
     }
 

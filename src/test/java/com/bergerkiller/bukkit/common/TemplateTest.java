@@ -12,14 +12,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.TeamColorConversion;
 import com.bergerkiller.bukkit.common.utils.DebugUtil;
 import com.bergerkiller.generated.net.minecraft.core.DirectionHandle;
 import com.bergerkiller.generated.net.minecraft.core.RotationsHandle;
 import com.bergerkiller.generated.net.minecraft.network.syncher.SynchedEntityDataHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.MinecartHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.BlockHitResultHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.HitResultHandle;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.block.BlockFace;
+import org.bukkit.util.Vector;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -270,5 +275,22 @@ public class TemplateTest {
         Object entity = MinecartHandle.T.newInstanceNull();
         EntityHook hook = new EntityHook();
         assertNotNull(hook.hook(entity));
+    }
+
+    @Test
+    public void testHitResultCreateHandle() {
+        // Makes sure the Mountiplex createHandle template logic works correctly
+
+        BlockHitResultHandle hitResult = BlockHitResultHandle.createNew(
+                new Vector(1, 2, 3),
+                BlockFace.NORTH,
+                new IntVector3(4, 5, 6),
+                false
+        );
+
+        // Call the HitResult createHandle with this raw type
+        HitResultHandle fromCreateHandle = HitResultHandle.createHandle(hitResult.getRaw());
+
+        assertTrue(fromCreateHandle instanceof BlockHitResultHandle);
     }
 }

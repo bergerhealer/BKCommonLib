@@ -51,12 +51,13 @@ public class TemplateResolver implements ClassDeclarationResolver {
             return allByType.get(0);
         } else {
             // Poor man's method of selecting the right packet using Class Simple Name
+            ClassDeclaration longestMatchingName = null;
             for (ClassDeclaration dec : allByType) {
-                if (classPath.endsWith(dec.type.typeName)) {
-                    return dec;
+                if ((longestMatchingName == null || dec.type.typeName.length() > longestMatchingName.type.typeName.length()) && classPath.endsWith(dec.type.typeName)) {
+                    longestMatchingName = dec;
                 }
             }
-            return allByType.get(0);
+            return longestMatchingName != null ? longestMatchingName : allByType.get(0);
         }
     }
 

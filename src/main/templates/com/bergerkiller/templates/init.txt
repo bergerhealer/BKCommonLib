@@ -128,7 +128,7 @@
 #include /net/minecraft/world/level_world.txt
 #include /net/minecraft/world/mobeffect.txt
 #include /net/minecraft/world/phys_axisalignedbb.txt
-#include /net/minecraft/world/phys_movingobject.txt
+#include /net/minecraft/world/phys_hitresult.txt
 #include /net/minecraft/world/phys_shapes_voxelshape.txt
 #include /net/minecraft/world/phys_vec3d.txt
 

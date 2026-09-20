@@ -845,6 +845,11 @@ public class CommonBootstrap {
 
             // Empty block getter doesn't exist, so we made our own implementation for it
             remappings.put("net.minecraft.world.level.EmptyBlockGetter", EmptyBlockGetterInit.CLASS_NAME);
+
+            // There is no specific class for block/entity hitting. All use the same HitResult (MovingObjectPosition) class.
+            // They are differentiated solely by the getType() method.
+            remappings.put("net.minecraft.world.phys.BlockHitResult", "net.minecraft.world.phys.HitResult");
+            remappings.put("net.minecraft.world.phys.EntityHitResult", "net.minecraft.world.phys.HitResult");
         }
 
         /* ======== Mojang remapping changes for 1.13 ======== */
