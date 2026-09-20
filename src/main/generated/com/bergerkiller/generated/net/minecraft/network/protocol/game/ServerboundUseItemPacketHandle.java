@@ -21,44 +21,47 @@ public abstract class ServerboundUseItemPacketHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public static ServerboundUseItemPacketHandle createNew(HumanHandRole handRole, long timestamp, int sequence, float yaw, float pitch) {
+        return T.createNew.invoke(handRole, timestamp, sequence, yaw, pitch);
+    }
+
+    public abstract int getSequence();
     public abstract float getYaw();
     public abstract float getPitch();
-    public abstract void setYaw(float yaw);
-    public abstract void setPitch(float pitch);
     public abstract HumanHandRole getHandRole();
-    public abstract void setHandRole(HumanHandRole handRole);
+    public abstract long getTimestamp();
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
         return com.bergerkiller.bukkit.common.protocol.PacketType.IN_USE_ITEM;
-    }
-
-    public void setTimestamp(long timestamp) {
-        if (T.timestamp.isAvailable()) {
-            T.timestamp.setLong(getRaw(), timestamp);
-        }
     }
 
     public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
         return getHandRole().getHandOf(humanEntity);
     }
 
-    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
-        setHandRole(hand.getRoleOf(humanEntity));
+    public ServerboundUseItemPacketHandle withRotation(float yaw, float pitch) {
+        return createNew(getHandRole(), getTimestamp(), getSequence(), yaw, pitch);
+    }
+
+    public ServerboundUseItemPacketHandle withHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
+        return withHandRole(hand.getRoleOf(humanEntity));
+    }
+
+    public ServerboundUseItemPacketHandle withHandRole(HumanHandRole handRole) {
+        return createNew(handRole, getTimestamp(), getSequence(), getYaw(), getPitch());
     }
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.ServerboundUseItemPacket</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ServerboundUseItemPacketClass extends Template.Class<ServerboundUseItemPacketHandle> {
-        @Template.Optional
-        public final Template.Field.Long timestamp = new Template.Field.Long();
+        public final Template.StaticMethod.Converted<ServerboundUseItemPacketHandle> createNew = new Template.StaticMethod.Converted<ServerboundUseItemPacketHandle>();
 
+        public final Template.Method<Integer> getSequence = new Template.Method<Integer>();
         public final Template.Method<Float> getYaw = new Template.Method<Float>();
         public final Template.Method<Float> getPitch = new Template.Method<Float>();
-        public final Template.Method<Void> setYaw = new Template.Method<Void>();
-        public final Template.Method<Void> setPitch = new Template.Method<Void>();
         public final Template.Method.Converted<HumanHandRole> getHandRole = new Template.Method.Converted<HumanHandRole>();
-        public final Template.Method.Converted<Void> setHandRole = new Template.Method.Converted<Void>();
+        public final Template.Method<Long> getTimestamp = new Template.Method<Long>();
 
     }
 

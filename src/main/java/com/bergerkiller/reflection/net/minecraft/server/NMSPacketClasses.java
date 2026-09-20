@@ -122,18 +122,6 @@ public class NMSPacketClasses {
     }
 
     public static class NMSServerboundSwingPacket extends NMSPacket {
-
-        /**
-         * Sets the hand that is animated
-         *
-         * @param packet to write to
-         * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
-         * @param humanHand to set to
-         */
-        public final void setHand(CommonPacket packet, HumanEntity humanEntity, HumanHand humanHand) {
-            ServerboundSwingPacketHandle.createHandle(packet.getHandle()).setHand(humanEntity, humanHand);
-        }
-
         /**
          * Gets the hand that is animated
          *
@@ -159,8 +147,6 @@ public class NMSPacketClasses {
 
     public static class NMSServerboundUseItemPacket extends NMSPacket {
 
-        public final FieldAccessor<Long> timestamp = ServerboundUseItemPacketHandle.T.timestamp.toFieldAccessor().ignoreInvalid(0L);
-
         @Override
         protected boolean matchPacket(Object packetHandle) {
             if (CommonCapabilities.PLACE_PACKETS_MERGED) {
@@ -178,17 +164,6 @@ public class NMSPacketClasses {
         }
 
         /**
-         * Sets the hand that placed the block
-         *
-         * @param packet to write to
-         * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
-         * @param humanHand to set to
-         */
-        public final void setHand(CommonPacket packet, HumanEntity humanEntity, HumanHand humanHand) {
-            ServerboundUseItemPacketHandle.createHandle(packet.getHandle()).setHand(humanEntity, humanHand);
-        }
-
-        /**
          * Gets the hand that placed the block
          *
          * @param packet to read from
@@ -202,69 +177,77 @@ public class NMSPacketClasses {
 
     public static class NMSServerboundUseItemOnPacket extends NMSPacket {
 
+        /** Note: block position */
         public final FieldAccessor<IntVector3> position = new SafeDirectField<IntVector3>() {
             @Override
             public IntVector3 get(Object instance) {
-                return ServerboundUseItemOnPacketHandle.T.getPosition.invoke(instance);
+                return ServerboundUseItemOnPacketHandle.createHandle(instance).getBlockPos();
             }
 
             @Override
             public boolean set(Object instance, IntVector3 value) {
-                ServerboundUseItemOnPacketHandle.T.setPosition.invoke(instance, value);
-                return true;
+                return false;
             }
         };
         public final FieldAccessor<BlockFace> direction = new SafeDirectField<BlockFace>() {
             @Override
             public BlockFace get(Object instance) {
-                return ServerboundUseItemOnPacketHandle.T.getDirection.invoke(instance);
+                return ServerboundUseItemOnPacketHandle.createHandle(instance).getDirection();
             }
 
             @Override
             public boolean set(Object instance, BlockFace value) {
-                ServerboundUseItemOnPacketHandle.T.setDirection.invoke(instance, value);
-                return true;
+                return false;
             }
         };
 
-
+        @Deprecated
         public final FieldAccessor<Float> deltaX = new SafeDirectField<Float>() {
             @Override
             public Float get(Object instance) {
-                return ServerboundUseItemOnPacketHandle.T.getDeltaX.invoke(instance);
+                return ServerboundUseItemOnPacketHandle.createHandle(instance).getDeltaX();
             }
 
             @Override
             public boolean set(Object instance, Float value) {
-                ServerboundUseItemOnPacketHandle.T.setDeltaX.invoke(instance, value);
-                return true;
+                return false;
             }
         };
+        @Deprecated
         public final FieldAccessor<Float> deltaY = new SafeDirectField<Float>() {
             @Override
             public Float get(Object instance) {
-                return ServerboundUseItemOnPacketHandle.T.getDeltaY.invoke(instance);
+                return ServerboundUseItemOnPacketHandle.createHandle(instance).getDeltaY();
             }
 
             @Override
             public boolean set(Object instance, Float value) {
-                ServerboundUseItemOnPacketHandle.T.setDeltaY.invoke(instance, value);
-                return true;
+                return false;
             }
         };
+        @Deprecated
         public final FieldAccessor<Float> deltaZ = new SafeDirectField<Float>() {
             @Override
             public Float get(Object instance) {
-                return ServerboundUseItemOnPacketHandle.T.getDeltaZ.invoke(instance);
+                return ServerboundUseItemOnPacketHandle.createHandle(instance).getDeltaZ();
             }
 
             @Override
             public boolean set(Object instance, Float value) {
-                ServerboundUseItemOnPacketHandle.T.setDeltaZ.invoke(instance, value);
-                return true;
+                return false;
             }
         };
-        public final FieldAccessor<Long> timestamp = ServerboundUseItemOnPacketHandle.T.timestamp.toFieldAccessor().ignoreInvalid(0L);
+        public final FieldAccessor<Long> timestamp = new FieldAccessor<Long>() {
+            @Override
+            public Long get(Object instance) {
+                return ServerboundUseItemOnPacketHandle.createHandle(instance).getTimestamp();
+            }
+
+            @Override
+            public boolean set(Object instance, Long value) {
+                return false;
+            }
+        };
 
         @Override
         protected boolean matchPacket(Object packetHandle) {
@@ -273,17 +256,6 @@ public class NMSPacketClasses {
             } else {
                 return true;
             }
-        }
-
-        /**
-         * Sets the hand that used the item
-         *
-         * @param packet to write to
-         * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
-         * @param humanHand to set to
-         */
-        public final void setHand(CommonPacket packet, HumanEntity humanEntity, HumanHand humanHand) {
-            ServerboundUseItemOnPacketHandle.createHandle(packet.getHandle()).setHand(humanEntity, humanHand);
         }
 
         /**
