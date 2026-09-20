@@ -30,6 +30,9 @@ public abstract class EntityHitResultHandle extends HitResultHandle {
     }
 
     public abstract Entity getEntity();
+    public EntityHitResultHandle withLocation(org.bukkit.util.Vector location) {
+        return createNewAt(getEntity(), location);
+    }
     /**
      * Stores class members for <b>net.minecraft.world.phys.EntityHitResult</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

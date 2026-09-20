@@ -31,10 +31,23 @@ public abstract class BlockHitResultHandle extends HitResultHandle {
     }
 
     public abstract IntVector3 getBlockPos();
+    public abstract Vector getRelativePosition();
     public abstract BlockFace getDirection();
     public abstract boolean isInside();
     public abstract boolean isWorldBorderHit();
     public abstract boolean isMiss();
+    public BlockHitResultHandle withLocation(org.bukkit.util.Vector location) {
+        return createNew(location, getDirection(), getBlockPos(), isInside());
+    }
+
+    public BlockHitResultHandle withRelativePosition(org.bukkit.util.Vector relativeLocation) {
+        IntVector3 blockPos = getBlockPos();
+        return withLocation(new org.bukkit.util.Vector(
+            relativeLocation.getX() + blockPos.x,
+            relativeLocation.getY() + blockPos.y,
+            relativeLocation.getZ() + blockPos.z
+        ));
+    }
     /**
      * Stores class members for <b>net.minecraft.world.phys.BlockHitResult</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -44,6 +57,7 @@ public abstract class BlockHitResultHandle extends HitResultHandle {
         public final Template.StaticMethod.Converted<BlockHitResultHandle> createNew = new Template.StaticMethod.Converted<BlockHitResultHandle>();
 
         public final Template.Method.Converted<IntVector3> getBlockPos = new Template.Method.Converted<IntVector3>();
+        public final Template.Method<Vector> getRelativePosition = new Template.Method<Vector>();
         public final Template.Method.Converted<BlockFace> getDirection = new Template.Method.Converted<BlockFace>();
         public final Template.Method<Boolean> isInside = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isWorldBorderHit = new Template.Method<Boolean>();

@@ -13,10 +13,9 @@ import com.bergerkiller.generated.net.minecraft.world.phys.BlockHitResultHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.EntityHitResultHandle;
 
 class HitResult {
-#if version >= 1.18
+#if version >= 1.14
+    // Note: has remappings in hitresult_remappings.txt
     public (org.bukkit.util.Vector) Vec3 getLocation();
-#elseif version >= 1.14
-    public (org.bukkit.util.Vector) Vec3 getLocation:getPos();
 #else
     public (org.bukkit.util.Vector) Vec3 getLocation() {
         return instance.pos;
@@ -45,15 +44,20 @@ class HitResult {
 }
 
 class BlockHitResult extends HitResult {
-#if version >= 1.18
+    // Note: has remappings in hitresult_remappings.txt
     public (IntVector3) BlockPos getBlockPos();
-#elseif version >= 1.14
-    public (IntVector3) BlockPos getBlockPos:getBlockPosition();
-#elseif version >= 1.13.2 && exists net.minecraft.world.phys.BlockHitResult public net.minecraft.core.BlockPos getBlockPosition();
-    public (IntVector3) BlockPos getBlockPos:getBlockPosition();
+
+    // Convenience methods to get the delta x/y/z
+    // This is what the < 1.9 player interaction packet used
+    public org.bukkit.util.Vector getRelativePosition() {
+        BlockPos blockPos = instance.getBlockPos();
+#if version >= 1.14
+        Vec3 pos = instance.getLocation();
 #else
-    public (IntVector3) BlockPos getBlockPos:a();
+        Vec3 pos = instance.pos;
 #endif
+        return new org.bukkit.util.Vector(pos.x - blockPos.getX(), pos.y - blockPos.getY(), pos.z - blockPos.getZ());
+    }
 
 #if version >= 1.14
     public (BlockFace) Direction getDirection();
@@ -102,6 +106,21 @@ class BlockHitResult extends HitResult {
         return new BlockHitResult(location, direction, pos);
 #endif
     }
+
+    <code>
+    public BlockHitResultHandle withLocation(org.bukkit.util.Vector location) {
+        return createNew(location, getDirection(), getBlockPos(), isInside());
+    }
+
+    public BlockHitResultHandle withRelativePosition(org.bukkit.util.Vector relativeLocation) {
+        IntVector3 blockPos = getBlockPos();
+        return withLocation(new org.bukkit.util.Vector(
+            relativeLocation.getX() + blockPos.x,
+            relativeLocation.getY() + blockPos.y,
+            relativeLocation.getZ() + blockPos.z
+        ));
+    }
+    </code>
 }
 
 class EntityHitResult extends HitResult {
@@ -120,4 +139,10 @@ class EntityHitResult extends HitResult {
     public static (EntityHitResultHandle) EntityHitResult createNewAt((org.bukkit.entity.Entity) Entity entity, (org.bukkit.util.Vector) Vec3 location) {
         return new EntityHitResult(entity, location);
     }
+
+    <code>
+    public EntityHitResultHandle withLocation(org.bukkit.util.Vector location) {
+        return createNewAt(getEntity(), location);
+    }
+    </code>
 }
