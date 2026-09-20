@@ -712,9 +712,6 @@ public class NMSPacketClasses {
     }
 
     public static class NMSClientboundUpdateAdvancementsPacket extends NMSPacket {
-
-        public final FieldAccessor<Boolean> initial = ClientboundUpdateAdvancementsPacketHandle.T.initial.toFieldAccessor();
-        //TODO: Fields
     }
 
     public static class NMSClientboundAnimatePacket extends NMSPacket {

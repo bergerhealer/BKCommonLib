@@ -21,14 +21,13 @@ public abstract class ClientboundUpdateAdvancementsPacketHandle extends PacketHa
 
     /* ============================================================================== */
 
-    public abstract boolean isInitial();
-    public abstract void setInitial(boolean value);
+    public abstract boolean shouldReset();
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.ClientboundUpdateAdvancementsPacket</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ClientboundUpdateAdvancementsPacketClass extends Template.Class<ClientboundUpdateAdvancementsPacketHandle> {
-        public final Template.Field.Boolean initial = new Template.Field.Boolean();
+        public final Template.Method<Boolean> shouldReset = new Template.Method<Boolean>();
 
     }
 

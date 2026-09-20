@@ -2718,10 +2718,17 @@ class ServerboundTeleportToEntityPacket extends Packet {
 
 // Since Minecraft 1.12
 optional class ClientboundUpdateAdvancementsPacket extends Packet {
-#if version >= 1.17
-    private boolean initial:reset;
+#if version >= 1.18
+    public boolean shouldReset();
+#elseif version >= 1.17
+    public boolean shouldReset:e();
+#elseif version >= 1.12
+    public boolean shouldReset() {
+        #require ClientboundUpdateAdvancementsPacket private boolean reset:a;
+        return instance#reset;
+    }
 #else
-    private boolean initial:a;
+    public boolean shouldReset();
 #endif
 }
 
