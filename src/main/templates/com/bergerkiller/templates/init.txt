@@ -81,6 +81,7 @@
 #include /net/minecraft/network/protocol_packets_playerinfo.txt
 #include /net/minecraft/network/protocol_packets_common.txt
 #include /net/minecraft/network/protocol_packets_interaction.txt
+#include /net/minecraft/network/protocol_packets_particles.txt
 #include /net/minecraft/network/protocol_packets_other.txt
 #include /net/minecraft/network/protocol_packets_scoreboard.txt
 #include /net/minecraft/network/protocol_packets_spawn.txt
