@@ -943,17 +943,6 @@ class ClientboundLevelChunkWithLightPacket extends Packet {
     private int z:b;
 #endif
 
-    public static (ClientboundLevelChunkWithLightPacketHandle) ClientboundLevelChunkWithLightPacket createNew() {
-#if version >= 1.20.5
-        #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private ClientboundLevelChunkWithLightPacket createMapChunkPacket:<init>(net.minecraft.network.RegistryFriendlyByteBuf buf);
-        return #createMapChunkPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
-#elseif version >= 1.17
-        return new ClientboundLevelChunkWithLightPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
-#else
-        return new ClientboundLevelChunkWithLightPacket();
-#endif
-    }
-
     // Heightmap data, not available on MC 1.13.2 and before
     public (CommonTagCompound) CompoundTag getHeightmaps() {
 #if version >= 1.21.5

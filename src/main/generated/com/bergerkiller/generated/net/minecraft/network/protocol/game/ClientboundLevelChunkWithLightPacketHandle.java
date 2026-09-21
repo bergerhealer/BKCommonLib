@@ -23,10 +23,6 @@ public abstract class ClientboundLevelChunkWithLightPacketHandle extends PacketH
 
     /* ============================================================================== */
 
-    public static ClientboundLevelChunkWithLightPacketHandle createNew() {
-        return T.createNew.invoke();
-    }
-
     public abstract CommonTagCompound getHeightmaps();
     public abstract void setHeightmaps(CommonTagCompound heightmapsData);
     public abstract byte[] getBuffer();
@@ -60,8 +56,6 @@ public abstract class ClientboundLevelChunkWithLightPacketHandle extends PacketH
     public static final class ClientboundLevelChunkWithLightPacketClass extends Template.Class<ClientboundLevelChunkWithLightPacketHandle> {
         public final Template.Field.Integer x = new Template.Field.Integer();
         public final Template.Field.Integer z = new Template.Field.Integer();
-
-        public final Template.StaticMethod.Converted<ClientboundLevelChunkWithLightPacketHandle> createNew = new Template.StaticMethod.Converted<ClientboundLevelChunkWithLightPacketHandle>();
 
         public final Template.Method.Converted<CommonTagCompound> getHeightmaps = new Template.Method.Converted<CommonTagCompound>();
         public final Template.Method.Converted<Void> setHeightmaps = new Template.Method.Converted<Void>();
