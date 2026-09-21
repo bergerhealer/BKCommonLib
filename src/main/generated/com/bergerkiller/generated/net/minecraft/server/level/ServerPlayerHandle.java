@@ -43,6 +43,7 @@ public abstract class ServerPlayerHandle extends PlayerHandle {
     }
 
     public void closeSignEditWindow() {
+        // Tell client to close the dialog by editing a sign far away in a chunk that 100% guaranteed is not loaded
         openSignEditWindow(IntVector3.of(Integer.MAX_VALUE, 0, Integer.MAX_VALUE));
     }
 

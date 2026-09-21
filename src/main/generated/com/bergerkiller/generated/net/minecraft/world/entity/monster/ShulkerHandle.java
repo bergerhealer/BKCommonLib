@@ -24,6 +24,7 @@ public abstract class ShulkerHandle extends MobHandle {
     /* ============================================================================== */
 
     public static final Key<org.bukkit.block.BlockFace> DATA_FACE_DIRECTION = Key.Type.DIRECTION.createKey(T.DATA_FACE_DIRECTION, -1);
+    //public static final Key<IntVector3> DATA_AP = Key.Type.BLOCK_POSITION.createKey(T.DATA_AP, -1);
     public static final Key<Byte> DATA_PEEK = Key.Type.BYTE.createKey(T.DATA_PEEK, -1);
     public static final Key<Byte> DATA_COLOR = Key.Type.BYTE.createKey(T.DATA_COLOR, -1);
     /**

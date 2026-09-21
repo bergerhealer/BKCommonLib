@@ -50,6 +50,7 @@ public abstract class ClientboundSoundPacketHandle extends PacketHandle {
         if (T.category_1_10_2.isAvailable()) {
             T.category_1_10_2.set(getRaw(), categoryName);
         } else {
+            // Do nothing, unused
         }
     }
     public abstract ResourceKey<SoundEffect> getSound();

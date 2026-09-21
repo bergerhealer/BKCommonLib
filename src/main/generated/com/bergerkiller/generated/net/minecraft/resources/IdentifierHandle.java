@@ -42,6 +42,7 @@ public abstract class IdentifierHandle extends Template.Handle {
 
     public static boolean isValidNamespace(String namespace) {
         if (namespace == null || namespace.isEmpty()) {
+            // defaults to minecraft namespace in these cases
             return true;
         }
         for (int cidx = 0; cidx < namespace.length(); cidx++) {

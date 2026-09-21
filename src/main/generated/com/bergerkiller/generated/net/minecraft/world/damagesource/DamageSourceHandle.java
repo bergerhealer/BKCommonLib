@@ -96,6 +96,7 @@ public abstract class DamageSourceHandle extends Template.Handle {
                     "Failed to initialize damage sources by name", t);
         }
 
+        // Bleh!
         translateLegacyName("inFire", "in_fire");
         translateLegacyName("lightningBolt", "lightning_bolt");
         translateLegacyName("onFire", "on_fire");

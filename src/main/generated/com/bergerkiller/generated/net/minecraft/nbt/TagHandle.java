@@ -208,6 +208,7 @@ public abstract class TagHandle extends Template.Handle {
         return info.handleClass.createHandle(info.constructor.apply(data));
     }
 
+    // Used for decoding records/values using Codecs
     public static java.util.function.Consumer<String> createPartialErrorLogger(Object nbtBase) {
         return (s) -> {
             String nbtToStr = (nbtBase == null) ? "[null]" : nbtBase.toString();

@@ -38,7 +38,7 @@ public abstract class ClientboundCustomSoundPacketHandle extends PacketHandle {
     public abstract float getPitch();
     public abstract long getRandomSeed();
     public abstract void setRandomSeed(long seed);
-
+    /** Used for the random seed when creating new sound packets. */
     public static final java.util.Random SOUND_RANDOM_SEED_SOURCE = new java.util.Random();
 
     public static ClientboundCustomSoundPacketHandle createNew(com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect> soundEffect, String category, org.bukkit.Location location, float volume, float pitch) {
@@ -50,7 +50,7 @@ public abstract class ClientboundCustomSoundPacketHandle extends PacketHandle {
         return createNew(soundEffect, category, x, y, z, volume, pitch, randomSeed);
     }
 
-
+    /** @deprecated World argument is no longer needed */
     @Deprecated
     public static ClientboundCustomSoundPacketHandle createNew(com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect> soundEffect, String category, org.bukkit.World world, double x, double y, double z, float volume, float pitch) {
         return createNew(soundEffect, category, x, y, z, volume, pitch);

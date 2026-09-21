@@ -79,6 +79,12 @@ public class CommonCapabilities {
     public static final boolean TILE_ENTITY_LEGACY_NAMES = CommonBootstrap.evaluateMCVersion("<=", "1.10.2");
 
     /**
+     * Since Minecraft 1.10 entity movement updates are encoded as a short-encoded delta, while before this
+     * was a byte with less granularity.
+     */
+    public static final boolean PROTOCOL_MOVEMENT_IS_SHORT_DELTA = CommonBootstrap.evaluateMCVersion(">=", "1.10");
+
+    /**
      * Since Minecraft 1.9 more than one passenger per vehicle are permitted
      */
     public static final boolean MULTIPLE_PASSENGERS = CommonBootstrap.evaluateMCVersion(">=", "1.9");

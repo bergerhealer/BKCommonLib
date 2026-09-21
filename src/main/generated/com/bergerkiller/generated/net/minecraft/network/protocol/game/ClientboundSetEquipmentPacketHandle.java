@@ -45,6 +45,7 @@ public abstract class ClientboundSetEquipmentPacketHandle extends PacketHandle {
         }
     }
 
+    // Should no longer be used because it could be invalid on Minecraft 1.8 (player vs non-player)
     @Deprecated
     public static ClientboundSetEquipmentPacketHandle createNew(int entityId, org.bukkit.inventory.EquipmentSlot slot, org.bukkit.inventory.ItemStack itemStack) {
         return createNew(OwnerType.NON_PLAYER, entityId, slot, itemStack);

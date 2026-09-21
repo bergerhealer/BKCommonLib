@@ -30,25 +30,33 @@ public abstract class ClientboundMoveEntityPacketHandle extends PacketHandle {
     public abstract float getPitch();
     public abstract void setYaw(float yaw);
     public abstract void setPitch(float pitch);
-
+    /**
+     * Deprecated: is not actually a delta, use getYaw() instead
+     */
     @Deprecated
     public float getDeltaYaw() {
         return getYaw();
     }
 
-
+    /**
+     * Deprecated: is not actually a delta, use getPitch() instead
+     */
     @Deprecated
     public float getDeltaPitch() {
         return getPitch();
     }
 
-
+    /**
+     * Deprecated: is not actually a delta, use setYaw(yaw) instead
+     */
     @Deprecated
     public void setDeltaYaw(float deltaYaw) {
         setYaw(deltaYaw);
     }
 
-
+    /**
+     * Deprecated: is not actually a delta, use setPitch(pitch) instead
+     */
     @Deprecated
     public void setDeltaPitch(float deltaPitch) {
         setPitch(deltaPitch);

@@ -32,12 +32,14 @@ public abstract class ServerGamePacketListenerImplHandle extends Template.Handle
     }
 
     static {
+        // Default method when the Connection is vanilla unchanged
         queuePacketMethods.put(com.bergerkiller.generated.net.minecraft.network.ConnectionHandle.T.getType(), defaultQueuePacketMethod);
     }
 
     private static QueuePacketMethod findPacketMethod(Class<?> networkManagerType) throws Throwable {
         String typeName = networkManagerType.getName();
 
+        // Denizens
         if (typeName.startsWith("com.denizenscript.denizen.nms.") && typeName.endsWith("DenizenNetworkManagerImpl")) {
             final com.bergerkiller.mountiplex.reflection.util.FastField<Object> oldManagerField = new com.bergerkiller.mountiplex.reflection.util.FastField<Object>();
             oldManagerField.init(networkManagerType.getDeclaredField("oldManager"));
@@ -47,9 +49,11 @@ public abstract class ServerGamePacketListenerImplHandle extends Template.Handle
                 return queuePacket(oldManager, packet);
             };
         } else if (typeName.startsWith("com.denizenscript.denizen.nms.") && typeName.endsWith("FakeNetworkManagerImpl")) {
+            // No base implementation, we can treat it like a vanilla one
             return defaultQueuePacketMethod;
         }
 
+        // Unsupported
         return null;
     }
 
@@ -60,6 +64,8 @@ public abstract class ServerGamePacketListenerImplHandle extends Template.Handle
                 try {
                     method = findPacketMethod(networkManager.getClass());
                 } catch (Throwable t) {
+                    // Ignore, assume it isn't supported
+                    //t.printStackTrace();
                 }
                 if (method != null) {
                     queuePacketMethods.put(networkManager.getClass(), method);
@@ -79,6 +85,7 @@ public abstract class ServerGamePacketListenerImplHandle extends Template.Handle
 
     public void queuePacket(Object packet) {
         if (!queuePacket(getNetworkManager(), packet)) {
+            // Fallback: execute next tick
             com.bergerkiller.bukkit.common.utils.CommonUtil.nextTick(() -> sendPacket(packet));
         }
     }
@@ -87,10 +94,20 @@ public abstract class ServerGamePacketListenerImplHandle extends Template.Handle
         return com.bergerkiller.generated.net.minecraft.network.ConnectionHandle.T.isConnected.invoke(getNetworkManager()).booleanValue();
     }
 
-
+    /**
+     * Gets the ServerGamePacketListenerImpl NMS instance, which is used for sending packets to.
+     * If the player is an NPC, or is disconnected, this method returns null.
+     * 
+     * @param player
+     * @return player connection
+     */
     public static ServerGamePacketListenerImplHandle forPlayer(org.bukkit.entity.Player player) {
         Object handle = com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player);
 
+        // Check not NPC player
+        // This check used to exist 7+ years ago or even older, and even back then it was unknown if this check was even needed.
+        // I've disabled it (9 apr 2024) because this breaks sending packets when mods/plugins alter the server player instance.
+        //if (!com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle.T.isType(handle)) return null;
 
         final ServerGamePacketListenerImplHandle connection = com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle.T.playerConnection.get(handle);
         if (connection == null || !connection.isConnected()) {

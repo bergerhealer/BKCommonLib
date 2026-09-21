@@ -54,6 +54,7 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
         setVelocity(velocity.getX(), velocity.getY(), velocity.getZ());
     }
 
+    // Minimal change of x/y/z position or rotation that is supported
     public static final double POSITION_STEP;
     public static final float ROTATION_STEP;
     public static final float ROTATION_STEP_INV;
@@ -98,26 +99,32 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
         return (float) protAngle * ROTATION_STEP;
     }
 
+    // Performs protocol translation to set the synchronized yaw rotation
     public void setYaw(float yaw) {
         setEncodedYaw(getProtocolRotation(yaw));
     }
 
+    // Performs protocol translation to set the synchronized pitch rotation
     public void setPitch(float pitch) {
         setEncodedPitch(getProtocolRotation(pitch));
     }
 
+    // Performs protocol translation to set the synchronized head rotation
     public void setHeadYaw(float headYaw) {
         setEncodedHeadYaw(getProtocolRotation(headYaw));
     }
 
+    // Performs protocol translation to get the synchronized yaw rotation
     public float getYaw() {
         return getRotationFromProtocol(getEncodedYaw());
     }
 
+    // Performs protocol translation to get the synchronized pitch rotation
     public float getPitch() {
         return getRotationFromProtocol(getEncodedPitch());
     }
 
+    // Performs protocol translation to get the synchronized head rotation
     public float getHeadYaw() {
         return getRotationFromProtocol(getEncodedHeadYaw());
     }

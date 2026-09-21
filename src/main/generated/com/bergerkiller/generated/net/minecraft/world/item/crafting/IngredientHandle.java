@@ -24,6 +24,7 @@ public abstract class IngredientHandle extends Template.Handle {
 
     public abstract List<ItemStack> getChoices();
     public abstract void setChoices(List<ItemStack> choices);
+    // Note: only 1.12+
     public static Object createRawRecipeItemStack(List<org.bukkit.inventory.ItemStack> choices) {
         Object raw = T.newInstanceNull();
         T.setChoices.invoke(raw, choices);

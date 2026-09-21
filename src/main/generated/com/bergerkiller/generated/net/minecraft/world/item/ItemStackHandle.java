@@ -93,6 +93,7 @@ public abstract class ItemStackHandle extends Template.Handle {
     public abstract UUID getMapDisplayUUID();
     public static final ItemStackHandle EMPTY_ITEM;
     static {
+        // On 1.11.2, an empty item constant is used. <= 1.9, null is used.
         if (T.OPT_EMPTY_ITEM.isAvailable()) {
             EMPTY_ITEM = T.OPT_EMPTY_ITEM.get();
         } else {
