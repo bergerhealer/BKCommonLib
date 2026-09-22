@@ -684,7 +684,11 @@ class ClientboundLoginPacket extends Packet {
     public (DimensionType) net.minecraft.world.level.dimension.DimensionType getDimensionType() { return instance#dimensionType; }
 #endif
 
-#if version >= 1.20.2
+#if version >= 26.3
+    public (org.bukkit.GameMode) GameType getPreviousGameMode() {
+        return (GameType) instance.commonPlayerSpawnInfo().previousGameType().orElse(null);
+    }
+#elseif version >= 1.20.2
     public (org.bukkit.GameMode) GameType getPreviousGameMode() {
         return instance.commonPlayerSpawnInfo().previousGameType();
     }
@@ -823,7 +827,11 @@ class ClientboundRespawnPacket extends Packet {
 
     // Since 1.16 the previous game mode of the player is also sent
     // This allows the player to toggle back and forth between modes
-#if version >= 1.20.2
+#if version >= 26.3
+    public (org.bukkit.GameMode) GameType getPreviousGameMode() {
+        return (GameType) instance.commonPlayerSpawnInfo().previousGameType().orElse(null);
+    }
+#elseif version >= 1.20.2
     public (org.bukkit.GameMode) GameType getPreviousGameMode() {
         return instance.commonPlayerSpawnInfo().previousGameType();
     }

@@ -7,7 +7,7 @@ optional interface UpdateInterval {
         if (period == Integer.MAX_VALUE) {
             return UpdateInterval.NEVER;
         } else if (period > 0) {
-            return UpdateInterval.period(period);
+            return UpdateInterval.periodic(period);
         } else {
             throw new IllegalArgumentException("Invalid update interval period: " + period);
         }
