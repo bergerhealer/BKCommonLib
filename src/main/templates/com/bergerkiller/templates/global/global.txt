@@ -241,11 +241,11 @@ import net.minecraft.world.level.storage.TagValueInput;
     return out.toString();
 }
 
-#require net.minecraft.network.chat.Component public static String[] formatLinesAsLegacyStrings(Component[] lines) {
-    int numLines = lines.length;
+#require net.minecraft.network.chat.Component public static String[] formatLinesAsLegacyStrings(List<Component> lines) {
+    int numLines = lines.size();
     String[] legacyLines = new String[numLines];
     for (int i = 0; i < numLines; i++) {
-        Component component = lines[i];
+        Component component = (Component) lines.get(i);
         legacyLines[i] = (component == null) ? "" : component#formatAsLegacyString();
     }
     return legacyLines;

@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.block.entity.SignTextSlot;
 
 import net.minecraft.world.level.block.entity.Hopper;
 
@@ -266,40 +267,38 @@ class HopperBlockEntity extends BlockEntity {
 }
 
 class SignBlockEntity extends BlockEntity {
-    public Object[] getRawFrontLines() {
-#if version >= 1.20
-        return instance.getFrontText().getMessages(false);
+    public List<Object> getRawFrontLines() {
+#if version >= 26.3
+        return instance.getText(SignTextSlot.FRONT).getMessages(false);
+#elseif version >= 1.20
+        return Arrays.asList(instance.getFrontText().getMessages(false));
 #elseif version >= 1.17
-        return (Object[]) instance.messages;
+        return Arrays.asList((Object[]) instance.messages);
 #else
-        return (Object[]) instance.lines;
+        return Arrays.asList((Object[]) instance.lines);
 #endif
     }
 
     public String[] getMessageFrontLines() {
-#if version >= 1.20
-        Component[] lines = instance.getFrontText().getMessages(false);
-#elseif version >= 1.17
-        Component[] lines = instance.messages;
-#else
-        Component[] lines = instance.lines;
-#endif
+        List lines = (List) SignBlockEntityHandle.T.getRawFrontLines.invoke(instance);
         return #formatLinesAsLegacyStrings(lines);
     }
 
 <code>
-    public static final Object[] ALL_EMPTY_RAW_LINES;
+    public static final java.util.List<Object> ALL_EMPTY_RAW_LINES;
     public static final String[] ALL_EMPTY_STRING_LINES;
     static {
         Object raw_empty = ChatText.empty().getRawHandle();
-        ALL_EMPTY_RAW_LINES = new Object[] {raw_empty, raw_empty, raw_empty, raw_empty};
+        ALL_EMPTY_RAW_LINES = java.util.Arrays.asList(raw_empty, raw_empty, raw_empty, raw_empty);
         ALL_EMPTY_STRING_LINES = new String[] { "", "", "", "" };
     }
 </code>
 
-    public Object[] getRawBackLines() {
-#if version >= 1.20
-        return instance.getBackText().getMessages(false);
+    public List<Object> getRawBackLines() {
+#if version >= 26.3
+        return instance.getText(SignTextSlot.BACK).getMessages(false);
+#elseif version >= 1.20
+        return Arrays.asList(instance.getBackText().getMessages(false));
 #else
         return SignBlockEntityHandle.ALL_EMPTY_RAW_LINES;
 #endif
@@ -307,7 +306,7 @@ class SignBlockEntity extends BlockEntity {
 
     public String[] getMessageBackLines() {
 #if version >= 1.20
-        Component[] lines = instance.getBackText().getMessages(false);
+        List lines = (List) SignBlockEntityHandle.T.getRawBackLines.invoke(instance);
         return #formatLinesAsLegacyStrings(lines);
 #else
         return SignBlockEntityHandle.ALL_EMPTY_STRING_LINES;
@@ -315,7 +314,9 @@ class SignBlockEntity extends BlockEntity {
     }
 
     public void setFormattedFrontLine(int index, (ChatText) Component text) {
-#if version >= 1.20
+#if version >= 26.3
+        instance.setText(instance.getText(SignTextSlot.FRONT).asMutable().setLine(index, text).asImmutable(), SignTextSlot.FRONT);
+#elseif version >= 1.20
         instance.setText(instance.getFrontText().setMessage(index, text), true);
 #elseif version >= 1.18
         instance.setMessage(index, text);
@@ -330,7 +331,9 @@ class SignBlockEntity extends BlockEntity {
     }
 
     public void setFormattedBackLine(int index, (ChatText) Component text) {
-#if version >= 1.20
+#if version >= 26.3
+        instance.setText(instance.getText(SignTextSlot.BACK).asMutable().setLine(index, text).asImmutable(), SignTextSlot.BACK);
+#elseif version >= 1.20
         instance.setText(instance.getBackText().setMessage(index, text), false);
 #endif
     }

@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.block;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -29,8 +30,8 @@ import com.bergerkiller.mountiplex.reflection.util.FastField;
 /**
  * Efficiently detects when the text contents of a Sign change, when the
  * sign's backing block entity unloads and re-loads, and when the sign
- * block is destroyed in the world.
- *
+ * block is destroyed in the world.<br>
+ * <br>
  * Detecting will actively load the chunk the sign is in.
  */
 public class SignChangeTracker implements Cloneable, SignLineAccessor {
@@ -38,8 +39,8 @@ public class SignChangeTracker implements Cloneable, SignLineAccessor {
     private Sign state;
     private BlockData blockData;
     private SignBlockEntityHandle tileEntity;
-    private Object[] lastRawFrontLines;
-    private Object[] lastRawBackLines;
+    private List<Object> lastRawFrontLines;
+    private List<Object> lastRawBackLines;
     private String[] lastMessageFrontLines;
     private String[] lastMessageBackLines;
 
@@ -78,9 +79,9 @@ public class SignChangeTracker implements Cloneable, SignLineAccessor {
             this.resetTileEntity();
         } else {
             this.tileEntity = tile;
-            this.lastRawFrontLines = tile.getRawFrontLines().clone();
+            this.lastRawFrontLines = new ArrayList<>(tile.getRawFrontLines());
             this.lastRawBackLines = CommonCapabilities.HAS_SIGN_BACK_TEXT
-                    ? tile.getRawBackLines().clone() : null;
+                    ? new ArrayList<>(tile.getRawBackLines()) : null;
             this.lastMessageFrontLines = null;
             this.lastMessageBackLines = null;
 
@@ -180,7 +181,7 @@ public class SignChangeTracker implements Cloneable, SignLineAccessor {
     @Override
     public ChatText getFormattedFrontLine(int index) {
         checkRemoved();
-        return ChatText.fromComponent(tileEntity.getRawFrontLines()[index]);
+        return ChatText.fromComponent(tileEntity.getRawFrontLines().get(index));
     }
 
     @Override
@@ -196,7 +197,7 @@ public class SignChangeTracker implements Cloneable, SignLineAccessor {
     @Override
     public ChatText[] getFormattedFrontLines() {
         checkRemoved();
-        return LogicUtil.mapArray(tileEntity.getRawFrontLines(), ChatText.class, ChatText::fromComponent);
+        return LogicUtil.mapCollectionToArray(tileEntity.getRawFrontLines(), ChatText.class, ChatText::fromComponent);
     }
 
     @Override
@@ -229,7 +230,7 @@ public class SignChangeTracker implements Cloneable, SignLineAccessor {
     @Override
     public ChatText getFormattedBackLine(int index) {
         checkRemoved();
-        return ChatText.fromComponent(tileEntity.getRawBackLines()[index]);
+        return ChatText.fromComponent(tileEntity.getRawBackLines().get(index));
     }
 
     @Override
@@ -247,7 +248,7 @@ public class SignChangeTracker implements Cloneable, SignLineAccessor {
     @Override
     public ChatText[] getFormattedBackLines() {
         checkRemoved();
-        return LogicUtil.mapArray(tileEntity.getRawBackLines(), ChatText.class, ChatText::fromComponent);
+        return LogicUtil.mapCollectionToArray(tileEntity.getRawBackLines(), ChatText.class, ChatText::fromComponent);
     }
 
     /**
@@ -486,19 +487,19 @@ public class SignChangeTracker implements Cloneable, SignLineAccessor {
     }
 
     private boolean detectChangedLines(SignBlockEntityHandle tileEntity) {
-        Object[] oldRawFrontLines = this.lastRawFrontLines;
-        Object[] newRawFrontLines = tileEntity.getRawFrontLines();
+        List<Object> oldRawFrontLines = this.lastRawFrontLines;
+        List<Object> newRawFrontLines = tileEntity.getRawFrontLines();
 
-        Object[] oldRawBackLines = this.lastRawBackLines;
-        Object[] newRawBackLines = tileEntity.getRawBackLines();
+        List<Object> oldRawBackLines = this.lastRawBackLines;
+        List<Object> newRawBackLines = tileEntity.getRawBackLines();
 
-        if (oldRawFrontLines.length != newRawFrontLines.length ||
-                (CommonCapabilities.HAS_SIGN_BACK_TEXT && oldRawBackLines.length != newRawBackLines.length)
+        if (oldRawFrontLines.size() != newRawFrontLines.size() ||
+                (CommonCapabilities.HAS_SIGN_BACK_TEXT && oldRawBackLines.size() != newRawBackLines.size())
         ) {
             // Never happens, really
-            this.lastRawFrontLines = newRawFrontLines.clone();
+            this.lastRawFrontLines = new ArrayList<>(newRawFrontLines);
             if (CommonCapabilities.HAS_SIGN_BACK_TEXT) {
-                this.lastRawBackLines = newRawBackLines.clone();
+                this.lastRawBackLines = new ArrayList<>(newRawBackLines);
             }
         } else if (!copyLinesCheckChanges(oldRawFrontLines, newRawFrontLines)) {
             if (!CommonCapabilities.HAS_SIGN_BACK_TEXT || !copyLinesCheckChanges(oldRawBackLines, newRawBackLines)) {
@@ -506,8 +507,10 @@ public class SignChangeTracker implements Cloneable, SignLineAccessor {
                 return false;
             }
         } else if (CommonCapabilities.HAS_SIGN_BACK_TEXT) {
-            // Front changed, take over changes of back blindly as we haven't done the copy for thise
-            System.arraycopy(oldRawBackLines, 0, newRawBackLines, 0, newRawBackLines.length);
+            // Front changed, take over changes of back blindly as we haven't done the copy for this
+            for (int i = 0; i < oldRawBackLines.size(); i++) {
+                newRawBackLines.set(i, oldRawBackLines.get(i));
+            }
         }
 
         // Reset cached 'stringified' lines
@@ -520,17 +523,17 @@ public class SignChangeTracker implements Cloneable, SignLineAccessor {
         return true;
     }
 
-    private static boolean copyLinesCheckChanges(Object[] oldRawLines, Object[] newRawLines) {
-        int numLines = newRawLines.length;
+    private static boolean copyLinesCheckChanges(List<Object> oldRawLines, List<Object> newRawLines) {
+        int numLines = newRawLines.size();
         int line = 0;
         while (line < numLines) {
-            Object newLine = newRawLines[line];
-            if (oldRawLines[line] != newLine) {
-                oldRawLines[line] = newLine;
+            Object newLine = newRawLines.get(line);
+            if (oldRawLines.get(line) != newLine) {
+                oldRawLines.set(line, newLine);
 
                 // Copy remaining lines over, too
                 while (++line < numLines) {
-                    oldRawLines[line] = newRawLines[line];
+                    oldRawLines.set(line, newRawLines.get(line));
                 }
 
                 return true;

@@ -402,6 +402,26 @@ public class LogicUtil {
     }
 
     /**
+     * Maps all the elements of an input collection and writes the result as a new array
+     *
+     * @param inputCollection Input collection to map
+     * @param outputType Output type of the array to map into
+     * @param mapper Mapper function. All values in the input array are mapped.
+     * @return Mapped array
+     * @param <I> Input array element type
+     * @param <O> Output array element type
+     */
+    public static <I, O> O[] mapCollectionToArray(Collection<I> inputCollection, Class<O> outputType, Function<I, O> mapper) {
+        int len = inputCollection.size();
+        O[] outputArray = createArray(outputType, len);
+        int i = 0;
+        for (I item : inputCollection) {
+            outputArray[i++] = mapper.apply(item);
+        }
+        return outputArray;
+    }
+
+    /**
      * Iterates all the values in a Map and calls the mapper function on it to compute a new value for each.
      *
      * @param map Map
