@@ -124,6 +124,17 @@ public abstract class ClientboundMoveEntityPacketHandle extends PacketHandle {
         double getDeltaZ();
 
         /**
+         * Creates a new, initially-empty, stepped position change. Add steps to it (chaining), then assign it
+         * to a ClientboundMoveEntityPacket packet change field.
+         * Multi-step changes are only supported on Minecraft 26.3 and later.
+         *
+         * @return stepped position change
+         */
+        static SteppedPositionChange steppedBuilder() {
+            return new SteppedPositionChange();
+        }
+
+        /**
          * Creates a new Change instance that encodes the given delta values.
          * The encoding used depends on the Minecraft version.
          *
@@ -180,6 +191,38 @@ public abstract class ClientboundMoveEntityPacketHandle extends PacketHandle {
     }
 
     /**
+     * Encoding used before 1.10.2, where the delta is encoded as a byte.
+     * Interpolates the movement over the standard entity interpolation tick time (usually 3 ticks),
+     * and moves the entity linearly.
+     */
+    public static final class LinearPositionChangeLegacy implements PositionChange {
+        public final byte encodedDeltaX;
+        public final byte encodedDeltaY;
+        public final byte encodedDeltaZ;
+
+        public LinearPositionChangeLegacy(byte encodedDeltaX, byte encodedDeltaY, byte encodedDeltaZ) {
+            this.encodedDeltaX = encodedDeltaX;
+            this.encodedDeltaY = encodedDeltaY;
+            this.encodedDeltaZ = encodedDeltaZ;
+        }
+
+        @Override
+        public double getDeltaX() {
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(encodedDeltaX);
+        }
+
+        @Override
+        public double getDeltaY() {
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(encodedDeltaY);
+        }
+
+        @Override
+        public double getDeltaZ() {
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(encodedDeltaZ);
+        }
+    }
+
+    /**
      * Encoding used since 26.3, where the delta is encoded as a list of steps.
      * Each step has its own delta and duration in ticks.
      * Multi-step changes are only supported on Minecraft 26.3 and later.
@@ -210,9 +253,11 @@ public abstract class ClientboundMoveEntityPacketHandle extends PacketHandle {
          * Multi-step changes are only supported on Minecraft 26.3 and later.
          *
          * @param step Step to add
+         * @return this, for chaining
          */
-        public void addStep(Step step) {
+        public SteppedPositionChange addStep(Step step) {
             steps.add(step);
+            return this;
         }
 
         /**
@@ -223,9 +268,11 @@ public abstract class ClientboundMoveEntityPacketHandle extends PacketHandle {
          * @param deltaY Delta movement to encode, Y-coordinate
          * @param deltaZ Delta movement to encode, Z-coordinate
          * @param ticks Duration of this step in ticks
+         * @return this, for chaining
          */
-        public void addStep(double deltaX, double deltaY, double deltaZ, int ticks) {
+        public SteppedPositionChange addStep(double deltaX, double deltaY, double deltaZ, int ticks) {
             steps.add(encodeStep(deltaX, deltaY, deltaZ, ticks));
+            return this;
         }
 
         @Override
@@ -296,38 +343,6 @@ public abstract class ClientboundMoveEntityPacketHandle extends PacketHandle {
                 super(encodedDeltaX, encodedDeltaY, encodedDeltaZ);
                 this.ticks = ticks;
             }
-        }
-    }
-
-    /**
-     * Encoding used before 1.10.2, where the delta is encoded as a byte.
-     * Interpolates the movement over the standard entity interpolation tick time (usually 3 ticks),
-     * and moves the entity linearly.
-     */
-    public static final class LinearPositionChangeLegacy implements PositionChange {
-        public final byte encodedDeltaX;
-        public final byte encodedDeltaY;
-        public final byte encodedDeltaZ;
-
-        public LinearPositionChangeLegacy(byte encodedDeltaX, byte encodedDeltaY, byte encodedDeltaZ) {
-            this.encodedDeltaX = encodedDeltaX;
-            this.encodedDeltaY = encodedDeltaY;
-            this.encodedDeltaZ = encodedDeltaZ;
-        }
-
-        @Override
-        public double getDeltaX() {
-            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(encodedDeltaX);
-        }
-
-        @Override
-        public double getDeltaY() {
-            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(encodedDeltaY);
-        }
-
-        @Override
-        public double getDeltaZ() {
-            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(encodedDeltaZ);
         }
     }
     public abstract int getEntityId();

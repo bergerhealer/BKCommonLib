@@ -6,6 +6,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior;
+import net.minecraft.world.entity.PositionPath;
+import net.minecraft.world.entity.PositionStep;
 
 import net.minecraft.network.protocol.game.VecDelta;
 import com.bergerkiller.bukkit.common.internal.logic.ProtocolMath;
@@ -178,25 +180,52 @@ class ClientboundEntityPositionSyncPacket extends Packet {
     #require ClientboundEntityPositionSyncPacket private boolean onGround:g;
 #endif
 
-#if version >= 1.21.2
+#if version >= 26.3
     public int getEntityId:id();
-    public double getPosX() { return instance.values().position().x; }
-    public double getPosY() { return instance.values().position().y; }
-    public double getPosZ() { return instance.values().position().z; }
+    public float getYaw() { return instance.yRot(); }
+    public float getPitch() { return instance.xRot(); }
+    public boolean isOnGround:onGround();
+
+    public ClientboundEntityPositionSyncPacketHandle.Position getPosition() {
+        PositionPath path = instance.position();
+        if (path instanceof PositionPath$Linear) {
+            PositionPath$Linear linear = (PositionPath$Linear) path;
+            Vec3 pos = linear.endPosition();
+            return new ClientboundEntityPositionSyncPacketHandle$LinearPosition(pos.x, pos.y, pos.z);
+        } else if (path instanceof PositionPath$Stepped) {
+            PositionPath$Stepped stepped = (PositionPath$Stepped) path;
+            java.util.List steps = stepped.steps();
+            java.util.List bkclSteps = new java.util.ArrayList(steps.size());
+            for (java.util.Iterator iter = steps.iterator(); iter.hasNext();) {
+                PositionStep step = (PositionStep) iter.next();
+                Vec3 stepPos = step.position();
+                bkclSteps.add(new ClientboundEntityPositionSyncPacketHandle$SteppedPosition$Step(stepPos.x, stepPos.y, stepPos.z, step.tickOffset()));
+            }
+            return new ClientboundEntityPositionSyncPacketHandle$SteppedPosition(bkclSteps);
+        } else {
+            throw new IllegalArgumentException("Unsupported Position type: " + (path == null ? "null" : path.getClass().getName()));
+        }
+    }
+
+    // Not really used anymore, but here for completion sake
+    public int getEncodedYaw() {
+        return ProtocolMath.serializeRotation(instance.yRot());
+    }
+    public int getEncodedPitch() {
+        return ProtocolMath.serializeRotation(instance.xRot());
+    }
+#elseif version >= 1.21.2
+    public int getEntityId:id();
     public float getYaw() { return instance.values().yRot(); }
     public float getPitch() { return instance.values().xRot(); }
     public boolean isOnGround:onGround();
 
+    public ClientboundEntityPositionSyncPacketHandle.Position getPosition() {
+        PositionMoveRotation values = instance.values();
+        return new ClientboundEntityPositionSyncPacketHandle$LinearPosition(values.position().x, values.position().y, values.position().z);
+    }
+
     // Not really used anymore, but here for completion sake
-    public int getEncodedPosX() {
-        return ProtocolMath.serializePosition_1_8_8(instance.values().position().x);
-    }
-    public int getEncodedPosY() {
-        return ProtocolMath.serializePosition_1_8_8(instance.values().position().y);
-    }
-    public int getEncodedPosZ() {
-        return ProtocolMath.serializePosition_1_8_8(instance.values().position().z);
-    }
     public int getEncodedYaw() {
         return ProtocolMath.serializeRotation(instance.values().yRot());
     }
@@ -205,9 +234,6 @@ class ClientboundEntityPositionSyncPacket extends Packet {
     }
 #elseif version >= 1.18
     public int getEntityId:getId();
-    public double getPosX:getX();
-    public double getPosY:getY();
-    public double getPosZ:getZ();
     public float getYaw() {
         return ProtocolMath.deserializeRotation(instance.getyRot());
     }
@@ -216,24 +242,14 @@ class ClientboundEntityPositionSyncPacket extends Packet {
     }
     public boolean isOnGround();
 
-    // Not really used anymore, but here for completion sake
-    public int getEncodedPosX() {
-        return ProtocolMath.serializePosition_1_8_8(instance.getX());
-    }
-    public int getEncodedPosY() {
-        return ProtocolMath.serializePosition_1_8_8(instance.getY());
-    }
-    public int getEncodedPosZ() {
-        return ProtocolMath.serializePosition_1_8_8(instance.getZ());
+    public ClientboundEntityPositionSyncPacketHandle.Position getPosition() {
+        return new ClientboundEntityPositionSyncPacketHandle$LinearPosition(instance.getX(), instance.getY(), instance.getZ());
     }
 
     public int getEncodedYaw() { return (int) instance.getyRot() & 0xFF; }
     public int getEncodedPitch() { return (int) instance.getxRot() & 0xFF; }
 #elseif version >= 1.17
     public int getEntityId:b();
-    public double getPosX:c();
-    public double getPosY:d();
-    public double getPosZ:e();
     public float getYaw() {
         return ProtocolMath.deserializeRotation(instance.f());
     }
@@ -242,15 +258,8 @@ class ClientboundEntityPositionSyncPacket extends Packet {
     }
     public boolean isOnGround:h();
 
-    // Not really used anymore, but here for completion sake
-    public int getEncodedPosX() {
-        return ProtocolMath.serializePosition_1_8_8(instance.c());
-    }
-    public int getEncodedPosY() {
-        return ProtocolMath.serializePosition_1_8_8(instance.d());
-    }
-    public int getEncodedPosZ() {
-        return ProtocolMath.serializePosition_1_8_8(instance.e());
+    public ClientboundEntityPositionSyncPacketHandle.Position getPosition() {
+        return new ClientboundEntityPositionSyncPacketHandle$LinearPosition(instance.c(), instance.d(), instance.e());
     }
 
     public int getEncodedYaw() { return (int) instance.f() & 0xFF; }
@@ -258,16 +267,6 @@ class ClientboundEntityPositionSyncPacket extends Packet {
 #else
     // Relies on reflection to access the private fields
     public int getEntityId() { return instance#entityId; }
-
-  #if version >= 1.9
-    public double getPosX() { return instance#posX; }
-    public double getPosY() { return instance#posY; }
-    public double getPosZ() { return instance#posZ; }
-  #else
-    public double getPosX() { return ProtocolMath.deserializePosition_1_8_8( instance#encodedPosX ); }
-    public double getPosY() { return ProtocolMath.deserializePosition_1_8_8( instance#encodedPosY ); }
-    public double getPosZ() { return ProtocolMath.deserializePosition_1_8_8( instance#encodedPosZ ); }
-  #endif
 
     public float getYaw() {
         return ProtocolMath.deserializeRotation( instance#encodedYaw );
@@ -278,29 +277,24 @@ class ClientboundEntityPositionSyncPacket extends Packet {
 
     public boolean isOnGround() { return instance#onGround; }
 
+    public ClientboundEntityPositionSyncPacketHandle.Position getPosition() {
   #if version >= 1.9
-    // Not really used anymore, but here for completion sake
-    public int getEncodedPosX() {
-        return ProtocolMath.serializePosition_1_8_8( instance#posX );
-    }
-    public int getEncodedPosY() {
-        return ProtocolMath.serializePosition_1_8_8( instance#posY );
-    }
-    public int getEncodedPosZ() {
-        return ProtocolMath.serializePosition_1_8_8( instance#posZ );
-    }
+        return new ClientboundEntityPositionSyncPacketHandle$LinearPosition(instance#posX, instance#posY, instance#posZ);
   #else
-    public int getEncodedPosX() { return instance#encodedPosX; }
-    public int getEncodedPosY() { return instance#encodedPosY; }
-    public int getEncodedPosZ() { return instance#encodedPosZ; }
+        return new ClientboundEntityPositionSyncPacketHandle$LinearPositionLegacy(instance#encodedPosX, instance#encodedPosY, instance#encodedPosZ);
   #endif
+    }
 
     public int getEncodedYaw() { return (int) instance#encodedYaw & 0xFF; }
     public int getEncodedPitch() { return (int) instance#encodedPitch & 0xFF; }
 #endif
 
     public static (ClientboundEntityPositionSyncPacketHandle) ClientboundEntityPositionSyncPacket createNewForEntity((org.bukkit.entity.Entity) Entity entity) {
-#if version >= 1.21.2
+#if version >= 26.3
+        PositionMoveRotation values = PositionMoveRotation.of(entity);
+        PositionPath path = PositionPath.of(values.position());
+        return new ClientboundEntityPositionSyncPacket(entity.getId(), path, values.yRot(), values.xRot(), entity.onGround());
+#elseif version >= 1.21.2
         PositionMoveRotation values = PositionMoveRotation.of(entity);
         return new ClientboundEntityPositionSyncPacket(entity.getId(), values, entity.onGround());
 #else
@@ -308,42 +302,76 @@ class ClientboundEntityPositionSyncPacket extends Packet {
 #endif
     }
 
-    public static (ClientboundEntityPositionSyncPacketHandle) ClientboundEntityPositionSyncPacket createNew(int entityId, double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
-#if version >= 1.21.2
-        PositionMoveRotation values = new PositionMoveRotation(new Vec3(posX, posY, posZ), new Vec3(0.0, 0.0, 0.0), yaw, pitch);
-        return new ClientboundEntityPositionSyncPacket(entityId, values, onGround);
+    public static (ClientboundEntityPositionSyncPacketHandle) ClientboundEntityPositionSyncPacket createNew(int entityId, ClientboundEntityPositionSyncPacketHandle.Position pos, float yaw, float pitch, boolean onGround) {
+#if version >= 26.3
+        // Since 26.3, the position supports multi-step changes. If the position is a stepped change, we can use it directly. Otherwise, we convert it to a linear change.
+        PositionPath path;
+        if (pos instanceof ClientboundEntityPositionSyncPacketHandle$LinearPosition) {
+            ClientboundEntityPositionSyncPacketHandle$LinearPosition linear = (ClientboundEntityPositionSyncPacketHandle$LinearPosition) pos;
+            path = PositionPath.of(new Vec3(linear.getX(), linear.getY(), linear.getZ()));
+        } else if (pos instanceof ClientboundEntityPositionSyncPacketHandle$SteppedPosition) {
+            ClientboundEntityPositionSyncPacketHandle$SteppedPosition stepped = (ClientboundEntityPositionSyncPacketHandle$SteppedPosition) pos;
+            if (stepped.getSteps().isEmpty()) {
+                throw new IllegalArgumentException("SteppedPosition must have at least one step");
+            }
+            java.util.List steps = new java.util.ArrayList(stepped.getSteps().size());
+            for (java.util.Iterator iter = stepped.getSteps().iterator(); iter.hasNext();) {
+                ClientboundEntityPositionSyncPacketHandle$SteppedPosition$Step step = (ClientboundEntityPositionSyncPacketHandle$SteppedPosition$Step) iter.next();
+                steps.add(new PositionStep(new Vec3(step.getX(), step.getY(), step.getZ()), step.ticks));
+            }
+            path = PositionPath.stepped(steps);
+        } else {
+            throw new IllegalArgumentException("Unsupported Position type: " + (pos == null ? "null" : pos.getClass().getName()));
+        }
+
+        return new ClientboundEntityPositionSyncPacket(entityId, path, yaw, pitch, onGround);
 
 #elseif version >= 1.9
+        if (!(pos instanceof ClientboundEntityPositionSyncPacketHandle$LinearPosition)) {
+            throw new IllegalArgumentException("Position must be a LinearPosition for Minecraft 1.9 - 26.2");
+        }
+
+        ClientboundEntityPositionSyncPacketHandle$LinearPosition linear = (ClientboundEntityPositionSyncPacketHandle$LinearPosition) pos;
+
+  #if version >= 1.21.2
+        PositionMoveRotation values = new PositionMoveRotation(new Vec3(linear.getX(), linear.getY(), linear.getZ()), new Vec3(0.0, 0.0, 0.0), yaw, pitch);
+        return new ClientboundEntityPositionSyncPacket(entityId, values, onGround);
+
+  #else
         // Create a new packet and use reflection to set the fields
         // Unfortunately, no nice constructor :(
-  #if version >= 1.20.5
+    #if version >= 1.20.5
         #require net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket private ClientboundEntityPositionSyncPacket createTeleportPacket:<init>(net.minecraft.network.FriendlyByteBuf serializer);
         ClientboundEntityPositionSyncPacket packet = #createTeleportPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
-  #elseif version >= 1.17
+    #elseif version >= 1.17
         ClientboundEntityPositionSyncPacket packet = new ClientboundEntityPositionSyncPacket(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
-  #else
+    #else
         ClientboundEntityPositionSyncPacket packet = new ClientboundEntityPositionSyncPacket();
-  #endif
+    #endif
 
         byte encodedYaw = (byte) ProtocolMath.serializeRotation(yaw);
         byte encodedPitch = (byte) ProtocolMath.serializeRotation(pitch);
 
         packet#entityId = entityId;
-        packet#posX = posX;
-        packet#posY = posY;
-        packet#posZ = posZ;
+        packet#posX = linear.getX();
+        packet#posY = linear.getY();
+        packet#posZ = linear.getZ();
         packet#encodedYaw = encodedYaw;
         packet#encodedPitch = encodedPitch;
         packet#onGround = onGround;
         return packet;
+  #endif
+
 #else
-        // Constructor is available
-        int encodedPosX = ProtocolMath.serializePosition_1_8_8(posX);
-        int encodedPosY = ProtocolMath.serializePosition_1_8_8(posY);
-        int encodedPosZ = ProtocolMath.serializePosition_1_8_8(posZ);
+        // 1.8: legacy int encoded
+        if (!(pos instanceof ClientboundEntityPositionSyncPacketHandle$LinearPositionLegacy)) {
+            throw new IllegalArgumentException("Position must be a LinearPositionLegacy for Minecraft 1.8");
+        }
+
+        ClientboundEntityPositionSyncPacketHandle$LinearPositionLegacy linear = (ClientboundEntityPositionSyncPacketHandle$LinearPositionLegacy) pos;
         byte encodedYaw = (byte) ProtocolMath.serializeRotation(yaw);
         byte encodedPitch = (byte) ProtocolMath.serializeRotation(pitch);
-        return new ClientboundEntityPositionSyncPacket(entityId, encodedPosX, encodedPosY, encodedPosZ, encodedYaw, encodedPitch, onGround);
+        return new ClientboundEntityPositionSyncPacket(entityId, linear.encodedX, linear.encodedY, linear.encodedZ, encodedYaw, encodedPitch, onGround);
 #endif
     }
 
@@ -353,6 +381,250 @@ class ClientboundEntityPositionSyncPacket extends Packet {
         return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_TELEPORT;
     }
 
+    public static ClientboundEntityPositionSyncPacketHandle createNew(int entityId, double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
+        return createNew(entityId, Position.encodeLinear(posX, posY, posZ), yaw, pitch, onGround);
+    }
+
+    /** @deprecated Use {@link #getPosition()} instead */
+    @Deprecated
+    public double getPosX() {
+        return getPosition().getX();
+    }
+
+    /** @deprecated Use {@link #getPosition()} instead */
+    @Deprecated
+    public double getPosY() {
+        return getPosition().getY();
+    }
+
+    /** @deprecated Use {@link #getPosition()} instead */
+    @Deprecated
+    public double getPosZ() {
+        return getPosition().getZ();
+    }
+
+    /**
+     * Represents the updated position of an entity, encoded in the way that the Minecraft protocol expects.
+     * The encoding used depends on the Minecraft version.
+     */
+    public interface Position {
+        Position UNSET = new LinearPosition(Double.NaN, Double.NaN, Double.NaN);
+
+        /**
+         * Gets the X-component of the new position the client will teleport the entity to
+         *
+         * @return new position X
+         */
+        double getX();
+
+        /**
+         * Gets the Y-component of the new position the client will teleport the entity to
+         *
+         * @return new position Y
+         */
+        double getY();
+
+        /**
+         * Gets the Z-component of the new position the client will teleport the entity to
+         *
+         * @return new position Z
+         */
+        double getZ();
+
+        /**
+         * Creates a new, initially-empty, stepped position update. Add steps to it (chaining), then assign it
+         * to a ClientboundEntityPositionSyncPacket packet position field.
+         * Multi-step changes are only supported on Minecraft 26.3 and later.
+         *
+         * @return stepped position
+         */
+        static SteppedPosition steppedBuilder() {
+            return new SteppedPosition();
+        }
+
+        /**
+         * Creates a new Position instance that encodes the given position values, teleporting the
+         * the player towards that position following linear interpolation.
+         * The encoding used depends on the Minecraft version.
+         *
+         * @param x New position to encode, X-coordinate
+         * @param y New position to encode, Y-coordinate
+         * @param z New position to encode, Z-coordinate
+         * @return position instance that can be assigned to a ClientboundEntityPositionSyncPacket packet position field
+         */
+        static Position encodeLinear(double x, double y, double z) {
+            if (com.bergerkiller.bukkit.common.internal.CommonCapabilities.PROTOCOL_TELEPORT_IS_DOUBLE_POSITION) {
+                return new LinearPosition(x, y, z);
+            } else {
+                int encodedX = (int) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_8_8(x);
+                int encodedY = (int) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_8_8(y);
+                int encodedZ = (int) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_8_8(z);
+                return new LinearPositionLegacy(encodedX, encodedY, encodedZ);
+            }
+        }
+    }
+
+    /**
+     * Encoding used since 1.9, where the position is encoded as double.
+     * Interpolates the movement over the standard entity interpolation tick time (usually 3 ticks),
+     * and moves the entity linearly.
+     */
+    public static class LinearPosition implements Position {
+        private final double x;
+        private final double y;
+        private final double z;
+
+        public LinearPosition(double x, double y, double z) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
+        @Override
+        public double getX() {
+            return x;
+        }
+
+        @Override
+        public double getY() {
+            return y;
+        }
+
+        @Override
+        public double getZ() {
+            return z;
+        }
+    }
+
+    /**
+     * Encoding used before 1.9, where the position is encoded as an int..
+     * Interpolates the movement over the standard entity interpolation tick time (usually 3 ticks),
+     * and moves the entity linearly.
+     */
+    public static final class LinearPositionLegacy implements Position {
+        public final int encodedX;
+        public final int encodedY;
+        public final int encodedZ;
+
+        public LinearPositionLegacy(int encodedX, int encodedY, int encodedZ) {
+            this.encodedX = encodedX;
+            this.encodedY = encodedY;
+            this.encodedZ = encodedZ;
+        }
+
+        @Override
+        public double getX() {
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(encodedX);
+        }
+
+        @Override
+        public double getY() {
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(encodedY);
+        }
+
+        @Override
+        public double getZ() {
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(encodedZ);
+        }
+    }
+
+    /**
+     * Encoding used since 26.3, where the position is encoded as a list of steps.
+     * Each step has its own absolute position and duration in ticks to interpolate over.
+     * Multi-step changes are only supported on Minecraft 26.3 and later.
+     */
+    public static final class SteppedPosition implements Position {
+        public final java.util.List<Step> steps;
+
+        public SteppedPosition() {
+            this(new java.util.ArrayList<>());
+        }
+
+        public SteppedPosition(java.util.List<Step> steps) {
+            this.steps = steps;
+        }
+
+        /**
+         * Gets the list of steps that make up this multi-step position update.
+         * Multi-step changes are only supported on Minecraft 26.3 and later.
+         *
+         * @return list of steps
+         */
+        public java.util.List<Step> getSteps() {
+            return steps;
+        }
+
+        /**
+         * Adds a new step to this multi-step change.
+         * Multi-step changes are only supported on Minecraft 26.3 and later.
+         *
+         * @param step Step to add
+         * @return this, for chaining
+         */
+        public SteppedPosition addStep(Step step) {
+            steps.add(step);
+            return this;
+        }
+
+        /**
+         * Adds a new position step to this multi-step position update, encoding the given position and tick duration as a single step.
+         * Multi-step changes are only supported on Minecraft 26.3 and later.
+         *
+         * @param x Step postion, X-coordinate
+         * @param y Step postion, Y-coordinate
+         * @param z Step postion, Z-coordinate
+         * @param ticks Duration of this step in ticks
+         * @return this, for chaining
+         */
+        public SteppedPosition addStep(double x, double y, double z, int ticks) {
+            steps.add(new Step(x, y, z, ticks));
+            return this;
+        }
+
+        @Override
+        public double getX() {
+            int count = steps.size();
+            return count == 0 ? Double.NaN : steps.get(count - 1).getX();
+        }
+
+        @Override
+        public double getY() {
+            int count = steps.size();
+            return count == 0 ? Double.NaN : steps.get(count - 1).getY();
+        }
+
+        @Override
+        public double getZ() {
+            int count = steps.size();
+            return count == 0 ? Double.NaN : steps.get(count - 1).getZ();
+        }
+
+        /**
+         * Gets the total number of ticks that this multi-step change will take to complete.
+         *
+         * @return total ticks
+         */
+        public int getTicks() {
+            int sum = 0;
+            for (Step change : steps) {
+                sum += change.ticks;
+            }
+            return sum;
+        }
+
+        /**
+         * Represents a single step in a multi-step position teleport.
+         * Each step has its own position and duration in ticks.
+         */
+        public static final class Step extends LinearPosition {
+            public final int ticks;
+
+            public Step(double x, double y, double z, int ticks) {
+                super(x, y, z);
+                this.ticks = ticks;
+            }
+        }
+    }
 
     public static Builder builder() {
         return new Builder();
@@ -360,23 +632,35 @@ class ClientboundEntityPositionSyncPacket extends Packet {
 
     public static class Builder {
         private int entityId;
-        private double posX, posY, posZ;
+        private Position pos = Position.UNSET;
         private float yaw, pitch;
         private boolean onGround;
 
         public Builder entityId(int entityId) { this.entityId = entityId; return this; }
-        public Builder posX(double posX) { this.posX = posX; return this; }
-        public Builder posY(double posY) { this.posY = posY; return this; }
-        public Builder posZ(double posZ) { this.posZ = posZ; return this; }
+
+        /** @deprecated Use the position() style methods instead */
+        @Deprecated
+        public Builder posX(double posX) {
+            return position(posX, pos.getY(), pos.getZ());
+        }
+        /** @deprecated Use the position() style methods instead */
+        @Deprecated
+        public Builder posY(double posY) {
+            return position(pos.getX(), posY, pos.getZ());
+        }
+        /** @deprecated Use the position() style methods instead */
+        @Deprecated
+        public Builder posZ(double posZ) {
+            return position(pos.getX(), pos.getY(), posZ);
+        }
+
         public Builder position(org.bukkit.util.Vector position) {
             return position(position.getX(), position.getY(), position.getZ());
         }
         public Builder position(double x, double y, double z) {
-            this.posX = x;
-            this.posY = y;
-            this.posZ = z;
-            return this;
+            return position(Position.encodeLinear(x, y, z));
         }
+        public Builder position(Position pos) { this.pos = pos; return this; }
         public Builder yaw(float yaw) { this.yaw = yaw; return this; }
         public Builder pitch(float pitch) { this.pitch = pitch; return this; }
         public Builder rotation(float yaw, float pitch) {
@@ -387,7 +671,7 @@ class ClientboundEntityPositionSyncPacket extends Packet {
         public Builder onGround(boolean onGround) { this.onGround = onGround; return this; }
 
         public ClientboundEntityPositionSyncPacketHandle create() {
-            return ClientboundEntityPositionSyncPacketHandle.createNew(entityId, posX, posY, posZ, yaw, pitch, onGround);
+            return ClientboundEntityPositionSyncPacketHandle.createNew(entityId, pos, yaw, pitch, onGround);
         }
     }
     </code>
@@ -725,6 +1009,17 @@ class ClientboundMoveEntityPacket extends Packet {
         double getDeltaZ();
 
         /**
+         * Creates a new, initially-empty, stepped position change. Add steps to it (chaining), then assign it
+         * to a ClientboundMoveEntityPacket packet change field.
+         * Multi-step changes are only supported on Minecraft 26.3 and later.
+         *
+         * @return stepped position change
+         */
+        static SteppedPositionChange steppedBuilder() {
+            return new SteppedPositionChange();
+        }
+
+        /**
          * Creates a new Change instance that encodes the given delta values.
          * The encoding used depends on the Minecraft version.
          *
@@ -781,6 +1076,38 @@ class ClientboundMoveEntityPacket extends Packet {
     }
 
     /**
+     * Encoding used before 1.10.2, where the delta is encoded as a byte.
+     * Interpolates the movement over the standard entity interpolation tick time (usually 3 ticks),
+     * and moves the entity linearly.
+     */
+    public static final class LinearPositionChangeLegacy implements PositionChange {
+        public final byte encodedDeltaX;
+        public final byte encodedDeltaY;
+        public final byte encodedDeltaZ;
+
+        public LinearPositionChangeLegacy(byte encodedDeltaX, byte encodedDeltaY, byte encodedDeltaZ) {
+            this.encodedDeltaX = encodedDeltaX;
+            this.encodedDeltaY = encodedDeltaY;
+            this.encodedDeltaZ = encodedDeltaZ;
+        }
+
+        @Override
+        public double getDeltaX() {
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(encodedDeltaX);
+        }
+
+        @Override
+        public double getDeltaY() {
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(encodedDeltaY);
+        }
+
+        @Override
+        public double getDeltaZ() {
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(encodedDeltaZ);
+        }
+    }
+
+    /**
      * Encoding used since 26.3, where the delta is encoded as a list of steps.
      * Each step has its own delta and duration in ticks.
      * Multi-step changes are only supported on Minecraft 26.3 and later.
@@ -811,9 +1138,11 @@ class ClientboundMoveEntityPacket extends Packet {
          * Multi-step changes are only supported on Minecraft 26.3 and later.
          *
          * @param step Step to add
+         * @return this, for chaining
          */
-        public void addStep(Step step) {
+        public SteppedPositionChange addStep(Step step) {
             steps.add(step);
+            return this;
         }
 
         /**
@@ -824,9 +1153,11 @@ class ClientboundMoveEntityPacket extends Packet {
          * @param deltaY Delta movement to encode, Y-coordinate
          * @param deltaZ Delta movement to encode, Z-coordinate
          * @param ticks Duration of this step in ticks
+         * @return this, for chaining
          */
-        public void addStep(double deltaX, double deltaY, double deltaZ, int ticks) {
+        public SteppedPositionChange addStep(double deltaX, double deltaY, double deltaZ, int ticks) {
             steps.add(encodeStep(deltaX, deltaY, deltaZ, ticks));
+            return this;
         }
 
         @Override
@@ -897,38 +1228,6 @@ class ClientboundMoveEntityPacket extends Packet {
                 super(encodedDeltaX, encodedDeltaY, encodedDeltaZ);
                 this.ticks = ticks;
             }
-        }
-    }
-
-    /**
-     * Encoding used before 1.10.2, where the delta is encoded as a byte.
-     * Interpolates the movement over the standard entity interpolation tick time (usually 3 ticks),
-     * and moves the entity linearly.
-     */
-    public static final class LinearPositionChangeLegacy implements PositionChange {
-        public final byte encodedDeltaX;
-        public final byte encodedDeltaY;
-        public final byte encodedDeltaZ;
-
-        public LinearPositionChangeLegacy(byte encodedDeltaX, byte encodedDeltaY, byte encodedDeltaZ) {
-            this.encodedDeltaX = encodedDeltaX;
-            this.encodedDeltaY = encodedDeltaY;
-            this.encodedDeltaZ = encodedDeltaZ;
-        }
-
-        @Override
-        public double getDeltaX() {
-            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(encodedDeltaX);
-        }
-
-        @Override
-        public double getDeltaY() {
-            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(encodedDeltaY);
-        }
-
-        @Override
-        public double getDeltaZ() {
-            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(encodedDeltaZ);
         }
     }
     </code>

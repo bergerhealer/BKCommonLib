@@ -1201,6 +1201,8 @@ public class NMSPacketClasses {
         public final FieldAccessor<Byte> status = ClientboundEntityEventPacketHandle.T.eventId.toFieldAccessor();
     }
 
+    /** @deprecated It's better to use {@link ClientboundEntityPositionSyncPacketHandle} directly, as this old api is less efficient */
+    @Deprecated
     public static class NMSClientboundEntityPositionSyncPacket extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = new FieldAccessor<Integer>() {
@@ -1214,6 +1216,7 @@ public class NMSPacketClasses {
                 return false;
             }
         };
+        @Deprecated
         public final FieldAccessor<Double> x = new SafeDirectField<Double>() {
             @Override
             public Double get(Object instance) {
@@ -1225,6 +1228,7 @@ public class NMSPacketClasses {
                 return false;
             }
         };
+        @Deprecated
         public final FieldAccessor<Double> y = new SafeDirectField<Double>() {
             @Override
             public Double get(Object instance) {
@@ -1236,6 +1240,7 @@ public class NMSPacketClasses {
                 return false;
             }
         };
+        @Deprecated
         public final FieldAccessor<Double> z = new SafeDirectField<Double>() {
             @Override
             public Double get(Object instance) {

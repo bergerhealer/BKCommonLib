@@ -85,6 +85,12 @@ public class CommonCapabilities {
     public static final boolean PROTOCOL_MOVEMENT_IS_SHORT_DELTA = CommonBootstrap.evaluateMCVersion(">=", "1.10");
 
     /**
+     * Since Minecraft 1.9 entity position updates (teleports) use double x/y/z. Before, they were encoded into integers
+     * with some loss of precision.
+     */
+    public static final boolean PROTOCOL_TELEPORT_IS_DOUBLE_POSITION = CommonBootstrap.evaluateMCVersion(">=", "1.9");
+
+    /**
      * Since Minecraft 1.9 more than one passenger per vehicle are permitted
      */
     public static final boolean MULTIPLE_PASSENGERS = CommonBootstrap.evaluateMCVersion(">=", "1.9");
