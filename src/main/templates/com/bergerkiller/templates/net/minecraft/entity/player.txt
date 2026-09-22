@@ -6,12 +6,12 @@ import net.minecraft.network.chat.ChatMessage;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
-import net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.entity.SignTextSlot;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerLevelAccess;
@@ -401,6 +401,14 @@ class ServerPlayer extends net.minecraft.world.entity.player.Player {
     }
 
     <code>
+    public void openSignEditWindow(IntVector3 signPosition, boolean isFrontText) {
+        openSignEditWindow(signPosition, com.bergerkiller.bukkit.common.block.SignSide.byFront(isFrontText));
+    }
+
+    public void openSignEditWindow(IntVector3 signPosition, com.bergerkiller.bukkit.common.block.SignSide side) {
+        getPlayerConnection().sendPacket(com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacketHandle.createNew(signPosition, side).getRaw());
+    }
+
     public void closeSignEditWindow() {
         // Tell client to close the dialog by editing a sign far away in a chunk that 100% guaranteed is not loaded
         openSignEditWindow(IntVector3.of(Integer.MAX_VALUE, 0, Integer.MAX_VALUE));
@@ -409,27 +417,7 @@ class ServerPlayer extends net.minecraft.world.entity.player.Player {
     public void openSignEditWindow(IntVector3 signPosition) {
         openSignEditWindow(signPosition, true);
     }
-    </code>
 
-    public void openSignEditWindow((IntVector3) BlockPos signPosition, boolean isFrontText) {
-#if version >= 1.20
-        instance.connection.send((Packet) new ClientboundOpenSignEditorPacket(signPosition, isFrontText));
-#else
-        if (!isFrontText) {
-            throw new UnsupportedOperationException("Back text not supported on this version of Minecraft");
-        }
-
-  #if version >= 1.18
-        instance.connection.send((Packet) new ClientboundOpenSignEditorPacket(signPosition));
-  #elseif version >= 1.17
-        instance.connection.sendPacket((Packet) new ClientboundOpenSignEditorPacket(signPosition));
-  #else
-        instance.playerConnection.sendPacket((Packet) new ClientboundOpenSignEditorPacket(signPosition));
-  #endif
-#endif
-    }
-
-    <code>
     public static ServerPlayerHandle fromBukkit(org.bukkit.entity.Player player) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player));
     }

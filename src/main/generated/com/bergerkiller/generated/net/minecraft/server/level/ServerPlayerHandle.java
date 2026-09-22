@@ -37,9 +37,16 @@ public abstract class ServerPlayerHandle extends PlayerHandle {
     public abstract void sendMessage(ChatText ichatbasecomponent);
     public abstract int getCurrentWindowId();
     public abstract InventoryView openAnvilWindow(ChatText titleText);
-    public abstract void openSignEditWindow(IntVector3 signPosition, boolean isFrontText);
     @Deprecated
     public void setSpawnForced(boolean forced) {
+    }
+
+    public void openSignEditWindow(IntVector3 signPosition, boolean isFrontText) {
+        openSignEditWindow(signPosition, com.bergerkiller.bukkit.common.block.SignSide.byFront(isFrontText));
+    }
+
+    public void openSignEditWindow(IntVector3 signPosition, com.bergerkiller.bukkit.common.block.SignSide side) {
+        getPlayerConnection().sendPacket(com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacketHandle.createNew(signPosition, side).getRaw());
     }
 
     public void closeSignEditWindow() {
@@ -78,7 +85,6 @@ public abstract class ServerPlayerHandle extends PlayerHandle {
         public final Template.Method<Collection<Integer>> getRemoveQueue = new Template.Method<Collection<Integer>>();
         public final Template.Method<Integer> getCurrentWindowId = new Template.Method<Integer>();
         public final Template.Method<InventoryView> openAnvilWindow = new Template.Method<InventoryView>();
-        public final Template.Method.Converted<Void> openSignEditWindow = new Template.Method.Converted<Void>();
 
     }
 

@@ -33,7 +33,7 @@ optional class ServerboundMoveVehiclePacket extends Packet {
     public boolean isOnGround:onGround();
 
     public static (ServerboundMoveVehiclePacketHandle) ServerboundMoveVehiclePacket createNew(double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
-        return new ServerboundMoveVehiclePacket(PositionAndRotation.of(new Vec3(posX, posY, posZ), yaw, pitch, onGround));
+        return new ServerboundMoveVehiclePacket(PositionAndRotation.of(new Vec3(posX, posY, posZ), yaw, pitch), onGround);
     }
 #elseif version >= 1.21.4
     public double getPosX() { return instance.position().x; }
@@ -965,7 +965,9 @@ class ClientboundMoveEntityPacket extends Packet {
 
     class ClientboundMoveEntityPacket.Pos extends ClientboundMoveEntityPacket {
         public static (ClientboundMoveEntityPacketHandle.PosHandle) ClientboundMoveEntityPacket.Pos createNew() {
-#if version >= 1.20.5
+#if version >= 26.3
+            return new ClientboundMoveEntityPacket$Pos(0, new VecDelta$Linear((short) 0, (short) 0, (short) 0), false);
+#elseif version >= 1.20.5
             return new ClientboundMoveEntityPacket$Pos(0, (short) 0, (short) 0, (short) 0, false);
 #elseif version >= 1.18
             return ClientboundMoveEntityPacket$Pos.read(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
@@ -998,7 +1000,9 @@ class ClientboundMoveEntityPacket extends Packet {
 
     class ClientboundMoveEntityPacket.PosRot extends ClientboundMoveEntityPacket {
         public static (ClientboundMoveEntityPacketHandle.PosRotHandle) ClientboundMoveEntityPacket.PosRot createNew() {
-#if version >= 1.20.5
+#if version >= 26.3
+            return new ClientboundMoveEntityPacket$PosRot(0, new VecDelta$Linear((short) 0, (short) 0, (short) 0), (byte) 0, (byte) 0, false);
+#elseif version >= 1.20.5
             return new ClientboundMoveEntityPacket$PosRot(0, (short) 0, (short) 0, (short) 0, (byte) 0, (byte) 0, false);
 #elseif version >= 1.18
             return ClientboundMoveEntityPacket$PosRot.read(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
