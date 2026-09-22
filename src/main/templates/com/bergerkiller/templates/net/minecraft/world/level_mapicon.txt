@@ -6,7 +6,7 @@ import net.minecraft.resources.Identifier;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
 
-import com.bergerkiller.bukkit.common.map.MapMarker.Type;
+import com.bergerkiller.bukkit.common.map.MapMarker;
 
 import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapDecorationHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapDecorationTypeHandle;

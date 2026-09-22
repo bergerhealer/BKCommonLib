@@ -85,7 +85,7 @@ import com.bergerkiller.generated.net.minecraft.sounds.SoundSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectInstanceHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeInstanceHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle.RespawnConfigHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ServerPlayerHandle;
 
 class ClientboundRemoveEntitiesPacket extends Packet {
 #if version >= 1.17.1

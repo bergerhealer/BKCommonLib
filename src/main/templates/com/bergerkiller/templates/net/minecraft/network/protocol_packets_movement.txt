@@ -5,22 +5,20 @@ import net.minecraft.core.PositionAndRotation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior.MinecartStep;
+import net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior;
 
+import net.minecraft.network.protocol.game.VecDelta;
 import com.bergerkiller.bukkit.common.internal.logic.ProtocolMath;
 
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMoveEntityPacketHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMoveEntityPacketHandle.PosHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMoveEntityPacketHandle.PosRotHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMoveEntityPacketHandle.RotHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundRotateHeadPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacketHandle
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMoveVehiclePacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundMoveVehiclePacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundMoveMinecartPacketHandle;
 
-import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.NewMinecartBehaviorHandle.MinecartStepHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.minecart.NewMinecartBehaviorHandle;
 
 import com.bergerkiller.bukkit.common.wrappers.RelativeFlags;
 
@@ -486,95 +484,121 @@ class ClientboundMoveEntityPacket extends Packet {
     protected boolean onGround:g;
 #endif
 
-#if version >= 1.14
+#if version >= 26.3
+    #require ClientboundMoveEntityPacket protected final VecDelta delta;
+
+    public ClientboundMoveEntityPacketHandle.PositionChange getPositionChange() {
+        VecDelta delta = instance.getPositionDelta();
+        if (delta instanceof VecDelta.Linear) {
+            VecDelta$Linear linear = (VecDelta$Linear) delta;
+            return new ClientboundMoveEntityPacketHandle$LinearPositionChange(linear.xa(), linear.ya(), linear.za());
+        } else if (delta instanceof VecDelta.Stepped) {
+            VecDelta$Stepped stepped = (VecDelta$Stepped) delta;
+            java.util.List steps = stepped.steps();
+            java.util.List bkclSteps = new java.util.ArrayList(steps.size());
+            for (java.util.Iterator iter = steps.iterator(); iter.hasNext();) {
+                VecDelta$Stepped$DeltaStep step = (VecDelta$Stepped$DeltaStep) iter.next();
+                bkclSteps.add(new ClientboundMoveEntityPacketHandle$SteppedPositionChange$Step(
+                    step.xa(), step.ya(), step.za(), step.ticks()
+                ));
+            }
+            return new ClientboundMoveEntityPacketHandle$SteppedPositionChange(bkclSteps);
+        } else {
+            throw new IllegalArgumentException("Unsupported PositionChange type: " + (delta == null ? "null" : delta.getClass().getName()));
+        }
+    }
+
+    public void setPositionChange(ClientboundMoveEntityPacketHandle.PositionChange change) {
+        if (change instanceof ClientboundMoveEntityPacketHandle$LinearPositionChange) {
+            ClientboundMoveEntityPacketHandle$LinearPositionChange linearChange = (ClientboundMoveEntityPacketHandle$LinearPositionChange) change;
+
+            VecDelta$Linear linear = new VecDelta$Linear(linearChange.encodedDeltaX, linearChange.encodedDeltaY, linearChange.encodedDeltaZ);
+            instance#delta = linear;
+        } else if (change instanceof ClientboundMoveEntityPacketHandle.SteppedPositionChange) {
+            ClientboundMoveEntityPacketHandle$SteppedPositionChange steppedChange = (ClientboundMoveEntityPacketHandle$SteppedPositionChange) change;
+
+            java.util.List steps = new java.util.ArrayList(steppedChange.steps.size());
+            for (java.util.Iterator iter = steppedChange.getSteps().iterator(); iter.hasNext();) {
+                ClientboundMoveEntityPacketHandle$SteppedPositionChange$Step step = (ClientboundMoveEntityPacketHandle$SteppedPositionChange$Step) iter.next();
+                steps.add(new VecDelta$Stepped$DeltaStep(step.encodedDeltaX, step.encodedDeltaY, step.encodedDeltaZ, step.ticks));
+            }
+            VecDelta$Stepped stepped = new VecDelta$Stepped(steps);
+            instance#delta = stepped;
+        } else if (change == null) {
+            throw new IllegalArgumentException("PositionChange cannot be null");
+        } else {
+            throw new IllegalArgumentException("Unsupported PositionChange type: " + change.getClass().getName());
+        }
+    }
+
+#elseif version >= 1.14
   #if version >= 1.17
-    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected short dx:xa;
-    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected short dy:ya;
-    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected short dz:za;
+    #require ClientboundMoveEntityPacket protected short dx:xa;
+    #require ClientboundMoveEntityPacket protected short dy:ya;
+    #require ClientboundMoveEntityPacket protected short dz:za;
   #else
-    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected short dx:b;
-    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected short dy:c;
-    #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected short dz:d;
+    #require ClientboundMoveEntityPacket protected short dx:b;
+    #require ClientboundMoveEntityPacket protected short dy:c;
+    #require ClientboundMoveEntityPacket protected short dz:d;
   #endif
 
-    public double getDeltaX() {
-        return ProtocolMath.deserializePosition_1_10_2(instance#dx);
+    public ClientboundMoveEntityPacketHandle.PositionChange getPositionChange() {
+        return new ClientboundMoveEntityPacketHandle$LinearPositionChange(instance#dx, instance#dy, instance#dz);
     }
 
-    public double getDeltaY() {
-        return ProtocolMath.deserializePosition_1_10_2(instance#dy);
-    }
-
-    public double getDeltaZ() {
-        return ProtocolMath.deserializePosition_1_10_2(instance#dz);
-    }
-
-    public void setDeltaX(double dx) {
-        instance#dx = (short) ProtocolMath.serializePosition_1_10_2(dx);
-    }
-
-    public void setDeltaY(double dy) {
-        instance#dy = (short) ProtocolMath.serializePosition_1_10_2(dy);
-    }
-
-    public void setDeltaZ(double dz) {
-        instance#dz = (short) ProtocolMath.serializePosition_1_10_2(dz);
+    public void setPositionChange(ClientboundMoveEntityPacketHandle.PositionChange change) {
+        if (change instanceof ClientboundMoveEntityPacketHandle$LinearPositionChange) {
+            ClientboundMoveEntityPacketHandle$LinearPositionChange linear = (ClientboundMoveEntityPacketHandle$LinearPositionChange) change;
+            instance#dx = linear.encodedDeltaX;
+            instance#dy = linear.encodedDeltaY;
+            instance#dz = linear.encodedDeltaZ;
+        } else if (change == null) {
+            throw new IllegalArgumentException("PositionChange cannot be null");
+        } else {
+            throw new IllegalArgumentException("Unsupported PositionChange type: " + change.getClass().getName());
+        }
     }
 #elseif version >= 1.9
     #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected int dx:b;
     #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected int dy:c;
     #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected int dz:d;
 
-    public double getDeltaX() {
-        return ProtocolMath.deserializePosition_1_10_2(instance#dx);
+    public ClientboundMoveEntityPacketHandle.PositionChange getPositionChange() {
+        return new ClientboundMoveEntityPacketHandle$LinearPositionChange((short) instance#dx, (short) instance#dy, (short) instance#dz);
     }
 
-    public double getDeltaY() {
-        return ProtocolMath.deserializePosition_1_10_2(instance#dy);
-    }
-
-    public double getDeltaZ() {
-        return ProtocolMath.deserializePosition_1_10_2(instance#dz);
-    }
-
-    public void setDeltaX(double dx) {
-        instance#dx = ProtocolMath.serializePosition_1_10_2(dx);
-    }
-
-    public void setDeltaY(double dy) {
-        instance#dy = ProtocolMath.serializePosition_1_10_2(dy);
-    }
-
-    public void setDeltaZ(double dz) {
-        instance#dz = ProtocolMath.serializePosition_1_10_2(dz);
+    public void setPositionChange(ClientboundMoveEntityPacketHandle.PositionChange change) {
+        if (change instanceof ClientboundMoveEntityPacketHandle$LinearPositionChange) {
+            ClientboundMoveEntityPacketHandle$LinearPositionChange linear = (ClientboundMoveEntityPacketHandle$LinearPositionChange) change;
+            instance#dx = (int)linear.encodedDeltaX;
+            instance#dy = (int)linear.encodedDeltaY;
+            instance#dz = (int)linear.encodedDeltaZ;
+        } else if (change == null) {
+            throw new IllegalArgumentException("PositionChange cannot be null");
+        } else {
+            throw new IllegalArgumentException("Unsupported PositionChange type: " + change.getClass().getName());
+        }
     }
 #else
     #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected byte dx:b;
     #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected byte dy:c;
     #require net.minecraft.network.protocol.game.ClientboundMoveEntityPacket protected byte dz:d;
 
-    public double getDeltaX() {
-        return ProtocolMath.deserializePosition_1_8_8(instance#dx);
+    public ClientboundMoveEntityPacketHandle.PositionChange getPositionChange() {
+        return new ClientboundMoveEntityPacketHandle$LinearPositionChangeLegacy(instance#dx, instance#dy, instance#dz);
     }
 
-    public double getDeltaY() {
-        return ProtocolMath.deserializePosition_1_8_8(instance#dy);
-    }
-
-    public double getDeltaZ() {
-        return ProtocolMath.deserializePosition_1_8_8(instance#dz);
-    }
-
-    public void setDeltaX(double dx) {
-        instance#dx = (byte) ProtocolMath.serializePosition_1_8_8(dx);
-    }
-
-    public void setDeltaY(double dy) {
-        instance#dy = (byte) ProtocolMath.serializePosition_1_8_8(dy);
-    }
-
-    public void setDeltaZ(double dz) {
-        instance#dz = (byte) ProtocolMath.serializePosition_1_8_8(dz);
+    public void setPositionChange(ClientboundMoveEntityPacketHandle.PositionChange change) {
+        if (change instanceof ClientboundMoveEntityPacketHandle$LinearPositionChangeLegacy) {
+            ClientboundMoveEntityPacketHandle$LinearPositionChangeLegacy linear = (ClientboundMoveEntityPacketHandle$LinearPositionChangeLegacy) change;
+            instance#dx = linear.encodedDeltaX;
+            instance#dy = linear.encodedDeltaY;
+            instance#dz = linear.encodedDeltaZ;
+        } else if (change == null) {
+            throw new IllegalArgumentException("PositionChange cannot be null");
+        } else {
+            throw new IllegalArgumentException("Unsupported PositionChange type: " + change.getClass().getName());
+        }
     }
 #endif
 
@@ -634,6 +658,279 @@ class ClientboundMoveEntityPacket extends Packet {
     public void setDeltaPitch(float deltaPitch) {
         setPitch(deltaPitch);
     }
+
+    /** @deprecated Use getPositionChange() instead */
+    @Deprecated
+    public double getDeltaX() {
+        return getPositionChange().getDeltaX();
+    }
+
+    /** @deprecated Use getPositionChange() instead */
+    @Deprecated
+    public double getDeltaY() {
+        return getPositionChange().getDeltaY();
+    }
+
+    /** @deprecated Use getPositionChange() instead */
+    @Deprecated
+    public double getDeltaZ() {
+        return getPositionChange().getDeltaZ();
+    }
+
+    /** @deprecated Use {@link #setPositionChange(PositionChange)} instead */
+    @Deprecated
+    public void setDeltaX(double dx) {
+        PositionChange change = getPositionChange();
+        setPositionChange(PositionChange.encodeLinearChange(dx, change.getDeltaY(), change.getDeltaZ()));
+    }
+
+    /** @deprecated Use {@link #setPositionChange(PositionChange)} instead */
+    @Deprecated
+    public void setDeltaY(double dy) {
+        PositionChange change = getPositionChange();
+        setPositionChange(PositionChange.encodeLinearChange(change.getDeltaX(), dy, change.getDeltaZ()));
+    }
+
+    /** @deprecated Use {@link #setPositionChange(PositionChange)} instead */
+    @Deprecated
+    public void setDeltaZ(double dz) {
+        PositionChange change = getPositionChange();
+        setPositionChange(PositionChange.encodeLinearChange(change.getDeltaX(), change.getDeltaY(), dz));
+    }
+
+    /**
+     * Represents a change in position of an entity, encoded in the way that the Minecraft protocol expects.
+     * The encoding used depends on the Minecraft version.
+     */
+    public interface PositionChange {
+        /**
+         * Gets the X-component of the movement change the client will perform with this position change
+         *
+         * @return delta movement X
+         */
+        double getDeltaX();
+
+        /**
+         * Gets the Y-component of the movement change the client will perform with this position change
+         *
+         * @return delta movement Y
+         */
+        double getDeltaY();
+
+        /**
+         * Gets the Z-component of the movement change the client will perform with this position change
+         *
+         * @return delta movement Z
+         */
+        double getDeltaZ();
+
+        /**
+         * Creates a new Change instance that encodes the given delta values.
+         * The encoding used depends on the Minecraft version.
+         *
+         * @param deltaX Delta movement to encode, X-coordinate
+         * @param deltaY Delta movement to encode, Y-coordinate
+         * @param deltaZ Delta movement to encode, Z-coordinate
+         * @return change instance that can be assigned to a ClientboundMoveEntityPacket packet change field
+         */
+        static PositionChange encodeLinearChange(double deltaX, double deltaY, double deltaZ) {
+            if (com.bergerkiller.bukkit.common.internal.CommonCapabilities.PROTOCOL_MOVEMENT_IS_SHORT_DELTA) {
+                short encodedDeltaX = (short) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_10_2(deltaX);
+                short encodedDeltaY = (short) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_10_2(deltaY);
+                short encodedDeltaZ = (short) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_10_2(deltaZ);
+                return new LinearPositionChange(encodedDeltaX, encodedDeltaY, encodedDeltaZ);
+            } else {
+                byte encodedDeltaX = (byte) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_8_8(deltaX);
+                byte encodedDeltaY = (byte) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_8_8(deltaY);
+                byte encodedDeltaZ = (byte) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_8_8(deltaZ);
+                return new LinearPositionChangeLegacy(encodedDeltaX, encodedDeltaY, encodedDeltaZ);
+            }
+        }
+    }
+
+    /**
+     * Encoding used since 1.10.2, where the delta is encoded as a short.
+     * Interpolates the movement over the standard entity interpolation tick time (usually 3 ticks),
+     * and moves the entity linearly.
+     */
+    public static class LinearPositionChange implements PositionChange {
+        public final short encodedDeltaX;
+        public final short encodedDeltaY;
+        public final short encodedDeltaZ;
+
+        public LinearPositionChange(short encodedDeltaX, short encodedDeltaY, short encodedDeltaZ) {
+            this.encodedDeltaX = encodedDeltaX;
+            this.encodedDeltaY = encodedDeltaY;
+            this.encodedDeltaZ = encodedDeltaZ;
+        }
+
+        @Override
+        public double getDeltaX() {
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_10_2(encodedDeltaX);
+        }
+
+        @Override
+        public double getDeltaY() {
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_10_2(encodedDeltaY);
+        }
+
+        @Override
+        public double getDeltaZ() {
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_10_2(encodedDeltaZ);
+        }
+    }
+
+    /**
+     * Encoding used since 26.3, where the delta is encoded as a list of steps.
+     * Each step has its own delta and duration in ticks.
+     * Multi-step changes are only supported on Minecraft 26.3 and later.
+     */
+    public static final class SteppedPositionChange implements PositionChange {
+        public final java.util.List<Step> steps;
+
+        public SteppedPositionChange() {
+            this(new java.util.ArrayList<>());
+        }
+
+        public SteppedPositionChange(java.util.List<Step> steps) {
+            this.steps = steps;
+        }
+
+        /**
+         * Gets the list of steps that make up this multi-step change.
+         * Multi-step changes are only supported on Minecraft 26.3 and later.
+         *
+         * @return list of steps
+         */
+        public java.util.List<Step> getSteps() {
+            return steps;
+        }
+
+        /**
+         * Adds a new step to this multi-step change.
+         * Multi-step changes are only supported on Minecraft 26.3 and later.
+         *
+         * @param step Step to add
+         */
+        public void addStep(Step step) {
+            steps.add(step);
+        }
+
+        /**
+         * Adds a new step to this multi-step change, encoding the given delta values and tick duration as a single step.
+         * Multi-step changes are only supported on Minecraft 26.3 and later.
+         *
+         * @param deltaX Delta movement to encode, X-coordinate
+         * @param deltaY Delta movement to encode, Y-coordinate
+         * @param deltaZ Delta movement to encode, Z-coordinate
+         * @param ticks Duration of this step in ticks
+         */
+        public void addStep(double deltaX, double deltaY, double deltaZ, int ticks) {
+            steps.add(encodeStep(deltaX, deltaY, deltaZ, ticks));
+        }
+
+        @Override
+        public double getDeltaX() {
+            double sum = 0.0;
+            for (Step change : steps) {
+                sum += change.getDeltaX();
+            }
+            return sum;
+        }
+
+        @Override
+        public double getDeltaY() {
+            double sum = 0.0;
+            for (Step change : steps) {
+                sum += change.getDeltaY();
+            }
+            return sum;
+        }
+
+        @Override
+        public double getDeltaZ() {
+            double sum = 0.0;
+            for (Step change : steps) {
+                sum += change.getDeltaZ();
+            }
+            return sum;
+        }
+
+        /**
+         * Gets the total number of ticks that this multi-step change will take to complete.
+         *
+         * @return total ticks
+         */
+        public int getTicks() {
+            int sum = 0;
+            for (Step change : steps) {
+                sum += change.ticks;
+            }
+            return sum;
+        }
+
+        /**
+         * Creates a new Step instance that encodes the given delta values and tick duration as a single step.
+         * Multi-step changes are only supported on Minecraft 26.3 and later.
+         *
+         * @param deltaX Delta movement to encode, X-coordinate
+         * @param deltaY Delta movement to encode, Y-coordinate
+         * @param deltaZ Delta movement to encode, Z-coordinate
+         * @param ticks Duration of this step in ticks
+         * @return step instance that can be added to MultiPositionChange
+         */
+        public static Step encodeStep(double deltaX, double deltaY, double deltaZ, int ticks) {
+            short encodedDeltaX = (short) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_10_2(deltaX);
+            short encodedDeltaY = (short) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_10_2(deltaY);
+            short encodedDeltaZ = (short) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_10_2(deltaZ);
+            return new Step(encodedDeltaX, encodedDeltaY, encodedDeltaZ, ticks);
+        }
+
+        /**
+         * Represents a single step in a multi-step position change.
+         * Each step has its own delta and duration in ticks.
+         */
+        public static final class Step extends LinearPositionChange {
+            public final int ticks;
+
+            public Step(short encodedDeltaX, short encodedDeltaY, short encodedDeltaZ, int ticks) {
+                super(encodedDeltaX, encodedDeltaY, encodedDeltaZ);
+                this.ticks = ticks;
+            }
+        }
+    }
+
+    /**
+     * Encoding used before 1.10.2, where the delta is encoded as a byte.
+     * Interpolates the movement over the standard entity interpolation tick time (usually 3 ticks),
+     * and moves the entity linearly.
+     */
+    public static final class LinearPositionChangeLegacy implements PositionChange {
+        public final byte encodedDeltaX;
+        public final byte encodedDeltaY;
+        public final byte encodedDeltaZ;
+
+        public LinearPositionChangeLegacy(byte encodedDeltaX, byte encodedDeltaY, byte encodedDeltaZ) {
+            this.encodedDeltaX = encodedDeltaX;
+            this.encodedDeltaY = encodedDeltaY;
+            this.encodedDeltaZ = encodedDeltaZ;
+        }
+
+        @Override
+        public double getDeltaX() {
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(encodedDeltaX);
+        }
+
+        @Override
+        public double getDeltaY() {
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(encodedDeltaY);
+        }
+
+        @Override
+        public double getDeltaZ() {
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(encodedDeltaZ);
+        }
+    }
     </code>
 
     class ClientboundMoveEntityPacket.Rot extends ClientboundMoveEntityPacket {
@@ -686,11 +983,13 @@ class ClientboundMoveEntityPacket extends Packet {
         }
 
         public static ClientboundMoveEntityPacketHandle.PosHandle createNew(int entityId, double dx, double dy, double dz, boolean onGround) {
+            return createNew(entityId, PositionChange.encodeLinearChange(dx, dy, dz), onGround);
+        }
+
+        public static ClientboundMoveEntityPacketHandle.PosHandle createNew(int entityId, PositionChange posChange, boolean onGround) {
             ClientboundMoveEntityPacketHandle.PosHandle handle = createNew();
             handle.setEntityId(entityId);
-            handle.setDeltaX(dx);
-            handle.setDeltaY(dy);
-            handle.setDeltaZ(dz);
+            handle.setPositionChange(posChange);
             handle.setOnGround(onGround);
             return handle;
         }
@@ -717,11 +1016,13 @@ class ClientboundMoveEntityPacket extends Packet {
         }
 
         public static ClientboundMoveEntityPacketHandle.PosRotHandle createNew(int entityId, double dx, double dy, double dz, float yaw, float pitch, boolean onGround) {
+            return createNew(entityId, PositionChange.encodeLinearChange(dx, dy, dz), yaw, pitch, onGround);
+        }
+
+        public static ClientboundMoveEntityPacketHandle.PosRotHandle createNew(int entityId, PositionChange posChange, float yaw, float pitch, boolean onGround) {
             ClientboundMoveEntityPacketHandle.PosRotHandle handle = createNew();
             handle.setEntityId(entityId);
-            handle.setDeltaX(dx);
-            handle.setDeltaY(dy);
-            handle.setDeltaZ(dz);
+            handle.setPositionChange(posChange);
             handle.setYaw(yaw);
             handle.setPitch(pitch);
             handle.setOnGround(onGround);

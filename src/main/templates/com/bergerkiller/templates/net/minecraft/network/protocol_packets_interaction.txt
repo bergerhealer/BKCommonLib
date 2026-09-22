@@ -430,15 +430,14 @@ class ServerboundUseItemPacket extends Packet {
     // We use this to clone the packet with a single property changed.
     // Some fields, like timestamp, are a no-op.
     public static (ServerboundUseItemPacketHandle) ServerboundUseItemPacket createNew((HumanHandRole) InteractionHand handRole, long timestamp, int sequence, float yaw, float pitch) {
-#if version >= 1.21
+#if version >= 1.9
+  #if version >= 1.21
         ServerboundUseItemPacket packet = new ServerboundUseItemPacket(handRole, sequence, yaw, pitch);
-#elseif version >= 1.19
+  #elseif version >= 1.19
         ServerboundUseItemPacket packet = new ServerboundUseItemPacket(handRole, sequence);
-#elseif version >= 1.9
+  #elseif version >= 1.9
         ServerboundUseItemPacket packet = new ServerboundUseItemPacket(handRole);
-#else
-        throw new UnsupportedOperationException("ServerboundUseItemPacket is not supported on this Minecraft version");
-#endif
+  #endif
 
         // Spigot-specific field not present in vanilla
   #if exists net.minecraft.network.protocol.game.ServerboundUseItemPacket public long timestamp;
@@ -446,6 +445,9 @@ class ServerboundUseItemPacket extends Packet {
   #endif
 
         return packet;
+#else
+        throw new UnsupportedOperationException("ServerboundUseItemPacket is not supported on this Minecraft version");
+#endif
     }
 
     <code>
