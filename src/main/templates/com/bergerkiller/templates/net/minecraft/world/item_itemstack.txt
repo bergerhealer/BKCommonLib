@@ -633,7 +633,9 @@ class ItemStack {
 
 
     public int getMapColor() {
-#if version >= 1.20.5
+#if version >= 26.3
+        return -1; // Removed :(
+#elseif version >= 1.20.5
         net.minecraft.world.item.component.MapItemColor color;
         color = (net.minecraft.world.item.component.MapItemColor) instance.get(DataComponents.MAP_COLOR);
         return (color == null) ? -1 : color.rgb();
@@ -649,7 +651,9 @@ class ItemStack {
 #endif
     }
     public void setMapColor(int rgb) {
-#if version >= 1.20.5
+#if version >= 26.3
+        // Removed :(
+#elseif version >= 1.20.5
         if (rgb != -1) {
             instance.set(DataComponents.MAP_COLOR, new net.minecraft.world.item.component.MapItemColor(rgb));
         } else {
