@@ -951,13 +951,20 @@ class ClientboundLevelChunkWithLightPacket extends Packet {
     private int z:b;
 #endif
 
+#if version >= 26.3
+    #require ClientboundLevelChunkWithLightPacket public ClientboundLevelChunkPacketData chunkData();
+#elseif version >= 1.18
+    #require ClientboundLevelChunkWithLightPacket public ClientboundLevelChunkPacketData chunkData:getChunkData();
+#endif
+
     // Heightmap data, not available on MC 1.13.2 and before
     public (CommonTagCompound) CompoundTag getHeightmaps() {
 #if version >= 1.21.5
         // Convert Map<Heightmap.Types, long[]> into NBT
         CompoundTag heightmapsNBT = new CompoundTag();
 
-        java.util.Map heightmaps = instance.getChunkData().getHeightmaps();
+        ClientboundLevelChunkPacketData chunkData = instance#chunkData();
+        java.util.Map heightmaps = chunkData.getHeightmaps();
         java.util.Iterator iter = heightmaps.entrySet().iterator();
         while (iter.hasNext()) {
             java.util.Map$Entry entry = (java.util.Map$Entry) iter.next();
@@ -969,7 +976,8 @@ class ClientboundLevelChunkWithLightPacket extends Packet {
         return heightmapsNBT;
 
 #elseif version >= 1.18
-        return instance.getChunkData().getHeightmaps();
+        ClientboundLevelChunkPacketData chunkData = instance#chunkData();
+        return chunkData.getHeightmaps();
 #elseif version >= 1.17
         return instance.f();
 #elseif version >= 1.14
@@ -1018,12 +1026,13 @@ class ClientboundLevelChunkWithLightPacket extends Packet {
         }
 
         #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData private final Map<Heightmap.Types, long[]> heightmaps;
-        instance#heightmaps = heightmaps;
+        ClientboundLevelChunkPacketData chunkData = instance#chunkData();
+        chunkData#heightmaps = heightmaps;
 
 #elseif version >= 1.18
         #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData private final CompoundTag heightmaps;
-        ClientboundLevelChunkPacketData data = instance.getChunkData();
-        data#heightmaps = heightmapsData;
+        ClientboundLevelChunkPacketData chunkData = instance#chunkData();
+        chunkData#heightmaps = heightmapsData;
 #elseif version >= 1.17
         #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private final CompoundTag heightmaps;
         instance#heightmaps = heightmapsData;
@@ -1054,8 +1063,8 @@ class ClientboundLevelChunkWithLightPacket extends Packet {
 
     public byte[] getBuffer() {
 #if version >= 1.18
-        ClientboundLevelChunkPacketData data = instance.getChunkData();
-        return data#chunkDataBuffer;
+        ClientboundLevelChunkPacketData chunkData = instance#chunkData();
+        return chunkData#chunkDataBuffer;
 #elseif version >= 1.9
         return instance#chunkDataBuffer;
 #else
@@ -1066,8 +1075,8 @@ class ClientboundLevelChunkWithLightPacket extends Packet {
 
     public void setBuffer(byte[] buffer) {
 #if version >= 1.18
-        ClientboundLevelChunkPacketData data = instance.getChunkData();
-        data#chunkDataBuffer = buffer;
+        ClientboundLevelChunkPacketData chunkData = instance#chunkData();
+        chunkData#chunkDataBuffer = buffer;
 #elseif version >= 1.9
         instance#chunkDataBuffer = buffer;
 #else
@@ -1080,10 +1089,17 @@ class ClientboundLevelChunkWithLightPacket extends Packet {
     public List<BlockStateChange> getBlockStates() {
 #if version >= 1.18
         // Complicated: requires conversion using chunk x/z
-        net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData data = instance.getChunkData();
+        ClientboundLevelChunkPacketData chunkData = instance#chunkData();
+  #if version >= 26.3
+        int cx = instance.x();
+        int cz = instance.z();
+  #else
+        int cx = instance.getX();
+        int cz = instance.getZ();
+  #endif
         #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData private final List<net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityInfo> blockEntitiesData;
         return com.bergerkiller.bukkit.common.conversion.blockstate.ChunkBlockStateChangeConverter.convertList(
-                data#blockEntitiesData, instance.getX(), instance.getZ());
+                chunkData#blockEntitiesData, cx, cz);
 #elseif version >= 1.9.4
   #if version >= 1.17
         #require net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket private (List<BlockStateChange) List<CompoundTag> blockEntitiesTags;
