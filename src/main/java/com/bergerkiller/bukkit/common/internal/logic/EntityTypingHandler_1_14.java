@@ -193,6 +193,7 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
     @Template.Import("net.minecraft.world.attribute.EnvironmentAttributeSystem")
     @Template.Import("net.minecraft.world.level.dimension.DimensionType")
     @Template.Import("net.minecraft.world.clock.ServerClockManager")
+    @Template.Import("net.minecraft.world.entity.UpdateInterval")
     @Template.Import("com.bergerkiller.bukkit.common.utils.CommonUtil")
     @Template.Import("com.bergerkiller.mountiplex.reflection.ClassTemplate")
     @Template.Import("com.bergerkiller.mountiplex.reflection.util.NullInstantiator")
@@ -476,25 +477,28 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          * public static Object createEntry((Object) ChunkMap playerChunkMap, (Object) Entity entity) {
          * #if version >= 1.18
          *     EntityType entitytypes = entity.getType();
-         *     int i = entitytypes.clientTrackingRange() * 16;
+         *     int range = entitytypes.clientTrackingRange() * 16;
          * #else
          *     EntityType entitytypes = entity.getEntityType();
-         *     int i = entitytypes.getChunkRange() * 16;
+         *     int range = entitytypes.getChunkRange() * 16;
          * #endif
          *
          * #if exists org.spigotmc.TrackingRange
-         *     i = org.spigotmc.TrackingRange.getEntityTrackingRange(entity, i);
+         *     range = org.spigotmc.TrackingRange.getEntityTrackingRange(entity, range);
          * #endif
          *
-         * #if version >= 1.18
-         *     int j = entitytypes.updateInterval();
+         * #if version >= 26.3
+         *     UpdateInterval updateInterval = entitytypes.hasUpdateInterval() ? UpdateInterval.periodic(entitytypes.updateInterval()) : UpdateInterval.NEVER;
+         *     boolean trackDeltas = entitytypes.trackDeltas();
+         * #elseif version >= 1.18
+         *     int updateInterval = entitytypes.updateInterval();
          *     boolean trackDeltas = entitytypes.trackDeltas();
          * #else
-         *     int j = entitytypes.getUpdateInterval();
+         *     int updateInterval = entitytypes.getUpdateInterval();
          *     boolean trackDeltas = entitytypes.isDeltaTracking();
          * #endif
          * 
-         *     return new ChunkMap$TrackedEntity(playerChunkMap, entity, i, j, trackDeltas);
+         *     return new ChunkMap$TrackedEntity(playerChunkMap, entity, range, updateInterval, trackDeltas);
          * }
          */
         @Template.Generated("%CREATE_ENTRY%")

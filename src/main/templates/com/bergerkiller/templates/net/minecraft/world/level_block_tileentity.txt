@@ -225,7 +225,11 @@ class BlockEntity {
 class AbstractFurnaceBlockEntity extends BlockEntity {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
-#if version >= 1.21.2
+#if version >= 26.3
+    public static int fuelTime((ItemStackHandle) ItemStack itemstack) {
+        return itemStack.get(DataComponents.COOKING_FUEL).burnTime().get(
+    }
+#elseif version >= 1.21.2
     public static int fuelTime((ItemStackHandle) ItemStack itemstack) {
         return net.minecraft.server.MinecraftServer.getServer().fuelValues().burnDuration(itemstack);
     }
