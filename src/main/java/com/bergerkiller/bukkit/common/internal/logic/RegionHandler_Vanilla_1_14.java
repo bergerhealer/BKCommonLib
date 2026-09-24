@@ -8,6 +8,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -43,22 +44,17 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void closeStreams(World world) {
         // Close region files
-        {
-            Object regionFileCache = findRegionFileCache(world);
-            for (Object regionFile : this.handler.findCacheRegionFileInstances(regionFileCache)) {
-                RegionFileHandle.createHandle(regionFile).closeStream();
-            }
-        }
+        this.handler.forEachRegionFile(findRegionFileCache(world), regionFile -> {
+            RegionFileHandle.createHandle(regionFile).closeStream();
+        });
 
         // Close POI region files
-        {
-            Object regionFileCache = findPOIFileCache(world);
-            for (Object regionFile : this.handler.findCacheRegionFileInstances(regionFileCache)) {
-                RegionFileHandle.createHandle(regionFile).closeStream();
-            }
-        }
+        this.handler.forEachRegionFile(findPOIFileCache(world), regionFile -> {
+            RegionFileHandle.createHandle(regionFile).closeStream();
+        });
     }
 
     @Override
@@ -301,6 +297,8 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
          * #elseif exists net.minecraft.world.level.chunk.storage.RegionFileStorage public final Long2ObjectLinkedOpenHashMap<org.stupidcraft.linearpaper.region.IRegionFile> regionCache;
          *     // Used on Leaf server (1.21)
          *     #require net.minecraft.world.level.chunk.storage.RegionFileStorage public final Long2ObjectLinkedOpenHashMap<org.stupidcraft.linearpaper.region.IRegionFile> regionCache;
+         * #elseif version >= 26.3
+         *     #require net.minecraft.world.level.chunk.storage.RegionFileStorage public final Long2ObjectLinkedOpenHashMap<java.util.Optional<RegionFile>> regionCache;
          * #elseif version >= 1.17
          *     #require net.minecraft.world.level.chunk.storage.RegionFileStorage private Long2ObjectLinkedOpenHashMap<RegionFile> regionCache;
          * #else
@@ -314,12 +312,23 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
 
         /*
          * <FIND_CACHE_REGION_FILES>
-         * public static Collection<RegionFile> findWorldRegionFileInstances(Long2ObjectLinkedOpenHashMap cache) {
-         *     return cache.values();
+         * public static void forEachRegionFile(Long2ObjectLinkedOpenHashMap cache, java.util.function.Consumer consumer) {
+         *     for (java.util.Iterator iter = cache.values().iterator(); iter.hasNext();) {
+         *         Object regionFile = iter.next();
+         *
+         *         // Since 26.3 this stores an Optional<RegionFile> instead. Some server forks might change that though.
+         * #if version >= 26.3
+         *         if (regionFile instanceof java.util.Optional) {
+         *             regionFile = ((java.util.Optional) regionFile).orElse(null);
+         *         }
+         * #endif
+         *
+         *         consumer.accept(regionFile);
+         *     }
          * }
          */
         @Template.Generated("%FIND_CACHE_REGION_FILES%")
-        public abstract Collection<Object> findCacheRegionFileInstances(Object cache);
+        public abstract void forEachRegionFile(Object cache, Consumer<Object> consumer);
 
         /*
          * <FIND_CACHE_REGION_FILE_COORDINATES>
@@ -352,7 +361,15 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
          * #else
          *     long coord = ChunkPos.pair(rx, rz);
          * #endif
-         *     return (RegionFile) cache.get(coord);
+         *     Object value = cache.get(coord);
+         *
+         *     // Since 26.3 it stores Optional<RegionFile>
+         * #if version >= 26.3
+         *     if (value instanceof java.util.Optional) {
+         *         value = ((java.util.Optional) value).orElse(null);
+         *     }
+         * #endif
+         *     return (RegionFile) value;
          * }
          */
         @Template.Generated("%FIND_REGION_FILE_AT%")
