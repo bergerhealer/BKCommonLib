@@ -326,6 +326,7 @@ optional class SmeltingRecipe extends Recipe {
 #if version >= 1.20.2
             recipe = ((net.minecraft.world.item.crafting.RecipeHolder) recipe).value();
 #endif
+
             if (recipe instanceof SmeltingRecipe) {
                 filteredResult.add(recipe);
             }
@@ -394,6 +395,22 @@ class RecipeManager {
   #elseif version >= 1.17
             if (!(recipe instanceof FireworkRocketRecipe) && ((Recipe) recipe).getResult().getItem() == Items.FIREWORK_ROCKET) {
                 continue;
+            }
+  #endif
+
+            // Since 26.3 there's transmute with this flag set, but we don't support it (empty item input)
+  #if version >= 26.3
+            if (recipe instanceof TransmuteRecipe) {
+                  TransmuteRecipe transmute = (TransmuteRecipe) recipe;
+                  #require TransmuteRecipe private final boolean addMaterialCountToResult;
+                  boolean add = transmute#addMaterialCountToResult;
+                  if (add) {
+                      // Skip this recipe, as it is not a 'normal' smelting recipe
+                      // In our crafting system we don't yet support an input item, to produce the output item.
+                      continue;
+                  }
+            } else if (recipe instanceof MapExtendingRecipe) {
+                  continue;
             }
   #endif
 
