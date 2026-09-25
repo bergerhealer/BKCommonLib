@@ -259,16 +259,6 @@ public class ItemMaterialTest {
             .checkOthers(false)
             .done();
 
-        testProperty(MaterialUtil.ISFUEL, "ISFUEL")
-            .check(Material.COAL, true)
-            .check("OAK_PLANKS", true)
-            .checkLegacy("WOOD", true)
-            .check(Material.STICK, true)
-            .check(Material.STONE, false)
-            .check(Material.GLASS, false)
-            .check(Material.APPLE, false)
-            .done();
-
         testProperty(MaterialUtil.ISHEATABLE, "ISHEATABLE")
             .check(Material.COBBLESTONE, true)
             .check(Material.STONE, Common.evaluateMCVersion(">=", "1.14"))

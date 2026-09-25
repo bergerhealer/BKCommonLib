@@ -379,16 +379,6 @@ public class MaterialUtil {
     };
 
     /**
-     * The material is a type of fuel that can be burned in a furnace
-     */
-    public static final MaterialProperty<Boolean> ISFUEL = new MaterialBooleanProperty() {
-        @Override
-        public Boolean get(Material type) {
-            return RecipeUtil.isFuelItem(type);
-        }
-    };
-
-    /**
      * The material can supply redstone power and redstone wire connects to it
      */
     public static final MaterialProperty<Boolean> ISPOWERSOURCE = new MaterialBlockProperty<Boolean>() {

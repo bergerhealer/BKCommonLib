@@ -1,6 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.world.item.crafting;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.World;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.world.item.crafting.RecipeManager</b>.
@@ -23,12 +25,17 @@ public abstract class RecipeManagerHandle extends Template.Handle {
         return T.getRecipes.invoke();
     }
 
+    public static int getFuelBurnTime(World world, ItemStack itemstack) {
+        return T.getFuelBurnTime.invoke(world, itemstack);
+    }
+
     /**
      * Stores class members for <b>net.minecraft.world.item.crafting.RecipeManager</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class RecipeManagerClass extends Template.Class<RecipeManagerHandle> {
         public final Template.StaticMethod.Converted<Iterable<RecipeHandle>> getRecipes = new Template.StaticMethod.Converted<Iterable<RecipeHandle>>();
+        public final Template.StaticMethod.Converted<Integer> getFuelBurnTime = new Template.StaticMethod.Converted<Integer>();
 
     }
 

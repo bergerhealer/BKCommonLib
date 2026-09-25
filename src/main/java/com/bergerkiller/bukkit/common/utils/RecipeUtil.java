@@ -6,82 +6,85 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
+import com.bergerkiller.bukkit.common.offline.OfflineWorld;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeManagerHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.SmeltingRecipeHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipesFurnaceHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntityHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingSet;
 
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
 public class RecipeUtil {
+    private static final Map<OfflineWorld, Map<Material, Integer>> fuelBurnTimesByMaterialByWorld = new HashMap<>();
 
-    private static final EnumMap<Material, Integer> fuelTimes = new EnumMap<Material, Integer>(Material.class);
+    public static Map<Material, Integer> getFuelBurnTimes(final World world) {
+        return fuelBurnTimesByMaterialByWorld.computeIfAbsent(OfflineWorld.of(world), (unused) -> {
+            final EnumMap<Material, Integer> fuelTimes = new EnumMap<Material, Integer>(Material.class);
 
-    static {
-        // Store initial values
-        for (Material material : MaterialsByName.getAllMaterials()) {
-            ItemStackHandle item;
-            try {
-                item = ItemStackHandle.newInstance(material);
-            } catch (Throwable t) {
-                // Ignore forge errors
-                continue;
+            // Store initial values
+            for (Material material : MaterialsByName.getAllMaterials()) {
+                if (!CraftMagicNumbersHandle.isItemMaterial(material)) {
+                    continue; // Invalid item
+                }
+
+                ItemStack item;
+                try {
+                    item = ItemUtil.createItem(material, 1);
+                } catch (Throwable t) {
+                    // Ignore forge errors
+                    continue;
+                }
+                int fuelBurnTime = getFuelBurnTime(world, item);
+                if (fuelBurnTime > 0) {
+                    fuelTimes.put(material, fuelBurnTime);
+                }
             }
-            int fuel = ((Integer) AbstractFurnaceBlockEntityHandle.T.fuelTime.raw.invoke(item.getRaw())).intValue();
-            if (fuel > 0) {
-                fuelTimes.put(material, fuel);
+
+            // Store legacy material values too
+            for (Material legacyMaterial : CommonLegacyMaterials.getAllLegacyMaterials()) {
+                Material modernType = BlockData.fromMaterial(legacyMaterial).getType();
+                Integer modernFuelValue = fuelTimes.get(modernType);
+                if (modernFuelValue != null) {
+                    fuelTimes.put(legacyMaterial, modernFuelValue);
+                }
             }
-        }
 
-        // Store legacy material values too
-        for (Material legacyMaterial : CommonLegacyMaterials.getAllLegacyMaterials()) {
-            Material modernType = BlockData.fromMaterial(legacyMaterial).getType();
-            Integer modernFuelValue = fuelTimes.get(modernType);
-            if (modernFuelValue != null) {
-                fuelTimes.put(legacyMaterial, modernFuelValue);
-            }
-        }
+            return Collections.unmodifiableMap(fuelTimes);
+        });
     }
 
-    public static Set<Material> getFuelItems() {
-        return fuelTimes.keySet();
+    public static Set<Material> getFuelItems(World world) {
+        return getFuelBurnTimes(world).keySet();
     }
 
-    public static Map<Material, Integer> getFuelTimes() {
-        return fuelTimes;
+    public static int getFuelBurnTime(World world, Material material) {
+        return getFuelBurnTimes(world).getOrDefault(material, 0);
     }
 
-    public static int getFuelTime(Material material) {
-        if (!CraftMagicNumbersHandle.isItemMaterial(material)) {
-            return 0; // Invalid item
-        }
-        return getFuelTime(new ItemStack(material, 1));
-    }
-
-    public static int getFuelTime(org.bukkit.inventory.ItemStack item) {
+    public static int getFuelBurnTime(World world, org.bukkit.inventory.ItemStack item) {
         if (item == null) {
             return 0;
         } else {
-            return item.getAmount() * AbstractFurnaceBlockEntityHandle.fuelTime(CommonNMS.getHandle(item));
+            return item.getAmount() * RecipeManagerHandle.getFuelBurnTime(world, item);
         }
     }
 
-    public static boolean isFuelItem(Material material) {
-        return fuelTimes.containsKey(material);
+    public static boolean isFuelItem(World world, Material material) {
+        return getFuelBurnTime(world, material) > 0;
     }
 
-    public static boolean isFuelItem(org.bukkit.inventory.ItemStack item) {
-        return item != null && isFuelItem(item.getType());
+    public static boolean isFuelItem(World world, org.bukkit.inventory.ItemStack item) {
+        return item != null && getFuelBurnTime(world, item) > 0;
     }
 
     public static boolean isHeatableItem(Material material) {

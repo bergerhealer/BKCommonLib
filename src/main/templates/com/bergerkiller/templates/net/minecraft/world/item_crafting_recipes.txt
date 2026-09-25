@@ -3,10 +3,19 @@ package net.minecraft.world.item.crafting;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.RegistryAccess$Frozen;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CookingFuel;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableInt;
+import net.minecraft.server.level.ServerLevel;
 
 import net.minecraft.world.item.crafting.Ingredient;
 
@@ -326,6 +335,8 @@ optional class SmeltingRecipe extends Recipe {
 }
 
 class RecipeManager {
+    #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
+
     public static (Iterable<RecipeHandle>) Iterable<Recipe> getRecipes() {
 #if version >= 1.13
   #if version >= 1.18
@@ -393,6 +404,53 @@ class RecipeManager {
         return RecipeManager.recipes;
 #else
         return RecipeManager.getInstance().recipes;
+#endif
+    }
+
+    public static int getFuelBurnTime((org.bukkit.World) ServerLevel world, (org.bukkit.inventory.ItemStack) ItemStack itemstack) {
+#if version >= 26.3
+        CookingFuel fuel = (CookingFuel) itemstack.get(DataComponents.COOKING_FUEL);
+        if (fuel == null) {
+            return 0;
+        }
+
+        ResolvableInt burnTime = fuel.burnTime();
+        if (burnTime instanceof ResolvableInt$Constant) {
+            return ((ResolvableInt$Constant) burnTime).value();
+        }
+
+        // Requires the full loot context to resolve, for which we must have a server level instance
+        // There's quite a lot of code involved in creating one...
+        LootParams$Builder lootParamsBuilder = new LootParams$Builder(world);
+        LootParams lootParams = lootParamsBuilder.create(LootContextParamSets.ALL_PARAMS);
+
+        LootContext$Builder contextBuilder = new LootContext$Builder(lootParams);
+        LootContext context = contextBuilder.create(java.util.Optional.empty());
+
+        return burnTime.get(context, 0);
+#elseif version >= 1.21.2
+        return net.minecraft.server.MinecraftServer.getServer().fuelValues().burnDuration(itemstack);
+#elseif version >= 1.14
+        if (itemstack.isEmpty()) {
+            return 0;
+        } else {
+            Item item = itemstack.getItem();
+  #if version >= 1.18
+            Integer fuelTime = (Integer) AbstractFurnaceBlockEntity.getFuel().get(item);
+  #else
+            Integer fuelTime = (Integer) AbstractFurnaceBlockEntity.f().get(item);
+  #endif
+            if (fuelTime == null) {
+                return 0;
+            } else {
+                return fuelTime.intValue();
+            }
+        }
+#elseif version >= 1.13
+        #require AbstractFurnaceBlockEntity private static int fuelTime(ItemStack itemstack);
+        return #fuelTime(itemstack);
+#else
+        return AbstractFurnaceBlockEntity.fuelTime(itemstack);
 #endif
     }
 }

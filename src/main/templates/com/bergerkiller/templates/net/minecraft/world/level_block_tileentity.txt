@@ -222,42 +222,6 @@ class BlockEntity {
     </code>
 }
 
-class AbstractFurnaceBlockEntity extends BlockEntity {
-    #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
-
-#if version >= 26.3
-    public static int fuelTime((ItemStackHandle) ItemStack itemstack) {
-        return itemStack.get(DataComponents.COOKING_FUEL).burnTime().get(
-    }
-#elseif version >= 1.21.2
-    public static int fuelTime((ItemStackHandle) ItemStack itemstack) {
-        return net.minecraft.server.MinecraftServer.getServer().fuelValues().burnDuration(itemstack);
-    }
-#elseif version >= 1.14
-    public static int fuelTime((ItemStackHandle) ItemStack itemstack) {
-        if (itemstack.isEmpty()) {
-            return 0;
-        } else {
-            Item item = itemstack.getItem();
-  #if version >= 1.18
-            Integer fuelTime = (Integer) AbstractFurnaceBlockEntity.getFuel().get(item);
-  #else
-            Integer fuelTime = (Integer) AbstractFurnaceBlockEntity.f().get(item);
-  #endif
-            if (fuelTime == null) {
-                return 0;
-            } else {
-                return fuelTime.intValue();
-            }
-        }
-    }
-#elseif version >= 1.13
-    private static int fuelTime((ItemStackHandle) ItemStack itemstack);
-#else
-    public static int fuelTime((ItemStackHandle) ItemStack itemstack);
-#endif
-}
-
 class HopperBlockEntity extends BlockEntity {
 #if version >= 1.18
     public static boolean suckItems:suckInItems((org.bukkit.World) Level world, (Object) Hopper ihopper);

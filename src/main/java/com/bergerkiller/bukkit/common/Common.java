@@ -89,7 +89,8 @@ public class Common {
             "Common:DamageSource:CreateVehicleDamageEvent",
             "Common:ServerboundAttackPacket:HasSecondaryAction",
             "Common:Fixes:PaperSignEditNotInverted",
-            "Common:Packet:InteractionPacketsImmutable"
+            "Common:Packet:InteractionPacketsImmutable",
+            "Common:RecipeUtil:FuelBurnTimeRequiresWorld"
     ).collect(Collectors.toSet());
 
     /**
