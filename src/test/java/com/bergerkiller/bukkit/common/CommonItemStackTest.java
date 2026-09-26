@@ -11,6 +11,7 @@ import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -20,6 +21,19 @@ import static com.bergerkiller.bukkit.common.utils.MaterialUtil.getFirst;
 import static org.junit.Assert.*;
 
 public class CommonItemStackTest {
+
+    @Test
+    public void testCraftItemIsMapItem() {
+        CommonItemStack craftItem = CommonItemStack.create(CommonItemMaterials.Maps.BURIED_TREASURE, 1);
+        assertTrue(craftItem.isCraftItemStack());
+        assertTrue(craftItem.isFilledMap());
+    }
+
+    @Test
+    public void testBukkitItemIsMapItem() {
+        ItemStack bukkitItem = new ItemStack(CommonItemMaterials.Maps.BURIED_TREASURE);
+        assertTrue(CommonItemStack.of(bukkitItem).isFilledMap());
+    }
 
     @Test
     public void testPaintingVariant() {

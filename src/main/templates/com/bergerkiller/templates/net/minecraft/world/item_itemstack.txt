@@ -1149,6 +1149,10 @@ class ItemStack {
         return instance.getItem() instanceof MapItem;
     }
 
+    public static boolean isTypeMapItem((org.bukkit.Material) net.minecraft.world.item.Item item) {
+        return item instanceof MapItem;
+    }
+
     public int getMapId() {
         return instance#getItemStackMapId();
     }

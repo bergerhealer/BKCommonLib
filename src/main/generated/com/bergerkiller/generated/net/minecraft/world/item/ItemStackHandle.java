@@ -38,6 +38,10 @@ public abstract class ItemStackHandle extends Template.Handle {
         return T.fromBlockData.invoke(data, amount);
     }
 
+    public static boolean isTypeMapItem(Material item) {
+        return T.isTypeMapItem.invoke(item);
+    }
+
     public abstract Object getItem();
     public abstract Material getTypeField();
     public abstract void refreshPatchMap();
@@ -122,6 +126,7 @@ public abstract class ItemStackHandle extends Template.Handle {
 
         public final Template.StaticMethod.Converted<ItemStackHandle> newInstance = new Template.StaticMethod.Converted<ItemStackHandle>();
         public final Template.StaticMethod.Converted<ItemStackHandle> fromBlockData = new Template.StaticMethod.Converted<ItemStackHandle>();
+        public final Template.StaticMethod.Converted<Boolean> isTypeMapItem = new Template.StaticMethod.Converted<Boolean>();
 
         @Template.Optional
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();

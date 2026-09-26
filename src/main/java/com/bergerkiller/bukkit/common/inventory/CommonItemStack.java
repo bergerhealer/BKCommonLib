@@ -332,14 +332,15 @@ public final class CommonItemStack implements Cloneable {
 
     /**
      * Efficiently checks whether this item is a filled map. This is useful to see if this
-     * item could be a Map Display.
+     * item could be a Map Display. Also counts treasure maps as valid filled maps.
+     * Any item type that shows a map to the player in the game returns true here.
      *
      * @return True if this item is a Filled Map
      */
     public boolean isFilledMap() {
         return getHandleIfCraftItemStack()
                 .map(ItemStackHandle::isMapItem)
-                .orElseGet(() -> isType(CommonItemMaterials.FILLED_MAP));
+                .orElseGet(() -> ItemStackHandle.isTypeMapItem(getType()));
     }
 
     /**
