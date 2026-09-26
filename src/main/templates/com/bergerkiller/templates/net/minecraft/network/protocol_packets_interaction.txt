@@ -20,7 +20,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.Serverboun
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundUseItemOnPacketHandle;
 
 // Since 26.3
-class ServerboundPunchPacket extends Packet {
+optional class ServerboundPunchPacket extends Packet {
 }
 
 // 1.8 - 26.2 only. Replaced by ServerboundPunchPacket since 26.3
