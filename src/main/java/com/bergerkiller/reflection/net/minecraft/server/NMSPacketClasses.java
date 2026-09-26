@@ -122,6 +122,9 @@ public class NMSPacketClasses {
         public final FieldAccessor<Boolean> isFlying = ServerboundPlayerAbilitiesPacketHandle.T.isFlying.toFieldAccessor();
     }
 
+    public static class NMSServerboundPunchPacket extends NMSPacket {
+    }
+
     public static class NMSServerboundSwingPacket extends NMSPacket {
         /**
          * Gets the hand that is animated

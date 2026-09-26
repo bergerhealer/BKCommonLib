@@ -168,6 +168,7 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSServerboundAcceptTeleportationPacket IN_TELEPORT_ACCEPT = new NMSServerboundAcceptTeleportationPacket();
     public static final NMSServerboundSignUpdatePacket IN_UPDATE_SIGN = new NMSServerboundSignUpdatePacket();
     public static final NMSServerboundPlayerActionPacket IN_PLAYER_ACTION = new NMSServerboundPlayerActionPacket();
+    public static final NMSServerboundPunchPacket IN_PUNCH = new NMSServerboundPunchPacket();
     public static final NMSServerboundSwingPacket IN_SWING = new NMSServerboundSwingPacket();
     public static final NMSServerboundInteractPacket IN_INTERACT = new NMSServerboundInteractPacket();
     public static final NMSServerboundAttackPacket IN_ATTACK = new NMSServerboundAttackPacket();

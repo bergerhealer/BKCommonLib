@@ -19,8 +19,21 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.Serverboun
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundUseItemPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundUseItemOnPacketHandle;
 
-class ServerboundSwingPacket extends Packet {
-#if version >= 1.9
+// Since 26.3
+class ServerboundPunchPacket extends Packet {
+}
+
+// 1.8 - 26.2 only. Replaced by ServerboundPunchPacket since 26.3
+optional class ServerboundSwingPacket extends Packet {
+#if version >= 26.3
+    public (HumanHandRole) InteractionHand getHandRole() {
+        throw new UnsupportedOperationException("ServerboundSwingPacket is not supported on this Minecraft version");
+    }
+
+    public void setHandRole((HumanHandRole) InteractionHand handRole) {
+        throw new UnsupportedOperationException("ServerboundSwingPacket is not supported on this Minecraft version");
+    }
+#elseif version >= 1.9
   #if version >= 1.17
     #require ServerboundSwingPacket private InteractionHand handRole:hand;
   #else
