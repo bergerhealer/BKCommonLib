@@ -294,3 +294,13 @@ import net.minecraft.world.level.storage.TagValueInput;
         return (ValueInput$TypedInputList) #tagListInputCtor(problemreporter, "", context, codec, nbttaglist);
     }
 #endif
+
+    // Paper renamed this method in 26.3, but we use it a lot to translate nms ItemStack to bukkit ItemStack
+    // This reusable requirement makes that easier to deal with.
+#if exists org.bukkit.craftbukkit.inventory.CraftItemStack public static org.bukkit.inventory.ItemStack asBukkitMirror(net.minecraft.world.item.ItemStack original);
+    #require org.bukkit.craftbukkit.inventory.CraftItemStack public static org.bukkit.inventory.ItemStack nmsItemStackToBukkit:asBukkitMirror(net.minecraft.world.item.ItemStack original);
+#else
+    #require org.bukkit.craftbukkit.inventory.CraftItemStack public static org.bukkit.inventory.ItemStack nmsItemStackToBukkit(net.minecraft.world.item.ItemStack original) {
+        return org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(original);
+    }
+#endif

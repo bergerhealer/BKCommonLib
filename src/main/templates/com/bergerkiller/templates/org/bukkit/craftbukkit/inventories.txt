@@ -21,9 +21,22 @@ class CraftItemStack {
 
     public static (Object) net.minecraft.world.item.ItemStack asNMSCopy(org.bukkit.inventory.ItemStack original);
 
+#if !exists org.bukkit.craftbukkit.inventory.CraftItemStack public static org.bukkit.craftbukkit.inventory.CraftItemStack asCraftCopy(org.bukkit.inventory.ItemStack original);
+    // Paper removed this method, and we must make our own using asNMSCopy instead
+    public static (org.bukkit.inventory.ItemStack) org.bukkit.inventory.ItemStack asCraftCopy(org.bukkit.inventory.ItemStack original) {
+        net.minecraft.world.item.ItemStack handle = CraftItemStack.asNMSCopy(original);
+        return CraftItemStack.asBukkitMirror(handle);
+    }
+#else
     public static (org.bukkit.inventory.ItemStack) CraftItemStack asCraftCopy(org.bukkit.inventory.ItemStack original);
+#endif
 
+#if exists org.bukkit.craftbukkit.inventory.CraftItemStack public static org.bukkit.inventory.ItemStack asBukkitMirror(net.minecraft.world.item.ItemStack original);
+    // Paper changed this method to return ItemStack instead of CraftItemStack, but it's still effectively the same
+    public static (org.bukkit.inventory.ItemStack) org.bukkit.inventory.ItemStack asCraftMirror:asBukkitMirror((Object) net.minecraft.world.item.ItemStack nmsItemStack);
+#else
     public static (org.bukkit.inventory.ItemStack) CraftItemStack asCraftMirror((Object) net.minecraft.world.item.ItemStack nmsItemStack);
+#endif
 
     public static org.bukkit.inventory.meta.ItemMeta deserializeItemMeta(java.util.Map<String, Object> values) {
         return SerializableMeta.deserialize(values);
@@ -88,7 +101,7 @@ class CraftItemStack {
         }
 
         net.minecraft.world.item.ItemStack item = (net.minecraft.world.item.ItemStack) itemOpt.get();
-        return CraftItemStack.asCraftMirror(item);
+        return #nmsItemStackToBukkit(item);
   #endif
     }
 #else

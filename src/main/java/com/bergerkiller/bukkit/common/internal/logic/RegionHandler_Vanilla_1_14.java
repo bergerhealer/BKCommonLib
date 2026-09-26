@@ -298,7 +298,8 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
          *     // Used on Leaf server (1.21)
          *     #require net.minecraft.world.level.chunk.storage.RegionFileStorage public final Long2ObjectLinkedOpenHashMap<org.stupidcraft.linearpaper.region.IRegionFile> regionCache;
          * #elseif version >= 26.3
-         *     #require net.minecraft.world.level.chunk.storage.RegionFileStorage public final Long2ObjectLinkedOpenHashMap<java.util.Optional<RegionFile>> regionCache;
+         *     // Note: Paper made the field private
+         *     #require net.minecraft.world.level.chunk.storage.RegionFileStorage private final Long2ObjectLinkedOpenHashMap<java.util.Optional<RegionFile>> regionCache;
          * #elseif version >= 1.17
          *     #require net.minecraft.world.level.chunk.storage.RegionFileStorage private Long2ObjectLinkedOpenHashMap<RegionFile> regionCache;
          * #else
