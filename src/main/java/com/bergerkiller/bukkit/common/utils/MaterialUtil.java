@@ -199,11 +199,26 @@ public class MaterialUtil {
      * can be obtained by prefixing LEGACY_. The LEGACY_ prefix is also required on older
      * versions of Minecraft.
      * 
-     * @param name
-     * @return Material
+     * @param name Material name
+     * @return Material, or null if not found by this name
      */
     public static Material getMaterial(String name) {
         return MaterialsByName.getMaterial(name);
+    }
+
+    /**
+     * Gets a Material by name.<br>
+     * <br>
+     * This assumes the 1.13 API, which means old legacy materials
+     * can be obtained by prefixing LEGACY_. The LEGACY_ prefix is also required on older
+     * versions of Minecraft.
+     *
+     * @param name Material name
+     * @param defaultValue Default Material to return if not found
+     * @return Material, or defaultValue if not found by this name
+     */
+    public static Material getMaterial(String name, Material defaultValue) {
+        return MaterialsByName.getMaterial(name, defaultValue);
     }
 
     /**

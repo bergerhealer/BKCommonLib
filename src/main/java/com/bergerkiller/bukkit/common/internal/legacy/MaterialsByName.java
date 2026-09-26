@@ -153,12 +153,24 @@ public class MaterialsByName {
     /**
      * Gets a material by name.
      * The Material remapping performed by Spigot on MC 1.13 is ignored.
-     * 
-     * @param name
+     *
+     * @param name Material enum name
      * @return material, null if not found
      */
     public static Material getMaterial(String name) {
         return allMaterialValuesByName.get(name);
+    }
+
+    /**
+     * Gets a material by name.
+     * The Material remapping performed by Spigot on MC 1.13 is ignored.
+     *
+     * @param name Material enum name
+     * @param defaultValue Default material to return if not found
+     * @return material, null if not found
+     */
+    public static Material getMaterial(String name, Material defaultValue) {
+        return allMaterialValuesByName.getOrDefault(name, defaultValue);
     }
 
     /**
