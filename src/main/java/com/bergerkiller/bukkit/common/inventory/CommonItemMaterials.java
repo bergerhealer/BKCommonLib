@@ -17,7 +17,9 @@ public class CommonItemMaterials {
 
     /**
      * Since 26.3 there are unique map types. These are constants for those map types, falling back to the FILLED_MAP
-     * type when the server version is before this one.
+     * type when the server version is before this one.<br>
+     * <br>
+     * See: <a href="https://minecraft.wiki/w/Explorer_Map">https://minecraft.wiki/w/Explorer_Map</a>
      */
     public static final class Maps {
         public static final Material OCEAN_MONUMENT = MaterialUtil.getMaterial("OCEAN_MONUMENT_MAP", FILLED_MAP);
