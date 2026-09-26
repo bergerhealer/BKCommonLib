@@ -90,7 +90,8 @@ public class Common {
             "Common:ServerboundAttackPacket:HasSecondaryAction",
             "Common:Fixes:PaperSignEditNotInverted",
             "Common:Packet:InteractionPacketsImmutable",
-            "Common:RecipeUtil:FuelBurnTimeRequiresWorld"
+            "Common:RecipeUtil:FuelBurnTimeRequiresWorld",
+            "Common:CommonItemMaterials:MapTypes"
     ).collect(Collectors.toSet());
 
     /**
