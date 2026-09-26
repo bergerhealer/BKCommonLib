@@ -439,7 +439,7 @@ class RecipeManager {
         // Requires the full loot context to resolve, for which we must have a server level instance
         // There's quite a lot of code involved in creating one...
         LootParams$Builder lootParamsBuilder = new LootParams$Builder(world);
-        LootParams lootParams = lootParamsBuilder.create(LootContextParamSets.ALL_PARAMS);
+        LootParams lootParams = lootParamsBuilder.create(LootContextParamSets.EMPTY);
 
         LootContext$Builder contextBuilder = new LootContext$Builder(lootParams);
         LootContext context = contextBuilder.create(java.util.Optional.empty());
