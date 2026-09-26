@@ -69,6 +69,9 @@ ISBUTTON:
 #if version >= 1.21.2
   PALE_OAK_BUTTON
 #endif
+#if version >= 26.3
+  POPLAR_BUTTON
+#endif
 
 ISCOMPARATOR:
   COMPARATOR
@@ -160,6 +163,12 @@ ISSIGN:
   PALE_OAK_HANGING_SIGN
   PALE_OAK_WALL_HANGING_SIGN
 #endif
+#if version >= 26.3
+  POPLAR_SIGN
+  POPLAR_WALL_SIGN
+  POPLAR_HANGING_SIGN
+  POPLAR_WALL_HANGING_SIGN
+#endif
 
 #else
 ISSIGN:
@@ -200,6 +209,9 @@ ISPRESSUREPLATE:
 #endif
 #if version >= 1.21.2
   PALE_OAK_PRESSURE_PLATE
+#endif
+#if version >= 26.3
+  POPLAR_PRESSURE_PLATE
 #endif
 
 ISMINECART:
