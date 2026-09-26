@@ -33,11 +33,11 @@ public class Model extends ModelInfo {
     protected transient BuiltinType builtinType = BuiltinType.DEFAULT;
     public boolean ambientocclusion = true;
     public Map<String, Display> display = new HashMap<String, Display>();
-    public Map<String, String> textures = new HashMap<String, String>();
+    public Map<String, TextureInfo> textures = new HashMap<>();
     public List<Element> elements = new ArrayList<Element>();
 
     public void loadParent(Model parentModel) {
-        for (Map.Entry<String, String> textureEntry : parentModel.textures.entrySet()) {
+        for (Map.Entry<String, TextureInfo> textureEntry : parentModel.textures.entrySet()) {
             if (!this.textures.containsKey(textureEntry.getKey())) {
                 this.textures.put(textureEntry.getKey(), textureEntry.getValue());
             }
@@ -63,14 +63,14 @@ public class Model extends ModelInfo {
         // Build all textures, turning paths into absolute paths
         boolean hasChanges;
         int loop_limit = 100;
-        String loop_last_changed = null;
+        TextureInfo loop_last_changed = null;
         do {
             hasChanges = false;
-            for (Map.Entry<String, String> textureEntry : this.textures.entrySet()) {
-                String oldTextureValue = textureEntry.getValue();
-                if (oldTextureValue.startsWith("#")) {
-                    String texture = this.textures.get(oldTextureValue.substring(1));
-                    if (texture != null && !texture.equals(oldTextureValue)) {
+            for (Map.Entry<String, TextureInfo> textureEntry : this.textures.entrySet()) {
+                TextureInfo oldTextureValue = textureEntry.getValue();
+                if (oldTextureValue instanceof TextureInfo.Reference) {
+                    TextureInfo texture = this.textures.get(((TextureInfo.Reference) oldTextureValue).getReference());
+                    if (texture != null && !texture.getSprite().equals(oldTextureValue.getSprite())) {
                         textureEntry.setValue(texture);
                         loop_last_changed = texture;
                         hasChanges = true;
@@ -97,11 +97,11 @@ public class Model extends ModelInfo {
             MapTexture result = null;
             for (int i = 0;;i++) {
                 String layerKey = "layer" + i;
-                String layerTexturePath = this.textures.get(layerKey);
+                TextureInfo layerTexturePath = this.textures.get(layerKey);
                 if (layerTexturePath == null) {
                     break;
                 }
-                MapTexture texture = resourcePack.getTexture(layerTexturePath);
+                MapTexture texture = resourcePack.getTexture(layerTexturePath.getSprite());
 
                 // Item-specific layer render colors
                 texture = applyTint(texture, options.get(layerKey + "tint"));
@@ -292,7 +292,7 @@ public class Model extends ModelInfo {
         public Map<BlockFace, Face> faces = new EnumMap<BlockFace, Face>(BlockFace.class);
         public transient Matrix4x4 transform = null;
 
-        public void build(MapResourcePack resourcePack, Map<String, String> textures) {
+        public void build(MapResourcePack resourcePack, Map<String, TextureInfo> textures) {
             for (Face face : faces.values()) {
                 face.build(resourcePack, textures);
             }
@@ -373,7 +373,7 @@ public class Model extends ModelInfo {
          */
         public static class Face {
             @SerializedName("texture")
-            private String textureName = "";
+            private TextureInfo textureName = TextureInfo.NONE;
             private float[] uv = null;
             public transient MapTexture texture = null;
             public int tintindex = -1;
@@ -381,15 +381,15 @@ public class Model extends ModelInfo {
             public BlockFace cullface;
             public transient Quad quad = null;
 
-            public void build(MapResourcePack resourcePack, Map<String, String> textures) {
-                if (this.textureName.startsWith("#")) {
-                    String texture = textures.get(this.textureName.substring(1));
+            public void build(MapResourcePack resourcePack, Map<String, TextureInfo> textures) {
+                if (this.textureName instanceof TextureInfo.Reference) {
+                    TextureInfo texture = textures.get(((TextureInfo.Reference) this.textureName).getReference());
                     if (texture != null) {
                         this.textureName = texture;
                     }
                 }
-                if (!this.textureName.isEmpty()) {
-                    this.texture = resourcePack.getTexture(this.textureName);
+                if (!this.textureName.isNone()) {
+                    this.texture = resourcePack.getTexture(this.textureName.getSprite());
                 }
                 if (uv != null) {
                     int x1 = (int) ((double) uv[0] * (double) this.texture.getWidth() / 16.0);
@@ -516,6 +516,56 @@ public class Model extends ModelInfo {
             clone.translation = this.translation.clone();
             clone.scale = this.scale.clone();
             return clone;
+        }
+    }
+
+    /**
+     * Describes the texture information for a single declared texture in a model configuration.
+     * Usually is just the sprite name.
+     */
+    public static class TextureInfo {
+        public static final TextureInfo NONE = of("");
+
+        private final String sprite;
+        public boolean forceTranslucent = false;
+
+        public static TextureInfo of(String sprite) {
+            if (sprite.startsWith("#")) {
+                return new Reference(sprite);
+            } else {
+                return new TextureInfo(sprite);
+            }
+        }
+
+        private TextureInfo(String sprite) {
+            this.sprite = sprite;
+        }
+
+        public String getSprite() {
+            return sprite;
+        }
+
+        public boolean isNone() {
+            return sprite.isEmpty();
+        }
+
+        /**
+         * Textures that are a reference (#) to another texture name. Not an actual sprite we can render.
+         */
+        public static class Reference extends TextureInfo {
+
+            private Reference(String sprite) {
+                super(sprite);
+            }
+
+            /**
+             * Gets the sprite reference name pointed to
+             *
+             * @return Sprite reference name
+             */
+            public String getReference() {
+                return getSprite().substring(1);
+            }
         }
     }
 

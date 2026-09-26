@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.gson.types.ResourcePackDescription;
 import com.bergerkiller.bukkit.common.map.util.BlockModelState;
 import com.bergerkiller.bukkit.common.map.util.ItemModel;
+import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.math.Vector3;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.google.gson.Gson;
@@ -48,6 +49,7 @@ public final class MapResourcePackDeserializer {
         gsonBuilder.registerTypeAdapter(new TypeToken<List<MapResourcePack.PackVersionRange>>() {}.getType(),
                 new PackVersionRangeListDeserializer());
         gsonBuilder.registerTypeAdapter(ResourcePackDescription.class, new ResourcePackDescription.Deserializer());
+        gsonBuilder.registerTypeAdapter(Model.TextureInfo.class, new TextureInfoDeserializer());
 
         ItemModel.registerDeserializers(gsonBuilder);
         this.gson = gsonBuilder.create();
