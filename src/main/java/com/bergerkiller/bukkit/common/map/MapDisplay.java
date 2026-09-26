@@ -9,9 +9,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.inventory.CommonItemMaterials;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -1587,13 +1589,31 @@ public class MapDisplay implements MapDisplayEvents {
 
     /**
      * Creates a new Map Display item that will automatically initialize a particular Map Display class
+     * when viewed<br>
+     * <br>
+     * To store additional properties for the display, use
+     * {@link MapDisplayProperties#createNew(Class)} instead.
+     *
+     * @param mapDisplayClass Map display controller class from a Java Plugin (jar)
+     * @param itemType Type of map item. Since 26.3 multiple filled map types exist.
+     *                 See also: {@link CommonItemMaterials.Maps}
+     * @return map item as a Bukkit ItemStack
+     * @throws IllegalArgumentException If the map display class is not from a plugin, or lacks a no-args constructor
+     * @throws UnsupportedOperationException If map displays are disabled in BKCommonLib's configuration
+     */
+    public static ItemStack createMapItem(Class<? extends MapDisplay> mapDisplayClass, Material itemType) {
+        return MapDisplayProperties.createNew(mapDisplayClass, itemType).getMapItem();
+    }
+
+    /**
+     * Creates a new Map Display item that will automatically initialize a particular Map Display class
      * when viewed.<br>
      * <br>
      * To store additional properties for the display, use
      * {@link MapDisplayProperties#createNew(Plugin, Class)} instead.
      * 
      * @param plugin owner of the display
-     * @param mapDisplayClass
+     * @param mapDisplayClass Map display controller class
      * @return map item as a Bukkit ItemStack
      * @throws IllegalArgumentException If the map display class lacks a no-args constructor
      * @throws UnsupportedOperationException If map displays are disabled in BKCommonLib's configuration
@@ -1604,12 +1624,31 @@ public class MapDisplay implements MapDisplayEvents {
 
     /**
      * Creates a new Map Display item that will automatically initialize a particular Map Display class
+     * when viewed.<br>
+     * <br>
+     * To store additional properties for the display, use
+     * {@link MapDisplayProperties#createNew(Plugin, Class)} instead.
+     *
+     * @param plugin owner of the display
+     * @param mapDisplayClass Map display controller class
+     * @param itemType Type of map item. Since 26.3 multiple filled map types exist.
+     *                 See also: {@link CommonItemMaterials.Maps}
+     * @return map item as a Bukkit ItemStack
+     * @throws IllegalArgumentException If the map display class lacks a no-args constructor
+     * @throws UnsupportedOperationException If map displays are disabled in BKCommonLib's configuration
+     */
+    public static ItemStack createMapItem(Plugin plugin, Class<? extends MapDisplay> mapDisplayClass, Material itemType) {
+        return MapDisplayProperties.createNew(plugin, mapDisplayClass, itemType).getMapItem();
+    }
+
+    /**
+     * Creates a new Map Display item that will automatically initialize a particular Map Display class
      * when viewed<br>
      * <br>
      * To store additional properties for the display, use
      * {@link MapDisplayProperties#createNew(Class)} instead.
      *
-     * @param mapDisplayClass from a Java Plugin (jar)
+     * @param mapDisplayClass Map display controller class from a Java Plugin (jar)
      * @return map item as a CommonItemStack
      * @throws IllegalArgumentException If the map display class is not from a plugin, or lacks a no-args constructor
      * @throws UnsupportedOperationException If map displays are disabled in BKCommonLib's configuration
@@ -1620,19 +1659,56 @@ public class MapDisplay implements MapDisplayEvents {
 
     /**
      * Creates a new Map Display item that will automatically initialize a particular Map Display class
+     * when viewed<br>
+     * <br>
+     * To store additional properties for the display, use
+     * {@link MapDisplayProperties#createNew(Class)} instead.
+     *
+     * @param mapDisplayClass Map display controller class from a Java Plugin (jar)
+     * @param itemType Type of map item. Since 26.3 multiple filled map types exist.
+     *                 See also: {@link CommonItemMaterials.Maps}
+     * @return map item as a CommonItemStack
+     * @throws IllegalArgumentException If the map display class is not from a plugin, or lacks a no-args constructor
+     * @throws UnsupportedOperationException If map displays are disabled in BKCommonLib's configuration
+     */
+    public static CommonItemStack createMapCommonItem(Class<? extends MapDisplay> mapDisplayClass, Material itemType) {
+        return MapDisplayProperties.createNew(mapDisplayClass, itemType).getCommonMapItem();
+    }
+
+    /**
+     * Creates a new Map Display item that will automatically initialize a particular Map Display class
      * when viewed.<br>
      * <br>
      * To store additional properties for the display, use
      * {@link MapDisplayProperties#createNew(Plugin, Class)} instead.
      *
      * @param plugin owner of the display
-     * @param mapDisplayClass
+     * @param mapDisplayClass Map display controller class
      * @return map item as a CommonItemStack
      * @throws IllegalArgumentException If the map display class lacks a no-args constructor
      * @throws UnsupportedOperationException If map displays are disabled in BKCommonLib's configuration
      */
     public static CommonItemStack createMapCommonItem(Plugin plugin, Class<? extends MapDisplay> mapDisplayClass) {
         return MapDisplayProperties.createNew(plugin, mapDisplayClass).getCommonMapItem();
+    }
+
+    /**
+     * Creates a new Map Display item that will automatically initialize a particular Map Display class
+     * when viewed.<br>
+     * <br>
+     * To store additional properties for the display, use
+     * {@link MapDisplayProperties#createNew(Plugin, Class)} instead.
+     *
+     * @param plugin owner of the display
+     * @param mapDisplayClass Map display controller class
+     * @param itemType Type of map item. Since 26.3 multiple filled map types exist.
+     *                 See also: {@link CommonItemMaterials.Maps}
+     * @return map item as a CommonItemStack
+     * @throws IllegalArgumentException If the map display class lacks a no-args constructor
+     * @throws UnsupportedOperationException If map displays are disabled in BKCommonLib's configuration
+     */
+    public static CommonItemStack createMapCommonItem(Plugin plugin, Class<? extends MapDisplay> mapDisplayClass, Material itemType) {
+        return MapDisplayProperties.createNew(plugin, mapDisplayClass, itemType).getCommonMapItem();
     }
 
     /**

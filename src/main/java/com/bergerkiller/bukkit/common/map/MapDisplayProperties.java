@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.inventory.CommonItemMaterials;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -248,6 +249,16 @@ public abstract class MapDisplayProperties {
     }
 
     /**
+     * Sets the type of map material the item is made of. Since 26.3 multiple map types
+     * exist.
+     *
+     * @param itemType Map material type. See also: {@link CommonItemMaterials.Maps}
+     */
+    public void setMapItemType(Material itemType) {
+        getCommonMapItem().setType(itemType);
+    }
+
+    /**
      * Flood-fills all item frames with the same item that are considered to be a single map display
      * cluster. Empty item frames are filled into as well, and are considered to be part of the
      * start item frame. This allows an existing display to be enlarged.<br>
@@ -298,11 +309,53 @@ public abstract class MapDisplayProperties {
      * @throws UnsupportedOperationException If map displays are disabled in BKCommonLib's configuration
      */
     public static MapDisplayProperties createNew(Class<? extends MapDisplay> mapDisplayClass) {
+        return createNew(mapDisplayClass, CommonItemMaterials.FILLED_MAP);
+    }
+
+    /**
+     * Creates map display properties for a unique, new display.
+     * A unique ID is generated and the plugin and map display class
+     * to display the item to players is registered.<br>
+     * <br>
+     * The class must come from a plugin. If it is not, an
+     * {@link IllegalArgumentException} is thrown.<br>
+     * <br>
+     * To obtain the final map display item, use {@link #getMapItem()}.
+     * The map item will automatically initialize the Map Display class
+     * when viewed.
+     *
+     * @param mapDisplayClass The map display class to initialize when the item is viewed
+     * @param itemType Type of map item. Since 26.3 multiple filled map types exist.
+     *                 See also: {@link CommonItemMaterials.Maps}
+     * @return new map display properties
+     * @throws IllegalArgumentException If the map display class is not from a plugin, or lacks a no-args constructor
+     * @throws UnsupportedOperationException If map displays are disabled in BKCommonLib's configuration
+     */
+    public static MapDisplayProperties createNew(Class<? extends MapDisplay> mapDisplayClass, Material itemType) {
         Plugin plugin = CommonUtil.getPluginByClass(mapDisplayClass);
         if (plugin == null) {
             throw new IllegalArgumentException("The class " + mapDisplayClass.getName() + " does not belong to a Java Plugin");
         }
-        return createNew(plugin, mapDisplayClass);
+        return createNew(plugin, mapDisplayClass, itemType);
+    }
+
+    /**
+     * Creates map display properties for a unique, new display.
+     * A unique ID is generated and the plugin and map display class
+     * to display the item to players is registered.<br>
+     * <br>
+     * To obtain the final map display item, use {@link #getMapItem()}.
+     * The map item will automatically initialize the Map Display class
+     * when viewed.
+     *
+     * @param plugin The plugin owner of the display
+     * @param mapDisplayClass The map display class to initialize when the item is viewed
+     * @return new map display properties
+     * @throws IllegalArgumentException If the map display class lacks a no-args constructor
+     * @throws UnsupportedOperationException If map displays are disabled in BKCommonLib's configuration
+     */
+    public static MapDisplayProperties createNew(Plugin plugin, Class<? extends MapDisplay> mapDisplayClass) {
+        return createNew(plugin, mapDisplayClass, CommonItemMaterials.FILLED_MAP);
     }
 
     /**
@@ -316,11 +369,13 @@ public abstract class MapDisplayProperties {
      * 
      * @param plugin The plugin owner of the display
      * @param mapDisplayClass The map display class to initialize when the item is viewed
+     * @param itemType Type of map item. Since 26.3 multiple filled map types exist.
+     *                 See also: {@link CommonItemMaterials.Maps}
      * @return new map display properties
      * @throws IllegalArgumentException If the map display class lacks a no-args constructor
      * @throws UnsupportedOperationException If map displays are disabled in BKCommonLib's configuration
      */
-    public static MapDisplayProperties createNew(Plugin plugin, Class<? extends MapDisplay> mapDisplayClass) {
+    public static MapDisplayProperties createNew(Plugin plugin, Class<? extends MapDisplay> mapDisplayClass, Material itemType) {
         if (!CommonPlugin.getInstance().isMapDisplaysEnabled()) {
             throw new UnsupportedOperationException("Map displays are disabled in BKCommonLib's config.yml!");
         }
@@ -331,7 +386,7 @@ public abstract class MapDisplayProperties {
             throw new IllegalArgumentException("The class " + mapDisplayClass.getName() + " does not have an empty constructor. Override onAttached() and use properties instead!");
         }
 
-        CommonItemStack mapItem = CommonItemStack.create(CommonItemMaterials.FILLED_MAP, 1);
+        CommonItemStack mapItem = CommonItemStack.create(itemType, 1);
         mapItem.setFilledMapId(0);
         mapItem.updateCustomData(tag -> {
             tag.putValue("mapDisplayPlugin", plugin.getName());

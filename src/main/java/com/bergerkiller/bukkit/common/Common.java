@@ -91,7 +91,8 @@ public class Common {
             "Common:Fixes:PaperSignEditNotInverted",
             "Common:Packet:InteractionPacketsImmutable",
             "Common:RecipeUtil:FuelBurnTimeRequiresWorld",
-            "Common:CommonItemMaterials:MapTypes"
+            "Common:CommonItemMaterials:MapTypes",
+            "Common:MapDisplay:CustomItemType"
     ).collect(Collectors.toSet());
 
     /**
