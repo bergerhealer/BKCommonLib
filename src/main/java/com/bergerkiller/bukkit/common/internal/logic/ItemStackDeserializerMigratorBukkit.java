@@ -349,8 +349,14 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
             return !Helper.ADDED_MC_26_2.contains(type);
         });
 
+        // From 26.2 to 26.3
+        this.register(4903, map -> {
+            Object type = map.get("type");
+            return !Helper.ADDED_MC_26_3.contains(type);
+        });
+
         // Maximum supported data version
-        this.setMaximumDataVersion(4903); // MC 26.2
+        this.setMaximumDataVersion(5023); // MC 26.3
     }
 
     public ItemStackDeserializerItemMetaMigrator getItemMetaDeserializer() {
@@ -896,6 +902,29 @@ public class ItemStackDeserializerMigratorBukkit extends ItemStackDeserializerMi
                         "CINNABAR_BRICK_WALL", "CHISELED_CINNABAR", "DRIPSTONE_BLOCK",
                         "SULFUR_CUBE_BUCKET", "SULFUR_CUBE_SPAWN_EGG",
                         "MUSIC_DISC_BOUNCE", "SULFUR_SPIKE"
+                )
+        );
+
+        // All material names (Material enum) added Minecraft 26.2 -> 26.3
+        public static final Set<String> ADDED_MC_26_3 = makeSet(
+                makeMaterialsOfWoodCategory("POPLAR"),
+                makeColoredMaterials("WOOL_STAIRS"),
+                makeColoredMaterials("WOOL_SLAB"),
+                makeColoredMaterials("CONCRETE_STAIRS"),
+                makeColoredMaterials("CONCRETE_SLAB"),
+                makeColoredMaterials("CUSHION"),
+                Arrays.asList(
+                        "RED_POPLAR_LEAVES",  "ORANGE_POPLAR_LEAVES",  "YELLOW_POPLAR_LEAVES",
+                        "RED_SHRUB", "SHELF_MUSHROOM", "POPLAR_SHELF", "STRAW_BED",
+                        /* Maps */
+                        "OCEAN_MONUMENT_MAP",  "WOODLAND_MANSION_MAP",
+                        "BURIED_TRIAL_CHAMBERS_MAP", "JUNGLE_PYRAMID_MAP",
+                        "SWAMP_HUT_MAP", "DESERT_VILLAGE_MAP",
+                        "PLAINS_VILLAGE_MAP", "SAVANNA_VILLAGE_MAP",
+                        "SNOWY_VILLAGE_MAP", "TAIGA_VILLAGE_MAP",
+                        "BURIED_TREASURE_MAP", "BURIED_ANCIENT_CITY_MAP",
+                        "BURIED_MINESHAFT_MAP", "DESERT_PYRAMID_MAP",
+                        "ABANDONED_CAMP_MAP", "WARM_OCEAN_RUINS_MAP"
                 )
         );
     }
