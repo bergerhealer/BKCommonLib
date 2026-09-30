@@ -509,7 +509,7 @@ public class SignChangeTracker implements Cloneable, SignLineAccessor {
         } else if (CommonCapabilities.HAS_SIGN_BACK_TEXT) {
             // Front changed, take over changes of back blindly as we haven't done the copy for this
             for (int i = 0; i < oldRawBackLines.size(); i++) {
-                newRawBackLines.set(i, oldRawBackLines.get(i));
+                oldRawBackLines.set(i, newRawBackLines.get(i));
             }
         }
 
