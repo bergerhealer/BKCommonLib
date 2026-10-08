@@ -12,6 +12,7 @@ import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
+import com.bergerkiller.mountiplex.reflection.util.fast.ConstantReturningInvoker;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -41,7 +42,6 @@ import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
 import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
-import com.bergerkiller.mountiplex.reflection.util.fast.NullInvoker;
 
 /**
  * From MC 1.8 to MC 1.13.2 there was an IWorldAccess listener list we could subscribe to.
@@ -315,7 +315,7 @@ class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler {
             }
 
             // All others are ignored
-            return new NullInvoker<Object>(method.getReturnType());
+            return ConstantReturningInvoker.nullOfType(method.getReturnType());
         }
 
         @HookMethod("public void onEntityAdded:a(Entity entity)")

@@ -5,8 +5,8 @@ import java.lang.reflect.Modifier;
 
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeMapHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
+import com.bergerkiller.mountiplex.reflection.util.fast.ConstantReturningInvoker;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
-import com.bergerkiller.mountiplex.reflection.util.fast.NullInvoker;
 
 /**
  * Helper class stores an instance of AttributeMapBase which is completely unusable.
@@ -19,10 +19,9 @@ public class DummyAttributeMapBase {
         // Make sure to implement all abstract methods and return some default null value
         ClassInterceptor interceptor = new ClassInterceptor() {
             @Override
-            @SuppressWarnings("unchecked")
             protected Invoker<?> getCallback(Method method) {
                 if (Modifier.isAbstract(method.getModifiers())) {
-                    return new NullInvoker<Object>((Class<Object>) method.getReturnType());
+                    return ConstantReturningInvoker.nullOfType(method.getReturnType());
                 } else {
                     return null;
                 }

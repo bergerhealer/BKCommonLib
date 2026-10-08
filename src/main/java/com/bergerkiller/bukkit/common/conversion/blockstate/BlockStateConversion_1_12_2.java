@@ -32,7 +32,6 @@ import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.util.fast.ConstantReturningInvoker;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
-import com.bergerkiller.mountiplex.reflection.util.fast.NullInvoker;
 
 /**
  * BlockState conversion used on MC 1.12.2 and before
@@ -90,7 +89,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
             protected Invoker<?> getCallback(Method method) {
                 String name = method.getName();
                 if (name.equals("getWorld")) {
-                    return new NullInvoker<World>(proxy_world);
+                    return ConstantReturningInvoker.of(proxy_world);
                 } else if (name.equals("getChunk")) {
                     return (instance, args) -> input_state.block.getChunk();
                 } else if (name.equals("getType")) {

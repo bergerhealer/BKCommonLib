@@ -6,8 +6,8 @@ import com.bergerkiller.generated.net.minecraft.network.syncher.EntityDataAccess
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.item.ItemEntityHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
+import com.bergerkiller.mountiplex.reflection.util.fast.ConstantReturningInvoker;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
-import com.bergerkiller.mountiplex.reflection.util.fast.NullInvoker;
 
 public class CommonDisabledEntity {
     public static final EntityHandle INSTANCE;
@@ -24,7 +24,7 @@ public class CommonDisabledEntity {
                     if (method.getParameterCount() == 1) {
                         Class<?> argType = method.getParameters()[0].getType();
                         if (EntityDataAccessorHandle.T.isAssignableFrom(argType)) {
-                            return new NullInvoker<Object>();
+                            return ConstantReturningInvoker.nullOfType(method.getReturnType());
                         }
                     }
 
