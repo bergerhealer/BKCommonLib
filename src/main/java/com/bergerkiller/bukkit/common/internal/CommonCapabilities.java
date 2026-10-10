@@ -302,6 +302,12 @@ public class CommonCapabilities {
     public static final boolean HAS_DISPLAY_ENTITY_LOCATION_INTERPOLATION = CommonBootstrap.evaluateMCVersion(">=", "1.20.2");
 
     /**
+     * Since Minecraft 1.20.2 the player spawn packet has a head yaw property that can be set. Before that, the head yaw had to be
+     * separately synchronized with the head rotation packet after spawning.
+     */
+    public static final boolean HAS_PLAYER_SPAWN_HEAD_YAW = CommonBootstrap.evaluateMCVersion(">=", "1.20.2");
+
+    /**
      * Since Minecraft 1.20 Paper server has their own PlayerOpenSignEvent.
      */
     public static final boolean HAS_SIGN_OPEN_EVENT_PAPER = LogicUtil.tryCreate(

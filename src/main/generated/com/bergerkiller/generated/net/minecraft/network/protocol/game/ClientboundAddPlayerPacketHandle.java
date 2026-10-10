@@ -27,6 +27,12 @@ public abstract class ClientboundAddPlayerPacketHandle extends PacketHandle {
         return T.createNew.invoke();
     }
 
+    public abstract float getYaw();
+    public abstract void setYaw(float yaw);
+    public abstract float getPitch();
+    public abstract void setPitch(float pitch);
+    public abstract float getHeadYaw();
+    public abstract void setHeadYaw(float headYaw);
     public boolean hasDataWatcherSupport() {
         return T.opt_dataWatcher.isAvailable();
     }
@@ -52,6 +58,16 @@ public abstract class ClientboundAddPlayerPacketHandle extends PacketHandle {
         return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_SPAWN_NAMED;
     }
 
+    /**
+     * Since Minecraft 1.20.2 the head yaw can be set in this spawn packet. Before, this had to be set with a separate
+     * head rotation packet.
+     *
+     * @return True if head yaw is supported in this packet, False if not
+     */
+    public static boolean isHeadYawSupported() {
+        return com.bergerkiller.bukkit.common.internal.CommonCapabilities.HAS_PLAYER_SPAWN_HEAD_YAW;
+    }
+
     public double getPosX() {
         return getProtocolPosition(T.posX_1_8_8, T.posX_1_10_2);
     }
@@ -74,22 +90,6 @@ public abstract class ClientboundAddPlayerPacketHandle extends PacketHandle {
 
     public void setPosZ(double posZ) {
         setProtocolPosition(T.posZ_1_8_8, T.posZ_1_10_2, posZ);
-    }
-
-    public float getYaw() {
-        return getProtocolRotation(T.yaw_raw);
-    }
-
-    public float getPitch() {
-        return getProtocolRotation(T.pitch_raw);
-    }
-
-    public void setYaw(float yaw) {
-        setProtocolRotation(T.yaw_raw, yaw);
-    }
-
-    public void setPitch(float pitch) {
-        setProtocolRotation(T.pitch_raw, pitch);
     }
 
     public void setHeldItem(Material type) {
@@ -129,15 +129,18 @@ public abstract class ClientboundAddPlayerPacketHandle extends PacketHandle {
         @Template.Optional
         public final Template.Field.Double posZ_1_10_2 = new Template.Field.Double();
         @Template.Optional
-        public final Template.Field.Byte yaw_raw = new Template.Field.Byte();
-        @Template.Optional
-        public final Template.Field.Byte pitch_raw = new Template.Field.Byte();
-        @Template.Optional
         public final Template.Field.Converted<Material> heldItem = new Template.Field.Converted<Material>();
         @Template.Optional
         public final Template.Field.Converted<DataWatcher> opt_dataWatcher = new Template.Field.Converted<DataWatcher>();
 
         public final Template.StaticMethod.Converted<ClientboundAddPlayerPacketHandle> createNew = new Template.StaticMethod.Converted<ClientboundAddPlayerPacketHandle>();
+
+        public final Template.Method<Float> getYaw = new Template.Method<Float>();
+        public final Template.Method<Void> setYaw = new Template.Method<Void>();
+        public final Template.Method<Float> getPitch = new Template.Method<Float>();
+        public final Template.Method<Void> setPitch = new Template.Method<Void>();
+        public final Template.Method<Float> getHeadYaw = new Template.Method<Float>();
+        public final Template.Method<Void> setHeadYaw = new Template.Method<Void>();
 
     }
 

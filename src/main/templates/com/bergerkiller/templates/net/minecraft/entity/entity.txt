@@ -1769,6 +1769,36 @@ class Entity {
     public float getHeadRotation();
 #endif
 
+#if version >= 1.19
+    public float getBodyRotation:getVisualRotationYInDegrees();
+#else
+    public float getBodyRotation() {
+        if (instance instanceof net.minecraft.world.entity.LivingEntity) {
+            net.minecraft.world.entity.LivingEntity living = (net.minecraft.world.entity.LivingEntity) instance;
+  #select version >=
+  #case 1.17:    return living.yBodyRot;
+  #case 1.16.2:  return living.aA;
+  #case 1.16:    return living.aH;
+  #case 1.15:    return living.aI;
+  #case 1.14:    return living.aK;
+  #case 1.13:    return living.aQ;
+  #case 1.11:    return living.aN;
+  #case 1.10:    return living.aO;
+  #case 1.9.4:   return living.aN;
+  #case 1.9:     return living.aM;
+  #case 1.8.3:   return living.aI;
+  #case else:    return living.aG;
+  #endselect
+        } else {
+  #if version >= 1.17
+            return instance.getYRot();
+  #else
+            return instance.yaw;
+  #endif
+        }
+    }
+#endif
+
 #select version >=
 #case 1.18:  public void setHeadRotation:setYHeadRot(float angle);
 #case 1.12:  public void setHeadRotation(float angle);

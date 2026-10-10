@@ -400,11 +400,52 @@ class ClientboundAddPlayerPacket extends Packet {
 #endif
 
 #if version >= 1.17
-    private optional byte yaw_raw:yRot;
-    private optional byte pitch_raw:xRot;
+    #require ClientboundAddPlayerPacket private byte protYaw:yRot;
+    #require ClientboundAddPlayerPacket private byte protPitch:xRot;
 #else
-    private optional byte yaw_raw:f;
-    private optional byte pitch_raw:g;
+    #require ClientboundAddPlayerPacket private byte protYaw:f;
+    #require ClientboundAddPlayerPacket private byte protPitch:g;
+#endif
+
+    public float getYaw() {
+        byte protYaw = instance#protYaw;
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeRotation((int) protYaw);
+    }
+
+    public void setYaw(float yaw) {
+        byte protYaw = (byte) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeRotation(yaw);
+        instance#protYaw = protYaw;
+    }
+
+    public float getPitch() {
+        byte protPitch = instance#protPitch;
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeRotation((int) protPitch);
+    }
+
+    public void setPitch(float pitch) {
+        byte protPitch = (byte) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeRotation(pitch);
+        instance#protPitch = protPitch;
+    }
+
+#if version >= 1.20.2
+    #require ClientboundAddPlayerPacket private byte protHeadYaw:yHeadRot;
+
+    public float getHeadYaw() {
+        byte protHeadYaw = instance#protHeadYaw;
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeRotation((int) protHeadYaw);
+    }
+
+    public void setHeadYaw(float headYaw) {
+        byte protHeadYaw = (byte) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeRotation(headYaw);
+        instance#protHeadYaw = protHeadYaw;
+    }
+#else
+    public float getHeadYaw() {
+        return 0.0f;
+    }
+
+    public void setHeadYaw(float headYaw) {
+    }
 #endif
 
 #if version >= 1.9
@@ -473,6 +514,16 @@ class ClientboundAddPlayerPacket extends Packet {
         return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_SPAWN_NAMED;
     }
 
+    /**
+     * Since Minecraft 1.20.2 the head yaw can be set in this spawn packet. Before, this had to be set with a separate
+     * head rotation packet.
+     *
+     * @return True if head yaw is supported in this packet, False if not
+     */
+    public static boolean isHeadYawSupported() {
+        return com.bergerkiller.bukkit.common.internal.CommonCapabilities.HAS_PLAYER_SPAWN_HEAD_YAW;
+    }
+
     public double getPosX() {
         return getProtocolPosition(T.posX_1_8_8, T.posX_1_10_2);
     }
@@ -495,22 +546,6 @@ class ClientboundAddPlayerPacket extends Packet {
 
     public void setPosZ(double posZ) {
         setProtocolPosition(T.posZ_1_8_8, T.posZ_1_10_2, posZ);
-    }
-
-    public float getYaw() {
-        return getProtocolRotation(T.yaw_raw);
-    }
-
-    public float getPitch() {
-        return getProtocolRotation(T.pitch_raw);
-    }
-
-    public void setYaw(float yaw) {
-        setProtocolRotation(T.yaw_raw, yaw);
-    }
-
-    public void setPitch(float pitch) {
-        setProtocolRotation(T.pitch_raw, pitch);
     }
 
     public void setHeldItem(Material type) {

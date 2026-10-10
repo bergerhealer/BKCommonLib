@@ -92,7 +92,8 @@ public class Common {
             "Common:Packet:InteractionPacketsImmutable",
             "Common:RecipeUtil:FuelBurnTimeRequiresWorld",
             "Common:CommonItemMaterials:MapTypes",
-            "Common:MapDisplay:CustomItemType"
+            "Common:MapDisplay:CustomItemType",
+            "Common:PlayerYawAPIFixes"
     ).collect(Collectors.toSet());
 
     /**
