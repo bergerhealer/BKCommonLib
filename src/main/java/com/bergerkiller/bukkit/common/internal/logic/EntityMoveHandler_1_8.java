@@ -77,13 +77,13 @@ class EntityMoveHandler_1_8 extends EntityMoveHandler {
                 // BKCommonLib start: block collision event handler
                 if (entity.canCollideWith(entity1)) {
                     AABBHandle axisalignedbb1 = entity1.getBoundingBox();
-                    if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(movedBounds)) {
+                    if (axisalignedbb1 != null && axisalignedbb1.intersects(movedBounds)) {
                         removeFromList(foundBounds, axisalignedbb1);
                     }
                 }
 
                 AABBHandle axisalignedbb2 = entity.getEntityBoundingBox(entity1);
-                if (axisalignedbb2 != null && axisalignedbb2.bbTransformA(movedBounds)) {
+                if (axisalignedbb2 != null && axisalignedbb2.intersects(movedBounds)) {
                     removeFromList(foundBounds, axisalignedbb2);
                 }
                 // BKCommonLib end
@@ -117,7 +117,7 @@ class EntityMoveHandler_1_8 extends EntityMoveHandler {
                 // BKCommonLib start: block collision event handler
                 if (entity.canCollideWith(entity1)) {
                     AABBHandle axisalignedbb1 = entity1.getBoundingBox();
-                    if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(axisalignedbb)
+                    if (axisalignedbb1 != null && axisalignedbb1.intersects(axisalignedbb)
                             && controller.onEntityCollision(entity1.getBukkitEntity())) {
 
                         collisions_buffer.add(axisalignedbb1);
@@ -125,7 +125,7 @@ class EntityMoveHandler_1_8 extends EntityMoveHandler {
                 }
 
                 AABBHandle axisalignedbb2 = entity.getEntityBoundingBox(entity1);
-                if (axisalignedbb2 != null && axisalignedbb2.bbTransformA(axisalignedbb)
+                if (axisalignedbb2 != null && axisalignedbb2.intersects(axisalignedbb)
                         && controller.onEntityCollision(entity1.getBukkitEntity())) {
 
                     collisions_buffer.add(axisalignedbb2);
@@ -155,11 +155,11 @@ class EntityMoveHandler_1_8 extends EntityMoveHandler {
         //world.a(entity, axisalignedbb, false, arraylist);
         AABBHandle entityBlockAABB = this.getBlockBoundingBox(entity);
         entity.setBoundingBoxField(entityBlockAABB);
-        world_getBlockCollisions(entity, entityBlockAABB, entityBlockAABB.transformB(mx, my, mz));
+        world_getBlockCollisions(entity, entityBlockAABB, entityBlockAABB.expandTowards(mx, my, mz));
         entity.setBoundingBoxField(axisalignedbb_old);
         // BKCommonLib end
 
-        world_addEntityCubes(entity,  axisalignedbb_old.transformB(mx, my, mz));
+        world_addEntityCubes(entity,  axisalignedbb_old.expandTowards(mx, my, mz));
 
         return collisions_buffer;
     }

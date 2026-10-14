@@ -24,11 +24,13 @@ class AABB {
 
     public (AABBHandle) AABB(double x1, double y1, double z1, double x2, double y2, double z2);
 
-#if version >= 1.18
     public (AABBHandle) AABB grow:inflate(double sx, double sy, double sz);
-#else
-    public (AABBHandle) AABB grow(double sx, double sy, double sz);
-#endif
+
+    public (AABBHandle) AABB expandTowards(double lx, double ly, double lz);
+
+    public (AABBHandle) AABB translate:move(double dx, double dy, double dz);
+
+    public boolean intersects((AABBHandle) AABB paramAABB);
 
     <code>
     public AABBHandle growUniform(double size) {
@@ -39,26 +41,6 @@ class AABB {
         return growUniform(-size);
     }
     </code>
-
-#if version >= 1.18
-    public (AABBHandle) AABB transformB:expandTowards(double lx, double ly, double lz);
-
-    public (AABBHandle) AABB translate:move(double dx, double dy, double dz);
-
-    public boolean bbTransformA:intersects((AABBHandle) AABB paramAABB);
-#elseif version >= 1.11
-    public (AABBHandle) AABB transformB:b(double lx, double ly, double lz);
-
-    public (AABBHandle) AABB translate:d(double dx, double dy, double dz);
-
-    public boolean bbTransformA:c((AABBHandle) AABB paramAABB);
-#else
-    public (AABBHandle) AABB transformB:a(double lx, double ly, double lz);
-
-    public (AABBHandle) AABB translate:c(double dx, double dy, double dz);
-
-    public boolean bbTransformA:b((AABBHandle) AABB paramAABB);
-#endif
 
 #if version >= 1.13.2
     // These methods were removed in MC 1.13, and min/max x/y/z fields changed names on 1.13.2

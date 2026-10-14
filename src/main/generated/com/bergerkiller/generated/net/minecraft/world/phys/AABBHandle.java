@@ -24,9 +24,9 @@ public abstract class AABBHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract AABBHandle grow(double sx, double sy, double sz);
-    public abstract AABBHandle transformB(double lx, double ly, double lz);
+    public abstract AABBHandle expandTowards(double lx, double ly, double lz);
     public abstract AABBHandle translate(double dx, double dy, double dz);
-    public abstract boolean bbTransformA(AABBHandle paramAABB);
+    public abstract boolean intersects(AABBHandle paramAABB);
     public abstract double calcSomeX(AABBHandle axisalignedbb, double d0);
     public abstract double calcSomeY(AABBHandle axisalignedbb, double d0);
     public abstract double calcSomeZ(AABBHandle axisalignedbb, double d0);
@@ -64,9 +64,9 @@ public abstract class AABBHandle extends Template.Handle {
         public final Template.Field.Double maxZ = new Template.Field.Double();
 
         public final Template.Method.Converted<AABBHandle> grow = new Template.Method.Converted<AABBHandle>();
-        public final Template.Method.Converted<AABBHandle> transformB = new Template.Method.Converted<AABBHandle>();
+        public final Template.Method.Converted<AABBHandle> expandTowards = new Template.Method.Converted<AABBHandle>();
         public final Template.Method.Converted<AABBHandle> translate = new Template.Method.Converted<AABBHandle>();
-        public final Template.Method.Converted<Boolean> bbTransformA = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<Boolean> intersects = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Double> calcSomeX = new Template.Method.Converted<Double>();
         public final Template.Method.Converted<Double> calcSomeY = new Template.Method.Converted<Double>();
         public final Template.Method.Converted<Double> calcSomeZ = new Template.Method.Converted<Double>();

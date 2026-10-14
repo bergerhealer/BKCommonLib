@@ -396,7 +396,7 @@ public abstract class EntityMoveHandler {
                 // BKCommonLib end
 
                 AABBHandle axisalignedbb2 = that.getBoundingBox();
-                AABBHandle axisalignedbb3 = axisalignedbb2.transformB(d7, 0.0D, d9);
+                AABBHandle axisalignedbb3 = axisalignedbb2.expandTowards(d7, 0.0D, d9);
 
                 double d11 = d1;
                 d11 = VoxelShapeHandle.traceAxis(DirectionHandle.AxisHandle.Y, axisalignedbb3, shapeAccumulator.stream(), d11);

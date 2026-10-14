@@ -80,7 +80,7 @@ class EntityMoveHandler_1_13 extends EntityMoveHandler {
         final double MIN_MOVE = 1.0E-7D;
         VoxelShapeHandle voxelshapeAABB = VoxelShapeHandle.fromAABB(entityBounds);
         VoxelShapeHandle voxelshapeAABBMoved = VoxelShapeHandle.fromAABB(entityBounds.translate(mx > 0.0D ? -MIN_MOVE : MIN_MOVE, my > 0.0D ? -MIN_MOVE : MIN_MOVE, mz > 0.0D ? -MIN_MOVE : MIN_MOVE));
-        VoxelShapeHandle voxelshapeBounds = VoxelShapeHandle.mergeOnlyFirst(VoxelShapeHandle.fromAABB(entityBounds.transformB(mx, my, mz).growUniform(MIN_MOVE)), voxelshapeAABBMoved);
+        VoxelShapeHandle voxelshapeBounds = VoxelShapeHandle.mergeOnlyFirst(VoxelShapeHandle.fromAABB(entityBounds.expandTowards(mx, my, mz).growUniform(MIN_MOVE)), voxelshapeAABBMoved);
 
         if (voxelshapeBounds.isEmpty()) {
             return Stream.empty();
@@ -106,7 +106,7 @@ class EntityMoveHandler_1_13 extends EntityMoveHandler {
 
         final double MIN_MOVE = 1.0E-7D;
         VoxelShapeHandle voxelshapeAABBMoved = VoxelShapeHandle.fromAABB(entityBounds.translate(mx > 0.0D ? -MIN_MOVE : MIN_MOVE, my > 0.0D ? -MIN_MOVE : MIN_MOVE, mz > 0.0D ? -MIN_MOVE : MIN_MOVE));
-        VoxelShapeHandle voxelshapeBounds = VoxelShapeHandle.mergeOnlyFirst(VoxelShapeHandle.fromAABB(entityBounds.transformB(mx, my, mz).growUniform(MIN_MOVE)), voxelshapeAABBMoved);
+        VoxelShapeHandle voxelshapeBounds = VoxelShapeHandle.mergeOnlyFirst(VoxelShapeHandle.fromAABB(entityBounds.expandTowards(mx, my, mz).growUniform(MIN_MOVE)), voxelshapeAABBMoved);
 
         if (voxelshapeBounds.isEmpty()) {
             return Stream.empty();
@@ -127,7 +127,7 @@ class EntityMoveHandler_1_13 extends EntityMoveHandler {
                 // BKCommonLib start: block collision event handler
                 if (entity.canCollideWith(entity1)) {
                     AABBHandle axisalignedbb1 = entity1.getBoundingBox();
-                    if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(axisalignedbb)
+                    if (axisalignedbb1 != null && axisalignedbb1.intersects(axisalignedbb)
                             && controller.onEntityCollision(entity1.getBukkitEntity())) {
 
                         shape = VoxelShapeHandle.merge(shape, VoxelShapeHandle.fromAABB(axisalignedbb1));
@@ -135,7 +135,7 @@ class EntityMoveHandler_1_13 extends EntityMoveHandler {
                 }
 
                 AABBHandle axisalignedbb2 = entity.getEntityBoundingBox(entity1);
-                if (axisalignedbb2 != null && axisalignedbb2.bbTransformA(axisalignedbb)
+                if (axisalignedbb2 != null && axisalignedbb2.intersects(axisalignedbb)
                         && controller.onEntityCollision(entity1.getBukkitEntity())) {
 
                     shape = VoxelShapeHandle.merge(shape, VoxelShapeHandle.fromAABB(axisalignedbb2));

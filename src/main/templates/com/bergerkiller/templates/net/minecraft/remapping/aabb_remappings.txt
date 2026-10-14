@@ -1,0 +1,27 @@
+// Axis-aligned bounding boxes are used a lot. We remap some commonly used functions for past versions.
+
+#if version >= 1.18
+    #remap net.minecraft.world.phys.AABB public AABB inflate(double xAdd, double yAdd, double zAdd);
+#else
+    #remap net.minecraft.world.phys.AABB public AABB inflate:grow(double xAdd, double yAdd, double zAdd);
+#endif
+
+#if version >= 1.18
+    #remap net.minecraft.world.phys.AABB public AABB inflate(double amountToAddInAllDirections);
+#elseif version >= 1.9
+    #remap net.minecraft.world.phys.AABB public AABB inflate:g(double amountToAddInAllDirections);
+#endif
+
+#if version >= 1.18
+    #remap net.minecraft.world.phys.AABB public AABB expandTowards(double lx, double ly, double lz);
+    #remap net.minecraft.world.phys.AABB public AABB move(double dx, double dy, double dz);
+    #remap net.minecraft.world.phys.AABB public boolean intersects(AABB paramAABB);
+#elseif version >= 1.11
+    #remap net.minecraft.world.phys.AABB public AABB expandTowards:b(double lx, double ly, double lz);
+    #remap net.minecraft.world.phys.AABB public AABB move:d(double dx, double dy, double dz);
+    #remap net.minecraft.world.phys.AABB public boolean intersects:c(AABB paramAABB);
+#else
+    #remap net.minecraft.world.phys.AABB public AABB expandTowards:a(double lx, double ly, double lz);
+    #remap net.minecraft.world.phys.AABB public AABB move:c(double dx, double dy, double dz);
+    #remap net.minecraft.world.phys.AABB public boolean intersects:b(AABB paramAABB);
+#endif
