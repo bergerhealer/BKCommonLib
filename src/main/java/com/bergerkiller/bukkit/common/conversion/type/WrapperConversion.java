@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.conversion.type;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.CustomModelData;
@@ -25,6 +26,7 @@ import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionEffect;
@@ -87,6 +89,12 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersH
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
 public class WrapperConversion {
+
+    // Required for 1.8 - 1.12.2 LevelHandle get-entities-in-bounds getEntities() + entityRayTrace() call
+    @ConverterMethod(output="com.google.common.base.Predicate<net.minecraft.world.entity.Entity>")
+    public static com.google.common.base.Predicate<Object> wrapAsGoogleCommonsPredicate(Predicate<Entity> entityPredicate) {
+        return entity -> entityPredicate.test(toEntity(entity));
+    }
 
     @ConverterMethod(input="net.minecraft.server.level.ServerPlayer.RespawnConfig", acceptsNull = true)
     public static PlayerRespawnPoint toRespawnPoint(Object respawnConfig) {

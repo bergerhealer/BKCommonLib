@@ -93,7 +93,8 @@ public class Common {
             "Common:RecipeUtil:FuelBurnTimeRequiresWorld",
             "Common:CommonItemMaterials:MapTypes",
             "Common:MapDisplay:CustomItemType",
-            "Common:PlayerYawAPIFixes"
+            "Common:PlayerYawAPIFixes",
+            "BlockRayTrace:EntityRayTrace"
     ).collect(Collectors.toSet());
 
     /**

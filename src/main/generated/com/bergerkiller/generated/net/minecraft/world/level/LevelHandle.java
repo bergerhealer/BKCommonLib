@@ -8,12 +8,14 @@ import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.entity.BlockEntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.EntityHitResultHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.HitResultHandle;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.world.level.Level</b>.
@@ -50,7 +52,8 @@ public abstract class LevelHandle extends BlockGetterHandle {
     public abstract boolean isBurnArea(AABBHandle bounds);
     public abstract Entity getEntityById(int entityId);
     public abstract boolean areChunksLoaded(IntVector3 blockposition, int distance);
-    public abstract HitResultHandle rayTrace(Vector point1, Vector point2);
+    public abstract EntityHitResultHandle entityRayTrace(Vector point1, Vector point2, Predicate<Entity> matching);
+    public abstract HitResultHandle blockRayTrace(Vector point1, Vector point2);
     public abstract void applyBlockPhysicsAround(IntVector3 position, BlockData causeType);
     public abstract void applyBlockPhysics(IntVector3 position, BlockData causeType);
     public abstract int getMinBuildHeight();
@@ -60,6 +63,14 @@ public abstract class LevelHandle extends BlockGetterHandle {
     public static final int UPDATE_PHYSICS = 0x1; // flag specifying block physics should occur after the change
     public static final int UPDATE_NOTIFY = 0x2; // flag specifying the change should be updated to players
     public static final int UPDATE_DEFAULT = (UPDATE_PHYSICS | UPDATE_NOTIFY); // default flags used when updating block types
+
+    /**
+      * @deprecated Use {@link #blockRayTrace(Vector, Vector)} instead. Same behavor.
+      */
+    @Deprecated
+    public HitResultHandle rayTrace(Vector point1, Vector point2) {
+        return blockRayTrace(point1, point2);
+    }
 
     public void applyBlockPhysics(IntVector3 position, BlockData causeType, boolean self) {
         applyBlockPhysicsAround(position, causeType);
@@ -113,7 +124,8 @@ public abstract class LevelHandle extends BlockGetterHandle {
         public final Template.Method.Converted<Boolean> isBurnArea = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Entity> getEntityById = new Template.Method.Converted<Entity>();
         public final Template.Method.Converted<Boolean> areChunksLoaded = new Template.Method.Converted<Boolean>();
-        public final Template.Method.Converted<HitResultHandle> rayTrace = new Template.Method.Converted<HitResultHandle>();
+        public final Template.Method.Converted<EntityHitResultHandle> entityRayTrace = new Template.Method.Converted<EntityHitResultHandle>();
+        public final Template.Method.Converted<HitResultHandle> blockRayTrace = new Template.Method.Converted<HitResultHandle>();
         public final Template.Method.Converted<Void> applyBlockPhysicsAround = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> applyBlockPhysics = new Template.Method.Converted<Void>();
         public final Template.Method<Integer> getMinBuildHeight = new Template.Method<Integer>();

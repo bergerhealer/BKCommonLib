@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.HitResult$Type;
 import net.minecraft.world.phys.Vec3;
@@ -24,6 +25,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.entity.BlockEntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AABBHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.EntityHitResultHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.HitResultHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
@@ -363,9 +365,75 @@ class Level extends BlockGetter {
     public boolean areChunksLoaded((IntVector3) BlockPos blockposition, int distance);
 #endif
 
+#if version >= 1.13
+    public (EntityHitResultHandle) EntityHitResult entityRayTrace((org.bukkit.util.Vector) Vec3 point1, (org.bukkit.util.Vector) Vec3 point2, (java.util.function.Predicate<org.bukkit.entity.Entity>) java.util.function.Predicate<Entity> matching) {
+#else
+    public (EntityHitResultHandle) EntityHitResult entityRayTrace((org.bukkit.util.Vector) Vec3 point1, (org.bukkit.util.Vector) Vec3 point2, (java.util.function.Predicate<org.bukkit.entity.Entity>) com.google.common.base.Predicate<Entity> matching) {
+#endif
+        // Create a search area using the two points, and expand it by 1 block in all directions
+        AABB searchArea = new AABB(point1.x, point1.y, point1.z, point2.x, point2.y, point2.z);
+        searchArea = searchArea.inflate(1.0, 1.0, 1.0);
+
+        // Since 1.14 an API method is available supporting the matching predicate, so we can use that directly
+#if version >= 1.18
+        return net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(instance, (Entity) null, point1, point2, searchArea, matching, 0.3F);
+#elseif version >= 1.16
+        return net.minecraft.world.entity.projectile.ProjectileUtil.a(instance, (Entity) null, point1, point2, searchArea, matching);
+#elseif version >= 1.14
+        return net.minecraft.world.entity.projectile.ProjectileUtil.a(instance, (Entity) null, point1, point2, searchArea, matching, Double.MAX_VALUE);
+#else
+
+        // Call world.getEntities() ourselves, and do all the logic that sits inside ProjectileHelper
+        // We cannot use the actual projectile helper methods because they also tests for blocks there
+        // Another bug is that the entity hit result just constructs using entity normally (so we don't get the hit result position)
+        // We fix this ourselves with some custom rewriting of the fields
+        double minDistanceSq = Double.MAX_VALUE;
+        HitResult closestHitResult = null;
+        Entity closestEntity = null;
+  #if version >= 1.9.4
+        java.util.List entities = instance.getEntities((Entity) null, searchArea, matching);
+  #else
+        java.util.List entities = instance.a((Entity) null, searchArea, matching);
+  #endif
+        for (java.util.Iterator iter = entities.iterator(); iter.hasNext();) {
+            Entity entity = (Entity) iter.next();
+
+            // Extra filtering rules that pre-1.14 applied (legacy note: isInteractable / noclip)
+            if (!entity.isPickable() || entity.noPhysics) {
+                continue;
+            }
+
+            AABB entityBounds = entity.getBoundingBox().inflate((double) 0.3F, (double) 0.3F, (double) 0.3F);
+
+  #if version >= 1.10
+            HitResult hitResult = entityBounds.b(point1, point2);
+  #else
+            HitResult hitResult = entityBounds.a(point1, point2);
+  #endif
+
+            if (hitResult != null) {
+                double distSq = point1.distanceSquared(hitResult.pos);
+                if (distSq < minDistanceSq) {
+                    closestHitResult = hitResult;
+                    closestEntity = entity;
+                    minDistanceSq = distSq;
+                }
+            }
+        }
+
+        // If we got a result, assign the entity to it. Original code creates a new HitResult with just entity, but
+        // that throws away the hit position computed earlier.
+        if (closestHitResult != null) {
+            closestHitResult.type = HitResult$Type.ENTITY;
+            closestHitResult.entity = closestEntity;
+        }
+
+        return closestHitResult;
+#endif
+    }
+
 #if version >= 1.14
-    // Fallback...
-    public (HitResultHandle) HitResult rayTrace((org.bukkit.util.Vector) Vec3 point1, (org.bukkit.util.Vector) Vec3 point2) {
+    public (HitResultHandle) HitResult blockRayTrace((org.bukkit.util.Vector) Vec3 point1, (org.bukkit.util.Vector) Vec3 point2) {
         ClipContext rayTrace = new ClipContext(point1, point2, ClipContext$Block.OUTLINE, ClipContext$Fluid.NONE, null);
   #if version >= 1.18
         HitResult result = instance.clip(rayTrace);
@@ -379,15 +447,22 @@ class Level extends BlockGetter {
         return result;
     }
 #elseif version >= 1.13
-    // Fallback...
-    public (HitResultHandle) HitResult rayTrace((org.bukkit.util.Vector) Vec3 point1, (org.bukkit.util.Vector) Vec3 point2) {
+    public (HitResultHandle) HitResult blockRayTrace((org.bukkit.util.Vector) Vec3 point1, (org.bukkit.util.Vector) Vec3 point2) {
         return instance.rayTrace(point1, point2);
     }
 #else
-    public (HitResultHandle) HitResult rayTrace((org.bukkit.util.Vector) Vec3 point1, (org.bukkit.util.Vector) Vec3 point2);
+    public (HitResultHandle) HitResult blockRayTrace:rayTrace((org.bukkit.util.Vector) Vec3 point1, (org.bukkit.util.Vector) Vec3 point2);
 #endif
 
     <code>
+    /**
+      * @deprecated Use {@link #blockRayTrace(Vector, Vector)} instead. Same behavor.
+      */
+    @Deprecated
+    public HitResultHandle rayTrace(Vector point1, Vector point2) {
+        return blockRayTrace(point1, point2);
+    }
+
     public void applyBlockPhysics(IntVector3 position, BlockData causeType, boolean self) {
         applyBlockPhysicsAround(position, causeType);
         if (self) {

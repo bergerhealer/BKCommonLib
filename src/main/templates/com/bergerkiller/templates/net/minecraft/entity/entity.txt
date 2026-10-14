@@ -948,13 +948,7 @@ class Entity {
     }
 #endif
 
-#if version >= 1.17
     public boolean noclip:noPhysics;
-#elseif version >= 1.8.3
-    public boolean noclip;
-#else
-    public boolean noclip:T;
-#endif
 
     protected (RandomSourceHandle) net.minecraft.util.RandomSource random;
 

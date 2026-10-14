@@ -1,17 +1,22 @@
 package com.bergerkiller.bukkit.common.block;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.BlockHitResultHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.EntityHitResultHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.HitResultHandle;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+
+import java.util.function.Predicate;
 
 /**
  * Stores the parameters for performing a block ray tracing operation.
@@ -143,14 +148,57 @@ public final class BlockRayTrace {
     }
 
     /**
-     * Performs the ray tracing operation
+     * Performs the ray tracing operation. Only returns blocks that were hit, not entities.
      *
      * @return HitResult if a block was hit by the ray, or <i>null</i> if no block
      *         was hit (air)
      */
     public HitResult rayTrace() {
-        HitResultHandle mop = LevelHandle.fromBukkit(world).rayTrace(from, to);
-        return mop == null ? null : new HitResult(this, mop);
+        return rayTrace(false, LogicUtil.alwaysTruePredicate());
+    }
+
+    /**
+     * Performs the ray tracing operation. Returns blocks that were hit, and optionally entities
+     * if hitEntities is true. If an Entity is in front of a Block, that is handled automatically
+     * and the hit result for the entity is returned, or vice versa.
+     *
+     * @param hitEntities Whether to scan for entities
+     * @param entityFilter A filter to apply to entities that are hit. If the filter returns false, the entity
+     *                     is ignored and the ray trace continues. Must not be null.
+     * @return HitResult if a block or entity was hit by the ray, or <i>null</i> if nothing was hit (air)
+     */
+    public HitResult rayTrace(boolean hitEntities, Predicate<Entity> entityFilter) {
+        return rayTrace(hitEntities, true, entityFilter);
+    }
+
+    /**
+     * Performs the ray tracing operation. Returns optionally blocks / entities that were hit.
+     * If hitEntities is true, entities are checked. If hitBlocks is true, blocks are checked.
+     * If an Entity is in front of a Block, that is handled automatically and the hit result for the
+     * entity is returned, or vice versa.
+     *
+     * @param hitEntities Whether to scan for entities
+     * @param hitBlocks Whether to scan for blocks
+     * @param entityFilter A filter to apply to entities that are hit. If the filter returns false, the entity
+     *                     is ignored and the ray trace continues. Must not be null.
+     * @return HitResult if a block or entity was hit by the ray, or <i>null</i> if nothing was hit (air)
+     */
+    public HitResult rayTrace(boolean hitEntities, boolean hitBlocks, Predicate<Entity> entityFilter) {
+        if (!hitEntities && !hitBlocks) {
+            return null;
+        }
+
+        HitResult blockResult = hitBlocks ? createResult(LevelHandle.fromBukkit(world).blockRayTrace(from, to)) : null;
+        HitResult entityResult = hitEntities ? createResult(LevelHandle.fromBukkit(world).entityRayTrace(from, to, entityFilter)) : null;
+        if (blockResult == null || (entityResult != null && entityResult.getHitDistanceFromStart() < blockResult.getHitDistanceFromStart())) {
+            return entityResult;
+        } else {
+            return blockResult;
+        }
+    }
+
+    private HitResult createResult(HitResultHandle handle) {
+        return handle == null ? null : new HitResult(this, handle);
     }
 
     /**
@@ -159,15 +207,21 @@ public final class BlockRayTrace {
     public static final class HitResult {
         private final BlockRayTrace rayTrace;
         private final Vector absolutePosition;
+        private final double distanceFromStart;
         private final BlockFace hitFace;
+        private final Entity entity;
         private final Block block;
 
         private HitResult(BlockRayTrace rayTrace, HitResultHandle mop) {
             this.rayTrace = rayTrace;
             this.absolutePosition = mop.getLocation();
+            this.distanceFromStart = rayTrace.getStartPosition().distance(this.absolutePosition);
             this.hitFace = (mop instanceof BlockHitResultHandle)
                     ? ((BlockHitResultHandle) mop).getDirection()
                     : BlockFace.DOWN;
+            this.entity = (mop instanceof EntityHitResultHandle)
+                    ? ((EntityHitResultHandle) mop).getEntity()
+                    : null;
 
             // Move an infinitely small amount forwards so that we are properly inside the block we hit
             // Avoids the common issue of getting air depending on the direction axis
@@ -205,6 +259,27 @@ public final class BlockRayTrace {
         }
 
         /**
+         * Gets the Entity that was hit by the ray, if any. Only ever set if an
+         * entity (entity OR block) ray trace was requested. Normal raytraces
+         * only test for blocks.
+         *
+         * @return Hit entity
+         */
+        public Entity getHitEntity() {
+            return entity;
+        }
+
+        /**
+         * Gets whether this is a hit result for hitting an Entity. Can call
+         * {@link #getHitEntity()} to get the entity that was hit.
+         *
+         * @return True if an Entity was hit
+         */
+        public boolean isEntityHit() {
+            return entity != null;
+        }
+
+        /**
          * Gets the block-relative coordinates where the ray has hit
          *
          * @return Position on the block where the ray hit
@@ -217,6 +292,16 @@ public final class BlockRayTrace {
                     pos.getY() - block.getY(),
                     pos.getZ() - block.getZ()
             );
+        }
+
+        /**
+         * Gets the block distance between the start of the ray tracing operation, and the position
+         * on the block or entity that was actually hit.
+         *
+         * @return Distance from the start of the ray trace to the hit position
+         */
+        public double getHitDistanceFromStart() {
+            return distanceFromStart;
         }
 
         /**

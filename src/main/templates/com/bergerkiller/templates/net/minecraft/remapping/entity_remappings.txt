@@ -17,6 +17,14 @@ import net.minecraft.world.level.storage.ValueOutput;
     #remap net.minecraft.world.entity.Entity public boolean horizontalMovementBlocked:positionChanged;
 #endif
 
+#if version >= 1.17
+    #remap net.minecraft.world.entity.Entity public boolean noPhysics;
+#elseif version >= 1.8.3
+    #remap net.minecraft.world.entity.Entity public boolean noPhysics:noclip;
+#else
+    #remap net.minecraft.world.entity.Entity public boolean noPhysics:T;
+#endif
+
 #if version >= 1.14 && version < 1.18
     #remap net.minecraft.world.entity.Entity public net.minecraft.world.phys.Vec3 getDeltaMovement:getMot();
     #remap net.minecraft.world.entity.Entity public void setDeltaMovement:setMot(net.minecraft.world.phys.Vec3 vec3);
@@ -191,4 +199,12 @@ import net.minecraft.world.level.storage.ValueOutput;
     #remap net.minecraft.world.entity.Entity public void igniteForSeconds:setOnFire(int seconds, boolean callEvent);
 #else
     #remap net.minecraft.world.entity.Entity public void igniteForSeconds:setOnFire(int seconds);
+#endif
+
+#if version >= 1.18
+    #remap net.minecraft.world.entity.Entity public boolean isPickable();
+#elseif version >= 1.9
+    #remap net.minecraft.world.entity.Entity public boolean isPickable:isInteractable();
+#else
+    #remap net.minecraft.world.entity.Entity public boolean isPickable:ad();
 #endif
