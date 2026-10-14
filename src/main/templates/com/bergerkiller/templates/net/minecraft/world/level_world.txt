@@ -376,7 +376,9 @@ class Level extends BlockGetter {
 
         // Since 1.14 an API method is available supporting the matching predicate, so we can use that directly
 #if version >= 1.18
-        return net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(instance, (Entity) null, point1, point2, searchArea, matching, 0.3F);
+        return net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(instance, (Entity) null, point1, point2, searchArea, matching, 0.0F);
+#elseif version >= 1.17
+        return net.minecraft.world.entity.projectile.ProjectileUtil.a(instance, (Entity) null, point1, point2, searchArea, matching, 0.0F);
 #elseif version >= 1.16
         return net.minecraft.world.entity.projectile.ProjectileUtil.a(instance, (Entity) null, point1, point2, searchArea, matching);
 #elseif version >= 1.14
