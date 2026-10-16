@@ -146,7 +146,7 @@ public class NMSPacketClasses {
 
         public final FieldAccessor<IntVector3> position = ServerboundPlayerActionPacketHandle.T.position.toFieldAccessor();
         public final FieldAccessor<BlockFace> direction = ServerboundPlayerActionPacketHandle.T.direction.toFieldAccessor();
-        public final FieldAccessor<ServerboundPlayerActionPacketHandle.ActionHandle> status = ServerboundPlayerActionPacketHandle.T.digType.toFieldAccessor();
+        public final FieldAccessor<ServerboundPlayerActionPacketHandle.ActionHandle> status = ServerboundPlayerActionPacketHandle.T.action.toFieldAccessor();
     }
 
     public static class NMSServerboundUseItemPacket extends NMSPacket {

@@ -22,12 +22,25 @@ public abstract class ServerboundPlayerActionPacketHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public static ServerboundPlayerActionPacketHandle createNew(IntVector3 position, BlockFace direction, ActionHandle action, int sequence) {
+        return T.createNew.invoke(position, direction, action, sequence);
+    }
+
+    public abstract int getSequence();
+    public abstract void setSequence(int sequence);
+    /** @deprecated Use {@link #getAction()} instead */
+    @Deprecated
+    public ActionHandle getDigType() { return getAction(); }
+
+    /** @deprecated Use {@link #setAction(ActionHandle)} instead */
+    @Deprecated
+    public void setDigType(ActionHandle action) { setAction(action); }
     public abstract IntVector3 getPosition();
     public abstract void setPosition(IntVector3 value);
     public abstract BlockFace getDirection();
     public abstract void setDirection(BlockFace value);
-    public abstract ActionHandle getDigType();
-    public abstract void setDigType(ActionHandle value);
+    public abstract ActionHandle getAction();
+    public abstract void setAction(ActionHandle value);
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.ServerboundPlayerActionPacket</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -35,7 +48,12 @@ public abstract class ServerboundPlayerActionPacketHandle extends PacketHandle {
     public static final class ServerboundPlayerActionPacketClass extends Template.Class<ServerboundPlayerActionPacketHandle> {
         public final Template.Field.Converted<IntVector3> position = new Template.Field.Converted<IntVector3>();
         public final Template.Field.Converted<BlockFace> direction = new Template.Field.Converted<BlockFace>();
-        public final Template.Field.Converted<ActionHandle> digType = new Template.Field.Converted<ActionHandle>();
+        public final Template.Field.Converted<ActionHandle> action = new Template.Field.Converted<ActionHandle>();
+
+        public final Template.StaticMethod.Converted<ServerboundPlayerActionPacketHandle> createNew = new Template.StaticMethod.Converted<ServerboundPlayerActionPacketHandle>();
+
+        public final Template.Method<Integer> getSequence = new Template.Method<Integer>();
+        public final Template.Method<Void> setSequence = new Template.Method<Void>();
 
     }
 

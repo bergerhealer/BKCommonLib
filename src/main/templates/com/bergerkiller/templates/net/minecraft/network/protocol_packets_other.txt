@@ -285,12 +285,48 @@ class ServerboundPlayerActionPacket extends Packet {
 #if version >= 1.17
     private (IntVector3) BlockPos position:pos;
     private (org.bukkit.block.BlockFace) Direction direction;
-    private (ServerboundPlayerActionPacketHandle.ActionHandle) ServerboundPlayerActionPacket.Action digType:action;
+    private (ServerboundPlayerActionPacketHandle.ActionHandle) ServerboundPlayerActionPacket.Action action;
 #else
     private (IntVector3) BlockPos position:a;
     private (org.bukkit.block.BlockFace) Direction direction:b;
-    private (ServerboundPlayerActionPacketHandle.ActionHandle) ServerboundPlayerActionPacket.Action digType:c;
+    private (ServerboundPlayerActionPacketHandle.ActionHandle) ServerboundPlayerActionPacket.Action action:c;
 #endif
+
+#if version >= 1.19
+    #require ServerboundPlayerActionPacket private final int sequence;
+    public int getSequence() { return instance#sequence; }
+    public void setSequence(int sequence) { instance#sequence = sequence; }
+#else
+    public int getSequence() { return 0; }
+    public void setSequence(int sequence) {}
+#endif
+
+    public static (ServerboundPlayerActionPacketHandle) ServerboundPlayerActionPacket createNew((IntVector3) BlockPos position, (org.bukkit.block.BlockFace) Direction direction, (ServerboundPlayerActionPacketHandle.ActionHandle) ServerboundPlayerActionPacket.Action action, int sequence) {
+#if version >= 1.19
+          return new ServerboundPlayerActionPacket(action, position, direction, sequence);
+#elseif version >= 1.17
+          return new ServerboundPlayerActionPacket(action, position, direction);
+#else
+          ServerboundPlayerActionPacket packet = new ServerboundPlayerActionPacket();
+          #require ServerboundPlayerActionPacket private BlockPos position:a;
+          #require ServerboundPlayerActionPacket private Direction direction:b;
+          #require ServerboundPlayerActionPacket private ServerboundPlayerActionPacket.Action action:c;
+          packet#position = position;
+          packet#direction = direction;
+          packet#action = action;
+          return packet;
+#endif
+    }
+
+    <code>
+    /** @deprecated Use {@link #getAction()} instead */
+    @Deprecated
+    public ActionHandle getDigType() { return getAction(); }
+
+    /** @deprecated Use {@link #setAction(ActionHandle)} instead */
+    @Deprecated
+    public void setDigType(ActionHandle action) { setAction(action); }
+    </code>
 
     class ServerboundPlayerActionPacket.Action {
         enum (ServerboundPlayerActionPacketHandle.ActionHandle) ServerboundPlayerActionPacket.Action START_DESTROY_BLOCK;
