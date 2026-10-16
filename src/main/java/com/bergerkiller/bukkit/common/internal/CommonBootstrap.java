@@ -588,6 +588,8 @@ public class CommonBootstrap {
             remappings.put(
                     "net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket$RandomizationType",
                     "com.bergerkiller.bukkit.common.wrappers.ParticleRandomization");
+            // Animate packet was replaced with one specific for swinging the arm
+            remappings.put("net.minecraft.network.protocol.game.ClientboundSwingAnimationPacket", "net.minecraft.network.protocol.game.ClientboundAnimatePacket");
         }
 
         /* ======== Mojang remapping changes for 26.2 ======== */

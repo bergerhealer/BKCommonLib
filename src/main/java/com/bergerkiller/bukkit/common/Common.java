@@ -94,7 +94,8 @@ public class Common {
             "Common:CommonItemMaterials:MapTypes",
             "Common:MapDisplay:CustomItemType",
             "Common:PlayerYawAPIFixes",
-            "BlockRayTrace:EntityRayTrace"
+            "BlockRayTrace:EntityRayTrace",
+            "Packets:ClientboundSwingAnimationPacket"
     ).collect(Collectors.toSet());
 
     /**

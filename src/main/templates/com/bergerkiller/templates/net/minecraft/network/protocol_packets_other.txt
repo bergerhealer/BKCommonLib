@@ -17,6 +17,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayer.RespawnConfig;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -47,6 +48,7 @@ import io.netty.buffer.Unpooled;
 import com.bergerkiller.bukkit.common.wrappers.BlockStateChange;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.Holder;
+import com.bergerkiller.bukkit.common.wrappers.HumanHandRole;
 import com.bergerkiller.bukkit.common.resources.BlockStateType;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.wrappers.WindowType;
@@ -81,6 +83,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.Clientboun
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundStopSoundPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSetDefaultSpawnPositionPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundSwingAnimationPacketHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectInstanceHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
@@ -237,6 +240,43 @@ class ClientboundRemoveEntitiesPacket extends Packet {
         }
 #else
         return new ClientboundRemoveEntitiesPacket(multipleEntityIds);
+#endif
+    }
+}
+
+// 1.8 - 1.21.11: PacketPlayOutAnimation
+// 26.1 - 26.2: ClientboundAnimatePacket
+class ClientboundSwingAnimationPacket extends Packet {
+
+    public static (ClientboundSwingAnimationPacketHandle) ClientboundSwingAnimationPacket createNewWhack(int entityId, (HumanHandRole) InteractionHand hand) {
+#if version >= 26.3
+        return new ClientboundSwingAnimationPacket(entityId, hand, net.minecraft.world.item.component.SwingAnimation.DEFAULT);
+#elseif version >= 1.17
+        #require ClientboundSwingAnimationPacket private final int id;
+        #require ClientboundSwingAnimationPacket private final int action;
+
+        int action = (hand == InteractionHand.MAIN_HAND)
+                ? ClientboundSwingAnimationPacket.SWING_MAIN_HAND
+                : ClientboundSwingAnimationPacket.SWING_OFF_HAND;
+
+        ClientboundSwingAnimationPacket packet = (ClientboundSwingAnimationPacket) ClientboundSwingAnimationPacketHandle.T.newInstanceNull();
+        packet#id = entityId;
+        packet#action = action;
+        return packet;
+#else
+        #require ClientboundSwingAnimationPacket private int id:a;
+        #require ClientboundSwingAnimationPacket private int action:b;
+
+  #if version >= 1.9
+        int action = (hand == InteractionHand.MAIN_HAND) ? 0 : 3;
+  #else
+        int action = 0;
+  #endif
+
+        ClientboundSwingAnimationPacket packet = new ClientboundSwingAnimationPacket();
+        packet#id = entityId;
+        packet#action = action;
+        return packet;
 #endif
     }
 }
