@@ -41,14 +41,32 @@ public class ProtocolMath {
         return (double) protPosition / 32.0;
     }
 
+    public static final int serializePosition_1_9(double position) {
+        return com.bergerkiller.bukkit.common.utils.MathUtil.floor(position * 4096.0);
+    }
+
+    public static final double deserializePosition_1_9(short protPosition) {
+        return (double) protPosition / 4096.0;
+    }
+
+    public static final double deserializePosition_1_9(int protPosition) {
+        return (double) protPosition / 4096.0;
+    }
+
+    /** @deprecated old name, use the 1_9 postfixed methods instead */
+    @Deprecated
     public static final int serializePosition_1_10_2(double position) {
         return com.bergerkiller.bukkit.common.utils.MathUtil.floor(position * 4096.0);
     }
 
+    /** @deprecated old name, use the 1_9 postfixed methods instead */
+    @Deprecated
     public static final double deserializePosition_1_10_2(short protPosition) {
         return (double) protPosition / 4096.0;
     }
 
+    /** @deprecated old name, use the 1_9 postfixed methods instead */
+    @Deprecated
     public static final double deserializePosition_1_10_2(int protPosition) {
         return (double) protPosition / 4096.0;
     }

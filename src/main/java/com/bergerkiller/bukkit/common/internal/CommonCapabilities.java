@@ -79,10 +79,10 @@ public class CommonCapabilities {
     public static final boolean TILE_ENTITY_LEGACY_NAMES = CommonBootstrap.evaluateMCVersion("<=", "1.10.2");
 
     /**
-     * Since Minecraft 1.10 entity movement updates are encoded as a short-encoded delta, while before this
+     * Since Minecraft 1.9 entity movement updates are encoded as a short-encoded delta, while before this
      * was a byte with less granularity.
      */
-    public static final boolean PROTOCOL_MOVEMENT_IS_SHORT_DELTA = CommonBootstrap.evaluateMCVersion(">=", "1.10");
+    public static final boolean PROTOCOL_MOVEMENT_IS_SHORT_DELTA = CommonBootstrap.evaluateMCVersion(">=", "1.9");
 
     /**
      * Since Minecraft 1.9 entity position updates (teleports) use double x/y/z. Before, they were encoded into integers

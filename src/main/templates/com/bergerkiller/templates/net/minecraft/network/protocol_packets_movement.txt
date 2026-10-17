@@ -1030,9 +1030,9 @@ class ClientboundMoveEntityPacket extends Packet {
          */
         static PositionChange encodeLinearChange(double deltaX, double deltaY, double deltaZ) {
             if (com.bergerkiller.bukkit.common.internal.CommonCapabilities.PROTOCOL_MOVEMENT_IS_SHORT_DELTA) {
-                short encodedDeltaX = (short) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_10_2(deltaX);
-                short encodedDeltaY = (short) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_10_2(deltaY);
-                short encodedDeltaZ = (short) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_10_2(deltaZ);
+                short encodedDeltaX = (short) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_9(deltaX);
+                short encodedDeltaY = (short) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_9(deltaY);
+                short encodedDeltaZ = (short) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_9(deltaZ);
                 return new LinearPositionChange(encodedDeltaX, encodedDeltaY, encodedDeltaZ);
             } else {
                 byte encodedDeltaX = (byte) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_8_8(deltaX);
@@ -1044,7 +1044,7 @@ class ClientboundMoveEntityPacket extends Packet {
     }
 
     /**
-     * Encoding used since 1.10.2, where the delta is encoded as a short.
+     * Encoding used since 1.9, where the delta is encoded as a short.
      * Interpolates the movement over the standard entity interpolation tick time (usually 3 ticks),
      * and moves the entity linearly.
      */
@@ -1061,22 +1061,22 @@ class ClientboundMoveEntityPacket extends Packet {
 
         @Override
         public double getDeltaX() {
-            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_10_2(encodedDeltaX);
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_9(encodedDeltaX);
         }
 
         @Override
         public double getDeltaY() {
-            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_10_2(encodedDeltaY);
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_9(encodedDeltaY);
         }
 
         @Override
         public double getDeltaZ() {
-            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_10_2(encodedDeltaZ);
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_9(encodedDeltaZ);
         }
     }
 
     /**
-     * Encoding used before 1.10.2, where the delta is encoded as a byte.
+     * Encoding used before 1.9, where the delta is encoded as a byte.
      * Interpolates the movement over the standard entity interpolation tick time (usually 3 ticks),
      * and moves the entity linearly.
      */
@@ -1211,9 +1211,9 @@ class ClientboundMoveEntityPacket extends Packet {
          * @return step instance that can be added to MultiPositionChange
          */
         public static Step encodeStep(double deltaX, double deltaY, double deltaZ, int ticks) {
-            short encodedDeltaX = (short) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_10_2(deltaX);
-            short encodedDeltaY = (short) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_10_2(deltaY);
-            short encodedDeltaZ = (short) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_10_2(deltaZ);
+            short encodedDeltaX = (short) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_9(deltaX);
+            short encodedDeltaY = (short) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_9(deltaY);
+            short encodedDeltaZ = (short) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_9(deltaZ);
             return new Step(encodedDeltaX, encodedDeltaY, encodedDeltaZ, ticks);
         }
 

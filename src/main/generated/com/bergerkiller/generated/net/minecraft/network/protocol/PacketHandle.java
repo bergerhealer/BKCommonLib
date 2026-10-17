@@ -31,33 +31,33 @@ public abstract class PacketHandle extends Template.Handle {
         return com.bergerkiller.bukkit.common.protocol.PacketType.getType(getRaw());
     }
 
-    protected final double getProtocolPosition(Template.Field.Byte field_1_8_8, Template.Field.Integer field_1_10_2) {
-        if (field_1_10_2.isAvailable()) {
-            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_10_2(field_1_10_2.getInteger(getRaw()));
+    protected final double getProtocolPosition(Template.Field.Byte field_1_8_8, Template.Field.Integer field_1_9) {
+        if (field_1_9.isAvailable()) {
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_9(field_1_9.getInteger(getRaw()));
         } else {
             return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8((int) field_1_8_8.getByte(getRaw()));
         }
     }
 
-    protected final void setProtocolPosition(Template.Field.Byte field_1_8_8, Template.Field.Integer field_1_10_2, double position) {
-        if (field_1_10_2.isAvailable()) {
-            field_1_10_2.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_10_2(position));
+    protected final void setProtocolPosition(Template.Field.Byte field_1_8_8, Template.Field.Integer field_1_9, double position) {
+        if (field_1_9.isAvailable()) {
+            field_1_9.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_9(position));
         } else {
             field_1_8_8.setByte(getRaw(), (byte) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_8_8(position));
         }
     }
 
-    protected final double getProtocolPosition(Template.Field.Integer field_1_8_8, Template.Field.Double field_1_10_2) {
-        if (field_1_10_2.isAvailable()) {
-            return field_1_10_2.getDouble(getRaw());
+    protected final double getProtocolPosition(Template.Field.Integer field_1_8_8, Template.Field.Double field_1_9) {
+        if (field_1_9.isAvailable()) {
+            return field_1_9.getDouble(getRaw());
         } else {
             return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(field_1_8_8.getInteger(getRaw()));
         }
     }
 
-    protected final void setProtocolPosition(Template.Field.Integer field_1_8_8, Template.Field.Double field_1_10_2, double position) {
-        if (field_1_10_2.isAvailable()) {
-            field_1_10_2.setDouble(getRaw(), position);
+    protected final void setProtocolPosition(Template.Field.Integer field_1_8_8, Template.Field.Double field_1_9, double position) {
+        if (field_1_9.isAvailable()) {
+            field_1_9.setDouble(getRaw(), position);
         } else {
             field_1_8_8.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_8_8(position));
         }
