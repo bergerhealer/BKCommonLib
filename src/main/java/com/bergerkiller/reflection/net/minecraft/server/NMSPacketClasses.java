@@ -122,10 +122,14 @@ public class NMSPacketClasses {
         public final FieldAccessor<Boolean> isFlying = ServerboundPlayerAbilitiesPacketHandle.T.isFlying.toFieldAccessor();
     }
 
-    public static class NMSServerboundPunchPacket extends NMSPacket {
+    // Just exists for backwards-support with older IN_SWING packet type
+    public static class NMSServerboundSwingPacket extends NMSPacket {
+        public HumanHand getHand(CommonPacket packet, HumanEntity humanEntity) {
+            return ServerboundPunchPacketHandle.createHandle(packet.getHandle()).getHand(humanEntity);
+        }
     }
 
-    public static class NMSServerboundSwingPacket extends NMSPacket {
+    public static class NMSServerboundPunchPacket extends NMSServerboundSwingPacket {
         /**
          * Gets the hand that is animated
          *
@@ -134,7 +138,7 @@ public class NMSPacketClasses {
          * @return humanHand
          */
         public final HumanHand getHand(CommonPacket packet, HumanEntity humanEntity) {
-            return ServerboundSwingPacketHandle.createHandle(packet.getHandle()).getHand(humanEntity);
+            return ServerboundPunchPacketHandle.createHandle(packet.getHandle()).getHand(humanEntity);
         }
     }
 

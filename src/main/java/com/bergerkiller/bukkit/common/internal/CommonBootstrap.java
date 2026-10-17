@@ -590,6 +590,8 @@ public class CommonBootstrap {
                     "com.bergerkiller.bukkit.common.wrappers.ParticleRandomization");
             // Animate packet was replaced with one specific for swinging the arm
             remappings.put("net.minecraft.network.protocol.game.ClientboundSwingAnimationPacket", "net.minecraft.network.protocol.game.ClientboundAnimatePacket");
+            // Arm swing packet no longer exists, only the punch packet does (without a hand argument anymore)
+            remappings.put("net.minecraft.network.protocol.game.ServerboundPunchPacket", "net.minecraft.network.protocol.game.ServerboundSwingPacket");
         }
 
         /* ======== Mojang remapping changes for 26.2 ======== */

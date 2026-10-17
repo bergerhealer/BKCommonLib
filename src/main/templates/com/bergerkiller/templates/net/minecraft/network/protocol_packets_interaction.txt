@@ -18,12 +18,52 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.Serverboun
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundAttackPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundUseItemPacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundUseItemOnPacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ServerboundPunchPacketHandle;
 
-// Since 26.3
-optional class ServerboundPunchPacket extends Packet {
+// Since 26.3, before this is the ServerboundSwingPacket
+class ServerboundPunchPacket extends Packet {
+
+    public static (ServerboundPunchPacketHandle) ServerboundPunchPacket createNew((HumanHandRole) InteractionHand handRole) {
+#if version >= 26.3
+        return new ServerboundPunchPacket();
+#elseif version >= 1.9
+        return new ServerboundSwingPacket(handRole);
+#else
+        ServerboundSwingPacket packet = new ServerboundSwingPacket();
+        packet.timestamp = System.currentTimeMillis();
+        return packet;
+#endif
+    }
+
+#if version >= 26.3
+    public (HumanHandRole) InteractionHand getHandRole() {
+        return InteractionHand.MAIN_HAND;
+    }
+#elseif version >= 1.18
+    public (HumanHandRole) InteractionHand getHandRole:getHand();
+#elseif version >= 1.13
+    public (HumanHandRole) InteractionHand getHandRole:b();
+#elseif version >= 1.9
+    public (HumanHandRole) InteractionHand getHandRole:a();
+#else
+    public (HumanHandRole) HumanHandRole getHandRole() {
+        return HumanHandRole.MAIN;
+    }
+#endif
+
+    <code>
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
+        return getHandRole().getHandOf(humanEntity);
+    }
+
+    public static ServerboundPunchPacketHandle createNew(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
+        return createNew(hand.getRoleOf(humanEntity));
+    }
+    </code>
 }
 
 // 1.8 - 26.2 only. Replaced by ServerboundPunchPacket since 26.3
+// Deprecated: but was still in use by TC-Coasters for a short time. Keep until that is no longer the case.
 optional class ServerboundSwingPacket extends Packet {
 #if version >= 26.3
     public (HumanHandRole) InteractionHand getHandRole() {
