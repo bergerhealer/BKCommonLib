@@ -96,7 +96,8 @@ public class Common {
             "Common:PlayerYawAPIFixes",
             "BlockRayTrace:EntityRayTrace",
             "Packets:ClientboundSwingAnimationPacket",
-            "Packets:ServerboundPlayerActionPacket:Constructor"
+            "Packets:ServerboundPlayerActionPacket:Constructor",
+            "Packets:SwingIsNowPunchPacket"
     ).collect(Collectors.toSet());
 
     /**
