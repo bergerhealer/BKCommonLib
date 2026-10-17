@@ -475,7 +475,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
                 continue;
             }
             com.comphenix.protocol.PacketType comType = getPacketType(type);
-            if (comType != null) {
+            if (comType != null && !comTypes.contains(comType)) {
                 comTypes.add(comType);
             }
         }

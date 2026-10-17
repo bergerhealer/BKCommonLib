@@ -72,19 +72,15 @@ class PacketHandlerRegistration {
         // Register the listener
         for (PacketType type : types) {
             // Map to listener array
-            List<PacketMonitor> monitorList = monitors.get(type);
-            if (monitorList == null) {
-                monitorList = new ArrayList<PacketMonitor>();
-                monitors.put(type, monitorList);
+            List<PacketMonitor> monitorList = monitors.computeIfAbsent(type, u -> new ArrayList<>());
+            if (!monitorList.contains(monitor)) {
+                monitorList.add(monitor);
             }
-            monitorList.add(monitor);
             // Map to plugin list
-            List<PacketMonitor> list = monitorPlugins.get(plugin);
-            if (list == null) {
-                list = new ArrayList<PacketMonitor>(2);
-                monitorPlugins.put(plugin, list);
+            List<PacketMonitor> list = monitorPlugins.computeIfAbsent(plugin, u -> new ArrayList<>(5));
+            if (!list.contains(monitor)) {
+                list.add(monitor);
             }
-            list.add(monitor);
         }
     }
 
@@ -97,32 +93,28 @@ class PacketHandlerRegistration {
         // Register the listener
         for (PacketType type : types) {
             // Map to listener array
-            List<PacketListener> listenerList = listeners.get(type);
-            if (listenerList == null) {
-                listenerList = new ArrayList<PacketListener>();
-                listeners.put(type, listenerList);
+            List<PacketListener> listenerList = listeners.computeIfAbsent(type, u -> new ArrayList<>());
+            if (!listenerList.contains(listener)) {
+                listenerList.add(listener);
             }
-            listenerList.add(listener);
             // Map to plugin list
-            List<PacketListener> list = listenerPlugins.get(plugin);
-            if (list == null) {
-                list = new ArrayList<PacketListener>(2);
-                listenerPlugins.put(plugin, list);
+            List<PacketListener> list = listenerPlugins.computeIfAbsent(plugin, u -> new ArrayList<>(5));
+            if (!list.contains(listener)) {
+                list.add(listener);
             }
-            list.add(listener);
         }
     }
 
     public void removePacketListeners(Plugin plugin) {
         // Listeners
-        List<PacketListener> listeners = listenerPlugins.get(plugin);
+        List<PacketListener> listeners = listenerPlugins.remove(plugin);
         if (listeners != null) {
             for (PacketListener listener : listeners) {
                 removePacketListener(listener, false);
             }
         }
         // Monitors
-        List<PacketMonitor> monitors = monitorPlugins.get(plugin);
+        List<PacketMonitor> monitors = monitorPlugins.remove(plugin);
         if (monitors != null) {
             for (PacketMonitor monitor : monitors) {
                 removePacketMonitor(monitor, false);
