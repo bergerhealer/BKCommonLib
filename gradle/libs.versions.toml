@@ -11,7 +11,7 @@ mountiplex = "3.43"
 # Explicitly defined to avoid the server pulling in an older version
 asm = "9.7"
 regionchangetracker = "1.4"
-regionflagtracker= "1.0"
+regionflagtracker= "1.1"
 colorconversionhelper = "1.05"
 softdependencylib = "1.05"
 gson = "2.8.9"
