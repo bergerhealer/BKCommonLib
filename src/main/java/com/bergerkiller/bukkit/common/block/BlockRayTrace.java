@@ -313,5 +313,14 @@ public final class BlockRayTrace {
         public Vector getAbsolutePosition() {
             return absolutePosition;
         }
+
+        @Override
+        public String toString() {
+            if (entity != null) {
+                return "HitResult{entity=" + entity + ", position=" + getAbsolutePosition() + ", distance=" + getHitDistanceFromStart() + "}";
+            } else {
+                return "HitResult{block=" + block +", face=" + getHitFace() + ", position=" + getAbsolutePosition() + ", distance=" + getHitDistanceFromStart() + "}";
+            }
+        }
     }
 }
