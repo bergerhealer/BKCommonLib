@@ -332,13 +332,21 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *     EntityLookup entityLookup = world.moonrise$getEntityLookup();
          *
          *     // Entities by ID lookup table
-         * #if version >= 26.1
+         * #if version >= 26.3 && exists ca.spottedleaf.moonrise.patches.chunk_system.level.entity.EntityLookup protected final ca.spottedleaf.concurrentutil.map.concurrent.ints.ConcurrentChainedInt2ReferenceHashTable<net.minecraft.world.entity.Entity> entityById;
+         *     #require EntityLookup protected final ca.spottedleaf.concurrentutil.map.concurrent.ints.ConcurrentChainedInt2ReferenceHashTable<Entity> entityById;
+         *     ca.spottedleaf.concurrentutil.map.concurrent.ints.ConcurrentChainedInt2ReferenceHashTable byIdMap = entityLookup#entityById;
+         * #elseif version >= 26.1
          *     #require EntityLookup protected final ca.spottedleaf.concurrentutil.map.concurrent.longs.ConcurrentChainedLong2ReferenceHashTable<Entity> entityById;
          *     ca.spottedleaf.concurrentutil.map.concurrent.longs.ConcurrentChainedLong2ReferenceHashTable byIdMap = entityLookup#entityById;
+         *     #set by_long_entity_id
          * #else
          *     #require EntityLookup protected final ca.spottedleaf.concurrentutil.map.ConcurrentLong2ReferenceChainedHashTable<Entity> entityById;
          *     ca.spottedleaf.concurrentutil.map.ConcurrentLong2ReferenceChainedHashTable byIdMap = entityLookup#entityById;
+         *     #set by_long_entity_id
          * #endif
+         *
+         * #if by_long_entity_id
+         *     // Long keys
          *     if (byIdMap.get((long) entityId) == oldEntity) {
          *         if (newEntity == null) {
          *             byIdMap.remove((long) entityId);
@@ -346,6 +354,16 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *             byIdMap.put((long) entityId, newEntity);
          *         }
          *     }
+         * #else
+         *     // Int keys
+         *     if (byIdMap.get(entityId) == oldEntity) {
+         *         if (newEntity == null) {
+         *             byIdMap.remove(entityId);
+         *         } else {
+         *             byIdMap.put(entityId, newEntity);
+         *         }
+         *     }
+         * #endif
          *
          *     // Entities by UUID lookup table
          *     #require EntityLookup protected final java.util.concurrent.ConcurrentHashMap<UUID, Entity> entityByUUID;
