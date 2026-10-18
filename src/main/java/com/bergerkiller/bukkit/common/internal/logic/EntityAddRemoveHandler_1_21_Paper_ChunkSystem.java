@@ -338,11 +338,11 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          * #elseif version >= 26.1
          *     #require EntityLookup protected final ca.spottedleaf.concurrentutil.map.concurrent.longs.ConcurrentChainedLong2ReferenceHashTable<Entity> entityById;
          *     ca.spottedleaf.concurrentutil.map.concurrent.longs.ConcurrentChainedLong2ReferenceHashTable byIdMap = entityLookup#entityById;
-         *     #set by_long_entity_id
+         *     #set by_long_entity_id true
          * #else
          *     #require EntityLookup protected final ca.spottedleaf.concurrentutil.map.ConcurrentLong2ReferenceChainedHashTable<Entity> entityById;
          *     ca.spottedleaf.concurrentutil.map.ConcurrentLong2ReferenceChainedHashTable byIdMap = entityLookup#entityById;
-         *     #set by_long_entity_id
+         *     #set by_long_entity_id true
          * #endif
          *
          * #if by_long_entity_id
