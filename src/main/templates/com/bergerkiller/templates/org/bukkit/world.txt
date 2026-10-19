@@ -34,17 +34,52 @@ class World {
         return false;
     }
 
-    public void playSound(Location loc, IdentifierHandle sound, float volume, float pitch) {
-#if version >= 1.13
+#if version >= 1.11
+    // Bukkit API supports SoundCategory
+    public void playSound(Location loc, IdentifierHandle sound, (String) org.bukkit.SoundCategory category, float volume, float pitch) {
+        if (category == null) {
+            return; // Not supported?
+        }
+
+  #if version >= 1.13
         // Since 1.13 namespace can also be specified (Identifier in packet)
-        instance.playSound(loc, sound.toString(), volume, pitch);
+        instance.playSound(loc, sound.toString(), category, volume, pitch);
+  #else
+        instance.playSound(loc, sound.getName(), category, volume, pitch);
+  #endif
+    }
 #elseif version >= 1.9
-        instance.playSound(loc, sound.getName(), volume, pitch);
+    // Server has a sound category (sound source) but Bukkit has no API for it yet on 1.9 - 1.10.2. Call the NMS API directly.
+    public void playSound(Location loc, IdentifierHandle sound, (String) net.minecraft.sounds.SoundSource category, float volume, float pitch) {
+        if (category == null) {
+            return; // Not supported?
+        }
+
+        // Same as CraftWorld playSound, but with the extra sound category parameter.
+        if (loc == null || sound == null) return;
+
+        double x = loc.getX();
+        double y = loc.getY();
+        double z = loc.getZ();
+
+        net.minecraft.server.level.ServerLevel worldServer = ((org.bukkit.craftbukkit.CraftWorld) instance).getHandle();
+        net.minecraft.world.level.Level world = worldServer;
+        net.minecraft.network.protocol.game.ClientboundCustomSoundPacket packet = new net.minecraft.network.protocol.game.ClientboundCustomSoundPacket(sound.getName(), category, x, y, z, volume, pitch);
+        world.getMinecraftServer().getPlayerList().sendPacketNearby(null, x, y, z, volume > 1.0F ? 16.0F * volume : 16.0D, worldServer.dimension, packet);
+    }
 #else
+    public void playSound(Location loc, IdentifierHandle sound, (String) String category, float volume, float pitch) {
+        // Sound category not supported. Just play the sound using NMS.
         net.minecraft.world.level.Level worldHandle = ((org.bukkit.craftbukkit.CraftWorld) instance).getHandle();
         worldHandle.makeSound(loc.getX(), loc.getY(), loc.getZ(), sound.getName(), volume, pitch);
-#endif
     }
+#endif
+
+    <code>
+    public void playSound(Location loc, IdentifierHandle sound, float volume, float pitch) {
+        playSound(loc, sound, "master", volume, pitch);
+    }
+    </code>
 
 #if version >= 1.17
     public int getMinHeight();

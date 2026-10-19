@@ -1155,7 +1155,7 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
-     * Plays a named sound effect at a location
+     * Plays a named sound effect at a location to the default master sound category.
      * 
      * @param location to play at
      * @param soundKey of the sound to play
@@ -1163,8 +1163,21 @@ public class WorldUtil extends ChunkUtil {
      * @param pitch of the sound
      */
     public static void playSound(Location location, ResourceKey<SoundEffect> soundKey, float volume, float pitch) {
+        playSound(location, soundKey, "master", volume, pitch);
+    }
+
+    /**
+     * Plays a named sound effect at a location
+     *
+     * @param location to play at
+     * @param soundKey of the sound to play
+     * @param soundCategory sound category name (e.g. "master")
+     * @param volume of the sound
+     * @param pitch of the sound
+     */
+    public static void playSound(Location location, ResourceKey<SoundEffect> soundKey, String soundCategory, float volume, float pitch) {
         com.bergerkiller.generated.org.bukkit.WorldHandle.T.playSound.invoke(location.getWorld(),
-                location, soundKey.getName(), volume, pitch);
+                location, soundKey.getName(), soundCategory, volume, pitch);
     }
 
     /**

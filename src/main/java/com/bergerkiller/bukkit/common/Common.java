@@ -97,7 +97,8 @@ public class Common {
             "BlockRayTrace:EntityRayTrace",
             "Packets:ClientboundSwingAnimationPacket",
             "Packets:ServerboundPlayerActionPacket:Constructor",
-            "Packets:SwingIsNowPunchPacket"
+            "Packets:SwingIsNowPunchPacket",
+            "WorldUtil:PlaySoundCategory"
     ).collect(Collectors.toSet());
 
     /**
