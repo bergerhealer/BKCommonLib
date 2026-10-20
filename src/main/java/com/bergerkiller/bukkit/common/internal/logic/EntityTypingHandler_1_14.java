@@ -463,7 +463,15 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *     java.util.Random newRandom = new java.util.Random();
          *     worldserver#random = newRandom;
          * #endif
-         * 
+         *
+         * #if exists net.minecraft.server.level.ServerLevel public final org.dreeam.leaf.async.tracker.AsyncTracker leaf$asyncTracker;
+         *     // Leaf server has an AsyncTracker leaf$asyncTracker in the world that entity constructors try activating
+         *     // We give it an instance, but it is not used in practice thankfully
+         *     #require net.minecraft.server.level.ServerLevel public final org.dreeam.leaf.async.tracker.AsyncTracker leaf_tracker:leaf$asyncTracker;
+         *     org.dreeam.leaf.async.tracker.AsyncTracker leaf_tracker = new org.dreeam.leaf.async.tracker.AsyncTracker();
+         *     worldserver#leaf_tracker = leaf_tracker;
+         * #endif
+         *
          *     // server field (for enabledFeatures() call on 1.19.3+)
          *     #require net.minecraft.server.level.ServerLevel private final net.minecraft.server.MinecraftServer server;
          *     worldserver#server = net.minecraft.server.MinecraftServer.getServer();
