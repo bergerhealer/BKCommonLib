@@ -288,7 +288,10 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
         /*
          * <FIND_REGION_FILE_CACHE_STORAGE>
          * public static Long2ObjectLinkedOpenHashMap findRegionFileCache(RegionFileStorage rfc) {
-         * #if exists net.minecraft.world.level.chunk.storage.RegionFileStorage private final Long2ObjectLinkedOpenHashMap<abomination.IRegionFile> regionCache;
+         * #if exists net.minecraft.world.level.chunk.storage.RegionFileStorage private final Long2ObjectLinkedOpenHashMap<java.util.Optional<me.earthme.luminol.data.RegionFile>> regionCache;
+         *     // Used on Leaf server 26.3
+         *     #require net.minecraft.world.level.chunk.storage.RegionFileStorage private final Long2ObjectLinkedOpenHashMap<java.util.Optional<me.earthme.luminol.data.RegionFile>> regionCache;
+         * #elseif exists net.minecraft.world.level.chunk.storage.RegionFileStorage private final Long2ObjectLinkedOpenHashMap<abomination.IRegionFile> regionCache;
          *     // Used on Leaf server 1.21.11
          *     #require net.minecraft.world.level.chunk.storage.RegionFileStorage private final Long2ObjectLinkedOpenHashMap<abomination.IRegionFile> regionCache;
          * #elseif exists net.minecraft.world.level.chunk.storage.RegionFileStorage public final Long2ObjectLinkedOpenHashMap<org.purpurmc.purpur.region.AbstractRegionFile> regionCache;
