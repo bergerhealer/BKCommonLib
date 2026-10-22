@@ -1693,7 +1693,7 @@ public class MapResourcePack {
      * Contents of <b>pack.mcmeta</b>
      */
     public static class Metadata {
-        private int pack_format;
+        private PackVersion pack_format;
         private PackVersion min_format;
         private PackVersion max_format;
         private ResourcePackDescription description;
@@ -1713,7 +1713,7 @@ public class MapResourcePack {
          *             BKCommonLib is interpreting this pack as
          */
         @Deprecated
-        public int getPackFormat() {
+        public PackVersion getPackFormat() {
             return pack_format;
         }
 
@@ -1825,7 +1825,7 @@ public class MapResourcePack {
             }
 
             // Rely exclusively on the pack_format
-            return PackVersion.of(pack_format);
+            return pack_format;
         }
 
         /**
@@ -1877,7 +1877,7 @@ public class MapResourcePack {
          */
         public static Metadata fallback(String errorReason) {
             Metadata metadata = new Metadata();
-            metadata.pack_format = PackVersion.HIGHEST_KNOWN.major();
+            metadata.pack_format = PackVersion.HIGHEST_KNOWN;
             metadata.min_format = PackVersion.HIGHEST_KNOWN;
             metadata.max_format = PackVersion.HIGHEST_KNOWN;
             metadata.description = new ResourcePackDescription("Unknown Resource pack - " + errorReason);
@@ -1894,7 +1894,7 @@ public class MapResourcePack {
             Metadata metadata = new Metadata();
             metadata.min_format = PackVersion.byGameVersion(mcVersion);
             metadata.max_format = metadata.min_format;
-            metadata.pack_format = metadata.min_format.major();
+            metadata.pack_format = metadata.min_format;
             metadata.description = new ResourcePackDescription("Vanilla Minecraft " + mcVersion);
             return metadata;
         }

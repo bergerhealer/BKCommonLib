@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import com.bergerkiller.bukkit.common.map.util.ItemModel;
 import com.bergerkiller.bukkit.common.map.util.ItemModelOverride;
