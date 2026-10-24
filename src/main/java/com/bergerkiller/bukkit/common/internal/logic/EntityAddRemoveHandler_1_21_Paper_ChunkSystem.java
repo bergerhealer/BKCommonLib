@@ -332,7 +332,11 @@ class EntityAddRemoveHandler_1_21_Paper_ChunkSystem extends EntityAddRemoveHandl
          *     EntityLookup entityLookup = world.moonrise$getEntityLookup();
          *
          *     // Entities by ID lookup table
-         * #if version >= 26.3 && exists ca.spottedleaf.moonrise.patches.chunk_system.level.entity.EntityLookup protected final ca.spottedleaf.concurrentutil.map.concurrent.ints.ConcurrentChainedInt2ReferenceHashTable<net.minecraft.world.entity.Entity> entityById;
+         * #if exists ca.spottedleaf.moonrise.patches.chunk_system.level.entity.EntityLookup protected final it.unimi.dsi.fastutil.longs.CustomLong2ReferenceOpenHashMap<net.minecraft.world.entity.Entity> entityById;
+         *     #require EntityLookup protected final it.unimi.dsi.fastutil.longs.CustomLong2ReferenceOpenHashMap<Entity> entityById;
+         *     it.unimi.dsi.fastutil.longs.CustomLong2ReferenceOpenHashMap byIdMap = entityLookup#entityById;
+         *     #set by_long_entity_id true
+         * #elseif version >= 26.3 && exists ca.spottedleaf.moonrise.patches.chunk_system.level.entity.EntityLookup protected final ca.spottedleaf.concurrentutil.map.concurrent.ints.ConcurrentChainedInt2ReferenceHashTable<net.minecraft.world.entity.Entity> entityById;
          *     #require EntityLookup protected final ca.spottedleaf.concurrentutil.map.concurrent.ints.ConcurrentChainedInt2ReferenceHashTable<Entity> entityById;
          *     ca.spottedleaf.concurrentutil.map.concurrent.ints.ConcurrentChainedInt2ReferenceHashTable byIdMap = entityLookup#entityById;
          * #elseif version >= 26.1
