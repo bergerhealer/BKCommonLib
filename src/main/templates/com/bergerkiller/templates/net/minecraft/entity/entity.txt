@@ -2188,7 +2188,12 @@ class Entity {
         return instance.level().getWorld();
     }
 
+  #if exists net.minecraft.world.entity.Entity public final net.minecraft.server.level.ServerLevel level();
+    // Some server forks narrow the return type. Preserve the LevelHandle API.
+    public (LevelHandle) ServerLevel getWorld:level();
+  #else
     public (LevelHandle) Level getWorld:level();
+  #endif
 
     // Public on Paper
   #if exists net.minecraft.world.entity.Entity public void setLevel(net.minecraft.world.level.Level world);
