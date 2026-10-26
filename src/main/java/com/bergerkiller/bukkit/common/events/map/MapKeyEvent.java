@@ -15,11 +15,50 @@ public class MapKeyEvent extends Event {
     private final MapDisplay _map;
     private final MapPlayerInput.Key _key;
     private final MapPlayerInput _input;
+    private final Player _player;
+    private final int _repeat;
 
     public MapKeyEvent(MapDisplay map, MapPlayerInput input,  MapPlayerInput.Key key) {
-        this._input = input;
-        this._key = key;
+        if (input == null) {
+            throw new IllegalArgumentException("Input can not be null");
+        }
         this._map = map;
+        this._key = key;
+        this._input = input;
+        this._player = input.player;
+        this._repeat = input.getRepeat();
+    }
+
+    /**
+     * Creates a key event without requiring a {@link MapPlayerInput} instance.
+     * <p>
+     * Note: this constructor is intended for tests. In normal runtime usage,
+     * key events are created with a non-null {@link MapPlayerInput}.
+     *
+     * @param map Map display
+     * @param player Player responsible for the key event
+     * @param key Key that changed
+     * @param repeat Repeat counter, where 0 is first press
+     */
+    private MapKeyEvent(MapDisplay map, Player player, MapPlayerInput.Key key, int repeat) {
+        this._map = map;
+        this._key = key;
+        this._input = null;
+        this._player = player;
+        this._repeat = repeat;
+    }
+
+    /**
+     * Creates a test key event without requiring a {@link MapPlayerInput} instance.
+     *
+     * @param map Map display
+     * @param player Player responsible for the key event
+     * @param key Key that changed
+     * @param repeat Repeat counter, where 0 is first press
+     * @return test key event
+     */
+    public static MapKeyEvent createTestEvent(MapDisplay map, Player player, MapPlayerInput.Key key, int repeat) {
+        return new MapKeyEvent(map, player, key, repeat);
     }
 
     /**
@@ -28,7 +67,7 @@ public class MapKeyEvent extends Event {
      * @return player
      */
     public Player getPlayer() {
-        return this._input.player;
+        return this._player;
     }
 
     /**
@@ -64,7 +103,7 @@ public class MapKeyEvent extends Event {
      * @return repeat counter
      */
     public int getRepeat() {
-        return this._input.getRepeat();
+        return this._repeat;
     }
 
     @Override

@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.map.binding.MapDisplayInfo;
-import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 
 /**
@@ -274,8 +273,8 @@ public class MapSession {
             }
         }
 
-        private void sendUpdate(MapDisplayTile.Update mapUpdate) {
-            PacketUtil.sendPacket(this.player, mapUpdate.packet.create(), false);
+        public void sendUpdate(MapDisplayTile.Update mapUpdate) {
+            display.getUpdateDispatcher().sendMapUpdate(display, this.player, mapUpdate);
             display.getMarkerManager().setMarkersSynchronized(this.player, mapUpdate);
         }
     }

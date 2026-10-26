@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.inventory.CommonItemMaterials;
 import com.bergerkiller.bukkit.common.inventory.CommonItemStack;
 import org.bukkit.Bukkit;
@@ -37,6 +38,7 @@ import com.bergerkiller.bukkit.common.map.widgets.MapWidgetRoot;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
+import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 
@@ -83,6 +85,7 @@ public class MapDisplay implements MapDisplayEvents {
     protected JavaPlugin plugin = null;
     private final MapWidgetRoot widgets = new MapWidgetRoot(this);
     private final MapDisplayMarkers markers = new MapDisplayMarkers();
+    private UpdateDispatcher updateDispatcher = UpdateDispatcher.packet();
 
     /**
      * Used by CommonMapController to initialize map displays
@@ -315,6 +318,28 @@ public class MapDisplay implements MapDisplayEvents {
      */
     public void setGlobal(boolean global) {
         this._global = global;
+    }
+
+    /**
+     * Sets the update dispatcher used to synchronize map tile updates to viewers.
+     * By default this dispatcher sends packet updates to players.
+     *
+     * @param updateDispatcher Dispatcher to use
+     */
+    protected final void setUpdateDispatcher(UpdateDispatcher updateDispatcher) {
+        if (updateDispatcher == null) {
+            throw new IllegalArgumentException("Update dispatcher can not be null");
+        }
+        this.updateDispatcher = updateDispatcher;
+    }
+
+    /**
+     * Gets the update dispatcher used to synchronize map tile updates.
+     *
+     * @return update dispatcher
+     */
+    protected final UpdateDispatcher getUpdateDispatcher() {
+        return this.updateDispatcher;
     }
 
     /**
@@ -1134,7 +1159,7 @@ public class MapDisplay implements MapDisplayEvents {
             try {
                 this.onDetached();
             } catch (Throwable t) {
-                this.plugin.getLogger().log(Level.SEVERE, "An error occurred during MapDisplay onDetached", t);
+                logDisplayException("onDetached", t);
             }
         }
         this.widgets.clearWidgets();
@@ -1151,7 +1176,15 @@ public class MapDisplay implements MapDisplayEvents {
         try {
             this.onAttached();
         } catch (Throwable t) {
-            this.plugin.getLogger().log(Level.SEVERE, "An error occurred during MapDisplay onAttached", t);
+            logDisplayException("onAttached", t);
+        }
+    }
+
+    private void logDisplayException(String lifecycleMethod, Throwable t) {
+        if (this.plugin != null) {
+            this.plugin.getLogger().log(Level.SEVERE, "An error occurred during MapDisplay " + lifecycleMethod, t);
+        } else {
+            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "An error occurred during MapDisplay " + lifecycleMethod, t);
         }
     }
 
@@ -1959,6 +1992,94 @@ public class MapDisplay implements MapDisplayEvents {
         @Override
         public void run() {
             update();
+        }
+    }
+
+    /**
+     * Creates a standalone debug controller that can tick this display without
+     * requiring owners/viewers or a map item-backed session.
+     *
+     * @return debug controller
+     */
+    final DebugController createDebugController() {
+        return new DebugController();
+    }
+
+    final class DebugController {
+        private boolean active = false;
+
+        public void start(int width, int height) {
+            if (width <= 0 || height <= 0) {
+                throw new IllegalArgumentException("Debug resolution must be positive");
+            }
+            if (active) {
+                throw new IllegalStateException("Debug controller is already active");
+            }
+            if (MapDisplay.this.isRunning()) {
+                throw new IllegalStateException("Display is already running using Bukkit scheduling");
+            }
+
+            MapDisplay.this.width = width;
+            MapDisplay.this.height = height;
+            MapDisplay.this.markers.clear();
+            MapDisplay.this.clearLayers();
+            MapDisplay.this.widgets.setBounds(0, 0, width, height);
+            MapDisplay.this._isOnAttachedCalled = true;
+            MapDisplay.this.callOnAttached();
+            active = true;
+        }
+
+        public void tick() {
+            if (!active) {
+                throw new IllegalStateException("Debug controller is not active");
+            }
+            MapDisplay.this.onTick();
+            MapDisplay.this.widgets.performTickUpdates();
+        }
+
+        public void stop() {
+            if (!active) {
+                return;
+            }
+            active = false;
+            if (MapDisplay.this._isOnAttachedCalled) {
+                MapDisplay.this._isOnAttachedCalled = false;
+                try {
+                    MapDisplay.this.onDetached();
+                } catch (Throwable t) {
+                    MapDisplay.this.logDisplayException("onDetached", t);
+                }
+            }
+            MapDisplay.this.widgets.clearWidgets();
+            MapDisplay.this.widgets.handleDetach();
+        }
+    }
+
+    /**
+     * Dispatches map display updates to a viewer. By default, updates are sent
+     * as packets, but alternative implementations can be used to synchronize map
+     * updates to other targets.
+     */
+    public interface UpdateDispatcher {
+        UpdateDispatcher PACKET = (display, viewer, mapUpdate) ->
+                PacketUtil.sendPacket(viewer, mapUpdate.packet.create(), false);
+
+        /**
+         * Sends a single map tile update to a viewer.
+         *
+         * @param display Map display producing this update
+         * @param viewer Viewer receiving the update
+         * @param mapUpdate Tile update
+         */
+        void sendMapUpdate(MapDisplay display, Player viewer, MapDisplayTile.Update mapUpdate);
+
+        /**
+         * Gets the default packet-based map update dispatcher.
+         *
+         * @return packet dispatcher
+         */
+        static UpdateDispatcher packet() {
+            return PACKET;
         }
     }
 }

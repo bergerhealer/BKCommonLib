@@ -17,7 +17,6 @@ import com.bergerkiller.bukkit.common.map.MapDisplayTile;
 import com.bergerkiller.bukkit.common.map.MapMarker;
 import com.bergerkiller.bukkit.common.map.MapSession;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
-import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.mountiplex.reflection.util.UniqueHash;
 
 public class MapDisplayMarkers {
@@ -156,7 +155,7 @@ public class MapDisplayMarkers {
                 }
 
                 // Send to this player. Makes a new packet each time, as the pixels byte[] array is mutable.
-                PacketUtil.sendPacket(owner.player, mapUpdate.packet.create(), false);
+                owner.sendUpdate(mapUpdate);
             }
         }
 
