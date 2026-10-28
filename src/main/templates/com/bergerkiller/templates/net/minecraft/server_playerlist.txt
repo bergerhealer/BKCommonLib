@@ -26,12 +26,29 @@ class PlayerList {
 
     public (CommonTagCompound) CompoundTag migratePlayerData((CommonTagCompound) CompoundTag playerProfileData) {
 #if version >= 1.20.5
+        int dataVersion = net.minecraft.nbt.NbtUtils.getDataVersion(playerProfileData, -1);
+#if exists ca.spottedleaf.dataconverter.minecraft.MCDataConverter
+        // Match Paper's PlayerDataStorage loader instead of bypassing its optimized converter.
+        // Newer Paper versions also pass the vanilla type to preserve the DFU fallback for
+        // versions not yet supported by the optimized converter.
+#if exists ca.spottedleaf.dataconverter.minecraft.MCDataConverter public static net.minecraft.nbt.CompoundTag convertTag(ca.spottedleaf.dataconverter.minecraft.datatypes.MCDataType type, net.minecraft.util.datafix.DataFixTypes vanillaType, net.minecraft.nbt.CompoundTag data, int fromVersion, int toVersion);
+        return ca.spottedleaf.dataconverter.minecraft.MCDataConverter.convertTag(
+                ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry.PLAYER,
+                net.minecraft.util.datafix.DataFixTypes.PLAYER, playerProfileData, dataVersion,
+                ca.spottedleaf.dataconverter.minecraft.util.Version.getCurrentVersion());
+#else
+        return ca.spottedleaf.dataconverter.minecraft.MCDataConverter.convertTag(
+                ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry.PLAYER,
+                playerProfileData, dataVersion,
+                ca.spottedleaf.dataconverter.minecraft.util.Version.getCurrentVersion());
+#endif
+#else
         #require net.minecraft.world.level.storage.PlayerDataStorage protected final com.mojang.datafixers.DataFixer fixerUpper;
         net.minecraft.world.level.storage.PlayerDataStorage storage = instance.playerIo;
         com.mojang.datafixers.DataFixer fixerUpper = storage#fixerUpper;
 
-        int dataVersion = net.minecraft.nbt.NbtUtils.getDataVersion(playerProfileData, -1);
         return net.minecraft.util.datafix.DataFixTypes.PLAYER.updateToCurrentVersion(fixerUpper, playerProfileData, dataVersion);
+#endif
 #else
         return playerProfileData;
 #endif
