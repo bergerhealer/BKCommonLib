@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Supplier;
@@ -16,7 +17,6 @@ import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.LevelHandle;
-import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.conversion.Converter;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
@@ -97,17 +97,14 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
 
         AABBHandle entityBounds = entity.getBoundingBox();
 
+        // BKCommonLib: only the bounding box of (expanded bounds ONLY_FIRST moved bounds) was used here,
+        //              which is the expanded bounds itself. Skip the costly shape join to compute it.
         final double MIN_MOVE = 1.0E-7D;
-        VoxelShapeHandle voxelshapeAABBMoved = VoxelShapeHandle.fromAABB(entityBounds.translate(mx > 0.0D ? -MIN_MOVE : MIN_MOVE, my > 0.0D ? -MIN_MOVE : MIN_MOVE, mz > 0.0D ? -MIN_MOVE : MIN_MOVE));
-        VoxelShapeHandle voxelshapeBounds = VoxelShapeHandle.mergeOnlyFirst(VoxelShapeHandle.fromAABB(entityBounds.expandTowards(mx, my, mz).growUniform(MIN_MOVE)), voxelshapeAABBMoved);
-
-        if (voxelshapeBounds.isEmpty()) {
-            return Stream.empty();
-        }
+        AABBHandle axisalignedbb = entityBounds.expandTowards(mx, my, mz).growUniform(MIN_MOVE);
 
         // default VoxelShape IWorldReader::a(@Nullable Entity entity, VoxelShape voxelshape, boolean flag, Set<Entity> set)
-        AABBHandle axisalignedbb = voxelshapeBounds.getBoundingBox();
-        VoxelShapeHandle shape = VoxelShapeHandle.empty();
+        // BKCommonLib: collect the shapes rather than merging them, colliding with each in sequence is the same
+        List<VoxelShapeHandle> shapes = null;
 
         if (this.entityCollisionEnabled) {
             List<EntityHandle> list = entity.getWorld().getNearbyEntities(entity, axisalignedbb.growUniform(0.25D));
@@ -123,7 +120,10 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
                     if (axisalignedbb1 != null && axisalignedbb1.intersects(axisalignedbb)
                             && controller.onEntityCollision(entity1.getBukkitEntity())) {
 
-                        shape = VoxelShapeHandle.merge(shape, VoxelShapeHandle.fromAABB(axisalignedbb1));
+                        if (shapes == null) {
+                            shapes = new ArrayList<>();
+                        }
+                        shapes.add(VoxelShapeHandle.fromAABB(axisalignedbb1));
                     }
                 }
 
@@ -131,7 +131,10 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
                 if (axisalignedbb2 != null && axisalignedbb2.intersects(axisalignedbb)
                         && controller.onEntityCollision(entity1.getBukkitEntity())) {
 
-                    shape = VoxelShapeHandle.merge(shape, VoxelShapeHandle.fromAABB(axisalignedbb2));
+                    if (shapes == null) {
+                        shapes = new ArrayList<>();
+                    }
+                    shapes.add(VoxelShapeHandle.fromAABB(axisalignedbb2));
                 }
                 // BKCommonLib end
 
@@ -154,10 +157,10 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
             }
         }
 
-        if (shape.isEmpty()) {
+        if (shapes == null) {
             return Stream.empty();
         } else {
-            return MountiplexUtil.toStream(shape);
+            return shapes.stream();
         }
     }
 
