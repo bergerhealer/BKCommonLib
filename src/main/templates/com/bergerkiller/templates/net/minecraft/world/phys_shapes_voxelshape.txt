@@ -39,7 +39,8 @@ class VoxelShape {
     }
 
     public static (VoxelShapeHandle) VoxelShape mergeOnlyFirst((VoxelShapeHandle) VoxelShape a, (VoxelShapeHandle) VoxelShape b) {
-        return Shapes.join(a, b, BooleanOp.ONLY_FIRST);
+        // Only used for collision bounds checks, so skip the costly optimize() that join() does
+        return Shapes.joinUnoptimized(a, b, BooleanOp.ONLY_FIRST);
     }
 
     public static (VoxelShapeHandle) VoxelShape merge((VoxelShapeHandle) VoxelShape a, (VoxelShapeHandle) VoxelShape b) {

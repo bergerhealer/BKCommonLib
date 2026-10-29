@@ -9,20 +9,28 @@
 // flag = always false
 
 public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler handler, VoxelShape voxelshape, VoxelShape voxelshape1, boolean flag) {
-    int i = MathUtil.floor(voxelshape.min(Direction$Axis.X)) - 1;
-    int j = MathUtil.ceil(voxelshape.max(Direction$Axis.X)) + 1;
-    int k = MathUtil.floor(voxelshape.min(Direction$Axis.Y)) - 1;
-    int l = MathUtil.ceil(voxelshape.max(Direction$Axis.Y)) + 1;
-    int i1 = MathUtil.floor(voxelshape.min(Direction$Axis.Z)) - 1;
-    int j1 = MathUtil.ceil(voxelshape.max(Direction$Axis.Z)) + 1;
+    // BKCommonLib: keep the bounds around for a cheap bounding box pre-check
+    double boundsMinX = voxelshape.min(Direction$Axis.X);
+    double boundsMaxX = voxelshape.max(Direction$Axis.X);
+    double boundsMinY = voxelshape.min(Direction$Axis.Y);
+    double boundsMaxY = voxelshape.max(Direction$Axis.Y);
+    double boundsMinZ = voxelshape.min(Direction$Axis.Z);
+    double boundsMaxZ = voxelshape.max(Direction$Axis.Z);
+    int i = MathUtil.floor(boundsMinX) - 1;
+    int j = MathUtil.ceil(boundsMaxX) + 1;
+    int k = MathUtil.floor(boundsMinY) - 1;
+    int l = MathUtil.ceil(boundsMaxY) + 1;
+    int i1 = MathUtil.floor(boundsMinZ) - 1;
+    int j1 = MathUtil.ceil(boundsMaxZ) + 1;
     WorldBorder worldborder = this.getWorldBorder();
-    VoxelShape voxelshape2 = Shapes.empty();
+
+    // BKCommonLib: collect the shapes rather than merging them into one shape. Merging (join + optimize)
+    //              is very slow, and colliding against each shape in sequence gives the same result.
+    java.util.ArrayList shapes = null;
 
     BlockPos$MutableBlockPos blockposition_b = new BlockPos$MutableBlockPos();
 
     for (int k1 = i; k1 < j; ++k1) {
-        VoxelShape voxelshape3 = Shapes.empty();
-
         for (int l1 = i1; l1 < j1; ++l1) {
             boolean flag2 = k1 == i || k1 == j - 1;
             boolean flag3 = l1 == i1 || l1 == j1 - 1;
@@ -34,8 +42,6 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
             blockposition_b.set(k1, 64, l1);
 
             if (this.isLoaded((BlockPos) blockposition_b)) {
-                VoxelShape voxelshape4 = Shapes.empty();
-
                 for (int i2 = k; i2 < l; ++i2) {
                     if (!flag2 && !flag3 || i2 != l - 1) {
                         blockposition_b.set(k1, i2, l1);
@@ -50,6 +56,17 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
                         if (!voxelshape5.isEmpty()) {
                             VoxelShape voxelshape6;
                             VoxelShape voxelshape7;
+
+                            // BKCommonLib: skip shapes outside the bounding box of the bounds before doing the costly join
+                            if ((voxelshape5.max(Direction$Axis.X) + (double) k1) < boundsMinX ||
+                                (voxelshape5.min(Direction$Axis.X) + (double) k1) > boundsMaxX ||
+                                (voxelshape5.max(Direction$Axis.Y) + (double) i2) < boundsMinY ||
+                                (voxelshape5.min(Direction$Axis.Y) + (double) i2) > boundsMaxY ||
+                                (voxelshape5.max(Direction$Axis.Z) + (double) l1) < boundsMinZ ||
+                                (voxelshape5.min(Direction$Axis.Z) + (double) l1) > boundsMaxZ
+                            ) {
+                                continue;
+                            }
 
                             // BKCommonLib start: check actually colliding + Block Collision event handler
                             voxelshape6 = voxelshape5.move((double) k1, (double) i2, (double) l1);
@@ -67,29 +84,28 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
                             // BKCommonLib end
 
                             // voxelshape6 = voxelshape5.a((double) k1, (double) i2, (double) l1);
-                            if (!Shapes.joinIsNotEmpty(voxelshape1, voxelshape6, BooleanOp.AND) && Shapes.joinIsNotEmpty(voxelshape, voxelshape6, BooleanOp.AND)) {
+                            // BKCommonLib: second joinIsNotEmpty(voxelshape, voxelshape6) check removed, was already checked above
+                            if (!Shapes.joinIsNotEmpty(voxelshape1, voxelshape6, BooleanOp.AND)) {
                                 if (flag) {
                                     voxelshape7 = Shapes.block();
                                     return voxelshape7;
                                 }
 
-                                voxelshape4 = Shapes.joinUnoptimized(voxelshape4, voxelshape6, BooleanOp.OR);
+                                if (shapes == null) {
+                                    shapes = new java.util.ArrayList();
+                                }
+                                shapes.add(voxelshape6);
                             }
                         }
                     }
                 }
-
-                voxelshape3 = Shapes.joinUnoptimized(voxelshape3, voxelshape4, BooleanOp.OR);
             }
         }
-
-        voxelshape2 = Shapes.joinUnoptimized(voxelshape2, voxelshape3, BooleanOp.OR);
     }
 
-    if (flag) {
+    if (flag || shapes == null) {
         return java.util.stream.Stream.empty();
     } else {
-        voxelshape2 = voxelshape2.optimize();
-        return com.bergerkiller.mountiplex.MountiplexUtil.toStream(voxelshape2);
+        return shapes.stream();
     }
 }
