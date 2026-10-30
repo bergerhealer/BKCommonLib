@@ -1,11 +1,15 @@
 package com.bergerkiller.bukkit.common.map;
 
 import java.awt.Image;
+import java.lang.ref.SoftReference;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import javax.imageio.ImageIO;
 
@@ -24,6 +28,12 @@ import com.bergerkiller.bukkit.common.utils.MathUtil;
  * and top to bottom. No copy is created.
  */
 public final class MapTexture extends MapCanvas {
+    // These are weak-keyed caches for storing recently loaded textures
+    // This allows for inline texture loading of atlas textures without having to store
+    // the full atlas somewhere to prevent PNG re-decoding overhead.
+    private static final TextureCache<ClassLoader> CLASS_LOADER_RESOURCE_TEXTURE_CACHE = new TextureCache<>();
+    private static final TextureCache<JavaPlugin> PLUGIN_RESOURCE_TEXTURE_CACHE = new TextureCache<>();
+
     private final byte[] buffer;
     private final int width, height;
 
@@ -160,13 +170,19 @@ public final class MapTexture extends MapCanvas {
         if (plugin == null) {
             throw new IllegalArgumentException("plugin is null");
         }
-        try {
-            try (InputStream stream = plugin.getResource(filename)) {
-                if (stream == null) {
-                    throw new TextureLoadException("Resource not found in " + plugin.getName() + ": " + filename);
-                }
-                return fromStream(stream);
+
+        MapTexture cachedTexture = PLUGIN_RESOURCE_TEXTURE_CACHE.get(plugin, filename);
+        if (cachedTexture != null) {
+            return cachedTexture.clone();
+        }
+
+        try (InputStream stream = plugin.getResource(filename)) {
+            if (stream == null) {
+                throw new TextureLoadException("Resource not found in " + plugin.getName() + ": " + filename);
             }
+            MapTexture texture = fromStream(stream);
+            PLUGIN_RESOURCE_TEXTURE_CACHE.put(plugin, filename, texture);
+            return texture.clone();
         } catch (IOException e) {
             throw new TextureLoadException("Failed to open image resource stream", e);
         }
@@ -184,13 +200,20 @@ public final class MapTexture extends MapCanvas {
         if (ownerClass == null) {
             throw new IllegalArgumentException("ownerClass is null");
         }
-        try {
-            try (InputStream stream = ownerClass.getResourceAsStream(filename)) {
-                if (stream == null) {
-                    throw new TextureLoadException("Resource not found: " + filename);
-                }
-                return fromStream(stream);
+
+        ClassLoader classLoader = ownerClass.getClassLoader();
+        MapTexture cachedTexture = CLASS_LOADER_RESOURCE_TEXTURE_CACHE.get(classLoader, filename);
+        if (cachedTexture != null) {
+            return cachedTexture.clone();
+        }
+
+        try (InputStream stream = ownerClass.getResourceAsStream(filename)) {
+            if (stream == null) {
+                throw new TextureLoadException("Resource not found: " + filename);
             }
+            MapTexture texture = fromStream(stream);
+            CLASS_LOADER_RESOURCE_TEXTURE_CACHE.put(classLoader, filename, texture);
+            return texture.clone();
         } catch (IOException e) {
             throw new TextureLoadException("Failed to open image resource stream", e);
         }
@@ -381,6 +404,47 @@ public final class MapTexture extends MapCanvas {
 
         public TextureLoadException(String message, Throwable cause) {
             super(message, cause);
+        }
+    }
+
+    private static final class TextureCache<K> {
+        private final Map<K, Map<String, SoftReference<MapTexture>>> cacheByKey = new WeakHashMap<>();
+
+        public MapTexture get(K key, String path) {
+            synchronized (cacheByKey) {
+                Map<String, SoftReference<MapTexture>> cacheByPath = cacheByKey.get(key);
+                if (cacheByPath == null) {
+                    return null;
+                }
+
+                SoftReference<MapTexture> textureRef = cacheByPath.get(path);
+                if (textureRef == null) {
+                    return null;
+                }
+
+                MapTexture texture = textureRef.get();
+
+                // We could clean it up, but right after this the texture will be loaded
+                // and put again anyway. So there really is no point in doing this.
+                /*
+                if (texture == null) {
+                    cacheByPath.remove(path);
+                    if (cacheByPath.isEmpty()) {
+                        cacheByKey.remove(key);
+                    }
+                    return null;
+                }
+                 */
+
+                return texture;
+            }
+        }
+
+        public void put(K key, String path, MapTexture texture) {
+            synchronized (cacheByKey) {
+                Map<String, SoftReference<MapTexture>> cacheByPath = cacheByKey.computeIfAbsent(key, k -> new HashMap<>());
+                cacheByPath.put(path, new SoftReference<>(texture));
+            }
         }
     }
 }
