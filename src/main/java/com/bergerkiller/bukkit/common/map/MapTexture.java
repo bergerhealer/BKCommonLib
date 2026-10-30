@@ -81,24 +81,35 @@ public final class MapTexture extends MapCanvas {
 
     @Override
     public MapCanvas writePixelsFill(int x, int y, int w, int h, byte color) {
-        // Clamp to within range of this buffer
-        x = Math.max(x, 0);
-        y = Math.max(y, 0);
+        // Clip rectangle to the in-bounds area of this buffer
+        if (x < 0) {
+            w += x;
+            x = 0;
+        }
+        if (y < 0) {
+            h += y;
+            y = 0;
+        }
+        if (x >= this.width || y >= this.height) {
+            return this;
+        }
         w = Math.min(w, this.width - x);
         h = Math.min(h, this.height - y);
+        if (w <= 0 || h <= 0) {
+            return this;
+        }
 
-        int index = y * this.width + x;
-        int res = this.width * this.height;
-        int max_index = Math.min(res, index + h * this.width + w);
-        if (index == 0 && max_index == res) {
-            // Fill entire canvas
-            Arrays.fill(this.buffer, 0, res, color);
-        } else {
-            // Fill the buffer within range in vertical slice steps
-            while (index < max_index) {
-                Arrays.fill(this.buffer, index, index + w, color);
-                index += width;
-            }
+        // Fill entire canvas
+        if (x == 0 && y == 0 && w == this.width && h == this.height) {
+            Arrays.fill(this.buffer, 0, this.width * this.height, color);
+            return this;
+        }
+
+        // Fill the buffer within range in vertical slice steps
+        int startIndex = y * this.width + x;
+        int max_index = Math.min(this.width * this.height, startIndex + h * this.width);
+        for (int index = startIndex; index < max_index; index += this.width) {
+            Arrays.fill(this.buffer, index, index + w, color);
         }
 
         return this;
