@@ -13,10 +13,7 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
 import java.util.EnumSet;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -55,7 +52,7 @@ public final class MapDisplayDebugWindow {
         t.setDaemon(true);
         return t;
     });
-    private final Set<MapPlayerInput.Key> pressedKeys = Collections.newSetFromMap(new ConcurrentHashMap<MapPlayerInput.Key, Boolean>());
+    private final AtomicReference<EnumSet<MapPlayerInput.Key>> pressedKeys = new AtomicReference<>(EnumSet.noneOf(MapPlayerInput.Key.class));
     private EnumSet<MapPlayerInput.Key> previousKeys = EnumSet.noneOf(MapPlayerInput.Key.class);
     private int keyRepeat = 0;
     private volatile boolean closed;
@@ -94,7 +91,7 @@ public final class MapDisplayDebugWindow {
             public void keyPressed(KeyEvent e) {
                 MapPlayerInput.Key key = fromKeyCode(e.getKeyCode());
                 if (key != null) {
-                    pressedKeys.add(key);
+                    setPressedState(key, true);
                 }
             }
 
@@ -102,7 +99,7 @@ public final class MapDisplayDebugWindow {
             public void keyReleased(KeyEvent e) {
                 MapPlayerInput.Key key = fromKeyCode(e.getKeyCode());
                 if (key != null) {
-                    pressedKeys.remove(key);
+                    setPressedState(key, false);
                 }
             }
         });
@@ -225,9 +222,7 @@ public final class MapDisplayDebugWindow {
     }
 
     private void processInputTick() {
-        EnumSet<MapPlayerInput.Key> currentKeys = pressedKeys.isEmpty()
-                ? EnumSet.noneOf(MapPlayerInput.Key.class)
-                : EnumSet.copyOf(pressedKeys);
+        EnumSet<MapPlayerInput.Key> currentKeys = pressedKeys.get();
 
         if (currentKeys.isEmpty()) {
             keyRepeat = 0;
@@ -257,6 +252,19 @@ public final class MapDisplayDebugWindow {
         }
 
         previousKeys = currentKeys;
+    }
+
+    private void setPressedState(MapPlayerInput.Key key, boolean pressed) {
+        while (true) {
+            EnumSet<MapPlayerInput.Key> oldState = pressedKeys.get();
+            EnumSet<MapPlayerInput.Key> newState = EnumSet.copyOf(oldState);
+            if (pressed ? !newState.add(key) : !newState.remove(key)) {
+                return;
+            }
+            if (pressedKeys.compareAndSet(oldState, newState)) {
+                return;
+            }
+        }
     }
 
     private void renderTick() {
