@@ -478,7 +478,7 @@ public class MapWidget implements MapDisplayEvents {
      * @return True if this widget is currently user-interactive
      */
     public boolean isUserInteractive() {
-        return this._userInteractive && this._userInteractiveSuppressionCount == 0;
+        return this._userInteractive && this._userInteractiveSuppressionCount == 0 && isVisibleAndDisplayed();
     }
 
     /**
