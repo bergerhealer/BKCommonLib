@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -38,6 +39,8 @@ public class MapWidget implements MapDisplayEvents {
     private boolean _invalidated;
     private boolean _focusable;
     private boolean _attached;
+    private boolean _userInteractive;
+    private int _userInteractiveSuppressionCount;
     private boolean _boundsChanged;
     private boolean _wasFocused;
     private boolean _retainChildren;
@@ -53,6 +56,8 @@ public class MapWidget implements MapDisplayEvents {
         this._boundsChanged = true;
         this._focusable = false;
         this._attached = false;
+        this._userInteractive = false;
+        this._userInteractiveSuppressionCount = 0;
         this._retainChildren = false;
         this._clipParent = false;
         this._visible = true;
@@ -452,6 +457,66 @@ public class MapWidget implements MapDisplayEvents {
     }
 
     /**
+     * Gets whether this widget has been added to a parent, and its {@link #onAttached()} has finished
+     * processing. In this state, only user input or external operations can cause changes to this widget.
+     * This is false right before and during {@link #onDetached()}.<br>
+     * <br>
+     * Use this property to decide whether to act upon change events, such as applying changes.<br>
+     * <br>
+     * If an external process makes changes that should be suppressed, you can call
+     * {@link #withoutUserInteractive()} in a try-with-resources to suppress those changes:
+     * <pre>
+     *     try (MapWidget.UserInteractiveSuppressionTicket ignored = widget.withoutUserInteractive()) {
+     *         widget.setText("Test"); // Make changes, isUserInteractive() will be false during change handling
+     *     }
+     * </pre>
+     * Or make use of the alternative method:
+     * <pre>
+     *     MapWidget.withoutUserInteractive(widget, w -> w.setText("Test"));
+     * </pre>
+     *
+     * @return True if this widget is currently user-interactive
+     */
+    public boolean isUserInteractive() {
+        return this._userInteractive && this._userInteractiveSuppressionCount == 0;
+    }
+
+    /**
+     * Returns a {@link UserInteractiveSuppressionTicket} that, while not closed, keeps
+     * {@link #isUserInteractive()} false. This is useful for suppressing user-interactive events
+     * while making changes to this widget.
+     *
+     * @return UserInteractiveSuppressionTicket
+     */
+    public final UserInteractiveSuppressionTicket withoutUserInteractive() {
+        _userInteractiveSuppressionCount++;
+        return new UserInteractiveSuppressionTicket() {
+            boolean closed = false;
+
+            @Override
+            public void close() {
+                if (!closed) {
+                    closed = true;
+                    _userInteractiveSuppressionCount--;
+                }
+            }
+        };
+    }
+
+    /**
+     * Runs an action while keeping {@link #isUserInteractive()} false. This is useful for suppressing user-interactive
+     * events while making changes to the widget.
+     *
+     * @param widget Widget to make changes to, and which should keep user-interactive false during it
+     * @param action Action on the widget to run during this suppression window
+     */
+    public static <T extends MapWidget> void withoutUserInteractive(T widget, Consumer<T> action) {
+        try (UserInteractiveSuppressionTicket ignored = widget.withoutUserInteractive()) {
+            action.accept(widget);
+        }
+    }
+
+    /**
      * Gets an immutable list of children of this widget.
      * These children are drawn on top of this widget.
      * The returned list is guaranteed to be left unmodified when additional children
@@ -589,6 +654,7 @@ public class MapWidget implements MapDisplayEvents {
         child.root = this.root;
         child.parent = this;
         child._attached = false;
+        child._userInteractive = false;
         child._invalidated = true;
         child._boundsChanged = true;
         for (MapWidget subChild : child.getWidgets()) {
@@ -1047,6 +1113,9 @@ public class MapWidget implements MapDisplayEvents {
             for (MapWidget child : this._children) {
                 child.handleAttach();
             }
+
+            // Now the widget and its children are properly attached, changes can be acted upon. Mark it as being interactive.
+            this._userInteractive = true;
         }
     }
 
@@ -1123,6 +1192,7 @@ public class MapWidget implements MapDisplayEvents {
     void handleDetach() {
         if (this._attached) {
             this._attached = false;
+            this._userInteractive = false;
 
             // If this widget or child thereof is activated, de-activate ourselves
             // This moves the activation back to whoever is behind is, fixing focus bugs
@@ -1270,4 +1340,11 @@ public class MapWidget implements MapDisplayEvents {
         return input;
     }
 
+    /**
+     * A try-with-resources ticket that keeps {@link #isUserInteractive()} false while open.
+     */
+    @FunctionalInterface
+    public interface UserInteractiveSuppressionTicket extends AutoCloseable {
+        void close();
+    }
 }
