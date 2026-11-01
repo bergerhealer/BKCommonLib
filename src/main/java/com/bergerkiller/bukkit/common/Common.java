@@ -99,7 +99,8 @@ public class Common {
             "Packets:ServerboundPlayerActionPacket:Constructor",
             "Packets:SwingIsNowPunchPacket",
             "WorldUtil:PlaySoundCategory",
-            "BlockData:Friction"
+            "BlockData:Friction",
+            "BlockData:JumpAndSpeedFactor"
     ).collect(Collectors.toSet());
 
     /**

@@ -272,6 +272,26 @@ interface BlockState {
 #endif
     }
 
+    public float getSpeedFactor() {
+#if version >= 1.16
+        return instance.getBlock().getSpeedFactor();
+#elseif version >= 1.15
+        return instance.getBlock().m();
+#else
+        return (instance.getBlock() instanceof net.minecraft.world.level.block.BlockSlowSand) ? 0.4F : 1.0F;
+#endif
+    }
+
+    public float getJumpFactor() {
+#if version >= 1.16
+        return instance.getBlock().getJumpFactor();
+#elseif version >= 1.15
+        return instance.getBlock().n();
+#else
+        return 1.0F;
+#endif
+    }
+
     public boolean isSolid() {
 #if version >= 1.20
         // Note: deprecated!

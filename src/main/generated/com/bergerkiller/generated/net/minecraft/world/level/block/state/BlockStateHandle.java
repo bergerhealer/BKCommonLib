@@ -33,6 +33,8 @@ public abstract class BlockStateHandle extends Template.Handle {
     public abstract boolean isPowerSource();
     public abstract SoundTypeHandle getSoundType();
     public abstract float getFriction();
+    public abstract float getSpeedFactor();
+    public abstract float getJumpFactor();
     public abstract boolean isSolid();
     public abstract AABBHandle getInteractableBox(BlockGetterHandle iblockaccess, IntVector3 blockposition);
     public abstract AABBHandle getBoundingBox(BlockGetterHandle iblockaccess, IntVector3 blockposition);
@@ -76,6 +78,8 @@ public abstract class BlockStateHandle extends Template.Handle {
         public final Template.Method<Boolean> isPowerSource = new Template.Method<Boolean>();
         public final Template.Method.Converted<SoundTypeHandle> getSoundType = new Template.Method.Converted<SoundTypeHandle>();
         public final Template.Method<Float> getFriction = new Template.Method<Float>();
+        public final Template.Method<Float> getSpeedFactor = new Template.Method<Float>();
+        public final Template.Method<Float> getJumpFactor = new Template.Method<Float>();
         public final Template.Method<Boolean> isSolid = new Template.Method<Boolean>();
         public final Template.Method.Converted<AABBHandle> getInteractableBox = new Template.Method.Converted<AABBHandle>();
         public final Template.Method.Converted<AABBHandle> getBoundingBox = new Template.Method.Converted<AABBHandle>();

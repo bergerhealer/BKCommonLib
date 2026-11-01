@@ -610,6 +610,16 @@ class BlockDataImpl extends BlockData {
     }
 
     @Override
+    public final float getSpeedFactor() {
+        return this.data.getSpeedFactor();
+    }
+
+    @Override
+    public final float getJumpFactor() {
+        return this.data.getJumpFactor();
+    }
+
+    @Override
     public final boolean canSupportTop(Block block) {
         return this.block.canSupportOnFace(this.data, block, BlockFace.UP);
     }

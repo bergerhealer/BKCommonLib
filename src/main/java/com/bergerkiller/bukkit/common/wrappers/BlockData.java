@@ -542,6 +542,21 @@ public abstract class BlockData extends BlockDataRegistry {
     public abstract float getFriction();
 
     /**
+     * Gets the speed factor of this block for entity movement while on/in the block.
+     * Lower values slow entities down (for example, soul sand).
+     *
+     * @return speed factor
+     */
+    public abstract float getSpeedFactor();
+
+    /**
+     * Gets the jump factor of this block for entity jumping while on/in the block.
+     *
+     * @return jump factor
+     */
+    public abstract float getJumpFactor();
+
+    /**
      * Gets whether this Block is capable of supporting other blocks on top, like torches and minecart track.
      * Equivalent to {@link #canSupportOnFace(Block, BlockFace)} with UP as face.
      * 
