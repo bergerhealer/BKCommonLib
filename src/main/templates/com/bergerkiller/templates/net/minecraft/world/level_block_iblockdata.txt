@@ -256,6 +256,22 @@ interface BlockState {
     }
 #endif
 
+    public float getFriction() {
+#if version >= 1.18
+        return instance.getBlock().getFriction();
+#elseif version >= 1.16
+        return instance.getBlock().getFrictionFactor();
+#elseif version >= 1.15
+        return instance.getBlock().l();
+#elseif version >= 1.14
+        return instance.getBlock().m();
+#elseif version >= 1.13
+        return instance.getBlock().n();
+#else
+        return instance.getBlock().frictionFactor;
+#endif
+    }
+
     public boolean isSolid() {
 #if version >= 1.20
         // Note: deprecated!

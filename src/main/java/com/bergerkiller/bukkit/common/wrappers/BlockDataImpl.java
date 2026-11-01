@@ -605,6 +605,11 @@ class BlockDataImpl extends BlockData {
     }
 
     @Override
+    public final float getFriction() {
+        return this.data.getFriction();
+    }
+
+    @Override
     public final boolean canSupportTop(Block block) {
         return this.block.canSupportOnFace(this.data, block, BlockFace.UP);
     }

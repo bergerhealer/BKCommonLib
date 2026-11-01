@@ -535,6 +535,13 @@ public abstract class BlockData extends BlockDataRegistry {
     public abstract float getDamageResilience();
 
     /**
+     * Gets the friction factor of this block for movement across its top surface.
+     *
+     * @return friction factor
+     */
+    public abstract float getFriction();
+
+    /**
      * Gets whether this Block is capable of supporting other blocks on top, like torches and minecart track.
      * Equivalent to {@link #canSupportOnFace(Block, BlockFace)} with UP as face.
      * 
