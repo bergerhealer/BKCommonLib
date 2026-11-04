@@ -540,7 +540,8 @@ public class EntityGroupingUtil {
         JOCKEY(true, false, "isJockey"),
         ANIMAL(true, true, Animals.class, Squid.class, Bat.class, CommonUtil.getClass("org.bukkit.entity.Fish"),
                 CommonUtil.getClass("org.bukkit.entity.Dolphin")),
-        MONSTER(true, true, Monster.class, Slime.class, Ghast.class, Golem.class, CommonUtil.getClass("org.bukkit.entity.Phantom")),
+        MONSTER(true, true, Monster.class, Slime.class, Ghast.class, Golem.class, EnderDragon.class,
+                CommonUtil.getClass("org.bukkit.entity.Phantom"), CommonUtil.getClass("org.bukkit.entity.Boss")),
         NPC(true, true, NPC.class),
         PASSIVE(true, false, Bat.class, Chicken.class, Cow.class, MushroomCow.class, Pig.class, Sheep.class, Squid.class, Villager.class,
                 CommonUtil.getClass("org.bukkit.entity.AbstractVillager"), CommonUtil.getClass("org.bukkit.entity.Fish"),
@@ -549,7 +550,7 @@ public class EntityGroupingUtil {
         HOSTILE(true, false, Blaze.class, Creeper.class, Guardian.class, Endermite.class, Ghast.class, MagmaCube.class, Silverfish.class, Skeleton.class, Slime.class, Witch.class, Zombie.class, CommonUtil.getClass("org.bukkit.entity.Phantom")),
         TAMEABLE(true, false, Tameable.class),
         UTILITY(true, false, Golem.class),
-        BOSS(true, false, EnderDragon.class, EnderDragonPart.class, Wither.class),
+        BOSS(true, false, EnderDragon.class, EnderDragonPart.class, Wither.class, CommonUtil.getClass("org.bukkit.entity.Boss")),
         OTHER(false, true);
 
         private final boolean isMob;

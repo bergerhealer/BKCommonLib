@@ -2,6 +2,9 @@ package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
 
+import com.bergerkiller.bukkit.common.utils.EntityGroupingUtil;
+import com.bergerkiller.bukkit.common.utils.EntityUtil;
+import org.bukkit.entity.EntityType;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
@@ -18,6 +21,11 @@ public class EntityRegistryTest {
 
         // Initialize the entity lists first
         CommonUtil.loadClass(CommonEntityType.class);
+    }
+
+    @Test
+    public void testEnderDragonIsMonster() {
+        assertTrue(EntityUtil.isEntityType(EntityType.ENDER_DRAGON, EntityGroupingUtil.EntityCategory.MONSTER));
     }
 
     @Test
