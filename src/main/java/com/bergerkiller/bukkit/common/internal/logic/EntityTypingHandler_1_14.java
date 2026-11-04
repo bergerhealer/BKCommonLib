@@ -316,6 +316,10 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *     #require net.minecraft.world.level.Level private net.minecraft.world.level.dimension.DimensionType cachedDimensionType;
          *     worldserver#cachedDimensionType = dimensionType;
          *   #endif
+         *
+         *     // Assign MinecraftServer instance to the world server. Needed on 26.1.1 at least.
+         *     #require ServerLevel private final net.minecraft.server.MinecraftServer server;
+         *     worldserver#server = minecraftServer;
          * #endif
          *
          *     // Ensure registryAccess is initialized, some entities call this in the constructor to lookup stuff
