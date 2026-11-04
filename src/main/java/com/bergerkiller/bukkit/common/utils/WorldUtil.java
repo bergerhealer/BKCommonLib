@@ -83,6 +83,19 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
+     * Disables the Ender Dragon fight state for an End world.
+     *
+     * @param world Bukkit world
+     * @return True if the dragon fight existed and was disabled, False if not applicable
+     */
+    public static boolean disableEnderDragonFight(World world) {
+        if (world == null) {
+            return false;
+        }
+        return ServerLevelHandle.fromBukkit(world).disableEnderDragonFight();
+    }
+
+    /**
      * Gets whether a Bukkit World instance has been unloaded from the server.
      * Use this to check whether loading new chunks for a World is acceptable, and
      * to purge world-tied volatile data.<br>

@@ -125,6 +125,115 @@ class ServerLevel extends Level {
 #endif
     }
 
+    public boolean disableEnderDragonFight() {
+#if version >= 1.9
+        org.bukkit.World bukkitWorld = instance.getWorld();
+        if (bukkitWorld == null || bukkitWorld.getEnvironment() != org.bukkit.World.Environment.THE_END) {
+            return false;
+        }
+
+        // Step 1: Get the dragon fight instance in NMS
+  #if version >= 1.20
+        net.minecraft.world.level.dimension.end.EnderDragonFight fight = instance.getDragonFight();
+  #elseif version >= 1.18
+        net.minecraft.world.level.dimension.end.EnderDragonFight fight = instance.dragonFight();
+  #elseif version >= 1.16
+        net.minecraft.world.level.dimension.end.EnderDragonFight fight = instance.getDragonBattle();
+  #elseif version >= 1.13
+        if (!(instance.worldProvider instanceof WorldProviderTheEnd)) {
+            return false;
+        }
+        WorldProviderTheEnd worldProvider = (WorldProviderTheEnd) instance.worldProvider;
+    #if version >= 1.15
+        #require net.minecraft.server.level.WorldProviderTheEnd public net.minecraft.world.level.dimension.end.EnderDragonFight getDragonBattle:o();
+    #elseif version >= 1.14
+        #require net.minecraft.server.level.WorldProviderTheEnd public net.minecraft.world.level.dimension.end.EnderDragonFight getDragonBattle:q();
+    #else
+        #require net.minecraft.server.level.WorldProviderTheEnd public net.minecraft.world.level.dimension.end.EnderDragonFight getDragonBattle:r();
+    #endif
+        net.minecraft.world.level.dimension.end.EnderDragonFight fight = worldProvider#getDragonBattle();
+  #else
+        if (!(instance.worldProvider instanceof WorldProviderTheEnd)) {
+            return false;
+        }
+        WorldProviderTheEnd worldProvider = (WorldProviderTheEnd) instance.worldProvider;
+    #if version >= 1.11
+        #require net.minecraft.server.level.WorldProviderTheEnd public net.minecraft.world.level.dimension.end.EnderDragonFight getDragonBattle:t();
+    #else
+        #require net.minecraft.server.level.WorldProviderTheEnd public net.minecraft.world.level.dimension.end.EnderDragonFight getDragonBattle:s();
+    #endif
+        net.minecraft.world.level.dimension.end.EnderDragonFight fight = worldProvider#getDragonBattle();
+  #endif
+
+        // Step 2: Must have a dragon fight instance
+        if (fight == null) {
+            return false;
+        }
+
+        // Step 3: Force "already completed" state flags
+  #if version >= 1.16
+        #require net.minecraft.world.level.dimension.end.EnderDragonFight private boolean fight_dragonKilled:dragonKilled;
+  #else
+        #require net.minecraft.world.level.dimension.end.EnderDragonFight private boolean fight_dragonKilled:k;
+  #endif
+  #if version >= 26.1
+        #require net.minecraft.world.level.dimension.end.EnderDragonFight public boolean fight_previouslyKilled:hasPreviouslyKilledDragon;
+  #elseif version >= 1.20.5
+        #require net.minecraft.world.level.dimension.end.EnderDragonFight public boolean fight_previouslyKilled:previouslyKilled;
+  #elseif version >= 1.16
+        #require net.minecraft.world.level.dimension.end.EnderDragonFight private boolean fight_previouslyKilled:previouslyKilled;
+  #else
+        #require net.minecraft.world.level.dimension.end.EnderDragonFight private boolean fight_previouslyKilled:l;
+  #endif
+  #if version >= 1.17
+        #require net.minecraft.world.level.dimension.end.EnderDragonFight private boolean fight_needsStateScanning:needsStateScanning;
+  #else
+        #require net.minecraft.world.level.dimension.end.EnderDragonFight private boolean fight_needsStateScanning:n;
+  #endif
+        fight#fight_dragonKilled = true;
+        fight#fight_previouslyKilled = true;
+        fight#fight_needsStateScanning = false;
+
+        // Step 4: Clear respawn state
+  #if version >= 1.17
+        fight.respawnStage = null;
+  #elseif version >= 1.16
+        fight.respawnPhase = null;
+  #else
+        #require net.minecraft.world.level.dimension.end.EnderDragonFight private net.minecraft.world.level.dimension.end.EnumDragonRespawn fight_respawnPhase:p;
+        fight#fight_respawnPhase = null;
+  #endif
+
+        // Step 5: Hide dragon boss bar
+  #if version >= 1.17
+        if (fight.dragonEvent != null) {
+            fight.dragonEvent.setVisible(false);
+        }
+  #elseif version >= 1.13.2
+        if (fight.bossBattle != null) {
+            fight.bossBattle.setVisible(false);
+        }
+  #else
+        #require net.minecraft.world.level.dimension.end.EnderDragonFight private net.minecraft.server.level.BossBattleServer fight_bossBattle:c;
+        if (fight#fight_bossBattle != null) {
+            net.minecraft.server.level.BossBattleServer bossBattleServer = fight#fight_bossBattle;
+            bossBattleServer.setVisible(false);
+        }
+  #endif
+
+        // Step 6: Persist changes where this API exists
+  #if version >= 26.3
+        fight.setDirty();
+  #endif
+
+        return true;
+#else
+        // Boss bar is not supported before 1.9, so we cannot hide it
+        // On this version the boss fight is entirely driven by the Ender Dragon entity
+        return false;
+#endif
+    }
+
 #if version >= 1.18
     public (List<ServerPlayerHandle>) List<ServerPlayer> getPlayers:players();
 #elseif version >= 1.14

@@ -65,6 +65,7 @@ public class Common {
             "Common:PacketListener:SetPacket",
             "Common:Packet:MinecartMovementPacket",
             "Common:WorldUtil:HasFeatureFlag",
+            "Common:WorldUtil:disableEnderDragonFight",
             "Common:ResourcePack:ItemModel",
             "Common:NBTUtil:LoadSaveEquipment",
             "Common:NBT:ChatTextSerialization",

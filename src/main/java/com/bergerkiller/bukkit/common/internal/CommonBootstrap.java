@@ -611,6 +611,8 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.inventory.ContainerInput", "net.minecraft.world.inventory.ClickType");
             // Attack is handled by the interact packet
             remappings.put("net.minecraft.network.protocol.game.ServerboundAttackPacket", "net.minecraft.network.protocol.game.ServerboundInteractPacket");
+            // Mojang renamed this from End to Ender
+            remappings.put("net.minecraft.world.level.dimension.end.EnderDragonFight", "net.minecraft.world.level.dimension.end.EndDragonFight");
         }
 
         /* ======== Mojang remapping changes for 1.21.11 ======== */

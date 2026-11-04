@@ -40,6 +40,7 @@ public abstract class ServerLevelHandle extends LevelHandle {
     public abstract ChunkMapHandle getPlayerChunkMap();
     public abstract ServerChunkCacheHandle getChunkProviderServer();
     public abstract boolean isLoaded();
+    public abstract boolean disableEnderDragonFight();
     public abstract List<ServerPlayerHandle> getPlayers();
     public abstract Entity getEntityByUUID(UUID entityUUID);
     public abstract EntityTracker getEntityTracker();
@@ -85,6 +86,7 @@ public abstract class ServerLevelHandle extends LevelHandle {
         public final Template.Method.Converted<ChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<ChunkMapHandle>();
         public final Template.Method.Converted<ServerChunkCacheHandle> getChunkProviderServer = new Template.Method.Converted<ServerChunkCacheHandle>();
         public final Template.Method<Boolean> isLoaded = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> disableEnderDragonFight = new Template.Method<Boolean>();
         public final Template.Method.Converted<List<ServerPlayerHandle>> getPlayers = new Template.Method.Converted<List<ServerPlayerHandle>>();
         public final Template.Method.Converted<Entity> getEntityByUUID = new Template.Method.Converted<Entity>();
         public final Template.Method<EntityTracker> getEntityTracker = new Template.Method<EntityTracker>();
