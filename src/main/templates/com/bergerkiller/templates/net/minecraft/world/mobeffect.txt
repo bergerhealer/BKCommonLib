@@ -141,7 +141,7 @@ class MobEffect {
     }
 #endif
 
-#if exists MobEffect public static int getId(MobEffect mobeffectlist);
+#if exists net.minecraft.world.effect.MobEffect public static int getId(MobEffect mobeffectlist);
     public static int getId((MobEffectHandle) MobEffect mobeffectlist);
 #elseif version >= 1.18
     public static int getId((MobEffectHandle) MobEffect mobeffectlist) {
@@ -155,7 +155,7 @@ class MobEffect {
     public static int getId((MobEffectHandle) MobEffect mobeffectlist);
 #endif
 
-#if exists MobEffect public static MobEffect byId(int id);
+#if exists net.minecraft.world.effect.MobEffect public static MobEffect byId(int id);
     public static (MobEffectHandle) MobEffect fromId:byId(int id);
 #elseif version >= 1.18
     public static (MobEffectHandle) MobEffect fromId(int id) {
