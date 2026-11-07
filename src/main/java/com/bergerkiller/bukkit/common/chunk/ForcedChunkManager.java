@@ -25,7 +25,8 @@ public abstract class ForcedChunkManager {
 
     /**
      * Retrieve the entry for a chunk and adds one reference to it.
-     * Assumes a radius of 2 chunks, which ticks entities.
+     * Assumes a radius of 2, which makes the center chunk entity-ticking.
+     * Minecraft propagates less active load states to surrounding chunks.
      * 
      * @param world World of the chunk to add
      * @param chunkX X-coordinate of the chunk to add
@@ -42,8 +43,9 @@ public abstract class ForcedChunkManager {
      * @param world World of the chunk to add
      * @param chunkX X-coordinate of the chunk to add
      * @param chunkZ Z-coordinate of the chunk to add
-     * @param radius Chunk radius around the chunk to load, 0 to only load the chunk.
-     *               A chunk radius of 2 or more is needed to tick entities.
+     * @param radius Minecraft chunk-ticket radius/load-level offset. This is not a hard radius
+     *               of equally active chunks: Minecraft propagates weaker load states to
+     *               surrounding chunks. A radius of 2 or more makes the center entity-ticking.
      * @return forced chunk entry for the chunk
      */
     public abstract ForcedChunkEntry add(World world, int chunkX, int chunkZ, int radius);

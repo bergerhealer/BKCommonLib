@@ -45,7 +45,8 @@ public class ForcedChunk implements AutoCloseable, Cloneable {
      * Forces a chunk to stay loaded. Call {@link ForcedChunk#close()} to release
      * the chunk again to allow it to unload. The chunk is loaded asynchronously
      * if it is not already loaded.
-     * Loads with a radius of 2, so that entities inside are ticked.
+     * Loads with radius 2 by default, making the center chunk entity-ticking.
+     * Minecraft propagates less active load states to surrounding chunks.
      * 
      * @param world
      * @param chunkX
@@ -60,7 +61,8 @@ public class ForcedChunk implements AutoCloseable, Cloneable {
      * Forces a chunk to stay loaded. Call {@link ForcedChunk#close()} to release
      * the chunk again to allow it to unload. If the provided chunk is currently not
      * actually loaded, it is loaded asynchronously.
-     * Loads with a radius of 2, so that entities inside are ticked.
+     * Loads with radius 2 by default, making the center chunk entity-ticking.
+     * Minecraft propagates less active load states to surrounding chunks.
      * 
      * @param chunk
      * @return forced chunk
@@ -77,8 +79,9 @@ public class ForcedChunk implements AutoCloseable, Cloneable {
      * @param world
      * @param chunkX
      * @param chunkZ
-     * @param radius Number of chunks around the chunk to keep loaded.
-     *               Radius 2 or higher will make entities inside the chunk get ticked.
+     * @param radius Minecraft chunk-ticket radius/load-level offset. This is not a hard radius
+     *               of equally active chunks: Minecraft propagates weaker load states to
+     *               surrounding chunks. Radius 2 or higher makes the center chunk entity-ticking.
      * @return forced chunk
      */
     public static ForcedChunk load(World world, int chunkX, int chunkZ, int radius) {
@@ -91,8 +94,9 @@ public class ForcedChunk implements AutoCloseable, Cloneable {
      * actually loaded, it is loaded asynchronously.
      * 
      * @param chunk
-     * @param radius Number of chunks around the chunk to keep loaded.
-     *               Radius 2 or higher will make entities inside the chunk get ticked.
+     * @param radius Minecraft chunk-ticket radius/load-level offset. This is not a hard radius
+     *               of equally active chunks: Minecraft propagates weaker load states to
+     *               surrounding chunks. Radius 2 or higher makes the center chunk entity-ticking.
      * @return forced chunk
      */
     public static ForcedChunk load(org.bukkit.Chunk chunk, int radius) {
