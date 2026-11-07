@@ -1,6 +1,8 @@
 # Using Cloud Command Framework
 BKCommonLib shades in the [Cloud Command Framework](https://github.com/Incendo/cloud "Cloud Command Framework") library so that depending plugins can use it. If you are new to Cloud, look through their [documentation](https://cloud.incendo.org/ "documentation") first.
 
+For BKCommonLib-specific command setup and APIs such as `CloudSimpleHandler`, quoted parsers, suggestions, and localized errors, see the [Cloud integration guide](docs/cloud-command-framework.md).
+
 ### Technical
 Cloud is shaded at a different package path (to avoid conflicts), so using the integrated cloud requires remapping it using the maven shade or gradle shadow plugin. BKCommonLib has a BOM (Bill of materials) hosted on the same repository BKCommonLib is, that includes information about the cloud dependency and its version. The below maven and gradle configurations make use of this.
 
@@ -200,5 +202,3 @@ tasks {
         relocate("net.kyori", "${commonPrefix}.net.kyori")
     }
 }
-
-
