@@ -425,12 +425,16 @@ public abstract class MapCanvas {
     /**
      * Draws the contents of another canvas or texture onto this canvas.
      * No color blending is performed and any original pixels are replaced.
+     *
+     * @deprecated Use {@link #draw(MapCanvas, int, int)} with
+     *             {@link #setBlendMode(MapBlendMode)} set to {@link MapBlendMode#NONE}.
      * 
      * @param canvas with the pixel data to draw
      * @param x - position of the top-left corner of the sprite
      * @param y - position of the top-left corner of the sprite
      * @return this canvas
      */
+    @Deprecated
     public final MapCanvas drawCopy(MapCanvas canvas, int x, int y) {
         return writePixels(x, y, canvas.getWidth(), canvas.getHeight(), canvas.getBuffer());
     }
