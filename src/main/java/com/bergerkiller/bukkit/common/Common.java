@@ -78,6 +78,7 @@ public class Common {
             "Common:Cloud:QuotedArgumentParserFromParser",
             "Minecraft:GameProfile:Immutable",
             "Common:EntityUtil:detectEquipmentChanges",
+            "Common:EntityUtil:isPushableBy",
             "Common:Math:OrientedBoundingBox:HasOverlapTest",
             "Common:Math:VectorList",
             "Common:Packet:PlayerRotationPacket",

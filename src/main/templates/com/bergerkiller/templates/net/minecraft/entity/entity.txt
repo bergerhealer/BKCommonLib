@@ -2183,6 +2183,26 @@ class Entity {
     public void collide((EntityHandle) Entity entity);
 #endif
 
+    public boolean isPushableBy((EntityHandle) Entity pusher) {
+#if version >= 1.18
+        #require net.minecraft.world.entity.EntitySelector public static java.util.function.Predicate pushableBy(Entity pusher);
+        java.util.function.Predicate selector = #pushableBy(pusher);
+        return selector.test(instance);
+#elseif version >= 1.13
+        #require net.minecraft.world.entity.EntitySelector public static java.util.function.Predicate pushableBy:a(Entity pusher);
+        java.util.function.Predicate selector = #pushableBy(pusher);
+        return selector.test(instance);
+#elseif version >= 1.9
+        #require net.minecraft.world.entity.EntitySelector public static com.google.common.base.Predicate pushableBy:a(Entity pusher);
+        com.google.common.base.Predicate selector = #pushableBy(pusher);
+        return selector.apply(instance);
+#else
+        #require net.minecraft.world.entity.EntitySelector public static final com.google.common.base.Predicate noSpectators:d;
+        #require Entity public boolean isPushable:ae();
+        return #noSpectators.apply(instance) && instance#isPushable();
+#endif
+    }
+
 #if version >= 1.20
     public org.bukkit.World getBukkitWorld() {
         return instance.level().getWorld();

@@ -23,6 +23,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class EntityUtil extends EntityPropertyUtil {
@@ -127,6 +128,24 @@ public class EntityUtil extends EntityPropertyUtil {
      */
     public static void doCollision(org.bukkit.entity.Entity entity, org.bukkit.entity.Entity with) {
         EntityHandle.fromBukkit(entity).collide(EntityHandle.fromBukkit(with));
+    }
+
+    /**
+     * Tests whether the server's push-entities selector accepts a candidate for
+     * the given pusher. Depending on the server version, this includes spectator,
+     * collision and scoreboard team rules. This does not test bounding boxes,
+     * vehicle relationships, no-physics state or collision limits, and does not
+     * move either entity.
+     *
+     * @param pusher non-null entity performing the push query
+     * @param candidate non-null entity to test
+     * @return whether the candidate is accepted by the push selector
+     * @throws NullPointerException if either entity is null
+     */
+    public static boolean isPushableBy(Entity pusher, Entity candidate) {
+        Objects.requireNonNull(pusher, "pusher");
+        Objects.requireNonNull(candidate, "candidate");
+        return EntityHandle.fromBukkit(candidate).isPushableBy(EntityHandle.fromBukkit(pusher));
     }
 
     /**

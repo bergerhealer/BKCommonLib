@@ -153,6 +153,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract boolean hasCustomName();
     public abstract ChatText getCustomName();
     public abstract void collide(EntityHandle entity);
+    public abstract boolean isPushableBy(EntityHandle pusher);
     public abstract World getBukkitWorld();
     public abstract LevelHandle getWorld();
     public abstract void setWorld(LevelHandle world);
@@ -434,6 +435,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Boolean> hasCustomName = new Template.Method<Boolean>();
         public final Template.Method.Converted<ChatText> getCustomName = new Template.Method.Converted<ChatText>();
         public final Template.Method.Converted<Void> collide = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Boolean> isPushableBy = new Template.Method.Converted<Boolean>();
         public final Template.Method<World> getBukkitWorld = new Template.Method<World>();
         public final Template.Method.Converted<LevelHandle> getWorld = new Template.Method.Converted<LevelHandle>();
         public final Template.Method.Converted<Void> setWorld = new Template.Method.Converted<Void>();
