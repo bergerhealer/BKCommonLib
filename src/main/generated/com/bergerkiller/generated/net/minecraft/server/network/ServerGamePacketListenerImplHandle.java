@@ -19,6 +19,7 @@ public abstract class ServerGamePacketListenerImplHandle extends Template.Handle
 
     /* ============================================================================== */
 
+    public abstract boolean resetFlyingKickCounter();
     public abstract Object getNetworkManager();
     public abstract void sendPacket(Object packet);
     public abstract void sendPos(double x, double y, double z);
@@ -120,6 +121,7 @@ public abstract class ServerGamePacketListenerImplHandle extends Template.Handle
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ServerGamePacketListenerImplClass extends Template.Class<ServerGamePacketListenerImplHandle> {
+        public final Template.Method<Boolean> resetFlyingKickCounter = new Template.Method<Boolean>();
         public final Template.Method<Object> getNetworkManager = new Template.Method<Object>();
         public final Template.Method.Converted<Void> sendPacket = new Template.Method.Converted<Void>();
         public final Template.Method<Void> sendPos = new Template.Method<Void>();

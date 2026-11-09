@@ -75,6 +75,30 @@ public class PlayerUtil extends EntityUtil {
     }
 
     /**
+     * Resets the vanilla player flying-kick counter without changing flight
+     * permissions, on-ground state, or the separate vehicle flying counter.
+     * Call this on the server thread once per tick while the player is actually
+     * supported by a client-side surface, starting before the kick limit is
+     * reached. Stop calling it when that support ends so the normal check can
+     * resume with a fresh flying window. This does not bypass third-party
+     * anti-cheat checks.
+     * <p>
+     * On Minecraft 1.8 the counter advances per movement packet, so a burst
+     * of more than 80 packets between resets can still cause a kick.
+     * The availability of this API in BKCommonLib can be checked using
+     * {@code Common.hasCapability("Common:PlayerUtil:resetFlyingKickCounter")}.
+     * This capability does not guarantee that the server exposes the counter.
+     *
+     * @param player player whose counter should be reset
+     * @return True if the counter was reset; false if the connection is
+     *         unavailable or the server does not expose the counter
+     */
+    public static boolean resetFlyingKickCounter(Player player) {
+        ServerGamePacketListenerImplHandle connection = ServerGamePacketListenerImplHandle.forPlayer(player);
+        return connection != null && connection.resetFlyingKickCounter();
+    }
+
+    /**
      * Adds the chunk coordinates of the chunk specified to the player chunk
      * sending queue
      *

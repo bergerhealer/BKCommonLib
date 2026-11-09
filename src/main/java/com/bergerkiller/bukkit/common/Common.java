@@ -79,6 +79,7 @@ public class Common {
             "Minecraft:GameProfile:Immutable",
             "Common:EntityUtil:detectEquipmentChanges",
             "Common:EntityUtil:isPushableBy",
+            "Common:PlayerUtil:resetFlyingKickCounter",
             "Common:Math:OrientedBoundingBox:HasOverlapTest",
             "Common:Math:VectorList",
             "Common:Packet:PlayerRotationPacket",

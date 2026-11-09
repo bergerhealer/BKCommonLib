@@ -10,6 +10,34 @@ import net.minecraft.world.phys.Vec3;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 
 class ServerGamePacketListenerImpl {
+    public boolean resetFlyingKickCounter() {
+#if version >= 1.17
+  #if exists net.minecraft.server.network.ServerGamePacketListenerImpl private int aboveGroundTickCount;
+        #require ServerGamePacketListenerImpl private int flyingKickCounter:aboveGroundTickCount;
+        instance#flyingKickCounter = 0;
+        return true;
+  #else
+        return false;
+  #endif
+#elseif version >= 1.9
+  #if exists net.minecraft.server.network.ServerGamePacketListenerImpl private int C;
+        #require ServerGamePacketListenerImpl private int flyingKickCounter:C;
+        instance#flyingKickCounter = 0;
+        return true;
+  #else
+        return false;
+  #endif
+#else
+  #if exists net.minecraft.server.network.ServerGamePacketListenerImpl private int g;
+        #require ServerGamePacketListenerImpl private int flyingKickCounter:g;
+        instance#flyingKickCounter = 0;
+        return true;
+  #else
+        return false;
+  #endif
+#endif
+    }
+
     public Object getNetworkManager() {
 #if version >= 1.20.2
         // Moved to ServerCommonPacketListenerImpl
