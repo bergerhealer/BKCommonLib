@@ -652,6 +652,22 @@ class BlockDataImpl extends BlockData {
     }
 
     @Override
+    public void fallOn(org.bukkit.World world, IntVector3 blockPosition, org.bukkit.entity.Entity entity, double distance) {
+        this.block.fallOn(world, blockPosition, this.data, entity, distance);
+    }
+
+    @Override
+    public void fallOnFakeBlock(org.bukkit.entity.Entity entity, double distance) {
+        org.bukkit.World world = entity.getWorld();
+        IntVector3 pos = IntVector3.blockOf(entity.getLocation());
+        if (!this.block.isFallOnFakeSupported()) {
+            BlockData.fromMaterial(Material.STONE).fallOn(world, pos, entity, distance);
+        } else {
+            this.fallOn(world, pos, entity, distance);
+        }
+    }
+
+    @Override
     public BlockData setProperty(String key, Object value) {
         BlockStateHandle updated_data = this.data.set(key, value);
         return BlockDataRegistry.fromBlockData(updated_data.getRaw());

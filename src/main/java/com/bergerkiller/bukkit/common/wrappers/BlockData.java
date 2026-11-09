@@ -690,4 +690,37 @@ public abstract class BlockData extends BlockDataRegistry {
      */
     public abstract void stepOn(World world, IntVector3 blockPosition, Entity entity);
 
+    /**
+     * Handles an Entity falling onto a Block. The block is located at the specified
+     * Block position in its world.
+     *
+     * @param block The block the entity fell onto
+     * @param entity The entity that fell onto the block
+     * @param distance The distance the entity fell
+     */
+    public final void fallOn(org.bukkit.block.Block block, Entity entity, double distance) {
+        fallOn(block.getWorld(), IntVector3.coordinatesOf(block), entity, distance);
+    }
+
+    /**
+     * Handles an Entity falling onto a Block at a position in a World
+     *
+     * @param world the block is in
+     * @param blockPosition of the block
+     * @param entity that fell onto the block
+     * @param distance the entity fell
+     */
+    public abstract void fallOn(World world, IntVector3 blockPosition, Entity entity, double distance);
+
+    /**
+     * Handles an Entity falling onto a Block that does not actually exist in the world.
+     * The entity's world and block position are used, in case the block uses the position
+     * to play effects or sounds. Blocks that fire events or require a real block to exist
+     * (Farmland, Turtle Egg) are replaced with Stone to avoid errors.
+     *
+     * @param entity that fell onto the block
+     * @param distance the entity fell
+     */
+    public abstract void fallOnFakeBlock(Entity entity, double distance);
+
 }

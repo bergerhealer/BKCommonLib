@@ -103,7 +103,8 @@ public class Common {
             "Packets:SwingIsNowPunchPacket",
             "WorldUtil:PlaySoundCategory",
             "BlockData:Friction",
-            "BlockData:JumpAndSpeedFactor"
+            "BlockData:JumpAndSpeedFactor",
+            "BlockData:FallOn"
     ).collect(Collectors.toSet());
 
     /**

@@ -481,6 +481,30 @@ class Block {
     }
 #endif
 
+    public void fallOn((org.bukkit.World) Level world, (IntVector3) BlockPos blockposition, (BlockStateHandle) BlockState iblockdata, (org.bukkit.entity.Entity) Entity entity, double distance) {
+#if version >= 1.21.5
+        instance.fallOn(world, iblockdata, blockposition, entity, distance);
+#elseif version >= 1.17
+        instance.fallOn(world, iblockdata, blockposition, entity, (float) distance);
+#elseif version >= 1.8.4
+        instance.fallOn(world, blockposition, entity, (float) distance);
+#else
+        instance.a(world, blockposition, entity, (float) distance);
+#endif
+    }
+
+    public boolean isFallOnFakeSupported() {
+#if version >= 26.1
+        return !(instance instanceof net.minecraft.world.level.block.FarmlandBlock) && !(instance instanceof net.minecraft.world.level.block.TurtleEggBlock);
+#elseif version >= 1.17
+        return !(instance instanceof net.minecraft.world.level.block.FarmBlock) && !(instance instanceof net.minecraft.world.level.block.TurtleEggBlock);
+#elseif version >= 1.13
+        return !(instance instanceof BlockSoil) && !(instance instanceof BlockTurtleEgg);
+#else
+        return !(instance instanceof BlockSoil);
+#endif
+    }
+
     public (BlockStateHandle) BlockState updateState((BlockStateHandle) BlockState iblockdata, (org.bukkit.World) Level world, (IntVector3) BlockPos blockposition) {
 #if version >= 1.18
         return Block.updateFromNeighbourShapes(iblockdata, (net.minecraft.world.level.LevelAccessor) world, blockposition);

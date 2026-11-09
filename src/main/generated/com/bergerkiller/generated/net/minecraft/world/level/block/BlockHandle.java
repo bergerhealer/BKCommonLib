@@ -49,6 +49,8 @@ public abstract class BlockHandle extends Template.Handle {
     public abstract float getDamageResillience();
     public abstract void dropNaturally(BlockStateHandle iblockdata, World world, IntVector3 blockposition, float yield, int chance);
     public abstract void stepOn(World world, IntVector3 blockposition, BlockStateHandle iblockdata, Entity entity);
+    public abstract void fallOn(World world, IntVector3 blockposition, BlockStateHandle iblockdata, Entity entity, double distance);
+    public abstract boolean isFallOnFakeSupported();
     public abstract BlockStateHandle updateState(BlockStateHandle iblockdata, World world, IntVector3 blockposition);
     public abstract BlockStateHandle getBlockData();
     /**
@@ -73,6 +75,8 @@ public abstract class BlockHandle extends Template.Handle {
         public final Template.Method<Float> getDamageResillience = new Template.Method<Float>();
         public final Template.Method.Converted<Void> dropNaturally = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> stepOn = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> fallOn = new Template.Method.Converted<Void>();
+        public final Template.Method<Boolean> isFallOnFakeSupported = new Template.Method<Boolean>();
         public final Template.Method.Converted<BlockStateHandle> updateState = new Template.Method.Converted<BlockStateHandle>();
         public final Template.Method.Converted<BlockStateHandle> getBlockData = new Template.Method.Converted<BlockStateHandle>();
 
