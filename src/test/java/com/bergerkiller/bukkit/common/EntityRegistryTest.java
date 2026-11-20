@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import com.bergerkiller.bukkit.common.utils.EntityGroupingUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
+import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import org.bukkit.entity.EntityType;
 import org.junit.Test;
 
@@ -26,6 +27,17 @@ public class EntityRegistryTest {
     @Test
     public void testEnderDragonIsMonster() {
         assertTrue(EntityUtil.isEntityType(EntityType.ENDER_DRAGON, EntityGroupingUtil.EntityCategory.MONSTER));
+    }
+
+    @Test
+    public void testMagmaCubeIsMonster() {
+        EntityType magma_cube = ParseUtil.parseEnum(EntityType.class, "MAGMA_CUBE", null);
+        if (magma_cube == null) {
+            // Not available in this MC version
+            return;
+        }
+
+        assertTrue(EntityUtil.isEntityType(magma_cube, EntityGroupingUtil.EntityCategory.MONSTER));
     }
 
     @Test
