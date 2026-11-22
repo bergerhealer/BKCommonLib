@@ -61,6 +61,13 @@ class Heightmap {
         BitStorage databits = instance#databits;
   #endif
 
+  // Paper 26.3+ added heightmapRaw - a char[] cache that getFirstAvailable() reads directly
+  // instead of going through BitStorage. We must keep it in sync with databits.
+  #if version >= 26.3
+        #require net.minecraft.world.level.levelgen.Heightmap private final char[] heightmapRaw;
+        char[] rawHeightmap = instance#heightmapRaw;
+  #endif
+
         ChunkAccess ichunkaccess = instance#chunk;
         int databits_index = 0;
   #if version >= 26.1
@@ -138,6 +145,11 @@ class Heightmap {
   #if exists net.minecraft.world.level.levelgen.Heightmap private final char[] heightmap;
                 // Tuinity
                 databits[databits_index++] = (char) (y+1);
+  #elseif version >= 26.3
+                // Paper 26.3+: update both BitStorage and heightmapRaw cache
+                databits.set(databits_index, y+1);
+                rawHeightmap[databits_index] = (char)(y+1);
+                databits_index++;
   #elseif version >= 1.18
                 // Standard spigot (with mojangmap method names)
                 databits.set(databits_index++, y+1);
